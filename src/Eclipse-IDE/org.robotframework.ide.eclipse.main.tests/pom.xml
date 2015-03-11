@@ -18,13 +18,11 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-                    <testSourceDirectory>${basedir}/src/</testSourceDirectory>
-                    <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>				
 					<useUIHarness>true</useUIHarness>
 					<dependencies>
 						<dependency>
 							<type>eclipse-feature</type>
-							<artifactId>org.robotframework.ide.eclipse.base</artifactId>
+							<artifactId>org.robotframework.ide.eclipse.base.feature</artifactId>
 							<!-- This is the minimum required version -->
 							<version>1.0.0</version>
 						</dependency>
