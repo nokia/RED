@@ -6,5 +6,6 @@ Bundle-SymbolicName: org.robotframework.ide.eclipse.main.tests
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.junit;bundle-version="4.11.0"
+ org.junit;bundle-version="4.11.0",
+ org.robotframework.ide.eclipse.main
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
