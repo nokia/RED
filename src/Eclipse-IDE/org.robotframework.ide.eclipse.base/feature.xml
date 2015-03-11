@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.robotframework.ide.eclipse.base.feature"
-       label="%featureName"
+      label="%featureName"
       version="1.0.0.qualifier"
       provider-name="%providerName">
 
@@ -20,5 +20,11 @@
    <includes
          id="org.eclipse.rcp"
          version="4.4.2.v20150204-1700"/>
+
+   <plugin
+         id="org.robotframework.ide.eclipse.main"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

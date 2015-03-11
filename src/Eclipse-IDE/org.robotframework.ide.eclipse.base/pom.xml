@@ -10,5 +10,5 @@
   <artifactId>org.robotframework.ide.eclipse.base.feature</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
-  
+
 </project>
