@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            name="org.robotframework.ide.eclipse"
+            application="org.eclipse.e4.ui.workbench.swt.E4Application">
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/org.robotframework.ide.eclipse/css/default.css">
+         </property>
+         
+	     <property
+	           name="applicationXMI"
+	           value="platform:/plugin/org.robotframework.ide.eclipse/Application.e4xmi">
+	     </property>         
+      </product>
+   </extension>
+
+</plugin>

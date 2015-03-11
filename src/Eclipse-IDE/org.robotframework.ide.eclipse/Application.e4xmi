@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmi:id="_ivmm4MfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ide.application" bindingContexts="_ivnN-MfmEeSvo8ZkGBCuTg">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_ivnN8MfmEeSvo8ZkGBCuTg" label="org.robotframework.ide.eclipse" width="500" height="400"/>
+  <rootContext xmi:id="_ivnN-MfmEeSvo8ZkGBCuTg" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
+    <children xmi:id="_ivnN-cfmEeSvo8ZkGBCuTg" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
+    <children xmi:id="_ivnN-sfmEeSvo8ZkGBCuTg" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
+  </rootContext>
+  <addons xmi:id="_ivnN8cfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
+  <addons xmi:id="_ivnN8sfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
+  <addons xmi:id="_ivnN88fmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
+  <addons xmi:id="_ivnN9MfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.workbench.commands.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon"/>
+  <addons xmi:id="_ivnN9cfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
+  <addons xmi:id="_ivnN9sfmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
+  <addons xmi:id="_ivnN98fmEeSvo8ZkGBCuTg" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
+</application:Application>
