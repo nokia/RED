@@ -16,6 +16,7 @@
 		<module>../org.robotframework.ide.eclipse.target-platform</module>
 		<module>../org.robotframework.ide.eclipse.main</module>
 		<module>../org.robotframework.ide.eclipse.base</module>
+		<module>../org.robotframework.ide.eclipse.main.tests</module>
 	</modules>
 	<build>
 		<plugins>
