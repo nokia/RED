@@ -12,8 +12,8 @@
   <packaging>pom</packaging>
   
   <modules>
-  	<module>${project.basedir}/../org.robotframework.ide.core-functions</module>
-  	<module>${project.basedir}/../org.robotframework.ide.eclipse.main.plugin</module>
-  	<module>${project.basedir}/../org.robotframework.ide.eclipse.main.feature</module>
+  	<module>../org.robotframework.ide.core-functions</module>
+  	<module>../org.robotframework.ide.eclipse.main.plugin</module>
+  	<module>../org.robotframework.ide.eclipse.main.feature</module>
   </modules>
 </project>
