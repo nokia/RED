@@ -13,7 +13,7 @@
 	</properties>
 
 	<modules>
-		<module>../org.robotframework.ide.eclipse.target-platform</module>
+		<module>${project.basedir}/../org.robotframework.ide.eclipse.target-platform</module>
 	</modules>
 	<build>
 		<plugins>
