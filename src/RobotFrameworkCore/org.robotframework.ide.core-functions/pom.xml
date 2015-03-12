@@ -1,0 +1,8 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.robotframework.ide</groupId>
+  <artifactId>org.robotframework.ide.core-functions</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Robotframework IDE Core Functions</name>
+  <description>It is base functions for Robot Framework IDE - it is not depend from view part - can be adopt to any kind of editor, which will handle in MVC - view responsibility.</description>
+</project>
