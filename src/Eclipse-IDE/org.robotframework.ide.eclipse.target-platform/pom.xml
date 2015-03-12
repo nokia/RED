@@ -5,7 +5,7 @@
     <groupId>org.robotframework.ide.eclipse</groupId>
     <artifactId>org.robotframework.ide.eclipse.parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../org.robotframework.ide.eclipse.parent/pom.xml</relativePath>
+    <relativePath>${project.basedir}/../org.robotframework.ide.eclipse.parent/pom.xml</relativePath>
   </parent>
   
   <artifactId>org.robotframework.ide.eclipse.target-platform</artifactId>
