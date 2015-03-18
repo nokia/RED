@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.model.utils.MovableLinkedListWrapper;
-import org.robotframework.ide.core.testData.model.utils.TestMovableListWrapper;
 
 /**
  * @author wypych
