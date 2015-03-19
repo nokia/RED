@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+            point="org.eclipse.ui.perspectives">
+        <perspective
+                class="org.robotframework.ide.eclipse.main.plugin.perspectives.RobotPerspective"
+                fixed="true"
+                icon="resources/robo1.png"
+                id="org.eclipse.ui.perspectives.RobotPerspective"
+                name="Robot Perspective">
+        </perspective>
+    </extension>
+
+	<extension
+            point="org.eclipse.ui.editors">
+        <editor
+                name="Robot Text Editor"
+                extensions="txt,robot"
+                default="true"
+                icon="resources/robo1.png"
+                class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
+                id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
+        </editor>
+    </extension>
+
+</plugin>
