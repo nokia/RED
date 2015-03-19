@@ -93,8 +93,9 @@ public class ParseResultBuilder<InputType, OutputType> {
 
 
     /**
+     * call it when You will set all information regarding parsing result
      * 
-     * @return
+     * @return {@link ParseResult} object expected by other part of application
      */
     public ParseResult<InputType, OutputType> build() {
 
