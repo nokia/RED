@@ -5,19 +5,20 @@ import java.util.List;
 
 
 /**
- * Holder of parsing process final result
+ * Holder of parsing process final result.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
  * @serial 1.0
  * 
+ * @see ParseResultBuilder
  * @param <InputType>
  *            {{@link #dataLeft} will be also this type
  * @param <OutputType>
  */
 public class ParseResult<InputType, OutputType> {
 
-    private final ParseStatus status = ParseStatus.NOT_STARTED;
+    private final ParseStatus status;
 
     private OutputType createdElement = null;
     @SuppressWarnings("unused")
@@ -34,8 +35,9 @@ public class ParseResult<InputType, OutputType> {
      * 
      * @serial 1.0
      */
-    public ParseResult(InputType originalTestData) {
+    public ParseResult(InputType originalTestData, ParseStatus status) {
         this.originalTestData = originalTestData;
+        this.status = status;
     }
 
 
