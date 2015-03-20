@@ -83,7 +83,7 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.1</version>
 					<configuration>
-						<arguments>-Pjdk16</arguments>
+						<arguments>-Pjdk17</arguments>
 					</configuration>
 				</plugin>
 			</plugins>
