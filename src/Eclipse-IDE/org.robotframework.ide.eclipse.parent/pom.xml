@@ -21,7 +21,7 @@
 	</properties>
 
 	<modules>
-		<module>${project.basedir}/../org.robotframework.ide.eclipse.target-platform</module>
+		<module>../org.robotframework.ide.eclipse.target-platform</module>
 	</modules>
 	<build>
 		<plugins>
