@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Target Definition for Eclipse Luna (4.4)" sequenceNumber="153">
+<?pde version="3.8"?><target name="Target Definition for Eclipse Luna (4.4)" sequenceNumber="154">
 <locations>
-<location includeAllPlatforms="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.equinox.sdk.feature.group" version="3.10.2.v20150204-1316"/>
 <unit id="org.eclipse.rcp.sdk.id" version="4.4.2.M20150204-1700"/>
 <unit id="org.eclipse.equinox.p2.user.ui.source.feature.group" version="2.2.0.v20150129-0838"/>
 <unit id="org.eclipse.sdk.ide" version="4.4.2.M20150204-1700"/>
 <unit id="org.eclipse.rcp.feature.group" version="4.4.2.v20150204-1700"/>
-<unit id="org.eclipse.zest.sdk.feature.group" version="1.5.101.201408150207"/>
 <unit id="org.eclipse.rcp.source.feature.group" version="4.4.2.v20150204-1700"/>
-<unit id="org.eclipse.gef.sdk.feature.group" version="3.9.101.201408150207"/>
 <repository location="http://download.eclipse.org/releases/luna/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.e4.core.tools.feature.feature.group" version="0.14.0.v20150108-1540"/>
+<unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="0.14.0.v20150108-1540"/>
+<repository location="http://download.vogella.com/luna/e4tools"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
