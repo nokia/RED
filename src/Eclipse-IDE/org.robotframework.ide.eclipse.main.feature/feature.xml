@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <includes
-         id="org.eclipse.e4.core.tools.feature"
-         version="0.0.0"/>
-
    <plugin
          id="org.robotframework.ide.eclipse.main.plugin"
          download-size="0"
