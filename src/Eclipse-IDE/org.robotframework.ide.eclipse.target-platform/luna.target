@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Target Definition for Eclipse Luna (4.4)" sequenceNumber="160">
+<?pde version="3.8"?><target name="Target Definition for Eclipse Luna (4.4)" sequenceNumber="162">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.equinox.sdk.feature.group" version="3.10.2.v20150204-1316"/>
@@ -12,24 +12,20 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.sdk.ide" version="4.4.2.M20150204-1700"/>
-<unit id="org.eclipse.test.feature.group" version="3.6.101.v20150202-1306"/>
+<unit id="org.eclipse.releng.tools.feature.group" version="3.5.1.v20140604-1105"/>
 <unit id="org.eclipse.platform.sdk" version="4.4.2.M20150204-1700"/>
 <unit id="org.eclipse.rcp.source.feature.group" version="4.4.2.v20150204-1700"/>
-<unit id="org.eclipse.pde.api.tools.ee.feature.feature.group" version="1.0.1.v20140424-1723"/>
-<unit id="org.eclipse.equinox.sdk.feature.group" version="3.10.2.v20150204-1316"/>
-<unit id="org.eclipse.rcp.feature.group" version="4.4.2.v20150204-1700"/>
-<unit id="org.eclipse.sdk.tests.feature.group" version="4.4.1.v20150204-2305"/>
-<unit id="org.eclipse.osgi.compatibility.plugins.feature.feature.group" version="1.0.0.v20140416-1648"/>
 <unit id="org.eclipse.pde.feature.group" version="3.10.1.v20150204-1700"/>
 <unit id="org.eclipse.platform.ide" version="4.4.2.M20150204-1700"/>
-<unit id="org.eclipse.sdk.examples.source.feature.group" version="3.5.401.v20150204-1700"/>
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.10.2.v20150204-1316"/>
+<unit id="org.eclipse.rcp.feature.group" version="4.4.2.v20150204-1700"/>
 <unit id="org.eclipse.pde.source.feature.group" version="3.10.1.v20150204-1700"/>
 <repository location="http://download.eclipse.org/eclipse/updates/4.4"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
-<unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="0.14.0.v20140116-1126"/>
-<unit id="org.eclipse.e4.core.tools.feature.feature.group" version="0.14.0.v20140116-1126"/>
-<repository location="http://download.vogella.com/kepler/e4tools"/>
+<unit id="org.eclipse.e4.core.tools.feature.feature.group" version="0.14.0.v20141225-1728"/>
+<unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="0.14.0.v20141225-1728"/>
+<repository location="http://download.eclipse.org/e4/downloads/drops/S-0.17-201501051100/repository/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
