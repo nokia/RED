@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
   
   <properties>
-	<core.functions.dir>../</core.functions.dir>
+	<core.functions.dir>../../RobotFrameworkCore</core.functions.dir>
   </properties>
   
   <modules>
