@@ -22,6 +22,8 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	
 	private String lastError = null;
 	
+	private boolean showSections;
+	
 	private TextEditorContextValidator validator = new TextEditorContextValidator(this);
 	
 	Map<String, String> sections = new LinkedHashMap<>();
@@ -38,6 +40,8 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 		availableKeywords.put("Log Many", "Logs the given messages as separate entries with the INFO level.");
 		availableKeywords.put("Log Variables", "Logs all variables in the current scope with given log level.");
 		availableKeywords.put("Replace Variables", "Replaces variables in the given text with their current values.");
+		availableKeywords.put("Set Variable", "Returns the given values which can then be assigned to a variables.");
+		 
 	}
 	
 	Map<String, String> args = new LinkedHashMap<>();
@@ -46,6 +50,7 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	    args.put("Log Many", "Arguments:[ *messages ]");
 	    args.put("Log Variables", "Arguments:[ level=INFO ]");
 	    args.put("Replace Variables", "Arguments:[ text ]");
+	    args.put("Set Variable", "Arguments:[ *values ]");
 	}
 
 	@Override
@@ -59,7 +64,14 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	        char currChar, prevChar;
 	        
 	        if(currOffset < 0 || document.getChar(currOffset) == '\n') {
+	            showSections = true;
 	        	return buildProposals(sections, "", currOffset+1);
+	        } else {
+	            showSections = false;
+	        }
+	        
+	        if(currOffset == 0) {
+	            return new ICompletionProposal[0];
 	        }
 	        
 	        while (currOffset > 0) {
@@ -109,9 +121,14 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	    int index = 0;
 	    for (Iterator<String> i =  suggestions.keySet().iterator(); i.hasNext();) {
             String keywordSuggestion = (String) i.next();
+            
+            ContextInformation contextInfo = null;
+            if(!showSections) {
+                contextInfo = new ContextInformation(keywordSuggestion, args.get(keywordSuggestion));
+            }
+            
             proposals[index] = new CompletionProposal(keywordSuggestion, offset, replacedWord.length(),
-                    keywordSuggestion.length(), null, keywordSuggestion, new ContextInformation(keywordSuggestion,
-                            args.get(keywordSuggestion)), suggestions.get(keywordSuggestion).toString());
+                    keywordSuggestion.length(), null, keywordSuggestion, contextInfo, suggestions.get(keywordSuggestion).toString());
             index++;
 			
 	    }
@@ -122,11 +139,12 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
 		
-		IContextInformation[] info = new IContextInformation[4];
+		IContextInformation[] info = new IContextInformation[5];
 		info[0] = new ContextInformation("Log", "Arguments:[ message | level=INFO ]");
 		info[1] = new ContextInformation("Log Many", "Arguments:[ *messages ]");
 		info[2] = new ContextInformation("Log Variables", "Arguments:[ level=INFO ]");
 		info[3] = new ContextInformation("Replace Variables", "Arguments:[ text ]");
+		info[4] = new ContextInformation("Set Variable", "Arguments:[ *values ]");
 		
 		return info;
 	}
