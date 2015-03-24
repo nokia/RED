@@ -279,16 +279,16 @@ public class TextEditor {
 			IMarker marker = editedFile.createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker.setAttribute(IMarker.MESSAGE, "test 1");
-			marker.setAttribute(IMarker.LINE_NUMBER, 2);
-			marker.setAttribute(IMarker.CHAR_START, 1);
-			marker.setAttribute(IMarker.CHAR_END, 12);
+			marker.setAttribute(IMarker.LINE_NUMBER, 1);
+			marker.setAttribute(IMarker.CHAR_START, 0);
+			marker.setAttribute(IMarker.CHAR_END, 18);
 			
 			IMarker marker1 = editedFile.createMarker(IMarker.PROBLEM);
 			marker1.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker1.setAttribute(IMarker.MESSAGE, "test 2");
-			marker1.setAttribute(IMarker.LINE_NUMBER, 4);
-			marker1.setAttribute(IMarker.CHAR_START, 15);
-			marker1.setAttribute(IMarker.CHAR_END, 18);
+			marker1.setAttribute(IMarker.LINE_NUMBER, 2);
+			marker1.setAttribute(IMarker.CHAR_START, 20);
+			marker1.setAttribute(IMarker.CHAR_END, 25);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

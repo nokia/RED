@@ -15,16 +15,21 @@ import org.eclipse.jface.text.rules.Token;
 public class KeywordRule implements IRule {
 	
 	List<String> keywords = new ArrayList<>();
-	List<String> temp = new ArrayList<>();
+	List<String> tempKeywords = new ArrayList<>();
 	
 	{
 		keywords.add("Log");
 		keywords.add("Log Many");
 		keywords.add("Log Variables");
 		keywords.add("Replace Variables");
+		keywords.add("Set Variable");
 	}
 	
 	private IToken token;
+	
+	private char prevCharBeforeKeyword = ' ';
+	
+	private int currentReadCount = 0;
 	
 	public KeywordRule(IToken token) {
 		this.token = token;
@@ -34,50 +39,81 @@ public class KeywordRule implements IRule {
 	public IToken evaluate(ICharacterScanner scanner) {
 		//char[][] d = scanner.getLegalLineDelimiters();
 		
-		temp = keywords;
+		tempKeywords = keywords;
 		
 		int c= scanner.read();
 		
-		if(isInKeyword((char) c, 1, temp)) {
+		if(isInKeyword((char) c, 1, tempKeywords)) {
 			if(keywordDetected(scanner)) {
-				int next = scanner.read();
-				char nextChar = (char) next;
+				int nextCharAfterKeyword = scanner.read();
 				scanner.unread();
-				if(nextChar == ' ' || nextChar == '\t' || nextChar == '\n' || next == ICharacterScanner.EOF) {
+				if((isSeparator((char) nextCharAfterKeyword) || nextCharAfterKeyword == ICharacterScanner.EOF) && isSeparator(prevCharBeforeKeyword)) {
 					return token;
+				} else {
+				    clearScanner(scanner, currentReadCount);
 				}
 			}
 		}
 		
+		prevCharBeforeKeyword = (char) c;
 		scanner.unread();
 		return Token.UNDEFINED;
 	}
 	
 	private boolean keywordDetected(ICharacterScanner scanner) {
+	   
 		int readCount= 1;
 		int c;
 		while ((c= scanner.read()) != ICharacterScanner.EOF) {
 			char elem = (char) c;
 			
-			if(isInKeyword(elem, readCount+1, temp)) {
-				if(temp.size()==1 && (readCount+1) == temp.get(0).length()) {
+			if(elem == ' ') {
+			    char nextElem = (char) scanner.read();
+			    scanner.unread();
+			    if(nextElem == ' ' && findKeywordByLength(tempKeywords, readCount)) {
+			        scanner.unread();
+	                return true;
+			    }
+			}
+			
+			if(elem == '\t' || elem == '\n' || elem == '\r' && findKeywordByLength(tempKeywords, readCount)) {
+			    scanner.unread();
+			    return true;
+			}
+			
+			if(isInKeyword(elem, readCount+1, tempKeywords)) {
+				if(tempKeywords.size()==1 && (readCount+1) == tempKeywords.get(0).length()) {
 					return true;
 				}
 			} else {
-				
-				for (; readCount > 0; readCount--)
-					scanner.unread();
-				
+			    this.clearScanner(scanner, readCount);
 				return false;
 			}
 			
 			readCount++;
 		}
 		
-		for (; readCount > 0; readCount--)
-			scanner.unread();
+		currentReadCount = readCount;
+		if(findKeywordByLength(tempKeywords, readCount)) {
+		    return true;
+		} 
 		
+		this.clearScanner(scanner, readCount);
 		return false;
+	}
+	
+	private void clearScanner(ICharacterScanner scanner, int readCount) {
+	    for (; readCount > 0; readCount--)
+            scanner.unread();
+	}
+	
+	private boolean findKeywordByLength(List<String> list, int readCount) {
+	    for (String keyword : list) {
+            if(keyword.length() == readCount) {
+                return true;
+            }
+        }
+	    return false;
 	}
 	
 	private boolean isInKeyword(char c, int position, List<String> list) {
@@ -91,9 +127,16 @@ public class KeywordRule implements IRule {
 		}
 		
 		if(hasChar)
-			temp = newList;
+			tempKeywords = newList;
 		
 		return hasChar;
+	}
+	
+	private boolean isSeparator(char c) {
+	    if(Character.isWhitespace(c) || !Character.isDefined(c)) {
+	        return true;
+	    }
+	    return false;
 	}
 
 }
