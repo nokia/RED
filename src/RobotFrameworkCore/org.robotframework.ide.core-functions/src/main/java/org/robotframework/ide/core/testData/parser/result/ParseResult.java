@@ -123,5 +123,46 @@ public class ParseResult<InputFormatType, OutputModelElementType> {
         public static enum ParseResultMessageType {
             INFO, WARN, ERROR
         }
+
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime
+                    * result
+                    + ((localizationOfProblem == null) ? 0
+                            : localizationOfProblem.hashCode());
+            result = prime * result
+                    + ((message == null) ? 0 : message.hashCode());
+            result = prime * result + ((type == null) ? 0 : type.hashCode());
+            return result;
+        }
+
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ParseResultMessage other = (ParseResultMessage) obj;
+            if (localizationOfProblem == null) {
+                if (other.localizationOfProblem != null)
+                    return false;
+            } else if (!localizationOfProblem
+                    .equals(other.localizationOfProblem))
+                return false;
+            if (message == null) {
+                if (other.message != null)
+                    return false;
+            } else if (!message.equals(other.message))
+                return false;
+            if (type != other.type)
+                return false;
+            return true;
+        }
     }
 }
