@@ -90,7 +90,7 @@ public class TextEditor {
 	
 	@PostConstruct
 	public void postConstruct(Composite parent, IEditorInput input, final IEditorPart editorPart) {
-		parent.getShell().setText("aaaa");
+
 		FillLayout layout = new FillLayout();
 		layout.marginHeight = 1;
         parent.setLayout(layout);
