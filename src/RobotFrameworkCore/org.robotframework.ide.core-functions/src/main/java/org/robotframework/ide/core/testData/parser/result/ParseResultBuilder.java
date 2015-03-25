@@ -97,7 +97,7 @@ public class ParseResultBuilder<InputFormatType, OutputModelElementType> {
             computeStatus = this.status;
         } else {
             if (wasAnyError || this.producedElementModel == null) {
-                computeStatus = ParseStatus.UNSUCESSFULY_PARSED;
+                computeStatus = ParseStatus.UNSUCCESSFULY_PARSED;
             } else {
                 if (wasAnyWarn) {
                     computeStatus = ParseStatus.PARTIAL_PARSED;

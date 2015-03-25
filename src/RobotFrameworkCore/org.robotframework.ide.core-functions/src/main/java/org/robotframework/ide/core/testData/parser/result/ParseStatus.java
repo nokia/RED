@@ -20,5 +20,5 @@ public enum ParseStatus {
     /**
      * parsing failed
      */
-    UNSUCESSFULY_PARSED
+    UNSUCCESSFULY_PARSED
 }
