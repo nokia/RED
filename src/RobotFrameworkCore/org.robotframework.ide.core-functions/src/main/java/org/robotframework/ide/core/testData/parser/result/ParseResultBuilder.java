@@ -14,6 +14,11 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult.ParseResul
  * @serial RobotFramework 2.8.6
  * @serial 1.0
  * @see ParseResult
+ * 
+ * @param <InputFormatType>
+ *            input type i.e. xml doc
+ * @param <OutputModelElementType>
+ * 
  */
 public class ParseResultBuilder<InputFormatType, OutputModelElementType> {
 
