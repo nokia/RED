@@ -6,7 +6,7 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 /**
  * Handle logic regarding mapping files from disk to objector representation.
  * This parser interface just map single unit, but shouldn't map whole file. For
- * parsing whole file see {@link ITestDataParser}
+ * parsing whole file see {@link ITestDataParsersProvider}
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
