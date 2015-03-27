@@ -7,6 +7,7 @@ import org.robotframework.ide.core.testData.model.VariableTable;
 
 
 /**
+ * Take responsibility for providing parsers to parse test data tables.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
@@ -18,14 +19,26 @@ import org.robotframework.ide.core.testData.model.VariableTable;
  */
 public interface ITestDataParser<InputFormatType> {
 
+    /**
+     * @return parser for {@code Setting} table in {@code InputFormatType}
+     */
     ITestDataElementParser<InputFormatType, SettingTable> getSettingTableParser();
 
 
+    /**
+     * @return parser for {@code Variable} table in {@code InputFormatType}
+     */
     ITestDataElementParser<InputFormatType, VariableTable> getVariableTableParser();
 
 
+    /**
+     * @return parser for {@code TestCase} table in {@code InputFormatType}
+     */
     ITestDataElementParser<InputFormatType, TestCaseTable> getTestCaseTableParser();
 
 
+    /**
+     * @return parser for {@code Keyword} table in {@code InputFormatType}
+     */
     ITestDataElementParser<InputFormatType, KeywordTable> getKeywordTableParser();
 }
