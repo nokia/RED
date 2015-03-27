@@ -16,7 +16,9 @@ import java.util.List;
  * @see ParseResultBuilder
  * 
  * @param <InputFormatType>
+ *            in type (i.e. file, xml doc)
  * @param <OutputModelElementType>
+ *            output type
  */
 public class ParseResult<InputFormatType, OutputModelElementType> {
 
