@@ -24,5 +24,47 @@
                 id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
         </editor>
     </extension>
+ <extension
+       point="org.eclipse.debug.core.launchConfigurationTypes">
+    <launchConfigurationType
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          id="org.robotframework.ide.robotLaunchConfiguration"
+          modes="run"
+          name="Robot">
+    </launchConfigurationType>
+ </extension>
+ <extension
+       point="org.eclipse.debug.core.launchModes">
+    <launchMode
+          label="Run"
+          mode="org.robotframework.ide.robotRunLaunch">
+    </launchMode>
+ </extension>
+ <extension
+       point="org.eclipse.debug.ui.launchGroups">
+    <launchGroup
+          bannerImage="resources/robo1.png"
+          id="org.robotframework.ide.robotLaunchConfigurationGroup"
+          image="resources/robo1.png"
+          label="Robot Framework"
+          mode="org.robotframework.ide.robotRunLaunch">
+    </launchGroup>
+ </extension>
+ <extension
+       point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+          class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab"
+          id="org.robotframework.ide.robotLaunchConfigurationTabGroup"
+          type="org.robotframework.ide.robotLaunchConfiguration">
+    </launchConfigurationTabGroup>
+ </extension>
+ <extension
+       point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+    <launchConfigurationTypeImage
+          configTypeID="org.robotframework.ide.robotLaunchConfiguration"
+          icon="resources/robo1.png"
+          id="org.robotframework.ide.robotLaunchConfigurationImage">
+    </launchConfigurationTypeImage>
+ </extension>
 
 </plugin>
