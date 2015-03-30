@@ -29,21 +29,37 @@ public class SettingTable {
     private final MovableLinkedListWrapper<AbstractImportable> importedArtifacts = new MovableLinkedListWrapper<AbstractImportable>();
 
 
+    /**
+     * @return all imported as external libraries, resources and variables files
+     */
     public MovableLinkedListWrapper<AbstractImportable> getImportedArtifacts() {
         return importedArtifacts;
     }
 
 
+    /**
+     * @param library
+     * @return an information if adding was successful
+     */
     public boolean addLibrary(LibraryReference library) {
         return importedArtifacts.add(library);
     }
 
 
+    /**
+     * @param resourceFile
+     * @return an information if adding was successful
+     */
     public boolean addResource(ResourceFileReference resourceFile) {
         return importedArtifacts.add(resourceFile);
     }
 
 
+    /**
+     * 
+     * @param variablesFile
+     * @return an information if adding was successful
+     */
     public boolean addVariablesFile(VariablesFileReference variablesFile) {
         return importedArtifacts.add(variablesFile);
     }
