@@ -100,6 +100,7 @@ public abstract class AbstractImportable {
 
     /**
      * @param resolvedFile
+     *            path to reference file
      */
     public void setResolvedReferenceFile(File resolvedFile) {
         this.resolvedFile = resolvedFile;

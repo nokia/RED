@@ -1,6 +1,9 @@
 package org.robotframework.ide.core.testData.parser;
 
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.VariablesTable;
 
 
 /**
@@ -16,5 +19,25 @@ public interface ITestDataParserProvider<InputFormatType> {
     /**
      * @return
      */
-    ITestDataElementParser<InputFormatType, SettingTable> getSettingsParser();
+    ITestDataElementParser<InputFormatType, SettingTable> getSettingsTableParser();
+
+
+    /**
+     * @return
+     */
+    ITestDataElementParser<InputFormatType, TestCaseTable> getTestCasesTableParser();
+
+
+    /**
+     * 
+     * @return
+     */
+    ITestDataElementParser<InputFormatType, VariablesTable> getVariablesTableParser();
+
+
+    /**
+     * 
+     * @return
+     */
+    ITestDataElementParser<InputFormatType, KeywordTable> getKeywordsTableParser();
 }
