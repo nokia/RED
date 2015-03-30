@@ -10,6 +10,7 @@ import java.util.LinkedList;
  * @author wypych
  * @serial RobotFramework 2.8.6
  * @serial 1.0
+ * 
  * @param <ElementType>
  *            type of objects in wrapped linked list
  */
