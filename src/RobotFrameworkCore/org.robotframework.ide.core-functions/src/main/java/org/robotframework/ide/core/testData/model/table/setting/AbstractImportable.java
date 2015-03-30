@@ -45,7 +45,7 @@ public abstract class AbstractImportable {
 
 
     /**
-     * @return optional comment
+     * @return optional user comment
      */
     protected Comment getComment() {
         return comment;
@@ -61,7 +61,7 @@ public abstract class AbstractImportable {
 
 
     /**
-     * @return
+     * @return user comment text
      */
     public String getCommentText() {
         return this.comment.getText();

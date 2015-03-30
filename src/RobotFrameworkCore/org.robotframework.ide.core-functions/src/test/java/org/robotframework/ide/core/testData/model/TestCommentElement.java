@@ -7,7 +7,6 @@ import org.junit.Test;
 
 
 /**
- * 
  * @author wypych
  * @see Comment
  */
