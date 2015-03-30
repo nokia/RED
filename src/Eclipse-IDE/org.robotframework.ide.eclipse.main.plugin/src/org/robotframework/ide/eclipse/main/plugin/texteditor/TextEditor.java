@@ -90,6 +90,8 @@ public class TextEditor {
 	
 	@PostConstruct
 	public void postConstruct(Composite parent, IEditorInput input, final IEditorPart editorPart) {
+	    
+	    ((TextEditorWrapper)editorPart).setPartName(input.getName());
 
 		FillLayout layout = new FillLayout();
 		layout.marginHeight = 1;
