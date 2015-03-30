@@ -15,23 +15,54 @@ public class Comment implements IOptional {
     private boolean isExists = false;
 
 
+    /**
+     * Comment will be set to {@code null} and flag will be unavailable
+     */
+    public Comment() {
+        comment = null;
+        isExists = false;
+    }
+
+
+    /**
+     * @param comment
+     *            text to set
+     */
+    public Comment(String comment) {
+        this.comment = comment;
+        this.isExists = true;
+    }
+
+
+    /**
+     * @return comment set by user
+     */
     public String getText() {
         return comment;
     }
 
 
+    /**
+     * @param comment
+     */
     public void setText(String comment) {
         this.comment = comment;
         isExists = true;
     }
 
 
+    /**
+     * clear comment
+     */
     public void clearText() {
         comment = null;
         isExists = false;
     }
 
 
+    /**
+     * @return an information if comment is available
+     */
     public boolean isPresent() {
         return isExists;
     }
