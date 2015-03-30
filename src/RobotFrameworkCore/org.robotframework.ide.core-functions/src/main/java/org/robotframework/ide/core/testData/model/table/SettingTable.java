@@ -1,10 +1,18 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import org.robotframework.ide.core.testData.model.table.setting.AbstractImportable;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryReference;
+import org.robotframework.ide.core.testData.model.table.setting.ResourceFileReference;
+import org.robotframework.ide.core.testData.model.table.setting.VariablesFileReference;
 import org.robotframework.ide.core.testData.model.util.MovableLinkedListWrapper;
 
 
 /**
+ * Mapping for Setting table used to import test libraries, resource files and
+ * variable files and to define metadata for test suites and test cases. It can
+ * included in test case files and resource files. Note that in resource file, a
+ * Setting table can only include settings for importing libraries, resources,
+ * and variables.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
@@ -13,6 +21,11 @@ import org.robotframework.ide.core.testData.model.util.MovableLinkedListWrapper;
  */
 public class SettingTable {
 
+    /**
+     * container for libraries, resources and variables, they can appear in any
+     * order - means - that it could be library, then variables file and again
+     * library
+     */
     private final MovableLinkedListWrapper<AbstractImportable> importedArtifacts = new MovableLinkedListWrapper<AbstractImportable>();
 
 
@@ -21,17 +34,17 @@ public class SettingTable {
     }
 
 
-    public void addLibrary() {
-        // importedArtifacts.add(e)
+    public boolean addLibrary(LibraryReference library) {
+        return importedArtifacts.add(library);
     }
 
 
-    public void addResource() {
-        // importedArtifacts.add(e)
+    public boolean addResource(ResourceFileReference resourceFile) {
+        return importedArtifacts.add(resourceFile);
     }
 
 
-    public void addVariablesFile() {
-        // importedArtifacts.add(e)
+    public boolean addVariablesFile(VariablesFileReference variablesFile) {
+        return importedArtifacts.add(variablesFile);
     }
 }
