@@ -1,11 +1,14 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.io.File;
+
 import org.robotframework.ide.core.testData.model.Comment;
 
 
 /**
  * This is common element for Library, Resources and Variables used in Setting
- * Table.
+ * Table. The field {@link #fileLastModified} was added for tracking if file was
+ * changed after last read.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
@@ -15,7 +18,9 @@ import org.robotframework.ide.core.testData.model.Comment;
 public abstract class AbstractImportable {
 
     private String pathOrName;
+    private File resolvedFile;
     private final Comment comment = new Comment();
+    private long fileLastModified = 0;
 
 
     /**
@@ -73,5 +78,38 @@ public abstract class AbstractImportable {
      */
     public void setCommentText(String comment) {
         this.comment.setText(comment);
+    }
+
+
+    /**
+     * @param fileLastModified
+     *            timestamp of reference file last modification as EPOCH
+     */
+    public void setFileLastModified(long fileLastModified) {
+        this.fileLastModified = fileLastModified;
+    }
+
+
+    /**
+     * @return timestamp of reference file last modification as EPOCH
+     */
+    public long getFileLastModified() {
+        return fileLastModified;
+    }
+
+
+    /**
+     * @param resolvedFile
+     */
+    public void setResolvedReferenceFile(File resolvedFile) {
+        this.resolvedFile = resolvedFile;
+    }
+
+
+    /**
+     * @return resolved reference file
+     */
+    public File getResolvedReferenceFile() {
+        return this.resolvedFile;
     }
 }
