@@ -7,37 +7,38 @@ import org.robotframework.ide.core.testData.model.table.VariablesTable;
 
 
 /**
+ * Gives all parsers for every Test Data section available in Robot Framework
+ * files.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
  * @serial 1.0
  * 
  * @param <InputFormatType>
+ *            format of accepted data
  */
 public interface ITestDataParserProvider<InputFormatType> {
 
     /**
-     * @return
+     * @return parser for Settings table
      */
     ITestDataElementParser<InputFormatType, SettingTable> getSettingsTableParser();
 
 
     /**
-     * @return
+     * @return parser for Test Case table
      */
     ITestDataElementParser<InputFormatType, TestCaseTable> getTestCasesTableParser();
 
 
     /**
-     * 
-     * @return
+     * @return parser for Variables table
      */
     ITestDataElementParser<InputFormatType, VariablesTable> getVariablesTableParser();
 
 
     /**
-     * 
-     * @return
+     * @return parser for Keyword table
      */
     ITestDataElementParser<InputFormatType, KeywordTable> getKeywordsTableParser();
 }
