@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model;
+package org.robotframework.ide.core.testData.model.common;
 
 /**
  * Responsible for say if optional element is available.
