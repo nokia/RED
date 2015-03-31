@@ -1,6 +1,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 /**
+ * Table of tests included in test case file and test suites
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
