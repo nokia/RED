@@ -1,7 +1,5 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import java.io.File;
-
 import org.robotframework.ide.core.testData.model.Comment;
 
 
@@ -17,10 +15,8 @@ import org.robotframework.ide.core.testData.model.Comment;
  */
 public abstract class AbstractImportable {
 
-    private String pathOrName;
-    private File resolvedFile;
+    private final ExternalFile externalFile;
     private final Comment comment = new Comment();
-    private long fileLastModified = 0;
 
 
     /**
@@ -28,24 +24,7 @@ public abstract class AbstractImportable {
      *            path to file or in case of library it could be also it name
      */
     public AbstractImportable(String pathOrName) {
-        this.pathOrName = pathOrName;
-    }
-
-
-    /**
-     * @return library name, path to library, resource or file with variables
-     */
-    public String getPathOrName() {
-        return pathOrName;
-    }
-
-
-    /**
-     * @param pathOrName
-     *            library name, path to library, resource or file with variables
-     */
-    public void setPathOrName(String pathOrName) {
-        this.pathOrName = pathOrName;
+        this.externalFile = new ExternalFile(pathOrName);
     }
 
 
@@ -82,35 +61,10 @@ public abstract class AbstractImportable {
 
 
     /**
-     * @param fileLastModified
-     *            timestamp of reference file last modification as EPOCH
+     * @return materialized file referenced
      */
-    public void setFileLastModified(long fileLastModified) {
-        this.fileLastModified = fileLastModified;
+    public ExternalFile getExternalFile() {
+        return externalFile;
     }
 
-
-    /**
-     * @return timestamp of reference file last modification as EPOCH
-     */
-    public long getFileLastModified() {
-        return fileLastModified;
-    }
-
-
-    /**
-     * @param resolvedFile
-     *            path to reference file
-     */
-    public void setResolvedReferenceFile(File resolvedFile) {
-        this.resolvedFile = resolvedFile;
-    }
-
-
-    /**
-     * @return resolved reference file
-     */
-    public File getResolvedReferenceFile() {
-        return this.resolvedFile;
-    }
 }
