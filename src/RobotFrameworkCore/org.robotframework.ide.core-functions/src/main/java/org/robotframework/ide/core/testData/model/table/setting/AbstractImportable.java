@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import org.robotframework.ide.core.testData.model.Comment;
+import org.robotframework.ide.core.testData.model.common.Comment;
 
 
 /**

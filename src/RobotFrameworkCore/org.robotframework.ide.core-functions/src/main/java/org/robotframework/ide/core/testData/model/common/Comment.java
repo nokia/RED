@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model;
+package org.robotframework.ide.core.testData.model.common;
 
 /**
  * Represents comment in Test Data files, because comment is always '#' it could

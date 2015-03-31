@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Test;
+import org.robotframework.ide.core.testData.model.common.Comment;
 
 
 /**
