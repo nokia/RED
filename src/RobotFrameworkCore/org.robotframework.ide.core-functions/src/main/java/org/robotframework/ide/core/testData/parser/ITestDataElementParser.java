@@ -2,6 +2,7 @@ package org.robotframework.ide.core.testData.parser;
 
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 
+
 /**
  * Responsible for decoding simple element - i.e. Setting table. It shouldn't be
  * used for decoding whole file - for this please check
@@ -19,6 +20,8 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 public interface ITestDataElementParser<InputFormatType, OutputElementType> {
 
     /**
+     * Note - that this method shouldn't consume data
+     * 
      * @param testData
      *            current data to use
      * @return an information if current parser can handle this data
