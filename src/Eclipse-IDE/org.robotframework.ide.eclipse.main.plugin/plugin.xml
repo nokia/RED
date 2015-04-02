@@ -1,17 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.robotframework.ide.eclipse.wizards.category"
+            name="Robot Framework">
+      </category>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotProjectWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            hasPages="true"
+            icon="resources/new_robot_project.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotProject"
+            name="Robot Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuiteWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            icon="resources/new_robot_suite.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotSuite"
+            name="Robot Test Suite">
+      </wizard>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestCaseWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            hasPages="true"
+            icon="resources/new_robot_file.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotCase"
+            name="Robot Test Cases File">
+      </wizard>
+   </extension>
+   <extension
+         id="robotNature"
+         name="Robot project nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature">
+         </run>
+      </runtime>
+      <options
+            allowLinking="false">
+      </options>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="resources/robot_dec.png"
+            id="org.robotframework.ide.eclipse.main.plugin.robotNature.img"
+            natureId="org.robotframework.ide.eclipse.main.plugin.robotNature">
+      </image>
+   </extension>
+ <extension
+       point="org.eclipse.ui.decorators">
+    <decorator
+          class="org.robotframework.ide.eclipse.main.plugin.explorer.RobotSuitesDecorator"
+          icon="resources/robot_dec.png"
+          id="org.robotframework.ide.eclipse.main.plugin.robotSuiteDecorator"
+          label="Robot Test Suites"
+          lightweight="true"
+          location="TOP_RIGHT"
+          state="true">
+       <description>
+          This decorator adds icon to Robot test suites
+       </description>
+       <enablement>
+          <objectClass
+                name="org.eclipse.core.resources.IFolder">
+          </objectClass>
+       </enablement>
+    </decorator>
+ </extension>
 
 	<extension
             point="org.eclipse.ui.perspectives">
         <perspective
                 class="org.robotframework.ide.eclipse.main.plugin.perspectives.RobotPerspective"
-                fixed="true"
-                icon="resources/robo1.png"
+                icon="resources/robot.png"
                 id="org.eclipse.ui.perspectives.RobotPerspective"
-                name="Robot Perspective">
+                name="Robot">
         </perspective>
     </extension>
+ <extension
+       point="org.eclipse.ui.perspectiveExtensions">
+    <perspectiveExtension
+          targetID="org.eclipse.ui.perspectives.RobotPerspective">
+       <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotProject">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotSuite">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotCase">
+       </newWizardShortcut>
+    </perspectiveExtension>
+ </extension>
 
 	<extension
             point="org.eclipse.ui.editors">
@@ -19,9 +108,17 @@
                 name="Robot Text Editor"
                 extensions="txt,robot"
                 default="true"
-                icon="resources/robo1.png"
+                icon="resources/robot.png"
                 class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
                 id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
+        </editor>
+        <editor
+              class="org.robotframework.ide.eclipse.main.plugin.tableeditor.TableEditorWrapper"
+              default="false"
+              extensions="txt,robot"
+              icon="resources/robot.png"
+              id="org.robotframework.ide.tableditor"
+              name="Robot Table Editor">
         </editor>
     </extension>
  <extension
@@ -43,9 +140,9 @@
  <extension
        point="org.eclipse.debug.ui.launchGroups">
     <launchGroup
-          bannerImage="resources/robo1.png"
+          bannerImage="resources/robot.png"
           id="org.robotframework.ide.robotLaunchConfigurationGroup"
-          image="resources/robo1.png"
+          image="resources/robot.png"
           label="Robot Framework"
           mode="org.robotframework.ide.robotRunLaunch">
     </launchGroup>
@@ -62,9 +159,92 @@
        point="org.eclipse.debug.ui.launchConfigurationTypeImages">
     <launchConfigurationTypeImage
           configTypeID="org.robotframework.ide.robotLaunchConfiguration"
-          icon="resources/robo1.png"
+          icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchConfigurationImage">
     </launchConfigurationTypeImage>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewerContentBinding
+          viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       <includes>
+          <contentExtension
+                pattern="org\.robotframework\.content.*.">
+          </contentExtension>
+          <contentExtension
+                pattern="org\.robotframework\.filters.*.">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="org.robotframework.ide.eclipse.main.plugin.explorer.NavigatorContentProvider"
+          icon="resources/settings.png"
+          id="org.robotframework.content.settings"
+          labelProvider="org.robotframework.ide.eclipse.main.plugin.explorer.NavigatorLabelProvider"
+          name="Foo">
+       <triggerPoints>
+          <and>
+             <instanceof
+                   value="org.eclipse.core.resources.IFile">
+             </instanceof>
+             <test
+                   property="org.eclipse.core.resources.extension"
+                   value="txt">
+             </test>
+          </and>
+       </triggerPoints>
+       <possibleChildren>
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tempmodel.Settings">
+          </instanceof>
+       </possibleChildren>
+    </navigatorContent>
+    <commonFilter
+          activeByDefault="false"
+          class="org.robotframework.ide.eclipse.main.plugin.explorer.SuiteInitFilesFilter"
+          description="Hides all Robot Suite initialization files (__init__.robot)"
+          id="org.robotframework.filters.initFilesFilter"
+          name="Robot Suite initialization files"
+          visibleInUI="true">
+    </commonFilter>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotProject">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotCase">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with>
+       </enablement>
+    </commonWizard>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotSuite">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with>
+       </enablement>
+    </commonWizard>
  </extension>
 
 </plugin>
