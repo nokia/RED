@@ -89,11 +89,11 @@ public class TextEditor {
 	
 	
 	@PostConstruct
-	public void postConstruct(Composite parent, IEditorInput input, final IEditorPart editorPart) {
+	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
 	    
 	    ((TextEditorWrapper)editorPart).setPartName(input.getName());
 
-		FillLayout layout = new FillLayout();
+		final FillLayout layout = new FillLayout();
 		layout.marginHeight = 1;
         parent.setLayout(layout);
         
@@ -105,19 +105,19 @@ public class TextEditor {
         }
         
         editedFile = fileEditorInput.getFile();
-        String text = this.extractTextFromFile();
+        final String text = this.extractTextFromFile();
 
         this.deleteMarkersFromFile();
 		this.createMarkers();
 		
-		AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
-		DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
-		ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
+		final AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
+		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
+		final ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
 		
-		CompositeRuler compositeRuler = new CompositeRuler(1);
+		final CompositeRuler compositeRuler = new CompositeRuler(1);
 		compositeRuler.setModel(markerAnnotationModel);
 		
-		OverviewRuler overviewRuler = new OverviewRuler(markerAnnotationAccess, 15, new SharedTextColors());
+		final OverviewRuler overviewRuler = new OverviewRuler(markerAnnotationAccess, 15, new SharedTextColors());
 		overviewRuler.addAnnotationType(errorAnnotationType.getType());
 		overviewRuler.addHeaderAnnotationType(errorAnnotationType.getType());
 		overviewRuler.setModel(markerAnnotationModel);
@@ -127,7 +127,7 @@ public class TextEditor {
 		viewer.setEditable(true);
 		viewer.getTextWidget().setFont(JFaceResources.getTextFont());
 		
-		AnnotationRulerColumn annotationColumn = new AnnotationRulerColumn(15,markerAnnotationAccess);
+		final AnnotationRulerColumn annotationColumn = new AnnotationRulerColumn(15,markerAnnotationAccess);
 		annotationColumn.addAnnotationType(errorAnnotationType.getType());
 		
 		final LineNumberRulerColumn lineNumberColumn = new LineNumberRulerColumn();
@@ -138,17 +138,17 @@ public class TextEditor {
 		viewer.addVerticalRulerColumn(annotationColumn);
 		viewer.addVerticalRulerColumn(lineNumberColumn);
 		
-		SourceViewerDecorationSupport decorationSupport = new SourceViewerDecorationSupport(viewer, overviewRuler, markerAnnotationAccess, new SharedTextColors());
-		IPreferenceStore editorsPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.ui.editors");
-		AnnotationPreference errorAnnotationPreference = this.createAnnotationPreference(errorAnnotationType);
+		final SourceViewerDecorationSupport decorationSupport = new SourceViewerDecorationSupport(viewer, overviewRuler, markerAnnotationAccess, new SharedTextColors());
+		final IPreferenceStore editorsPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.ui.editors");
+		final AnnotationPreference errorAnnotationPreference = this.createAnnotationPreference(errorAnnotationType);
 		decorationSupport.setAnnotationPreference(errorAnnotationPreference);
 		decorationSupport.install(editorsPreferenceStore);
 		
-		IDocument document = new Document();
+		final IDocument document = new Document();
 		document.set( text );
 		viewer.setDocument( document, markerAnnotationModel );
 		
-		TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration();
+		final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration();
 		viewer.configure(svc);
 		
 		final Menu contextMenu = this.createContextMenu(lineNumberColumn, saveAsCommand);
@@ -160,23 +160,23 @@ public class TextEditor {
 		final ContentAssistant contentAssistant = this.createContentAssistant();
 		contentAssistant.install(viewer);
 		
-		PresentationReconciler reconciler = this.createPresentationReconciler();
+		final PresentationReconciler reconciler = this.createPresentationReconciler();
 		reconciler.install(viewer);
 		
 		//TODO Add Listener classes
 		viewer.getTextWidget().addModifyListener(new ModifyListener() {
 			@Override
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				dirtyProviderService.setDirtyState(true);
 			}
 		});
 		
 		viewer.getTextWidget().addKeyListener(new KeyListener() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 			}
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'z')) {
 					if(undoManager.undoable()) {
 						undoManager.undo();
@@ -201,30 +201,29 @@ public class TextEditor {
 		
 		viewer.getTextWidget().addMouseListener(new MouseListener() {
 			@Override
-			public void mouseUp(MouseEvent e) {}
+			public void mouseUp(final MouseEvent e) {}
 			@Override
-			public void mouseDown(MouseEvent e) {
+			public void mouseDown(final MouseEvent e) {
 				if(e.button == 3) {
 					contextMenu.setVisible(true);
 				}
 			}
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {}
+			public void mouseDoubleClick(final MouseEvent e) {}
 		});
 		
 	}
 	
 	@Persist
-	public void save(IProgressMonitor monitor) {
+	public void save(final IProgressMonitor monitor) {
 		
 		dirtyProviderService.setDirtyState(false);
 		
-		try(InputStream is = new ByteArrayInputStream(viewer.getDocument().get().getBytes())){
-			editedFile.setContents(is, false, false, monitor);
-			
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
-		}
+        try (InputStream is = new ByteArrayInputStream(viewer.getDocument().get().getBytes())) {
+            editedFile.setContents(is, false, true, monitor);
+        } catch (CoreException | IOException e) {
+            e.printStackTrace();
+        }
 		
 	}
 
@@ -236,7 +235,7 @@ public class TextEditor {
 	
 	private ParameterizedCommand createSaveAsCommand() {
 		ParameterizedCommand cmd = null;
-		Command saveAsCommand = commandService.getCommand("org.eclipse.ui.file.saveAs");
+		final Command saveAsCommand = commandService.getCommand("org.eclipse.ui.file.saveAs");
 		if (saveAsCommand.isDefined()) {
 			handlerService.activateHandler("org.eclipse.ui.file.saveAs",new SaveAsHandler());
 			cmd = commandService.createCommand("org.eclipse.ui.file.saveAs", null);
@@ -250,7 +249,7 @@ public class TextEditor {
 	
 	private String extractTextFromFile() {
 		Scanner scanner = null;
-        StringBuilder text = new StringBuilder("");
+        final StringBuilder text = new StringBuilder("");
         try(InputStream is = editedFile.getContents()) {
         	 scanner = new Scanner(is).useDelimiter("\\n");
     		while(scanner.hasNext()) {
@@ -266,11 +265,11 @@ public class TextEditor {
 	
 	private void deleteMarkersFromFile() {
 		try {
-			IMarker[] markers = editedFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ONE);
+			final IMarker[] markers = editedFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ONE);
 			for (int i = 0; i < markers.length; i++) {
 				markers[i].delete();
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
@@ -278,26 +277,26 @@ public class TextEditor {
 	private void createMarkers() {
 		
 		try {
-			IMarker marker = editedFile.createMarker(IMarker.PROBLEM);
+			final IMarker marker = editedFile.createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker.setAttribute(IMarker.MESSAGE, "test 1");
 			marker.setAttribute(IMarker.LINE_NUMBER, 1);
 			marker.setAttribute(IMarker.CHAR_START, 0);
 			marker.setAttribute(IMarker.CHAR_END, 18);
 			
-			IMarker marker1 = editedFile.createMarker(IMarker.PROBLEM);
+			final IMarker marker1 = editedFile.createMarker(IMarker.PROBLEM);
 			marker1.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker1.setAttribute(IMarker.MESSAGE, "test 2");
 			marker1.setAttribute(IMarker.LINE_NUMBER, 2);
 			marker1.setAttribute(IMarker.CHAR_START, 20);
 			marker1.setAttribute(IMarker.CHAR_END, 25);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private AnnotationPreference createAnnotationPreference(AnnotationType type) {
-		AnnotationPreference annotationPreference = new AnnotationPreference();
+	private AnnotationPreference createAnnotationPreference(final AnnotationType type) {
+		final AnnotationPreference annotationPreference = new AnnotationPreference();
 		annotationPreference.setAnnotationType(type.getType());
 		annotationPreference.setTextStylePreferenceKey("errorTextStyle");
 		annotationPreference.setTextStyleValue("UNDERLINE");
@@ -317,11 +316,11 @@ public class TextEditor {
 		saveAsItem.setText("Save As");
 		saveAsItem.addSelectionListener(new SelectionListener() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				handlerService.executeHandler(saveAsCommand); 
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+			public void widgetDefaultSelected(final SelectionEvent e) {
 			}
 		});
 		
@@ -332,7 +331,7 @@ public class TextEditor {
 		toggleLineNumberColumnItem.setText("Show Line Numbers");
 		toggleLineNumberColumnItem.addSelectionListener(new SelectionListener() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				if(toggleLineNumberColumnItem.getSelection()) {
 					viewer.addVerticalRulerColumn(lineNumberColumn);
 				} else {
@@ -340,7 +339,7 @@ public class TextEditor {
 				}
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+			public void widgetDefaultSelected(final SelectionEvent e) {
 			}
 		});
 		new MenuItem(menu, SWT.SEPARATOR);
@@ -348,7 +347,7 @@ public class TextEditor {
 	}
 	
 	private ContentAssistant createContentAssistant() {
-		ContentAssistant contentAssistant = new ContentAssistant();
+		final ContentAssistant contentAssistant = new ContentAssistant();
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
@@ -357,7 +356,7 @@ public class TextEditor {
 		contentAssistant.setEmptyMessage("No proposals");
 		contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
             @Override
-            protected IInformationControl doCreateInformationControl(Shell parent) {
+            protected IInformationControl doCreateInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent, true);
             }
         });
@@ -365,9 +364,9 @@ public class TextEditor {
 	}
 	
 	private PresentationReconciler createPresentationReconciler() {
-		PresentationReconciler reconciler = new PresentationReconciler();
-		TxtScanner txtScanner = new TxtScanner();
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(txtScanner);
+		final PresentationReconciler reconciler = new PresentationReconciler();
+		final TxtScanner txtScanner = new TxtScanner();
+		final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(txtScanner);
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		return reconciler;
