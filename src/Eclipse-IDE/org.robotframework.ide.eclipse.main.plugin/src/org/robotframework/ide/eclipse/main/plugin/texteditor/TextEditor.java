@@ -108,7 +108,7 @@ public class TextEditor {
         final String text = this.extractTextFromFile();
 
         this.deleteMarkersFromFile();
-		this.createMarkers();
+		//this.createMarkers();
 		
 		final AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
 		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();

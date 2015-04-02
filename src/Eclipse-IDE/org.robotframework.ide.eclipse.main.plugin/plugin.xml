@@ -150,7 +150,7 @@
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
     <launchConfigurationTabGroup
-          class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationTabGroup"
           id="org.robotframework.ide.robotLaunchConfigurationTabGroup"
           type="org.robotframework.ide.robotLaunchConfiguration">
     </launchConfigurationTabGroup>
@@ -162,6 +162,21 @@
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchConfigurationImage">
     </launchConfigurationTypeImage>
+ </extension>
+ <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+            class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+            id="org.robotframework.ide.robotLaunchShortcutConfiguration"
+            label="Robot Test"
+            icon="resources/robot.png"
+            modes="run,debug">
+        <contextualLaunch>
+            <enablement>
+                <with variable="selection">
+                </with>
+            </enablement>
+        </contextualLaunch>
+    </shortcut>
  </extension>
  <extension
        point="org.eclipse.ui.navigator.viewer">
