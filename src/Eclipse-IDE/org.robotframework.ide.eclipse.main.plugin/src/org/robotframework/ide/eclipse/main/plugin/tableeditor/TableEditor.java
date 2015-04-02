@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.robotframework.ide.eclipse.main.plugin.tempmodel.Keyword;
 
 
 /**
@@ -54,11 +55,12 @@ public class TableEditor {
     private TableViewer viewer;
     
     @PostConstruct
-    public void postConstruct(Composite parent, IEditorInput input, final IEditorPart editorPart) {
-        
-        GridLayout layout = new GridLayout(2, false);
+    public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
+		((TableEditorWrapper) editorPart).setPartName(input.getName());
+
+        final GridLayout layout = new GridLayout(2, false);
         parent.setLayout(layout);
-        Label searchLabel = new Label(parent, SWT.NONE);
+        final Label searchLabel = new Label(parent, SWT.NONE);
         searchLabel.setText("Label ");
         final Text searchText = new Text(parent, SWT.BORDER | SWT.SEARCH);
         searchText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -66,11 +68,12 @@ public class TableEditor {
         
         viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
         
-        TableViewerFocusCellManager fcm = new TableViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
+        final TableViewerFocusCellManager fcm = new TableViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
                 viewer));
-        ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+        final ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
 
-            protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+            @Override
+			protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
 
                 if (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL 
                         || event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
@@ -78,7 +81,7 @@ public class TableEditor {
                 }
                 
                 if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
-                    EventObject source = event.sourceEvent;
+                    final EventObject source = event.sourceEvent;
                     if (source instanceof MouseEvent && ((MouseEvent) source).button == 3)
                         return false;
 
@@ -99,11 +102,11 @@ public class TableEditor {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         
-        Menu contextMenu = new Menu(table);
+        final Menu contextMenu = new Menu(table);
         table.setMenu(contextMenu);
         
         int count = 1;
-        for (TableColumn column : table.getColumns()) {
+        for (final TableColumn column : table.getColumns()) {
             createMenuItem(contextMenu, column, count);
             count++;
         }
@@ -111,16 +114,16 @@ public class TableEditor {
         viewer.setContentProvider(new ArrayContentProvider());
 
         final List<Keyword> list = new ArrayList<>();
-        list.add(new Keyword("Log", 1, "arg1"));
-        list.add(new Keyword("Log Vars", 2, "arg1", "arg2"));
-        list.add(new Keyword("Log Many", 2, "arg1", ""));
+		list.add(new Keyword("Log", "arg1"));
+		list.add(new Keyword("Log Vars", "arg1", "arg2"));
+		list.add(new Keyword("Log Many", "arg1", ""));
         
         viewer.setInput(list);
         
         
         editorPart.getSite().setSelectionProvider(viewer);
        
-        GridData gridData = new GridData();
+        final GridData gridData = new GridData();
         gridData.verticalAlignment = GridData.FILL;
         gridData.horizontalSpan = 2;
         gridData.grabExcessHorizontalSpace = true;
@@ -130,19 +133,19 @@ public class TableEditor {
         
         table.addMouseListener(new MouseListener() {
             @Override
-            public void mouseUp(MouseEvent e) {
+            public void mouseUp(final MouseEvent e) {
             }
             @Override
-            public void mouseDown(MouseEvent e) {
-                Point p = new Point(e.x, e.y);
-                TableItem item = table.getItem(p);
+            public void mouseDown(final MouseEvent e) {
+                final Point p = new Point(e.x, e.y);
+                final TableItem item = table.getItem(p);
                 if(item == null) {
-                    list.add(new Keyword("", 3, "", ""));
+					list.add(new Keyword("", "", ""));
                     viewer.refresh();
                 }
             }
             @Override
-            public void mouseDoubleClick(MouseEvent e) {
+            public void mouseDoubleClick(final MouseEvent e) {
             }
         });
         
@@ -150,47 +153,47 @@ public class TableEditor {
     
     private void createColumns(final Composite parent, final TableViewer viewer) {
 
-        TableViewerColumn col1 = createTableViewerColumn();
+        final TableViewerColumn col1 = createTableViewerColumn();
         col1.setEditingSupport(new TableEditingSupport(viewer, 1));
         col1.setLabelProvider(new StyledCellLabelProvider() {
 
             @Override
-            public void update(ViewerCell cell) {
-                String text = ((Keyword) cell.getElement()).getName();
+            public void update(final ViewerCell cell) {
+                final String text = ((Keyword) cell.getElement()).getName();
                 cell.setText(text);
-                StyleRange myStyledRange = new StyleRange(0, text.length(), SWTResourceManager.getColor(0, 102, 204),
+                final StyleRange myStyledRange = new StyleRange(0, text.length(), SWTResourceManager.getColor(0, 102, 204),
                         null);
-                StyleRange[] range = { myStyledRange };
+                final StyleRange[] range = { myStyledRange };
                 cell.setStyleRanges(range);
                 super.update(cell);
             }
 
             @Override
-            public String getToolTipText(Object element) {
-                Keyword k = (Keyword) element;
+            public String getToolTipText(final Object element) {
+                final Keyword k = (Keyword) element;
                 return k.getName();
             }
         });
 
-        TableViewerColumn col2 = createTableViewerColumn();
+        final TableViewerColumn col2 = createTableViewerColumn();
         col2.setEditingSupport(new TableEditingSupport(viewer, 2));
         col2.setLabelProvider(new ColumnLabelProvider() {
 
             @Override
-            public String getText(Object element) {
-                Keyword p = (Keyword) element;
-                return p.getArg1();
+            public String getText(final Object element) {
+                final Keyword p = (Keyword) element;
+				return p.getArguments().get(0);
             }
         });
 
-        TableViewerColumn col3 = createTableViewerColumn();
+        final TableViewerColumn col3 = createTableViewerColumn();
         col3.setEditingSupport(new TableEditingSupport(viewer, 3));
         col3.setLabelProvider(new ColumnLabelProvider() {
 
             @Override
-            public String getText(Object element) {
-                Keyword p = (Keyword) element;
-                return p.getArg2();
+            public String getText(final Object element) {
+                final Keyword p = (Keyword) element;
+				return p.getArguments().get(1);
             }
         });
 
@@ -199,19 +202,19 @@ public class TableEditor {
     private TableViewerColumn createTableViewerColumn() {
         
         final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-        TableColumn column = viewerColumn.getColumn();
+        final TableColumn column = viewerColumn.getColumn();
         column.setWidth(100);
         column.setResizable(true);
         return viewerColumn;
     }
     
-    private void createMenuItem(Menu parent, final TableColumn column, int c) {
+    private void createMenuItem(final Menu parent, final TableColumn column, final int c) {
         final MenuItem itemName = new MenuItem(parent, SWT.CHECK);
         itemName.setText("Show Column " + c);
         itemName.setSelection(column.getResizable());
         itemName.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
             if (itemName.getSelection()) {
               column.setWidth(100);
               column.setResizable(true);
@@ -226,7 +229,7 @@ public class TableEditor {
 
 
     @Persist
-    public void save(IProgressMonitor monitor) {
+    public void save(final IProgressMonitor monitor) {
         
     }
 

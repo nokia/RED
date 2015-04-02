@@ -9,4 +9,8 @@ public class TableEditorWrapper extends DIEditorPart<TableEditor> {
         super(TableEditor.class);
     }
 
+    @Override
+	public void setPartName(final String name) {
+		super.setPartName(name);
+	}
 }
