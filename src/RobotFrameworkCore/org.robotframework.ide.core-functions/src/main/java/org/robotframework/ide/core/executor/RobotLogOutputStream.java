@@ -27,5 +27,9 @@ public class RobotLogOutputStream extends LogOutputStream{
     public void addListener(IRobotLogOutputStreamListener listener) {
         listeners.add(listener);
     }
+    
+    public void removeListener(IRobotLogOutputStreamListener listener) {
+        listeners.remove(listener);
+    }
 
 }
