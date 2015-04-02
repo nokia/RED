@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 
 
@@ -14,6 +17,10 @@ import org.robotframework.ide.core.testData.model.table.SettingTable;
  */
 public class LibraryReference extends AbstractImportable {
 
+    private final List<Argument> arguments = new LinkedList<Argument>();
+    private final Alias alias = new Alias();
+
+
     /**
      * @param pathOrName
      *            path to library file or library name
@@ -23,4 +30,37 @@ public class LibraryReference extends AbstractImportable {
         super(pathOrName);
     }
 
+
+    /**
+     * @param arg
+     *            library argument
+     */
+    public void addArgument(Argument arg) {
+        this.arguments.add(arg);
+    }
+
+
+    public Argument getArgument(int index) {
+        return this.arguments.get(index);
+    }
+
+
+    public void removeArgument(int index) {
+        this.arguments.remove(index);
+    }
+
+
+    public int numberOfArguments() {
+        return this.arguments.size();
+    }
+
+
+    public List<Argument> getArguments() {
+        return this.arguments;
+    }
+
+
+    public Alias getAlias() {
+        return this.alias;
+    }
 }
