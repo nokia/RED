@@ -10,6 +10,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.robotframework.ide.eclipse.main.plugin.tempmodel.Keyword;
 
 public class TableEditingSupport extends EditingSupport {
 
@@ -23,7 +24,7 @@ public class TableEditingSupport extends EditingSupport {
 
     private final int colNum;
 
-    public TableEditingSupport(TableViewer v, int col) {
+    public TableEditingSupport(final TableViewer v, final int col) {
         super(v);
         this.viewer = v;
         this.editor = new TextCellEditor(viewer.getTable());
@@ -32,21 +33,23 @@ public class TableEditingSupport extends EditingSupport {
         editor.addListener(new ICellEditorListener() {
 
             @Override
-            public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-                Table table = viewer.getTable();
-                int argsNumber = ((Keyword) table.getItem(table.getSelectionIndex()).getData()).getArgsNumber();
-                int colCount = table.getColumnCount();
+            public void editorValueChanged(final boolean oldValidState, final boolean newValidState) {
+                final Table table = viewer.getTable();
+				final int argsNumber = ((Keyword) table.getItem(
+						table.getSelectionIndex()).getData()).getArguments()
+						.size();
+                final int colCount = table.getColumnCount();
                 if (colCount - 1 < argsNumber && colNum == colCount && !isColumnAdded) {
                     final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-                    TableColumn column = viewerColumn.getColumn();
+                    final TableColumn column = viewerColumn.getColumn();
                     column.setWidth(100);
                     column.setResizable(true);
                     viewerColumn.setEditingSupport(new TableEditingSupport(viewer, colCount + 1));
                     viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
                         @Override
-                        public String getText(Object element) {
-                            Keyword k = (Keyword) element;
+                        public String getText(final Object element) {
+                            final Keyword k = (Keyword) element;
                             return "new column";
                         }
                     });
@@ -70,37 +73,34 @@ public class TableEditingSupport extends EditingSupport {
     }
 
     @Override
-    protected CellEditor getCellEditor(Object element) {
+    protected CellEditor getCellEditor(final Object element) {
         return editor;
     }
 
     @Override
-    protected boolean canEdit(Object element) {
-        Keyword k = (Keyword) element;
-        return k.getArgsNumber() + 1 >= colNum;
+    protected boolean canEdit(final Object element) {
+        final Keyword k = (Keyword) element;
+		return k.getArguments().size() + 1 >= colNum;
     }
 
     @Override
-    protected Object getValue(Object element) {
-        Keyword k = (Keyword) element;
+    protected Object getValue(final Object element) {
+        final Keyword k = (Keyword) element;
         if (colNum == 1) {
             return k.getName();
         } else if (colNum == 2) {
-            return k.getArg1();
+			return k.getArguments().get(0);
         } else {
-            return k.getArg2();
+			return k.getArguments().get(1);
         }
     }
 
     @Override
-    protected void setValue(Object element, Object userInputValue) {
-        Keyword k = (Keyword) element;
+    protected void setValue(final Object element, final Object userInputValue) {
+        final Keyword k = (Keyword) element;
         if (colNum == 1) {
-            k.setName(String.valueOf(userInputValue));
         } else if (colNum == 2) {
-            k.setArg1(String.valueOf(userInputValue));
         } else {
-            k.setArg2(String.valueOf(userInputValue));
         }
 
         viewer.update(element, null);
