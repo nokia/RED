@@ -25,8 +25,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.core.executor.ExecutorFactory;
-import org.robotframework.ide.core.executor.IExecutor;
+import org.robotframework.ide.core.executor.RobotExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab;
 
 public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDelegate, ILaunchShortcut {
@@ -35,14 +34,14 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
     private static final String ROBOT_CONSOLE_NAME = "Robot Test Result";
 
-    private ExecutorFactory executorFactory;
+    private RobotExecutor robotExecutor;
 
     private ILaunchConfigurationType launchConfigurationType;
 
     private ILaunchManager manager;
 
     public RobotLaunchConfigurationDelegate() {
-        executorFactory = new ExecutorFactory();
+        robotExecutor = new RobotExecutor();
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(ROBOT_LAUNCH_CONFIGURATION_TYPE);
     }
@@ -173,9 +172,9 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     }
 
     private void executeRobotTest(IFile file, IProject project, String robotExecutorName) {
-        IExecutor executor = executorFactory.getExecutor(robotExecutorName);
         ExecutorOutputStreamListener executorOutputStreamListener = new ExecutorOutputStreamListener(ROBOT_CONSOLE_NAME);
-        executor.addOutputStreamListener(executorOutputStreamListener);
-        executor.execute(file.getLocation().toPortableString(), project.getLocation().toFile());
+        robotExecutor.addOutputStreamListener(executorOutputStreamListener);
+        robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), robotExecutorName);
+        robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
     }
 }
