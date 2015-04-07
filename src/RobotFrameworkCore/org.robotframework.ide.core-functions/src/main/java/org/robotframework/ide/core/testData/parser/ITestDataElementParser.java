@@ -13,27 +13,14 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
  * @serial 1.0
  * 
  * @param <InputFormatType>
- *            type of data i.e. bytes, xml elements
+ *            type of data i.e. bytes, xml elements, but it should give
+ *            possibility to restore position in case parsing fails
  * @param <OutputElementType>
  *            produced output i.e. SettingTable
  */
-public interface ITestDataElementParser<InputFormatType, OutputElementType> {
+public interface ITestDataElementParser<InputFormatType extends IParsePositionMarkable, OutputElementType> {
 
     /**
-     * should be called before {@link #parse(Object)}, gives simple information
-     * about possibility of parsing this element
-     * 
-     * @param testData
-     *            current data to decode
-     * @return an information if we are able to parse
-     */
-    boolean canParse(InputFormatType testData);
-
-
-    /**
-     * call {@link #canParse(Object)} if you are not ensure if declaration
-     * belongs to this element
-     * 
      * @param testData
      *            current data to use
      * @return result of parsing, method should not throws any kind of exception
