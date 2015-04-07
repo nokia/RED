@@ -17,7 +17,7 @@ import org.robotframework.ide.core.testData.model.table.VariablesTable;
  * @param <InputFormatType>
  *            format of accepted data
  */
-public interface ITestDataParserProvider<InputFormatType> {
+public interface ITestDataParserProvider<InputFormatType extends IParsePositionMarkable> {
 
     /**
      * @return parser for Settings table
