@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import org.robotframework.ide.core.testData.model.common.IOptional;
 import org.robotframework.ide.core.testData.model.table.setting.AbstractImportable;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryReference;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceFileReference;
@@ -19,7 +20,9 @@ import org.robotframework.ide.core.testData.model.util.MovableLinkedListWrapper;
  * @serial 1.0
  * 
  */
-public class SettingTable {
+public class SettingTable implements IOptional {
+
+    private boolean declarationOfTableAppears = false;
 
     /**
      * container for libraries, resources and variables, they can appear in any
@@ -62,5 +65,21 @@ public class SettingTable {
      */
     public boolean addVariablesFile(VariablesFileReference variablesFile) {
         return importedArtifacts.add(variablesFile);
+    }
+
+
+    public void unsetPresent() {
+        this.declarationOfTableAppears = false;
+    }
+
+
+    public void setPresent() {
+        this.declarationOfTableAppears = true;
+    }
+
+
+    @Override
+    public boolean isPresent() {
+        return this.declarationOfTableAppears;
     }
 }
