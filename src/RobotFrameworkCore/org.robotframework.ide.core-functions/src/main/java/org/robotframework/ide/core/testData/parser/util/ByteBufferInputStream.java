@@ -30,7 +30,19 @@ public class ByteBufferInputStream extends InputStream implements
             return -1;
         }
 
+        this.readBytes.incrementAndGet();
+
         return buffer.get() & 0xFF;
+    }
+
+
+    public int currentByte() throws IOException {
+        int c = -1;
+        if (buffer.capacity() > 0) {
+            c = buffer.get(buffer.position());
+        }
+
+        return c;
     }
 
 
@@ -50,24 +62,39 @@ public class ByteBufferInputStream extends InputStream implements
             buffer.get(bytes, off, length);
         }
 
+        if (length > 0) {
+            this.readBytes.addAndGet(length);
+        }
+
         return length;
     }
 
 
     @Override
     public void mark() {
-
+        buffer.mark();
+        this.readLimit.set(-1);
+        this.readBytes.set(0);
     }
 
 
     @Override
     public void mark(int readLimit) {
+        if (readLimit < 0) {
+            throw new IllegalArgumentException(
+                    "Got read limit for buffer less than zero: " + readLimit);
+        }
 
+        buffer.mark();
+        this.readLimit.set(readLimit);
+        this.readBytes.set(0);
     }
 
 
     @Override
     public void reset() {
-
+        if (readLimit.get() == -1 || readLimit.get() <= readBytes.get()) {
+            buffer.reset();
+        }
     }
 }
