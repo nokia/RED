@@ -8,6 +8,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.robotframework.ide.core.testData.parser.IParsePositionMarkable;
 
 
+/**
+ * Take {@link ByteBuffer} as data provider and read byte-by-byte with
+ * possibility to pushback read content.
+ * 
+ * @author wypych
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
+ * 
+ */
 public class ByteBufferInputStream extends InputStream implements
         IParsePositionMarkable {
 
@@ -17,6 +26,10 @@ public class ByteBufferInputStream extends InputStream implements
     private final ByteBuffer buffer;
 
 
+    /**
+     * 
+     * @param buffer
+     */
     public ByteBufferInputStream(final ByteBuffer buffer) {
         this.buffer = buffer;
         this.readBytes = new AtomicInteger(0);
@@ -36,9 +49,14 @@ public class ByteBufferInputStream extends InputStream implements
     }
 
 
-    public int currentByte() throws IOException {
+    /**
+     * 
+     * @return current unread byte
+     * @throws IOException
+     */
+    public int currentByteInBuffer() throws IOException {
         int c = -1;
-        if (buffer.capacity() > 0) {
+        if (buffer.hasRemaining()) {
             c = buffer.get(buffer.position());
         }
 
@@ -93,7 +111,7 @@ public class ByteBufferInputStream extends InputStream implements
 
     @Override
     public void reset() {
-        if (readLimit.get() == -1 || readLimit.get() <= readBytes.get()) {
+        if (readLimit.get() == -1 || readLimit.get() >= readBytes.get()) {
             buffer.reset();
         }
     }
