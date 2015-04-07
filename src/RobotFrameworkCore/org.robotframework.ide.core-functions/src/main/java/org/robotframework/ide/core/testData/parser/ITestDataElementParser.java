@@ -20,16 +20,20 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 public interface ITestDataElementParser<InputFormatType, OutputElementType> {
 
     /**
-     * Note - that this method shouldn't consume data
+     * should be called before {@link #parse(Object)}, gives simple information
+     * about possibility of parsing this element
      * 
      * @param testData
-     *            current data to use
-     * @return an information if current parser can handle this data
+     *            current data to decode
+     * @return an information if we are able to parse
      */
     boolean canParse(InputFormatType testData);
 
 
     /**
+     * call {@link #canParse(Object)} if you are not ensure if declaration
+     * belongs to this element
+     * 
      * @param testData
      *            current data to use
      * @return result of parsing, method should not throws any kind of exception
