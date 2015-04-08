@@ -78,11 +78,19 @@ public class ByteBufferReader extends Reader implements IParsePositionMarkable {
         byte[] bytes = new byte[cbuf.length];
         int readBytes = inStream.read(bytes, off, len);
         if (readBytes > 0) {
-            cbuf = charset.decode(ByteBuffer.wrap(bytes, off, readBytes))
+            char[] got = charset.decode(ByteBuffer.wrap(bytes, off, readBytes))
                     .array();
+            copyArrayToArray(got, cbuf, off, len);
         }
 
         return readBytes;
+    }
+
+
+    private void copyArrayToArray(char[] src, char[] dst, int off, int len) {
+        for (int i = 0; i < len; i++) {
+            dst[off + i] = src[i];
+        }
     }
 
 
