@@ -22,23 +22,23 @@ public interface ITestDataParserProvider<InputFormatType extends IParsePositionM
     /**
      * @return parser for Settings table
      */
-    ITestDataElementParser<InputFormatType, SettingTable> getSettingsTableParser();
+    ITableTestDataElementParser<InputFormatType, SettingTable> getSettingsTableParser();
 
 
     /**
      * @return parser for Test Case table
      */
-    ITestDataElementParser<InputFormatType, TestCaseTable> getTestCasesTableParser();
+    ITableTestDataElementParser<InputFormatType, TestCaseTable> getTestCasesTableParser();
 
 
     /**
      * @return parser for Variables table
      */
-    ITestDataElementParser<InputFormatType, VariablesTable> getVariablesTableParser();
+    ITableTestDataElementParser<InputFormatType, VariablesTable> getVariablesTableParser();
 
 
     /**
      * @return parser for Keyword table
      */
-    ITestDataElementParser<InputFormatType, KeywordTable> getKeywordsTableParser();
+    ITableTestDataElementParser<InputFormatType, KeywordTable> getKeywordsTableParser();
 }
