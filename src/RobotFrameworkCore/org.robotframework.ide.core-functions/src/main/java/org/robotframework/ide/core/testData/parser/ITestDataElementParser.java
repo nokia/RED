@@ -4,9 +4,13 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 
 
 /**
- * Responsible for decoding simple element - i.e. Setting table. It shouldn't be
- * used for decoding whole file - for this please check
- * {@link ITestDataParserProvider} .
+ * Responsible for decoding simple element - i.e. LibraryReference. It shouldn't
+ * be used for decoding whole file - for this please check
+ * {@link ITestDataParserProvider} or whole Table section - for this please
+ * check {@link ITableTestDataElementParser}.
+ * 
+ * NOTE: Invoke {@link #canParse(IParsePositionMarkable)} before real parse
+ * method will be invoked.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
@@ -16,9 +20,17 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
  *            type of data i.e. bytes, xml elements, but it should give
  *            possibility to restore position in case parsing fails
  * @param <OutputElementType>
- *            produced output i.e. SettingTable
+ *            produced output i.e. LibraryReference
  */
 public interface ITestDataElementParser<InputFormatType extends IParsePositionMarkable, OutputElementType> {
+
+    /**
+     * @param testData
+     *            input data get by parser
+     * @return an information if current data could be parsed by this parser
+     */
+    boolean canParse(InputFormatType testData);
+
 
     /**
      * @param testData
