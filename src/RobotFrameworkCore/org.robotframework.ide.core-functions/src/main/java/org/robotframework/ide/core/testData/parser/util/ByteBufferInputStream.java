@@ -115,4 +115,10 @@ public class ByteBufferInputStream extends InputStream implements
             buffer.reset();
         }
     }
+
+
+    @Override
+    public boolean markSupported() {
+        return true;
+    }
 }

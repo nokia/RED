@@ -10,9 +10,25 @@ import org.junit.After;
 import org.junit.Test;
 
 
+/**
+ * 
+ * @author wypych
+ * @see ByteBufferInputStream
+ */
 public class TestByteBufferInputStream {
 
     private ByteBufferInputStream bbis;
+
+
+    @Test
+    public void test_isMarkSupported_shouldReturn_True() {
+        // prepare
+        ByteBuffer bb = ByteBuffer.wrap(new byte[0]);
+        bbis = new ByteBufferInputStream(bb);
+
+        // execute & verify
+        assertThat(bbis.markSupported()).isTrue();
+    }
 
 
     @Test
