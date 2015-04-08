@@ -22,21 +22,48 @@ public class TestByteBufferReader {
 
 
     @Test
+    public void test_read_toCharArray_twice() throws IOException {
+        // prepare
+        String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = false;
+
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
+        bbr = new ByteBufferReader(bb, "UTF-8");
+
+        // // FIRST READ
+        assertReadCharArray(lines, 0, separator);
+
+        // // SECOND READ
+        assertReadCharArray(lines, 1, separator);
+    }
+
+
+    private void assertReadCharArray(String[] lines, int position,
+            String separator) throws IOException {
+        int numberOfCharsToRead = lines[position].length() + separator.length();
+        char text[] = new char[numberOfCharsToRead];
+
+        // execute
+        int readChars = bbr.read(text, 0, numberOfCharsToRead);
+
+        // verify
+        assertThat(readChars).isEqualTo(numberOfCharsToRead);
+        assertThat(text).isEqualTo((lines[position] + separator).toCharArray());
+    }
+
+
+    @Test
     public void test_readLine_markWithoutBounder_firstLineMark_and_afterSecondLineMark()
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = false;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            if (line.equals(lines[lines.length - 1])) {
-                strBuilder.append(line);
-            } else {
-                strBuilder.append(line).append(LINUX_SEPARATOR);
-            }
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -52,7 +79,7 @@ public class TestByteBufferReader {
         // after mark 2, the position should be equal to length of first line
         // plus OS separator
         assertThat(bb.position()).isEqualTo(
-                lines[0].length() + LINUX_SEPARATOR.length());
+                lines[0].length() + separator.length());
     }
 
 
@@ -61,17 +88,11 @@ public class TestByteBufferReader {
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = false;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            if (line.equals(lines[lines.length - 1])) {
-                strBuilder.append(line);
-            } else {
-                strBuilder.append(line).append(LINUX_SEPARATOR);
-            }
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         bbr.mark();
@@ -93,17 +114,11 @@ public class TestByteBufferReader {
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = false;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            if (line.equals(lines[lines.length - 1])) {
-                strBuilder.append(line);
-            } else {
-                strBuilder.append(line).append(LINUX_SEPARATOR);
-            }
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -119,13 +134,11 @@ public class TestByteBufferReader {
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine", "" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = true;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            strBuilder.append(line).append(LINUX_SEPARATOR);
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -140,13 +153,11 @@ public class TestByteBufferReader {
     public void test_readLine_by_line_inLinux() throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = LINUX_SEPARATOR;
+        boolean lastLineWithSeparator = true;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            strBuilder.append(line).append(LINUX_SEPARATOR);
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -162,17 +173,11 @@ public class TestByteBufferReader {
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = WINDOWS_SEPARATOR;
+        boolean lastLineWithSeparator = false;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            if (line.equals(lines[lines.length - 1])) {
-                strBuilder.append(line);
-            } else {
-                strBuilder.append(line).append(WINDOWS_SEPARATOR);
-            }
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -188,13 +193,11 @@ public class TestByteBufferReader {
             throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine", "" };
+        String separator = WINDOWS_SEPARATOR;
+        boolean lastLineWithSeparator = true;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            strBuilder.append(line).append(WINDOWS_SEPARATOR);
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -209,13 +212,11 @@ public class TestByteBufferReader {
     public void test_readLine_by_line_inWindows() throws IOException {
         // prepare
         String[] lines = { "firstLine", "secondLine", "thirdLine" };
+        String separator = WINDOWS_SEPARATOR;
+        boolean lastLineWithSeparator = true;
 
-        StringBuilder strBuilder = new StringBuilder();
-        for (String line : lines) {
-            strBuilder.append(line).append(WINDOWS_SEPARATOR);
-        }
-
-        ByteBuffer bb = ByteBuffer.wrap(strBuilder.toString().getBytes());
+        ByteBuffer bb = buildSingleLineToRead(lines, separator,
+                lastLineWithSeparator);
         bbr = new ByteBufferReader(bb, "UTF-8");
 
         // execute & verify
@@ -223,6 +224,22 @@ public class TestByteBufferReader {
             String text = bbr.readLine();
             assertThat(text).isEqualTo(line);
         }
+    }
+
+
+    private ByteBuffer buildSingleLineToRead(String[] lines, String separator,
+            boolean lastLineWithSeparator) {
+        StringBuilder strBuilder = new StringBuilder();
+        int length = lines.length;
+        for (int i = 0; i < length; i++) {
+            if (i == length - 1 && !lastLineWithSeparator) {
+                strBuilder.append(lines[i]);
+            } else {
+                strBuilder.append(lines[i]).append(separator);
+            }
+        }
+
+        return ByteBuffer.wrap(strBuilder.toString().getBytes());
     }
 
 
