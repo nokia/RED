@@ -1,6 +1,14 @@
 package org.robotframework.ide.core.testData.parser;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.robotframework.ide.core.testData.model.TestDataFile;
+import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.VariablesTable;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 
 
@@ -20,9 +28,20 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
     protected final ITestDataParserProvider<InputFormatType> parsersProvider;
 
 
+    /**
+     * @param parsersProvider
+     *            providers of parsers of table for current input format
+     * @throws MissingParserException
+     *             in case at least one of table parser is not declared
+     * @throws IllegalArgumentException
+     *             when parsers provider is null
+     */
     public AbstractRobotFrameworkFileParser(
             final ITestDataParserProvider<InputFormatType> parsersProvider)
-            throws MissingParserException {
+            throws MissingParserException, IllegalArgumentException {
+        if (parsersProvider == null) {
+            throw new IllegalArgumentException("Parsers provider is null.");
+        }
         checkParsersProvider(parsersProvider);
         this.parsersProvider = parsersProvider;
     }
@@ -31,10 +50,31 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
     private void checkParsersProvider(
             final ITestDataParserProvider<InputFormatType> parsersProvider)
             throws MissingParserException {
+        List<IRobotSectionTable> missingTablesParsers = new LinkedList<IRobotSectionTable>();
+        if (parsersProvider.getSettingsTableParser() == null) {
+            missingTablesParsers.add(new SettingTable());
+        }
+        if (parsersProvider.getKeywordsTableParser() == null) {
+            missingTablesParsers.add(new KeywordTable());
+        }
+        if (parsersProvider.getTestCasesTableParser() == null) {
+            missingTablesParsers.add(new TestCaseTable());
+        }
+        if (parsersProvider.getVariablesTableParser() == null) {
+            missingTablesParsers.add(new VariablesTable());
+        }
 
+        if (!missingTablesParsers.isEmpty()) {
+            throw new MissingParserException(missingTablesParsers);
+        }
     }
 
 
+    /**
+     * 
+     * @param testData
+     * @return
+     */
     public abstract ParseResult<InputFormatType, TestDataFile> parse(
             InputFormatType testData);
 }
