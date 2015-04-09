@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.parser;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
@@ -21,19 +22,37 @@ public class MissingParserException extends Exception {
 
 
     /**
-     * 
      * @param missingParserForTables
      *            i.e. Keyword table
      */
     public MissingParserException(
             List<IRobotSectionTable> missingParserForTables) {
         super("Missing table" + getTimesLaterIfRequired(missingParserForTables)
-                + " parser" + getTimesLaterIfRequired(missingParserForTables));
+                + formatTableNames(missingParserForTables) + " parser"
+                + getTimesLaterIfRequired(missingParserForTables));
+    }
+
+
+    private static String formatTableNames(
+            final List<IRobotSectionTable> missingParserForTables) {
+        StringBuilder str = new StringBuilder();
+        str.append('[');
+        Iterator<IRobotSectionTable> i = missingParserForTables.iterator();
+        while(i.hasNext()) {
+            str.append(i.next().getTableName());
+            if (i.hasNext()) {
+                str.append(',').append(' ');
+            }
+        }
+
+        str.append(']');
+
+        return str.toString();
     }
 
 
     private static String getTimesLaterIfRequired(
-            List<IRobotSectionTable> missingParserForTables) {
+            final List<IRobotSectionTable> missingParserForTables) {
         return missingParserForTables.size() > 1 ? "s" : "";
     }
 }
