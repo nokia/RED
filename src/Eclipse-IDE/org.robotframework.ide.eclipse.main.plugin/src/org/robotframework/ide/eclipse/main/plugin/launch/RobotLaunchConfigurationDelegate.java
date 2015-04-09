@@ -20,11 +20,14 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.ui.ILaunchShortcut;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.core.executor.IRobotOutputListener;
 import org.robotframework.ide.core.executor.RobotExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab;
 
@@ -38,12 +41,15 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
     private ILaunchConfigurationType launchConfigurationType;
 
-    private ILaunchManager manager;
+    private ILaunchManager manager; 
+    
+    private IEventBroker broker;
 
     public RobotLaunchConfigurationDelegate() {
         robotExecutor = new RobotExecutor();
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(ROBOT_LAUNCH_CONFIGURATION_TYPE);
+        broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     @Override
@@ -68,7 +74,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
     @Override
     public void launch(final ISelection selection, final String mode) {
-
+        
         if (selection instanceof IStructuredSelection) {
             WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 
@@ -87,6 +93,8 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
             job.schedule();
         }
     }
+    
+    
 
     @Override
     public void launch(IEditorPart editor, final String mode) {
@@ -174,6 +182,15 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     private void executeRobotTest(IFile file, IProject project, String robotExecutorName) {
         ExecutorOutputStreamListener executorOutputStreamListener = new ExecutorOutputStreamListener(ROBOT_CONSOLE_NAME);
         robotExecutor.addOutputStreamListener(executorOutputStreamListener);
+        
+        robotExecutor.setMessageLogListener(new IRobotOutputListener() {
+
+            @Override
+            public void handleLine(String line) {
+                broker.send("MessageLogView/AppendLine", line);
+            }
+        });
+        
         robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), robotExecutorName);
         robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
     }

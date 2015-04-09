@@ -5,9 +5,9 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.robotframework.ide.core.executor.IRobotLogOutputStreamListener;
+import org.robotframework.ide.core.executor.IRobotOutputListener;
 
-public class ExecutorOutputStreamListener implements IRobotLogOutputStreamListener {
+public class ExecutorOutputStreamListener implements IRobotOutputListener {
 
     private MessageConsoleStream out;
     private MessageConsole console;
