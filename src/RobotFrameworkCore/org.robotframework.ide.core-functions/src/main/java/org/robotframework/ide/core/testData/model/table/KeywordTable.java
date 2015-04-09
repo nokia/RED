@@ -1,8 +1,5 @@
 package org.robotframework.ide.core.testData.model.table;
 
-import org.robotframework.ide.core.testData.model.common.IOptional;
-
-
 /**
  * Represents high-level user keyword defined in test data file - test case or
  * better in resource files
@@ -12,10 +9,16 @@ import org.robotframework.ide.core.testData.model.common.IOptional;
  * @serial 1.0
  * 
  */
-public class KeywordTable implements IOptional {
+public class KeywordTable implements IRobotSectionTable {
 
     @Override
     public boolean isPresent() {
         return false;
+    }
+
+
+    @Override
+    public String getTableName() {
+        return "Keywords";
     }
 }

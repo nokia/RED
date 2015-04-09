@@ -6,8 +6,7 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 /**
  * Responsible for decoding simple element - i.e. LibraryReference. It shouldn't
  * be used for decoding whole file - for this please check
- * {@link ITestDataParserProvider} or whole Table section - for this please
- * check {@link ITableTestDataElementParser}.
+ * {@link ITestDataParserProvider}.
  * 
  * NOTE: Invoke {@link #canParse(IParsePositionMarkable)} before real parse
  * method will be invoked.
