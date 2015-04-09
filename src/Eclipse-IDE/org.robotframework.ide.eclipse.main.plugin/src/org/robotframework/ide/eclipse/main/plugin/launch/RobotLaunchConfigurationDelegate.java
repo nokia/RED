@@ -65,9 +65,11 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                     "");
             IFile file = project.getFile(fileNameAttribute);
             if (file.exists()) {
-                String robotExecutorNameAttribute = configuration.getAttribute(
+                String executorNameAttribute = configuration.getAttribute(
                         RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
-                executeRobotTest(file, project, robotExecutorNameAttribute);
+                String executorArgsAttribute = configuration.getAttribute(
+                        RobotLaunchConfigurationMainTab.EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
+                executeRobotTest(file, project, executorNameAttribute, executorArgsAttribute);
             }
         }
     }
@@ -179,7 +181,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         return null;
     }
 
-    private void executeRobotTest(IFile file, IProject project, String robotExecutorName) {
+    private void executeRobotTest(IFile file, IProject project, String executorName, String arguments) {
         ExecutorOutputStreamListener executorOutputStreamListener = new ExecutorOutputStreamListener(ROBOT_CONSOLE_NAME);
         robotExecutor.addOutputStreamListener(executorOutputStreamListener);
         
@@ -191,7 +193,8 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
             }
         });
         
-        robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), robotExecutorName);
+        robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), executorName,
+                arguments);
         robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
     }
 }

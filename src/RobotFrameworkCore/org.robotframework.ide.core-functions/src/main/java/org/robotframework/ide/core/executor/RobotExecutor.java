@@ -20,13 +20,14 @@ public class RobotExecutor {
     
     private RobotLogOutputStream logOutputStream;
     
-    private TestRunnerAgentMessageLogParser testRunnerAgentMessageLogParser = new TestRunnerAgentMessageLogParser();
+    private TestRunnerAgentMessageLogParser testRunnerAgentMessageLogParser;
     
     public RobotExecutor() {
         logOutputStream = new RobotLogOutputStream();
+        testRunnerAgentMessageLogParser = new TestRunnerAgentMessageLogParser();
     }
 
-    public int execute(String testPath, File projectLocation, String executorName) {
+    public int execute(String testPath, File projectLocation, String executorName, String arguments) {
         String robotExecutorName = executorName;
         if (OS.isFamilyWindows()) {
             robotExecutorName += ".bat";
@@ -41,7 +42,12 @@ public class RobotExecutor {
         
         Path testRunnerAgentFilePath = createTestRunnerAgentFile();
         
-        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False " + testPath;
+        String executorArgs = "";
+        if (arguments != null && !arguments.equals("")) {
+            executorArgs = arguments + " ";
+        }
+        
+        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False " + executorArgs + testPath;
         
         CommandLine cmd = CommandLine.parse(line);
         
