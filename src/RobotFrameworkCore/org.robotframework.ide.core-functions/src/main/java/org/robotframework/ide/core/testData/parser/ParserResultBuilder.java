@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.parser.result.ParserMessage;
 
 
 /**
- * Helper builder for create <code>ParseResult</code> object.
+ * Helper builder for create {@code ParseResult} object.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6

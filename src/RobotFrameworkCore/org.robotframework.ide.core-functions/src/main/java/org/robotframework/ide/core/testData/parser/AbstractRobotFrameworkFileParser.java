@@ -54,12 +54,15 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
         if (parsersProvider.getSettingsTableParser() == null) {
             missingTablesParsers.add(new SettingTable());
         }
+
         if (parsersProvider.getKeywordsTableParser() == null) {
             missingTablesParsers.add(new KeywordTable());
         }
+
         if (parsersProvider.getTestCasesTableParser() == null) {
             missingTablesParsers.add(new TestCaseTable());
         }
+
         if (parsersProvider.getVariablesTableParser() == null) {
             missingTablesParsers.add(new VariablesTable());
         }
@@ -71,9 +74,16 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
 
 
     /**
+     * Handle logic related to split current data format to more significant
+     * part of data in case it is required. It should use parsers provided for
+     * each section to split correctly logic for each part. Implementators of
+     * this method should do not take too much effort for validation part - it
+     * should be just simple parse what we can get.
      * 
      * @param testData
-     * @return
+     *            original data get from file it could by bytes or even xml
+     *            nodes
+     * @return result object, which contains errors and/or parsed object
      */
     public abstract ParseResult<InputFormatType, TestDataFile> parse(
             InputFormatType testData);
