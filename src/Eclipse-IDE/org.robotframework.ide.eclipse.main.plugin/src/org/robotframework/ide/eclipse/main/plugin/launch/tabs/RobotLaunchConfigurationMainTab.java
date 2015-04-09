@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
@@ -37,6 +38,8 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public static final String FILE_NAME_ATTRIBUTE = "File name";
 
     public static final String EXECUTOR_NAME_ATTRIBUTE = "Executor name";
+    
+    public static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
 
     public static final String PYBOT_NAME = "pybot";
 
@@ -45,14 +48,17 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private Text txtFile;
 
     private Text txtProject;
+    
+    private Text txtArgs;
 
-    private Combo executorCombo;
+    private Combo comboExecutorName;
 
     @Override
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(PROJECT_NAME_ATTRIBUTE, "");
         configuration.setAttribute(FILE_NAME_ATTRIBUTE, "");
         configuration.setAttribute(EXECUTOR_NAME_ATTRIBUTE, "");
+        configuration.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
     }
 
     @Override
@@ -60,7 +66,8 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         try {
             txtProject.setText(configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, ""));
             txtFile.setText(configuration.getAttribute(FILE_NAME_ATTRIBUTE, ""));
-            executorCombo.select(executorCombo.indexOf(configuration.getAttribute(EXECUTOR_NAME_ATTRIBUTE, "")));
+            comboExecutorName.select(comboExecutorName.indexOf(configuration.getAttribute(EXECUTOR_NAME_ATTRIBUTE, "")));
+            txtArgs.setText(configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, ""));
         } catch (CoreException e) {
             e.printStackTrace();
         }
@@ -70,11 +77,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(PROJECT_NAME_ATTRIBUTE, txtProject.getText());
         configuration.setAttribute(FILE_NAME_ATTRIBUTE, txtFile.getText());
-        if (executorCombo.getSelectionIndex() > -1) {
+        if (comboExecutorName.getSelectionIndex() > -1) {
             configuration.setAttribute(EXECUTOR_NAME_ATTRIBUTE,
-                    executorCombo.getItem(executorCombo.getSelectionIndex()));
+                    comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
         }
-
+        configuration.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, txtArgs.getText());
     }
 
     @Override
@@ -107,7 +114,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public boolean canSave() {
-        return (!txtProject.getText().isEmpty()) && (!txtFile.getText().isEmpty());
+        return (!txtProject.getText().isEmpty() && !txtFile.getText().isEmpty());
     }
 
     @Override
@@ -124,19 +131,33 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         Group executorGroup = new Group(topControl, SWT.NONE);
         executorGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         executorGroup.setText("Executor");
-        executorGroup.setLayout(new GridLayout(1, false));
+        executorGroup.setLayout(new GridLayout(3, false));
 
-        executorCombo = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
-        executorCombo.add(PYBOT_NAME);
-        executorCombo.add(JYBOT_NAME);
-        executorCombo.select(0);
-        executorCombo.addModifyListener(new ModifyListener() {
+        comboExecutorName = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        comboExecutorName.add(PYBOT_NAME);
+        comboExecutorName.add(JYBOT_NAME);
+        comboExecutorName.select(0);
+        comboExecutorName.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
+        
+        Label lblArgs = new Label(executorGroup, SWT.NONE);
+        lblArgs.setText("Arguments:");
+        
+        txtArgs = new Text(executorGroup, SWT.BORDER);
+        txtArgs.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        txtArgs.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        
 
         Group projectGroup = new Group(topControl, SWT.NONE);
         projectGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
