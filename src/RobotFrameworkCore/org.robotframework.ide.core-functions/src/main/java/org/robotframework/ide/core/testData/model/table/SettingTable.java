@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.testData.model.table;
 
-import org.robotframework.ide.core.testData.model.common.IOptional;
 import org.robotframework.ide.core.testData.model.table.setting.AbstractImportable;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryReference;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceFileReference;
@@ -20,7 +19,7 @@ import org.robotframework.ide.core.testData.model.util.MovableLinkedListWrapper;
  * @serial 1.0
  * 
  */
-public class SettingTable implements IOptional {
+public class SettingTable implements IRobotSectionTable {
 
     private boolean declarationOfTableAppears = false;
 
@@ -81,5 +80,11 @@ public class SettingTable implements IOptional {
     @Override
     public boolean isPresent() {
         return this.declarationOfTableAppears;
+    }
+
+
+    @Override
+    public String getTableName() {
+        return "Settings";
     }
 }
