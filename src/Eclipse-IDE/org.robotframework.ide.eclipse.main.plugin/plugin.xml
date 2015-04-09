@@ -122,6 +122,16 @@
         </editor>
     </extension>
  <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.robotframework.ide.eclipse.main.plugin.views.MessageLogViewWrapper"
+            icon="resources/robot.png"
+            id="org.robotframework.ide.MessageLogView"
+            name="Message Log"
+            restorable="true">
+      </view>
+ </extension>
+ <extension
        point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
           delegate="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
