@@ -28,7 +28,7 @@ public class MissingParserException extends Exception {
     public MissingParserException(
             List<IRobotSectionTable> missingParserForTables) {
         super("Missing table" + getTimesLaterIfRequired(missingParserForTables)
-                + formatTableNames(missingParserForTables) + " parser"
+                + " " + formatTableNames(missingParserForTables) + " parser"
                 + getTimesLaterIfRequired(missingParserForTables));
     }
 
