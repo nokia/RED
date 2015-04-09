@@ -11,7 +11,7 @@ import org.apache.commons.exec.LogOutputStream;
  */
 public class RobotLogOutputStream extends LogOutputStream{
 
-	private List<IRobotLogOutputStreamListener> listeners;
+	private List<IRobotOutputListener> listeners;
 	
 	public RobotLogOutputStream() {
 	    listeners = new ArrayList<>();
@@ -19,16 +19,16 @@ public class RobotLogOutputStream extends LogOutputStream{
     
     @Override 
     protected void processLine(String line, int level) {
-        for (IRobotLogOutputStreamListener listener : listeners) {
+        for (IRobotOutputListener listener : listeners) {
             listener.handleLine(line);
         }
     }   
     
-    public void addListener(IRobotLogOutputStreamListener listener) {
+    public void addListener(IRobotOutputListener listener) {
         listeners.add(listener);
     }
     
-    public void removeListener(IRobotLogOutputStreamListener listener) {
+    public void removeListener(IRobotOutputListener listener) {
         listeners.remove(listener);
     }
 

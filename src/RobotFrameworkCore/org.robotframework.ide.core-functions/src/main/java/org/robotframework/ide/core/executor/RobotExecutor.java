@@ -2,6 +2,9 @@ package org.robotframework.ide.core.executor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 
 import org.apache.commons.exec.CommandLine;
@@ -17,6 +20,8 @@ public class RobotExecutor {
     
     private RobotLogOutputStream logOutputStream;
     
+    private TestRunnerAgentMessageLogParser testRunnerAgentMessageLogParser = new TestRunnerAgentMessageLogParser();
+    
     public RobotExecutor() {
         logOutputStream = new RobotLogOutputStream();
     }
@@ -29,7 +34,15 @@ public class RobotExecutor {
             robotExecutorName += ".sh";
         }
         
-        String line = robotExecutorName + " " + testPath;
+        TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler();
+        testRunnerAgentHandler.addListener(testRunnerAgentMessageLogParser);
+        Thread handler = new Thread(testRunnerAgentHandler);
+        handler.start();
+        
+        Path testRunnerAgentFilePath = createTestRunnerAgentFile();
+        
+        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False " + testPath;
+        
         CommandLine cmd = CommandLine.parse(line);
         
         DefaultExecutor executor = new DefaultExecutor();
@@ -50,15 +63,21 @@ public class RobotExecutor {
             logOutputStream.processLine("Elapsed time: " + this.computeTestDuration(startTime, endTime) + "\n", 1);
         }
         
+        removeTempDir(testRunnerAgentFilePath.getParent());
+        
         return exitValue;
     }
     
-    public void addOutputStreamListener(IRobotLogOutputStreamListener listener) {
+    public void addOutputStreamListener(IRobotOutputListener listener) {
         logOutputStream.addListener(listener);
     }
     
-    public void removeOutputStreamListener(IRobotLogOutputStreamListener listener) {
+    public void removeOutputStreamListener(IRobotOutputListener listener) {
         logOutputStream.removeListener(listener);
+    }
+    
+    public void setMessageLogListener(IRobotOutputListener listener) {
+        testRunnerAgentMessageLogParser.setMessageLogListener(listener);
     }
     
     private String computeTestDuration(long startTime, long endTime) {
@@ -71,5 +90,33 @@ public class RobotExecutor {
 
         DecimalFormat df = new DecimalFormat("00");
         return df.format(diffHours) +":"+ df.format(diffMinutes) +":"+ df.format(diffSeconds);
+    }
+    
+    private Path createTestRunnerAgentFile() {
+        Path tempDir = null;
+        File agentFile = new File("");
+        try {
+            tempDir = Files.createTempDirectory("RobotTempDir");
+            agentFile = new File(tempDir.toString() + "\\TestRunnerAgent.py");
+            Files.copy(RobotExecutor.class.getResourceAsStream("TestRunnerAgent.py"), agentFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return agentFile.toPath();
+    }
+    
+    private void removeTempDir(Path dir) {
+        File tempDir = new File(dir.toString());
+        File[] files = tempDir.listFiles();
+        try {
+            for (int i = 0; i < files.length; i++) {
+                Files.delete(files[i].toPath());
+            }
+            Files.delete(dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

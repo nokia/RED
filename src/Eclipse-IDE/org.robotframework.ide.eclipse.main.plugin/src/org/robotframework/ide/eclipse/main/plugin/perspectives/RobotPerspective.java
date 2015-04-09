@@ -11,7 +11,10 @@ public class RobotPerspective implements IPerspectiveFactory {
 	    final String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(true); 
         
-        final IFolderLayout bottom= layout.createFolder("bottom", IPageLayout.BOTTOM, 0.65f ,editorArea);
+        final IFolderLayout bottomLog = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.75f ,editorArea);
+        bottomLog.addView("org.robotframework.ide.MessageLogView");
+        
+        final IFolderLayout bottom = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.65f ,editorArea);
         bottom.addView("org.eclipse.ui.console.ConsoleView"); 
         bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
         
