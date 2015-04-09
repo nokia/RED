@@ -121,4 +121,12 @@ public class ByteBufferInputStream extends InputStream implements
     public boolean markSupported() {
         return true;
     }
+
+
+    /**
+     * @return underline byte buffer
+     */
+    public ByteBuffer getByteBuffer() {
+        return this.buffer;
+    }
 }

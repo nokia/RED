@@ -29,6 +29,20 @@ public class ByteBufferReader extends Reader implements IParsePositionMarkable {
 
 
     /**
+     * @param inStream
+     *            input stream with byte buffer inside
+     * @param charsetName
+     *            encoding {@link Charset}
+     */
+    public ByteBufferReader(final ByteBufferInputStream inStream,
+            String charsetName) {
+        this.inStream = inStream;
+        this.buffer = inStream.getByteBuffer();
+        this.charset = Charset.forName(charsetName);
+    }
+
+
+    /**
      * 
      * @param b
      *            buffer with data
