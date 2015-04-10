@@ -107,6 +107,11 @@ public class TestDataFile {
     public static enum TestDataType {
         /**
          * usually __init__.ext file where ext is supported file type extension
+         * always is directory
+         */
+        TEST_SUITE_FILE_WITH_INIT,
+        /**
+         * directory represents test suite
          */
         TEST_SUITE_FILE,
         /**
@@ -117,10 +122,6 @@ public class TestDataFile {
          * resource shouldn't contains any test case
          */
         RESOURCES_FILE,
-        /**
-         * directory in model hierarchy structure
-         */
-        DIRECTORY,
         /**
          * during parsing problem with file occurred or file is not in any Robot
          * Framework accepted format
