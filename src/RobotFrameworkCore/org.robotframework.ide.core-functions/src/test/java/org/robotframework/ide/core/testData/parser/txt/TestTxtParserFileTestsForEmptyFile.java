@@ -1,5 +1,10 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +30,12 @@ public class TestTxtParserFileTestsForEmptyFile {
             MissingParserException {
         // prepare
         String fileContent = "";
-        // execute
 
+        File f = mock(File.class);
+        String g = mock(String.class);
+        when(f.getName()).thenReturn(g);
+        // execute
+        parser.canAcceptFile(f);
         // verify
     }
 
@@ -40,6 +49,7 @@ public class TestTxtParserFileTestsForEmptyFile {
 
     @After
     public void tearDown() {
-
+        parser = null;
+        parsersProvider = null;
     }
 }
