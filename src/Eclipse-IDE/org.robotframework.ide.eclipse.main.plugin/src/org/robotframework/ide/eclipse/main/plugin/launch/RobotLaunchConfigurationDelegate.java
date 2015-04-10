@@ -130,7 +130,8 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                             file.getName());
                     configuration.setAttribute(RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE,
                             file.getProject().getName());
-                    configuration.setAttribute(RobotLaunchConfigurationMainTab.FILE_NAME_ATTRIBUTE, file.getName());
+                    configuration.setAttribute(RobotLaunchConfigurationMainTab.FILE_NAME_ATTRIBUTE, file.getParent()
+                            .getName() + "/" + file.getName());
                     configuration.setAttribute(RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE,
                             RobotLaunchConfigurationMainTab.PYBOT_NAME);
 
