@@ -206,10 +206,10 @@
        point="org.eclipse.ui.navigator.navigatorContent">
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorContentProvider"
-          icon="resources/settings.png"
+          icon="resources/robot.png"
           id="org.robotframework.content.testFileContent"
           labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider"
-          name="Foo">
+          name="Robot Elements">
        <triggerPoints>
           <and>
              <instanceof
