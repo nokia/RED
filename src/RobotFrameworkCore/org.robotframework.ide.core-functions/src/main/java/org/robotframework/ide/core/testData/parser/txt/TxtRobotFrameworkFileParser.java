@@ -58,6 +58,15 @@ public class TxtRobotFrameworkFileParser extends
 
     @Override
     public boolean canAcceptFile(File file) {
-        return false;
+        boolean result = false;
+        if (file != null) {
+            String extension = ".txt";
+            String filename = file.getName();
+            if (filename.length() > extension.length()) {
+                result = filename.toLowerCase().endsWith(extension);
+            }
+        }
+
+        return result;
     }
 }
