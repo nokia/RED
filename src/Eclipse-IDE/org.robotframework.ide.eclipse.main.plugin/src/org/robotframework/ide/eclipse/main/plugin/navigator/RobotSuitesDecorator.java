@@ -1,10 +1,10 @@
-package org.robotframework.ide.eclipse.main.plugin.explorer;
+package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
-import org.robotframework.ide.eclipse.main.plugin.RobotFrameworkPluginActivator;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature;
 
 public class RobotSuitesDecorator implements ILightweightLabelDecorator {
@@ -32,7 +32,7 @@ public class RobotSuitesDecorator implements ILightweightLabelDecorator {
     @Override
     public void decorate(final Object element, final IDecoration decoration) {
         if (element instanceof IFolder && RobotProjectNature.isRobotSuite((IFolder) element)) {
-            decoration.addOverlay(RobotFrameworkPluginActivator.getImageDescriptor("resources/robot_dec.png"));
+            decoration.addOverlay(RobotImages.getRobotDecoratorImage());
         }
     }
 
