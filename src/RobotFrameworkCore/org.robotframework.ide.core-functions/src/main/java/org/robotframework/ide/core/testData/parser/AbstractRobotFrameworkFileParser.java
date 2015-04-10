@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.parser;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,4 +88,14 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
      */
     public abstract ParseResult<InputFormatType, TestDataFile> parse(
             InputFormatType testData);
+
+
+    /**
+     * Pre-check if file can be expected base on file object
+     * 
+     * @param file
+     *            to check
+     * @return an information if file could be expected one by this parser
+     */
+    public abstract boolean hasFileNameAsExcpected(File file);
 }
