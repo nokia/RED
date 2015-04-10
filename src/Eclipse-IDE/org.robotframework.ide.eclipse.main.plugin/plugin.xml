@@ -99,6 +99,9 @@
        <newWizardShortcut
              id="org.robotframework.ide.eclipse.wizards.newRobotCase">
        </newWizardShortcut>
+       <actionSet
+             id="org.eclipse.debug.ui.launchActionSet">
+       </actionSet>
     </perspectiveExtension>
  </extension>
 
@@ -304,6 +307,13 @@
           This color is used in Robot tables in order to highlight currently selected cell
        </description>
     </colorDefinition>
+ </extension>
+ <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="toolbar:org.eclipse.ui.main.toolbar">
+    </menuContribution>
  </extension>
 
 </plugin>
