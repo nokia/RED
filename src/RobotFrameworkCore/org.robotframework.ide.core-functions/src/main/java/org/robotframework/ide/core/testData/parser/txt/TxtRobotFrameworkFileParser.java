@@ -1,7 +1,5 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
-import java.io.IOException;
-
 import org.robotframework.ide.core.testData.model.TestDataFile;
 import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
@@ -51,12 +49,6 @@ public class TxtRobotFrameworkFileParser extends
     @Override
     public ParseResult<ByteBufferInputStream, TestDataFile> parse(
             ByteBufferInputStream testData) {
-        try {
-            System.out.println((char) testData.read());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         return null;
     }
