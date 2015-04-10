@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -44,8 +45,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -314,13 +315,10 @@ public class TextEditor {
 		final Menu menu = new Menu(viewer.getControl());
 		final MenuItem saveAsItem = new MenuItem(menu, SWT.PUSH);
 		saveAsItem.setText("Save As");
-		saveAsItem.addSelectionListener(new SelectionListener() {
+		saveAsItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				handlerService.executeHandler(saveAsCommand); 
-			}
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent e) {
 			}
 		});
 		
@@ -329,7 +327,7 @@ public class TextEditor {
 		final MenuItem toggleLineNumberColumnItem = new MenuItem(menu, SWT.CHECK);
 		toggleLineNumberColumnItem.setSelection(true);
 		toggleLineNumberColumnItem.setText("Show Line Numbers");
-		toggleLineNumberColumnItem.addSelectionListener(new SelectionListener() {
+        toggleLineNumberColumnItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				if(toggleLineNumberColumnItem.getSelection()) {
@@ -338,11 +336,7 @@ public class TextEditor {
 					viewer.removeVerticalRulerColumn(lineNumberColumn);
 				}
 			}
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent e) {
-			}
 		});
-		new MenuItem(menu, SWT.SEPARATOR);
 		return menu;
 	}
 	

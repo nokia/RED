@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.explorer;
+package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.Viewer;
