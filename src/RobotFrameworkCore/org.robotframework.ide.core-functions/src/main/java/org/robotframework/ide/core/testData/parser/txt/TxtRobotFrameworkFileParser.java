@@ -57,7 +57,7 @@ public class TxtRobotFrameworkFileParser extends
 
 
     @Override
-    public boolean hasFileNameAsExcpected(File file) {
+    public boolean canAcceptFile(File file) {
         return false;
     }
 }
