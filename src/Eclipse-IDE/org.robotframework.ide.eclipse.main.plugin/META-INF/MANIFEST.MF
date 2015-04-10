@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10.0",
  org.eclipse.e4.tools.services;bundle-version="0.12.0",
  org.eclipse.jface.text;bundle-version="3.9.1",
  org.eclipse.ui.editors;bundle-version="3.8.200",
+ org.eclipse.ui.forms;bundle-version="3.6.100",
  org.eclipse.ui.ide;bundle-version="3.10.1",
  org.eclipse.e4.core.commands;bundle-version="0.10.2",
  org.eclipse.core.resources,
@@ -27,4 +28,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
  .
-Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RobotFrameworkPluginActivator
+Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RobotFramework

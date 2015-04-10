@@ -59,7 +59,7 @@
  <extension
        point="org.eclipse.ui.decorators">
     <decorator
-          class="org.robotframework.ide.eclipse.main.plugin.explorer.RobotSuitesDecorator"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotSuitesDecorator"
           icon="resources/robot_dec.png"
           id="org.robotframework.ide.eclipse.main.plugin.robotSuiteDecorator"
           label="Robot Test Suites"
@@ -107,14 +107,14 @@
         <editor
                 name="Robot Text Editor"
                 extensions="txt,robot"
-                default="true"
+                default="false"
                 icon="resources/robot.png"
                 class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
                 id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
         </editor>
         <editor
-              class="org.robotframework.ide.eclipse.main.plugin.tableeditor.TableEditorWrapper"
-              default="false"
+              class="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor"
+              default="true"
               extensions="txt,robot"
               icon="resources/robot.png"
               id="org.robotframework.ide.tableditor"
@@ -205,34 +205,51 @@
  <extension
        point="org.eclipse.ui.navigator.navigatorContent">
     <navigatorContent
-          contentProvider="org.robotframework.ide.eclipse.main.plugin.explorer.NavigatorContentProvider"
+          contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorContentProvider"
           icon="resources/settings.png"
-          id="org.robotframework.content.settings"
-          labelProvider="org.robotframework.ide.eclipse.main.plugin.explorer.NavigatorLabelProvider"
+          id="org.robotframework.content.testFileContent"
+          labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider"
           name="Foo">
        <triggerPoints>
           <and>
              <instanceof
                    value="org.eclipse.core.resources.IFile">
              </instanceof>
-             <test
-                   property="org.eclipse.core.resources.extension"
-                   value="txt">
-             </test>
+             <or>
+                <test
+                      property="org.eclipse.core.resources.extension"
+                      value="txt">
+                </test>
+                <test
+                      property="org.eclipse.core.resources.extension"
+                      value="robot">
+                </test></or>
           </and>
        </triggerPoints>
        <possibleChildren>
           <instanceof
-                value="org.robotframework.ide.eclipse.main.plugin.tempmodel.Settings">
+                value="org.robotframework.ide.eclipse.main.plugin.RobotElement">
           </instanceof>
        </possibleChildren>
+       <actionProvider
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorActionsProvider"
+             id="org.robotframework.actions.provider">
+       </actionProvider>
     </navigatorContent>
     <commonFilter
           activeByDefault="false"
-          class="org.robotframework.ide.eclipse.main.plugin.explorer.SuiteInitFilesFilter"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.SuiteInitFilesFilter"
           description="Hides all Robot Suite initialization files (__init__.robot)"
           id="org.robotframework.filters.initFilesFilter"
           name="Robot Suite initialization files"
+          visibleInUI="true">
+    </commonFilter>
+    <commonFilter
+          activeByDefault="true"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.NonRobotProjectsFilter"
+          description="Hide all non-Robot projects"
+          id="org.robotframework.filters.nonRobotProjectsFilter"
+          name="Non-Robot projects"
           visibleInUI="true">
     </commonFilter>
     <commonWizard
@@ -270,6 +287,23 @@
           </with>
        </enablement>
     </commonWizard>
+ </extension>
+ <extension
+       point="org.eclipse.ui.themes">
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.theme"
+          label="Robot">
+    </themeElementCategory>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.cell.highlight"
+          isEditable="true"
+          label="Highlighted cell color"
+          value="255, 245, 225">
+       <description>
+          This color is used in Robot tables in order to highlight currently selected cell
+       </description>
+    </colorDefinition>
  </extension>
 
 </plugin>

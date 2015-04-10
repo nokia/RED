@@ -1,9 +1,9 @@
-package org.robotframework.ide.eclipse.main.plugin.explorer;
+package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.tempmodel.FileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 
 public class NavigatorLabelProvider implements ILabelProvider {
 
@@ -29,12 +29,18 @@ public class NavigatorLabelProvider implements ILabelProvider {
 
 	@Override
 	public Image getImage(final Object element) {
-		return ((FileSection) element).getImage().createImage();
+        if (element instanceof RobotElement) {
+            return ((RobotElement) element).getImage().createImage();
+        }
+        return null;
 	}
 
 	@Override
 	public String getText(final Object element) {
-		return ((FileSection) element).getName();
+        if (element instanceof RobotElement) {
+            return ((RobotElement) element).getName();
+        }
+        return "";
 	}
 
 }

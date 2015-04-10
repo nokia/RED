@@ -9,24 +9,90 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 
 public class FileSectionsParser {
 
-    public FileSection[] parseSections(final IFile file) throws CoreException, IOException {
-        final List<FileSection> sections = new ArrayList<>();
+    private final boolean readOnly;
+    private IFile file;
+    private InputStream stream;
 
-        final InputStream inputStream = file.getContents();
-        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+    public FileSectionsParser(final IFile file) {
+        this.file = file;
+        this.readOnly = file.isReadOnly();
+    }
 
-        String line = bufferedReader.readLine();
+    public FileSectionsParser(final InputStream stream, final boolean readOnly) {
+        this.stream = stream;
+        this.readOnly = readOnly;
+    }
 
-        while (line != null) {
-            if (line.startsWith("*")) {
-                sections.add(new FileSection(extractSectionName(line)));
-            }
-            line = bufferedReader.readLine();
+    public List<RobotSuiteFileSection> parseRobotFileSections() throws IOException {
+        final List<RobotSuiteFileSection> sections = new ArrayList<>();
+
+        InputStream inputStream = null;
+        try {
+            inputStream = file != null ? file.getContents(true) : stream;
+        } catch (final CoreException e) {
+            throw new IOException("Unable to get content of file: " + file.getLocation().toString(), e);
         }
-        return sections.toArray(new FileSection[0]);
+
+        try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+            String line = bufferedReader.readLine();
+
+            RobotSuiteFileSection varSection = null;
+            while (line != null) {
+                if (line.trim().isEmpty()) {
+                    line = bufferedReader.readLine();
+                    continue;
+                } else if (line.startsWith("*")) {
+                    varSection = null;
+                    final String sectionName = extractSectionName(line);
+                    final RobotSuiteFile parent = RobotFramework.getModelManager().createSuiteFile(file);
+                    if ("Variables".equals(sectionName)) {
+                        varSection = new RobotSuiteFileSection(parent, file, sectionName, readOnly);
+                        sections.add(varSection);
+                    } else {
+                        sections.add(new RobotSuiteFileSection(parent, file, sectionName, readOnly));
+                    }
+                } else if (varSection != null) {
+                    final String name = extractVarName(line);
+                    final String value = extractVarValue(line);
+                    final String comment = extractVarComment(line);
+
+                    if (line.startsWith("@")) {
+                        varSection.createListVariable(name, value, comment);
+                    } else {
+                        varSection.createScalarVariable(name, value, comment);
+                    }
+                }
+                line = bufferedReader.readLine();
+            }
+        }
+        return sections;
+    }
+
+    private String extractVarComment(final String line) {
+        final int indexOfComment = line.indexOf('#');
+        if (indexOfComment < 0) {
+            return "";
+        }
+        return line.substring(line.indexOf('#')).trim();
+    }
+
+    private String extractVarValue(final String line) {
+        final int indexOfComment = line.indexOf('#');
+        if (indexOfComment < 0) {
+            return line.substring(line.indexOf('}') + 1).trim();
+        } else {
+            return line.substring(line.indexOf('}') + 1, indexOfComment).trim();
+        }
+    }
+
+    private String extractVarName(final String line) {
+        return line.substring(2, line.indexOf('}')).trim();
     }
 
     private String extractSectionName(final String line) {
