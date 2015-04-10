@@ -6,6 +6,8 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -154,6 +156,12 @@ public class TestAbstractRobotFrameworkFileParser {
         public ParseResult<ByteBufferInputStream, TestDataFile> parse(
                 ByteBufferInputStream testData) {
             return null;
+        }
+
+
+        @Override
+        public boolean canAcceptFile(File file) {
+            return false;
         }
     }
 }

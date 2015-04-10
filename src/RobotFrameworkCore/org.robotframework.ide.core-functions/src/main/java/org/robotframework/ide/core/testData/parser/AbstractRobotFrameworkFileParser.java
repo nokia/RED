@@ -97,5 +97,5 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
      *            to check
      * @return an information if file could be expected one by this parser
      */
-    public abstract boolean hasFileNameAsExcpected(File file);
+    public abstract boolean canAcceptFile(File file);
 }
