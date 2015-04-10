@@ -49,4 +49,10 @@ public class MessageLogView {
     private void lineEvent(@UIEventTopic("MessageLogView/AppendLine") String line) {
         appendLine(line);
     }
+    
+    @Inject
+    @Optional
+    private void clearEvent(@UIEventTopic("MessageLogView/Clear") String s) {
+        styledText.setText("");
+    }
 }
