@@ -36,7 +36,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     private static final String ROBOT_LAUNCH_CONFIGURATION_TYPE = "org.robotframework.ide.robotLaunchConfiguration";
 
     private static final String ROBOT_CONSOLE_NAME = "Robot Test Result";
-
+    
     private RobotExecutor robotExecutor;
 
     private ILaunchConfigurationType launchConfigurationType;
@@ -65,6 +65,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                     "");
             IFile file = project.getFile(fileNameAttribute);
             if (file.exists()) {
+                clearMessageLogView();
                 String executorNameAttribute = configuration.getAttribute(
                         RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
                 String executorArgsAttribute = configuration.getAttribute(
@@ -82,6 +83,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
                 @Override
                 public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                    clearMessageLogView();
                     for (Object element : ((IStructuredSelection) selection).toArray()) {
                         if (element instanceof IFile) {
                             IFile file = (IFile) element;
@@ -96,10 +98,9 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         }
     }
     
-    
-
     @Override
     public void launch(IEditorPart editor, final String mode) {
+        
         IEditorInput input = editor.getEditorInput();
         if (input instanceof FileEditorInput) {
             final IFile file = ((FileEditorInput) input).getFile();
@@ -107,6 +108,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
                 @Override
                 public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                    clearMessageLogView();
                     launchWithExistingOrNewConfiguration(file, mode, monitor);
 
                     return Status.OK_STATUS;
@@ -196,5 +198,9 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), executorName,
                 arguments);
         robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
+    }
+    
+    private void clearMessageLogView() {
+        broker.send("MessageLogView/Clear", "");
     }
 }
