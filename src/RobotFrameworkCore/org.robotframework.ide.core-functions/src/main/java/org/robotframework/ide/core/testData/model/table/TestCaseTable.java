@@ -10,12 +10,24 @@ package org.robotframework.ide.core.testData.model.table;
  */
 public class TestCaseTable implements IRobotSectionTable {
 
-    private final boolean declarationOfTableAppears = false;
+    private boolean declarationOfTableAppears = false;
 
 
     @Override
     public boolean isPresent() {
         return declarationOfTableAppears;
+    }
+
+
+    @Override
+    public void setPresent() {
+        declarationOfTableAppears = true;
+    }
+
+
+    @Override
+    public void unsetPresent() {
+        declarationOfTableAppears = false;
     }
 
 

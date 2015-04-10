@@ -19,6 +19,18 @@ import org.robotframework.ide.core.testData.model.common.IOptional;
 public interface IRobotSectionTable extends IOptional {
 
     /**
+     * enable this table in model
+     */
+    void setPresent();
+
+
+    /**
+     * disable this table in model
+     */
+    void unsetPresent();
+
+
+    /**
      * @return name of this table
      */
     String getTableName();
