@@ -1,5 +1,7 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
+import java.io.File;
+
 import org.robotframework.ide.core.testData.model.TestDataFile;
 import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
@@ -51,5 +53,11 @@ public class TxtRobotFrameworkFileParser extends
             ByteBufferInputStream testData) {
 
         return null;
+    }
+
+
+    @Override
+    public boolean hasFileNameAsExcpected(File file) {
+        return false;
     }
 }
