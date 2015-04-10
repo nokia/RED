@@ -11,9 +11,24 @@ package org.robotframework.ide.core.testData.model.table;
  */
 public class KeywordTable implements IRobotSectionTable {
 
+    private boolean declarationOfTableAppears = false;
+
+
     @Override
     public boolean isPresent() {
-        return false;
+        return declarationOfTableAppears;
+    }
+
+
+    @Override
+    public void setPresent() {
+        declarationOfTableAppears = true;
+    }
+
+
+    @Override
+    public void unsetPresent() {
+        declarationOfTableAppears = false;
     }
 
 
