@@ -111,7 +111,8 @@ public class TestDataFile {
          */
         TEST_SUITE_FILE_WITH_INIT,
         /**
-         * directory represents test suite
+         * directory represents test suite - usually doesn't contain any special
+         * information for test cases
          */
         TEST_SUITE_FILE,
         /**
