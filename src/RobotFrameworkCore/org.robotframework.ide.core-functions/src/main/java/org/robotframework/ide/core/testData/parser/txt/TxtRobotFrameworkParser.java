@@ -39,17 +39,17 @@ public class TxtRobotFrameworkParser extends
                 if (findTableSectionDeclaration(testData)) {
                     ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tablePraser = findMatchTableSectionParser(testData);
                     if (tablePraser != null) {
-                        if (isTableSectionStartsFromNewLine(testData)) {
-                            ParseResult<ByteBufferInputStream, ? extends IRobotSectionTable> createdRobotFrameworkElement = tablePraser
-                                    .parse(testData);
-                            // TODO: checks of object
-                        } else {
-                            if (previousTableFoundPosition == 0) {
-
-                            }
-                            addWarningAboutIncorrectTablePlace(testData,
-                                    outputBuilder, tablePraser);
+                        if (areDataBeforeFirstTable(testData,
+                                previousTableFoundPosition)) {
+                            handleTrashDataBeforeFirstTableDeclaration(
+                                    testData, outputBuilder);
+                            previousTableFoundPosition = testData
+                                    .getByteBuffer().position();
                         }
+
+                        // check is done before parsing will happen, according
+                        // to Robot Framework documentation each table should
+                        // start from new line
                     } else {
                         addInformationAboutTableMarkFound(testData,
                                 outputBuilder);
@@ -61,6 +61,29 @@ public class TxtRobotFrameworkParser extends
         }
 
         return outputBuilder.build();
+    }
+
+
+    private boolean areDataBeforeFirstTable(ByteBufferInputStream testData,
+            int previousTableFoundPosition) {
+        return previousTableFoundPosition == 0
+                && testData.getByteBuffer().position() > 0;
+    }
+
+
+    private void handleTrashDataBeforeFirstTableDeclaration(
+            ByteBufferInputStream testData,
+            ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder) {
+        int currentPosition = testData.getByteBuffer().position();
+        byte[] trashData = new byte[currentPosition];
+        testData.mark();
+        testData.getByteBuffer().position(0);
+        testData.getByteBuffer().get(trashData);
+        testData.reset();
+
+        outputBuilder
+                .addTrashDataFoundBeforeFirstElementAppears(new ByteBufferInputStream(
+                        ByteBuffer.wrap(trashData)));
     }
 
 
@@ -86,41 +109,6 @@ public class TxtRobotFrameworkParser extends
                 + testData.getByteBuffer().position(),
                 "Found possible '*', which indicate begin of table, but "
                         + " non of parsers for section was interested");
-    }
-
-
-    private void addWarningAboutIncorrectTablePlace(
-            ByteBufferInputStream testData,
-            ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder,
-            ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tablePraser) {
-        outputBuilder.addWarningMessage("Position in buffer: "
-                + testData.getByteBuffer().position(), "Found table "
-                + tablePraser.getName() + ", but it was not in correct place. "
-                + "According to Robot Framework specification "
-                + "tables should starts from begin of line/file.");
-    }
-
-
-    /**
-     * Check if is correct place means starting position for table is new line
-     * or begin of file
-     * 
-     * @param content
-     *            current test data file data
-     * @return says if table could exists here
-     */
-    private boolean isTableSectionStartsFromNewLine(
-            ByteBufferInputStream content) {
-        boolean isCorrect = false;
-
-        ByteBuffer byteBuffer = content.getByteBuffer();
-        if (byteBuffer.position() == 0) {
-            isCorrect = true;
-        } else {
-            isCorrect = (byteBuffer.get(byteBuffer.position() - 1) == '\n');
-        }
-
-        return isCorrect;
     }
 
 
