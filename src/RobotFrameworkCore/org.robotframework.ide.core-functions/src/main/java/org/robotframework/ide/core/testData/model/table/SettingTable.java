@@ -14,6 +14,7 @@ package org.robotframework.ide.core.testData.model.table;
  */
 public class SettingTable implements IRobotSectionTable {
 
+    public static final String TABLE_NAME = "Settings";
     private boolean declarationOfTableAppears = false;
 
 
@@ -35,6 +36,6 @@ public class SettingTable implements IRobotSectionTable {
 
     @Override
     public String getName() {
-        return "Settings";
+        return TABLE_NAME;
     }
 }

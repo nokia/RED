@@ -26,6 +26,6 @@ public class TxtKeywordTableParser implements
 
     @Override
     public String getName() {
-        return new KeywordTable().getName();
+        return KeywordTable.TABLE_NAME;
     }
 }

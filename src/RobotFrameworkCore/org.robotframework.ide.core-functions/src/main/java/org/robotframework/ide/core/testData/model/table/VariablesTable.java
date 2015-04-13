@@ -10,6 +10,7 @@ package org.robotframework.ide.core.testData.model.table;
  */
 public class VariablesTable implements IRobotSectionTable {
 
+    public static final String TABLE_NAME = "Variables";
     private boolean declarationOfTableAppears = false;
 
 
@@ -34,6 +35,6 @@ public class VariablesTable implements IRobotSectionTable {
 
     @Override
     public String getName() {
-        return "Variables";
+        return TABLE_NAME;
     }
 }
