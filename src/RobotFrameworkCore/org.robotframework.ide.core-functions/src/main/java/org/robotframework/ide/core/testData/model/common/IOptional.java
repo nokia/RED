@@ -9,7 +9,7 @@ package org.robotframework.ide.core.testData.model.common;
  * 
  * @see Comment
  */
-public interface IOptional {
+public interface IOptional extends ITraceableNamed {
 
     /**
      * @return an information if element is available

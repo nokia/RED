@@ -66,4 +66,10 @@ public class Comment implements IOptional {
     public boolean isPresent() {
         return isExists;
     }
+
+
+    @Override
+    public String getName() {
+        return "Comment";
+    }
 }
