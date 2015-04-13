@@ -25,7 +25,7 @@ public class TxtVariablesTableParser implements
 
 
     @Override
-    public VariablesTable newOutputElement() {
-        return new VariablesTable();
+    public String getName() {
+        return VariablesTable.TABLE_NAME;
     }
 }
