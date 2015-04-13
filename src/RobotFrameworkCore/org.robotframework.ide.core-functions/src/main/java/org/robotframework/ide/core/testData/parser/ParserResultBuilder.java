@@ -1,6 +1,7 @@
 package org.robotframework.ide.core.testData.parser;
 
 import org.robotframework.ide.core.testData.parser.result.MessageType;
+import org.robotframework.ide.core.testData.parser.result.OutOfOrderData;
 import org.robotframework.ide.core.testData.parser.result.ParseProcessResult;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 import org.robotframework.ide.core.testData.parser.result.ParserMessage;
@@ -102,6 +103,36 @@ public class ParserResultBuilder<InputFormatType, OutputFormatType> {
         parseResultBuildUp.addParserMessage(new ParserMessage(
                 MessageType.ERROR, localization, message));
         this.wasError = true;
+
+        return this;
+    }
+
+
+    /**
+     * 
+     * @param garbageData
+     *            data without non-sens for parser
+     * @return current view on builder
+     */
+    public ParserResultBuilder<InputFormatType, OutputFormatType> addTrashDataFoundBeforeFirstElementAppears(
+            InputFormatType garbageData) {
+        parseResultBuildUp.setTrashBeforeFirstExpectedData(garbageData);
+
+        return this;
+    }
+
+
+    /**
+     * @param data
+     *            which could be possible process by parser, but from some
+     *            reason they are treat as unexpected here
+     * @return current view on builder
+     */
+    public ParserResultBuilder<InputFormatType, OutputFormatType> addOutOfOrderElement(
+            InputFormatType data, String localization, String message) {
+        parseResultBuildUp
+                .addOutOfOrderElementFound(new OutOfOrderData<InputFormatType>(
+                        data, localization, message));
 
         return this;
     }

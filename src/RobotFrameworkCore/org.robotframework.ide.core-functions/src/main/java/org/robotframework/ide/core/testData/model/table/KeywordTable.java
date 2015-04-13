@@ -33,7 +33,7 @@ public class KeywordTable implements IRobotSectionTable {
 
 
     @Override
-    public String getTableName() {
+    public String getName() {
         return "Keywords";
     }
 }

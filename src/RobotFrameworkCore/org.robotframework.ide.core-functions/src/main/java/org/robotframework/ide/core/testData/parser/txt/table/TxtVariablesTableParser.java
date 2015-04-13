@@ -23,4 +23,9 @@ public class TxtVariablesTableParser implements
         return null;
     }
 
+
+    @Override
+    public VariablesTable newOutputElement() {
+        return new VariablesTable();
+    }
 }

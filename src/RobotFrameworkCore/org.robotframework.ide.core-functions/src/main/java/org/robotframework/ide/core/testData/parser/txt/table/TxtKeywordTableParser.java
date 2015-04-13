@@ -23,4 +23,9 @@ public class TxtKeywordTableParser implements
         return null;
     }
 
+
+    @Override
+    public String getName() {
+        return new KeywordTable().getName();
+    }
 }
