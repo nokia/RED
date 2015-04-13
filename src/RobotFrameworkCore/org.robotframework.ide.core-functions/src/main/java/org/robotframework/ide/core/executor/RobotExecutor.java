@@ -22,12 +22,14 @@ public class RobotExecutor {
     
     private TestRunnerAgentMessageLogParser testRunnerAgentMessageLogParser;
     
+    private String executionArguments = "";
+    
     public RobotExecutor() {
         logOutputStream = new RobotLogOutputStream();
         testRunnerAgentMessageLogParser = new TestRunnerAgentMessageLogParser();
     }
 
-    public int execute(String testPath, File projectLocation, String executorName, String arguments) {
+    public int execute(File projectLocation, String executorName, String userArguments) {
         String robotExecutorName = executorName;
         if (OS.isFamilyWindows()) {
             robotExecutorName += ".bat";
@@ -42,13 +44,16 @@ public class RobotExecutor {
         
         Path testRunnerAgentFilePath = createTestRunnerAgentFile();
         
-        String executorArgs = "";
-        if (arguments != null && !arguments.equals("")) {
-            executorArgs = arguments + " ";
+        if (userArguments != null && !userArguments.equals("")) {
+            executionArguments += " " + userArguments;
+        }
+        if(!executionArguments.equals("")) {
+            executionArguments += " ";
         }
         
-        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False " + executorArgs + testPath;
-        
+        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False" + " "
+                + executionArguments + projectLocation.getAbsolutePath();
+
         CommandLine cmd = CommandLine.parse(line);
         
         DefaultExecutor executor = new DefaultExecutor();
@@ -67,6 +72,7 @@ public class RobotExecutor {
         } finally {
             long endTime = System.currentTimeMillis();
             logOutputStream.processLine("Elapsed time: " + this.computeTestDuration(startTime, endTime) + "\n", 1);
+            executionArguments = "";
         }
         
         removeTempDir(testRunnerAgentFilePath.getParent());
@@ -123,6 +129,34 @@ public class RobotExecutor {
             Files.delete(dir);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    
+    public void addTest(String suiteName, String testName) {
+        String testOption = "--test";
+        if (testName != null && !testName.equals("")) {
+            if (!executionArguments.equals("")) {
+                executionArguments += " ";
+            }
+            if (suiteName != null && !suiteName.equals("")) {
+                executionArguments += testOption + " " + suiteName + "." + testName;
+            } else {
+                executionArguments += testOption + " " + testName;
+            }
+        }
+    }
+
+    public void addSuite(String parent, String suiteName) {
+        String suiteOption = "--suite";
+        if (suiteName != null && !suiteName.equals("")) {
+            if (!executionArguments.equals("")) {
+                executionArguments += " ";
+            }
+            if (parent != null && !parent.equals("")) {
+                executionArguments += suiteOption + " " + parent + "." + suiteName;
+            } else {
+                executionArguments += suiteOption + " " + suiteName;
+            }
         }
     }
 }
