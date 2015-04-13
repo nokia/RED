@@ -30,8 +30,6 @@ import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
  */
 public class TestAbstractRobotFrameworkFileParser {
 
-    private AbstractRobotFrameworkFileParser<ByteBufferInputStream> parser;
-
     @Mock
     private ITestDataParserProvider<ByteBufferInputStream> parsersProvider;
     @Mock
@@ -57,7 +55,7 @@ public class TestAbstractRobotFrameworkFileParser {
 
         // execute & verify
         try {
-            parser = new DummyRobotParser(parsersProvider);
+            new DummyRobotParser(parsersProvider);
             fail("Should thrown: " + MissingParserException.class);
         } catch (MissingParserException mpe) {
             assertThat(mpe.getMessage()).isEqualTo(
@@ -77,7 +75,7 @@ public class TestAbstractRobotFrameworkFileParser {
 
         // execute & verify
         try {
-            parser = new DummyRobotParser(parsersProvider);
+            new DummyRobotParser(parsersProvider);
             fail("Should thrown: " + MissingParserException.class);
         } catch (MissingParserException mpe) {
             assertThat(mpe.getMessage()).isEqualTo(
@@ -94,7 +92,7 @@ public class TestAbstractRobotFrameworkFileParser {
             throws MissingParserException {
         // execute & verify
         try {
-            parser = new DummyRobotParser(null);
+            new DummyRobotParser(null);
             fail("Should thrown: " + IllegalArgumentException.class);
         } catch (IllegalArgumentException iae) {
             assertThat(iae.getMessage()).isEqualTo("Parsers provider is null.");
@@ -116,8 +114,7 @@ public class TestAbstractRobotFrameworkFileParser {
         when(parsersProvider.getVariablesTableParser()).thenReturn(
                 variablesParser);
 
-        // execute
-        parser = new DummyRobotParser(parsersProvider);
+        new DummyRobotParser(parsersProvider);
 
         // verify
         order.verify(parsersProvider, times(1)).getSettingsTableParser();
@@ -136,7 +133,6 @@ public class TestAbstractRobotFrameworkFileParser {
 
     @After
     public void tearDown() {
-        parser = null;
     }
 
     private class DummyRobotParser extends
