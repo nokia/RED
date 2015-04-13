@@ -3,7 +3,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -36,13 +38,13 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     private static final String ROBOT_LAUNCH_CONFIGURATION_TYPE = "org.robotframework.ide.robotLaunchConfiguration";
 
     private static final String ROBOT_CONSOLE_NAME = "Robot Test Result";
-    
+
     private RobotExecutor robotExecutor;
 
     private ILaunchConfigurationType launchConfigurationType;
 
-    private ILaunchManager manager; 
-    
+    private ILaunchManager manager;
+
     private IEventBroker broker;
 
     public RobotLaunchConfigurationDelegate() {
@@ -61,35 +63,57 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameAttribute);
 
         if (project.exists()) {
-            String fileNameAttribute = configuration.getAttribute(RobotLaunchConfigurationMainTab.FILE_NAME_ATTRIBUTE,
-                    "");
-            IFile file = project.getFile(fileNameAttribute);
-            if (file.exists()) {
-                clearMessageLogView();
-                String executorNameAttribute = configuration.getAttribute(
-                        RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
-                String executorArgsAttribute = configuration.getAttribute(
-                        RobotLaunchConfigurationMainTab.EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
-                executeRobotTest(file, project, executorNameAttribute, executorArgsAttribute);
+            String resourceNameAttribute = configuration.getAttribute(
+                    RobotLaunchConfigurationMainTab.RESOURCE_NAME_ATTRIBUTE, "");
+            if (!resourceNameAttribute.equals("")) {
+                String[] resourceNames = resourceNameAttribute.split(RobotLaunchConfigurationMainTab.RESOURCES_SEPARATOR);
+                for (int i = 0; i < resourceNames.length; i++) {
+                    IFile file = project.getFile(resourceNames[i]);
+                    if (file.exists()) {
+                        IContainer parent = file.getParent();
+                        String fileName = file.getName();
+                        String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+                        if (parent != null) {
+                            robotExecutor.addSuite(parent.getName(), fileNameWithoutExtension);
+                        } else {
+                            robotExecutor.addSuite("", fileNameWithoutExtension);
+                        }
+                    } else {
+                        IFolder folder = project.getFolder(resourceNames[i]);
+                        if (folder.exists()) {
+                            robotExecutor.addSuite("", folder.getName());
+                        }
+                    }
+                }
             }
+            clearMessageLogView();
+            String executorNameAttribute = configuration.getAttribute(
+                    RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
+            String executorArgsAttribute = configuration.getAttribute(
+                    RobotLaunchConfigurationMainTab.EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
+            executeRobotTest(project, executorNameAttribute, executorArgsAttribute);
+
         }
     }
 
     @Override
     public void launch(final ISelection selection, final String mode) {
-        
+
         if (selection instanceof IStructuredSelection) {
             WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 
                 @Override
                 public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
                     clearMessageLogView();
+                    List<IResource> resourcesList = new ArrayList<>();
                     for (Object element : ((IStructuredSelection) selection).toArray()) {
-                        if (element instanceof IFile) {
-                            IFile file = (IFile) element;
-                            launchWithExistingOrNewConfiguration(file, mode, monitor);
+                        if (element instanceof IResource) {
+                            resourcesList.add((IResource) element);
                         }
                     }
+
+                    launchWithExistingOrNewConfiguration(resourcesList, mode, monitor);
+
                     return Status.OK_STATUS;
                 }
             };
@@ -97,10 +121,10 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
             job.schedule();
         }
     }
-    
+
     @Override
     public void launch(IEditorPart editor, final String mode) {
-        
+
         IEditorInput input = editor.getEditorInput();
         if (input instanceof FileEditorInput) {
             final IFile file = ((FileEditorInput) input).getFile();
@@ -109,7 +133,9 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                 @Override
                 public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
                     clearMessageLogView();
-                    launchWithExistingOrNewConfiguration(file, mode, monitor);
+                    List<IResource> resourcesList = new ArrayList<>();
+                    resourcesList.add(file);
+                    launchWithExistingOrNewConfiguration(resourcesList, mode, monitor);
 
                     return Status.OK_STATUS;
                 }
@@ -119,47 +145,79 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         }
     }
 
-    private void launchWithExistingOrNewConfiguration(IResource file, String mode, IProgressMonitor monitor) {
+    private void launchWithExistingOrNewConfiguration(List<IResource> resources, String mode, IProgressMonitor monitor) {
 
-        if (file instanceof IFile) {
-
-            try {
-                ILaunchConfiguration[] configurations = findLaunchConfgurations(file);
-                if (configurations.length == 0) {
-                    ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
-                            file.getName());
-                    configuration.setAttribute(RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE,
-                            file.getProject().getName());
-                    configuration.setAttribute(RobotLaunchConfigurationMainTab.FILE_NAME_ATTRIBUTE, file.getParent()
-                            .getName() + "/" + file.getName());
-                    configuration.setAttribute(RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE,
-                            RobotLaunchConfigurationMainTab.PYBOT_NAME);
-
-                    configuration.doSave();
-
-                    configurations = new ILaunchConfiguration[] { configuration };
-
+        try {
+            ILaunchConfiguration[] configurations = findLaunchConfgurations(resources);
+            if (configurations.length == 0) {
+                IProject project = resources.get(0).getProject();
+                StringBuilder resourceNameAttribute = new StringBuilder();
+                for (int i = 0; i < resources.size(); i++) {
+                    IResource resource = resources.get(i);
+                    if (resource instanceof IFile) {
+                        resourceNameAttribute.append(resource.getParent().getName() + "/" + resource.getName());
+                    } else if (resource instanceof IFolder) {
+                        resourceNameAttribute.append(resource.getName());
+                    }
+                    if (resources.size() > 1 && i < resources.size() - 1) {
+                        resourceNameAttribute.append(RobotLaunchConfigurationMainTab.RESOURCES_SEPARATOR);
+                    }
                 }
 
-                configurations[0].launch(mode, monitor);
+                String configurationName = "";
+                if (resources.size() > 1) {
+                    configurationName = project.getName() + "_new_configuration";
+                } else {
+                    configurationName = manager.generateLaunchConfigurationName(resources.get(0).getName());
+                }
+                ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
+                        configurationName);
+                configuration.setAttribute(RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE, project.getName());
+                configuration.setAttribute(RobotLaunchConfigurationMainTab.RESOURCE_NAME_ATTRIBUTE,
+                        resourceNameAttribute.toString());
+                configuration.setAttribute(RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE,
+                        RobotLaunchConfigurationMainTab.PYBOT_NAME);
 
-            } catch (CoreException e) {
-                e.printStackTrace();
+                configuration.doSave();
+
+                configurations = new ILaunchConfiguration[] { configuration };
+
             }
+
+            configurations[0].launch(mode, monitor);
+
+        } catch (CoreException e) {
+            e.printStackTrace();
         }
+
     }
 
-    private ILaunchConfiguration[] findLaunchConfgurations(IResource resource) {
+    private ILaunchConfiguration[] findLaunchConfgurations(List<IResource> selectedResources) {
 
         List<ILaunchConfiguration> configurations = new ArrayList<>();
         try {
             for (ILaunchConfiguration configuration : manager.getLaunchConfigurations(launchConfigurationType)) {
-                try {
-                    IFile file = getSourceFile(configuration);
-                    if (resource.equals(file))
-                        configurations.add(configuration);
-                } catch (CoreException e) {
-                    e.printStackTrace();
+                String projectName = configuration.getAttribute(RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE,
+                        "");
+                IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+                if (project.exists()) {
+                    String configurationResourcesNames = configuration.getAttribute(
+                            RobotLaunchConfigurationMainTab.RESOURCE_NAME_ATTRIBUTE, "");
+                    String[] configurationResources = configurationResourcesNames.split(RobotLaunchConfigurationMainTab.RESOURCES_SEPARATOR);
+                    if (configurationResources.length == selectedResources.size()) {
+                        boolean hasResources = true;
+                        for (int i = 0; i < configurationResources.length; i++) {
+                            if (!selectedResources.contains(project.getFile(configurationResources[i]))
+                                    && !selectedResources.contains(project.getFolder(configurationResources[i]))) {
+                                hasResources = false;
+                                break;
+                            }
+                        }
+                        if (hasResources) {
+                            configurations.add(configuration);
+                            return configurations.toArray(new ILaunchConfiguration[configurations.size()]);
+                        }
+                    }
                 }
             }
         } catch (CoreException e) {
@@ -169,25 +227,10 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         return configurations.toArray(new ILaunchConfiguration[configurations.size()]);
     }
 
-    private IFile getSourceFile(ILaunchConfiguration configuration) throws CoreException {
-        String projectName = configuration.getAttribute(RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE, "");
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-
-        if (project.exists()) {
-            String fileName = configuration.getAttribute(RobotLaunchConfigurationMainTab.FILE_NAME_ATTRIBUTE, "");
-            IFile file = project.getFile(fileName);
-
-            if (file.exists())
-                return file;
-        }
-
-        return null;
-    }
-
-    private void executeRobotTest(IFile file, IProject project, String executorName, String arguments) {
+    private void executeRobotTest(IProject project, String executorName, String arguments) {
         ExecutorOutputStreamListener executorOutputStreamListener = new ExecutorOutputStreamListener(ROBOT_CONSOLE_NAME);
         robotExecutor.addOutputStreamListener(executorOutputStreamListener);
-        
+
         robotExecutor.setMessageLogListener(new IRobotOutputListener() {
 
             @Override
@@ -195,12 +238,11 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                 broker.send("MessageLogView/AppendLine", line);
             }
         });
-        
-        robotExecutor.execute(file.getLocation().toPortableString(), project.getLocation().toFile(), executorName,
-                arguments);
+
+        robotExecutor.execute(project.getLocation().toFile(), executorName, arguments);
         robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
     }
-    
+
     private void clearMessageLogView() {
         broker.send("MessageLogView/Clear", "");
     }
