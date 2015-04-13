@@ -33,7 +33,7 @@ public class VariablesTable implements IRobotSectionTable {
 
 
     @Override
-    public String getTableName() {
+    public String getName() {
         return "Variables";
     }
 }

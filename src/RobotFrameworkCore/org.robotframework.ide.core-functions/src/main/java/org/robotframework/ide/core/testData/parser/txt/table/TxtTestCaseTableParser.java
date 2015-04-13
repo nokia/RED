@@ -23,4 +23,9 @@ public class TxtTestCaseTableParser implements
         return null;
     }
 
+
+    @Override
+    public TestCaseTable newOutputElement() {
+        return new TestCaseTable();
+    }
 }
