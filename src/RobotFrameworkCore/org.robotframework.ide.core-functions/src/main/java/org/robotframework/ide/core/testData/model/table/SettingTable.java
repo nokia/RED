@@ -1,7 +1,5 @@
 package org.robotframework.ide.core.testData.model.table;
 
-
-
 /**
  * Mapping for Setting table used to import test libraries, resource files and
  * variable files and to define metadata for test suites and test cases. It can
@@ -36,7 +34,7 @@ public class SettingTable implements IRobotSectionTable {
 
 
     @Override
-    public String getTableName() {
+    public String getName() {
         return "Settings";
     }
 }

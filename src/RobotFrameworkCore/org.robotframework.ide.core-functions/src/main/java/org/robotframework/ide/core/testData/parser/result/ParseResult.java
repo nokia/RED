@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class ParseResult<InputFormatType, OutputFormatType> {
 
+    private InputFormatType trashBeforeFirstExpectedData;
+    private List<OutOfOrderData<InputFormatType>> outOfOrderOrConstrainsPossibleElements = new LinkedList<OutOfOrderData<InputFormatType>>();
     private InputFormatType dataConsumed;
     private OutputFormatType producedModelElement;
     private ParseProcessResult result = ParseProcessResult.NOT_STARTED;
@@ -92,5 +94,48 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      */
     public List<ParserMessage> getParserMessages() {
         return this.parserMessages;
+    }
+
+
+    /**
+     * 
+     * @param garbageData
+     *            data exists before declaration of expected elements
+     */
+    public void setTrashBeforeFirstExpectedData(InputFormatType garbageData) {
+        this.trashBeforeFirstExpectedData = garbageData;
+    }
+
+
+    /**
+     * 
+     * @return data exists before declaration of expected elements
+     */
+    public InputFormatType getTrashBeforeFirstExpectedData() {
+        return this.trashBeforeFirstExpectedData;
+    }
+
+
+    /**
+     * 
+     * @param outOfOrderElement
+     *            found element, but because of some restriction in wrong place
+     *            or with some problems to solve with user interaction - data,
+     *            which could be recovered
+     */
+    public void addOutOfOrderElementFound(
+            OutOfOrderData<InputFormatType> outOfOrderElement) {
+        this.outOfOrderOrConstrainsPossibleElements.add(outOfOrderElement);
+    }
+
+
+    /**
+     * 
+     * @return all found elements, but because of some restriction in wrong
+     *         place or with some problems to solve with user interaction -
+     *         data, which could be recovered
+     */
+    public List<OutOfOrderData<InputFormatType>> getOutOfOrderElementsFound() {
+        return this.outOfOrderOrConstrainsPossibleElements;
     }
 }
