@@ -1,6 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -35,17 +34,19 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     public static final String PROJECT_NAME_ATTRIBUTE = "Project name";
 
-    public static final String FILE_NAME_ATTRIBUTE = "File name";
+    public static final String RESOURCE_NAME_ATTRIBUTE = "Resource name";
 
     public static final String EXECUTOR_NAME_ATTRIBUTE = "Executor name";
     
     public static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
+    
+    public static final String RESOURCES_SEPARATOR = ";";
 
     public static final String PYBOT_NAME = "pybot";
 
     public static final String JYBOT_NAME = "jybot";
 
-    private Text txtFile;
+    private Text txtResources;
 
     private Text txtProject;
     
@@ -56,7 +57,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(PROJECT_NAME_ATTRIBUTE, "");
-        configuration.setAttribute(FILE_NAME_ATTRIBUTE, "");
+        configuration.setAttribute(RESOURCE_NAME_ATTRIBUTE, "");
         configuration.setAttribute(EXECUTOR_NAME_ATTRIBUTE, "");
         configuration.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
     }
@@ -65,7 +66,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
             txtProject.setText(configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, ""));
-            txtFile.setText(configuration.getAttribute(FILE_NAME_ATTRIBUTE, ""));
+            txtResources.setText(configuration.getAttribute(RESOURCE_NAME_ATTRIBUTE, ""));
             comboExecutorName.select(comboExecutorName.indexOf(configuration.getAttribute(EXECUTOR_NAME_ATTRIBUTE, "")));
             txtArgs.setText(configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, ""));
         } catch (CoreException e) {
@@ -76,7 +77,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(PROJECT_NAME_ATTRIBUTE, txtProject.getText());
-        configuration.setAttribute(FILE_NAME_ATTRIBUTE, txtFile.getText());
+        configuration.setAttribute(RESOURCE_NAME_ATTRIBUTE, txtResources.getText());
         if (comboExecutorName.getSelectionIndex() > -1) {
             configuration.setAttribute(EXECUTOR_NAME_ATTRIBUTE,
                     comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
@@ -88,22 +89,29 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public boolean isValid(final ILaunchConfiguration configuration) {
 
         try {
-            String projectName = configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
-            IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+            String projectNameAttribute = configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
+            IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameAttribute);
             if (project.exists()) {
-                String fileName = configuration.getAttribute(FILE_NAME_ATTRIBUTE, "");
-                IFile file = project.getFile(fileName);
-                if (file.exists()) {
-                    setMessage("");
+                String resourceNameAttribute = configuration.getAttribute(RESOURCE_NAME_ATTRIBUTE, "");
+                if (resourceNameAttribute.equals("")) {
+                    return true;
                 }
-                return file.exists();
+                String[] resourceNames = resourceNameAttribute.split(RESOURCES_SEPARATOR);
+                for (int i = 0; i < resourceNames.length; i++) {
+                    
+                    String name = resourceNames[i];
+                    if (!name.equals("") && !project.getFile(name).exists() && !project.getFolder(name).exists()) {
+                        return false;
+                    }
+                }
+                
+                return true;
             }
         } catch (Exception e) {
             setErrorMessage("Invalid file selected.");
         }
 
         setErrorMessage("Invalid file selected.");
-
         return false;
     }
 
@@ -114,7 +122,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public boolean canSave() {
-        return (!txtProject.getText().isEmpty() && !txtFile.getText().isEmpty());
+        return !txtProject.getText().isEmpty();
     }
 
     @Override
@@ -184,8 +192,9 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 dialog.setTitle("Select project");
                 dialog.setMessage("Select the project hosting your test suites:");
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-                if (dialog.open() == Window.OK)
+                if (dialog.open() == Window.OK) {
                     txtProject.setText(((IResource) dialog.getFirstResult()).getName());
+                }
             }
         });
         btnBrowseProject.setText("Browse...");
@@ -195,15 +204,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         testGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         testGroup.setText("Test Suite");
 
-        txtFile = new Text(testGroup, SWT.BORDER);
-        txtFile.addModifyListener(new ModifyListener() {
+        txtResources = new Text(testGroup, SWT.BORDER);
+        txtResources.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
-        txtFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        txtResources.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         Button btnBrowseTest = new Button(testGroup, SWT.NONE);
         btnBrowseTest.addSelectionListener(new SelectionAdapter() {
@@ -212,11 +221,20 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             public void widgetSelected(final SelectionEvent e) {
                 ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(parent.getShell(),
                         new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+                dialog.setAllowMultiple(true);
                 dialog.setTitle("Select test suite");
                 dialog.setMessage("Select the test suite to execute:");
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-                if (dialog.open() == Window.OK)
-                    txtFile.setText(((IFile) dialog.getFirstResult()).getProjectRelativePath().toPortableString());
+                if (dialog.open() == Window.OK) {
+                    txtResources.setText("");
+                    Object[] results = dialog.getResult();
+                    for (int i = 0; i < results.length; i++) {
+                        txtResources.append(((IResource) results[i]).getProjectRelativePath().toPortableString());
+                        if(results.length > 1 && i < results.length-1) {
+                            txtResources.append(RESOURCES_SEPARATOR);
+                        }
+                    }
+                }
             }
         });
         btnBrowseTest.setText("Browse...");

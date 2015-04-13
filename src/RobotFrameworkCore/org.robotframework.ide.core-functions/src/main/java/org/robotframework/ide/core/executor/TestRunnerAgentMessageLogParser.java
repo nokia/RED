@@ -51,6 +51,7 @@ public class TestRunnerAgentMessageLogParser implements IRobotOutputListener {
             Map<String, String> elements = (Map<String, String>) list.get(1);
             messageLogListener.handleLine("Ending test: "
                     + elements.get("longname") + '\n');
+            messageLogListener.handleLine("\n");
         }
     }
 
