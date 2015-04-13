@@ -38,7 +38,7 @@ public class ByteBufferInputStream extends InputStream implements
 
 
     @Override
-    public int read() throws IOException {
+    public int read() {
         if (!buffer.hasRemaining()) {
             return -1;
         }
@@ -54,7 +54,7 @@ public class ByteBufferInputStream extends InputStream implements
      * @return current unread byte
      * @throws IOException
      */
-    public int currentByteInBuffer() throws IOException {
+    public int currentByteInBuffer() {
         int c = -1;
         if (buffer.hasRemaining()) {
             c = buffer.get(buffer.position());
@@ -65,7 +65,7 @@ public class ByteBufferInputStream extends InputStream implements
 
 
     @Override
-    public int available() throws IOException {
+    public int available() {
         return buffer.remaining();
     }
 
