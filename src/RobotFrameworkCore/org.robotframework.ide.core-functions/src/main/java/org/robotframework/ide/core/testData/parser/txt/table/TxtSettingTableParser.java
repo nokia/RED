@@ -25,7 +25,7 @@ public class TxtSettingTableParser implements
 
 
     @Override
-    public SettingTable newOutputElement() {
-        return new SettingTable();
+    public String getName() {
+        return SettingTable.TABLE_NAME;
     }
 }
