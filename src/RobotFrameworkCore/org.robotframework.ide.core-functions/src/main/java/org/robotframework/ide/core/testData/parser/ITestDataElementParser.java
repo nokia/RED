@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.parser;
 
+import org.robotframework.ide.core.testData.model.common.ITraceableNamed;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 
 
@@ -21,7 +22,8 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
  * @param <OutputElementType>
  *            produced output i.e. LibraryReference
  */
-public interface ITestDataElementParser<InputFormatType extends IParsePositionMarkable, OutputElementType> {
+public interface ITestDataElementParser<InputFormatType extends IParsePositionMarkable, OutputElementType>
+        extends ITraceableNamed {
 
     /**
      * @param testData

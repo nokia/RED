@@ -28,10 +28,4 @@ public interface IRobotSectionTable extends IOptional {
      * disable this table in model
      */
     void unsetPresent();
-
-
-    /**
-     * @return name of this table
-     */
-    String getTableName();
 }

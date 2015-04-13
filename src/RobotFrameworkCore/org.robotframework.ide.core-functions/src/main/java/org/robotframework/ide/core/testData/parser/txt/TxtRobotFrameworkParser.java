@@ -33,37 +33,71 @@ public class TxtRobotFrameworkParser extends
         ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder = new ParserResultBuilder<ByteBufferInputStream, TestDataFile>();
 
         TestDataFile currentFile = new TestDataFile();
-        if (testData.available() > 0) {
-            while(testData.available() > 0) {
+        if (hasRemainingData(testData)) {
+            int previousTableFoundPosition = 0;
+            while(hasRemainingData(testData)) {
                 if (findTableSectionDeclaration(testData)) {
                     ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tablePraser = findMatchTableSectionParser(testData);
-                    // TODO: check if is correct place means starting position
-                    // new line etc.
                     if (tablePraser != null) {
                         if (isTableSectionStartsFromNewLine(testData)) {
                             ParseResult<ByteBufferInputStream, ? extends IRobotSectionTable> createdRobotFrameworkElement = tablePraser
                                     .parse(testData);
+                            // TODO: checks of object
                         } else {
+                            if (previousTableFoundPosition == 0) {
 
+                            }
+                            addWarningAboutIncorrectTablePlace(testData,
+                                    outputBuilder, tablePraser);
                         }
                     } else {
-                        outputBuilder
-                                .addInformationMessage(
-                                        "Position in buffer: "
-                                                + testData.getByteBuffer()
-                                                        .position(),
-                                        "Found possible '*', which indicate begin of table, but "
-                                                + " non of parsers for section was interested");
+                        addInformationAboutTableMarkFound(testData,
+                                outputBuilder);
                     }
                 }
             }
         } else {
-            outputBuilder.addDataConsumed(testData)
-                    .addProducedModelElement(currentFile)
-                    .addInformationMessage("begin", "empty file");
+            addInformationAboutEmptyFile(testData, outputBuilder, currentFile);
         }
 
         return outputBuilder.build();
+    }
+
+
+    private boolean hasRemainingData(ByteBufferInputStream testData) {
+        return testData.available() > 0;
+    }
+
+
+    private void addInformationAboutEmptyFile(
+            ByteBufferInputStream testData,
+            ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder,
+            TestDataFile currentFile) {
+        outputBuilder.addDataConsumed(testData)
+                .addProducedModelElement(currentFile)
+                .addInformationMessage("begin", "empty file");
+    }
+
+
+    private void addInformationAboutTableMarkFound(
+            ByteBufferInputStream testData,
+            ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder) {
+        outputBuilder.addInformationMessage("Position in buffer: "
+                + testData.getByteBuffer().position(),
+                "Found possible '*', which indicate begin of table, but "
+                        + " non of parsers for section was interested");
+    }
+
+
+    private void addWarningAboutIncorrectTablePlace(
+            ByteBufferInputStream testData,
+            ParserResultBuilder<ByteBufferInputStream, TestDataFile> outputBuilder,
+            ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tablePraser) {
+        outputBuilder.addWarningMessage("Position in buffer: "
+                + testData.getByteBuffer().position(), "Found table "
+                + tablePraser.getName() + ", but it was not in correct place. "
+                + "According to Robot Framework specification "
+                + "tables should starts from begin of line/file.");
     }
 
 
@@ -125,7 +159,7 @@ public class TxtRobotFrameworkParser extends
             ByteBufferInputStream fileContent) {
         boolean wasFound = false;
 
-        while(fileContent.available() > 0) {
+        while(hasRemainingData(fileContent)) {
             if (fileContent.currentByteInBuffer() == '*') {
                 wasFound = true;
                 break;

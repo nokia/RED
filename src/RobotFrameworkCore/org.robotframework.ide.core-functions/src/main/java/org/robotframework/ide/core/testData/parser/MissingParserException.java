@@ -39,7 +39,7 @@ public class MissingParserException extends Exception {
         str.append('[');
         Iterator<IRobotSectionTable> i = missingParserForTables.iterator();
         while(i.hasNext()) {
-            str.append(i.next().getTableName());
+            str.append(i.next().getName());
             if (i.hasNext()) {
                 str.append(',').append(' ');
             }

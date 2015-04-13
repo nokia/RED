@@ -32,7 +32,7 @@ public class TestCaseTable implements IRobotSectionTable {
 
 
     @Override
-    public String getTableName() {
+    public String getName() {
         return "Test Case";
     }
 }

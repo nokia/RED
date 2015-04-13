@@ -23,4 +23,9 @@ public class TxtSettingTableParser implements
         return null;
     }
 
+
+    @Override
+    public SettingTable newOutputElement() {
+        return new SettingTable();
+    }
 }
