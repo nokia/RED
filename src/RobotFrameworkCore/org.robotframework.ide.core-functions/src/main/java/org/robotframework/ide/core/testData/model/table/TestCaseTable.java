@@ -10,6 +10,7 @@ package org.robotframework.ide.core.testData.model.table;
  */
 public class TestCaseTable implements IRobotSectionTable {
 
+    public static final String TABLE_NAME = "Test Case";
     private boolean declarationOfTableAppears = false;
 
 
@@ -33,6 +34,6 @@ public class TestCaseTable implements IRobotSectionTable {
 
     @Override
     public String getName() {
-        return "Test Case";
+        return TABLE_NAME;
     }
 }

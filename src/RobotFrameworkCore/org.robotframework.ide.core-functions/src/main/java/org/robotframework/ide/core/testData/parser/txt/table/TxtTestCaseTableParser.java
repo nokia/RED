@@ -25,7 +25,7 @@ public class TxtTestCaseTableParser implements
 
 
     @Override
-    public TestCaseTable newOutputElement() {
-        return new TestCaseTable();
+    public String getName() {
+        return TestCaseTable.TABLE_NAME;
     }
 }

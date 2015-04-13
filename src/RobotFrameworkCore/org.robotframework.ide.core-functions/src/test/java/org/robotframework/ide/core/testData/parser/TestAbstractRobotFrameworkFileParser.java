@@ -61,7 +61,7 @@ public class TestAbstractRobotFrameworkFileParser {
             fail("Should thrown: " + MissingParserException.class);
         } catch (MissingParserException mpe) {
             assertThat(mpe.getMessage()).isEqualTo(
-                    "Missing table [" + new SettingTable().getTableName()
+                    "Missing table [" + new SettingTable().getName()
                             + "] parser");
         }
     }
@@ -80,14 +80,11 @@ public class TestAbstractRobotFrameworkFileParser {
             parser = new DummyRobotParser(parsersProvider);
             fail("Should thrown: " + MissingParserException.class);
         } catch (MissingParserException mpe) {
-            assertThat(mpe.getMessage())
-                    .isEqualTo(
-                            "Missing tables ["
-                                    + new SettingTable().getTableName() + ", "
-                                    + new KeywordTable().getTableName() + ", "
-                                    + new TestCaseTable().getTableName() + ", "
-                                    + new VariablesTable().getTableName()
-                                    + "] parsers");
+            assertThat(mpe.getMessage()).isEqualTo(
+                    "Missing tables [" + new SettingTable().getName() + ", "
+                            + new KeywordTable().getName() + ", "
+                            + new TestCaseTable().getName() + ", "
+                            + new VariablesTable().getName() + "] parsers");
         }
     }
 
