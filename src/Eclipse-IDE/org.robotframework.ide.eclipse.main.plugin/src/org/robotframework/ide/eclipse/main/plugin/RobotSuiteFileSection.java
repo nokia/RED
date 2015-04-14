@@ -23,9 +23,10 @@ public class RobotSuiteFileSection implements RobotElement {
     private final List<RobotElement> variables = new ArrayList<>();
     private final RobotElement parent;
 
-    public RobotSuiteFileSection(final RobotElement parent, final IFile file, final String name, final boolean readOnly) {
+    public RobotSuiteFileSection(final RobotSuiteFile parent, final String name,
+            final boolean readOnly) {
         this.parent = parent;
-        this.file = file;
+        this.file = parent.getFile();
         this.name = name;
         this.readOnly = readOnly;
     }
@@ -56,7 +57,7 @@ public class RobotSuiteFileSection implements RobotElement {
             return false;
         } else if (obj.getClass() == getClass()) {
             final RobotSuiteFileSection other = (RobotSuiteFileSection) obj;
-            return file.equals(other.file) && name.equals(other.name);
+            return Objects.equals(file, other.file) && name.equals(other.name);
         }
         return false;
     }
@@ -111,5 +112,15 @@ public class RobotSuiteFileSection implements RobotElement {
 
     public boolean isReadOnly() {
         return readOnly;
+    }
+
+    @Override
+    public boolean contains(final RobotElement element) {
+        for (final RobotElement variable : variables) {
+            if (variable.equals(element) || element.contains(variable)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

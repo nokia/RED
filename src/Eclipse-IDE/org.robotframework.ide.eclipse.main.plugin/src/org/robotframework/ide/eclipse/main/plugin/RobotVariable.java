@@ -137,4 +137,8 @@ public class RobotVariable implements RobotElement {
         this.name = name;
     }
 
+    @Override
+    public boolean contains(final RobotElement element) {
+        return element.equals(this);
+    }
 }

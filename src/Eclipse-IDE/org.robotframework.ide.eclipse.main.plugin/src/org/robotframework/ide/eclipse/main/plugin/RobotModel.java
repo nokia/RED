@@ -6,25 +6,28 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IWorkbenchPage;
 
-public class RobotModel {
+public class RobotModel implements RobotElement {
 
-    List<RobotProject> projects = new ArrayList<>();
+    private final List<RobotElement> projects = new ArrayList<>();
 
-    public RobotProject createRobotProject(final IProject project) {
+    RobotProject createRobotProject(final IProject project) {
         if (project == null) {
             return null;
         }
         final RobotProject robotProject = new RobotProject(project);
         if (projects.contains(robotProject)) {
-            return projects.get(projects.indexOf(robotProject));
+            return (RobotProject) projects.get(projects.indexOf(robotProject));
         } else {
             projects.add(robotProject);
             return robotProject;
         }
     }
 
-    public RobotFolder createRobotSuite(final IFolder folder) {
+    RobotFolder createRobotSuite(final IFolder folder) {
         if (folder == null) {
             return null;
         }
@@ -35,7 +38,7 @@ public class RobotModel {
         }
     }
 
-    public RobotSuiteFile createSuiteFile(final IFile file) {
+    RobotSuiteFile createSuiteFile(final IFile file) {
         if (file == null) {
             return null;
         }
@@ -44,5 +47,85 @@ public class RobotModel {
         } else {
             return createRobotSuite((IFolder) file.getParent()).createSuiteFile(file);
         }
+    }
+
+    @Override
+    public List<RobotElement> getChildren() {
+        return projects;
+    }
+
+    @Override
+    public String getName() {
+        return "";
+    }
+
+    @Override
+    public RobotElement getParent() {
+        return null;
+    }
+
+    @Override
+    public ImageDescriptor getImage() {
+        return null;
+    }
+
+    @Override
+    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
+        return new OpenStrategy();
+    }
+
+    List<RobotElementChange> removeProject(final IProject project) {
+        final List<RobotElementChange> changes = new ArrayList<>();
+        
+        final List<RobotElement> toRemove = new ArrayList<>();
+        for (final RobotElement element : projects) {
+            if (((RobotProject) element).getProject().equals(project)) {
+                toRemove.add(element);
+                changes.add(RobotElementChange.createRemovedElement(element));
+            }
+        }
+        projects.removeAll(toRemove);
+        return changes;
+    }
+
+    List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
+        final List<IProject> toRemove = new ArrayList<>();
+        final List<RobotElementChange> changes = new ArrayList<>();
+
+        for (final RobotElement element : projects) {
+            final RobotProject project = (RobotProject) element;
+
+            final IResourceDelta projectDelta = delta.findMember(project.getProject().getFullPath());
+            if (isRemoved(projectDelta)) {
+                changes.add(RobotElementChange.createRemovedElement(element));
+                toRemove.add((IProject) projectDelta.getResource());
+            } else if (isChanged(projectDelta)) {
+                changes.add(RobotElementChange.createAddedElement(element));
+                changes.addAll(project.synchronizeChanges(delta));
+            }
+        }
+
+        for (final IProject project : toRemove) {
+            removeProject(project);
+        }
+        return changes;
+    }
+
+    private boolean isChanged(final IResourceDelta projectDelta) {
+        return projectDelta != null && projectDelta.getKind() == IResourceDelta.CHANGED;
+    }
+
+    private boolean isRemoved(final IResourceDelta projectDelta) {
+        return projectDelta != null && projectDelta.getKind() == IResourceDelta.REMOVED;
+    }
+
+    @Override
+    public boolean contains(final RobotElement element) {
+        for (final RobotElement project : projects) {
+            if (project.equals(element) || element.contains(project)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
