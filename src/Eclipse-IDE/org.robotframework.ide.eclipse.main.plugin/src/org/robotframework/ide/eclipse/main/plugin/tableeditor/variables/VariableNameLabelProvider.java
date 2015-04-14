@@ -4,7 +4,6 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.S
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withFontStyle;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withForeground;
 
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -12,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.DisposeNeededStyler;
 
-public class VariableNameLabelProvider extends VariableLabelProvider implements IStyledLabelProvider {
+public class VariableNameLabelProvider extends VariableLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
