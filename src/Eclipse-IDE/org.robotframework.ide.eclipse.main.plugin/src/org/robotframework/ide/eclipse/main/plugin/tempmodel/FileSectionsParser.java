@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
@@ -29,8 +30,14 @@ public class FileSectionsParser {
         this.readOnly = readOnly;
     }
 
-    public List<RobotSuiteFileSection> parseRobotFileSections() throws IOException {
-        final List<RobotSuiteFileSection> sections = new ArrayList<>();
+    public RobotSuiteFile parseRobotSuiteFile() throws IOException {
+        final RobotSuiteFile robotSuite = file != null ? RobotFramework.getModelManager().createSuiteFile(file) : new RobotSuiteFile(null, null);
+        parseRobotFileSections(robotSuite);
+        return robotSuite;
+    }
+
+    public List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent) throws IOException {
+        final List<RobotElement> sections = new ArrayList<>();
 
         InputStream inputStream = null;
         try {
@@ -50,12 +57,11 @@ public class FileSectionsParser {
                 } else if (line.startsWith("*")) {
                     varSection = null;
                     final String sectionName = extractSectionName(line);
-                    final RobotSuiteFile parent = RobotFramework.getModelManager().createSuiteFile(file);
                     if ("Variables".equals(sectionName)) {
-                        varSection = new RobotSuiteFileSection(parent, file, sectionName, readOnly);
+                        varSection = new RobotSuiteFileSection(parent, sectionName, readOnly);
                         sections.add(varSection);
                     } else {
-                        sections.add(new RobotSuiteFileSection(parent, file, sectionName, readOnly));
+                        sections.add(new RobotSuiteFileSection(parent, sectionName, readOnly));
                     }
                 } else if (varSection != null) {
                     final String name = extractVarName(line);

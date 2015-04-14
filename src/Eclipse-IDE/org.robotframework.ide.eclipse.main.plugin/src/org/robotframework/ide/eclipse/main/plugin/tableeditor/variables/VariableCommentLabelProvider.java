@@ -4,13 +4,12 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.S
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withFontStyle;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withForeground;
 
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.DisposeNeededStyler;
 
-public class VariableCommentLabelProvider extends VariableLabelProvider implements IStyledLabelProvider {
+public class VariableCommentLabelProvider extends VariableLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {

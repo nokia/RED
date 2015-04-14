@@ -27,7 +27,7 @@ public class RobotSuiteFile implements RobotElement {
         if (file == null) {
             return null;
         }
-        final RobotSuiteFileSection section = new RobotSuiteFileSection(this, file, name, file.isReadOnly());
+        final RobotSuiteFileSection section = new RobotSuiteFileSection(this, name, file.isReadOnly());
         if (getSections().contains(section)) {
             return (RobotSuiteFileSection) sections.get(sections.indexOf(section));
         } else {
@@ -40,12 +40,23 @@ public class RobotSuiteFile implements RobotElement {
         if (sections == null) {
             sections = new ArrayList<>();
             try {
-                sections.addAll(new FileSectionsParser(file).parseRobotFileSections());
+                sections.addAll(new FileSectionsParser(file).parseRobotFileSections(this));
             } catch (final IOException e) {
-                // nothing to do currently;
+                throw new RuntimeException("Unable to read sections");
             }
         }
         return sections;
+    }
+
+    void refreshOnFileChange() {
+        sections = null;
+        getSections();
+    }
+
+    public List<RobotElementChange> synchronizeChanges() {
+        sections = null;
+        getSections();
+        return new ArrayList<>();
     }
 
     @Override
@@ -76,7 +87,7 @@ public class RobotSuiteFile implements RobotElement {
 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new OpenStrategy() {};
+        return new OpenStrategy();
     }
 
     @Override
@@ -84,8 +95,26 @@ public class RobotSuiteFile implements RobotElement {
         return parent;
     }
 
+    public IFile getFile() {
+        return file;
+    }
+
     @Override
     public List<RobotElement> getChildren() {
         return sections;
+    }
+
+    public boolean isEditable() {
+        return !file.isReadOnly();
+    }
+
+    @Override
+    public boolean contains(final RobotElement element) {
+        for (final RobotElement section : sections) {
+            if (section.equals(element) || element.contains(section)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
