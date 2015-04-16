@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class MatchResult {
 
-    private final MatchResult parent;
+    private MatchResult parent;
     private final IMatcher usedMatcher;
     private final MatchStatus status;
     private final Position matchPosition = new Position();
@@ -29,7 +29,7 @@ public class MatchResult {
     public MatchResult(final IMatcher usedMatcher, MatchStatus status) {
         this.usedMatcher = usedMatcher;
         this.status = status;
-        this.parent = null;
+        setParent(null);
     }
 
 
@@ -41,7 +41,7 @@ public class MatchResult {
             MatchStatus status) {
         this.usedMatcher = usedMatcher;
         this.status = status;
-        this.parent = parent;
+        setParent(parent);
     }
 
 
@@ -52,6 +52,12 @@ public class MatchResult {
      */
     public void addSubResult(final IMatcher subMatcher, MatchStatus subStatus) {
         this.subResults.add(new MatchResult(this, subMatcher, subStatus));
+    }
+
+
+    public void addSubResult(final MatchResult subResult) {
+        subResult.setParent(this);
+        this.subResults.add(subResult);
     }
 
 
@@ -83,6 +89,11 @@ public class MatchResult {
     }
 
 
+    private void setParent(final MatchResult parentResult) {
+        this.parent = parentResult;
+    }
+
+
     /**
      * 
      * @return {@code null} or parent matcher in case this matching result was
@@ -90,6 +101,11 @@ public class MatchResult {
      */
     public MatchResult getParent() {
         return this.parent;
+    }
+
+
+    public boolean hasParent() {
+        return this.parent != null;
     }
 
 
