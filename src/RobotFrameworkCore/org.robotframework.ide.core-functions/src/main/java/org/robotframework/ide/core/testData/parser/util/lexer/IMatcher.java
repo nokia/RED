@@ -13,12 +13,10 @@ public interface IMatcher {
     /**
      * check if current data contains data expected
      * 
-     * @param data
-     *            to check
-     * @param dataWindowAllowed
-     *            give information from where we should start and where last
-     *            position to check
+     * @param dataWithPosition
+     *            to check, which contains given information from where we
+     *            should start and where last position to check
      * @return
      */
-    MatchResult match(byte[] data, Position dataWindowAllowed);
+    MatchResult match(final DataMarked dataWithPosition);
 }
