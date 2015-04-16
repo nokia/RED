@@ -16,7 +16,7 @@ public class MatchResult {
 
     private MatchResult parent;
     private final IMatcher usedMatcher;
-    private final MatchStatus status;
+    private MatchStatus status;
     private final Position matchPosition = new Position();
     private final List<MatchResult> subResults = new LinkedList<MatchResult>();
     private final List<String> messages = new LinkedList<String>();
@@ -124,6 +124,11 @@ public class MatchResult {
      */
     public Position getPosition() {
         return this.matchPosition;
+    }
+
+
+    public void setStatus(MatchStatus status) {
+        this.status = status;
     }
 
 
