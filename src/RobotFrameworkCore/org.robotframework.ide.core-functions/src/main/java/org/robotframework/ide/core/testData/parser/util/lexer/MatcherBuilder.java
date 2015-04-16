@@ -1,5 +1,7 @@
 package org.robotframework.ide.core.testData.parser.util.lexer;
 
+
+
 /**
  * 
  * @author wypych
@@ -8,7 +10,4 @@ package org.robotframework.ide.core.testData.parser.util.lexer;
  */
 public class MatcherBuilder {
 
-    public IMatcher build() {
-        return null;
-    }
 }

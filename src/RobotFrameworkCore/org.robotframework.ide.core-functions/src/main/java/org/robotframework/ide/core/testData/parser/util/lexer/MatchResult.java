@@ -22,10 +22,6 @@ public class MatchResult {
     private final List<String> messages = new LinkedList<String>();
 
 
-    /**
-     * @param usedMatcher
-     * @param status
-     */
     public MatchResult(final IMatcher usedMatcher, MatchStatus status) {
         this.usedMatcher = usedMatcher;
         this.status = status;
@@ -33,10 +29,6 @@ public class MatchResult {
     }
 
 
-    /**
-     * @param usedMatcher
-     * @param status
-     */
     private MatchResult(final MatchResult parent, final IMatcher usedMatcher,
             MatchStatus status) {
         this.usedMatcher = usedMatcher;
@@ -45,11 +37,6 @@ public class MatchResult {
     }
 
 
-    /**
-     * 
-     * @param subMatcher
-     * @param subStatus
-     */
     public void addSubResult(final IMatcher subMatcher, MatchStatus subStatus) {
         this.subResults.add(new MatchResult(this, subMatcher, subStatus));
     }
@@ -80,10 +67,6 @@ public class MatchResult {
     }
 
 
-    /**
-     * 
-     * @return
-     */
     public List<MatchResult> getSubResults() {
         return subResults;
     }
@@ -109,19 +92,11 @@ public class MatchResult {
     }
 
 
-    /**
-     * 
-     * @return
-     */
     public IMatcher getMatcher() {
         return this.usedMatcher;
     }
 
 
-    /**
-     * 
-     * @return
-     */
     public Position getPosition() {
         return this.matchPosition;
     }
@@ -132,10 +107,6 @@ public class MatchResult {
     }
 
 
-    /**
-     * 
-     * @return
-     */
     public MatchStatus getStatus() {
         return this.status;
     }
