@@ -1,6 +1,14 @@
 package org.robotframework.ide.core.testData.parser.util.lexer.matcher;
 
+public class AnyByteMatcher extends AbstractSimpleByteMatcher {
 
-public class AnyByteMatcher {
+    public AnyByteMatcher(byte expectedByte) {
+        super(expectedByte);
+    }
 
+
+    @Override
+    public boolean areBytesMatch(byte expected, byte got) {
+        return true;
+    }
 }
