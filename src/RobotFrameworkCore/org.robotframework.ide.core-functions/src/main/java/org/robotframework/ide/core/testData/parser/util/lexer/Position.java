@@ -17,17 +17,16 @@ public class Position {
     private int end = NOT_DECLARED;
 
 
-    /**
-     * 
-     * @param start
-     * @param end
-     */
     public Position(final int start, final int end) {
         this.start = start;
         this.end = end;
     }
 
 
+    /**
+     * Initialization with both {@code start} and {@code end} set to
+     * {@link #NOT_DECLARED}
+     */
     public Position() {
         this(NOT_DECLARED, NOT_DECLARED);
     }

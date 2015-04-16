@@ -105,9 +105,6 @@ public abstract class AbstractMatcher implements IMatcher {
         private final MatchResult result;
 
 
-        /**
-         * @param result
-         */
         public ExecuteState(final MatchResult result) {
             this.result = result;
         }
@@ -131,9 +128,6 @@ public abstract class AbstractMatcher implements IMatcher {
         }
 
 
-        /**
-         * @return
-         */
         public MatchResult getResult() {
             return this.result;
         }
