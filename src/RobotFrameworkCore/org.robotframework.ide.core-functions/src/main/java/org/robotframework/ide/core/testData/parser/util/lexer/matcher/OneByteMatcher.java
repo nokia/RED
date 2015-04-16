@@ -52,23 +52,23 @@ public class OneByteMatcher implements IMatcher {
         int end = pos.getEnd();
 
         if (data.length > 0) {
-            if (start > end) {
-                errorMessage = "Start position " + start
-                        + " is greater than end position " + end;
-            } else if (start < 0) {
+            if (start < 0) {
                 errorMessage = "Start position " + start + " is below zero.";
             } else if (end < 0) {
                 errorMessage = "End position " + end + " is below zero.";
+            } else if (start > end) {
+                errorMessage = "Start position " + start
+                        + " is greater than end position " + end;
             } else if (end >= data.length) {
-                errorMessage = "Do not enough data to read, expected end position "
+                errorMessage = "Do not have enough data to read, expected end position "
                         + end + " but we have " + data.length + " bytes.";
             } else if (start == end) {
                 // ok
                 errorMessage = null;
             }
         } else {
-            errorMessage = "No data available for byte [" + (char) expectedByte
-                    + "]";
+            errorMessage = "No data available for matching byte ["
+                    + (char) expectedByte + "]";
         }
         return errorMessage;
     }
