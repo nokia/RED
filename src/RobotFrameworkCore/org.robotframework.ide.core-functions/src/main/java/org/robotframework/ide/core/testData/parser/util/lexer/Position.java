@@ -1,6 +1,8 @@
 package org.robotframework.ide.core.testData.parser.util.lexer;
 
 /**
+ * Contains information about start and end position to match or matching
+ * criteria.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
