@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.parser.util.lexer.MatchResult.MatchS
  * @serial RobotFramework 2.8.6
  * @serial 1.0
  */
-public abstract class AbstractMatcher implements IMatcher {
+public abstract class AbstractComplexMatcher implements IMatcher {
 
     /**
      * sub matchers used to give final judgment about result
