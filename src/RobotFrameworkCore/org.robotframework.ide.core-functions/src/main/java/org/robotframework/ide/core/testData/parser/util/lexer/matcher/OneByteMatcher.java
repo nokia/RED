@@ -24,10 +24,10 @@ public class OneByteMatcher implements IMatcher {
         byte[] data = dataWithPosition.getData();
         Position pos = dataWithPosition.getPosition();
 
-        int start = pos.getStart();
+        int byteIndex = pos.getStart();
         String validationMessage = checkLengthValid(dataWithPosition);
         if (validationMessage == null) {
-            if (data[start] == expectedByte) {
+            if (data[byteIndex] == expectedByte) {
                 result.setStatus(MatchStatus.FOUND);
             } else {
                 result.setStatus(MatchStatus.NOT_FOUND);
@@ -35,6 +35,9 @@ public class OneByteMatcher implements IMatcher {
         } else {
             result.addMessage(validationMessage);
         }
+
+        result.getPosition().setStart(pos.getStart());
+        result.getPosition().setEnd(pos.getEnd());
 
         return result;
     }
@@ -64,7 +67,8 @@ public class OneByteMatcher implements IMatcher {
                 errorMessage = null;
             }
         } else {
-            errorMessage = "No data available for byte [" + expectedByte + "]";
+            errorMessage = "No data available for byte [" + (char) expectedByte
+                    + "]";
         }
         return errorMessage;
     }
