@@ -33,22 +33,14 @@ public class RobotSuiteFileSection implements RobotElement {
 
     public RobotVariable createListVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.LIST, name, value, comment);
-        if (variables.contains(robotVariable)) {
-            return (RobotVariable) variables.get(variables.indexOf(robotVariable));
-        } else {
-            variables.add(robotVariable);
-            return robotVariable;
-        }
+        variables.add(robotVariable);
+        return robotVariable;
     }
 
     public RobotVariable createScalarVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.SCALAR, name, value, comment);
-        if (variables.contains(robotVariable)) {
-            return (RobotVariable) variables.get(variables.indexOf(robotVariable));
-        } else {
-            variables.add(robotVariable);
-            return robotVariable;
-        }
+        variables.add(robotVariable);
+        return robotVariable;
     }
 
     @Override
@@ -122,5 +114,10 @@ public class RobotSuiteFileSection implements RobotElement {
             }
         }
         return false;
+    }
+
+    @Override
+    public RobotSuiteFile getSuiteFile() {
+        return (RobotSuiteFile) this.getParent();
     }
 }

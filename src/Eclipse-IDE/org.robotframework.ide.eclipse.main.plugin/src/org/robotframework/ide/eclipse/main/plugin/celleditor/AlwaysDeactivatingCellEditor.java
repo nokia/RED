@@ -3,20 +3,16 @@ package org.robotframework.ide.eclipse.main.plugin.celleditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 
 /**
  * This is a specialized custom cell editor which deactivates just after
- * activation and only produces new object which should be added.
+ * activation which allows editing support to add new objects.
  *
  */
-public class AddVariableCellEditor extends CellEditor {
+public class AlwaysDeactivatingCellEditor extends CellEditor {
 
-    private final RobotSuiteFileSection section;
-
-    public AddVariableCellEditor(final RobotSuiteFileSection section, final Composite parent) {
+    public AlwaysDeactivatingCellEditor(final Composite parent) {
         super(parent);
-        this.section = section;
     }
 
     @Override
@@ -31,7 +27,7 @@ public class AddVariableCellEditor extends CellEditor {
 
     @Override
     protected Object doGetValue() {
-        return section.createScalarVariable("var", "", "");
+        return null;
     }
 
     @Override

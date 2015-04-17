@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tempmodel.cmd;
+package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;

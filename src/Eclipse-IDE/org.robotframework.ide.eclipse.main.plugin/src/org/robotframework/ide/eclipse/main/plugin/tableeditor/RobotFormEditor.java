@@ -1,10 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
@@ -20,6 +15,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.part.FileEditorInput;
@@ -28,43 +24,44 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotFolder;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPage;
-import org.robotframework.ide.eclipse.main.plugin.tempmodel.FileSectionsParser;
 
 public class RobotFormEditor extends FormEditor {
+
+    private static final String EDITOR_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.context";
 
     public static final String ID = "org.robotframework.ide.tableditor";
 
     private RobotSuiteFile suiteModel;
-
-    private RobotEditorCommandsStack commandsStack;
 
     private boolean isEditable;
 
     @Override
     public void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
         try {
-            final IEclipseContext context = (IEclipseContext) site.getService(IEclipseContext.class);
-            commandsStack = new RobotEditorCommandsStack(context);
-            context.set(RobotEditorCommandsStack.class, commandsStack);
-            context.set("suiteFileModel", new ContextFunction() {
-                @Override
-                public Object compute(final IEclipseContext context, final String contextKey) {
-                    return provideSuiteModel();
-                }
-            });
-            ContextInjectionFactory.inject(this, context);
-
             super.init(site, input);
+
+            prepareEclipseContext();
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
+    }
+
+    private void prepareEclipseContext() {
+        final IEclipseContext eclipseContext = (IEclipseContext) getSite().getService(IEclipseContext.class);
+        eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
+            @Override
+            public Object compute(final IEclipseContext context, final String contextKey) {
+                return provideSuiteModel();
+            }
+        });
+        ContextInjectionFactory.inject(this, eclipseContext);
     }
 
     @Override
@@ -92,62 +89,50 @@ public class RobotFormEditor extends FormEditor {
     @Override
     protected void addPages() {
         try {
-            addEditCasesPage();
-            addVariablesPage();
+            prepareCommandsContext();
+
+            addPage(new CasesEditorPage(this));
+            addPage(new VariablesEditorPage(this));
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
         }
     }
 
-    private void addEditCasesPage() throws PartInitException {
-        final FormPage main = new CasesEditorPage(this);
-        final int index = addPage(main);
-        setPageImage(index, RobotImages.getRobotImage().createImage());
+    private void prepareCommandsContext() {
+        final IContextService commandsContext = (IContextService) getSite().getService(IContextService.class);
+        commandsContext.activateContext(EDITOR_CONTEXT_ID);
     }
 
-    private void addVariablesPage() throws PartInitException {
-        final FormPage main = new VariablesEditorPage(this);
-        final int index = addPage(main);
-        setPageImage(index, RobotImages.getRobotVariableImage().createImage());
+    private void addPage(final FormPage page) throws PartInitException {
+        final int index = addPage(page, getEditorInput());
+        setPageImage(index, page.getTitleImage());
     }
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
         commitPages(true);
-        for (final IEditorPart dirtyEditorPart : getDirtyEditors()) {
-            dirtyEditorPart.doSave(monitor);
+        try {
+            suiteModel.commitChanges(monitor);
+            firePropertyChange(PROP_DIRTY);
+        } catch (final CoreException e) {
+            monitor.setCanceled(true);
         }
     }
 
     @Override
     public boolean isSaveAsAllowed() {
-        return getActiveEditor() != null && getActiveEditor().isSaveAsAllowed();
+        return false; // FIXME : getActiveEditor() != null && getActiveEditor().isSaveAsAllowed();
     }
 
     @Override
     public void doSaveAs() {
-        commitPages(true);
-        for (final IEditorPart dirtyEditorPart : getDirtyEditors()) {
-            dirtyEditorPart.doSaveAs();
-        }
-    }
-
-    private List<IEditorPart> getDirtyEditors() {
-        final List<IEditorPart> list = new ArrayList<>();
-        for (int i = 0; i < getPageCount(); i++) {
-            final IEditorPart editor = getEditor(i);
-            if (editor.isDirty()) {
-                list.add(editor);
-            }
-        }
-        return Collections.unmodifiableList(list);
+        // FIXME : implement
     }
 
     @Override
     public void dispose() {
         super.dispose();
 
-        commandsStack.clear();
         final IEclipseContext context = (IEclipseContext) getSite().getService(IEclipseContext.class);
         ContextInjectionFactory.uninject(this, context);
     }
@@ -155,7 +140,7 @@ public class RobotFormEditor extends FormEditor {
     @Inject
     @Optional
     private void closeEditorWhenResourceBecomesNotAvailable(
-            @UIEventTopic(RobotModelEvents.ROBOT_MODEL) final RobotElementChange change) {
+            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.REMOVED && getEditorInput() instanceof FileEditorInput) {
             final IFile file = ((FileEditorInput) getEditorInput()).getFile();
             final RobotElement element = change.getElement();
@@ -176,16 +161,17 @@ public class RobotFormEditor extends FormEditor {
             return suiteModel;
         }
         if (getEditorInput() instanceof FileEditorInput) {
-            return RobotFramework.getModelManager().createSuiteFile(((FileEditorInput) getEditorInput()).getFile());
+            suiteModel = RobotFramework.getModelManager().createSuiteFile(
+                    ((FileEditorInput) getEditorInput()).getFile());
         } else {
             final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);
             try {
-                final FileSectionsParser parser = new FileSectionsParser(storage.getContents(), storage.isReadOnly());
-                return parser.parseRobotSuiteFile();
-            } catch (final IOException | CoreException e) {
+                suiteModel = new RobotSuiteStreamFile(storage.getContents(), storage.isReadOnly());
+            } catch (final CoreException e) {
                 throw new RuntimeException("Unable to provide model for given input", e);
             }
         }
+        return suiteModel;
     }
 
     public IEditorPart activatePage(final RobotSuiteFileSection section) {
