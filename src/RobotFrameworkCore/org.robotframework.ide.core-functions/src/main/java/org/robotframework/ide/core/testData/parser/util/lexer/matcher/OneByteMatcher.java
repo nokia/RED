@@ -1,15 +1,14 @@
 package org.robotframework.ide.core.testData.parser.util.lexer.matcher;
 
 /**
+ * Matcher, which check if single one byte is as expected.
  * 
  * @author wypych
- * 
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
  */
 public class OneByteMatcher extends AbstractSimpleByteMatcher {
 
-    /**
-     * @param expectedByte
-     */
     public OneByteMatcher(final byte expectedByte) {
         super(expectedByte);
     }

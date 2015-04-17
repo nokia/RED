@@ -7,6 +7,12 @@ import org.robotframework.ide.core.testData.parser.util.lexer.MatchResult.MatchS
 import org.robotframework.ide.core.testData.parser.util.lexer.Position;
 
 
+/**
+ * 
+ * @author wypych
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
+ */
 public abstract class AbstractSimpleByteMatcher implements IMatcher {
 
     private final byte expectedByte;
@@ -17,6 +23,11 @@ public abstract class AbstractSimpleByteMatcher implements IMatcher {
     }
 
 
+    /**
+     * @param expected
+     * @param got
+     * @return
+     */
     public abstract boolean areBytesMatch(byte expected, byte got);
 
 
@@ -28,6 +39,7 @@ public abstract class AbstractSimpleByteMatcher implements IMatcher {
     @Override
     public MatchResult match(DataMarked dataWithPosition) {
         MatchResult result = new MatchResult(this, MatchStatus.NOT_FOUND);
+        Position resultPosition = result.getPosition();
 
         byte[] data = dataWithPosition.getData();
         Position pos = dataWithPosition.getPosition();
@@ -37,15 +49,18 @@ public abstract class AbstractSimpleByteMatcher implements IMatcher {
         if (validationMessage == null) {
             if (areBytesMatch(data[byteIndex], expectedByte)) {
                 result.setStatus(MatchStatus.FOUND);
+                resultPosition.setStart(byteIndex);
+                resultPosition.setEnd(byteIndex);
             } else {
                 result.setStatus(MatchStatus.NOT_FOUND);
+                resultPosition.setStart(pos.getStart());
+                resultPosition.setEnd(pos.getEnd());
             }
         } else {
             result.addMessage(validationMessage);
+            resultPosition.setStart(pos.getStart());
+            resultPosition.setEnd(pos.getEnd());
         }
-
-        result.getPosition().setStart(pos.getStart());
-        result.getPosition().setEnd(pos.getEnd());
 
         return result;
     }
