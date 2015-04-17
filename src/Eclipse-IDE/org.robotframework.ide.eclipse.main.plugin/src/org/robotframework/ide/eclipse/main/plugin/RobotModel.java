@@ -128,4 +128,9 @@ public class RobotModel implements RobotElement {
         }
         return false;
     }
+
+    @Override
+    public RobotSuiteFile getSuiteFile() {
+        return null;
+    }
 }

@@ -75,6 +75,11 @@ public abstract class RobotContainer implements RobotElement {
     }
 
     @Override
+    public RobotSuiteFile getSuiteFile() {
+        return null;
+    }
+
+    @Override
     public List<RobotElement> getChildren() {
         return elements;
     }

@@ -6,13 +6,17 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.celleditor.AddVariableCellEditor;
-import org.robotframework.ide.eclipse.main.plugin.tempmodel.cmd.CmdAddVariable;
+import org.robotframework.ide.eclipse.main.plugin.celleditor.AlwaysDeactivatingCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 abstract class VariableEditingSupport extends EditingSupport {
 
-    VariableEditingSupport(final ColumnViewer viewer) {
+    protected final RobotEditorCommandsStack commandsStack;
+
+    VariableEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
         super(viewer);
+        this.commandsStack = commandsStack;
     }
 
     @Override
@@ -24,8 +28,7 @@ abstract class VariableEditingSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(final Object element) {
         if (element instanceof AddVariableToken) {
-            final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
-            return new AddVariableCellEditor(section, (Composite) getViewer().getControl());
+            return new AlwaysDeactivatingCellEditor((Composite) getViewer().getControl());
         }
         return null;
     }
@@ -33,13 +36,15 @@ abstract class VariableEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof AddVariableToken) {
-            addNewVariable((RobotVariable) value);
+            addNewVariable();
         }
     }
 
-    protected final void addNewVariable(final RobotVariable newVariable) {
+    private void addNewVariable() {
         final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
-        new CmdAddVariable(section, newVariable).execute();
+        commandsStack.execute(new CreateFreshVariableCommand(section, true));
+
+        final RobotVariable newVariable = (RobotVariable) section.getChildren().get(section.getChildren().size() - 1);
         scheduleViewerRefreshAndEditorActivation(newVariable, getColumnIndex());
     }
 
