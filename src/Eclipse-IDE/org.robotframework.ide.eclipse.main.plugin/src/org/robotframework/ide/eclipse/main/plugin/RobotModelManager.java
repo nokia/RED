@@ -32,7 +32,7 @@ public final class RobotModelManager {
             final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
             
             for (final RobotElementChange change : changes) {
-                eventBroker.post(RobotModelEvents.ROBOT_MODEL, change);
+                eventBroker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, change);
             }
         }
     }

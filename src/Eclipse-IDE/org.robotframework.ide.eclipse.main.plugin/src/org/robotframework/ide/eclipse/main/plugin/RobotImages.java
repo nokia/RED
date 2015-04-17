@@ -20,6 +20,14 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/variable.png");
     }
 
+    public static ImageDescriptor getRobotScalarVariableImage() {
+        return RobotFramework.getImageDescriptor("resources/variable_scalar.png");
+    }
+
+    public static ImageDescriptor getRobotListVariableImage() {
+        return RobotFramework.getImageDescriptor("resources/variable_list.png");
+    }
+
     public static ImageDescriptor getAddImage() {
         return RobotFramework.getImageDescriptor("resources/add.png");
     }

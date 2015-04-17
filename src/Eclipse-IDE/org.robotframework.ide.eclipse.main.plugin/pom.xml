@@ -67,5 +67,10 @@
 		  <version>0.0.1-SNAPSHOT</version>
 		  <type>jar</type>	
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
 	</dependencies>
 </project>

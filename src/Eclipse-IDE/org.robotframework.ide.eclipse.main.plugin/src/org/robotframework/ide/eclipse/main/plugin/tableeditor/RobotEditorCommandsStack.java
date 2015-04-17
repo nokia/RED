@@ -4,22 +4,18 @@ import java.util.Stack;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class RobotEditorCommandsStack {
-
-    private final IEclipseContext context;
 
     private final Stack<EditorCommand> _executedCommands = new Stack<>();
 
     private final Stack<EditorCommand> _toRedoCommands = new Stack<>();
 
-    
-    public RobotEditorCommandsStack(final IEclipseContext context) {
-        this.context = context;
-    }
-    
     public void execute(final EditorCommand command) throws CommandExecutionException {
+        final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class))
+                .getActiveLeaf();
         ContextInjectionFactory.inject(command, context);
         command.execute();
         
@@ -58,6 +54,8 @@ public class RobotEditorCommandsStack {
 
     private void clear(final Stack<EditorCommand> stackToClear) {
         while (!stackToClear.isEmpty()) {
+            final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench().getService(
+                    IEclipseContext.class)).getActiveLeaf();
             final EditorCommand command = stackToClear.pop();
             ContextInjectionFactory.uninject(command, context);
         }

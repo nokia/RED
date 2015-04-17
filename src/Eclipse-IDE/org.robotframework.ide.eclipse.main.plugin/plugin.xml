@@ -19,20 +19,20 @@
       </wizard>
       <wizard
             category="org.robotframework.ide.eclipse.wizards.category"
-            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuiteWizard"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuitesFolderWizard"
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             icon="resources/new_robot_suite.png"
             id="org.robotframework.ide.eclipse.wizards.newRobotSuite"
-            name="Robot Test Suite">
+            name="Robot Test Suites folder">
       </wizard>
       <wizard
             category="org.robotframework.ide.eclipse.wizards.category"
-            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestCaseWizard"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuiteWizard"
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             hasPages="true"
             icon="resources/new_robot_file.png"
             id="org.robotframework.ide.eclipse.wizards.newRobotCase"
-            name="Robot Test Cases File">
+            name="Robot Test Suite">
       </wizard>
    </extension>
    <extension
@@ -238,6 +238,14 @@
              class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorActionsProvider"
              id="org.robotframework.actions.provider">
        </actionProvider>
+       <commonSorter
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.VariablesSorter">
+          <parentExpression>
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection">
+             </instanceof>
+          </parentExpression>
+       </commonSorter>
     </navigatorContent>
     <commonFilter
           activeByDefault="false"
@@ -309,11 +317,247 @@
     </colorDefinition>
  </extension>
  <extension
+       point="org.eclipse.ui.contexts">
+    <context
+          description="Context for Robot suite files editor"
+          id="org.robotframework.ide.eclipse.tableeditor.context"
+          name="Table Editor Context"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
+    <context
+          description="Context for Variables section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          name="Variables Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
+    <context
+          description="Context for Test Cases section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.cases.context"
+          name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
+ </extension>
+ <extension
+       point="org.eclipse.ui.commands">
+    <category
+          id="org.robotframework.ide.eclipse.robotCommands"
+          name="Robot Commands">
+    </category>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNew"
+          name="Add new element">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.moveElementUp"
+          name="Move up">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.moveElementDown"
+          name="Move down">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.sortElements"
+          name="Sort elements">
+    </command>
+ </extension>
+ <extension
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.atLeastOneVariableIsSelected">
+          </reference></enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertNewVariableHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.MoveVariableUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.MoveVariableDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.SortVariablesHandler"
+          commandId="org.robotframework.ide.eclipse.sortElements">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+ </extension>
+ <extension
+       point="org.eclipse.ui.bindings">
+    <key
+          commandId="org.robotframework.ide.eclipse.insertNew"
+          contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+N">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.moveElementUp"
+          contextId="org.eclipse.ui.contexts.window"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+ARROW_UP">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.moveElementDown"
+          contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+ARROW_DOWN">
+    </key>
+ </extension>
+ <extension
        point="org.eclipse.ui.menus">
     <menuContribution
           allPopups="false"
-          locationURI="toolbar:org.eclipse.ui.main.toolbar">
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNew"
+             icon="resources/add.png"
+             label="Add new variable"
+             style="push">
+       </command>
+       <separator
+             name="navigation"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementUp"
+             label="Move variable up"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementDown"
+             label="Move variable down"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.sortElements"
+             label="Sort variables"
+             style="push">
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
     </menuContribution>
+ </extension>
+ <extension
+       point="org.eclipse.core.expressions.propertyTesters">
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertyTester.RobotEditorPropertTester"
+          id="org.robotframework.robotEditorPropertyTester"
+          namespace="org.robotframework"
+          properties="editorModelIsEditable"
+          type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+    </propertyTester>
+ </extension>
+ <extension
+       point="org.eclipse.core.expressions.definitions">
+    <definition
+          id="org.robotframework.activeVariablesPartIsEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.variables.context">
+                </equals>
+             </iterate>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.atLeastOneVariableIsSelected">
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="and">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotVariable">
+             </instanceof>
+          </iterate>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.exactlyOneVariableIsSelected">
+       <with
+             variable="selection">
+          <and>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.RobotVariable">
+                </instanceof>
+             </iterate>
+             <count
+                   value="1">
+             </count>
+          </and>
+       </with>
+    </definition>
  </extension>
 
 </plugin>
