@@ -17,11 +17,16 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Variable
 
 public class RobotVariable implements RobotElement {
 
-    enum Type {
+    public enum Type {
         SCALAR {
             @Override
             public String getMark() {
                 return "$";
+            }
+
+            @Override
+            public ImageDescriptor getImage() {
+                return RobotImages.getRobotScalarVariableImage();
             }
         },
         LIST {
@@ -29,14 +34,21 @@ public class RobotVariable implements RobotElement {
             public String getMark() {
                 return "@";
             }
+
+            @Override
+            public ImageDescriptor getImage() {
+                return RobotImages.getRobotListVariableImage();
+            }
         };
 
         public abstract String getMark();
+
+        public abstract ImageDescriptor getImage();
     }
 
-    private final RobotSuiteFileSection section;
+    private RobotSuiteFileSection section;
     private String name;
-    private final Type type;
+    private Type type;
     private String value;
     private String comment;
 
@@ -55,15 +67,35 @@ public class RobotVariable implements RobotElement {
             return false;
         } else if (obj.getClass() == getClass()) {
             final RobotVariable other = (RobotVariable) obj;
-            return section.equals(other.section) && name.equals(other.name) && value.equals(other.value)
+            final int index1 = getIndexInParent(this);
+            final int index2 = getIndexInParent(other);
+
+            return getParent() == other.getParent() && index1 == index2 && section.equals(other.section)
+                    && name.equals(other.name) && value.equals(other.value)
                     && comment.equals(other.comment);
         }
         return false;
     }
 
+    private int getIndexInParent(final RobotVariable var) {
+        for (int i = 0; i < var.getParent().getChildren().size(); i++) {
+            if (var.getParent().getChildren().get(i) == var) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(section, name);
+    }
+
+    // representation for debug; provide own specialized method if some kind of
+    // string representation is desired
+    @Override
+    public String toString() {
+        return getPrefix() + name + getSuffix() + "= " + value + "# " + comment;
     }
 
     @Override
@@ -73,8 +105,9 @@ public class RobotVariable implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getRobotVariableImage();
+        return type.getImage();
     }
+
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new OpenStrategy() {
@@ -137,8 +170,25 @@ public class RobotVariable implements RobotElement {
         this.name = name;
     }
 
+    public void setParent(final RobotSuiteFileSection variablesSection) {
+        this.section = variablesSection;
+    }
+
     @Override
     public boolean contains(final RobotElement element) {
         return element.equals(this);
+    }
+
+    @Override
+    public RobotSuiteFile getSuiteFile() {
+        return section.getSuiteFile();
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(final Type type) {
+        this.type = type;
     }
 }

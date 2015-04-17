@@ -11,6 +11,8 @@ public interface RobotElement {
 
     RobotElement getParent();
 
+    RobotSuiteFile getSuiteFile();
+
     List<RobotElement> getChildren();
 
     boolean contains(RobotElement element);

@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tempmodel;
+package org.robotframework.ide.eclipse.main.plugin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,34 +9,24 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 
-public class FileSectionsParser {
+class FileSectionsParser {
 
     private final boolean readOnly;
     private IFile file;
     private InputStream stream;
 
-    public FileSectionsParser(final IFile file) {
+    FileSectionsParser(final IFile file) {
         this.file = file;
         this.readOnly = file.isReadOnly();
     }
 
-    public FileSectionsParser(final InputStream stream, final boolean readOnly) {
+    FileSectionsParser(final InputStream stream, final boolean readOnly) {
         this.stream = stream;
         this.readOnly = readOnly;
     }
 
-    public RobotSuiteFile parseRobotSuiteFile() throws IOException {
-        final RobotSuiteFile robotSuite = file != null ? RobotFramework.getModelManager().createSuiteFile(file) : new RobotSuiteFile(null, null);
-        parseRobotFileSections(robotSuite);
-        return robotSuite;
-    }
-
-    public List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent) throws IOException {
+    List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent) throws IOException {
         final List<RobotElement> sections = new ArrayList<>();
 
         InputStream inputStream = null;
@@ -85,7 +75,7 @@ public class FileSectionsParser {
         if (indexOfComment < 0) {
             return "";
         }
-        return line.substring(line.indexOf('#')).trim();
+        return line.substring(line.indexOf('#')).replaceFirst("#", "").trim();
     }
 
     private String extractVarValue(final String line) {

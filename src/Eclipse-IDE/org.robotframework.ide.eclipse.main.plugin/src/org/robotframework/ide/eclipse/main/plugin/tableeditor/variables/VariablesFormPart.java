@@ -1,12 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -23,8 +22,14 @@ import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -36,20 +41,31 @@ import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSectionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tempmodel.cmd.CreateSectionCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 
 public class VariablesFormPart extends AbstractFormPart {
 
     @Inject
-    @Named("suiteFileModel")
+    @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
 
+    private final IEditorSite site;
     private TableViewer viewer;
     private HyperlinkAdapter createSectionLinkListener;
+
+
+    public VariablesFormPart(final IEditorSite site) {
+        this.site = site;
+    }
+
+    TableViewer getViewer() {
+        return viewer;
+    }
 
     @Override
     public final void initialize(final IManagedForm managedForm) {
@@ -68,34 +84,55 @@ public class VariablesFormPart extends AbstractFormPart {
 
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
+        viewer.setUseHashlookup(true);
 
         createColumn("Variable", 270, new DelegatingStyledCellLabelProvider(new VariableNameLabelProvider()),
-                new VariableNameEditingSupport(viewer));
+                new VariableNameEditingSupport(viewer, commandsStack));
 
-        createColumn("Value", 270, new VariableValueLabelProvider(), new VariableValueEditingSupport(viewer));
+        createColumn("Value", 270, new VariableValueLabelProvider(), 
+                new VariableValueEditingSupport(viewer, commandsStack));
 
         createColumn("Comment", 400, new DelegatingStyledCellLabelProvider(new VariableCommentLabelProvider()),
-                new VariableCommentEditingSupport(viewer));
+                new VariableCommentEditingSupport(viewer, commandsStack));
 
+        createContextMenu();
         setInput();
+    }
 
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.contextMenu";
+
+        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
+        final Table control = viewer.getTable();
+        control.addMenuDetectListener(new MenuDetectListener() {
+
+            @Override
+            public void menuDetected(final MenuDetectEvent e) {
+                final Point point = control.toControl(e.x, e.y);
+                final boolean isClickedOnHeader = point.y <= control.getHeaderHeight();
+                e.doit = !isClickedOnHeader;
+            }
+        });
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, viewer, false);
     }
 
     private void setInput() {
-        final RobotSuiteFileSection variableSection = findVariableSection(fileModel.getSections());
+        final com.google.common.base.Optional<RobotElement> variablesSection = fileModel.findVariablesSection();
         final Form form = getManagedForm().getForm().getForm();
-        if (variableSection == null && fileModel.isEditable()) {
+        if (!variablesSection.isPresent() && fileModel.isEditable()) {
             createSectionLinkListener = createHyperlinkListener(fileModel);
             form.addMessageHyperlinkListener(createSectionLinkListener);
             form.setMessage("There is no Variables section defined, do you want to define it?", IMessageProvider.ERROR);
         } else {
             form.removeMessageHyperlinkListener(createSectionLinkListener);
-            if (variableSection.isReadOnly()) {
+            if (((RobotSuiteFileSection) variablesSection.get()).isReadOnly()) {
                 form.setMessage("Variable section is read-only!", IMessageProvider.WARNING);
             } else {
                 form.setMessage(null, 0);
             }
-            viewer.setInput(variableSection);
+            viewer.setInput(variablesSection.get());
         }
     }
 
@@ -109,18 +146,11 @@ public class VariablesFormPart extends AbstractFormPart {
             @Override
             public void linkActivated(final HyperlinkEvent e) {
                 commandsStack.execute(new CreateSectionCommand(suite, VariablesEditorPage.SECTION_NAME));
+                setInput();
+                markDirty();
             }
         };
         return createSectionLinkListener;
-    }
-
-    private RobotSuiteFileSection findVariableSection(final List<RobotElement> sections) {
-        for (final RobotElement section : sections) {
-            if (section.getName().equals(VariablesEditorPage.SECTION_NAME)) {
-                return (RobotSuiteFileSection) section;
-            }
-        }
-        return null;
     }
 
     private void createColumn(final String columnName, final int width, final CellLabelProvider labelProvider,
@@ -164,18 +194,28 @@ public class VariablesFormPart extends AbstractFormPart {
                 | ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_VERTICAL
                 | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR);
     }
-    
+
+    public void revealVariable(final RobotVariable robotVariable) {
+        viewer.setSelection(new StructuredSelection(new Object[] { robotVariable }));
+    }
+
     @Inject
     @Optional
-    private void whenFileModelChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotSuiteFile affectedFile) {
-        if (affectedFile == fileModel) {
-            setInput();
+    private void whenVariableDetailChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
+        if (variable.getSuiteFile() == fileModel) {
+            viewer.update(variable, null);
             markDirty();
         }
     }
 
-    public void revealVariable(final RobotVariable robotVariable) {
-        viewer.setSelection(new StructuredSelection(new Object[] { robotVariable }));
+    @Inject
+    @Optional
+    private void whenVariableIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            viewer.refresh();
+            markDirty();
+        }
     }
 }

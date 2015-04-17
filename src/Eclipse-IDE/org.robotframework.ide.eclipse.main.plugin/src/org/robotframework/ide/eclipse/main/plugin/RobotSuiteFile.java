@@ -3,11 +3,18 @@ package org.robotframework.ide.eclipse.main.plugin;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.tempmodel.FileSectionsParser;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class RobotSuiteFile implements RobotElement {
 
@@ -24,10 +31,8 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public RobotSuiteFileSection createRobotSection(final String name) {
-        if (file == null) {
-            return null;
-        }
-        final RobotSuiteFileSection section = new RobotSuiteFileSection(this, name, file.isReadOnly());
+        final RobotSuiteFileSection section = new RobotSuiteFileSection(this, name, file == null ? false
+                : file.isReadOnly());
         if (getSections().contains(section)) {
             return (RobotSuiteFileSection) sections.get(sections.indexOf(section));
         } else {
@@ -40,7 +45,7 @@ public class RobotSuiteFile implements RobotElement {
         if (sections == null) {
             sections = new ArrayList<>();
             try {
-                sections.addAll(new FileSectionsParser(file).parseRobotFileSections(this));
+                sections.addAll(createParser().parseRobotFileSections(this));
             } catch (final IOException e) {
                 throw new RuntimeException("Unable to read sections");
             }
@@ -48,7 +53,11 @@ public class RobotSuiteFile implements RobotElement {
         return sections;
     }
 
-    void refreshOnFileChange() {
+    protected FileSectionsParser createParser() {
+        return new FileSectionsParser(file);
+    }
+
+    public void refreshOnFileChange() {
         sections = null;
         getSections();
     }
@@ -65,7 +74,7 @@ public class RobotSuiteFile implements RobotElement {
             return false;
         } else if (obj.getClass() == getClass()) {
             final RobotSuiteFile other = (RobotSuiteFile) obj;
-            return file.equals(other.file);
+            return Objects.equals(file, other.file);
         }
         return false;
     }
@@ -101,7 +110,7 @@ public class RobotSuiteFile implements RobotElement {
 
     @Override
     public List<RobotElement> getChildren() {
-        return sections;
+        return sections == null ? Lists.<RobotElement> newArrayList() : sections;
     }
 
     public boolean isEditable() {
@@ -116,5 +125,23 @@ public class RobotSuiteFile implements RobotElement {
             }
         }
         return false;
+    }
+
+    @Override
+    public RobotSuiteFile getSuiteFile() {
+        return this;
+    }
+
+    public void commitChanges(final IProgressMonitor monitor) throws CoreException {
+        file.setContents(new FilesSectionsEmiter(this).emit(), true, true, monitor);
+    }
+
+    public Optional<RobotElement> findVariablesSection() {
+        return Iterables.tryFind(getSections(), new Predicate<RobotElement>() {
+            @Override
+            public boolean apply(final RobotElement element) {
+                return element.getName().equals("Variables");
+            }
+        });
     }
 }

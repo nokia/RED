@@ -5,11 +5,13 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.celleditor.ActivationCharPreservingTextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetVariableValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 public class VariableValueEditingSupport extends VariableEditingSupport {
 
-    public VariableValueEditingSupport(final ColumnViewer viewer) {
-        super(viewer);
+    public VariableValueEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
+        super(viewer, commandsStack);
     }
 
     @Override
@@ -33,9 +35,7 @@ public class VariableValueEditingSupport extends VariableEditingSupport {
     protected void setValue(final Object element, final Object value) {
         if (element instanceof RobotVariable) {
             final String val = (String) value;
-            ((RobotVariable) element).setValue(val);
-
-            getViewer().update(element, null);
+            commandsStack.execute(new SetVariableValueCommand((RobotVariable) element, val));
         } else {
             super.setValue(element, value);
         }

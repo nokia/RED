@@ -5,11 +5,13 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.celleditor.ActivationCharPreservingTextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetVariableNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 public class VariableNameEditingSupport extends VariableEditingSupport {
 
-    public VariableNameEditingSupport(final ColumnViewer viewer) {
-        super(viewer);
+    public VariableNameEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
+        super(viewer, commandsStack);
     }
 
     @Override
@@ -37,11 +39,7 @@ public class VariableNameEditingSupport extends VariableEditingSupport {
     protected void setValue(final Object element, final Object value) {
         if (element instanceof RobotVariable) {
             final String name = (String) value;
-
-            // FIXME : should be done via command
-            ((RobotVariable) element).setName(name.substring(2, name.length() - 1));
-
-            getViewer().update(element, null);
+            commandsStack.execute(new SetVariableNameCommand((RobotVariable) element, name));
         } else {
             super.setValue(element, value);
         }
