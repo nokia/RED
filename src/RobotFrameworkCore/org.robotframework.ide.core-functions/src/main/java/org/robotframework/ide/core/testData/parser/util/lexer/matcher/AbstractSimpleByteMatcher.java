@@ -49,15 +49,18 @@ public abstract class AbstractSimpleByteMatcher implements IMatcher {
         if (validationMessage == null) {
             if (areBytesMatch(data[byteIndex], expectedByte)) {
                 result.setStatus(MatchStatus.FOUND);
-                resultPosition.setStart(byteIndex);
-                resultPosition.setEnd(byteIndex);
             } else {
                 result.setStatus(MatchStatus.NOT_FOUND);
-                resultPosition.setStart(pos.getStart());
-                resultPosition.setEnd(pos.getEnd());
             }
         } else {
             result.addMessage(validationMessage);
+        }
+
+        if (result.getStatus() == MatchStatus.FOUND) {
+            resultPosition.setStart(byteIndex);
+            resultPosition.setEnd(byteIndex);
+        } else {
+            // we do not found so we set it to as was requested
             resultPosition.setStart(pos.getStart());
             resultPosition.setEnd(pos.getEnd());
         }
