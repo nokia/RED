@@ -20,8 +20,8 @@ public class VariableNameEditingSupport extends VariableEditingSupport {
         if (element instanceof RobotVariable) {
             final String prefix = ((RobotVariable) element).getPrefix();
             final String suffix = ((RobotVariable) element).getSuffix();
-            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent, prefix,
-                    suffix);
+            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent, CONTEXT_ID,
+                    prefix, suffix);
         }
         return super.getCellEditor(element);
     }

@@ -37,6 +37,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
@@ -204,7 +205,7 @@ public class VariablesFormPart extends AbstractFormPart {
     private void whenVariableDetailChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
         if (variable.getSuiteFile() == fileModel) {
-            viewer.update(variable, null);
+            viewer.refresh();
             markDirty();
         }
     }
@@ -217,5 +218,12 @@ public class VariablesFormPart extends AbstractFormPart {
             viewer.refresh();
             markDirty();
         }
+    }
+
+    @Inject
+    @Optional
+    private void whenFileChangedExternally(
+            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
+        setInput();
     }
 }
