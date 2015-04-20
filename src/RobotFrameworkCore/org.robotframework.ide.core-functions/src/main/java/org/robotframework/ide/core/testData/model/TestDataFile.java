@@ -129,4 +129,56 @@ public class TestDataFile {
          */
         UNKNOWN_FILE
     }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((keywords == null) ? 0 : keywords.hashCode());
+        result = prime * result
+                + ((settings == null) ? 0 : settings.hashCode());
+        result = prime * result
+                + ((testCases == null) ? 0 : testCases.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result
+                + ((variables == null) ? 0 : variables.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TestDataFile other = (TestDataFile) obj;
+        if (keywords == null) {
+            if (other.keywords != null)
+                return false;
+        } else if (!keywords.equals(other.keywords))
+            return false;
+        if (settings == null) {
+            if (other.settings != null)
+                return false;
+        } else if (!settings.equals(other.settings))
+            return false;
+        if (testCases == null) {
+            if (other.testCases != null)
+                return false;
+        } else if (!testCases.equals(other.testCases))
+            return false;
+        if (type != other.type)
+            return false;
+        if (variables == null) {
+            if (other.variables != null)
+                return false;
+        } else if (!variables.equals(other.variables))
+            return false;
+        return true;
+    }
 }
