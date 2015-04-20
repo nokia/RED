@@ -18,7 +18,7 @@ public class VariableValueEditingSupport extends VariableEditingSupport {
     protected CellEditor getCellEditor(final Object element) {
         final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotVariable) {
-            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent);
+            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent, CONTEXT_ID);
         }
         return super.getCellEditor(element);
     }

@@ -10,6 +10,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 
 /**
  * This is a custom implementation of TextCellEditor which can be activated by
@@ -21,18 +24,21 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
     private final String prefix;
     private final String suffix;
+    private final String contextToDeactivate;
 
     public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
-            final String prefix, final String suffix) {
+            final String contextToDeactivate, final String prefix, final String suffix) {
         super(parent, SWT.SINGLE);
         this.prefix = prefix;
         this.suffix = suffix;
+        this.contextToDeactivate = contextToDeactivate;
 
         registerActivationListener(viewerEditor);
     }
 
-    public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent) {
-        this(viewerEditor, parent, "", "");
+    public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
+            final String contextToDeactivate) {
+        this(viewerEditor, parent, contextToDeactivate, "", "");
     }
 
     private void registerActivationListener(final ColumnViewerEditor viewerEditor) {
@@ -57,25 +63,31 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
     private class EditorActivationListener extends ColumnViewerEditorActivationListener {
 
+        private IContextActivation contextActivation;
+
         @Override
         public void beforeEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
-            // nothing to do
+            final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(
+                    IContextService.class);
+            service.deactivateContext(contextActivation);
         }
 
         @Override
         public void beforeEditorActivated(final ColumnViewerEditorActivationEvent event) {
-            // nothing to do
-        }
-
-        @Override
-        public void afterEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
-            // nothing to do
+            final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(
+                    IContextService.class);
+            contextActivation = service.activateContext(contextToDeactivate);
         }
 
         @Override
         public void afterEditorActivated(final ColumnViewerEditorActivationEvent event) {
             final Text text = (Text) ActivationCharPreservingTextCellEditor.this.getControl();
             text.setSelection(prefix.length(), text.getText().length() - suffix.length());
+        }
+
+        @Override
+        public void afterEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
+            // nothing to do
         }
     };
 }
