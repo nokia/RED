@@ -27,9 +27,6 @@ public class ParserResultBuilder<InputFormatType, OutputFormatType> {
     private ParseProcessResult userStatus;
 
 
-    /**
-     * 
-     */
     public ParserResultBuilder() {
         parseResultBuildUp = new ParseResult<InputFormatType, OutputFormatType>();
     }
