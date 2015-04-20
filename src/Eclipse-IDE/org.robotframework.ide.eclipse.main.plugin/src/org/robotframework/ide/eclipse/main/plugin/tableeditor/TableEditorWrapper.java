@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
 
-@SuppressWarnings("restriction")
 public class TableEditorWrapper extends DIEditorPart<TableEditor> {
 
     public TableEditorWrapper() {

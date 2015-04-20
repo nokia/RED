@@ -113,6 +113,7 @@ public class RobotFormEditor extends FormEditor {
         commitPages(true);
         try {
             suiteModel.commitChanges(monitor);
+            suiteModel = null;
             firePropertyChange(PROP_DIRTY);
         } catch (final CoreException e) {
             monitor.setCanceled(true);

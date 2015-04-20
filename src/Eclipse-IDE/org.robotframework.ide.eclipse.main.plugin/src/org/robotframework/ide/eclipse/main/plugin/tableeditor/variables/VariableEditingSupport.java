@@ -12,6 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 
 abstract class VariableEditingSupport extends EditingSupport {
 
+    protected static final String CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
     protected final RobotEditorCommandsStack commandsStack;
 
     VariableEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
