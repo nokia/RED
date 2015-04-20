@@ -6,10 +6,18 @@ import org.robotframework.ide.core.testData.model.TestDataFile;
 import org.robotframework.ide.core.testData.parser.AbstractRobotFrameworkFileParser;
 import org.robotframework.ide.core.testData.parser.ITestDataParserProvider;
 import org.robotframework.ide.core.testData.parser.MissingParserException;
+import org.robotframework.ide.core.testData.parser.ParserResultBuilder;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
+/**
+ * 
+ * @author wypych
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
+ * 
+ */
 public class TxtRobotFrameworkParser extends
         AbstractRobotFrameworkFileParser<ByteBufferInputStream> {
 
@@ -26,8 +34,18 @@ public class TxtRobotFrameworkParser extends
     @Override
     public ParseResult<ByteBufferInputStream, TestDataFile> parse(
             ByteBufferInputStream testData) {
-        // TODO Auto-generated method stub
-        return null;
+        ParserResultBuilder<ByteBufferInputStream, TestDataFile> parseResultBuilder = new ParserResultBuilder<ByteBufferInputStream, TestDataFile>();
+        if (testData.available() > 0) {
+            while(testData.available() > 0) {
+
+            }
+        } else {
+            parseResultBuilder.addDataConsumed(testData)
+                    .addInformationMessage("Begin of file.", "File is empty.")
+                    .addProducedModelElement(new TestDataFile());
+        }
+
+        return parseResultBuilder.build();
     }
 
 
