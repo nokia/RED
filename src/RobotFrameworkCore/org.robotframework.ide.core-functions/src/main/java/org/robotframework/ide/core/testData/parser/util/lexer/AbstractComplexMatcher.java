@@ -76,7 +76,7 @@ public abstract class AbstractComplexMatcher implements IMatcher {
                     currentPosition);
 
             NextStep nextStep = execState.getNextStep();
-            if (nextStep == NextStep.CONTINOUE) {
+            if (nextStep == NextStep.CONTINUE) {
                 currentPosition = nextPosition(currentMatchResult,
                         currentPosition);
             } else if (nextStep == NextStep.BREAK) {
@@ -85,9 +85,8 @@ public abstract class AbstractComplexMatcher implements IMatcher {
         }
 
         // compute what to say to the world
-        matchResult = finalJudgment(matchResult, currentPosition);
 
-        return matchResult;
+        return finalJudgment(matchResult, currentPosition);
     }
 
     /**
@@ -101,7 +100,7 @@ public abstract class AbstractComplexMatcher implements IMatcher {
      */
     public static class ExecuteState {
 
-        private NextStep nextStep = NextStep.CONTINOUE;
+        private NextStep nextStep = NextStep.CONTINUE;
         private final MatchResult result;
 
 
@@ -115,7 +114,7 @@ public abstract class AbstractComplexMatcher implements IMatcher {
          * continue
          */
         public void continueMatching() {
-            nextStep = NextStep.CONTINOUE;
+            nextStep = NextStep.CONTINUE;
         }
 
 
@@ -139,6 +138,6 @@ public abstract class AbstractComplexMatcher implements IMatcher {
     }
 
     private static enum NextStep {
-        BREAK, CONTINOUE
+        BREAK, CONTINUE
     }
 }
