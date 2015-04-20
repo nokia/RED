@@ -63,8 +63,7 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<RobotElementChange> synchronizeChanges() {
-        sections = null;
-        getSections();
+        refreshOnFileChange();
         return new ArrayList<>();
     }
 

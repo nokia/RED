@@ -97,7 +97,7 @@ public class TableEditor {
                 | ColumnViewerEditor.KEYBOARD_ACTIVATION);
         
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE); 
-        createColumns(parent, viewer);
+        createColumns(viewer);
         final Table table = viewer.getTable();
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -151,7 +151,7 @@ public class TableEditor {
         
     }
     
-    private void createColumns(final Composite parent, final TableViewer viewer) {
+    private void createColumns(final TableViewer viewer) {
 
         final TableViewerColumn col1 = createTableViewerColumn();
         col1.setEditingSupport(new TableEditingSupport(viewer, 1));

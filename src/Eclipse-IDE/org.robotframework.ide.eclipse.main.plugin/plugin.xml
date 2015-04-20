@@ -126,7 +126,12 @@
     </extension>
  <extension
          point="org.eclipse.ui.views">
+    <category
+          id="org.robotframework.ide.eclipse.views"
+          name="Robot">
+    </category>
       <view
+            category="org.robotframework.ide.eclipse.views"
             class="org.robotframework.ide.eclipse.main.plugin.views.MessageLogViewWrapper"
             icon="resources/robot.png"
             id="org.robotframework.ide.MessageLogView"
@@ -209,7 +214,7 @@
        point="org.eclipse.ui.navigator.navigatorContent">
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorContentProvider"
-          icon="resources/_file"
+          icon="resources/robot_file.png"
           id="org.robotframework.content.testFileContent"
           labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider"
           name="Robot Elements">
@@ -318,6 +323,12 @@
  </extension>
  <extension
        point="org.eclipse.ui.contexts">
+    <context
+          description="Context for details editing"
+          id="org.robotframework.ide.eclipse.details.context"
+          name="Detail Context"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
     <context
           description="Context for Robot suite files editor"
           id="org.robotframework.ide.eclipse.tableeditor.context"
@@ -517,6 +528,17 @@
                       value="org.robotframework.ide.eclipse.tableeditor.variables.context">
                 </equals>
              </iterate>
+             <and>
+                <not>
+                   <iterate
+                         ifEmpty="false"
+                         operator="or">
+                      <equals
+                            value="org.robotframework.ide.eclipse.details.context">
+                      </equals>
+                   </iterate>
+                </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
