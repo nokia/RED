@@ -11,8 +11,9 @@ public class TxtSettingTableParser implements
 
     @Override
     public boolean canParse(ByteBufferInputStream testData) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean shouldParse = false;
+
+        return shouldParse;
     }
 
 
