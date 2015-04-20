@@ -6,6 +6,13 @@ import org.robotframework.ide.core.testData.parser.result.ParseResult;
 import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
+/**
+ * 
+ * @author wypych
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
+ * 
+ */
 public class TxtKeywordTableParser implements
         ITestDataElementParser<ByteBufferInputStream, KeywordTable> {
 
