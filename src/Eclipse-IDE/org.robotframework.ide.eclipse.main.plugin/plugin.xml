@@ -315,9 +315,19 @@
           id="org.robotframework.ide.eclipse.cell.highlight"
           isEditable="true"
           label="Highlighted cell color"
-          value="255, 245, 225">
+          value="255, 245, 210">
        <description>
-          This color is used in Robot tables in order to highlight currently selected cell
+          This color is used in Robot tables in order to highlight currently focused cell
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.row.selected"
+          isEditable="true"
+          label="Selected row color"
+          value="255, 250, 245">
+       <description>
+          This color is used in Robot tables in order to highlight currently selected row
        </description>
     </colorDefinition>
  </extension>
