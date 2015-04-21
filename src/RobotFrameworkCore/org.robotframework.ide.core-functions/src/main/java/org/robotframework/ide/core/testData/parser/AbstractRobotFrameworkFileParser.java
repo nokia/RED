@@ -91,6 +91,53 @@ public abstract class AbstractRobotFrameworkFileParser<InputFormatType extends I
 
 
     /**
+     * Search for table parser, which could handle current data - the test is
+     * done via {@link ITestDataElementParser#canParse(IParsePositionMarkable)},
+     * before any check current position is marked by execution
+     * {@link IParsePositionMarkable#mark()} and in case any after fails in data
+     * check by parser, this method just revert position back by execution
+     * {@link IParsePositionMarkable#reset()}. This method is also executed in
+     * the end of this method, so data can be easily consume by parser
+     * (important for parsers, which want to hold consumed data as part of
+     * parsing result.
+     * 
+     * @param testData
+     *            current portion of data to check
+     * @return found parser or {@code null}
+     */
+    protected ITestDataElementParser<InputFormatType, ? extends IRobotSectionTable> findParser(
+            InputFormatType testData) {
+        ITestDataElementParser<InputFormatType, ? extends IRobotSectionTable> tableParser = null;
+        testData.mark();
+        if (parsersProvider.getSettingsTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getSettingsTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getVariablesTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getVariablesTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getTestCasesTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getTestCasesTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getKeywordsTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getKeywordsTableParser();
+        }
+
+        testData.reset();
+
+        return tableParser;
+    }
+
+
+    /**
      * Pre-check if file can be expected base on file object
      * 
      * @param file
