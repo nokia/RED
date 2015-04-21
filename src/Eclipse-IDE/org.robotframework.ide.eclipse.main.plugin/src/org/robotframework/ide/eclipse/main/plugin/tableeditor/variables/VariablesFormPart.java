@@ -24,6 +24,7 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -38,6 +39,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
@@ -56,7 +58,7 @@ public class VariablesFormPart extends AbstractFormPart {
     private RobotEditorCommandsStack commandsStack;
 
     private final IEditorSite site;
-    private TableViewer viewer;
+    private RowExposingTableViewer viewer;
     private HyperlinkAdapter createSectionLinkListener;
 
 
@@ -75,7 +77,7 @@ public class VariablesFormPart extends AbstractFormPart {
     }
 
     private void createContent(final Composite parent) {
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+        viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
 
         addActivationStrategy();
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
@@ -97,7 +99,25 @@ public class VariablesFormPart extends AbstractFormPart {
                 new VariableCommentEditingSupport(viewer, commandsStack));
 
         createContextMenu();
+        registerDeselectionListener();
+
         setInput();
+    }
+
+    private void registerDeselectionListener() {
+        // sets empty selection when user clicked outside the table items section
+        viewer.getTable().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseUp(final MouseEvent e) {
+                if (leftClickOutsideTable(e)) {
+                    site.getSelectionProvider().setSelection(new StructuredSelection());
+                }
+            }
+
+            private boolean leftClickOutsideTable(final MouseEvent e) {
+                return e.button == 1 && viewer.getTable().getItem(new Point(e.x, e.y)) == null;
+            }
+        });
     }
 
     private void createContextMenu() {
@@ -196,6 +216,11 @@ public class VariablesFormPart extends AbstractFormPart {
                 | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR);
     }
 
+    @Override
+    public void setFocus() {
+        viewer.getTable().setFocus();
+    }
+
     public void revealVariable(final RobotVariable robotVariable) {
         viewer.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
@@ -224,6 +249,8 @@ public class VariablesFormPart extends AbstractFormPart {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        setInput();
+        if (change.getKind() == Kind.CHANGED) {
+            setInput();
+        }
     }
 }
