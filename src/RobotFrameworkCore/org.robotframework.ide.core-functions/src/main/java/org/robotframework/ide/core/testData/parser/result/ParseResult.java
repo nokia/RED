@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ParseResult<InputFormatType, OutputFormatType> {
 
-    private InputFormatType trashBeforeFirstExpectedData;
+    private final List<InputFormatType> trashData = new LinkedList<InputFormatType>();
     private List<OutOfOrderData<InputFormatType>> outOfOrderOrConstrainsPossibleElements = new LinkedList<OutOfOrderData<InputFormatType>>();
     private InputFormatType dataConsumed;
     private OutputFormatType producedModelElement;
@@ -102,8 +102,8 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      * @param garbageData
      *            data exists before declaration of expected elements
      */
-    public void setTrashBeforeFirstExpectedData(InputFormatType garbageData) {
-        this.trashBeforeFirstExpectedData = garbageData;
+    public void addNextTrashData(InputFormatType garbageData) {
+        this.trashData.add(garbageData);
     }
 
 
@@ -111,8 +111,8 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      * 
      * @return data exists before declaration of expected elements
      */
-    public InputFormatType getTrashBeforeFirstExpectedData() {
-        return this.trashBeforeFirstExpectedData;
+    public List<InputFormatType> getTrashData() {
+        return this.trashData;
     }
 
 
