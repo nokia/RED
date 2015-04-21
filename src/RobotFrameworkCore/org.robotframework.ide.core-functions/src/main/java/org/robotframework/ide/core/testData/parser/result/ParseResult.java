@@ -20,7 +20,6 @@ import java.util.List;
 public class ParseResult<InputFormatType, OutputFormatType> {
 
     private final List<InputFormatType> trashData = new LinkedList<InputFormatType>();
-    private List<OutOfOrderData<InputFormatType>> outOfOrderOrConstrainsPossibleElements = new LinkedList<OutOfOrderData<InputFormatType>>();
     private InputFormatType dataConsumed;
     private OutputFormatType producedModelElement;
     private ParseProcessResult result = ParseProcessResult.NOT_STARTED;
@@ -113,29 +112,5 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      */
     public List<InputFormatType> getTrashData() {
         return this.trashData;
-    }
-
-
-    /**
-     * 
-     * @param outOfOrderElement
-     *            found element, but because of some restriction in wrong place
-     *            or with some problems to solve with user interaction - data,
-     *            which could be recovered
-     */
-    public void addOutOfOrderElementFound(
-            OutOfOrderData<InputFormatType> outOfOrderElement) {
-        this.outOfOrderOrConstrainsPossibleElements.add(outOfOrderElement);
-    }
-
-
-    /**
-     * 
-     * @return all found elements, but because of some restriction in wrong
-     *         place or with some problems to solve with user interaction -
-     *         data, which could be recovered
-     */
-    public List<OutOfOrderData<InputFormatType>> getOutOfOrderElementsFound() {
-        return this.outOfOrderOrConstrainsPossibleElements;
     }
 }
