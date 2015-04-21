@@ -111,9 +111,9 @@ public class ParserResultBuilder<InputFormatType, OutputFormatType> {
      *            data without non-sens for parser
      * @return current view on builder
      */
-    public ParserResultBuilder<InputFormatType, OutputFormatType> addTrashDataFoundBeforeFirstElementAppears(
+    public ParserResultBuilder<InputFormatType, OutputFormatType> addTrashDataFound(
             InputFormatType garbageData) {
-        parseResultBuildUp.setTrashBeforeFirstExpectedData(garbageData);
+        parseResultBuildUp.addNextTrashData(garbageData);
 
         return this;
     }

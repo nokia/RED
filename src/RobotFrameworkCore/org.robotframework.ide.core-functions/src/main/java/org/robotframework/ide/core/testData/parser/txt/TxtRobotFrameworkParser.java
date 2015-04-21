@@ -1,9 +1,13 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.ByteBuffer;
 
 import org.robotframework.ide.core.testData.model.TestDataFile;
+import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
 import org.robotframework.ide.core.testData.parser.AbstractRobotFrameworkFileParser;
+import org.robotframework.ide.core.testData.parser.ITestDataElementParser;
 import org.robotframework.ide.core.testData.parser.ITestDataParserProvider;
 import org.robotframework.ide.core.testData.parser.MissingParserException;
 import org.robotframework.ide.core.testData.parser.ParserResultBuilder;
@@ -35,17 +39,92 @@ public class TxtRobotFrameworkParser extends
     public ParseResult<ByteBufferInputStream, TestDataFile> parse(
             ByteBufferInputStream testData) {
         ParserResultBuilder<ByteBufferInputStream, TestDataFile> parseResultBuilder = new ParserResultBuilder<ByteBufferInputStream, TestDataFile>();
+        TestDataFile testDataFile = new TestDataFile();
+
+        int startPositionByteNr = 0;
         if (testData.available() > 0) {
             while(testData.available() > 0) {
+                ByteArrayOutputStream trashData = consumeTrashData(testData);
 
+                if (trashData.size() > 0) {
+                    parseResultBuilder.addWarningMessage("byte: "
+                            + startPositionByteNr, "Unrecognized data found: '"
+                            + new String(trashData.toByteArray()) + "'.");
+                    parseResultBuilder
+                            .addTrashDataFound(new ByteBufferInputStream(
+                                    ByteBuffer.wrap(trashData.toByteArray())));
+                } else {
+                    // normal processing - table section found
+                    ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tableParser = findParserToUse(testData);
+
+                    if (tableParser != null) {
+
+                    } else {
+                        // do sth with data and give possibility to search for
+                        // new
+                    }
+                }
+
+                startPositionByteNr = testData.getByteBuffer().position();
             }
+
         } else {
-            parseResultBuilder.addDataConsumed(testData)
-                    .addInformationMessage("Begin of file.", "File is empty.")
-                    .addProducedModelElement(new TestDataFile());
+            // handling for empty file - just simple information
+            parseResultBuilder.addInformationMessage("line: 0, column: 0",
+                    "Empty file.");
         }
 
-        return parseResultBuilder.build();
+        return parseResultBuilder.addDataConsumed(testData)
+                .addProducedModelElement(testDataFile).build();
+    }
+
+
+    private ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> findParserToUse(
+            ByteBufferInputStream testData) {
+        ITestDataParserProvider<ByteBufferInputStream> parsersProvider = this.parsersProvider;
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tableParser = null;
+        testData.mark();
+        if (parsersProvider.getSettingsTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getSettingsTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getVariablesTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getVariablesTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getTestCasesTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getTestCasesTableParser();
+        } else {
+            testData.reset();
+        }
+        if (tableParser == null
+                && parsersProvider.getKeywordsTableParser().canParse(testData)) {
+            tableParser = parsersProvider.getKeywordsTableParser();
+        }
+
+        testData.reset();
+
+        return tableParser;
+    }
+
+
+    private ByteArrayOutputStream consumeTrashData(
+            ByteBufferInputStream testData) {
+        ByteArrayOutputStream trashData = new ByteArrayOutputStream();
+        while(testData.available() > 0) {
+            int currentByteInBuffer = testData.currentByteInBuffer();
+            if (currentByteInBuffer != '|' && currentByteInBuffer != '*') {
+                trashData.write(testData.read());
+            } else {
+                break;
+            }
+        }
+
+        return trashData;
     }
 
 
