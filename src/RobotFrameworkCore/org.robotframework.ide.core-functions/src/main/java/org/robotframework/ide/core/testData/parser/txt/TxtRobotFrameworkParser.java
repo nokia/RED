@@ -3,9 +3,7 @@ package org.robotframework.ide.core.testData.parser.txt;
 import java.io.File;
 
 import org.robotframework.ide.core.testData.model.TestDataFile;
-import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
 import org.robotframework.ide.core.testData.parser.AbstractRobotFrameworkFileParser;
-import org.robotframework.ide.core.testData.parser.ITestDataElementParser;
 import org.robotframework.ide.core.testData.parser.ITestDataParserProvider;
 import org.robotframework.ide.core.testData.parser.MissingParserException;
 import org.robotframework.ide.core.testData.parser.ParserResultBuilder;
@@ -41,39 +39,6 @@ public class TxtRobotFrameworkParser extends
 
         return parseResultBuilder.addDataConsumed(testData)
                 .addProducedModelElement(testDataFile).build();
-    }
-
-
-    private ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> findParserToUse(
-            ByteBufferInputStream testData) {
-        ITestDataParserProvider<ByteBufferInputStream> parsersProvider = this.parsersProvider;
-        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tableParser = null;
-        testData.mark();
-        if (parsersProvider.getSettingsTableParser().canParse(testData)) {
-            tableParser = parsersProvider.getSettingsTableParser();
-        } else {
-            testData.reset();
-        }
-        if (tableParser == null
-                && parsersProvider.getVariablesTableParser().canParse(testData)) {
-            tableParser = parsersProvider.getVariablesTableParser();
-        } else {
-            testData.reset();
-        }
-        if (tableParser == null
-                && parsersProvider.getTestCasesTableParser().canParse(testData)) {
-            tableParser = parsersProvider.getTestCasesTableParser();
-        } else {
-            testData.reset();
-        }
-        if (tableParser == null
-                && parsersProvider.getKeywordsTableParser().canParse(testData)) {
-            tableParser = parsersProvider.getKeywordsTableParser();
-        }
-
-        testData.reset();
-
-        return tableParser;
     }
 
 

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -128,11 +127,6 @@ public class TestAbstractRobotFrameworkFileParser {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-    }
-
-
-    @After
-    public void tearDown() {
     }
 
     private class DummyRobotParser extends
