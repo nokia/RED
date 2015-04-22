@@ -129,4 +129,45 @@ public class ByteBufferInputStream extends InputStream implements
     public ByteBuffer getByteBuffer() {
         return this.buffer;
     }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((buffer == null) ? 0 : buffer.hashCode());
+        result = prime * result
+                + ((readBytes == null) ? 0 : readBytes.hashCode());
+        result = prime * result
+                + ((readLimit == null) ? 0 : readLimit.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ByteBufferInputStream other = (ByteBufferInputStream) obj;
+        if (buffer == null) {
+            if (other.buffer != null)
+                return false;
+        } else if (!buffer.equals(other.buffer))
+            return false;
+        if (readBytes == null) {
+            if (other.readBytes != null)
+                return false;
+        } else if (!readBytes.equals(other.readBytes))
+            return false;
+        if (readLimit == null) {
+            if (other.readLimit != null)
+                return false;
+        } else if (!readLimit.equals(other.readLimit))
+            return false;
+        return true;
+    }
 }
