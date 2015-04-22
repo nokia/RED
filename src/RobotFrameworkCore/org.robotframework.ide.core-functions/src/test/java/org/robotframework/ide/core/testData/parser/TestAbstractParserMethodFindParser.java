@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.testData.parser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -7,9 +10,11 @@ import java.io.File;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robotframework.ide.core.testData.model.TestDataFile;
+import org.robotframework.ide.core.testData.model.table.IRobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
@@ -36,11 +41,205 @@ public class TestAbstractParserMethodFindParser {
     private ITestDataElementParser<ByteBufferInputStream, TestCaseTable> testCasesParser;
     @Mock
     private ITestDataElementParser<ByteBufferInputStream, VariablesTable> variablesParser;
+    @Mock
+    private ByteBufferInputStream dataInStream;
+
+
+    @Test
+    public void test_noTableParserFound_sayThatDataCouldNotBeParsed_noMoreInteractionShouldBePerformed() {
+        // prepare
+        when(settingsParser.canParse(dataInStream)).thenReturn(false);
+        when(variablesParser.canParse(dataInStream)).thenReturn(false);
+        when(testCasesParser.canParse(dataInStream)).thenReturn(false);
+        when(keywordsParser.canParse(dataInStream)).thenReturn(false);
+
+        InOrder orderMethodExec = inOrder(parsersProvider, settingsParser,
+                variablesParser, testCasesParser, keywordsParser, dataInStream);
+
+        // execute
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> parserFound = robotParser
+                .findParser(dataInStream);
+
+        // verify
+        assertThat(parserFound).isNull();
+
+        orderMethodExec.verify(dataInStream, times(1)).mark();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(settingsParser, times(1)).canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getVariablesTableParser();
+        orderMethodExec.verify(variablesParser, times(1))
+                .canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getTestCasesTableParser();
+        orderMethodExec.verify(testCasesParser, times(1))
+                .canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getKeywordsTableParser();
+        orderMethodExec.verify(keywordsParser, times(1)).canParse(dataInStream);
+
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verifyNoMoreInteractions();
+    }
+
+
+    @Test
+    public void test_keywordsTableParser_sayThatDataCouldBeParsed_noMoreInteractionShouldBePerformed() {
+        // prepare
+        when(settingsParser.canParse(dataInStream)).thenReturn(false);
+        when(variablesParser.canParse(dataInStream)).thenReturn(false);
+        when(testCasesParser.canParse(dataInStream)).thenReturn(false);
+        when(keywordsParser.canParse(dataInStream)).thenReturn(true);
+
+        InOrder orderMethodExec = inOrder(parsersProvider, settingsParser,
+                variablesParser, testCasesParser, keywordsParser, dataInStream);
+
+        // execute
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> parserFound = robotParser
+                .findParser(dataInStream);
+
+        // verify
+        assertThat(parserFound).isNotNull();
+        assertThat(parserFound).isEqualTo(keywordsParser);
+
+        orderMethodExec.verify(dataInStream, times(1)).mark();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(settingsParser, times(1)).canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getVariablesTableParser();
+        orderMethodExec.verify(variablesParser, times(1))
+                .canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getTestCasesTableParser();
+        orderMethodExec.verify(testCasesParser, times(1))
+                .canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getKeywordsTableParser();
+        orderMethodExec.verify(keywordsParser, times(1)).canParse(dataInStream);
+
+        // for return propose
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getKeywordsTableParser();
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verifyNoMoreInteractions();
+    }
+
+
+    @Test
+    public void test_testCaseTableParser_sayThatDataCouldBeParsed_noMoreInteractionShouldBePerformed() {
+        // prepare
+        when(settingsParser.canParse(dataInStream)).thenReturn(false);
+        when(variablesParser.canParse(dataInStream)).thenReturn(false);
+        when(testCasesParser.canParse(dataInStream)).thenReturn(true);
+        when(keywordsParser.canParse(dataInStream)).thenReturn(false);
+
+        InOrder orderMethodExec = inOrder(parsersProvider, settingsParser,
+                variablesParser, testCasesParser, keywordsParser, dataInStream);
+
+        // execute
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> parserFound = robotParser
+                .findParser(dataInStream);
+
+        // verify
+        assertThat(parserFound).isNotNull();
+        assertThat(parserFound).isEqualTo(testCasesParser);
+
+        orderMethodExec.verify(dataInStream, times(1)).mark();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(settingsParser, times(1)).canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getVariablesTableParser();
+        orderMethodExec.verify(variablesParser, times(1))
+                .canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getTestCasesTableParser();
+        orderMethodExec.verify(testCasesParser, times(1))
+                .canParse(dataInStream);
+
+        // for return propose
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getTestCasesTableParser();
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verifyNoMoreInteractions();
+    }
+
+
+    @Test
+    public void test_variablesTableParser_sayThatDataCouldBeParsed_noMoreInteractionShouldBePerformed() {
+        // prepare
+        when(settingsParser.canParse(dataInStream)).thenReturn(false);
+        when(variablesParser.canParse(dataInStream)).thenReturn(true);
+        when(testCasesParser.canParse(dataInStream)).thenReturn(false);
+        when(keywordsParser.canParse(dataInStream)).thenReturn(false);
+
+        InOrder orderMethodExec = inOrder(parsersProvider, settingsParser,
+                variablesParser, testCasesParser, keywordsParser, dataInStream);
+
+        // execute
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> parserFound = robotParser
+                .findParser(dataInStream);
+
+        // verify
+        assertThat(parserFound).isNotNull();
+        assertThat(parserFound).isEqualTo(variablesParser);
+
+        orderMethodExec.verify(dataInStream, times(1)).mark();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(settingsParser, times(1)).canParse(dataInStream);
+        orderMethodExec.verify(dataInStream, times(1)).reset();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getVariablesTableParser();
+        orderMethodExec.verify(variablesParser, times(1))
+                .canParse(dataInStream);
+
+        // for return propose
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getVariablesTableParser();
+        orderMethodExec.verify(dataInStream, times(2)).reset();
+        orderMethodExec.verifyNoMoreInteractions();
+    }
 
 
     @Test
     public void test_settingTableParser_sayThatDataCouldBeParsed_noMoreInteractionShouldBePerformed() {
+        // prepare
+        when(settingsParser.canParse(dataInStream)).thenReturn(true);
+        when(variablesParser.canParse(dataInStream)).thenReturn(false);
+        when(testCasesParser.canParse(dataInStream)).thenReturn(false);
+        when(keywordsParser.canParse(dataInStream)).thenReturn(false);
 
+        InOrder orderMethodExec = inOrder(parsersProvider, settingsParser,
+                variablesParser, testCasesParser, keywordsParser, dataInStream);
+
+        // execute
+        ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> parserFound = robotParser
+                .findParser(dataInStream);
+
+        // verify
+        assertThat(parserFound).isNotNull();
+        assertThat(parserFound).isEqualTo(settingsParser);
+
+        orderMethodExec.verify(dataInStream, times(1)).mark();
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(settingsParser, times(1)).canParse(dataInStream);
+        // for return propose
+        orderMethodExec.verify(parsersProvider, times(1))
+                .getSettingsTableParser();
+        orderMethodExec.verify(dataInStream, times(3)).reset();
+        orderMethodExec.verifyNoMoreInteractions();
     }
 
 
