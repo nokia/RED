@@ -88,6 +88,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
 
+        setErrorMessage(null);
         try {
             String projectNameAttribute = configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
             IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameAttribute);
