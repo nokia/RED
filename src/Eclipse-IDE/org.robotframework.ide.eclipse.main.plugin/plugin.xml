@@ -144,7 +144,7 @@
     <launchConfigurationType
           delegate="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
           id="org.robotframework.ide.robotLaunchConfiguration"
-          modes="run"
+          modes="run,debug"
           name="Robot">
     </launchConfigurationType>
  </extension>
@@ -591,5 +591,85 @@
        </with>
     </definition>
  </extension>
+ 
+  	<extension
+		point="org.eclipse.ui.editors.annotationTypes">
+		<type
+			markerType="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker"
+			super="org.eclipse.debug.core.breakpoint"
+			name="org.eclipse.debug.core.robot.breakpoint">
+		</type>
+	</extension>	
+ 	<extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            markerType="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker"
+            class="org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint"
+            id="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint">
+      </breakpoint>
+   </extension>
+   <extension
+     id="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker"
+     point="org.eclipse.core.resources.markers">
+	  <super
+	        type="org.eclipse.debug.core.lineBreakpointMarker">
+	  </super>
+	  <persistent
+	        value="true">
+	  </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.robotframework.ide.eclipse.main.plugin.debug.RobotModelPresentation"
+            id="org.eclipse.debug.robot">
+      </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            name="Debugging Robot"
+            description="Debugging Robot"
+            id="org.robotframework.ide.eclipse.main.plugin.ui.robot.debugging"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelContextBindings">
+      <modelContextBinding
+            debugModelId="org.eclipse.debug.robot"
+            contextId="org.robotframework.ide.eclipse.main.plugin.ui.robot.debugging">
+      </modelContextBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <view
+               relative="org.eclipse.ui.console.ConsoleView"
+               relationship="right"
+               ratio="0.55f"
+               id="org.robotframework.ide.MessageLogView">
+         </view>
+         <viewShortcut
+               id="org.robotframework.ide.MessageLogView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            name="Robot Source Lookup Director"
+            class="org.robotframework.ide.eclipse.main.plugin.debug.RobotSourceLookupDirector"
+            id="org.eclipse.debug.robot.sourceLookupDirector">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.robotframework.ide.eclipse.main.plugin.debug.RobotSourcePathComputerDelegate"
+            id="org.eclipse.debug.robot.sourcePathComputer">
+      </sourcePathComputer>
+   </extension>
 
 </plugin>

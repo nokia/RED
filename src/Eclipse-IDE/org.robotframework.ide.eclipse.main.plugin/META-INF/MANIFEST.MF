@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10.0",
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.e4.core.services,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ org.eclipse.osgi.services;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
