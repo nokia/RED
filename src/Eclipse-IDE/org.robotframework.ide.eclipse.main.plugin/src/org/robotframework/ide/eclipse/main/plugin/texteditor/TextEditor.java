@@ -16,11 +16,15 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
@@ -49,6 +53,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -62,6 +67,7 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistProcessor;
@@ -85,13 +91,18 @@ public class TextEditor {
 	IDirtyProviderService dirtyProviderService;
 	
 	private IFile editedFile;
+	private IEditorInput input;
 	private SourceViewer viewer;
+	
+	private int breakpointLine = 0; 
 	
 	
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
 	    
 	    ((TextEditorWrapper)editorPart).setPartName(input.getName());
+	    
+	    this.input = input;
 
 		final FillLayout layout = new FillLayout();
 		layout.marginHeight = 1;
@@ -109,8 +120,10 @@ public class TextEditor {
 
         this.deleteMarkersFromFile();
 		//this.createMarkers();
-		
+        
 		final AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
+		final AnnotationType breakpointAnnotationType = new AnnotationType("org.eclipse.debug.core.breakpoint", null);
+		
 		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
 		final ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
 		
@@ -129,6 +142,7 @@ public class TextEditor {
 		
 		final AnnotationRulerColumn annotationColumn = new AnnotationRulerColumn(15,markerAnnotationAccess);
 		annotationColumn.addAnnotationType(errorAnnotationType.getType());
+		annotationColumn.addAnnotationType(breakpointAnnotationType.getType());
 		
 		final LineNumberRulerColumn lineNumberColumn = new LineNumberRulerColumn();
 		lineNumberColumn.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -232,6 +246,25 @@ public class TextEditor {
 		
 	}
 	
+	@Inject
+    @Optional
+    private void lineBreakpointEvent(@UIEventTopic("TextEditor/LineBreakpoint") org.osgi.service.event.Event event) {
+	    if(((String) event.getProperty("file")).equals(editedFile.getName())) {
+	        int line = Integer.parseInt((String) event.getProperty("line"));
+	        if(line > 0) {
+        	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
+        	    viewer.getTextWidget().setLineBackground(line-1, 1, SWTResourceManager.getColor(198, 219, 174));
+        	    breakpointLine = line-1;
+	        }
+	    }
+    }
+	
+	@Inject
+    @Optional
+    private void clearBreakpointEvent(@UIEventTopic("TextEditor/ClearLineBreakpoint") int line) {
+	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
+        breakpointLine = 0;
+    }
 	
 	private ParameterizedCommand createSaveAsCommand() {
 		ParameterizedCommand cmd = null;
@@ -277,6 +310,7 @@ public class TextEditor {
 	private void createMarkers() {
 		
 		try {
+		    
 			final IMarker marker = editedFile.createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker.setAttribute(IMarker.MESSAGE, "test 1");
@@ -284,7 +318,7 @@ public class TextEditor {
 			marker.setAttribute(IMarker.CHAR_START, 0);
 			marker.setAttribute(IMarker.CHAR_END, 18);
 			
-			final IMarker marker1 = editedFile.createMarker(IMarker.PROBLEM);
+			final IMarker marker1 = editedFile.createMarker(IBreakpoint.LINE_BREAKPOINT_MARKER);
 			marker1.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 			marker1.setAttribute(IMarker.MESSAGE, "test 2");
 			marker1.setAttribute(IMarker.LINE_NUMBER, 2);
@@ -320,6 +354,21 @@ public class TextEditor {
 				handlerService.executeHandler(saveAsCommand); 
 			}
 		});
+		
+		final MenuItem breakpointItem = new MenuItem(menu, SWT.PUSH);
+		breakpointItem.setText("Add breakpoint");
+		breakpointItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                try {
+                    int line = viewer.getTextWidget().getLineAtOffset(viewer.getTextWidget().getSelection().x);
+                    RobotLineBreakpoint lineBreakpoint = new RobotLineBreakpoint((IResource) input.getAdapter(IResource.class), line+1);
+                    DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(lineBreakpoint);
+                } catch (CoreException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 		
 		new MenuItem(menu, SWT.SEPARATOR);
 		
