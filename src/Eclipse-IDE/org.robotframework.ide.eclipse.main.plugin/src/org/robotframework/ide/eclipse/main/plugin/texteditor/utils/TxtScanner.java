@@ -21,7 +21,7 @@ public class TxtScanner extends RuleBasedScanner {
 		IToken sectionToken = new Token(sectionTextAttribute);
 		TextAttribute variableTextAttribute = new TextAttribute(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
 		IToken variableToken = new Token(variableTextAttribute);
-		TextAttribute keywordTextAttribute = new TextAttribute(SWTResourceManager.getColor(22,223,245));
+		TextAttribute keywordTextAttribute = new TextAttribute(SWTResourceManager.getColor(0,174,249));
 		IToken keywordToken = new Token(keywordTextAttribute);
 		
 		IRule[] rules = new IRule[3];

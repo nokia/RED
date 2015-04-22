@@ -131,6 +131,8 @@ class TestRunnerAgent:
         self._send_pid()
         self._create_debugger((len(args) >= 2) and (args[1] == 'True'))
         self._create_kill_server()
+        self._is_robot_paused = False
+        self._is_debug_enabled = (args[1] == 'True')
 
     def _create_debugger(self, pause_on_failure):
         self._debugger = RobotDebugger(pause_on_failure)
@@ -163,14 +165,68 @@ class TestRunnerAgent:
 
     def start_keyword(self, name, attrs):
         self._send_socket("start_keyword", name, attrs)
-        if self._debugger.is_breakpoint(name, attrs):
-            self._debugger.pause()
-        paused = self._debugger.is_paused()
-        if paused:
+        if self._is_debug_enabled:
+            self._send_vars()
+        self._is_robot_paused = False
+        #if self._debugger.is_breakpoint(name, attrs):
+        if self._is_debug_enabled:
+            if self._check_breakpoint():
+                self._is_robot_paused = True
+            #self._debugger.pause()
+        #self._wait_for_breakpoint_unlock()
+        #paused = self._debugger.is_paused()
+        if self._is_robot_paused:
             self._send_socket('paused')
-        self._debugger.start_keyword()
-        if paused:
-            self._send_socket('continue')
+            self._wait_for_resume()
+        #self._debugger.start_keyword()
+        #if paused:
+        #    self._send_socket('continue')
+
+    def _wait_for_resume(self):
+        data = ''
+        while data != 'resume' and data != 'interrupt':
+            data = self.sock.recv(4096)
+            if self._is_debug_enabled:
+                self._check_changed_variable(data)
+        if data == 'interrupt':
+            sys.exit()
+        self._debugger.resume()
+
+    def _send_vars(self):
+        try:
+            from robot.libraries.BuiltIn import BuiltIn
+            vars = BuiltIn().get_variables()
+            data = {}
+            for k in vars.keys():
+                data[k] = str(vars[k])
+            self._send_socket('vars','vars',data)
+        except AttributeError:
+            self._send_socket('error')
+
+    def _check_breakpoint(self):
+        data = ''
+        while data != 'stop' and data != 'run' and data != 'interrupt':
+            data = self.sock.recv(4096)
+        if data == 'stop':
+            return True
+        if data == 'run':
+            return False
+        if data == 'interrupt':
+            sys.exit()
+
+    def _check_changed_variable(self, data):
+        self._send_socket(data)
+        if _JSONAVAIL:
+            json_decoder = json.JSONDecoder(strict=False).decode
+            try:
+                js = json_decoder(data)
+                from robot.libraries.BuiltIn import BuiltIn
+                vars = BuiltIn().get_variables()
+                for key in js.keys():
+                    if key in vars:
+                        BuiltIn().set_test_variable(key, js[key])
+            except:
+                pass
 
     def end_keyword(self, name, attrs):
         self._send_socket("end_keyword", name, attrs)

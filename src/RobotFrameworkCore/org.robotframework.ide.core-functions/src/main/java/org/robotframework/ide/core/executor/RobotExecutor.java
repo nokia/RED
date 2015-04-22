@@ -104,7 +104,7 @@ public class RobotExecutor {
         return df.format(diffHours) +":"+ df.format(diffMinutes) +":"+ df.format(diffSeconds);
     }
     
-    private Path createTestRunnerAgentFile() {
+    public Path createTestRunnerAgentFile() {
         Path tempDir = null;
         File agentFile = new File("");
         try {
@@ -119,7 +119,7 @@ public class RobotExecutor {
         return agentFile.toPath();
     }
     
-    private void removeTempDir(Path dir) {
+    public void removeTempDir(Path dir) {
         File tempDir = new File(dir.toString());
         File[] files = tempDir.listFiles();
         try {
