@@ -28,7 +28,7 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
     private AbstractRobotFrameworkFileParser<ByteBufferInputStream> txtParser;
 
 
-    @Test(timeout = 1000)
+    @Test(timeout = 10000)
     public void test_emptyFile() throws UnsupportedEncodingException {
         // prepare
         String fileContent = "";
