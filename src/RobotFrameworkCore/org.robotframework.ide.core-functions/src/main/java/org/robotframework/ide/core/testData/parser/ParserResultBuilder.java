@@ -4,6 +4,7 @@ import org.robotframework.ide.core.testData.parser.result.MessageType;
 import org.robotframework.ide.core.testData.parser.result.ParseProcessResult;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 import org.robotframework.ide.core.testData.parser.result.ParserMessage;
+import org.robotframework.ide.core.testData.parser.result.TrashData;
 
 
 /**
@@ -18,7 +19,7 @@ import org.robotframework.ide.core.testData.parser.result.ParserMessage;
  * @param <OutputFormatType>
  *            produced by parser element of model
  */
-public class ParserResultBuilder<InputFormatType, OutputFormatType> {
+public class ParserResultBuilder<InputFormatType extends IParsePositionMarkable, OutputFormatType> {
 
     private final ParseResult<InputFormatType, OutputFormatType> parseResultBuildUp;
     private boolean wasWarn = false;
@@ -108,11 +109,14 @@ public class ParserResultBuilder<InputFormatType, OutputFormatType> {
      * 
      * @param garbageData
      *            data without non-sens for parser
+     * @param location
+     *            position in file
      * @return current view on builder
      */
     public ParserResultBuilder<InputFormatType, OutputFormatType> addTrashDataFound(
-            InputFormatType garbageData) {
-        parseResultBuildUp.addNextTrashData(garbageData);
+            InputFormatType garbageData, IDataLocator<InputFormatType> location) {
+        parseResultBuildUp.addNextTrashData(new TrashData<InputFormatType>(
+                garbageData, location));
 
         return this;
     }

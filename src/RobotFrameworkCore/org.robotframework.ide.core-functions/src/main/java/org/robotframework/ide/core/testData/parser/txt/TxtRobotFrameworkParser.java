@@ -1,6 +1,10 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
 
 import org.robotframework.ide.core.testData.model.TestDataFile;
 import org.robotframework.ide.core.testData.parser.AbstractRobotFrameworkFileParser;
@@ -22,6 +26,7 @@ public class TxtRobotFrameworkParser extends
         AbstractRobotFrameworkFileParser<ByteBufferInputStream> {
 
     private static final String FILE_EXTENSION = ".txt";
+    private static final List<Character> TABLE_BEGINS = Arrays.asList('|', '*');
 
 
     public TxtRobotFrameworkParser(
@@ -37,8 +42,36 @@ public class TxtRobotFrameworkParser extends
         ParserResultBuilder<ByteBufferInputStream, TestDataFile> parseResultBuilder = new ParserResultBuilder<ByteBufferInputStream, TestDataFile>();
         TestDataFile testDataFile = new TestDataFile();
 
+        int position = 0;
+        while(testData.available() > 0) {
+            position = testData.getByteBuffer().position();
+            ByteArrayOutputStream trashData = consumeUntilTableMarkWillBeFind(testData);
+
+            if (trashData.size() > 0) {
+                parseResultBuilder.addTrashDataFound(new ByteBufferInputStream(
+                        ByteBuffer.wrap(trashData.toByteArray())),
+                        new ByteLocator(testData, position, trashData.size()));
+            } else {
+
+            }
+        }
+
         return parseResultBuilder.addDataConsumed(testData)
                 .addProducedModelElement(testDataFile).build();
+    }
+
+
+    private ByteArrayOutputStream consumeUntilTableMarkWillBeFind(
+            ByteBufferInputStream data) {
+        ByteArrayOutputStream collectedTrashData = new ByteArrayOutputStream();
+        while(data.available() > 0) {
+            int currentByte = data.currentByteInBuffer();
+            if (!TABLE_BEGINS.contains(currentByte)) {
+                collectedTrashData.write(currentByte);
+            }
+        }
+
+        return collectedTrashData;
     }
 
 

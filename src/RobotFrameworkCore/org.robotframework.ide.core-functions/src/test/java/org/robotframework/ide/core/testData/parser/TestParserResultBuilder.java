@@ -10,22 +10,23 @@ import org.robotframework.ide.core.testData.parser.result.MessageType;
 import org.robotframework.ide.core.testData.parser.result.ParseProcessResult;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
 import org.robotframework.ide.core.testData.parser.result.ParserMessage;
+import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
 /**
  * 
  * @author wypych
  * @see ParserResultBuilder#addDataConsumed(Object)
- * @see ParserResultBuilder#addErrorMessage(String, String)
- * @see ParserResultBuilder#addInformationMessage(String, String)
+ * @see ParserResultBuilder#addErrorMessage(ByteBufferInputStream, String)
+ * @see ParserResultBuilder#addInformationMessage(ByteBufferInputStream, String)
  * @see ParserResultBuilder#addParsingStatus(org.robotframework.ide.core.testData.parser.result.ParseProcessResult)
  * @see ParserResultBuilder#addProducedModelElement(Object)
- * @see ParserResultBuilder#addWarningMessage(String, String)
+ * @see ParserResultBuilder#addWarningMessage(ByteBufferInputStream, String)
  * @see ParserResultBuilder#build()
  */
 public class TestParserResultBuilder {
 
-    private ParserResultBuilder<String, String> prb;
+    private ParserResultBuilder<ByteBufferInputStream, String> prb;
 
 
     @Test
@@ -36,7 +37,7 @@ public class TestParserResultBuilder {
         prb.addProducedModelElement(output);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -59,7 +60,7 @@ public class TestParserResultBuilder {
                 .addProducedModelElement(output);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -84,7 +85,7 @@ public class TestParserResultBuilder {
                 .addProducedModelElement(output);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -106,7 +107,7 @@ public class TestParserResultBuilder {
         prb.addErrorMessage(errorLocalization, errorMessage);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -130,7 +131,7 @@ public class TestParserResultBuilder {
                 ppr);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -155,7 +156,7 @@ public class TestParserResultBuilder {
                 .addParsingStatus(ppr).addProducedModelElement(output);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -181,7 +182,7 @@ public class TestParserResultBuilder {
                 .addParsingStatus(ppr).addProducedModelElement(output);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -205,7 +206,7 @@ public class TestParserResultBuilder {
                 ppr);
 
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -221,7 +222,7 @@ public class TestParserResultBuilder {
     @Test
     public void test_buildResult_noErrorsAndWarns_noOutputObject_result_FAILED() {
         // execute
-        ParseResult<String, String> pr = prb.build();
+        ParseResult<ByteBufferInputStream, String> pr = prb.build();
 
         // verify
         assertThat(pr).isNotNull();
@@ -234,7 +235,7 @@ public class TestParserResultBuilder {
 
     @Before
     public void setUp() {
-        prb = new ParserResultBuilder<String, String>();
+        prb = new ParserResultBuilder<ByteBufferInputStream, String>();
     }
 
 
