@@ -52,7 +52,7 @@ public class TxtRobotFrameworkParser extends
                         ByteBuffer.wrap(trashData.toByteArray())),
                         new ByteLocator(testData, position, trashData.size()));
             } else {
-
+                // in case will be not table data eat as much as it can
             }
         }
 
