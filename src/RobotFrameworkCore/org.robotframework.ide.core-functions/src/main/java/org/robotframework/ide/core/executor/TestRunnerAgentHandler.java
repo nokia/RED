@@ -1,7 +1,9 @@
 package org.robotframework.ide.core.executor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,17 +26,13 @@ public class TestRunnerAgentHandler implements Runnable {
         try (ServerSocket socket = new ServerSocket(54470)) {
             socket.setReuseAddress(true);
             Socket client = socket.accept();
-            InputStream is = client.getInputStream();
-            StringBuilder stringBuilder = new StringBuilder();
-            int i = 0;
-            while ((i = is.read()) != -1) {
-                if ((char) i == '\n') {
-                    for (IRobotOutputListener listener : listeners) {
-                        listener.handleLine(stringBuilder.toString());
-                    }
-                    stringBuilder = new StringBuilder();
-                } else {
-                    stringBuilder.append((char) i);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                for (IRobotOutputListener listener : listeners) {
+                    listener.handleLine(line);
                 }
             }
         } catch (IOException e) {
