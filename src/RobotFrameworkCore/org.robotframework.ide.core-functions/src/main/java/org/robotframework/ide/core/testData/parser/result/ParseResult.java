@@ -3,6 +3,9 @@ package org.robotframework.ide.core.testData.parser.result;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.parser.IDataLocator;
+import org.robotframework.ide.core.testData.parser.IParsePositionMarkable;
+
 
 /**
  * Result of parsing process including data, which was used and produced output
@@ -17,13 +20,31 @@ import java.util.List;
  * @param <OutputFormatType>
  *            format of model object built up
  */
-public class ParseResult<InputFormatType, OutputFormatType> {
+public class ParseResult<InputFormatType extends IParsePositionMarkable, OutputFormatType> {
 
-    private final List<InputFormatType> trashData = new LinkedList<InputFormatType>();
+    private final List<TrashData<InputFormatType>> trashData = new LinkedList<TrashData<InputFormatType>>();
     private InputFormatType dataConsumed;
     private OutputFormatType producedModelElement;
     private ParseProcessResult result = ParseProcessResult.NOT_STARTED;
     private final List<ParserMessage> parserMessages = new LinkedList<ParserMessage>();
+    private IDataLocator<InputFormatType> thisElementLocation;
+
+
+    /**
+     * @param location
+     *            of built element in file
+     */
+    public void setDataLocation(IDataLocator<InputFormatType> location) {
+        this.thisElementLocation = location;
+    }
+
+
+    /**
+     * @return location of built element in file
+     */
+    public IDataLocator<InputFormatType> getElementLocation() {
+        return thisElementLocation;
+    }
 
 
     /**
@@ -101,7 +122,7 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      * @param garbageData
      *            data exists before declaration of expected elements
      */
-    public void addNextTrashData(InputFormatType garbageData) {
+    public void addNextTrashData(TrashData<InputFormatType> garbageData) {
         this.trashData.add(garbageData);
     }
 
@@ -110,7 +131,7 @@ public class ParseResult<InputFormatType, OutputFormatType> {
      * 
      * @return data exists before declaration of expected elements
      */
-    public List<InputFormatType> getTrashData() {
+    public List<TrashData<InputFormatType>> getTrashData() {
         return this.trashData;
     }
 }
