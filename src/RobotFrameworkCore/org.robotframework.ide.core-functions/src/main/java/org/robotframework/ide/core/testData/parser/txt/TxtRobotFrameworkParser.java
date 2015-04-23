@@ -48,9 +48,11 @@ public class TxtRobotFrameworkParser extends
             ByteArrayOutputStream trashData = consumeUntilTableMarkWillBeFind(testData);
 
             if (trashData.size() > 0) {
-                parseResultBuilder.addTrashDataFound(new ByteBufferInputStream(
-                        ByteBuffer.wrap(trashData.toByteArray())),
-                        new ByteLocator(testData, position, trashData.size()));
+                ByteBufferInputStream garbageData = new ByteBufferInputStream(
+                        ByteBuffer.wrap(trashData.toByteArray()));
+                ByteLocator location = new ByteLocator(testData, position,
+                        trashData.size());
+                parseResultBuilder.addTrashDataFound(garbageData, location);
             } else {
                 // in case will be not table data eat as much as it can
             }
@@ -67,7 +69,9 @@ public class TxtRobotFrameworkParser extends
         while(data.available() > 0) {
             int currentByte = data.currentByteInBuffer();
             if (!TABLE_BEGINS.contains(currentByte)) {
-                collectedTrashData.write(currentByte);
+                collectedTrashData.write(data.read());
+            } else {
+                break;
             }
         }
 
