@@ -27,6 +27,42 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
 
 
     @Test(timeout = 10000)
+    public void test_fileWithOneSpaceEOLonLinuxPlusEOLonWindows()
+            throws UnsupportedEncodingException {
+        // prepare
+        String fileContent = "  \n\r\n";
+        byte[] bytes = fileContent.getBytes("UTF-8");
+        ByteBuffer data = ByteBuffer.wrap(bytes);
+        ByteBufferInputStream dataFile = new ByteBufferInputStream(data);
+
+        // execute
+        ParseResult<ByteBufferInputStream, TestDataFile> result = txtParser
+                .parse(dataFile);
+
+        // verify - created object
+        assertThat(result).isNotNull();
+        assertThat(result.getDataConsumed()).isEqualTo(dataFile);
+        assertThat(result.getElementLocation()).isNull();
+        assertThat(result.getParserMessages()).isEmpty();
+        assertThat(result.getProducedModelElement()).isEqualTo(
+                new TestDataFile());
+        assertThat(result.getResult());
+        assertThat(result.getTrashData()).hasSize(1);
+        TrashData<ByteBufferInputStream> trashData = result.getTrashData().get(
+                0);
+        assertThat(trashData.getTrash()).isNotNull();
+        ByteBuffer trashBuffer = trashData.getTrash().getByteBuffer();
+        assertThat(trashBuffer).isNotNull();
+        assertThat(trashBuffer.array()).isEqualTo(bytes);
+        assertThat(trashData.getLocation()).isNotNull();
+        ByteLocator locator = (ByteLocator) trashData.getLocation();
+        assertThat(locator.getData()).isNotNull();
+        ByteBufferInputStream locatorData = locator.getData();
+        assertThat(locatorData.getByteBuffer().array()).isEqualTo(bytes);
+    }
+
+
+    @Test(timeout = 10000)
     public void test_fileWithOneSpace() throws UnsupportedEncodingException {
         // prepare
         String fileContent = " ";
