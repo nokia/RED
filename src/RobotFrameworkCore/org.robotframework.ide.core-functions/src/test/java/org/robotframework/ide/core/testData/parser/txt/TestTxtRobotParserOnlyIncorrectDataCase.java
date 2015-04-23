@@ -1,9 +1,6 @@
 package org.robotframework.ide.core.testData.parser.txt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -15,6 +12,7 @@ import org.robotframework.ide.core.testData.model.TestDataFile;
 import org.robotframework.ide.core.testData.parser.AbstractRobotFrameworkFileParser;
 import org.robotframework.ide.core.testData.parser.MissingParserException;
 import org.robotframework.ide.core.testData.parser.result.ParseResult;
+import org.robotframework.ide.core.testData.parser.result.TrashData;
 import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
@@ -29,42 +27,60 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
 
 
     @Test(timeout = 10000)
-    public void test_emptyFile() throws UnsupportedEncodingException {
+    public void test_fileWithOneSpace() throws UnsupportedEncodingException {
         // prepare
-        String fileContent = "";
-        ByteBuffer dataReal = createMockForByteBuffer(fileContent);
-        ByteBufferInputStream dataFile = new ByteBufferInputStream(dataReal);
-        ByteBufferInputStream dataFileSpied = spy(dataFile);
+        String fileContent = " ";
+        byte[] bytes = fileContent.getBytes("UTF-8");
+        ByteBuffer data = ByteBuffer.wrap(bytes);
+        ByteBufferInputStream dataFile = new ByteBufferInputStream(data);
 
         // execute
         ParseResult<ByteBufferInputStream, TestDataFile> result = txtParser
-                .parse(dataFileSpied);
+                .parse(dataFile);
 
-        // VERIFICATION
         // verify - created object
         assertThat(result).isNotNull();
-        assertThat(result.getDataConsumed()).isEqualTo(dataFileSpied);
+        assertThat(result.getDataConsumed()).isEqualTo(dataFile);
+        assertThat(result.getElementLocation()).isNull();
+        assertThat(result.getParserMessages()).isEmpty();
+        assertThat(result.getProducedModelElement()).isEqualTo(
+                new TestDataFile());
+        assertThat(result.getResult());
+        assertThat(result.getTrashData()).hasSize(1);
+        TrashData<ByteBufferInputStream> trashData = result.getTrashData().get(
+                0);
+        assertThat(trashData.getTrash()).isNotNull();
+        ByteBuffer trashBuffer = trashData.getTrash().getByteBuffer();
+        assertThat(trashBuffer).isNotNull();
+        assertThat(trashBuffer.array()).isEqualTo(bytes);
+        assertThat(trashData.getLocation()).isNotNull();
+        ByteLocator locator = (ByteLocator) trashData.getLocation();
+        assertThat(locator.getData()).isNotNull();
+        ByteBufferInputStream locatorData = locator.getData();
+        assertThat(locatorData.getByteBuffer().array()).isEqualTo(bytes);
+    }
+
+
+    @Test(timeout = 10000)
+    public void test_emptyFile() throws UnsupportedEncodingException {
+        // prepare
+        String fileContent = "";
+        ByteBuffer dataMock = ByteBuffer.wrap(fileContent.getBytes("UTF-8"));
+        ByteBufferInputStream dataFile = new ByteBufferInputStream(dataMock);
+
+        // execute
+        ParseResult<ByteBufferInputStream, TestDataFile> result = txtParser
+                .parse(dataFile);
+
+        // verify - created object
+        assertThat(result).isNotNull();
+        assertThat(result.getDataConsumed()).isEqualTo(dataFile);
         assertThat(result.getElementLocation()).isNull();
         assertThat(result.getParserMessages()).isEmpty();
         assertThat(result.getProducedModelElement()).isEqualTo(
                 new TestDataFile());
         assertThat(result.getResult());
         assertThat(result.getTrashData()).isEmpty();
-
-        // verify - execution order
-
-    }
-
-
-    private ByteBuffer createMockForByteBuffer(String data)
-            throws UnsupportedEncodingException {
-        ByteBuffer dataReal = mock(ByteBuffer.class);
-        byte[] asByteArray = data.getBytes("UTF-8");
-        for (byte b : asByteArray) {
-            when(dataReal.get()).thenReturn(b);
-        }
-
-        return dataReal;
     }
 
 

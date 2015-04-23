@@ -33,4 +33,44 @@ public class TrashData<InputFormatType extends IParsePositionMarkable> {
     public IDataLocator<InputFormatType> getLocation() {
         return locationInFile;
     }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((locationInFile == null) ? 0 : locationInFile.hashCode());
+        result = prime * result + ((trash == null) ? 0 : trash.hashCode());
+        return result;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TrashData<InputFormatType> other;
+        try {
+            other = ((TrashData<InputFormatType>) obj);
+        } catch (ClassCastException cce) {
+            return false;
+        }
+        if (locationInFile == null) {
+            if (other.locationInFile != null)
+                return false;
+        } else if (!locationInFile.equals(other.locationInFile))
+            return false;
+        if (trash == null) {
+            if (other.trash != null)
+                return false;
+        } else if (!trash.equals(other.trash))
+            return false;
+        return true;
+    }
 }

@@ -22,4 +22,10 @@ public interface IDataLocator<InputTypeFormat extends IParsePositionMarkable> {
      * put read pointer to end of data
      */
     void moveToEnd();
+
+
+    /**
+     * @return data inside this data locator
+     */
+    InputTypeFormat getData();
 }
