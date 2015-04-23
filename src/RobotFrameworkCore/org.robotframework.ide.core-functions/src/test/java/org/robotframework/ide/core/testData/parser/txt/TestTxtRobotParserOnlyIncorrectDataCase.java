@@ -76,30 +76,6 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
     }
 
 
-    private void assertThatTrashIsAsExpected(int trashBegin, int trashEnd,
-            String trashContent, byte[] expectedContent,
-            TrashData<ByteBufferInputStream> trashData)
-            throws UnsupportedEncodingException {
-        assertThat(trashData.getTrash()).isNotNull();
-        ByteBuffer trashBuffer = trashData.getTrash().getByteBuffer();
-        assertThat(trashBuffer).isNotNull();
-        assertThat(trashBuffer.array()).isEqualTo(
-                trashContent.getBytes("UTF-8"));
-        assertThat(trashData.getLocation()).isNotNull();
-        ByteLocator locator = (ByteLocator) trashData.getLocation();
-        assertThat(locator.getData()).isNotNull();
-        ByteBufferInputStream locatorData = locator.getData();
-        assertThat(locatorData.getByteBuffer().array()).isEqualTo(
-                expectedContent);
-        locator.moveToStart();
-        assertThat(locator.getData().getByteBuffer().position()).isEqualTo(
-                trashBegin);
-        locator.moveToEnd();
-        assertThat(locator.getData().getByteBuffer().position()).isEqualTo(
-                trashEnd);
-    }
-
-
     @Test(timeout = 10000)
     public void test_fileWithOneSpaceEOLonLinuxPlusEOLonWindows()
             throws UnsupportedEncodingException {
@@ -123,17 +99,15 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
         assertThat(result.getResult());
         assertThat(result.getTrashData()).hasSize(1);
 
+        int trashBegin = 0;
+        int trashEnd = fileContent.length();
+        String trashContent = fileContent;
+        byte[] expectedContent = bytes;
         TrashData<ByteBufferInputStream> trashData = result.getTrashData().get(
                 0);
-        assertThat(trashData.getTrash()).isNotNull();
-        ByteBuffer trashBuffer = trashData.getTrash().getByteBuffer();
-        assertThat(trashBuffer).isNotNull();
-        assertThat(trashBuffer.array()).isEqualTo(bytes);
-        assertThat(trashData.getLocation()).isNotNull();
-        ByteLocator locator = (ByteLocator) trashData.getLocation();
-        assertThat(locator.getData()).isNotNull();
-        ByteBufferInputStream locatorData = locator.getData();
-        assertThat(locatorData.getByteBuffer().array()).isEqualTo(bytes);
+
+        assertThatTrashIsAsExpected(trashBegin, trashEnd, trashContent,
+                expectedContent, trashData);
     }
 
 
@@ -158,17 +132,40 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
                 new TestDataFile());
         assertThat(result.getResult());
         assertThat(result.getTrashData()).hasSize(1);
+
+        int trashBegin = 0;
+        int trashEnd = fileContent.length();
+        String trashContent = fileContent;
+        byte[] expectedContent = bytes;
         TrashData<ByteBufferInputStream> trashData = result.getTrashData().get(
                 0);
+
+        assertThatTrashIsAsExpected(trashBegin, trashEnd, trashContent,
+                expectedContent, trashData);
+    }
+
+
+    private void assertThatTrashIsAsExpected(int trashBegin, int trashEnd,
+            String trashContent, byte[] expectedContent,
+            TrashData<ByteBufferInputStream> trashData)
+            throws UnsupportedEncodingException {
         assertThat(trashData.getTrash()).isNotNull();
         ByteBuffer trashBuffer = trashData.getTrash().getByteBuffer();
         assertThat(trashBuffer).isNotNull();
-        assertThat(trashBuffer.array()).isEqualTo(bytes);
+        assertThat(trashBuffer.array()).isEqualTo(
+                trashContent.getBytes("UTF-8"));
         assertThat(trashData.getLocation()).isNotNull();
         ByteLocator locator = (ByteLocator) trashData.getLocation();
         assertThat(locator.getData()).isNotNull();
         ByteBufferInputStream locatorData = locator.getData();
-        assertThat(locatorData.getByteBuffer().array()).isEqualTo(bytes);
+        assertThat(locatorData.getByteBuffer().array()).isEqualTo(
+                expectedContent);
+        locator.moveToStart();
+        assertThat(locator.getData().getByteBuffer().position()).isEqualTo(
+                trashBegin);
+        locator.moveToEnd();
+        assertThat(locator.getData().getByteBuffer().position()).isEqualTo(
+                trashEnd);
     }
 
 
