@@ -65,9 +65,12 @@ public class TxtRobotFrameworkParser extends
                         trashDataWithTableBeginSign = consumeUntilNextTableMarkWithIgnoreFirst(testData);
                     } catch (IOException e) {
                         // this exception should occurs we read from memory
-                        e.printStackTrace();
+                        e.printStackTrace(); // NOPMD wypych 24.03.2015 for .log
+                                             // and other loggers
+                        parseResultBuilder.addErrorMessage("error on byte "
+                                + position, "" + e);
+                        break;
                     }
-
                     if (trashDataWithTableBeginSign.size() > 0) {
                         addGarbageData(testData, parseResultBuilder, position,
                                 trashDataWithTableBeginSign);
@@ -87,8 +90,8 @@ public class TxtRobotFrameworkParser extends
             int position, ByteArrayOutputStream trashData) {
         ByteBufferInputStream garbageData = new ByteBufferInputStream(
                 ByteBuffer.wrap(trashData.toByteArray()));
-        ByteLocator location = new ByteLocator(testData, position,
-                trashData.size());
+        ByteLocator location = new ByteLocator(testData, position, testData
+                .getByteBuffer().position());
         parseResultBuilder.addTrashDataFound(garbageData, location);
     }
 
@@ -98,7 +101,8 @@ public class TxtRobotFrameworkParser extends
         ByteArrayOutputStream trashData = new ByteArrayOutputStream();
         while(data.available() > 0) {
             int currentByte = data.currentByteInBuffer();
-            if (TABLE_BEGINS.contains(currentByte) || isWhitespace(currentByte)) {
+            if (TABLE_BEGINS.contains((char) currentByte)
+                    || isWhitespace((char) currentByte)) {
                 trashData.write(data.read());
             } else {
                 break;
@@ -110,7 +114,7 @@ public class TxtRobotFrameworkParser extends
     }
 
 
-    private boolean isWhitespace(int currentByte) {
+    private boolean isWhitespace(char currentByte) {
         return Character.isWhitespace(currentByte);
     }
 
@@ -120,7 +124,7 @@ public class TxtRobotFrameworkParser extends
         ByteArrayOutputStream collectedTrashData = new ByteArrayOutputStream();
         while(data.available() > 0) {
             int currentByte = data.currentByteInBuffer();
-            if (!TABLE_BEGINS.contains(currentByte)) {
+            if (!TABLE_BEGINS.contains((char) currentByte)) {
                 collectedTrashData.write(data.read());
             } else {
                 break;
