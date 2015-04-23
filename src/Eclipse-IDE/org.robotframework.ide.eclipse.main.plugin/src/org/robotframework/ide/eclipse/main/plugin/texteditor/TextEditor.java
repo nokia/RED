@@ -239,7 +239,7 @@ public class TextEditor {
                     final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
 
                     for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
-                        if (point.getMarker().getResource() == editedFile
+                        if (point.getMarker().getResource().equals(editedFile)
                                 && point.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == line) {
                             breakpointManager.removeBreakpoint(point, true);
                             return;
