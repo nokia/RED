@@ -232,6 +232,10 @@ public class TextEditor {
             public void mouseDoubleClick(final MouseEvent e) {
                 try {
                     final int line = e.y / viewer.getTextWidget().getLineHeight() + 1;
+                    if (line > viewer.getTextWidget().getLineCount()) {
+                        return;
+                    }
+
                     final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
 
                     for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
