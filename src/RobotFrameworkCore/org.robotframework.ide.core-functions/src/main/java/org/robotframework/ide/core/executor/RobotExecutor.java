@@ -20,13 +20,13 @@ public class RobotExecutor {
     
     private RobotLogOutputStream logOutputStream;
     
-    private TestRunnerAgentMessageLogParser testRunnerAgentMessageLogParser;
+    private MessageLogParser testRunnerAgentMessageLogParser;
     
     private String executionArguments = "";
     
     public RobotExecutor() {
         logOutputStream = new RobotLogOutputStream();
-        testRunnerAgentMessageLogParser = new TestRunnerAgentMessageLogParser();
+        testRunnerAgentMessageLogParser = new MessageLogParser();
     }
 
     public int execute(File projectLocation, String executorName, String userArguments) {
