@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -46,6 +47,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -53,7 +55,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -226,6 +227,26 @@ public class TextEditor {
 			public void mouseDoubleClick(final MouseEvent e) {}
 		});
 		
+        compositeRuler.getControl().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(final MouseEvent e) {
+                try {
+                    final int line = e.y / viewer.getTextWidget().getLineHeight() + 1;
+                    final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
+
+                    for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
+                        if (point.getMarker().getResource() == editedFile
+                                && point.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == line) {
+                            breakpointManager.removeBreakpoint(point, true);
+                            return;
+                        }
+                    }
+                    breakpointManager.addBreakpoint(new RobotLineBreakpoint(editedFile, line));
+                } catch (final CoreException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 	}
 	
 	@Persist
@@ -248,9 +269,9 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void lineBreakpointEvent(@UIEventTopic("TextEditor/LineBreakpoint") org.osgi.service.event.Event event) {
+    private void lineBreakpointEvent(@UIEventTopic("TextEditor/LineBreakpoint") final org.osgi.service.event.Event event) {
 	    if(((String) event.getProperty("file")).equals(editedFile.getName())) {
-	        int line = Integer.parseInt((String) event.getProperty("line"));
+	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
         	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
         	    viewer.getTextWidget().setLineBackground(line-1, 1, SWTResourceManager.getColor(198, 219, 174));
@@ -261,7 +282,7 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void clearBreakpointEvent(@UIEventTopic("TextEditor/ClearLineBreakpoint") int line) {
+    private void clearBreakpointEvent(@UIEventTopic("TextEditor/ClearLineBreakpoint") final int line) {
 	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
         breakpointLine = 0;
     }
@@ -361,10 +382,10 @@ public class TextEditor {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 try {
-                    int line = viewer.getTextWidget().getLineAtOffset(viewer.getTextWidget().getSelection().x);
-                    RobotLineBreakpoint lineBreakpoint = new RobotLineBreakpoint((IResource) input.getAdapter(IResource.class), line+1);
+                    final int line = viewer.getTextWidget().getLineAtOffset(viewer.getTextWidget().getSelection().x);
+                    final RobotLineBreakpoint lineBreakpoint = new RobotLineBreakpoint((IResource) input.getAdapter(IResource.class), line+1);
                     DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(lineBreakpoint);
-                } catch (CoreException e1) {
+                } catch (final CoreException e1) {
                     e1.printStackTrace();
                 }
             }
