@@ -40,6 +40,12 @@ public class ByteLocator implements IDataLocator<ByteBufferInputStream> {
 
 
     @Override
+    public ByteBufferInputStream getData() {
+        return this.byteStream;
+    }
+
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
