@@ -108,7 +108,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                                 file.getName().substring(0, file.getName().lastIndexOf(".")), "--listener",
                                 testRunnerAgentFilePath.toString() + ":54470:True",
                                 project.getLocation().toFile().getAbsolutePath() };
-                        Process process = DebugPlugin.exec(commandLine, null);
+                        Process process = DebugPlugin.exec(commandLine, project.getLocation().toFile());
                         IProcess p = DebugPlugin.newProcess(launch, process, "pybot.bat");
                         
                         IDebugTarget target = new RobotDebugTarget(launch, p, 0, project, file.getParent().getName()+"/"+file.getName(), robotExecutor, testRunnerAgentFilePath);
