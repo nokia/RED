@@ -100,7 +100,7 @@ public class TestTxtRobotParserOnlyIncorrectDataCase {
         TrashData<ByteBufferInputStream> trailer = parseResult.getTrashData()
                 .get(1);
 
-        // header trash
+        // trailer trash
         int trailerBegin = headerEnd + fileSettingTable.length();
         int trailerEnd = trailerBegin + fileTrailerTrash.length();
         String trashContent = fileTrailerTrash;
