@@ -20,6 +20,7 @@ import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
 /**
+ * Main TXT Parser to invoke to get representation from bytes to object.
  * 
  * @author wypych
  * @serial RobotFramework 2.8.6
