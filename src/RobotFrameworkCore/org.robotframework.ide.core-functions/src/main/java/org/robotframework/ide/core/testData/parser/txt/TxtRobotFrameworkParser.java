@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.TestDataFile;
@@ -30,6 +31,7 @@ public class TxtRobotFrameworkParser extends
 
     private static final String FILE_EXTENSION = ".txt";
     private static final List<Character> TABLE_BEGINS = Arrays.asList('|', '*');
+    private final List<ParseResult<ByteBufferInputStream, ? extends IRobotSectionTable>> tables = new LinkedList<ParseResult<ByteBufferInputStream, ? extends IRobotSectionTable>>();
 
 
     public TxtRobotFrameworkParser(
@@ -57,6 +59,9 @@ public class TxtRobotFrameworkParser extends
                 ITestDataElementParser<ByteBufferInputStream, ? extends IRobotSectionTable> tableSectionParser = findParser(testData);
                 if (tableSectionParser != null) {
                     // processing
+                    ParseResult<ByteBufferInputStream, ? extends IRobotSectionTable> parseResult = tableSectionParser
+                            .parse(testData);
+                    tables.add(parseResult);
                 } else {
                     // data marker found, but data do not belongs to section
                     // expected
