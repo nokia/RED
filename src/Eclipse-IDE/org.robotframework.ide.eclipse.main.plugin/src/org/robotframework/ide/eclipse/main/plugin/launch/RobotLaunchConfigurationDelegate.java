@@ -1,6 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import java.nio.file.Path;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +24,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.internal.ui.views.console.ProcessConsole;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ISelection;
@@ -31,6 +32,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.core.executor.IRobotOutputListener;
 import org.robotframework.ide.core.executor.RobotExecutor;
@@ -41,10 +44,6 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
     private static final String ROBOT_LAUNCH_CONFIGURATION_TYPE = "org.robotframework.ide.robotLaunchConfiguration";
 
-    private static final String ROBOT_CONSOLE_NAME = "Robot Test Result";
-
-    private RobotExecutor robotExecutor;
-
     private ILaunchConfigurationType launchConfigurationType;
 
     private ILaunchManager manager;
@@ -52,7 +51,6 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     private IEventBroker broker;
 
     public RobotLaunchConfigurationDelegate() {
-        robotExecutor = new RobotExecutor();
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(ROBOT_LAUNCH_CONFIGURATION_TYPE);
         broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
@@ -65,13 +63,25 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         String projectNameAttribute = configuration.getAttribute(
                 RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE, "");
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameAttribute);
-        
+
         if (project.exists()) {
             String resourceNameAttribute = configuration.getAttribute(
                     RobotLaunchConfigurationMainTab.RESOURCE_NAME_ATTRIBUTE, "");
             if (!resourceNameAttribute.equals("")) {
-                
-                if(mode.equals(ILaunchManager.RUN_MODE)) {
+
+                clearMessageLogView();
+                String executorNameAttribute = configuration.getAttribute(
+                        RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
+                String executorArgsAttribute = configuration.getAttribute(
+                        RobotLaunchConfigurationMainTab.EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
+
+                RobotExecutor robotExecutor = new RobotExecutor();
+                robotExecutor.createTestRunnerAgentFile();
+                Process process = null;
+
+                if (mode.equals(ILaunchManager.RUN_MODE)) {
+
+                    List<String> suites = new ArrayList<String>();
                     String[] resourceNames = resourceNameAttribute.split(RobotLaunchConfigurationMainTab.RESOURCES_SEPARATOR);
                     for (int i = 0; i < resourceNames.length; i++) {
                         IFile file = project.getFile(resourceNames[i]);
@@ -79,41 +89,68 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                             IContainer parent = file.getParent();
                             String fileName = file.getName();
                             String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
-                            if (parent != null) {
-                                robotExecutor.addSuite(parent.getName(), fileNameWithoutExtension);
+                            if (parent != null && parent.getType() == IResource.FOLDER) {
+                                suites.add(parent.getName() + "." + fileNameWithoutExtension);
                             } else {
-                                robotExecutor.addSuite("", fileNameWithoutExtension);
+                                suites.add(fileNameWithoutExtension);
                             }
                         } else {
                             IFolder folder = project.getFolder(resourceNames[i]);
                             if (folder.exists()) {
-                                robotExecutor.addSuite("", folder.getName());
+                                suites.add(folder.getName());
                             }
                         }
                     }
-                    
-                    clearMessageLogView();
-                    String executorNameAttribute = configuration.getAttribute(
-                            RobotLaunchConfigurationMainTab.EXECUTOR_NAME_ATTRIBUTE, "");
-                    String executorArgsAttribute = configuration.getAttribute(
-                            RobotLaunchConfigurationMainTab.EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
-                    executeRobotTest(project, executorNameAttribute, executorArgsAttribute);
-                
+                    String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(), executorNameAttribute, suites,
+                            executorArgsAttribute, false);
+
+                    robotExecutor.startTestRunnerAgentHandler(new IRobotOutputListener() {
+
+                        @Override
+                        public void handleLine(String line) {
+                            broker.send("MessageLogView/AppendLine", line);
+                        }
+                    });
+                    process = DebugPlugin.exec(cmd, project.getLocation().toFile());
+                    DebugPlugin.newProcess(launch, process, executorNameAttribute);
+                    printCommandOnConsole(cmd, executorNameAttribute);
+
                 } else if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+
                     IFile file = project.getFile(resourceNameAttribute);
                     if (file.exists()) {
-                        //TODO: automatically show Debug perspective
-                        Path testRunnerAgentFilePath = robotExecutor.createTestRunnerAgentFile();
-                        String[] commandLine = new String[] { "pybot.bat", "--suite",
-                                file.getName().substring(0, file.getName().lastIndexOf(".")), "--listener",
-                                testRunnerAgentFilePath.toString() + ":54470:True",
-                                project.getLocation().toFile().getAbsolutePath() };
-                        Process process = DebugPlugin.exec(commandLine, project.getLocation().toFile());
-                        IProcess p = DebugPlugin.newProcess(launch, process, "pybot.bat");
-                        
-                        IDebugTarget target = new RobotDebugTarget(launch, p, 0, project, file.getParent().getName()+"/"+file.getName(), robotExecutor, testRunnerAgentFilePath);
+                        // TODO: automatically show Debug perspective
+
+                        List<String> suiteList = new ArrayList<String>();
+                        String fileName = file.getName();
+                        String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+                        IContainer parent = file.getParent();
+                        if (parent != null && parent.getType() == IResource.FOLDER) {
+                            suiteList.add(parent.getName() + "." + fileNameWithoutExtension);
+                        } else {
+                            suiteList.add(fileNameWithoutExtension);
+                        }
+
+                        String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(),
+                                executorNameAttribute, suiteList, executorArgsAttribute, true);
+
+                        process = DebugPlugin.exec(cmd, project.getLocation().toFile());
+                        IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, executorNameAttribute);
+                        printCommandOnConsole(cmd, executorNameAttribute);
+
+                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file);
                         launch.addDebugTarget(target);
                     }
+                }
+
+                try {
+                    if (process != null) {
+                        process.waitFor();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    robotExecutor.removeTestRunnerAgentFile();
                 }
             }
         }
@@ -178,7 +215,12 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                 for (int i = 0; i < resources.size(); i++) {
                     IResource resource = resources.get(i);
                     if (resource.getType() == IResource.FILE) {
-                        resourceNameAttribute.append(resource.getParent().getName() + "/" + resource.getName());
+                        IContainer parent = resource.getParent();
+                        if(parent.getType() == IResource.FOLDER) {
+                            resourceNameAttribute.append(parent.getName() + "/" + resource.getName());
+                        } else {
+                            resourceNameAttribute.append(resource.getName());
+                        }
                     } else if (resource.getType() == IResource.FOLDER) {
                         resourceNameAttribute.append(resource.getName());
                     }
@@ -250,23 +292,27 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
         return configurations.toArray(new ILaunchConfiguration[configurations.size()]);
     }
 
-    private void executeRobotTest(IProject project, String executorName, String arguments) {
-        ExecutorOutputStreamListener executorOutputStreamListener = new ExecutorOutputStreamListener(ROBOT_CONSOLE_NAME);
-        robotExecutor.addOutputStreamListener(executorOutputStreamListener);
-
-        robotExecutor.setMessageLogListener(new IRobotOutputListener() {
-
-            @Override
-            public void handleLine(String line) {
-                broker.send("MessageLogView/AppendLine", line);
-            }
-        });
-
-        robotExecutor.execute(project.getLocation().toFile(), executorName, arguments);
-        robotExecutor.removeOutputStreamListener(executorOutputStreamListener);
-    }
-
     private void clearMessageLogView() {
         broker.send("MessageLogView/Clear", "");
+    }
+
+    private void printCommandOnConsole(String[] cmd, String executor) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Command: ");
+        for (int i = 0; i < cmd.length; i++) {
+            stringBuilder.append(cmd[i] + " ");
+        }
+
+        IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
+        for (int i = 0; i < existingConsoles.length; i++) {
+            if (existingConsoles[i].getName().contains(executor)) {
+                try {
+                    ((ProcessConsole) existingConsoles[i]).newOutputStream().write(stringBuilder.toString() + '\n');
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
