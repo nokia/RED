@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ILineBreakpoint;
@@ -60,10 +59,8 @@ public class KeywordFinder {
         return result;
     }
 
-    public int getKeywordLine(IProject project, String suite, String keyword, List<String> args,
+    public int getKeywordLine(IFile editedFile, String keyword, List<String> args,
             List<Integer> executedLines) {
-
-        IFile editedFile = project.getFile(suite);
 
         String[] s = keyword.split("\\.");
         keyword = s[s.length - 1];

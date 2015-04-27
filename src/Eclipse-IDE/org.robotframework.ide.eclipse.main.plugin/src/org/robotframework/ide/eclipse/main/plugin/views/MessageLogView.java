@@ -22,9 +22,9 @@ public class MessageLogView {
     private StyledText styledText;
     
     @PostConstruct
-    public void postConstruct(final Composite parent) {
+    public void postConstruct(Composite parent) {
         
-        final FillLayout layout = new FillLayout();
+        FillLayout layout = new FillLayout();
         layout.marginHeight=2;
         layout.marginWidth=2;
         parent.setLayout(layout);
