@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,7 +35,6 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.core.executor.RobotExecutor;
 import org.robotframework.ide.eclipse.main.plugin.debug.KeywordFinder;
 
 /**
@@ -85,8 +83,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private String currentSuite = "";
 
-    private String executedSuite = "";
-
     private IStackFrame[] stackFrames;
 
     private KeywordFinder keywordFinder = new KeywordFinder();
@@ -95,13 +91,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private List<Integer> executedBreakpointsLines;
 
-    private IProject project;
+    private IFile executedFile;
 
     private IEventBroker broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     
-    private RobotExecutor executor;
-    private Path tempAgentPath;
-
     /**
      * Listens to events from the TestRunnerAgent and fires corresponding
      * debug events.
@@ -144,7 +137,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         
                         // TODO: check keywords in currentFrames and search keywords only after
                         // parent keywords
-                        int keywordLine = keywordFinder.getKeywordLine(project, executedSuite, currentKeyword, args,
+                        int keywordLine = keywordFinder.getKeywordLine(executedFile, currentKeyword, args,
                                 currentExecutionLines);
                         if (keywordLine >= 0) {
                             currentExecutionLines.add(keywordLine);
@@ -224,7 +217,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IProject project, String suite, RobotExecutor executor, Path tempAgentPath)
+    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile)
             throws CoreException {
         super(null);
         this.launch = launch;
@@ -233,12 +226,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         currentFrames = new LinkedHashMap<>();
         currentExecutionLines = new ArrayList<>();
         executedBreakpointsLines = new ArrayList<>();
-        this.project = project;
-        this.executedSuite = suite;
+        this.executedFile = executedFile;
         
-        this.executor = executor;
-        this.tempAgentPath = tempAgentPath;
-
         try {
             serverSocket = new ServerSocket(54470);
             serverSocket.setReuseAddress(true);
@@ -452,8 +441,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         isSuspended = false;
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
-        
-        executor.removeTempDir(tempAgentPath.getParent());
         
         try {
             serverSocket.close();

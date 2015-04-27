@@ -128,7 +128,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public String getMessage() {
-        return "Please select a file.";
+        return "Please select a project.";
     }
     
     @Override
