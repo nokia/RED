@@ -8,14 +8,13 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.WizardNewFolderMainPage;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature;
 
 public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
 
-    private WizardNewFolderMainPage mainPage;
+    private WizardNewRobotFolderMainPage mainPage;
 
     @Override
     public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
@@ -28,7 +27,7 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewFolderMainPage("New Robot Suites Folder", getSelection());
+        mainPage = new WizardNewRobotFolderMainPage("New Robot Suites Folder", getSelection());
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Suites Folder");
         mainPage.setDescription("Create new Robot test suites folder");
@@ -41,17 +40,21 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
         final IFolder newFolder = mainPage.createNewFolder();
         selectAndReveal(newFolder);
 
-        try {
-            final IFile initFile = RobotProjectNature.createRobotInitializationFile(newFolder);
+        if (mainPage.shouldInitFileBeCreated()) {
+            try {
+                final IFile initFile = RobotProjectNature.createRobotInitializationFile(newFolder);
+                selectAndReveal(initFile);
 
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
-                    .getDefaultEditor(initFile.getName());
-            page.openEditor(new FileEditorInput(initFile), desc.getId());
+                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
+                        .getDefaultEditor(initFile.getName());
+                page.openEditor(new FileEditorInput(initFile), desc.getId());
 
-        } catch (final CoreException e) {
-            throw new SuiteCreatingException("Unable to create suites directory " + newFolder.getName(), e);
+            } catch (final CoreException e) {
+                throw new SuiteCreatingException("Unable to create suites directory " + newFolder.getName(), e);
+            }
         }
+        
         return true;
     }
 
