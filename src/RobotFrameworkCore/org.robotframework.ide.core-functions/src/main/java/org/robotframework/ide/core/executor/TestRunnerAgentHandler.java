@@ -16,6 +16,8 @@ import java.util.List;
 public class TestRunnerAgentHandler implements Runnable {
 
     private List<IRobotOutputListener> listeners;
+    
+    private PrintWriter writer;
 
     public TestRunnerAgentHandler() {
         listeners = new ArrayList<>();
@@ -27,7 +29,7 @@ public class TestRunnerAgentHandler implements Runnable {
             socket.setReuseAddress(true);
             Socket client = socket.accept();
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
+            writer = new PrintWriter(client.getOutputStream(), true);
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -46,5 +48,9 @@ public class TestRunnerAgentHandler implements Runnable {
 
     public void removeListener(IRobotOutputListener listener) {
         listeners.remove(listener);
+    }
+    
+    public PrintWriter getWriter() {
+        return writer;
     }
 }

@@ -5,106 +5,56 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.OS;
-import org.apache.commons.exec.PumpStreamHandler;
 
-/**
- * @author mmarzec
- *
- */
 public class RobotExecutor {
-    
-    private RobotLogOutputStream logOutputStream;
-    
-    private MessageLogParser testRunnerAgentMessageLogParser;
-    
-    private String executionArguments = "";
-    
-    public RobotExecutor() {
-        logOutputStream = new RobotLogOutputStream();
-        testRunnerAgentMessageLogParser = new MessageLogParser();
-    }
 
-    public int execute(File projectLocation, String executorName, String userArguments) {
+    private Path testRunnerAgentFilePath;
+
+    public String[] createCommand(File projectLocation, String executorName, List<String> testArguments,
+            String userArguments, boolean isDebugging) {
+
+        List<String> cmdElements = new ArrayList<String>();
+
         String robotExecutorName = executorName;
         if (OS.isFamilyWindows()) {
             robotExecutorName += ".bat";
         } else {
             robotExecutorName += ".sh";
         }
-        
-        TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler();
-        testRunnerAgentHandler.addListener(testRunnerAgentMessageLogParser);
-        Thread handler = new Thread(testRunnerAgentHandler);
-        handler.start();
-        
-        Path testRunnerAgentFilePath = createTestRunnerAgentFile();
-        
-        if (userArguments != null && !userArguments.equals("")) {
-            executionArguments += " " + userArguments;
-        }
-        if(!executionArguments.equals("")) {
-            executionArguments += " ";
-        }
-        
-        String line = robotExecutorName + " --listener " + testRunnerAgentFilePath.toString() + ":54470:False" + " "
-                + executionArguments + projectLocation.getAbsolutePath();
+        cmdElements.add(robotExecutorName);
 
-        CommandLine cmd = CommandLine.parse(line);
-        
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(projectLocation);
-        PumpStreamHandler streamHandler = new PumpStreamHandler(logOutputStream);
-        executor.setStreamHandler(streamHandler);
-        
-        logOutputStream.processLine("Command: " + line, 1);
-        int exitValue = 1;
-        long startTime = 0;
-        try {
-            startTime = System.currentTimeMillis();
-            exitValue = executor.execute(cmd);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            long endTime = System.currentTimeMillis();
-            logOutputStream.processLine("Elapsed time: " + this.computeTestDuration(startTime, endTime) + "\n", 1);
-            executionArguments = "";
+        String debugEnabled = "False";
+        if (isDebugging) {
+            debugEnabled = "True";
         }
-        
-        removeTempDir(testRunnerAgentFilePath.getParent());
-        
-        return exitValue;
-    }
-    
-    public void addOutputStreamListener(IRobotOutputListener listener) {
-        logOutputStream.addListener(listener);
-    }
-    
-    public void removeOutputStreamListener(IRobotOutputListener listener) {
-        logOutputStream.removeListener(listener);
-    }
-    
-    public void setMessageLogListener(IRobotOutputListener listener) {
-        testRunnerAgentMessageLogParser.setMessageLogListener(listener);
-    }
-    
-    private String computeTestDuration(long startTime, long endTime) {
+        cmdElements.add("--listener");
+        cmdElements.add(testRunnerAgentFilePath.toString() + ":54470:" + debugEnabled);
 
-        long diff = endTime - startTime;
-        
-        long diffSeconds = diff / 1000 % 60;
-        long diffMinutes = diff / (60 * 1000) % 60;
-        long diffHours = diff / (60 * 60 * 1000) % 24;
+        for (String suite : testArguments) {
+            cmdElements.add("--suite");
+            cmdElements.add(suite);
+        }
 
-        DecimalFormat df = new DecimalFormat("00");
-        return df.format(diffHours) +":"+ df.format(diffMinutes) +":"+ df.format(diffSeconds);
+        if (!userArguments.equals("") && (userArguments.contains("--") || userArguments.contains("-"))) {
+            List<String> userArgsList = new ArrayList<String>();
+            this.extractArguments(userArgsList, userArguments);
+            for (String arg : userArgsList) {
+                if (!arg.equals(" ")) {
+                    cmdElements.add(arg);
+                }
+            }
+        }
+
+        cmdElements.add(projectLocation.getAbsolutePath());
+
+        return cmdElements.toArray(new String[cmdElements.size()]);
     }
-    
-    public Path createTestRunnerAgentFile() {
+
+    public void createTestRunnerAgentFile() {
         Path tempDir = null;
         File agentFile = new File("");
         try {
@@ -115,13 +65,12 @@ public class RobotExecutor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        return agentFile.toPath();
+        testRunnerAgentFilePath = agentFile.toPath();
     }
-    
-    public void removeTempDir(Path dir) {
-        File tempDir = new File(dir.toString());
-        File[] files = tempDir.listFiles();
+
+    public void removeTestRunnerAgentFile() {
+        Path dir = testRunnerAgentFilePath.getParent();
+        File[] files = new File(dir.toString()).listFiles();
         try {
             for (int i = 0; i < files.length; i++) {
                 Files.delete(files[i].toPath());
@@ -132,31 +81,77 @@ public class RobotExecutor {
         }
     }
     
-    public void addTest(String suiteName, String testName) {
-        String testOption = "--test";
-        if (testName != null && !testName.equals("")) {
-            if (!executionArguments.equals("")) {
-                executionArguments += " ";
-            }
-            if (suiteName != null && !suiteName.equals("")) {
-                executionArguments += testOption + " " + suiteName + "." + testName;
-            } else {
-                executionArguments += testOption + " " + testName;
-            }
-        }
+    public void startTestRunnerAgentHandler(IRobotOutputListener messageLogListener) {
+        MessageLogParser messageLogParser = new MessageLogParser();
+        messageLogParser.setMessageLogListener(messageLogListener);
+        TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler();
+        testRunnerAgentHandler.addListener(messageLogParser);
+        Thread handler = new Thread(testRunnerAgentHandler);
+        handler.start();
     }
 
-    public void addSuite(String parent, String suiteName) {
-        String suiteOption = "--suite";
-        if (suiteName != null && !suiteName.equals("")) {
-            if (!executionArguments.equals("")) {
-                executionArguments += " ";
+    private void extractArguments(List<String> arguments, String str) {
+
+        String argName = "";
+        String argValue = "";
+        int end = 0;
+        if (str.substring(0, 2).equals("--")) {
+            int argNameEnd = str.indexOf(' ');
+            if (argNameEnd < 0) {
+                argName = str.substring(2, str.length());
+                arguments.add("--" + argName);
+                return;
             }
-            if (parent != null && !parent.equals("")) {
-                executionArguments += suiteOption + " " + parent + "." + suiteName;
+            argName = str.substring(2, argNameEnd);
+            int argValueEnd1 = str.indexOf(" -", argNameEnd);
+            int argValueEnd2 = str.indexOf(" --", argNameEnd);
+            if (argValueEnd2 > 0 || argValueEnd1 > 0) {
+                if (argValueEnd2 < argValueEnd1 && argValueEnd2 > 0) {
+                    if (argNameEnd < argValueEnd2)
+                        argValue = str.substring(argNameEnd + 1, argValueEnd2);
+                    end = argValueEnd2 + 1;
+                } else {
+                    if (argNameEnd < argValueEnd1)
+                        argValue = str.substring(argNameEnd + 1, argValueEnd1);
+                    end = argValueEnd1 + 1;
+                }
             } else {
-                executionArguments += suiteOption + " " + suiteName;
+                argValue = str.substring(argNameEnd + 1);
+                end = str.length();
             }
+            arguments.add("--" + argName);
+        } else if (str.substring(0, 1).equals("-")) {
+            int argNameEnd = str.indexOf(' ');
+            if (argNameEnd < 0) {
+                argName = str.substring(1, str.length());
+                arguments.add("-" + argName);
+                return;
+            }
+            argName = str.substring(1, argNameEnd);
+            int argValueEnd1 = str.indexOf(" -", argNameEnd);
+            int argValueEnd2 = str.indexOf(" --", argNameEnd);
+            if (argValueEnd2 > 0 || argValueEnd1 > 0) {
+                if (argValueEnd2 < argValueEnd1 && argValueEnd2 > 0) {
+                    if (argNameEnd < argValueEnd2)
+                        argValue = str.substring(argNameEnd + 1, argValueEnd2);
+                    end = argValueEnd2 + 1;
+                } else {
+                    if (argNameEnd < argValueEnd1)
+                        argValue = str.substring(argNameEnd + 1, argValueEnd1);
+                    end = argValueEnd1 + 1;
+                }
+            } else {
+                argValue = str.substring(argNameEnd + 1);
+                end = str.length();
+            }
+            arguments.add("-" + argName);
+        } else {
+            return;
         }
+
+        if (!argValue.equals(""))
+            arguments.add(argValue);
+        if (end != str.length())
+            extractArguments(arguments, str.substring(end));
     }
 }
