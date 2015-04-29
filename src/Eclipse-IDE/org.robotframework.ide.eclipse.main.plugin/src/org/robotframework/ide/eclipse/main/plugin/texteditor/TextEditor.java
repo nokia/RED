@@ -297,10 +297,7 @@ public class TextEditor {
 		if (saveAsCommand.isDefined()) {
 			handlerService.activateHandler("org.eclipse.ui.file.saveAs",new SaveAsHandler());
 			cmd = commandService.createCommand("org.eclipse.ui.file.saveAs", null);
-			if (handlerService.canExecute(cmd)) {
-			    //TODO logger
-				System.out.println("SaveAsHandler can be executed.");
-			}
+			handlerService.canExecute(cmd);
 		}
 		return cmd;
 	}
