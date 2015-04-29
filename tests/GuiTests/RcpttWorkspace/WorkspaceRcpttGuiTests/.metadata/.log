@@ -1,0 +1,12 @@
+!SESSION 2015-04-29 12:55:42.781 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Ratas\Robot\AutomationSuite\WorkspaceRcpttGuiTests_clean
+
+!ENTRY org.eclipse.ui 4 4 2015-04-29 12:55:47.473
+!MESSAGE Bad extension specification
+
+!ENTRY org.lcx.robotframework.swtbotplugin 4 0 2015-04-29 12:55:47.502
+!MESSAGE startup class must implement org.eclipse.ui.IStartup
