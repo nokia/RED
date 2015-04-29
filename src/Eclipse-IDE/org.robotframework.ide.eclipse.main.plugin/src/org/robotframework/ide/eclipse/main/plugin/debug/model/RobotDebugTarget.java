@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -77,7 +81,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Map<String, Map<String, String>> currentFrames;
+    private Map<String, ActiveKeyword> currentFrames;
 
     private String currentKeyword = "";
 
@@ -90,6 +94,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private List<Integer> currentExecutionLines;
 
     private List<Integer> executedBreakpointsLines;
+    
+    private Map<String, String> currentResourceFiles;
 
     private IFile executedFile;
 
@@ -117,9 +123,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 while (!isTerminated() && (event = messageReader.readLine()) != null && messageReader != null) {
 
                     Map<String, Object> map = mapper.readValue(event, Map.class);
-
+                    
                     if (map.containsKey("pid")) {
-                        broker.send("MessageLogView/Clear", "");
+                        sendClearEventToMessageLogView();
                         started();
                     }
 
@@ -135,9 +141,25 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         Map<String, Object> elements = (Map<String, Object>) list.get(1);
                         List<String> args = (List<String>) elements.get("args");
                         
+                        
+                        String executedSuite = "";
+                        IFile currentFile = null;
+                        if(!currentResourceFiles.isEmpty()) {
+                            String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
+                            currentFile = executedFile.getProject().getFile(resource);
+                            if(!currentFile.exists()) {
+                                currentFile = (IFile) executedFile.getProject().findMember(new Path("resource"));
+                                currentFile = executedFile.getProject().getFile(executedFile.getParent().getName() + "/" + resource);
+                            }
+                            executedSuite = resource;
+                        } else {
+                            currentFile = executedFile;
+                            executedSuite = currentSuite;
+                        }
+                        
                         // TODO: check keywords in currentFrames and search keywords only after
                         // parent keywords
-                        int keywordLine = keywordFinder.getKeywordLine(executedFile, currentKeyword, args,
+                        int keywordLine = keywordFinder.getKeywordLine(currentFile, currentKeyword, args,
                                 currentExecutionLines);
                         if (keywordLine >= 0) {
                             currentExecutionLines.add(keywordLine);
@@ -151,7 +173,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                             IBreakpoint currentBreakpoint = currentBreakpoints[i];
                             String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
                             try {
-                                if (breakpointResourceName.equals(currentSuite) && currentBreakpoint.isEnabled()) {
+                                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
                                     int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                                             IMarker.LINE_NUMBER);
                                     if (!executedBreakpointsLines.contains(breakpointLineNum)
@@ -160,7 +182,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                                         executedBreakpointsLines.add(breakpointLineNum);
                                         isBreakpoint = true;
                                         breakpointHit(currentBreakpoint);
-                                        sendLineBreakpointEventToTextEditor(currentSuite, breakpointLineNum);
+                                        sendHighlightLineEventToTextEditor(executedSuite, breakpointLineNum);
                                     }
 
                                 }
@@ -172,25 +194,52 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         if (isBreakpoint || thread.isStepping()) {
 
                             if (thread.isStepping()) {
-                                sendLineBreakpointEventToTextEditor(currentSuite, keywordLine);
+                                sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
                             }
                             stackFrames = null;
                             sendMessageToAgent("stop");
                         } else {
                             sendMessageToAgent("run");
                         }
+                        
+                        String fileName = currentSuite;
+                        if(!currentResourceFiles.isEmpty()) {
+                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
+                        }
+                        currentFrames.put(currentKeyword, new ActiveKeyword(null, fileName, keywordLine));
+                        
+                        String[] keywordNameParts = currentKeyword.split("\\.");
+                        if(keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
+                            //next keyword from here will be in another file
+                            String resourceName = keywordNameParts[0];
+                            
+                            //TODO: get somehow name with extension of resource file
+                            currentResourceFiles.put(currentKeyword, findResourceName(resourceName));
+                        }
                     }
 
                     if (map.containsKey("vars")) {
                         List<Object> list = (List<Object>) map.get("vars");
-                        Map<String, String> mm = (Map<String, String>) list.get(1);
-                        currentFrames.put(currentKeyword, mm);
+                        Map<String, String> vars = (Map<String, String>) list.get(1);
+                      
+//                        String fileName = currentSuite;
+//                        if(!currentResourceFiles.isEmpty()) {
+//                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
+//                        }
+//                        currentFrames.put(currentKeyword, new ActiveKeyword(vars, fileName));
+                    
+                        ((ActiveKeyword) currentFrames.values().toArray()[currentFrames.size()-1]).setVariables(vars);
                     }
 
                     if (map.containsKey("end_keyword")) {
                         List<Object> list = (List<Object>) map.get("end_keyword");
                         String keyword = (String) list.get(0);
                         currentFrames.remove(keyword);
+                        
+                        String[] keywordNameParts = keyword.split("\\.");
+                        if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
+                            currentResourceFiles.remove(keyword);
+                        }
                     }
 
                     if (map.containsKey("paused")) {
@@ -198,7 +247,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     }
 
                     if (map.containsKey("close")) {
-                        broker.send("TextEditor/ClearLineBreakpoint", 0);
+                        sendClearHighlightedLineEventToTextEditor();
                         terminated();
                     }
 
@@ -207,7 +256,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         Map<String, String> elements = (Map<String, String>) list.get(0);
                         String line = elements.get("timestamp") + " : " + elements.get("level") + " : "
                                 + elements.get("message") + '\n';
-                        broker.send("MessageLogView/AppendLine", line);
+                        sendAppendLineEventToMessageLogView(line);
                     }
                 }
             } catch (IOException e) {
@@ -226,6 +275,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         currentFrames = new LinkedHashMap<>();
         currentExecutionLines = new ArrayList<>();
         executedBreakpointsLines = new ArrayList<>();
+        currentResourceFiles = new LinkedHashMap<>();
         this.executedFile = executedFile;
         
         try {
@@ -347,7 +397,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
         terminated();
 
-        broker.send("TextEditor/ClearLineBreakpoint", 0);
+        sendClearHighlightedLineEventToTextEditor();
     }
 
     /*
@@ -391,7 +441,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         sendMessageToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
 
-        broker.send("TextEditor/ClearLineBreakpoint", 0);
+        sendClearHighlightedLineEventToTextEditor();
     }
 
     /**
@@ -542,7 +592,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             stackFrames = new IStackFrame[currentFrames.size()];
             int i = 1;
             for (String key : currentFrames.keySet()) {
-                stackFrames[currentFrames.size() - i] = new RobotStackFrame(thread, key, currentSuite, currentFrames.get(key), i);
+                ActiveKeyword activeKeyword = currentFrames.get(key);
+
+                stackFrames[currentFrames.size() - i] = new RobotStackFrame(thread, activeKeyword.getFileName(), key,
+                        activeKeyword.getLineNumber(), activeKeyword.getVariables(), i);
                 i++;
             }
         }
@@ -589,11 +642,48 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    public void sendLineBreakpointEventToTextEditor(String file, int line) {
+    private void sendHighlightLineEventToTextEditor(String file, int line) {
 
         Map<String, String> eventMap = new HashMap<>();
         eventMap.put("file", file);
         eventMap.put("line", String.valueOf(line));
-        broker.send("TextEditor/LineBreakpoint", eventMap);
+        broker.send("TextEditor/HighlightLine", eventMap);
+    }
+    
+    private void sendClearHighlightedLineEventToTextEditor() {
+
+        broker.send("TextEditor/ClearHighlightedLine", 0);
+    }
+    
+    private void sendAppendLineEventToMessageLogView(String line) {
+
+        broker.send("MessageLogView/AppendLine", line);
+    }
+    
+    private void sendClearEventToMessageLogView() {
+
+        broker.send("MessageLogView/Clear", "");
+    }
+    
+    private String findResourceName(String resourceName) {
+        IProject project = executedFile.getProject();
+        String txtFile = resourceName + ".txt";
+        String robotFile = resourceName + ".robot";
+        if (project.getFile(robotFile).exists()) {
+            return robotFile;
+        } else if (project.getFile(txtFile).exists()) {
+            return txtFile;
+        }
+
+        IContainer parent = executedFile.getParent();
+        if (parent != null && parent.getType() == IResource.FOLDER) {
+            if (project.getFile(parent.getName() + "/" + robotFile).exists()) {
+                return robotFile;
+            } else if (project.getFile(parent.getName() + "/" + txtFile).exists()) {
+                return txtFile;
+            }
+        }
+
+        return "";
     }
 }

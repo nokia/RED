@@ -11,5 +11,6 @@ public class RobotSourceLookupDirector extends AbstractSourceLookupDirector {
      */
     public void initializeParticipants() {
         addParticipants(new ISourceLookupParticipant[]{new RobotSourceLookupParticipant()});
+        
     }
 }

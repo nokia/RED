@@ -273,7 +273,7 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void lineBreakpointEvent(@UIEventTopic("TextEditor/LineBreakpoint") final org.osgi.service.event.Event event) {
+    private void highlightLineEvent(@UIEventTopic("TextEditor/HighlightLine") final org.osgi.service.event.Event event) {
 	    if(((String) event.getProperty("file")).equals(editedFile.getName())) {
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
@@ -286,7 +286,7 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void clearBreakpointEvent(@UIEventTopic("TextEditor/ClearLineBreakpoint") final int line) {
+    private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final int line) {
 	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
         breakpointLine = 0;
     }
