@@ -40,6 +40,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.debug.KeywordFinder;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 
 /**
  * @author mmarzec
@@ -101,6 +102,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private IEventBroker broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     
+    private RobotPartListener partListener;
+    
     /**
      * Listens to events from the TestRunnerAgent and fires corresponding
      * debug events.
@@ -148,7 +151,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                             String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
                             currentFile = executedFile.getProject().getFile(resource);
                             if(!currentFile.exists()) {
-                                currentFile = (IFile) executedFile.getProject().findMember(new Path("resource"));
                                 currentFile = executedFile.getProject().getFile(executedFile.getParent().getName() + "/" + resource);
                             }
                             executedSuite = resource;
@@ -266,7 +268,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile)
+    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile, RobotPartListener partListener)
             throws CoreException {
         super(null);
         this.launch = launch;
@@ -277,6 +279,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         executedBreakpointsLines = new ArrayList<>();
         currentResourceFiles = new LinkedHashMap<>();
         this.executedFile = executedFile;
+        this.partListener = partListener;
         
         try {
             serverSocket = new ServerSocket(54470);
@@ -686,4 +689,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         return "";
     }
+
+    public RobotPartListener getPartListener() {
+        return partListener;
+    }
+    
 }

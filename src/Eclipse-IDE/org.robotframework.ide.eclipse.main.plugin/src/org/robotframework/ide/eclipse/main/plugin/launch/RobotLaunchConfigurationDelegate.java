@@ -41,6 +41,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.core.executor.IRobotOutputListener;
 import org.robotframework.ide.core.executor.RobotExecutor;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab;
 
@@ -82,6 +83,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                 RobotExecutor robotExecutor = new RobotExecutor();
                 robotExecutor.createTestRunnerAgentFile();
                 Process process = null;
+                RobotPartListener robotPartListener = null;
 
                 if (mode.equals(ILaunchManager.RUN_MODE)) {
 
@@ -105,8 +107,8 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                             }
                         }
                     }
-                    String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(), executorNameAttribute, suites,
-                            executorArgsAttribute, false);
+                    String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(), executorNameAttribute,
+                            suites, executorArgsAttribute, false);
 
                     robotExecutor.startTestRunnerAgentHandler(new IRobotOutputListener() {
 
@@ -141,8 +143,11 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                         process = DebugPlugin.exec(cmd, project.getLocation().toFile());
                         IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, executorNameAttribute);
                         printCommandOnConsole(cmd, executorNameAttribute);
-                        
-                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file);
+
+                        robotPartListener = new RobotPartListener(broker);
+                        new TogglePartListenerJob(robotPartListener, false).schedule();
+
+                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file, robotPartListener);
                         launch.addDebugTarget(target);
                     }
                 }
@@ -154,6 +159,9 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
+                    if (robotPartListener != null) {
+                        new TogglePartListenerJob(robotPartListener, true).schedule();
+                    }
                     robotExecutor.removeTestRunnerAgentFile();
                 }
             }
@@ -220,7 +228,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                     IResource resource = resources.get(i);
                     if (resource.getType() == IResource.FILE) {
                         IContainer parent = resource.getParent();
-                        if(parent.getType() == IResource.FOLDER) {
+                        if (parent.getType() == IResource.FOLDER) {
                             resourceNameAttribute.append(parent.getName() + "/" + resource.getName());
                         } else {
                             resourceNameAttribute.append(resource.getName());
@@ -319,7 +327,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
             }
         }
     }
-    
+
     private class ShowDebugPerspectiveJob extends UIJob {
 
         public ShowDebugPerspectiveJob() {
@@ -346,4 +354,36 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
             return Status.OK_STATUS;
         }
     }
+
+    private class TogglePartListenerJob extends UIJob {
+
+        private RobotPartListener listener;
+
+        private boolean shouldBeRemoved;
+
+        public TogglePartListenerJob(RobotPartListener listener, boolean shouldBeRemoved) {
+            super("Toggle Part Listener");
+            setSystem(true);
+            setPriority(Job.INTERACTIVE);
+            this.listener = listener;
+            this.shouldBeRemoved = shouldBeRemoved;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+            if (shouldBeRemoved) {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().removePartListener(listener);
+            } else {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(listener);
+            }
+
+            return Status.OK_STATUS;
+        }
+    }
+
 }
