@@ -18,9 +18,10 @@ public class TxtSettingTableParser implements
 
     @Override
     public boolean canParse(ByteBufferInputStream testData) {
-        boolean shouldParse = false;
+        TxtTableHeaderHelper tableHelper = new TxtTableHeaderHelper();
 
-        return shouldParse;
+        return tableHelper.createTableHeader("setting", "s", testData)
+                .computeFinalResult();
     }
 
 
