@@ -143,6 +143,8 @@
        point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
           delegate="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
+          sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer"
           id="org.robotframework.ide.robotLaunchConfiguration"
           modes="run,debug"
           name="Robot">

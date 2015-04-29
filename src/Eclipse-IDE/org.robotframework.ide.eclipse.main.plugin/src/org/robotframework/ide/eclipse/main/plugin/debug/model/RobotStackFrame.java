@@ -37,12 +37,14 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
      * @param id
      *            stack frame id (0 is the bottom of the stack)
      */
-    public RobotStackFrame(RobotThread thread, String keywordName, String fileName, Map<String, String> vars, int id) {
+    public RobotStackFrame(RobotThread thread, String fileName, String keywordName, int lineNumber,
+            Map<String, String> vars, int id) {
         super((RobotDebugTarget) thread.getDebugTarget());
         this.id = id;
         this.thread = thread;
         // TODO: take resource file from keyword name, set here to automatically show it in editor
         this.fileName = fileName;
+        this.lineNumber = lineNumber;
         name = keywordName;
         initVariables(keywordName, vars);
     }
@@ -53,8 +55,6 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
      * @param data
      */
     private void initVariables(String keywordName, Map<String, String> vars) {
-
-        lineNumber = 1;
 
         variables = new IVariable[vars.size()];
         int i = 0;

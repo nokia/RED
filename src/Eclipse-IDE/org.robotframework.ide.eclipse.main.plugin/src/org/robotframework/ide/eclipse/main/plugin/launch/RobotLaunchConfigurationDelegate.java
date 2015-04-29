@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -31,10 +32,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.core.executor.IRobotOutputListener;
 import org.robotframework.ide.core.executor.RobotExecutor;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -119,7 +123,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
                     IFile file = project.getFile(resourceNameAttribute);
                     if (file.exists()) {
-                        // TODO: automatically show Debug perspective
+                        new ShowDebugPerspectiveJob().schedule();
 
                         List<String> suiteList = new ArrayList<String>();
                         String fileName = file.getName();
@@ -137,7 +141,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                         process = DebugPlugin.exec(cmd, project.getLocation().toFile());
                         IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, executorNameAttribute);
                         printCommandOnConsole(cmd, executorNameAttribute);
-
+                        
                         IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file);
                         launch.addDebugTarget(target);
                     }
@@ -313,6 +317,33 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                     e.printStackTrace();
                 }
             }
+        }
+    }
+    
+    private class ShowDebugPerspectiveJob extends UIJob {
+
+        public ShowDebugPerspectiveJob() {
+            super("Show Debug Perspective");
+            setSystem(true);
+            setPriority(Job.INTERACTIVE);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+
+            IWorkbench workbench = PlatformUI.getWorkbench();
+            try {
+                workbench.showPerspective("org.eclipse.debug.ui.DebugPerspective", workbench.getActiveWorkbenchWindow());
+            } catch (WorkbenchException e) {
+                e.printStackTrace();
+            }
+
+            return Status.OK_STATUS;
         }
     }
 }
