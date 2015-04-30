@@ -15,8 +15,6 @@ public interface RobotElement {
 
     List<RobotElement> getChildren();
 
-    boolean contains(RobotElement element);
-
     ImageDescriptor getImage();
 
     OpenStrategy getOpenRobotEditorStrategy(IWorkbenchPage page);

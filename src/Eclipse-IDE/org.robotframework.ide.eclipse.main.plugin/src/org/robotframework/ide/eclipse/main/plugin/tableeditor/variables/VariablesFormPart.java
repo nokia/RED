@@ -6,20 +6,15 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -33,10 +28,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -44,9 +35,11 @@ import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSectionCommand;
+import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
 public class VariablesFormPart extends AbstractFormPart {
 
@@ -59,8 +52,6 @@ public class VariablesFormPart extends AbstractFormPart {
 
     private final IEditorSite site;
     private RowExposingTableViewer viewer;
-    private HyperlinkAdapter createSectionLinkListener;
-
 
     public VariablesFormPart(final IEditorSite site) {
         this.site = site;
@@ -78,8 +69,7 @@ public class VariablesFormPart extends AbstractFormPart {
 
     private void createContent(final Composite parent) {
         viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-
-        addActivationStrategy();
+        TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         viewer.setContentProvider(new VariablesContentProvider());
@@ -89,13 +79,13 @@ public class VariablesFormPart extends AbstractFormPart {
         viewer.getTable().setHeaderVisible(true);
         viewer.setUseHashlookup(true);
 
-        createColumn("Variable", 270, new DelegatingStyledCellLabelProvider(new VariableNameLabelProvider()),
+        createColumn("Variable", 270, new VariableNameLabelProvider(),
                 new VariableNameEditingSupport(viewer, commandsStack));
 
         createColumn("Value", 270, new VariableValueLabelProvider(), 
                 new VariableValueEditingSupport(viewer, commandsStack));
 
-        createColumn("Comment", 400, new DelegatingStyledCellLabelProvider(new VariableCommentLabelProvider()),
+        createColumn("Comment", 400, new VariableCommentLabelProvider(),
                 new VariableCommentEditingSupport(viewer, commandsStack));
 
         createContextMenu();
@@ -129,9 +119,11 @@ public class VariablesFormPart extends AbstractFormPart {
 
             @Override
             public void menuDetected(final MenuDetectEvent e) {
-                final Point point = control.toControl(e.x, e.y);
-                final boolean isClickedOnHeader = point.y <= control.getHeaderHeight();
-                e.doit = !isClickedOnHeader;
+                e.doit = !isClickedOnHeader(e);
+            }
+
+            private boolean isClickedOnHeader(final MenuDetectEvent e) {
+                return control.toControl(e.x, e.y).y <= control.getHeaderHeight();
             }
         });
         final Menu menu = manager.createContextMenu(control);
@@ -140,80 +132,25 @@ public class VariablesFormPart extends AbstractFormPart {
     }
 
     private void setInput() {
-        final com.google.common.base.Optional<RobotElement> variablesSection = fileModel.findVariablesSection();
-        final Form form = getManagedForm().getForm().getForm();
-        if (!variablesSection.isPresent() && fileModel.isEditable()) {
-            createSectionLinkListener = createHyperlinkListener(fileModel);
-            form.addMessageHyperlinkListener(createSectionLinkListener);
-            form.setMessage("There is no Variables section defined, do you want to define it?", IMessageProvider.ERROR);
-        } else {
-            form.removeMessageHyperlinkListener(createSectionLinkListener);
-            if (((RobotSuiteFileSection) variablesSection.get()).isReadOnly()) {
-                form.setMessage("Variable section is read-only!", IMessageProvider.WARNING);
-            } else {
-                form.setMessage(null, 0);
-            }
+        final com.google.common.base.Optional<RobotElement> variablesSection = fileModel
+                .findSection(RobotVariablesSection.class);
+        if (variablesSection.isPresent()) {
             viewer.setInput(variablesSection.get());
+        } else {
+            viewer.setInput(null);
+            viewer.refresh();
         }
     }
 
-    private HyperlinkAdapter createHyperlinkListener(final RobotSuiteFile suite) {
-        final HyperlinkAdapter createSectionLinkListener = new HyperlinkAdapter() {
-            @Override
-            public void linkEntered(final HyperlinkEvent e) {
-                ((Hyperlink) e.getSource()).setToolTipText("Click to create variables section");
-            }
-
-            @Override
-            public void linkActivated(final HyperlinkEvent e) {
-                commandsStack.execute(new CreateSectionCommand(suite, VariablesEditorPage.SECTION_NAME));
-                setInput();
-                markDirty();
-            }
-        };
-        return createSectionLinkListener;
-    }
-
-    private void createColumn(final String columnName, final int width, final CellLabelProvider labelProvider,
+    private void createColumn(final String columnName, final int width, final IStyledLabelProvider labelProvider,
             final EditingSupport editingSupport) {
         final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
         column.getColumn().setText(columnName);
         column.getColumn().setWidth(width);
-        column.setLabelProvider(labelProvider);
-        column.setEditingSupport(editingSupport);
-    }
-
-    private void addActivationStrategy() {
-        final TableViewerFocusCellManager fcm = new TableViewerFocusCellManager(viewer, new VariableCellsHighlighter(
-                viewer));
-        final ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-
-            @Override
-            protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
-                if (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
-                    if (event.character == SWT.CR || isPrintableChar(event.character)) {
-                        return true;
-                    }
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
-                    if (event.sourceEvent instanceof MouseEvent) {
-                        return true;
-                    }
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL) {
-                    return true;
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC) {
-                    return true;
-                }
-                return false;
-            }
-
-            private boolean isPrintableChar(final char character) {
-                return ' ' <= character && character <= '~';
-            }
-        };
-        activationSupport.setEnableEditorActivationWithKeyboard(true);
-        TableViewerEditor.create(viewer, fcm, activationSupport, ColumnViewerEditor.KEYBOARD_ACTIVATION
-                | ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_VERTICAL
-                | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR);
+        column.setLabelProvider(new TooltipsEnablingDelegatingStyledCellLabelProvider(labelProvider));
+        if (fileModel.isEditable()) {
+            column.setEditingSupport(editingSupport);
+        }
     }
 
     @Override
@@ -221,7 +158,7 @@ public class VariablesFormPart extends AbstractFormPart {
         viewer.getTable().setFocus();
     }
 
-    public void revealVariable(final RobotVariable robotVariable) {
+    public void revealVariable(final RobotElement robotVariable) {
         viewer.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
 
@@ -251,6 +188,26 @@ public class VariablesFormPart extends AbstractFormPart {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             setInput();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSectionIsCreated(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
+        if (file == fileModel && viewer.getInput() == null) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSectionIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
+        if (file == fileModel && viewer.getInput() != null) {
+            setInput();
+            markDirty();
         }
     }
 }

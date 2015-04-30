@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
+package org.eclipse.jface.viewers;
 
 import org.eclipse.jface.viewers.FocusCellHighlighter;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -11,11 +11,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 
-class VariableCellsHighlighter extends FocusCellHighlighter {
+public class TableCellsHighlighter extends FocusCellHighlighter {
 
     private final RowExposingTableViewer viewer;
 
-    public VariableCellsHighlighter(final RowExposingTableViewer viewer) {
+    public TableCellsHighlighter(final RowExposingTableViewer viewer) {
         super(viewer);
         this.viewer = viewer;
     }

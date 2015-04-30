@@ -120,16 +120,6 @@ public class RobotModel implements RobotElement {
     }
 
     @Override
-    public boolean contains(final RobotElement element) {
-        for (final RobotElement project : projects) {
-            if (project.equals(element) || element.contains(project)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public RobotSuiteFile getSuiteFile() {
         return null;
     }

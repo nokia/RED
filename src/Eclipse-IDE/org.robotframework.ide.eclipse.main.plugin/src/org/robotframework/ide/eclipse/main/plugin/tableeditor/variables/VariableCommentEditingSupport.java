@@ -1,24 +1,29 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.celleditor.ActivationCharPreservingTextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
-public class VariableCommentEditingSupport extends VariableEditingSupport {
+class VariableCommentEditingSupport extends RobotElementEditingSupport {
 
-    public VariableCommentEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
-        super(viewer, commandsStack);
+    VariableCommentEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
+        super(viewer, 2, commandsStack);
     }
 
     @Override
     protected CellEditor getCellEditor(final Object element) {
         final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotVariable) {
-            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent, CONTEXT_ID);
+            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
+                    DETAILS_EDITING_CONTEXT_ID);
         }
         return super.getCellEditor(element);
     }
@@ -42,7 +47,10 @@ public class VariableCommentEditingSupport extends VariableEditingSupport {
     }
 
     @Override
-    protected int getColumnIndex() {
-        return 2;
+    protected RobotElement createNewElement() {
+        final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
+        commandsStack.execute(new CreateFreshVariableCommand(section, true));
+
+        return section.getChildren().get(section.getChildren().size() - 1);
     }
 }

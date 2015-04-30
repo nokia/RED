@@ -4,16 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPage;
 
 public class RobotVariable implements RobotElement {
 
@@ -110,26 +102,7 @@ public class RobotVariable implements RobotElement {
 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new OpenStrategy() {
-
-            @Override
-            public void run() {
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-                try {
-                    final RobotFormEditor editor = (RobotFormEditor) page.openEditor(new FileEditorInput(getFile()),
-                            desc.getId());
-                    final VariablesEditorPage variablesPage = (VariablesEditorPage) editor.activatePage(section);
-                    variablesPage.revealVariable(RobotVariable.this);
-                } catch (final PartInitException e) {
-                    throw new RuntimeException("Unable to open editor for file: " + getFile().getName(), e);
-                }
-            }
-        };
-    }
-
-    protected IFile getFile() {
-        return section.getFile();
+        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), section, this);
     }
 
     @Override
@@ -172,11 +145,6 @@ public class RobotVariable implements RobotElement {
 
     public void setParent(final RobotSuiteFileSection variablesSection) {
         this.section = variablesSection;
-    }
-
-    @Override
-    public boolean contains(final RobotElement element) {
-        return element.equals(this);
     }
 
     @Override
