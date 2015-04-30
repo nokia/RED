@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -39,30 +40,52 @@ class FileSectionsParser {
         try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
             String line = bufferedReader.readLine();
 
-            RobotSuiteFileSection varSection = null;
+            RobotVariablesSection varSection = null;
+            RobotCasesSection casesSection = null;
+            RobotSuiteSettingsSection settingSection = null;
             while (line != null) {
                 if (line.trim().isEmpty()) {
                     line = bufferedReader.readLine();
                     continue;
                 } else if (line.startsWith("*")) {
                     varSection = null;
+                    casesSection = null;
                     final String sectionName = extractSectionName(line);
-                    if ("Variables".equals(sectionName)) {
-                        varSection = new RobotSuiteFileSection(parent, sectionName, readOnly);
+                    if (RobotVariablesSection.SECTION_NAME.equals(sectionName)) {
+                        varSection = new RobotVariablesSection(parent, readOnly);
                         sections.add(varSection);
+                    } else if (RobotCasesSection.SECTION_NAME.equals(sectionName)) {
+                        casesSection = new RobotCasesSection(parent, readOnly);
+                        sections.add(casesSection);
+                    } else if (RobotSuiteSettingsSection.SECTION_NAME.equals(sectionName)) {
+                        settingSection = new RobotSuiteSettingsSection(parent, readOnly);
+                        sections.add(settingSection);
                     } else {
                         sections.add(new RobotSuiteFileSection(parent, sectionName, readOnly));
                     }
                 } else if (varSection != null) {
-                    final String name = extractVarName(line);
-                    final String value = extractVarValue(line);
-                    final String comment = extractVarComment(line);
+                    final String comment = extractComment(line);
+                    final String lineWithoutComment = removeComment(line);
 
-                    if (line.startsWith("@")) {
+                    final String name = extractVarName(lineWithoutComment);
+                    final String value = extractVarValue(lineWithoutComment);
+
+                    if (lineWithoutComment.startsWith("@")) {
                         varSection.createListVariable(name, value, comment);
                     } else {
                         varSection.createScalarVariable(name, value, comment);
                     }
+                } else if (casesSection != null) {
+                    // parse cases
+                } else if (settingSection != null) {
+                    final String comment = extractComment(line);
+                    final String lineWithoutComment = removeComment(line);
+                    
+                    final String[] split = lineWithoutComment.split("  +");
+                    final String name = split[0];
+                    final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1, split.length);
+                    
+                    settingSection.createSetting(name, comment, args);
                 }
                 line = bufferedReader.readLine();
             }
@@ -70,7 +93,15 @@ class FileSectionsParser {
         return sections;
     }
 
-    private String extractVarComment(final String line) {
+    private String removeComment(final String line) {
+        final int indexOfComment = line.indexOf('#');
+        if (indexOfComment < 0) {
+            return line.trim();
+        }
+        return line.substring(0, indexOfComment).trim();
+    }
+
+    private String extractComment(final String line) {
         final int indexOfComment = line.indexOf('#');
         if (indexOfComment < 0) {
             return "";
@@ -79,12 +110,7 @@ class FileSectionsParser {
     }
 
     private String extractVarValue(final String line) {
-        final int indexOfComment = line.indexOf('#');
-        if (indexOfComment < 0) {
-            return line.substring(line.indexOf('}') + 1).trim();
-        } else {
-            return line.substring(line.indexOf('}') + 1, indexOfComment).trim();
-        }
+        return line.substring(line.indexOf('}') + 1).trim();
     }
 
     private String extractVarName(final String line) {

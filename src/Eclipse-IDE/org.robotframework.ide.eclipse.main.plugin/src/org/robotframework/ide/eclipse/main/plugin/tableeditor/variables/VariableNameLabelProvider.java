@@ -1,22 +1,20 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.mixStylers;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withFontStyle;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withForeground;
+import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
+import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.DisposeNeededStyler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class VariableNameLabelProvider extends VariableLabelProvider {
+class VariableNameLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
-        if (element instanceof AddVariableToken) {
-            return RobotImages.getAddImage().createImage();
+        if (element instanceof ElementAddingToken) {
+            return ((ElementAddingToken) element).getImage();
         }
         return null;
     }
@@ -32,12 +30,26 @@ public class VariableNameLabelProvider extends VariableLabelProvider {
             label.append(variable.getName());
             label.append(variable.getSuffix(), variableStyler);
             return label;
-        } else if (element instanceof AddVariableToken) {
-            final DisposeNeededStyler variableAdderStyler = addDisposeNeededStyler(mixStylers(
-                    withFontStyle(SWT.ITALIC), withForeground(30, 127, 60)));
-
-            return new StyledString("...add new variable", variableAdderStyler);
+        } else if (element instanceof ElementAddingToken) {
+            return ((ElementAddingToken) element).getStyledText();
         }
         return new StyledString();
+    }
+
+    @Override
+    public String getToolTipText(final Object element) {
+        if (element instanceof RobotVariable) {
+            final RobotVariable variable = (RobotVariable) element;
+            return variable.getPrefix() + variable.getName() + variable.getSuffix();
+        }
+        return null;
+    }
+
+    @Override
+    public Image getToolTipImage(final Object element) {
+        if (element instanceof RobotVariable) {
+            return super.getToolTipImage(element);
+        }
+        return null;
     }
 }

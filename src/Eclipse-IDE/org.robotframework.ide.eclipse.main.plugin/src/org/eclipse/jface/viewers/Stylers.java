@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
+package org.eclipse.jface.viewers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
@@ -35,6 +36,16 @@ public class Stylers {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = new Color(Display.getCurrent(), red, green, blue);
+                markForDisposal(textStyle.foreground);
+            }
+        };
+    }
+
+    public static DisposeNeededStyler withForeground(final RGB rgb) {
+        return new DisposeNeededStyler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = new Color(Display.getCurrent(), rgb);
                 markForDisposal(textStyle.foreground);
             }
         };

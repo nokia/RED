@@ -8,6 +8,7 @@ import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SortVariablesCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -28,7 +29,7 @@ public class SortVariablesHandler extends DIHandler<E4SortVariablesHandler> {
 
         @Execute
         public Object sortVariables(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile file) {
-            final Optional<RobotElement> section = file.findVariablesSection();
+            final Optional<RobotElement> section = file.findSection(RobotVariablesSection.class);
             if (section.isPresent()) {
                 final RobotSuiteFileSection variablesSection = (RobotSuiteFileSection) section.get();
 

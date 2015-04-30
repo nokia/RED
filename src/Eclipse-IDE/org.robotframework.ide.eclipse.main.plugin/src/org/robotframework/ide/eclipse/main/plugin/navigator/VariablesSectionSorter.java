@@ -7,12 +7,13 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
 
-public class VariablesSorter extends ViewerSorter {
+public class VariablesSectionSorter extends ViewerSorter {
 
-    public VariablesSorter() {
+    public VariablesSectionSorter() {
+        // nothing to do
     }
 
-    public VariablesSorter(final Collator collator) {
+    public VariablesSectionSorter(final Collator collator) {
         super(collator);
     }
 

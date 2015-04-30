@@ -1,12 +1,12 @@
-package org.robotframework.ide.eclipse.main.plugin.celleditor;
+package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
  * This is a specialized custom cell editor which deactivates just after
- * activation which allows editing support to add new objects.
+ * activation which allows editing support to immediately influence the
+ * displayed model.
  *
  */
 public class AlwaysDeactivatingCellEditor extends CellEditor {
