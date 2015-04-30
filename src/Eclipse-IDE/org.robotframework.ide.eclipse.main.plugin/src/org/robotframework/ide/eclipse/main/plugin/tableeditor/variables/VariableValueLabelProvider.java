@@ -1,15 +1,36 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
+import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 
-public class VariableValueLabelProvider extends VariableLabelProvider {
+class VariableValueLabelProvider extends StylersDisposingLabelProvider {
+
+    @Override
+    public String getText(final Object element) {
+        return element instanceof RobotVariable ? ((RobotVariable) element).getValue() : "";
+    }
 
     @Override
     public StyledString getStyledText(final Object element) {
+        return new StyledString(getText(element));
+    }
+
+    @Override
+    public String getToolTipText(final Object element) {
         if (element instanceof RobotVariable) {
-            return new StyledString(((RobotVariable) element).getValue());
+            final String tooltipText = getText(element);
+            return tooltipText.isEmpty() ? "<empty>" : tooltipText;
         }
-        return new StyledString();
+        return null;
+    }
+
+    @Override
+    public Image getToolTipImage(final Object element) {
+        if (element instanceof RobotVariable) {
+            return super.getToolTipImage(element);
+        }
+        return null;
     }
 }

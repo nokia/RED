@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 class FilesSectionsEmiter {
@@ -56,6 +57,22 @@ class FilesSectionsEmiter {
                     builder.append(variable.getComment());
                 }
 
+                builder.append('\n');
+            } else if (element instanceof RobotSetting) {
+                final RobotSetting setting = (RobotSetting) element;
+                
+                builder.append(setting.getName());
+                
+                if (!setting.getArguments().isEmpty()) {
+                    builder.append(getCellsSeparator());
+                    builder.append(Joiner.on(getCellsSeparator()).join(setting.getArguments()));
+                }
+
+                if (!setting.getComment().isEmpty()) {
+                    builder.append(getCellsSeparator());
+                    builder.append("# ");
+                    builder.append(setting.getComment());
+                }
                 builder.append('\n');
             }
         }
