@@ -1,5 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,9 +22,15 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 public class NavigatorContentProvider implements ITreeContentProvider {
 
@@ -70,13 +79,35 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof IFile) {
             return RobotFramework.getModelManager().createSuiteFile((IFile) parentElement).getSections().toArray();
+        } else if (parentElement instanceof RobotSuiteSettingsSection) {
+            final List<RobotElement> children = ((RobotElement) parentElement).getChildren();
+            return groupedChildren(children).toArray();
         } else if (parentElement instanceof RobotElement) {
             return ((RobotElement) parentElement).getChildren().toArray();
         }
         return new Object[0];
     }
 
-	@Override
+    private List<RobotElement> groupedChildren(final List<RobotElement> children) {
+        final List<RobotElement> grouped = new ArrayList<>(children);
+        final Multimap<SettingsGroup, RobotElement> removedElements = LinkedHashMultimap.create();
+
+        for (final RobotElement element : children) {
+            if (element instanceof RobotSetting) {
+                final SettingsGroup group = ((RobotSetting) element).getGroup();
+                if (group != SettingsGroup.NO_GROUP) {
+                    grouped.remove(element);
+                    removedElements.put(group, element);
+                }
+            }
+        }
+        for (final SettingsGroup key : removedElements.keySet()) {
+            grouped.add(new ArtificialGroupingRobotElement(key, new ArrayList<>(removedElements.get(key))));
+        }
+        return grouped;
+    }
+
+    @Override
 	public Object getParent(final Object element) {
         if (element instanceof RobotElement) {
             return ((RobotElement) element).getParent();
@@ -124,8 +155,17 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 
     @Inject
     @Optional
-    private void whenSectionChanges(
+    private void whenVariablesSectionChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (viewer != null) {
+            viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingsSectionChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null) {
             viewer.refresh(section);
         }

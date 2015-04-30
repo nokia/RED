@@ -1,26 +1,29 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.mixStylers;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withFontStyle;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.withForeground;
-
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Stylers.DisposeNeededStyler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CommentsLabelProvider;
 
-public class VariableCommentLabelProvider extends VariableLabelProvider {
+class VariableCommentLabelProvider extends CommentsLabelProvider {
 
     @Override
-    public StyledString getStyledText(final Object element) {
-        if (element instanceof RobotVariable) {
-            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(
-                    withForeground(150, 150, 150),
-                    withFontStyle(SWT.ITALIC)));
+    protected String getComment(final Object element) {
+        return element instanceof RobotVariable ? ((RobotVariable) element).getComment() : "";
+    }
 
-            final RobotVariable variable = (RobotVariable) element;
-            return new StyledString("# " + variable.getComment(), commentStyler);
+    @Override
+    public String getToolTipText(final Object element) {
+        if (element instanceof RobotVariable) {
+            return super.getToolTipText(element);
         }
-        return new StyledString();
+        return null;
+    }
+
+    @Override
+    public Image getToolTipImage(final Object element) {
+        if (element instanceof RobotVariable) {
+            return super.getToolTipImage(element);
+        }
+        return null;
     }
 }

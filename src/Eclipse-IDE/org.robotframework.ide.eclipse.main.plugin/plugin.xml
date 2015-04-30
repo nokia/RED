@@ -104,6 +104,21 @@
        </actionSet>
     </perspectiveExtension>
  </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <view
+               relative="org.eclipse.ui.console.ConsoleView"
+               relationship="right"
+               ratio="0.55f"
+               id="org.robotframework.ide.MessageLogView">
+         </view>
+         <viewShortcut
+               id="org.robotframework.ide.MessageLogView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
 
 	<extension
             point="org.eclipse.ui.editors">
@@ -136,6 +151,12 @@
             icon="resources/robot.png"
             id="org.robotframework.ide.MessageLogView"
             name="Message Log"
+            restorable="true">
+      </view>
+      <view
+            class="org.robotframework.tmp.ModelViewWrapper"
+            id="org.robotframework.ide.eclipse.main.plugin.view1"
+            name="Model"
             restorable="true">
       </view>
  </extension>
@@ -246,10 +267,18 @@
              id="org.robotframework.actions.provider">
        </actionProvider>
        <commonSorter
-             class="org.robotframework.ide.eclipse.main.plugin.navigator.VariablesSorter">
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.VariablesSectionSorter">
           <parentExpression>
              <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection">
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection">
+             </instanceof>
+          </parentExpression>
+       </commonSorter>
+       <commonSorter
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.SettingsSectionSorter">
+          <parentExpression>
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection">
              </instanceof>
           </parentExpression>
        </commonSorter>
@@ -312,24 +341,39 @@
           id="org.robotframework.ide.eclipse.theme"
           label="Robot">
     </themeElementCategory>
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.table.theme"
+          label="Table Editor"
+          parentId="org.robotframework.ide.eclipse.theme">
+    </themeElementCategory>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
+          categoryId="org.robotframework.ide.eclipse.table.theme"
           id="org.robotframework.ide.eclipse.cell.highlight"
           isEditable="true"
           label="Highlighted cell color"
           value="255, 245, 210">
        <description>
-          This color is used in Robot tables in order to highlight currently focused cell
+          This color is used in RED table editor in order to highlight currently focused cell
        </description>
     </colorDefinition>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
+          categoryId="org.robotframework.ide.eclipse.table.theme"
           id="org.robotframework.ide.eclipse.row.selected"
           isEditable="true"
           label="Selected row color"
           value="255, 250, 245">
        <description>
-          This color is used in Robot tables in order to highlight currently selected row
+          This color is used in RED table editor in order to highlight currently selected row
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.table.theme"
+          id="org.robotframework.ide.eclipse.comment"
+          isEditable="true"
+          label="Comments "
+          value="200, 200, 200">
+       <description>
+          Color used for comments in RED table editor
        </description>
     </colorDefinition>
  </extension>
@@ -359,6 +403,12 @@
           name="Test Cases Editor Context"
           parentId="org.robotframework.ide.eclipse.tableeditor.context">
     </context>
+    <context
+          description="Context for Settings section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.context"
+          name="Settings Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -385,6 +435,16 @@
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.sortElements"
           name="Sort elements">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.deleteSection"
+          name="Delete section">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.deleteSection.sectionName"
+             name="name"
+             optional="false">
+       </commandParameter>
     </command>
  </extension>
  <extension
@@ -452,6 +512,15 @@
                 definitionId="org.robotframework.activeVariablesPartIsEditable">
           </reference>
        </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteSectionHandler"
+          commandId="org.robotframework.ide.eclipse.deleteSection">
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.canDeleteSectionUsingToolbar">
+          </reference>
+       </enabledWhen>
     </handler>
  </extension>
  <extension
@@ -522,12 +591,41 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertyTester.RobotEditorPropertTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable"
+          properties="editorModelIsEditable,editorModelHasSection,activeSectionEditorHasSection"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
  </extension>
  <extension
        point="org.eclipse.core.expressions.definitions">
+    <definition
+          id="org.robotframework.editorContextIsActive">
+       <with
+             variable="activeContexts">
+          <iterate
+                ifEmpty="false"
+                operator="or">
+             <equals
+                   value="org.robotframework.ide.eclipse.tableeditor.context">
+             </equals>
+          </iterate>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.canDeleteSectionUsingToolbar">
+       <with
+             variable="activeEditor">
+          <and>
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+             <test
+                   property="org.robotframework.activeSectionEditorHasSection"
+                   value="true">
+             </test>
+          </and>
+       </with>
+    </definition>
     <definition
           id="org.robotframework.activeVariablesPartIsEditable">
        <and>
@@ -642,21 +740,6 @@
             debugModelId="org.eclipse.debug.robot"
             contextId="org.robotframework.ide.eclipse.main.plugin.ui.robot.debugging">
       </modelContextBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.debug.ui.DebugPerspective">
-         <view
-               relative="org.eclipse.ui.console.ConsoleView"
-               relationship="right"
-               ratio="0.55f"
-               id="org.robotframework.ide.MessageLogView">
-         </view>
-         <viewShortcut
-               id="org.robotframework.ide.MessageLogView">
-         </viewShortcut>
-      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.debug.core.sourceLocators">

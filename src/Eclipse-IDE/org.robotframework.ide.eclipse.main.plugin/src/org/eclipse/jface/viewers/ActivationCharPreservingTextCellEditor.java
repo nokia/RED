@@ -1,10 +1,5 @@
-package org.robotframework.ide.eclipse.main.plugin.celleditor;
+package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationListener;
-import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -26,6 +21,19 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     private final String suffix;
     private final String contextToDeactivate;
 
+    /**
+     * Instantiates cell editor
+     * 
+     * @param viewerEditor
+     * @param parent
+     * @param contextToDeactivate
+     * @param prefix
+     *            The prefix which will be displayed in text control after
+     *            activation
+     * @param suffix
+     *            The suffix which will be displayed in text control after
+     *            activation
+     */
     public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
             final String contextToDeactivate, final String prefix, final String suffix) {
         super(parent, SWT.SINGLE);

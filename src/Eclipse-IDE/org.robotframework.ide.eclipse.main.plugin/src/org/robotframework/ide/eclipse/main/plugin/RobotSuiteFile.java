@@ -31,8 +31,16 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public RobotSuiteFileSection createRobotSection(final String name) {
-        final RobotSuiteFileSection section = new RobotSuiteFileSection(this, name, file == null ? false
-                : file.isReadOnly());
+        final RobotSuiteFileSection section;
+        final boolean readOnly = !isEditable();
+        if (name.equals(RobotVariablesSection.SECTION_NAME)) {
+            section = new RobotVariablesSection(this, readOnly);
+        } else if (name.equals(RobotSuiteSettingsSection.SECTION_NAME)) {
+            section = new RobotSuiteSettingsSection(this, readOnly);
+        } else {
+            section = new RobotSuiteFileSection(this, name, readOnly);
+        }
+
         if (getSections().contains(section)) {
             return (RobotSuiteFileSection) sections.get(sections.indexOf(section));
         } else {
@@ -117,16 +125,6 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     @Override
-    public boolean contains(final RobotElement element) {
-        for (final RobotElement section : sections) {
-            if (section.equals(element) || element.contains(section)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public RobotSuiteFile getSuiteFile() {
         return this;
     }
@@ -135,11 +133,11 @@ public class RobotSuiteFile implements RobotElement {
         file.setContents(new FilesSectionsEmiter(this).emit(), true, true, monitor);
     }
 
-    public Optional<RobotElement> findVariablesSection() {
+    public Optional<RobotElement> findSection(final Class<? extends RobotElement> sectionClass) {
         return Iterables.tryFind(getSections(), new Predicate<RobotElement>() {
             @Override
             public boolean apply(final RobotElement element) {
-                return element.getName().equals("Variables");
+                return sectionClass.isInstance(element);
             }
         });
     }

@@ -94,16 +94,6 @@ public abstract class RobotContainer implements RobotElement {
         return new OpenStrategy();
     }
 
-    @Override
-    public boolean contains(final RobotElement element) {
-        for (final RobotElement el : elements) {
-            if (el.equals(element) || element.contains(el)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
         final List<RobotElement> toRemove = new ArrayList<>();
         final List<RobotElementChange> changes = new ArrayList<>();

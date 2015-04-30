@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPage;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPage;
 
 public class RobotFormEditor extends FormEditor {
@@ -54,7 +55,8 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void prepareEclipseContext() {
-        final IEclipseContext eclipseContext = (IEclipseContext) getSite().getService(IEclipseContext.class);
+        final IEclipseContext eclipseContext = ((IEclipseContext) getSite().getService(IEclipseContext.class))
+                .getActiveLeaf();
         eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
             @Override
             public Object compute(final IEclipseContext context, final String contextKey) {
@@ -92,6 +94,7 @@ public class RobotFormEditor extends FormEditor {
             prepareCommandsContext();
 
             addPage(new CasesEditorPage(this));
+            addPage(new SettingsEditorPage(this));
             addPage(new VariablesEditorPage(this));
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
@@ -112,6 +115,7 @@ public class RobotFormEditor extends FormEditor {
     public void doSave(final IProgressMonitor monitor) {
         commitPages(true);
         try {
+            suiteModel = provideSuiteModel();
             suiteModel.commitChanges(monitor);
             suiteModel = null;
             firePropertyChange(PROP_DIRTY);
@@ -134,7 +138,7 @@ public class RobotFormEditor extends FormEditor {
     public void dispose() {
         super.dispose();
 
-        final IEclipseContext context = (IEclipseContext) getSite().getService(IEclipseContext.class);
+        final IEclipseContext context = ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
     }
 
@@ -175,21 +179,53 @@ public class RobotFormEditor extends FormEditor {
         return suiteModel;
     }
 
+    @Override
+    protected void pageChange(final int newPageIndex) {
+        super.pageChange(newPageIndex);
+        updateActivePage();
+    }
+
+    private void updateActivePage() {
+        if (getActiveEditor() instanceof SectionEditorPage) {
+            final SectionEditorPage page = (SectionEditorPage) getActiveEditor();
+            page.updateMessages();
+            page.updateToolbars();
+        }
+    }
+
     public IEditorPart activatePage(final RobotSuiteFileSection section) {
         int index = -1;
 
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart part = (IEditorPart) pages.get(i);
-            if (part instanceof RobotSectionPart && ((RobotSectionPart) part).isPartFor(section)) {
+            if (part instanceof SectionEditorPage && ((SectionEditorPage) part).isPartFor(section)) {
                 index = i;
                 break;
             }
         }
-        if (index > 0) {
+        if (index >= 0) {
             setActivePage(index);
             return (IEditorPart) pages.get(index);
         }
         return null;
+    }
+
+    @Inject
+    @Optional
+    private void whenSectionIsCreated(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
+        if (suiteModel == file) {
+            updateActivePage();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSectionIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
+        if (suiteModel == file) {
+            updateActivePage();
+        }
     }
 
     private static class IllegalRobotEditorInputException extends RuntimeException {

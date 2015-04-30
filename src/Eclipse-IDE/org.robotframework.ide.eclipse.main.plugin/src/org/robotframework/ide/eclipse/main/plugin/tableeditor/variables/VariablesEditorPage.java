@@ -1,85 +1,50 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.contexts.IContextService;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSectionPart;
+import java.util.Arrays;
+import java.util.List;
 
-public class VariablesEditorPage extends FormPage implements RobotSectionPart {
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.forms.IFormPart;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPage;
+
+public class VariablesEditorPage extends SectionEditorPage {
 
     public static final String ID = "org.robotframework.ide.eclipse.editor.variablesPage";
     private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.variables.context";
-    static final String SECTION_NAME = "Variables";
-
-    private RobotEditorCommandsStack commandsStack;
 
     private VariablesFormPart variablesPart;
 
     public VariablesEditorPage(final FormEditor editor) {
-        super(editor, ID, SECTION_NAME);
+        super(editor, ID, RobotVariablesSection.SECTION_NAME);
     }
 
     @Override
-    public boolean isEditor() {
-        return true;
+    public boolean isPartFor(final RobotSuiteFileSection section) {
+        return section instanceof RobotVariablesSection;
     }
 
     @Override
-    protected void createFormContent(final IManagedForm managedForm) {
-        super.createFormContent(managedForm);
-
-        final ScrolledForm form = managedForm.getForm();
-        form.setImage(getTitleImage());
-        form.setText("Variables");
-        managedForm.getToolkit().decorateFormHeading(form.getForm());
-
-        GridLayoutFactory.fillDefaults().applyTo(form.getBody());
-        GridDataFactory.fillDefaults().applyTo(form.getBody());
-
-        variablesPart = new VariablesFormPart(getEditorSite());
-        prepareEclipseContext();
-
-        managedForm.addPart(variablesPart);
-
-        getSite().setSelectionProvider(variablesPart.getViewer());
-
-        final IContextService service = (IContextService) getSite().getService(IContextService.class);
-        service.activateContext(CONTEXT_ID);
-    }
-
-    private void prepareEclipseContext() {
-        commandsStack = new RobotEditorCommandsStack();
-        final IEclipseContext context = ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf();
-        context.set(RobotEditorCommandsStack.class, commandsStack);
-        ContextInjectionFactory.inject(variablesPart, context);
+    protected List<? extends IFormPart> createPageParts(final IEditorSite editorSite) {
+        variablesPart = new VariablesFormPart(editorSite);
+        return Arrays.asList(variablesPart);
     }
 
     @Override
-    public RobotFormEditor getEditor() {
-        return (RobotFormEditor) super.getEditor();
+    protected ISelectionProvider getSelectionProvider() {
+        return variablesPart.getViewer();
     }
 
     @Override
-    public void dispose() {
-        super.dispose();
-
-        if (commandsStack != null) {
-            commandsStack.clear();
-        }
-        ContextInjectionFactory.uninject(variablesPart,
-                ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf());
+    protected String getContextId() {
+        return CONTEXT_ID;
     }
 
     @Override
@@ -87,12 +52,18 @@ public class VariablesEditorPage extends FormPage implements RobotSectionPart {
         return RobotImages.getRobotVariableImage().createImage();
     }
 
-    public void revealVariable(final RobotVariable robotVariable) {
+    @Override
+    public void revealElement(final RobotElement robotVariable) {
         variablesPart.revealVariable(robotVariable);
     }
 
     @Override
-    public boolean isPartFor(final RobotSuiteFileSection section) {
-        return section.getName().equals(SECTION_NAME);
+    public com.google.common.base.Optional<RobotElement> provideSection(final RobotSuiteFile suite) {
+        return suite.findSection(RobotVariablesSection.class);
+    }
+
+    @Override
+    protected String getSectionName() {
+        return RobotVariablesSection.SECTION_NAME;
     }
 }
