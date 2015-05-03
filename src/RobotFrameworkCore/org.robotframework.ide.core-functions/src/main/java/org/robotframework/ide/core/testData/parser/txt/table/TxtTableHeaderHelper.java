@@ -7,8 +7,20 @@ import java.util.Map;
 import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
+/**
+ * 
+ * @author wypych
+ * 
+ */
 public class TxtTableHeaderHelper {
 
+    /**
+     * 
+     * @param expectedMandatoryText
+     * @param optionalTextAfterMandatory
+     * @param data
+     * @return
+     */
     public TableHeader createTableHeader(String expectedMandatoryText,
             String optionalTextAfterMandatory, ByteBufferInputStream data) {
         if (expectedMandatoryText == null) {
