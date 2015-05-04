@@ -1,7 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,16 +29,12 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class MetadataSettingsFormPart extends AbstractFormPart {
 
@@ -123,14 +117,8 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
                 .findSection(RobotSuiteSettingsSection.class);
 
         if (settingsSection.isPresent()) {
-            final List<RobotElement> settings = ((RobotSuiteSettingsSection) settingsSection.get()).getChildren();
-            return newArrayList(Iterables.filter(settings, new Predicate<RobotElement>() {
-                @Override
-                public boolean apply(final RobotElement element) {
-                    return element instanceof RobotSetting
-                            && (((RobotSetting) element).getGroup() == SettingsGroup.METADATA);
-                }
-            }));
+            return ((RobotSuiteSettingsSection) settingsSection.get()).getImportSettings();
+
         }
         return null;
     }

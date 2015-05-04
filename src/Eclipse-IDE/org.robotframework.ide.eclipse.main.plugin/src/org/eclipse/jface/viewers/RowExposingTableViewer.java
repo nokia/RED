@@ -2,9 +2,8 @@ package org.eclipse.jface.viewers;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
 
 public class RowExposingTableViewer extends TableViewer {
@@ -22,5 +21,22 @@ public class RowExposingTableViewer extends TableViewer {
     @Override
     public List getSelectionFromWidget() {
         return super.getSelectionFromWidget();
+    }
+
+    /**
+     * Disposes all columns starting from given index
+     */
+    public void removeColumns(final int beginIndex) {
+        int i = 0;
+        for (final TableColumn column : getTable().getColumns()) {
+            if (i >= beginIndex) {
+                column.dispose();
+            }
+            i++;
+        }
+    }
+
+    public void packFirstColumn() {
+        getTable().getColumn(0).pack();
     }
 }

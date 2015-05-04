@@ -1,7 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,7 +29,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
@@ -40,16 +37,12 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class ImportsSettingsFormPart extends AbstractFormPart {
 
@@ -109,7 +102,6 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
         createColumns(true);
 
         setInput();
-        packFirstColumn();
     }
 
     private void createColumns(final boolean createFirst) {
@@ -181,24 +173,11 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
         return max;
     }
 
-    private void packFirstColumn() {
-        viewer.getTable().getColumn(0).pack();
-    }
-
     private void setInput() {
         viewer.setInput(getImportElements());
-        reloadColumns();
-    }
-
-    private void reloadColumns() {
-        int i = 0;
-        for (final TableColumn column : viewer.getTable().getColumns()) {
-            if (i > 0) { // no need to remove first column
-                column.dispose();
-            }
-            i++;
-        }
+        viewer.removeColumns(1);
         createColumns(false);
+        viewer.packFirstColumn();
     }
 
     private List<RobotElement> getImportElements() {
@@ -206,14 +185,7 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
                 .findSection(RobotSuiteSettingsSection.class);
 
         if (settingsSection.isPresent()) {
-            final List<RobotElement> settings = ((RobotSuiteSettingsSection) settingsSection.get()).getChildren();
-            return newArrayList(Iterables.filter(settings, new Predicate<RobotElement>() {
-                @Override
-                public boolean apply(final RobotElement element) {
-                    return element instanceof RobotSetting
-                            && SettingsGroup.getImportsGroupsSet().contains(((RobotSetting) element).getGroup());
-                }
-            }));
+            return ((RobotSuiteSettingsSection) settingsSection.get()).getMetadataSettings();
         }
         return null;
     }
