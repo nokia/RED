@@ -9,13 +9,10 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -90,22 +87,14 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        createColumn("Metadata", 140, new MetadataSettingsNamesLabelProvider(), null);
-        createColumn("Value", 120, new MetadataSettingsValuesLabelProvider(), null);
-        createColumn("Comment", 300, new SettingsCommentsLabelProvider(), null);
+        ViewerColumnsFactory.newColumn("Metadata").withWidth(140)
+                .labelsProvidedBy(new MetadataSettingsNamesLabelProvider()).createFor(viewer);
+        ViewerColumnsFactory.newColumn("Value").withWidth(140)
+                .labelsProvidedBy(new MetadataSettingsValuesLabelProvider()).createFor(viewer);
+        ViewerColumnsFactory.newColumn("Comment").withWidth(140)
+                .labelsProvidedBy(new SettingsCommentsLabelProvider()).createFor(viewer);
 
         setInput();
-    }
-
-    private void createColumn(final String columnName, final int width, final IStyledLabelProvider labelProvider,
-            final EditingSupport editingSupport) {
-        final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-        column.getColumn().setText(columnName);
-        column.getColumn().setWidth(width);
-        column.setLabelProvider(new TooltipsEnablingDelegatingStyledCellLabelProvider(labelProvider));
-        if (fileModel.isEditable()) {
-            column.setEditingSupport(editingSupport);
-        }
     }
 
     private void setInput() {
@@ -118,7 +107,6 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
 
         if (settingsSection.isPresent()) {
             return ((RobotSuiteSettingsSection) settingsSection.get()).getImportSettings();
-
         }
         return null;
     }
@@ -126,12 +114,6 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
-    }
-
-    @Override
-    public void refresh() {
-        setInput();
-        super.refresh();
     }
 
     public void revealSetting(final RobotSetting setting) {

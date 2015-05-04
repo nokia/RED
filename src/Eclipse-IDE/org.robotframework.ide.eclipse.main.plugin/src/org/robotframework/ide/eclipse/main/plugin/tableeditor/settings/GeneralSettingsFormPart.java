@@ -11,29 +11,22 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
 import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -52,7 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetArgumentOfSettingKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
@@ -136,11 +129,12 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
                 final RobotSetting currentSetting = model.getDocumentationSetting();
 
                 if (currentSetting == null && !newDocumentation.isEmpty()) {
-                    commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation", newDocumentation));
+                    commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
+                            newArrayList(newDocumentation)));
                 } else if (currentSetting != null && newDocumentation.isEmpty()) {
                     commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
                 } else if (currentSetting != null) {
-                    commandsStack.execute(new SetArgumentOfSettingKeywordCall(currentSetting, 0, newDocumentation));
+                    commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
                 }
             }
         });
@@ -169,7 +163,9 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
 
     private void createColumns(final boolean createFirst) {
         if (createFirst) {
-            createColumn(100, "Setting", new GeneralSettingsNamesLabelProvider(), null);
+            ViewerColumnsFactory.newColumn("Setting").withWidth(100)
+                    .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
+                    .createFor(viewer);
         }
         if (!model.areSettingsExist()) {
             return;
@@ -177,52 +173,34 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
 
         final int max = calcualateLongestArgumentsLength();
         for (int i = 0; i < max; i++) {
-            createColumn(80, "", new GeneralSettingsArgsLabelProvider(i),
-                    new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack));
+            ViewerColumnsFactory.newColumn("").withWidth(80)
+                    .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(i))
+                    .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
+                    .createFor(viewer);
         }
-        createColumn(100, "Comment", new SettingsCommentsLabelProvider(),
-                new SettingsCommentsEditingSupport(viewer));
+        ViewerColumnsFactory.newColumn("Comment").withWidth(100)
+                .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider())
+                .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
+                .createFor(viewer);
 
         final int newColumnsStartingPosition = max + 1;
-        final TableViewerColumn addingColumn = createColumn(28, "", new ColumnAddingLabelProvider(),
-                new ColumnAddingEditingSupport(viewer,
-                newColumnsStartingPosition,
-                new ColumnProviders() {
-                    @Override
-                    public void createColumn(final int index) {
-                        GeneralSettingsFormPart.this.createColumn(80, "",
-                                new GeneralSettingsArgsLabelProvider(index - 1), 
-                                new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack));
-                    }
-                }));
-        addingColumn.getColumn().setResizable(false);
-        addingColumn.getColumn().setToolTipText("Activate cell in this column to add new arguments columns");
-        final Image addingColumnImage = RobotImages.getAddImage().createImage();
-        addingColumn.getColumn().setImage(addingColumnImage);
-        addingColumn.getColumn().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                addingColumnImage.dispose();
-            }
-        });
-    }
-
-    private TableViewerColumn createColumn(final int width, final String name, final CellLabelProvider labelProvider,
-            final EditingSupport editingSupport) {
-        final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-        column.getColumn().setWidth(width);
-        column.getColumn().setText(name);
-        if (labelProvider instanceof IStyledLabelProvider) {
-            column.setLabelProvider(new TooltipsEnablingDelegatingStyledCellLabelProvider(
-                    (IStyledLabelProvider) labelProvider));
-        } else {
-            column.setLabelProvider(labelProvider);
-        }
-        if (fileModel.isEditable()) {
-            column.setEditingSupport(editingSupport);
-        }
-        return column;
+        
+        ViewerColumnsFactory.newColumn("").withWidth(28).resizable(false)
+                .withTooltip("Activate cell in this column to add new arguments columns")
+                .withImage(RobotImages.getAddImage().createImage())
+                .labelsProvidedBy(new ColumnAddingLabelProvider())
+                .editingSupportedBy(
+                        new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
+                            @Override
+                            public void createColumn(final int index) {
+                                ViewerColumnsFactory.newColumn("").withWidth(80)
+                                        .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(index - 1))
+                                        .editingSupportedBy(
+                                                new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack))
+                                        .createFor(viewer);
+                            }
+                        }))
+                .createFor(viewer);
     }
 
     private int calcualateLongestArgumentsLength() {
@@ -247,11 +225,30 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
         viewer.setInput(model);
         viewer.removeColumns(1);
         createColumns(false);
+
+        viewer.refresh();
     }
 
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
+    }
+
+    public void revealSetting(final RobotSetting setting) {
+        if ("Documentation".equals(setting.getName())) {
+            documentation.forceFocus();
+            documentation.selectAll();
+            viewer.setSelection(StructuredSelection.EMPTY);
+        }
+        for (final Entry<String, RobotElement> entry : model.getEntries()) {
+            if (entry.getValue() == setting) {
+                viewer.setSelection(new StructuredSelection(entry));
+            }
+        }
+    }
+
+    public void clearSettingsSelection() {
+        viewer.setSelection(StructuredSelection.EMPTY);
     }
 
     @Inject
@@ -292,22 +289,5 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
             setInput();
             markDirty();
         }
-    }
-
-    public void revealSetting(final RobotSetting setting) {
-        if ("Documentation".equals(setting.getName())) {
-            documentation.forceFocus();
-            documentation.selectAll();
-            viewer.setSelection(StructuredSelection.EMPTY);
-        }
-        for (final Entry<String, RobotElement> entry : model.getEntries()) {
-            if (entry.getValue() == setting) {
-                viewer.setSelection(new StructuredSelection(entry));
-            }
-        }
-    }
-
-    public void clearSettingsSelection() {
-        viewer.setSelection(StructuredSelection.EMPTY);
     }
 }

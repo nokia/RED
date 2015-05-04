@@ -1,0 +1,27 @@
+package org.robotframework.ide.eclipse.main.plugin.cmd;
+
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+public class SetKeywordCallComment extends EditorCommand {
+
+    private final RobotKeywordCall keywordCall;
+    private final String comment;
+    private final String topic;
+
+    SetKeywordCallComment(final RobotKeywordCall keywordCall, final String comment, final String topic) {
+        this.keywordCall = keywordCall;
+        this.comment = comment;
+        this.topic = topic;
+    }
+
+    @Override
+    public void execute() throws CommandExecutionException {
+        if (keywordCall.getComment().equals(comment)) {
+            return;
+        }
+        keywordCall.setComment(comment);
+        
+        eventBroker.post(topic, keywordCall);
+    }
+}
