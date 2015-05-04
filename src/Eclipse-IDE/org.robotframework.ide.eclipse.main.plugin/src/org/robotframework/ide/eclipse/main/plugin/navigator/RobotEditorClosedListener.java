@@ -33,9 +33,12 @@ public class RobotEditorClosedListener implements IPartListener {
         if (part instanceof RobotFormEditor) {
             final RobotFormEditor robotEditor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = robotEditor.provideSuiteModel();
-            suiteModel.refreshOnFileChange();
             
-            broker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, RobotElementChange.createChangedElement(suiteModel));
+            if (suiteModel.exists()) {
+                suiteModel.refreshOnFileChange();
+
+                broker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, RobotElementChange.createChangedElement(suiteModel));
+            }
         }
     }
 

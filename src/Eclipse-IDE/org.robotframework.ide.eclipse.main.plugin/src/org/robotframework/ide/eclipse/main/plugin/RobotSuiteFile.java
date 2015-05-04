@@ -141,4 +141,8 @@ public class RobotSuiteFile implements RobotElement {
             }
         });
     }
+
+    public boolean exists() {
+        return file.exists();
+    }
 }
