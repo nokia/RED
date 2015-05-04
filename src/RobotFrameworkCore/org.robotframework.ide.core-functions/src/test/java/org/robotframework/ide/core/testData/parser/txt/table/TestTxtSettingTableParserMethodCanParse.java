@@ -18,6 +18,8 @@ import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
  * 
  * @author wypych
  * @see TxtSettingTableParser#canParse(org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream)
+ * @see TxtTableHeaderHelper#createTableHeader(String, String,
+ *      ByteBufferInputStream)
  */
 public class TestTxtSettingTableParserMethodCanParse {
 
