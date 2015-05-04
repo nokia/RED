@@ -10,3 +10,1013 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Ratas\Robot\A
 
 !ENTRY org.lcx.robotframework.swtbotplugin 4 0 2015-04-29 12:55:47.502
 !MESSAGE startup class must implement org.eclipse.ui.IStartup
+!SESSION 2015-05-04 13:04:25.168 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests
+
+!ENTRY org.eclipse.ui 4 4 2015-05-04 13:04:30.900
+!MESSAGE Bad extension specification
+
+!ENTRY org.lcx.robotframework.swtbotplugin 4 0 2015-05-04 13:04:30.908
+!MESSAGE startup class must implement org.eclipse.ui.IStartup
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.212
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@788ac749
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@788ac749
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430737508810.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:05:16.213
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:05:16.663
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:05:17.123
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:05:17.443
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.launching.ext 4 0 2015-05-04 13:05:17.669
+!MESSAGE Runtime injection failed for target platform No name D:\Ratas\Robot\Bins\Eclipse
+!SUBENTRY 1 org.eclipse.equinox.p2.artifact.repository 4 1001 2015-05-04 13:05:17.669
+!MESSAGE Repository already exists at file:/D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/.bundle_pool/.
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@a9ce0da
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@a9ce0da
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430737663431.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 13:07:47.118
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:47.188
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:47.506
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:47.718
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:55.689
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:55.822
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:56.524
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:07:56.714
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:01.359
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:01.503
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:02.734
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:02.915
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:03.041
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:03.215
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:04.268
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:04.407
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:04.534
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 13:08:04.657
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:08.876
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\RCPTT\configuration\org.eclipse.osgi\bundles\156\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:09.229
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:21.387
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:21.415
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:21.419
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:23.929
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=b1219339-d989-45f1-8cc5-5aea2d5afc7a, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=b1219339-d989-45f1-8cc5-5aea2d5afc7a
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:08:24.006
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests/../aut-org.eclipse.epp.package.java.product, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/org.eclipse.epp.package.java.product/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/org.eclipse.epp.package.java.product/dev.properties, -os, win32, -ws, win32, -arch, x86_64, -nl, en_US, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\org.eclipse.epp.package.java.product/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 13:09:04.982
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:11:32.798
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:11:32.806
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:11:32.811
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:11:35.052
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=8cecde9e-1ff8-4e9e-80ea-99c22b5bc29f, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=8cecde9e-1ff8-4e9e-80ea-99c22b5bc29f
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 13:11:35.159
+!MESSAGE RCPTT: Launching AUT: org.eclipse.epp.package.java.product: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/org.eclipse.epp.package.java.product/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/org.eclipse.epp.package.java.product/dev.properties, -os, win32, -ws, win32, -arch, x86_64, -nl, en_US, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\org.eclipse.epp.package.java.product/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 13:12:07.877
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+!SESSION 2015-05-04 14:12:39.658 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -application org.eclipse.rcptt.runner.headless -aut Bins\Eclipse\eclipse.exe -autWsPrefix WorkspaceAutTemp -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\BasicRobotProject
+Command-line arguments:  -application org.eclipse.rcptt.runner.headless -data SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests -aut Bins\Eclipse\eclipse.exe -autWsPrefix WorkspaceAutTemp -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\BasicRobotProject
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@75ae4a1f
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@75ae4a1f
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430741563125.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:12:46.113
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:46.327
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:46.677
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:46.923
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:53.272
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:53.386
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:53.660
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:53.843
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:54.289
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:54.403
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:55.439
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:55.584
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:55.694
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:55.844
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:56.311
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:56.421
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:56.532
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:12:56.646
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:12:59.530
+!MESSAGE AUT-0:Launching
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:00.648
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\Runner\configuration\org.eclipse.osgi\bundles\100\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:00.712
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:03.634
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: Bins\Eclipse\eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:03.639
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:03.643
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:05.906
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=0999637e-8999-4b85-b03e-4fb3822bfb35, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=0999637e-8999-4b85-b03e-4fb3822bfb35
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar
+]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:13:05.989
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\Runner\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, WorkspaceAutTemp0, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -ws, win32, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:13:40.258
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:13:40.640
+!MESSAGE [AUT-0] Starting: CheckPerspective.test (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:13:44.852
+!MESSAGE [AUT-0] Finished: CheckPerspective.test in 3885 (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:13:44.861
+!MESSAGE Pass 1 (2) processed. 0 failed. spent: 0:04, 0:02 mins remaining. CheckPerspective. time: 3885ms 
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:13:44.872
+!MESSAGE [AUT-0] Starting: CreateAndRemoveRobotProject.test (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:13:45.953
+!MESSAGE [AUT-0] Finished: CreateAndRemoveRobotProject.test in 678, Failed to set selection: [[RobotProject]]. (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:13:45.973
+!MESSAGE Fail 2 (2) processed. 1 failed. spent: 0:05, 0:00 mins remaining. CreateAndRemoveRobotProject. time: 678ms  Cause: Failed to set selection: [[RobotProject]].
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:13:45.979
+!MESSAGE Shut down AUTs: executed
+!SESSION 2015-05-04 14:14:13.781 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -application org.eclipse.rcptt.runner.headless -aut Bins\Eclipse\eclipse.exe -autWsPrefix WorkspaceAutTemp -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+Command-line arguments:  -application org.eclipse.rcptt.runner.headless -data SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests -aut Bins\Eclipse\eclipse.exe -autWsPrefix WorkspaceAutTemp -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@9596ce8
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@9596ce8
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430741655700.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:14:18.201
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:18.390
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:18.709
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:18.920
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:19.499
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:19.618
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:19.882
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:20.034
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:20.655
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:20.770
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:21.594
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:21.766
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:21.885
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:22.030
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:22.458
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:22.572
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:22.686
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:14:22.796
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:14:25.784
+!MESSAGE AUT-0:Launching
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:26.649
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\Runner\configuration\org.eclipse.osgi\bundles\100\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:26.863
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:30.126
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: Bins\Eclipse\eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:30.131
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:30.137
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:31.724
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=99fbb354-bb74-4eb2-b4c8-18f46378b684, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=99fbb354-bb74-4eb2-b4c8-18f46378b684
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar
+]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:14:31.814
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\Runner\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, WorkspaceAutTemp0, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -ws, win32, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:15:04.930
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:15:05.137
+!MESSAGE [AUT-0] Starting: CheckPerspective.test (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:15:10.264
+!MESSAGE [AUT-0] Finished: CheckPerspective.test in 4699 (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:15:10.282
+!MESSAGE Pass 1 (2) processed. 0 failed. spent: 0:05, 0:02 mins remaining. CheckPerspective. time: 4699ms 
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:15:10.292
+!MESSAGE [AUT-0] Starting: CreateAndRemoveRobotProject.test (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:15:11.365
+!MESSAGE [AUT-0] Finished: CreateAndRemoveRobotProject.test in 698, Failed to set selection: [[RobotProject]]. (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:15:11.396
+!MESSAGE Fail 2 (2) processed. 1 failed. spent: 0:06, 0:00 mins remaining. CreateAndRemoveRobotProject. time: 698ms  Cause: Failed to set selection: [[RobotProject]].
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:15:11.401
+!MESSAGE Shut down AUTs: executed
+!SESSION 2015-05-04 14:15:49.959 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -application org.eclipse.rcptt.runner.headless -aut Bins\Eclipse\eclipse.exe -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+Command-line arguments:  -application org.eclipse.rcptt.runner.headless -data SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests -aut Bins\Eclipse\eclipse.exe -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.726
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@227a47
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@227a47
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430741752014.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.726
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.726
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.726
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.726
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.727
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:15:54.727
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:54.954
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:55.278
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:55.489
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:56.098
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:56.229
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:56.493
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:56.641
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:57.100
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:57.226
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:58.115
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:58.265
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:58.383
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:58.521
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:58.974
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:59.090
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:59.202
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:15:59.318
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:02.660
+!MESSAGE AUT-0:Launching
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:03.547
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\Runner\configuration\org.eclipse.osgi\bundles\100\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:03.706
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:06.539
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: Bins\Eclipse\eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:06.546
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:06.552
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:08.344
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=c28a4d1b-c974-43bc-8d9c-fca93d41f1ae, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=c28a4d1b-c974-43bc-8d9c-fca93d41f1ae
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar
+]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:16:08.433
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\Runner\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RcpttWorkspace\aut-Eclipse-0, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -ws, win32, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:16:31.904
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:32.098
+!MESSAGE [AUT-0] Starting: CheckPerspective.test (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:36.252
+!MESSAGE [AUT-0] Finished: CheckPerspective.test in 3572 (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:16:36.259
+!MESSAGE Pass 1 (2) processed. 0 failed. spent: 0:04, 0:02 mins remaining. CheckPerspective. time: 3572ms 
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:36.280
+!MESSAGE [AUT-0] Starting: CreateAndRemoveRobotProject.test (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:37.354
+!MESSAGE [AUT-0] Finished: CreateAndRemoveRobotProject.test in 724, Failed to set selection: [[RobotProject]]. (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:16:37.398
+!MESSAGE Fail 2 (2) processed. 1 failed. spent: 0:05, 0:00 mins remaining. CreateAndRemoveRobotProject. time: 724ms  Cause: Failed to set selection: [[RobotProject]].
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:16:37.404
+!MESSAGE Shut down AUTs: executed
+!SESSION 2015-05-04 14:18:04.790 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2015-05-04 14:18:10.400
+!MESSAGE Bad extension specification
+
+!ENTRY org.lcx.robotframework.swtbotplugin 4 0 2015-05-04 14:18:10.431
+!MESSAGE startup class must implement org.eclipse.ui.IStartup
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@5a506359
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@5a506359
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430741945804.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:19:07.821
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:08.037
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:08.255
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:08.444
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:14.881
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:15.010
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:15.292
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:15.441
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:15.837
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:15.958
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:16.834
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:16.980
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:17.103
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:17.250
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:17.973
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:18.097
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:18.219
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:19:18.338
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:20.996
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\RCPTT\configuration\org.eclipse.osgi\bundles\156\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:21.249
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:44.247
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:44.261
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:44.270
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:46.671
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=2e2126a0-df66-4193-a208-0f74bbe0bcad, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=2e2126a0-df66-4193-a208-0f74bbe0bcad
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:19:46.799
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests/../aut-AUT_0, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:20:16.098
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:22:08.507
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:22:08.511
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:22:08.602
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:22:10.157
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=33f4c9be-cd94-4b3a-9a51-97a647d131bd, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=33f4c9be-cd94-4b3a-9a51-97a647d131bd
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:22:10.204
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:22:32.228
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:28:53.319
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:28:53.329
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:28:53.338
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:28:54.649
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=84e593d8-727c-42c3-84af-f89d0c301fce, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=84e593d8-727c-42c3-84af-f89d0c301fce
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:28:54.699
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:29:13.958
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.core 4 4 2015-05-04 14:29:30.140
+!MESSAGE Element: /RedGuiTests/1.ctx doesn't exist
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:32:08.703
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:32:08.709
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:32:08.718
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:32:09.791
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=36b9ae6b-c039-4d32-9659-486961d83b1a, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=36b9ae6b-c039-4d32-9659-486961d83b1a
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:32:09.837
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:32:28.951
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:34:45.897
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:34:45.901
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:34:45.905
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:34:46.822
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=bd070393-694f-4d18-ad76-a8a11dc5b14e, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=bd070393-694f-4d18-ad76-a8a11dc5b14e
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:34:46.854
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:35:03.103
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+!SESSION 2015-05-04 14:38:36.074 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2015-05-04 14:38:41.932
+!MESSAGE Bad extension specification
+
+!ENTRY org.lcx.robotframework.swtbotplugin 4 0 2015-05-04 14:38:41.958
+!MESSAGE startup class must implement org.eclipse.ui.IStartup
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:03.617
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:03.874
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:04.008
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:04.178
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:04.934
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:05.066
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:05.188
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:39:05.309
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:39:09.266
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\RCPTT\configuration\org.eclipse.osgi\bundles\156\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:39:09.320
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:40:33.603
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:40:33.609
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:40:33.616
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:40:39.469
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=dec9f2fd-bd9b-4e48-a665-faa0c8787dd6, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=dec9f2fd-bd9b-4e48-a665-faa0c8787dd6
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:40:39.555
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\RCPTT\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage, -vm, C:\Program Files\Java\jre1.8.0_45]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:40:57.922
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+!SESSION 2015-05-04 14:48:33.005 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -application org.eclipse.rcptt.runner.headless -aut Bins\Eclipse\eclipse.exe -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+Command-line arguments:  -application org.eclipse.rcptt.runner.headless -data SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests -aut Bins\Eclipse\eclipse.exe -htmlReport raports -autArgs -import;d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\;-data;d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject
+
+!ENTRY org.eclipse.core.resources 2 10035 2015-05-04 14:48:34.496
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Detected potential problems in target platform No Name
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@476fe690
+	[Lorg.eclipse.pde.internal.core.target.provisional.IBundleContainer;@476fe690
+Env: null/null/null/null
+JRE: null
+Args: null/null
+Implicit: null
+Handle: 1430743715431.target
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.50.v201403120620.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/com.jcraft.jsch_0.1.51.v201410302000.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.eclipse.jdt.annotation_2.0.0.v20140415-1436.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar
+!SUBENTRY 1 org.eclipse.rcptt.launching.ext 2 0 2015-05-04 14:48:39.316
+!MESSAGE Multiple versions of bundle file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201504231203.jar and file:/D:/Ratas/Robot/Bins/Eclipse/plugins/org.robotframework.ide.eclipse.main.plugin_1.0.0.201505040948.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:39.702
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:40.596
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:40.889
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:41.537
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:41.684
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:41.960
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:42.114
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:42.597
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:42.711
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:43.245
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:43.403
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:43.512
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:43.645
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/content.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:44.130
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.runtime.e4x/q7/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:44.245
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.kepler/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:44.355
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.module.nebula.updates/runtime/artifacts.jar
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2015-05-04 14:48:44.465
+!MESSAGE Server returned lastModified <= 0 for platform:/plugin/org.eclipse.rcptt.updates.aspectj.e44x/dependencies/artifacts.jar
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:48:48.478
+!MESSAGE AUT-0:Launching
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:49.928
+!MESSAGE Launched external Java process. Command line is:  "C:\Program Files\Java\jre1.8.0_45\bin\javaw.exe" -classpath D:\Ratas\Robot\Bins\Runner\configuration\org.eclipse.osgi\bundles\100\1\.cp\lib\launchingsupport.jar org.eclipse.jdt.internal.launching.support.SystemProperties os.arch java.version java.specification.name java.specification.version java.vm.info java.vm.name java.vm.version java.runtime.name java.runtime.version sun.arch.data.model
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:50.090
+!MESSAGE Java process completed normally
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:54.334
+!MESSAGE RCPTT: Launching AUT: AUT_0: Detected AUT architecture is x86_64.64bit arch is selected because AUT uses launcher library
+	"plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.200.v20150204-1316" specified in config file: Bins\Eclipse\eclipse.ini
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:54.369
+!MESSAGE RCPTT: Launching AUT: AUT_0: Selected JVM is C:\Program Files\Java\jre1.8.0_45 detected architecture is x86_64
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:54.375
+!MESSAGE RCPTT: Launching AUT: AUT_0: JVM and AUT architectures are compatible: true. JVM is 64bit and support running 32bit: false
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:57.355
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT JVM arguments is set to : [-Dosgi.requiredJavaVersion=1.6, -Xms40m, -Xmx512m, -XX:MaxPermSize=128m, -Dq7id=f83d7b5f-aaef-40a7-a85b-2b0e385b087f, -Dq7EclPort=4001, -Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar, -Declipse.vmargs=-Dosgi.requiredJavaVersion=1.6
+-Xms40m
+-Xmx512m
+-XX:MaxPermSize=128m
+-Dq7id=f83d7b5f-aaef-40a7-a85b-2b0e385b087f
+-Dq7EclPort=4001
+-Dosgi.framework.extensions=reference:file:org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar,reference:file:D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\.bundle_pool\plugins\org.eclipse.equinox.weaving.hook_1.1.100.weaving-hook-20140821.jar
+]
+
+!ENTRY org.eclipse.rcptt.launching.ext 1 0 2015-05-04 14:48:57.469
+!MESSAGE RCPTT: Launching AUT: AUT_0: AUT command line arguments is set to: [-launcher, D:\Ratas\Robot\Bins\Runner\eclipse.exe, -name, Eclipse, -showsplash, 600, -product, org.eclipse.epp.package.java.product, -data, D:\Ratas\Robot\SVN\RcpttWorkspace\aut-Eclipse-0, -configuration, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/, -dev, file:D:/Ratas/Robot/SVN/RcpttWorkspace/CleanWorkspaceRcpttGuiTests/.metadata/.plugins/org.eclipse.pde.core/AUT_0/dev.properties, -ws, win32, -import, d:\Ratas\Robot\SVN\RedWorkspace\CleanRedWorkspace\, -data, d:\Ratas\Robot\SVN\RedProjects\BasicRobotProject, -os, win32, -arch, x86_64, -consoleLog, -eclipse.keyring, D:\Ratas\Robot\SVN\RcpttWorkspace\CleanWorkspaceRcpttGuiTests\.metadata\.plugins\org.eclipse.pde.core\AUT_0/secure_storage]
+
+!ENTRY org.eclipse.rcptt.launching 1 0 2015-05-04 14:49:30.908
+!MESSAGE Activating AUT at host localhost. ECL port: 7001. Tesla port: 7002
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:49:31.180
+!MESSAGE [AUT-0] Starting: CheckPerspective.test (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:49:33.917
+!MESSAGE [AUT-0] Finished: CheckPerspective.test in 2458 (0 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:49:33.944
+!MESSAGE [AUT-0] Starting: CreateAndRemoveRobotProject.test (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:49:33.997
+!MESSAGE Pass 1 (2) processed. 0 failed. spent: 0:02, 0:00 mins remaining. CheckPerspective. time: 2458ms 
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:49:45.530
+!MESSAGE [AUT-0] Finished: CreateAndRemoveRobotProject.test in 11358 (1 from 2)
+
+!ENTRY org.eclipse.rcptt.runner 4 0 2015-05-04 14:49:45.572
+!MESSAGE Pass 2 (2) processed. 0 failed. spent: 0:14, 0:00 mins remaining. CreateAndRemoveRobotProject. time: 11358ms 
+
+!ENTRY org.eclipse.rcptt.runner 1 0 2015-05-04 14:49:45.577
+!MESSAGE Shut down AUTs: executed
