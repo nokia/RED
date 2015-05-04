@@ -19,18 +19,10 @@ public class SettingsCallNameLabelProvider extends ColumnLabelProvider implement
     }
 
     @Override
-    public String getText(final Object element) {
-        if (element instanceof RobotSetting) {
-            final RobotSetting setting = (RobotSetting) element;
-            return setting.getName();
-        }
-        return "";
-    }
-
-    @Override
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotSetting) {
-            return new StyledString(getText(element));
+            final RobotSetting setting = (RobotSetting) element;
+            return new StyledString(setting.getName());
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getStyledText();
         }
@@ -41,7 +33,7 @@ public class SettingsCallNameLabelProvider extends ColumnLabelProvider implement
     public String getToolTipText(final Object element) {
         if (element instanceof RobotSetting) {
             final RobotSetting metadataSetting = (RobotSetting) element;
-            final String name = metadataSetting.getNameInGroup();
+            final String name = metadataSetting.getName();
             return name.isEmpty() ? "<empty>" : name;
         }
         return null;
