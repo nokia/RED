@@ -2,7 +2,12 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
+
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class RobotSuiteSettingsSection extends RobotSuiteFileSection {
 
@@ -27,5 +32,25 @@ public class RobotSuiteSettingsSection extends RobotSuiteFileSection {
         }
         elements.add(setting);
         return setting;
+    }
+    
+    public List<RobotElement> getMetadataSettings() {
+        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
+            @Override
+            public boolean apply(final RobotElement element) {
+                return element instanceof RobotSetting
+                        && (((RobotSetting) element).getGroup() == SettingsGroup.METADATA);
+            }
+        }));
+    }
+
+    public List<RobotElement> getImportSettings() {
+        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
+            @Override
+            public boolean apply(final RobotElement element) {
+                return element instanceof RobotSetting
+                        && (((RobotSetting) element).getGroup() == SettingsGroup.METADATA);
+            }
+        }));
     }
 }
