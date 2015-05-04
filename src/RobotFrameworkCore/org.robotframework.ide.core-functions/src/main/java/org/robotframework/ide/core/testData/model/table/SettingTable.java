@@ -1,5 +1,9 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import org.robotframework.ide.core.testData.parser.IDataLocator;
+import org.robotframework.ide.core.testData.parser.IParsePositionMarkable;
+
+
 /**
  * Mapping for Setting table used to import test libraries, resource files and
  * variable files and to define metadata for test suites and test cases. It can
@@ -16,6 +20,7 @@ public class SettingTable implements IRobotSectionTable {
 
     public static final String TABLE_NAME = "Settings";
     private boolean declarationOfTableAppears = false;
+    private IDataLocator<? extends IParsePositionMarkable> positionInFile;
 
 
     public void unsetPresent() {
@@ -25,6 +30,18 @@ public class SettingTable implements IRobotSectionTable {
 
     public void setPresent() {
         this.declarationOfTableAppears = true;
+    }
+
+
+    public void setTableSectionPosition(
+            IDataLocator<? extends IParsePositionMarkable> positionInFile) {
+        this.positionInFile = positionInFile;
+    }
+
+
+    @Override
+    public IDataLocator<? extends IParsePositionMarkable> getTableSectionPosition() {
+        return this.positionInFile;
     }
 
 
@@ -45,6 +62,8 @@ public class SettingTable implements IRobotSectionTable {
         final int prime = 31;
         int result = 1;
         result = prime * result + (declarationOfTableAppears ? 1231 : 1237);
+        result = prime * result
+                + ((positionInFile == null) ? 0 : positionInFile.hashCode());
         return result;
     }
 
@@ -59,6 +78,11 @@ public class SettingTable implements IRobotSectionTable {
             return false;
         SettingTable other = (SettingTable) obj;
         if (declarationOfTableAppears != other.declarationOfTableAppears)
+            return false;
+        if (positionInFile == null) {
+            if (other.positionInFile != null)
+                return false;
+        } else if (!positionInFile.equals(other.positionInFile))
             return false;
         return true;
     }

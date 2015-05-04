@@ -1,6 +1,8 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import org.robotframework.ide.core.testData.model.common.IOptional;
+import org.robotframework.ide.core.testData.parser.IDataLocator;
+import org.robotframework.ide.core.testData.parser.IParsePositionMarkable;
 
 
 /**
@@ -28,4 +30,10 @@ public interface IRobotSectionTable extends IOptional {
      * disable this table in model
      */
     void unsetPresent();
+
+
+    /**
+     * @return position of table inside Robot File
+     */
+    IDataLocator<? extends IParsePositionMarkable> getTableSectionPosition();
 }
