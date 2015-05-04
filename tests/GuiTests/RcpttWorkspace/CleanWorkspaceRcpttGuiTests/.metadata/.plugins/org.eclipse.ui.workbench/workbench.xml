@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="20" version="2.0">
+<workbench progressCount="33" version="2.0">
 <workbenchAdvisor/>
-<window height="768" width="1024" x="25" y="25">
+<window height="768" maximized="true" width="1024" x="1981" y="226">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="160"/>
 </perspectiveBar>
 <coolbarLayout>
 <coolItem id="group.file" itemType="typeGroupMarker"/>
-<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="122" y="22"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="153" y="22"/>
 <coolItem id="additions" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.debug.ui.launchActionSet" itemType="typeToolBarContribution" x="129" y="22"/>
 <coolItem id="org.eclipse.rcptt.ui.actionSet3" itemType="typeToolBarContribution" x="38" y="22"/>
@@ -17,6 +17,8 @@
 <coolItem id="group.nav" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="190" y="22"/>
 <coolItem id="group.editor" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.rcptt.ui.editors.context" itemType="typeToolBarContribution" x="-1" y="-1"/>
+<coolItem id="org.eclipse.rcptt.ui.editors.scenario" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="group.help" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.help" itemType="typeToolBarContribution" x="-1" y="-1"/>
 </coolbarLayout>
@@ -25,10 +27,28 @@
 <editorArea activeWorkbook="DefaultEditorWorkbook">
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="3"/>
+</presentation>
 </folder>
 </info>
 </editorArea>
+<editor activePart="true" focus="true" id="org.eclipse.rcptt.ui.editors.test.suite" name="BasicTests.suite" partName="BasicTests" path="D:/Ratas/Robot/SVN/RcpttProjects/RedGuiTests/BasicTests.suite" title="BasicTests" tooltip="RedGuiTests/BasicTests.suite" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/RedGuiTests/BasicTests.suite"/>
+</editor>
+<editor id="org.eclipse.rcptt.ui.editors.scenario" name="CreateAndRemoveRobotProject" partName="CreateAndRemoveRobotProject" path="/RedGuiTests/ProjectExplorer/CreateAndRemoveRobotProject.test" title="CreateAndRemoveRobotProject" tooltip="CreateAndRemoveRobotProject" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" path="/RedGuiTests/ProjectExplorer/CreateAndRemoveRobotProject.test"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1459" selectionTopPixel="38"/>
+</editor>
+<editor id="org.eclipse.rcptt.ui.editors.context" name="GeneralContext.ctx" partName="GeneralContext" path="D:/Ratas/Robot/SVN/RcpttProjects/RedGuiTests/GeneralContext.ctx" title="GeneralContext" tooltip="RedGuiTests/GeneralContext.ctx" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/RedGuiTests/GeneralContext.ctx"/>
+</editor>
+<editor id="org.eclipse.rcptt.ui.editors.project.metadata" name="rcptt.properties" partName="RedGuiTests - Project Settings" path="D:/Ratas/Robot/SVN/RcpttProjects/RedGuiTests/rcptt.properties" title="RedGuiTests - Project Settings" tooltip="RedGuiTests/rcptt.properties" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/RedGuiTests/rcptt.properties"/>
+</editor>
 </editors>
 <views>
 <view id="org.eclipse.rcptt.ui.aut.manager" partName="Applications">
@@ -47,12 +67,14 @@
 <view id="org.eclipse.rcptt.ui.explorer" partName="Test Explorer">
 <viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
 </view>
-<view id="org.eclipse.rcptt.ui.tags" partName="Tags"/>
+<view id="org.eclipse.rcptt.ui.tags" partName="Tags">
+<viewState/>
+</view>
 <view id="org.eclipse.rcptt.ui.views.execution" partName="Execution View">
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.rcptt.ui.explorer" activePerspective="org.eclipse.rcptt.ui.perspective">
+<perspectives activePart="org.eclipse.rcptt.ui.editors.test.suite" activePerspective="org.eclipse.rcptt.ui.perspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.rcptt.ui.perspectives.Q7Perspective" id="org.eclipse.rcptt.ui.perspective" label="RCPTT"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -74,8 +96,8 @@
 <new_wizard_action id="org.eclipse.rcptt.ui.wizards.newSuperContext"/>
 <new_wizard_action id="org.eclipse.rcptt.ui.wizards.newScenario"/>
 <new_wizard_action id="org.eclipse.rcptt.ui.wizards.newTestSuite"/>
-<hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
 <view id="org.eclipse.rcptt.ui.explorer"/>
 <view id="org.eclipse.rcptt.ui.views.execution"/>
 <view id="org.eclipse.rcptt.ui.aut.manager"/>
@@ -126,7 +148,62 @@
 </perspective>
 </perspectives>
 <workingSets/>
-<navigationHistory/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.test.suite" path="/RedGuiTests/BasicTests.suite"/>
+<editor factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" path="/RedGuiTests/ProjectExplorer/CreateRobotProject.test"/>
+<editor factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" path="/RedGuiTests/ProjectExplorer/Re,pveRobotProject.test"/>
+<editor factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" path="/RedGuiTests/ProjectExplorer/RemoveRobotProject.test"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.context" path="/RedGuiTests/1.ctx"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.context" path="/RedGuiTests/GeneralContext.ctx"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.project.metadata" path="/RedGuiTests/rcptt.properties"/>
+<editor factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" path="/RedGuiTests/ProjectExplorer/CreateAndRemoveRobotProject.test"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.project.metadata" path="/RedGuiTests/rcptt.properties"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.context" path="/RedGuiTests/GeneralContext.ctx"/>
+<editor factoryID="org.eclipse.rcptt.ui.editors.ecl.EclEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" path="/RedGuiTests/ProjectExplorer/CreateAndRemoveRobotProject.test"/>
+</editors>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="CreateRobotProject" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="Re,pveRobotProject" index="2">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="CreateRobotProject" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="RemoveRobotProject" index="3">
+<position info="not_deleted" x="0" y="421"/>
+</item>
+<item historyLabel="CreateRobotProject" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="1" index="4"/>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="GeneralContext" index="5"/>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="GeneralContext" index="5"/>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="GeneralContext" index="5"/>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="RedGuiTests - Project Settings" index="6"/>
+<item historyLabel="GeneralContext" index="5"/>
+<item historyLabel="CreateAndRemoveRobotProject" index="7">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="RedGuiTests - Project Settings" index="8"/>
+<item historyLabel="GeneralContext" index="9"/>
+<item historyLabel="BasicTests" index="0"/>
+<item historyLabel="CreateAndRemoveRobotProject" index="10">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="CreateAndRemoveRobotProject" index="10">
+<position info="not_deleted" x="1459" y="0"/>
+</item>
+<item active="true" historyLabel="BasicTests" index="0"/>
+</navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
 </page>
 <workbenchWindowAdvisor/>
@@ -142,5 +219,24 @@
 </trimArea>
 </trimLayout>
 </window>
-<mruList/>
+<mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.project.metadata" name="rcptt.properties" tooltip="RedGuiTests/rcptt.properties">
+<persistable path="/RedGuiTests/rcptt.properties"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.context" name="GeneralContext.ctx" tooltip="RedGuiTests/GeneralContext.ctx">
+<persistable path="/RedGuiTests/GeneralContext.ctx"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.context" name="1.ctx" tooltip="RedGuiTests/1.ctx">
+<persistable path="/RedGuiTests/1.ctx"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" name="Re,pveRobotProject.test" tooltip="RedGuiTests/ProjectExplorer/Re,pveRobotProject.test">
+<persistable path="/RedGuiTests/ProjectExplorer/Re,pveRobotProject.test"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.scenario" name="CreateRobotProject.test" tooltip="RedGuiTests/ProjectExplorer/CreateRobotProject.test">
+<persistable path="/RedGuiTests/ProjectExplorer/CreateRobotProject.test"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.rcptt.ui.editors.test.suite" name="BasicTests.suite" tooltip="RedGuiTests/BasicTests.suite">
+<persistable path="/RedGuiTests/BasicTests.suite"/>
+</file>
+</mruList>
 </workbench>
