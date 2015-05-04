@@ -49,7 +49,8 @@ public class RobotSuiteSettingsSection extends RobotSuiteFileSection {
             @Override
             public boolean apply(final RobotElement element) {
                 return element instanceof RobotSetting
-                        && (((RobotSetting) element).getGroup() == SettingsGroup.METADATA);
+                        && SettingsGroup.getImportsGroupsSet()
+                                .contains((((RobotSetting) element).getGroup()));
             }
         }));
     }

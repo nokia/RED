@@ -61,7 +61,6 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
     @Override
     public final void initialize(final IManagedForm managedForm) {
         super.initialize(managedForm);
-        super.initialize(managedForm);
         final SashForm sash = (SashForm) managedForm.getForm().getBody().getChildren()[0];
         final SashForm rightPanelSash = (SashForm) sash.getChildren()[1];
         final Composite rightPanelBottomComposite = (Composite) rightPanelSash.getChildren()[1];
@@ -92,7 +91,10 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        setInput();
+        viewer.setInput(getImportElements());
+        createColumns(true);
+        viewer.refresh();
+        viewer.packFirstColumn();
     }
 
     private int calcualateLongestArgumentsLength() {
@@ -112,7 +114,7 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
     private void setInput() {
         viewer.setInput(getImportElements());
         viewer.removeColumns(1);
-        createColumns(!viewer.hasAtLeastOneColumn());
+        createColumns(false);
         viewer.packFirstColumn();
     }
 
@@ -121,7 +123,7 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
                 .findSection(RobotSuiteSettingsSection.class);
 
         if (settingsSection.isPresent()) {
-            return ((RobotSuiteSettingsSection) settingsSection.get()).getMetadataSettings();
+            return ((RobotSuiteSettingsSection) settingsSection.get()).getImportSettings();
         }
         return null;
     }

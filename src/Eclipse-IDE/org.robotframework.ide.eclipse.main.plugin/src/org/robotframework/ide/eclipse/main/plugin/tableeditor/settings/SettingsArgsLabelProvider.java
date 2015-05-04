@@ -36,12 +36,18 @@ public class SettingsArgsLabelProvider extends ColumnLabelProvider implements IS
 
     @Override
     public String getToolTipText(final Object element) {
-        final String tooltipText = getText(element);
-        return tooltipText.isEmpty() ? "<empty>" : tooltipText;
+        if (element instanceof RobotSetting) {
+            final String tooltipText = getText(element);
+            return tooltipText.isEmpty() ? "<empty>" : tooltipText;
+        }
+        return null;
     }
 
     @Override
-    public Image getToolTipImage(final Object object) {
-        return RobotImages.getTooltipImage().createImage();
+    public Image getToolTipImage(final Object element) {
+        if (element instanceof RobotSetting) {
+            return RobotImages.getTooltipImage().createImage();
+        }
+        return null;
     }
 }
