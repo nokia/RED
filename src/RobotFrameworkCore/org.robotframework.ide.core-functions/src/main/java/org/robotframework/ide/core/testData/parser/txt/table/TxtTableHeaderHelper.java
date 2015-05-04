@@ -8,8 +8,12 @@ import org.robotframework.ide.core.testData.parser.util.ByteBufferInputStream;
 
 
 /**
+ * Responsible for help to parse TXT table header i.e.: {@code *** Settings ***}
+ * 
  * 
  * @author wypych
+ * @serial RobotFramework 2.8.6
+ * @serial 1.0
  * 
  */
 public class TxtTableHeaderHelper {
@@ -56,6 +60,136 @@ public class TxtTableHeaderHelper {
         }
 
         return header;
+    }
+
+    /**
+     * Container of information collected by helper during parsing TXT table
+     * headers
+     * 
+     * @author wypych
+     * @serial RobotFramework 2.8.6
+     * @serial 1.0
+     * 
+     */
+    public class TableHeader {
+
+        // optional [condition ~ 1]
+        private int numberOfStartPipes = 0;
+        // conditional in case [condition ~ 1] is meet then mandatory
+        private StringBuilder separatorsAfterPipes = new StringBuilder();
+        // mandatory - minimum 1 expected
+        private int numberOfBeginAsterisks = 0;
+        // optional
+        private StringBuilder separatorsAfterBeginAsterisks = new StringBuilder();
+        // mandatory
+        private StringBuilder expectedText = new StringBuilder();
+        // optional in example it could be last letters in [expectedText] like
+        // 's' in Settings table
+        private StringBuilder optionalChars = new StringBuilder();
+        // after it could be just 2 spaces separator, tabulator or end of
+        // stream, new line [condition ~ 1] should be checked
+        private StringBuilder optionalEndBeforeEndAsteriskOrSeparator = new StringBuilder();
+
+        // in case no optional end:
+        //
+        //
+        // mandatory
+        private int numberOfEndAsteriks = 0;
+
+        // optional end - it could be just 2 spaces separator, tabulator or end
+        // of stream, new line [condition ~ 1] should be checked
+        private StringBuilder optionalEndOrSeparatorAfterEndAsterisks = new StringBuilder();
+        // conditional in case [condition ~ 1] is met
+        private int numberOfEndPipes = 0;
+        // final end of stream, 2 space separator, tabulator or new line
+        private StringBuilder endOrSeperator = new StringBuilder();
+
+        private ParsingHeaderState state = ParsingHeaderState.BEGIN_PIPES;
+
+        private final char[] expectedCharsCommonArray;
+        private final char[] optionalCharsArray;
+
+
+        public TableHeader(final char[] expectedCharsCommon,
+                final char[] optionalChars) {
+            this.expectedCharsCommonArray = expectedCharsCommon;
+            this.optionalCharsArray = optionalChars;
+        }
+
+
+        public int getNumberOfStartPipes() {
+            return numberOfStartPipes;
+        }
+
+
+        public String getAfterPipeSeparators() {
+            return separatorsAfterPipes.toString();
+        }
+
+
+        public int getNumberOfBeginAsterisks() {
+            return numberOfBeginAsterisks;
+        }
+
+
+        public String getSeparatorsAfterBeginAsterisks() {
+            return separatorsAfterBeginAsterisks.toString();
+        }
+
+
+        public String getExpectedText() {
+            return expectedText.toString();
+        }
+
+
+        public String getOptionalChars() {
+            return optionalChars.toString();
+        }
+
+
+        public String getOptionalEndBeforeEndAsterisksOrSeparator() {
+            return optionalEndBeforeEndAsteriskOrSeparator.toString();
+        }
+
+
+        public int getNumberOfEndAsteriks() {
+            return numberOfEndAsteriks;
+        }
+
+
+        public String getOptionalEndOrSeparatorAfterEndAsterisks() {
+            return optionalEndOrSeparatorAfterEndAsterisks.toString();
+        }
+
+
+        public int getNumberOfEndPipes() {
+            return numberOfEndPipes;
+        }
+
+
+        public String getEndOrSeperator() {
+            return endOrSeperator.toString();
+        }
+
+
+        public boolean computeFinalResult() {
+            boolean shouldParse = false;
+            if (state == ParsingHeaderState.MEET_OK) {
+                shouldParse = true;
+            } else if (state == ParsingHeaderState.MEET_FAILED) {
+                shouldParse = false;
+            } else {
+                if (state == ParsingHeaderState.EXPECTED_TEXT) {
+                    shouldParse = (this.expectedText.length() == expectedCharsCommonArray.length);
+                } else if (state == ParsingHeaderState.TABLE_END_ASTERISKS) {
+                    shouldParse = (numberOfEndAsteriks > 0);
+                } else if (state == ParsingHeaderState.OPTIONAL_TEXT) {
+                    shouldParse = (optionalChars.length() == optionalCharsArray.length);
+                }
+            }
+
+            return shouldParse;
+        }
     }
 
     private class TableHeaderStateHandlerFactory {
@@ -460,127 +594,6 @@ public class TxtTableHeaderHelper {
 
     private enum LoopNextStep {
         LOOP_CONTINUE, LOOP_BREAK, MOVE_TO_NEXT
-    }
-
-    public class TableHeader {
-
-        // optional [condition ~ 1]
-        private int numberOfStartPipes = 0;
-        // conditional in case [condition ~ 1] is meet then mandatory
-        private StringBuilder separatorsAfterPipes = new StringBuilder();
-        // mandatory - minimum 1 expected
-        private int numberOfBeginAsterisks = 0;
-        // optional
-        private StringBuilder separatorsAfterBeginAsterisks = new StringBuilder();
-        // mandatory
-        private StringBuilder expectedText = new StringBuilder();
-        // optional in example it could be last letters in [expectedText] like
-        // 's' in Settings table
-        private StringBuilder optionalChars = new StringBuilder();
-        // after it could be just 2 spaces separator, tabulator or end of
-        // stream, new line [condition ~ 1] should be checked
-        private StringBuilder optionalEndBeforeEndAsteriskOrSeparator = new StringBuilder();
-
-        // in case no optional end:
-        //
-        //
-        // mandatory
-        private int numberOfEndAsteriks = 0;
-
-        // optional end - it could be just 2 spaces separator, tabulator or end
-        // of stream, new line [condition ~ 1] should be checked
-        private StringBuilder optionalEndOrSeparatorAfterEndAsterisks = new StringBuilder();
-        // conditional in case [condition ~ 1] is met
-        private int numberOfEndPipes = 0;
-        // final end of stream, 2 space separator, tabulator or new line
-        private StringBuilder endOrSeperator = new StringBuilder();
-
-        private ParsingHeaderState state = ParsingHeaderState.BEGIN_PIPES;
-
-        private final char[] expectedCharsCommonArray;
-        private final char[] optionalCharsArray;
-
-
-        public TableHeader(final char[] expectedCharsCommon,
-                final char[] optionalChars) {
-            this.expectedCharsCommonArray = expectedCharsCommon;
-            this.optionalCharsArray = optionalChars;
-        }
-
-
-        public int getNumberOfStartPipes() {
-            return numberOfStartPipes;
-        }
-
-
-        public String getAfterPipeSeparators() {
-            return separatorsAfterPipes.toString();
-        }
-
-
-        public int getNumberOfBeginAsterisks() {
-            return numberOfBeginAsterisks;
-        }
-
-
-        public String getSeparatorsAfterBeginAsterisks() {
-            return separatorsAfterBeginAsterisks.toString();
-        }
-
-
-        public String getExpectedText() {
-            return expectedText.toString();
-        }
-
-
-        public String getOptionalChars() {
-            return optionalChars.toString();
-        }
-
-
-        public String getOptionalEndBeforeEndAsterisksOrSeparator() {
-            return optionalEndBeforeEndAsteriskOrSeparator.toString();
-        }
-
-
-        public int getNumberOfEndAsteriks() {
-            return numberOfEndAsteriks;
-        }
-
-
-        public String getOptionalEndOrSeparatorAfterEndAsterisks() {
-            return optionalEndOrSeparatorAfterEndAsterisks.toString();
-        }
-
-
-        public int getNumberOfEndPipes() {
-            return numberOfEndPipes;
-        }
-
-
-        public String getEndOrSeperator() {
-            return endOrSeperator.toString();
-        }
-
-
-        public boolean computeFinalResult() {
-            boolean shouldParse = false;
-            if (state == ParsingHeaderState.MEET_OK) {
-                shouldParse = true;
-            } else if (state == ParsingHeaderState.MEET_FAILED) {
-                shouldParse = false;
-            } else {
-                if (state == ParsingHeaderState.EXPECTED_TEXT) {
-                    shouldParse = (this.expectedText.length() == expectedCharsCommonArray.length);
-                } else if (state == ParsingHeaderState.TABLE_END_ASTERISKS) {
-                    shouldParse = (numberOfEndAsteriks > 0);
-                } else if (state == ParsingHeaderState.OPTIONAL_TEXT) {
-                    shouldParse = (optionalChars.length() == optionalCharsArray.length);
-                }
-            }
-
-            return shouldParse;
-        }
     }
 
     private enum ParsingHeaderState {
