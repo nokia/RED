@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
@@ -105,7 +104,7 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
         createViewer(panel);
 
         setInput();
-        packFirstColumn();
+        viewer.packFirstColumn();
     }
 
     private Composite createPanel(final Section section) {
@@ -226,17 +225,6 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
         return column;
     }
 
-    private void reloadColumns() {
-        int i = 0;
-        for (final TableColumn column : viewer.getTable().getColumns()) {
-            if (i > 0) { // no need to remove first column
-                column.dispose();
-            }
-            i++;
-        }
-        createColumns(false);
-    }
-
     private int calcualateLongestArgumentsLength() {
         int max = 1;
         for (final Entry<String, RobotElement> entry : model.getEntries()) {
@@ -248,10 +236,6 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
         return max;
     }
 
-    private void packFirstColumn() {
-        viewer.getTable().getColumn(0).pack();
-    }
-
     private void setInput() {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
                 .findSection(RobotSuiteSettingsSection.class);
@@ -260,8 +244,9 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
         documentation.setEnabled(settingsSection.isPresent());
         documentation.setText(model.getDocumentation());
 
-        reloadColumns();
         viewer.setInput(model);
+        viewer.removeColumns(1);
+        createColumns(false);
     }
 
     @Override
