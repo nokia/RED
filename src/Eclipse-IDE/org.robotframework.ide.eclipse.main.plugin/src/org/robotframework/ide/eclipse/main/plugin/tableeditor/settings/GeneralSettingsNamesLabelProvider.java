@@ -48,21 +48,26 @@ public class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider imple
 
     @Override
     public StyledString getStyledText(final Object element) {
-        final Entry<String, RobotElement> entry = getEntry(element);
-
-        if (entry.getValue() == null) {
-            return new StyledString(entry.getKey(), Stylers.withForeground(200, 200, 200));
+        final RobotSetting setting = getSetting(element);
+        if (setting == null) {
+            return new StyledString(getSettingName(element), Stylers.withForeground(200, 200, 200));
         } else {
-            return new StyledString(entry.getKey());
+            return new StyledString(setting.getName());
         }
     }
 
     @Override
     public String getToolTipText(final Object element) {
         final Entry<String, RobotElement> entry = getEntry(element);
-        final String keyword = entry.getValue() == null ? "given in first argument" : getKeyword(entry.getValue());
+        final RobotSetting setting = getSetting(element);
+        final String keyword = setting == null ? "given in first argument" : getKeyword(setting);
         
         return String.format(tooltips.get(entry.getKey()), keyword);
+    }
+
+    private String getKeyword(final RobotSetting element) {
+        final List<String> arguments = element.getArguments();
+        return arguments.isEmpty() ? "<empty>" : "'" + arguments.get(0) + "'";
     }
 
     @Override
@@ -70,13 +75,16 @@ public class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider imple
         return RobotImages.getTooltipImage().createImage();
     }
 
-    private String getKeyword(final RobotElement element) {
-        final List<String> arguments = ((RobotSetting) element).getArguments();
-        return arguments.isEmpty() ? "<empty>" : "'" + arguments.get(0) + "'";
-    }
-
     @SuppressWarnings("unchecked")
     private Entry<String, RobotElement> getEntry(final Object element) {
         return (Entry<String, RobotElement>) element;
+    }
+
+    private String getSettingName(final Object element) {
+        return (String) ((Entry<?, ?>) element).getKey();
+    }
+
+    private RobotSetting getSetting(final Object element) {
+        return (RobotSetting) ((Entry<?, ?>) element).getValue();
     }
 }

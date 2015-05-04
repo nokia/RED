@@ -1,10 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import java.util.Map.Entry;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 
 public class SettingsCommentsEditingSupport extends EditingSupport {
 
@@ -24,13 +27,22 @@ public class SettingsCommentsEditingSupport extends EditingSupport {
 
     @Override
     protected Object getValue(final Object element) {
-        return "";
+        final RobotSetting setting = getSetting(element);
+        return setting != null ? setting.getComment() : "";
     }
 
     @Override
     protected void setValue(final Object element, final Object value) {
-        // TODO Auto-generated method stub
+        final RobotSetting setting = getSetting(element);
 
     }
 
+    private RobotSetting getSetting(final Object element) {
+        if (element instanceof RobotSetting) {
+            return (RobotSetting) element;
+        } else if (element instanceof Entry<?, ?>) {
+            return (RobotSetting) ((Entry<?, ?>) element).getValue();
+        }
+        return null;
+    }
 }

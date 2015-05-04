@@ -10,7 +10,7 @@ public abstract class RobotKeywordCall implements RobotElement {
     private final RobotElement parent;
     private final String name;
     private final List<String> args;
-    private final String comment;
+    private String comment;
 
     RobotKeywordCall(final RobotElement parent, final String name, final List<String> args, final String comment) {
         this.parent = parent;
@@ -45,6 +45,10 @@ public abstract class RobotKeywordCall implements RobotElement {
 
     public String getComment() {
         return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     @Override
