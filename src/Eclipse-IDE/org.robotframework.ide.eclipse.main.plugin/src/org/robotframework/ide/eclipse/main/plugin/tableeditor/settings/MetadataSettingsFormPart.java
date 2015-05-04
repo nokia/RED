@@ -90,7 +90,7 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
         ViewerColumnsFactory.newColumn("Metadata").withWidth(140)
                 .labelsProvidedBy(new MetadataSettingsNamesLabelProvider()).createFor(viewer);
         ViewerColumnsFactory.newColumn("Value").withWidth(140)
-                .labelsProvidedBy(new MetadataSettingsValuesLabelProvider()).createFor(viewer);
+                .labelsProvidedBy(new SettingsArgsLabelProvider(1)).createFor(viewer);
         ViewerColumnsFactory.newColumn("Comment").withWidth(140)
                 .labelsProvidedBy(new SettingsCommentsLabelProvider()).createFor(viewer);
 
@@ -106,7 +106,7 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
                 .findSection(RobotSuiteSettingsSection.class);
 
         if (settingsSection.isPresent()) {
-            return ((RobotSuiteSettingsSection) settingsSection.get()).getImportSettings();
+            return ((RobotSuiteSettingsSection) settingsSection.get()).getMetadataSettings();
         }
         return null;
     }

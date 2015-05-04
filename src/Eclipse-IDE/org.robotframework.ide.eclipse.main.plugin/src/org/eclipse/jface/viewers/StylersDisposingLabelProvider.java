@@ -22,9 +22,4 @@ public abstract class StylersDisposingLabelProvider extends ColumnLabelProvider 
         stylersToDispose.add(styler);
         return styler;
     }
-
-    @Override
-    public String getText(final Object element) {
-        return getStyledText(element).toString();
-    }
 }

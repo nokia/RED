@@ -8,13 +8,9 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 class VariableValueLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
-    public String getText(final Object element) {
-        return element instanceof RobotVariable ? ((RobotVariable) element).getValue() : "";
-    }
-
-    @Override
     public StyledString getStyledText(final Object element) {
-        return new StyledString(getText(element));
+        final String text = element instanceof RobotVariable ? ((RobotVariable) element).getValue() : "";
+        return new StyledString(text);
     }
 
     @Override
