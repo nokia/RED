@@ -45,6 +45,8 @@ public class RobotModelEvents {
 
     public static final String ROBOT_SETTING_ARGUMENT_CHANGED = "robot/model/editor/file/detail/setting/changed/argument";
 
+    public static final String ROBOT_SETTING_COMMENT_CHANGED = "robot/model/editor/file/detail/setting/changed/comment";
+
 
     public static final String EXTERNAL_MODEL_CHANGE = "robot/model/external";
 

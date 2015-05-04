@@ -39,4 +39,8 @@ public class RowExposingTableViewer extends TableViewer {
     public void packFirstColumn() {
         getTable().getColumn(0).pack();
     }
+
+    public boolean hasAtLeastOneColumn() {
+        return getTable().getColumnCount() > 0;
+    }
 }
