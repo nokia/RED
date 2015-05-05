@@ -8,13 +8,28 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class SettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class SettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     private final int index;
+    private final boolean withAddingTokenInfo;
 
-    public SettingsArgsLabelProvider(final int index) {
+    SettingsArgsLabelProvider(final int index) {
+        this(index, false);
+    }
+
+    SettingsArgsLabelProvider(final int index, final boolean withAddingTokenInfo) {
         this.index = index;
+        this.withAddingTokenInfo = withAddingTokenInfo;
+    }
+
+    @Override
+    public Image getImage(final Object element) {
+        if (withAddingTokenInfo && element instanceof ElementAddingToken) {
+            return ((ElementAddingToken) element).getImage();
+        }
+        return super.getImage(element);
     }
 
     @Override
@@ -31,7 +46,12 @@ public class SettingsArgsLabelProvider extends ColumnLabelProvider implements IS
 
     @Override
     public StyledString getStyledText(final Object element) {
-        return new StyledString(getText(element));
+        if (element instanceof RobotSetting) {
+            return new StyledString(getText(element));
+        } else if (withAddingTokenInfo && element instanceof ElementAddingToken) {
+            return ((ElementAddingToken) element).getStyledText();
+        }
+        return new StyledString();
     }
 
     @Override

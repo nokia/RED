@@ -13,11 +13,11 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallComment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
-public class GeneralSettingsCommentsEditingSupport extends EditingSupport {
+class GeneralSettingsCommentsEditingSupport extends EditingSupport {
 
     private final RobotEditorCommandsStack commandsStack;
 
-    public GeneralSettingsCommentsEditingSupport(final ColumnViewer column, final RobotEditorCommandsStack commandsStack) {
+    GeneralSettingsCommentsEditingSupport(final ColumnViewer column, final RobotEditorCommandsStack commandsStack) {
         super(column);
         this.commandsStack = commandsStack;
     }

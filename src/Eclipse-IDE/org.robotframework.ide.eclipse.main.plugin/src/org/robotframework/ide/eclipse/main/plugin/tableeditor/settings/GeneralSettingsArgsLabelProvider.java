@@ -12,11 +12,11 @@ import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 
-public class GeneralSettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class GeneralSettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     private final int index;
 
-    public GeneralSettingsArgsLabelProvider(final int index) {
+    GeneralSettingsArgsLabelProvider(final int index) {
         this.index = index;
     }
 

@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class MetadataSettingsContentProvider implements IStructuredContentProvider {
+class MetadataSettingsContentProvider implements IStructuredContentProvider {
 
     private ElementAddingToken elementAddingToken;
     private final boolean editable;
