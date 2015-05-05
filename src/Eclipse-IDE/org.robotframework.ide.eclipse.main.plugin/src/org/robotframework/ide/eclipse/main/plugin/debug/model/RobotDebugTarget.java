@@ -92,11 +92,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private KeywordFinder keywordFinder = new KeywordFinder();
 
-    private List<Integer> currentExecutionLines;
+    private Map<String, List<Integer>> currentExecutionLinesInFile;
 
-    private List<Integer> executedBreakpointsLines;
+    private Map<String, List<Integer>> executedBreakpointsInFile;
     
     private Map<String, String> currentResourceFiles;
+    
+    private int currentStepOverLevel = 0;
 
     private IFile executedFile;
 
@@ -162,9 +164,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         // TODO: check keywords in currentFrames and search keywords only after
                         // parent keywords
                         int keywordLine = keywordFinder.getKeywordLine(currentFile, currentKeyword, args,
-                                currentExecutionLines);
+                                currentExecutionLinesInFile.get(currentFile.getName()));
                         if (keywordLine >= 0) {
-                            currentExecutionLines.add(keywordLine);
+                            List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
+                            if (executionLines == null) {
+                                executionLines = new ArrayList<Integer>();
+                                currentExecutionLinesInFile.put(currentFile.getName(), executionLines);
+                            }
+                            executionLines.add(keywordLine);
                         }
 
                         boolean isBreakpoint = false;
@@ -178,6 +185,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                                 if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
                                     int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                                             IMarker.LINE_NUMBER);
+                                    List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
+                                    if(executedBreakpointsLines == null) {
+                                        executedBreakpointsLines = new ArrayList<Integer>();
+                                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
+                                    }
                                     if (!executedBreakpointsLines.contains(breakpointLineNum)
                                             && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
                                                     currentKeyword, args, keywordLine)) {
@@ -193,9 +205,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                             }
                         }
 
-                        if (isBreakpoint || thread.isStepping()) {
-
+                        if ((isBreakpoint || thread.isStepping()) && !hasStepOver()) {
+                            
                             if (thread.isStepping()) {
+                                thread.setSteppingOver(false);
                                 sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
                             }
                             stackFrames = null;
@@ -210,13 +223,17 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         }
                         currentFrames.put(currentKeyword, new ActiveKeyword(null, fileName, keywordLine));
                         
+                        //first keyword with resource name is in old file, so until second keyword there is a need to switch between files
                         String[] keywordNameParts = currentKeyword.split("\\.");
                         if(keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
                             //next keyword from here will be in another file
                             String resourceName = keywordNameParts[0];
                             
                             //TODO: get somehow name with extension of resource file
-                            currentResourceFiles.put(currentKeyword, findResourceName(resourceName));
+                            String resourceFileName = findResourceName(resourceName);
+                            if(!resourceFileName.equals("")) {
+                                currentResourceFiles.put(currentKeyword, resourceFileName);
+                            }
                         }
                     }
 
@@ -240,6 +257,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                         
                         String[] keywordNameParts = keyword.split("\\.");
                         if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
+                            String fileName = currentResourceFiles.get(keyword);
+                            currentExecutionLinesInFile.remove(fileName);
+                            executedBreakpointsInFile.remove(fileName);
+                            sendClearEventToTextEditor(fileName);
+                            
                             currentResourceFiles.remove(keyword);
                         }
                     }
@@ -249,7 +271,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     }
 
                     if (map.containsKey("close")) {
-                        sendClearHighlightedLineEventToTextEditor();
+                        sendClearAllEventToTextEditor();
                         terminated();
                     }
 
@@ -275,8 +297,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         target = this;
         this.process = process;
         currentFrames = new LinkedHashMap<>();
-        currentExecutionLines = new ArrayList<>();
-        executedBreakpointsLines = new ArrayList<>();
+        currentExecutionLinesInFile = new LinkedHashMap<>();
+        executedBreakpointsInFile = new LinkedHashMap<>();
         currentResourceFiles = new LinkedHashMap<>();
         this.executedFile = executedFile;
         this.partListener = partListener;
@@ -400,7 +422,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
         terminated();
 
-        sendClearHighlightedLineEventToTextEditor();
+        sendClearAllEventToTextEditor();
     }
 
     /*
@@ -444,16 +466,18 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         sendMessageToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
 
-        sendClearHighlightedLineEventToTextEditor();
+        sendClearAllEventToTextEditor();
     }
 
-    /**
-     * Single step
-     */
     protected void step() {
         thread.setStepping(true);
         sendMessageToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
+    }
+    
+    protected void stepOver() {
+        currentStepOverLevel = currentFrames.size();
+        step();
     }
 
     /**
@@ -653,9 +677,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         broker.send("TextEditor/HighlightLine", eventMap);
     }
     
-    private void sendClearHighlightedLineEventToTextEditor() {
+    private void sendClearAllEventToTextEditor() {
 
-        broker.send("TextEditor/ClearHighlightedLine", 0);
+        broker.send("TextEditor/ClearHighlightedLine", "");
+    }
+    
+    private void sendClearEventToTextEditor(String file) {
+
+        broker.send("TextEditor/ClearHighlightedLine", file);
     }
     
     private void sendAppendLineEventToMessageLogView(String line) {
@@ -694,4 +723,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return partListener;
     }
     
+    private boolean hasStepOver() {
+
+        if (thread.isSteppingOver() && currentStepOverLevel <= currentFrames.size()) {
+            return true;
+        }
+
+        return false;
+    }
 }
