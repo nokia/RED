@@ -20,6 +20,8 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * Whether this thread is stepping
      */
     private boolean isStepping = false;
+    
+    private boolean isSteppingOver = false;
 
     /**
      * Constructs a new thread for the given target
@@ -145,7 +147,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.IStep#canStepInto()
      */
     public boolean canStepInto() {
-        return false;
+        return isSuspended();
     }
 
     /*
@@ -177,6 +179,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.IStep#stepInto()
      */
     public void stepInto() throws DebugException {
+        ((RobotDebugTarget) getDebugTarget()).step();
     }
 
     /*
@@ -184,7 +187,8 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.IStep#stepOver()
      */
     public void stepOver() throws DebugException {
-        ((RobotDebugTarget) getDebugTarget()).step();
+        isSteppingOver = true;
+        ((RobotDebugTarget) getDebugTarget()).stepOver();
     }
 
     /*
@@ -226,5 +230,13 @@ public class RobotThread extends RobotDebugElement implements IThread {
      */
     protected void setStepping(boolean stepping) {
         isStepping = stepping;
+    }
+    
+    protected void setSteppingOver(boolean stepping) {
+        isSteppingOver = stepping;
+    }
+    
+    public boolean isSteppingOver() {
+        return isSteppingOver;
     }
 }
