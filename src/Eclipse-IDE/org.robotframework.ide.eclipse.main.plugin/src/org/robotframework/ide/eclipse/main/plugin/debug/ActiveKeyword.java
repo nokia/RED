@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.debug.model;
+package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.util.Map;
 

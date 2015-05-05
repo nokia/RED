@@ -1,11 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
 public class RobotPartListener implements IPartListener {
@@ -14,10 +11,10 @@ public class RobotPartListener implements IPartListener {
 
     private int lineNumber;
 
-    private IEventBroker broker;
+    private RobotEventBroker robotEventBroker;
 
-    public RobotPartListener(IEventBroker broker) {
-        this.broker = broker;
+    public RobotPartListener(RobotEventBroker robotEventBroker) {
+        this.robotEventBroker = robotEventBroker;
     }
 
     @Override
@@ -28,7 +25,7 @@ public class RobotPartListener implements IPartListener {
                 String editorInputName = texteditor.getEditorInput().getName();
 
                 if (editorInputName.equals(fileName)) {
-                    sendHighlightLineEventToTextEditor(fileName, lineNumber);
+                    robotEventBroker.sendHighlightLineEventToTextEditor(fileName, lineNumber);
                 }
             }
         }
@@ -48,14 +45,6 @@ public class RobotPartListener implements IPartListener {
 
     @Override
     public void partActivated(IWorkbenchPart part) {
-    }
-
-    private void sendHighlightLineEventToTextEditor(String file, int line) {
-
-        Map<String, String> eventMap = new HashMap<>();
-        eventMap.put("file", file);
-        eventMap.put("line", String.valueOf(line));
-        broker.send("TextEditor/HighlightLine", eventMap);
     }
 
     public String getFileName() {
