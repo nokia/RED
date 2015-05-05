@@ -1,19 +1,21 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallComment;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
-class SettingsCommentsEditingSupport extends RobotElementEditingSupport {
+class SettingsArgsEditingSupport extends RobotElementEditingSupport {
 
-    SettingsCommentsEditingSupport(final ColumnViewer column, final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
-        super(column, ((TableViewer) column).getTable().getColumnCount(), commandsStack, creator);
+    SettingsArgsEditingSupport(final ColumnViewer viewer, final int index,
+            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
+        super(viewer, index, commandsStack, creator);
     }
 
     @Override
@@ -28,7 +30,10 @@ class SettingsCommentsEditingSupport extends RobotElementEditingSupport {
     protected Object getValue(final Object element) {
         if (element instanceof RobotSetting) {
             final RobotSetting setting = (RobotSetting) element;
-            return setting != null ? setting.getComment() : "";
+            final List<String> arguments = setting.getArguments();
+            if (index < arguments.size()) {
+                return arguments.get(index);
+            }
         }
         return "";
     }
@@ -37,9 +42,9 @@ class SettingsCommentsEditingSupport extends RobotElementEditingSupport {
     protected void setValue(final Object element, final Object value) {
         if (element instanceof RobotSetting) {
             final RobotSetting setting = (RobotSetting) element;
-            final String comment = (String) value;
+            final String arg = (String) value;
 
-            commandsStack.execute(new SetSettingKeywordCallComment(setting, comment));
+            commandsStack.execute(new SetSettingKeywordCallArgument(setting, index, arg));
         } else {
             super.setValue(element, value);
         }

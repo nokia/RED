@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -31,13 +30,15 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
-public class ImportsSettingsFormPart extends AbstractFormPart {
+class ImportsSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -52,10 +53,6 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
 
     public ImportsSettingsFormPart(final IEditorSite site) {
         this.site = site;
-    }
-
-    TableViewer getViewer() {
-        return viewer;
     }
 
     @Override
@@ -111,21 +108,23 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
         return max;
     }
 
-    private void setInput() {
+    private void refreshInput() {
         viewer.setInput(getImportElements());
         viewer.removeColumns(1);
         createColumns(false);
+        viewer.refresh();
         viewer.packFirstColumn();
     }
 
     private List<RobotElement> getImportElements() {
+        final RobotSuiteSettingsSection section = getSection();
+        return section != null ? section.getImportSettings() : null;
+    }
+
+    private RobotSuiteSettingsSection getSection() {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
                 .findSection(RobotSuiteSettingsSection.class);
-
-        if (settingsSection.isPresent()) {
-            return ((RobotSuiteSettingsSection) settingsSection.get()).getImportSettings();
-        }
-        return null;
+        return (RobotSuiteSettingsSection) settingsSection.orNull();
     }
 
     private void createColumns(final boolean createFirst) {
@@ -134,23 +133,21 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
                     .labelsProvidedBy(new SettingsCallNameLabelProvider())
                     .createFor(viewer);
         }
-        if (getViewer().getInput() == null) {
+        if (viewer.getInput() == null) {
             return;
         }
 
-        ViewerColumnsFactory.newColumn("Name / Path").withWidth(80)
-                .labelsProvidedBy(new SettingsArgsLabelProvider(0))
-                .createFor(viewer);
+        final NewElementsCreator creator = newElementsCreator();
 
         final int max = calcualateLongestArgumentsLength();
+        createArgumentColumn("Name / Path", 0, creator);
         for (int i = 1; i < max; i++) {
-            ViewerColumnsFactory.newColumn("").withWidth(80)
-                    .labelsProvidedBy(new SettingsArgsLabelProvider(i))
-                    .createFor(viewer);
+            createArgumentColumn("", i, creator);
         }
         ViewerColumnsFactory.newColumn("Comment").withWidth(100)
                 .labelsProvidedBy(new SettingsCommentsLabelProvider())
-                .editingSupportedBy(new SettingsCommentsEditingSupport(viewer))
+                .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
 
         final int newColumnsStartingPosition = max + 1;
@@ -163,12 +160,28 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
                         new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
                             @Override
                             public void createColumn(final int index) {
-                                ViewerColumnsFactory.newColumn("").withWidth(80)
-                                        .labelsProvidedBy(new SettingsArgsLabelProvider(index - 1))
-                                        .createFor(viewer);
+                                createArgumentColumn("", index - 1, creator);
                             }
                         }))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
+    }
+
+    private static NewElementsCreator newElementsCreator() {
+        return new NewElementsCreator() {
+            @Override
+            public RobotElement createNew() {
+                return null;
+            }
+        };
+    }
+    
+    private void createArgumentColumn(final String name, final int index, final NewElementsCreator creator) {
+        ViewerColumnsFactory.newColumn(name).withWidth(80)
+            .labelsProvidedBy(new SettingsArgsLabelProvider(index))
+            .editingSupportedBy(new SettingsArgsEditingSupport(viewer, index, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
     }
 
     @Override
@@ -189,7 +202,7 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
+            refreshInput();
             markDirty();
         }
     }
@@ -199,7 +212,28 @@ public class ImportsSettingsFormPart extends AbstractFormPart {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
+            refreshInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            refreshInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingDetailsChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+        final List<?> input = (List<?>) viewer.getInput();
+        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
+            refreshInput();
             markDirty();
         }
     }
