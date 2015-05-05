@@ -463,6 +463,20 @@
           </reference></enabledWhen>
     </handler>
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteSettingsHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeSettingsPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.atLeastOneSettingIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertNewVariableHandler"
           commandId="org.robotframework.ide.eclipse.insertNew">
        <activeWhen>
@@ -584,6 +598,33 @@
              style="push">
        </command>
     </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.settings.metadata.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
  </extension>
  <extension
        point="org.eclipse.core.expressions.propertyTesters">
@@ -688,6 +729,50 @@
                    value="1">
              </count>
           </and>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.activeSettingsPartIsEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.settings.context">
+                </equals>
+             </iterate>
+             <not>
+                 <iterate
+                     ifEmpty="false"
+                     operator="or">
+                    <equals
+                        value="org.robotframework.ide.eclipse.details.context">
+                    </equals>
+                 </iterate>
+              </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.atLeastOneSettingIsSelected">
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="and">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotSetting">
+             </instanceof>
+          </iterate>
        </with>
     </definition>
  </extension>

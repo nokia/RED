@@ -7,6 +7,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
@@ -14,13 +15,18 @@ import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
@@ -53,6 +59,10 @@ class ImportsSettingsFormPart extends AbstractFormPart {
 
     public ImportsSettingsFormPart(final IEditorSite site) {
         this.site = site;
+    }
+
+    TableViewer getViewer() {
+        return viewer;
     }
 
     @Override
@@ -88,6 +98,8 @@ class ImportsSettingsFormPart extends AbstractFormPart {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        createContextMenu();
+
         viewer.setInput(getImportElements());
         createColumns(true);
         viewer.refresh();
@@ -106,6 +118,27 @@ class ImportsSettingsFormPart extends AbstractFormPart {
             }
         }
         return max;
+    }
+
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+
+        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
+        final Table control = viewer.getTable();
+        control.addMenuDetectListener(new MenuDetectListener() {
+
+            @Override
+            public void menuDetected(final MenuDetectEvent e) {
+                e.doit = !isClickedOnHeader(e);
+            }
+
+            private boolean isClickedOnHeader(final MenuDetectEvent e) {
+                return control.toControl(e.x, e.y).y <= control.getHeaderHeight();
+            }
+        });
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
     }
 
     private void refreshInput() {
