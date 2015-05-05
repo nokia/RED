@@ -286,9 +286,16 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final int line) {
-	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
-        breakpointLine = 0;
+    private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final String file) {
+	    if("".equals(file)) {
+	        viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
+	        breakpointLine = 0;
+	    } else {
+	        if(editedFile.getName().equals(file)) {
+	            viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
+	            breakpointLine = 0;
+	        }
+	    }
     }
 	
 	private ParameterizedCommand createSaveAsCommand() {

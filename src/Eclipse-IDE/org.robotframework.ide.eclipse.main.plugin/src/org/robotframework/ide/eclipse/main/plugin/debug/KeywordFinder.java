@@ -79,7 +79,7 @@ public class KeywordFinder {
                             count++;
                         }
                     }
-                    if (count == args.size() && !executedLines.contains(lineNum)) {
+                    if (count == args.size() && (executedLines==null || !executedLines.contains(lineNum))) {
                         result = lineNum;
                         break;
                     }
