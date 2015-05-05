@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,7 +13,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -27,13 +28,16 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
-public class MetadataSettingsFormPart extends AbstractFormPart {
+class MetadataSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -48,10 +52,6 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
 
     public MetadataSettingsFormPart(final IEditorSite site) {
         this.site = site;
-    }
-
-    TableViewer getViewer() {
-        return viewer;
     }
 
     @Override
@@ -87,14 +87,35 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        final NewElementsCreator creator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Metadata").withWidth(140)
-                .labelsProvidedBy(new MetadataSettingsNamesLabelProvider()).createFor(viewer);
+                .labelsProvidedBy(new SettingsArgsLabelProvider(0, true))
+                .editingSupportedBy(new SettingsArgsEditingSupport(viewer, 0, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
+                .createFor(viewer);
         ViewerColumnsFactory.newColumn("Value").withWidth(140)
-                .labelsProvidedBy(new SettingsArgsLabelProvider(1)).createFor(viewer);
+                .labelsProvidedBy(new SettingsArgsLabelProvider(1))
+                .editingSupportedBy(new SettingsArgsEditingSupport(viewer, 1, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
+                .createFor(viewer);
         ViewerColumnsFactory.newColumn("Comment").withWidth(140)
-                .labelsProvidedBy(new SettingsCommentsLabelProvider()).createFor(viewer);
+                .labelsProvidedBy(new SettingsCommentsLabelProvider())
+                .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
+                .createFor(viewer);
 
         setInput();
+    }
+
+    private NewElementsCreator newElementsCreator() {
+        return new NewElementsCreator() {
+            @Override
+            public RobotElement createNew() {
+                final RobotSuiteSettingsSection settingsSection = getSection();
+                commandsStack.execute(new CreateSettingKeywordCall(settingsSection, "Metadata", newArrayList("data")));
+                return settingsSection.getChildren().get(settingsSection.getChildren().size() - 1);
+            }
+        };
     }
 
     private void setInput() {
@@ -102,13 +123,14 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
     }
 
     private List<RobotElement> getMetadataElements() {
+        final RobotSuiteSettingsSection section = getSection();
+        return section != null ? section.getMetadataSettings() : null;
+    }
+
+    private RobotSuiteSettingsSection getSection() {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
                 .findSection(RobotSuiteSettingsSection.class);
-
-        if (settingsSection.isPresent()) {
-            return ((RobotSuiteSettingsSection) settingsSection.get()).getMetadataSettings();
-        }
-        return null;
+        return (RobotSuiteSettingsSection) settingsSection.orNull();
     }
 
     @Override
@@ -139,6 +161,27 @@ public class MetadataSettingsFormPart extends AbstractFormPart {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingDetailsChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+        final List<?> input = (List<?>) viewer.getInput();
+        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
             setInput();
             markDirty();
         }

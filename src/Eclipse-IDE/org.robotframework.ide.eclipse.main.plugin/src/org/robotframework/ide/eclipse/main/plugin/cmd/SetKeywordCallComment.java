@@ -3,7 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class SetKeywordCallComment extends EditorCommand {
+class SetKeywordCallComment extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
     private final String comment;
@@ -22,6 +22,6 @@ public class SetKeywordCallComment extends EditorCommand {
         }
         keywordCall.setComment(comment);
         
-        eventBroker.post(topic, keywordCall);
+        eventBroker.send(topic, keywordCall);
     }
 }

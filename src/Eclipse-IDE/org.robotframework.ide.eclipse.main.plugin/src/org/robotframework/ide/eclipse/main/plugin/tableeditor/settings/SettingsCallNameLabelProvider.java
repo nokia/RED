@@ -8,7 +8,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     @Override
     public Image getImage(final Object element) {

@@ -15,6 +15,7 @@ public class ViewerColumnsFactory {
     private Image image;
     private String tooltip;
     private EditingSupport editingSupport;
+    private boolean shouldAddEditingSupport;
 
     public static ViewerColumnsFactory newColumn(final String name) {
         return new ViewerColumnsFactory(name);
@@ -59,6 +60,11 @@ public class ViewerColumnsFactory {
         return this;
     }
 
+    public ViewerColumnsFactory editingEnabledOnlyWhen(final boolean condition) {
+        this.shouldAddEditingSupport = condition;
+        return this;
+    }
+
     public TableViewerColumn createFor(final TableViewer viewer) {
         final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
         column.getColumn().setWidth(width);
@@ -75,7 +81,9 @@ public class ViewerColumnsFactory {
         column.getColumn().setToolTipText(tooltip);
         column.getColumn().setResizable(resizable);
         column.setLabelProvider(labelProvider);
-        column.setEditingSupport(editingSupport);
+        if (shouldAddEditingSupport) {
+            column.setEditingSupport(editingSupport);
+        }
         return column;
     }
 
@@ -95,7 +103,9 @@ public class ViewerColumnsFactory {
         column.getColumn().setToolTipText(tooltip);
         column.getColumn().setResizable(resizable);
         column.setLabelProvider(labelProvider);
-        column.setEditingSupport(editingSupport);
+        if (shouldAddEditingSupport) {
+            column.setEditingSupport(editingSupport);
+        }
         return column;
     }
 }

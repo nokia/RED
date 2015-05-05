@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 
-public class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     private final Map<String, String> tooltips = new LinkedHashMap<>(); {
         tooltips.put("Suite Setup",

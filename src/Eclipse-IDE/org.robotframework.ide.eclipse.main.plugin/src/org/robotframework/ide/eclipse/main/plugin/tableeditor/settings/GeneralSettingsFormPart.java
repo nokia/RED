@@ -51,7 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
-public class GeneralSettingsFormPart extends AbstractFormPart {
+class GeneralSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -176,11 +176,13 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
             ViewerColumnsFactory.newColumn("").withWidth(80)
                     .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(i))
                     .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
+                    .editingEnabledOnlyWhen(fileModel.isEditable())
                     .createFor(viewer);
         }
         ViewerColumnsFactory.newColumn("Comment").withWidth(100)
                 .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider())
                 .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
 
         final int newColumnsStartingPosition = max + 1;
@@ -197,9 +199,11 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
                                         .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(index - 1))
                                         .editingSupportedBy(
                                                 new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack))
+                                        .editingEnabledOnlyWhen(fileModel.isEditable())
                                         .createFor(viewer);
                             }
                         }))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
     }
 
@@ -285,7 +289,7 @@ public class GeneralSettingsFormPart extends AbstractFormPart {
     @Optional
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        if (setting.getSuiteFile() == fileModel) {
+        if (setting.getSuiteFile() == fileModel && model.contains(setting)) {
             setInput();
             markDirty();
         }

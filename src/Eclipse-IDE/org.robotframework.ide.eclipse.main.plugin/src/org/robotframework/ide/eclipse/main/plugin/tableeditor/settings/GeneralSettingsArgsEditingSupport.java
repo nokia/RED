@@ -16,12 +16,12 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
-public class GeneralSettingsArgsEditingSupport extends EditingSupport {
+class GeneralSettingsArgsEditingSupport extends EditingSupport {
 
     private final int index;
     private final RobotEditorCommandsStack commandsStack;
 
-    public GeneralSettingsArgsEditingSupport(final ColumnViewer column, final int index,
+    GeneralSettingsArgsEditingSupport(final ColumnViewer column, final int index,
             final RobotEditorCommandsStack commandsStack) {
         super(column);
         this.index = index;

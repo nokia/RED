@@ -3,7 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-public class GeneralSettingsContentProvider implements IStructuredContentProvider {
+class GeneralSettingsContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
