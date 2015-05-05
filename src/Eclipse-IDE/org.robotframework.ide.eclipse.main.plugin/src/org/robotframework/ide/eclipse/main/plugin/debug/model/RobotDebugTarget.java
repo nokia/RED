@@ -1,31 +1,17 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -37,14 +23,13 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.debug.KeywordFinder;
+import org.robotframework.ide.eclipse.main.plugin.debug.ActiveKeyword;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
  * @author mmarzec
- *
  */
 public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget {
 
@@ -77,232 +62,26 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private IThread[] threads;
 
-    // event dispatch job
-    private EventDispatchJob eventDispatch;
-
-    private ObjectMapper mapper = new ObjectMapper();
-
     private Map<String, ActiveKeyword> currentFrames;
-
-    private String currentKeyword = "";
-
-    private String currentSuite = "";
 
     private IStackFrame[] stackFrames;
 
-    private KeywordFinder keywordFinder = new KeywordFinder();
-
-    private Map<String, List<Integer>> currentExecutionLinesInFile;
-
-    private Map<String, List<Integer>> executedBreakpointsInFile;
-    
-    private Map<String, String> currentResourceFiles;
-    
     private int currentStepOverLevel = 0;
 
-    private IFile executedFile;
-
-    private IEventBroker broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-    
     private RobotPartListener partListener;
-    
-    /**
-     * Listens to events from the TestRunnerAgent and fires corresponding
-     * debug events.
-     */
-    class EventDispatchJob extends Job {
 
-        public EventDispatchJob() {
-            super("Robot Event Dispatch");
-            setSystem(true);
-        }
+    private RobotEventBroker robotEventBroker;
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-         */
-        @SuppressWarnings("unchecked")
-        protected IStatus run(IProgressMonitor monitor) {
-            try {
-                String event;
-                while (!isTerminated() && (event = messageReader.readLine()) != null && messageReader != null) {
-
-                    Map<String, Object> map = mapper.readValue(event, Map.class);
-                    
-                    if (map.containsKey("pid")) {
-                        sendClearEventToMessageLogView();
-                        started();
-                    }
-
-                    if (map.containsKey("start_suite")) {
-                        List<Object> list = (List<Object>) map.get("start_suite");
-                        Map<String, String> elements = (Map<String, String>) list.get(1);
-                        currentSuite = new File(elements.get("source")).getName();
-                    }
-
-                    if (map.containsKey("start_keyword")) {
-                        List<Object> list = (List<Object>) map.get("start_keyword");
-                        currentKeyword = (String) list.get(0);
-                        Map<String, Object> elements = (Map<String, Object>) list.get(1);
-                        List<String> args = (List<String>) elements.get("args");
-                        
-                        
-                        String executedSuite = "";
-                        IFile currentFile = null;
-                        if(!currentResourceFiles.isEmpty()) {
-                            String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
-                            currentFile = executedFile.getProject().getFile(resource);
-                            if(!currentFile.exists()) {
-                                currentFile = executedFile.getProject().getFile(executedFile.getParent().getName() + "/" + resource);
-                            }
-                            executedSuite = resource;
-                        } else {
-                            currentFile = executedFile;
-                            executedSuite = currentSuite;
-                        }
-                        
-                        // TODO: check keywords in currentFrames and search keywords only after
-                        // parent keywords
-                        int keywordLine = keywordFinder.getKeywordLine(currentFile, currentKeyword, args,
-                                currentExecutionLinesInFile.get(currentFile.getName()));
-                        if (keywordLine >= 0) {
-                            List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
-                            if (executionLines == null) {
-                                executionLines = new ArrayList<Integer>();
-                                currentExecutionLinesInFile.put(currentFile.getName(), executionLines);
-                            }
-                            executionLines.add(keywordLine);
-                        }
-
-                        boolean isBreakpoint = false;
-                        IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
-                                .getBreakpointManager()
-                                .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
-                        for (int i = 0; i < currentBreakpoints.length; i++) {
-                            IBreakpoint currentBreakpoint = currentBreakpoints[i];
-                            String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
-                            try {
-                                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
-                                    int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
-                                            IMarker.LINE_NUMBER);
-                                    List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
-                                    if(executedBreakpointsLines == null) {
-                                        executedBreakpointsLines = new ArrayList<Integer>();
-                                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
-                                    }
-                                    if (!executedBreakpointsLines.contains(breakpointLineNum)
-                                            && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
-                                                    currentKeyword, args, keywordLine)) {
-                                        executedBreakpointsLines.add(breakpointLineNum);
-                                        isBreakpoint = true;
-                                        breakpointHit(currentBreakpoint);
-                                        sendHighlightLineEventToTextEditor(executedSuite, breakpointLineNum);
-                                    }
-
-                                }
-                            } catch (CoreException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        if ((isBreakpoint || thread.isStepping()) && !hasStepOver()) {
-                            
-                            if (thread.isStepping()) {
-                                thread.setSteppingOver(false);
-                                sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
-                            }
-                            stackFrames = null;
-                            sendMessageToAgent("stop");
-                        } else {
-                            sendMessageToAgent("run");
-                        }
-                        
-                        String fileName = currentSuite;
-                        if(!currentResourceFiles.isEmpty()) {
-                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
-                        }
-                        currentFrames.put(currentKeyword, new ActiveKeyword(null, fileName, keywordLine));
-                        
-                        //first keyword with resource name is in old file, so until second keyword there is a need to switch between files
-                        String[] keywordNameParts = currentKeyword.split("\\.");
-                        if(keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
-                            //next keyword from here will be in another file
-                            String resourceName = keywordNameParts[0];
-                            
-                            //TODO: get somehow name with extension of resource file
-                            String resourceFileName = findResourceName(resourceName);
-                            if(!resourceFileName.equals("")) {
-                                currentResourceFiles.put(currentKeyword, resourceFileName);
-                            }
-                        }
-                    }
-
-                    if (map.containsKey("vars")) {
-                        List<Object> list = (List<Object>) map.get("vars");
-                        Map<String, String> vars = (Map<String, String>) list.get(1);
-                      
-//                        String fileName = currentSuite;
-//                        if(!currentResourceFiles.isEmpty()) {
-//                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
-//                        }
-//                        currentFrames.put(currentKeyword, new ActiveKeyword(vars, fileName));
-                    
-                        ((ActiveKeyword) currentFrames.values().toArray()[currentFrames.size()-1]).setVariables(vars);
-                    }
-
-                    if (map.containsKey("end_keyword")) {
-                        List<Object> list = (List<Object>) map.get("end_keyword");
-                        String keyword = (String) list.get(0);
-                        currentFrames.remove(keyword);
-                        
-                        String[] keywordNameParts = keyword.split("\\.");
-                        if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
-                            String fileName = currentResourceFiles.get(keyword);
-                            currentExecutionLinesInFile.remove(fileName);
-                            executedBreakpointsInFile.remove(fileName);
-                            sendClearEventToTextEditor(fileName);
-                            
-                            currentResourceFiles.remove(keyword);
-                        }
-                    }
-
-                    if (map.containsKey("paused")) {
-                        suspended(DebugEvent.CLIENT_REQUEST);
-                    }
-
-                    if (map.containsKey("close")) {
-                        sendClearAllEventToTextEditor();
-                        terminated();
-                    }
-
-                    if (map.containsKey("log_message")) {
-                        List<Object> list = (List<Object>) map.get("log_message");
-                        Map<String, String> elements = (Map<String, String>) list.get(0);
-                        String line = elements.get("timestamp") + " : " + elements.get("level") + " : "
-                                + elements.get("message") + '\n';
-                        sendAppendLineEventToMessageLogView(line);
-                    }
-                }
-            } catch (IOException e) {
-                terminated();
-            }
-            return Status.OK_STATUS;
-        }
-    }
-
-    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile, RobotPartListener partListener)
-            throws CoreException {
+    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile,
+            RobotPartListener partListener, RobotEventBroker robotEventBroker) throws CoreException {
         super(null);
-        this.launch = launch;
         target = this;
+        this.launch = launch;
         this.process = process;
-        currentFrames = new LinkedHashMap<>();
-        currentExecutionLinesInFile = new LinkedHashMap<>();
-        executedBreakpointsInFile = new LinkedHashMap<>();
-        currentResourceFiles = new LinkedHashMap<>();
-        this.executedFile = executedFile;
         this.partListener = partListener;
-        
+        this.robotEventBroker = robotEventBroker;
+        currentFrames = new LinkedHashMap<>();
+
         try {
             serverSocket = new ServerSocket(54470);
             serverSocket.setReuseAddress(true);
@@ -315,8 +94,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         thread = new RobotThread(this);
         threads = new IThread[] { thread };
-        eventDispatch = new EventDispatchJob();
-        eventDispatch.schedule();
+
+        RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, executedFile,
+                robotEventBroker);
+        eventDispatcher.schedule();
+
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
     }
 
@@ -422,7 +204,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
         terminated();
 
-        sendClearAllEventToTextEditor();
+        robotEventBroker.sendClearAllEventToTextEditor();
     }
 
     /*
@@ -466,7 +248,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         sendMessageToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
 
-        sendClearAllEventToTextEditor();
+        robotEventBroker.sendClearAllEventToTextEditor();
     }
 
     protected void step() {
@@ -474,7 +256,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         sendMessageToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
     }
-    
+
     protected void stepOver() {
         currentStepOverLevel = currentFrames.size();
         step();
@@ -486,7 +268,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param detail
      *            reason for the resume
      */
-    private void resumed(int detail) {
+    public void resumed(int detail) {
         isSuspended = false;
         thread.fireResumeEvent(detail);
     }
@@ -497,7 +279,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param detail
      *            reason for the suspend
      */
-    private void suspended(int detail) {
+    public void suspended(int detail) {
         isSuspended = true;
         thread.fireSuspendEvent(detail);
     }
@@ -505,7 +287,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     /**
      * Notification we have connected to the Agent and it has started.
      */
-    private void started() {
+    public void started() {
         fireCreationEvent();
         installDeferredBreakpoints();
     }
@@ -513,12 +295,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     /**
      * Called when this debug target terminates.
      */
-    private void terminated() {
+    public void terminated() {
         isTerminated = true;
         isSuspended = false;
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
-        
+
         try {
             serverSocket.close();
         } catch (IOException e) {
@@ -630,12 +412,16 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return stackFrames;
     }
 
+    public void clearStackFrames() {
+        stackFrames = null;
+    }
+
     /**
      * Set the thread's breakpoint
      * 
      * @param breakpoint
      */
-    private void breakpointHit(IBreakpoint breakpoint) {
+    public void breakpointHit(IBreakpoint breakpoint) {
 
         if (breakpoint instanceof ILineBreakpoint) {
             thread.setBreakpoints(new IBreakpoint[] { breakpoint });
@@ -647,7 +433,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * 
      * @param message
      */
-    private void sendMessageToAgent(String message) {
+    public void sendMessageToAgent(String message) {
 
         synchronized (messageSocket) {
             messageWriter.print(message);
@@ -669,66 +455,32 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    private void sendHighlightLineEventToTextEditor(String file, int line) {
-
-        Map<String, String> eventMap = new HashMap<>();
-        eventMap.put("file", file);
-        eventMap.put("line", String.valueOf(line));
-        broker.send("TextEditor/HighlightLine", eventMap);
-    }
-    
-    private void sendClearAllEventToTextEditor() {
-
-        broker.send("TextEditor/ClearHighlightedLine", "");
-    }
-    
-    private void sendClearEventToTextEditor(String file) {
-
-        broker.send("TextEditor/ClearHighlightedLine", file);
-    }
-    
-    private void sendAppendLineEventToMessageLogView(String line) {
-
-        broker.send("MessageLogView/AppendLine", line);
-    }
-    
-    private void sendClearEventToMessageLogView() {
-
-        broker.send("MessageLogView/Clear", "");
-    }
-    
-    private String findResourceName(String resourceName) {
-        IProject project = executedFile.getProject();
-        String txtFile = resourceName + ".txt";
-        String robotFile = resourceName + ".robot";
-        if (project.getFile(robotFile).exists()) {
-            return robotFile;
-        } else if (project.getFile(txtFile).exists()) {
-            return txtFile;
-        }
-
-        IContainer parent = executedFile.getParent();
-        if (parent != null && parent.getType() == IResource.FOLDER) {
-            if (project.getFile(parent.getName() + "/" + robotFile).exists()) {
-                return robotFile;
-            } else if (project.getFile(parent.getName() + "/" + txtFile).exists()) {
-                return txtFile;
-            }
-        }
-
-        return "";
-    }
-
-    public RobotPartListener getPartListener() {
-        return partListener;
-    }
-    
-    private boolean hasStepOver() {
+    public boolean hasStepOver() {
 
         if (thread.isSteppingOver() && currentStepOverLevel <= currentFrames.size()) {
             return true;
         }
 
         return false;
+    }
+
+    public RobotPartListener getPartListener() {
+        return partListener;
+    }
+
+    public BufferedReader getMessageReader() {
+        return messageReader;
+    }
+
+    public RobotThread getRobotThread() {
+        return thread;
+    }
+
+    public Map<String, ActiveKeyword> getCurrentFrames() {
+        return currentFrames;
+    }
+
+    public ActiveKeyword getLastKeywordFromCurrentFrames() {
+        return (ActiveKeyword) currentFrames.values().toArray()[currentFrames.size() - 1];
     }
 }

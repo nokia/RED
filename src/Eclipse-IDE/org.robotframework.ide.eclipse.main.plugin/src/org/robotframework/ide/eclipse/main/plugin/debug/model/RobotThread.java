@@ -98,7 +98,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @param breakpoints
      *            the breakpoints this thread is suspended at, or <code>null</code> if none
      */
-    protected void setBreakpoints(IBreakpoint[] breakpoints) {
+    public void setBreakpoints(IBreakpoint[] breakpoints) {
         this.breakpoints = breakpoints;
     }
 
@@ -232,7 +232,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
         isStepping = stepping;
     }
     
-    protected void setSteppingOver(boolean stepping) {
+    public void setSteppingOver(boolean stepping) {
         isSteppingOver = stepping;
     }
     
