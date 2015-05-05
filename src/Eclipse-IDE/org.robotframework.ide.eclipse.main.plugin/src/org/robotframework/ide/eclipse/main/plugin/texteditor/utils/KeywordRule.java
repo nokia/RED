@@ -71,18 +71,21 @@ public class KeywordRule implements IRule {
 			    char nextElem = (char) scanner.read();
 			    scanner.unread();
 			    if(nextElem == ' ' && findKeywordByLength(tempKeywords, readCount)) {
+			        currentReadCount = readCount;
 			        scanner.unread();
 	                return true;
 			    }
 			}
 			
 			if(elem == '\t' || elem == '\n' || elem == '\r' && findKeywordByLength(tempKeywords, readCount)) {
+			    currentReadCount = readCount;
 			    scanner.unread();
 			    return true;
 			}
 			
 			if(isInKeyword(elem, readCount+1, tempKeywords)) {
 				if(tempKeywords.size()==1 && (readCount+1) == tempKeywords.get(0).length()) {
+				    currentReadCount = readCount;
 					return true;
 				}
 			} else {
@@ -103,7 +106,7 @@ public class KeywordRule implements IRule {
 	}
 	
 	private void clearScanner(ICharacterScanner scanner, int readCount) {
-	    for (; readCount > 0; readCount--)
+	    for (; readCount > 1; readCount--)
             scanner.unread();
 	}
 	
