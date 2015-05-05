@@ -14,13 +14,16 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
 
     protected final RobotEditorCommandsStack commandsStack;
 
-    private final int indexToActivate;
+    protected final int index;
+
+    private final NewElementsCreator creator;
 
     public RobotElementEditingSupport(final ColumnViewer viewer, final int index,
-            final RobotEditorCommandsStack commandsStack) {
+            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
         super(viewer);
         this.commandsStack = commandsStack;
-        this.indexToActivate = index;
+        this.index = index;
+        this.creator = creator;
     }
 
     @Override
@@ -39,12 +42,9 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ElementAddingToken) {
-            final RobotElement newElement = createNewElement();
-            scheduleViewerRefreshAndEditorActivation(newElement, indexToActivate);
+            scheduleViewerRefreshAndEditorActivation(creator.createNew(), index);
         }
     }
-
-    protected abstract RobotElement createNewElement();
 
     // refresh and cell editor activation has to be done in GUI thread but after
     // current cell editor was properly deactivated
@@ -56,5 +56,10 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
                 getViewer().editElement(value, cellColumnToActivate);
             }
         });
+    }
+
+    public interface NewElementsCreator {
+
+        RobotElement createNew();
     }
 }

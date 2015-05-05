@@ -8,13 +8,10 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -36,8 +33,10 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
@@ -79,19 +78,42 @@ public class VariablesFormPart extends AbstractFormPart {
         viewer.getTable().setHeaderVisible(true);
         viewer.setUseHashlookup(true);
 
-        createColumn("Variable", 270, new VariableNameLabelProvider(),
-                new VariableNameEditingSupport(viewer, commandsStack));
+        final NewElementsCreator creator = newElementsCreator();
 
-        createColumn("Value", 270, new VariableValueLabelProvider(), 
-                new VariableValueEditingSupport(viewer, commandsStack));
+        ViewerColumnsFactory.newColumn("Variable").withWidth(270)
+            .labelsProvidedBy(new VariableNameLabelProvider())
+            .editingSupportedBy(new VariableNameEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
 
-        createColumn("Comment", 400, new VariableCommentLabelProvider(),
-                new VariableCommentEditingSupport(viewer, commandsStack));
+        ViewerColumnsFactory.newColumn("Value").withWidth(270)
+            .labelsProvidedBy(new VariableValueLabelProvider())
+            .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
+
+        ViewerColumnsFactory.newColumn("Comment").withWidth(400)
+            .labelsProvidedBy(new VariableCommentLabelProvider())
+            .editingSupportedBy(new VariableCommentEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
 
         createContextMenu();
         registerDeselectionListener();
 
         setInput();
+    }
+
+    private NewElementsCreator newElementsCreator() {
+        return new NewElementsCreator() {
+            @Override
+            public RobotElement createNew() {
+                final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
+                commandsStack.execute(new CreateFreshVariableCommand(section, true));
+
+                return section.getChildren().get(section.getChildren().size() - 1);
+            }
+        };
     }
 
     private void registerDeselectionListener() {
@@ -139,17 +161,6 @@ public class VariablesFormPart extends AbstractFormPart {
         } else {
             viewer.setInput(null);
             viewer.refresh();
-        }
-    }
-
-    private void createColumn(final String columnName, final int width, final IStyledLabelProvider labelProvider,
-            final EditingSupport editingSupport) {
-        final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-        column.getColumn().setText(columnName);
-        column.getColumn().setWidth(width);
-        column.setLabelProvider(new TooltipsEnablingDelegatingStyledCellLabelProvider(labelProvider));
-        if (fileModel.isEditable()) {
-            column.setEditingSupport(editingSupport);
         }
     }
 

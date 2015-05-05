@@ -68,4 +68,8 @@ class GeneralSettingsModel {
     Set<Entry<String, RobotElement>> getEntries() {
         return settings.entrySet();
     }
+
+    public boolean contains(final RobotSetting setting) {
+        return settings.values().contains(setting);
+    }
 }

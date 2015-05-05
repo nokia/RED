@@ -4,18 +4,16 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
 class VariableCommentEditingSupport extends RobotElementEditingSupport {
 
-    VariableCommentEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack) {
-        super(viewer, 2, commandsStack);
+    VariableCommentEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack,
+            final NewElementsCreator creator) {
+        super(viewer, 2, commandsStack, creator);
     }
 
     @Override
@@ -44,13 +42,5 @@ class VariableCommentEditingSupport extends RobotElementEditingSupport {
         } else {
             super.setValue(element, value);
         }
-    }
-
-    @Override
-    protected RobotElement createNewElement() {
-        final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
-        commandsStack.execute(new CreateFreshVariableCommand(section, true));
-
-        return section.getChildren().get(section.getChildren().size() - 1);
     }
 }
