@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -8,29 +8,29 @@ import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.MoveVariableDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertNewVariableHandler.E4InsertNewHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableDownHandler.E4MoveVariableDownHandler;
 import org.robotframework.viewers.Selections;
 
-public class InsertNewVariableHandler extends DIHandler<E4InsertNewHandler> {
+public class MoveVariableDownHandler extends DIHandler<E4MoveVariableDownHandler> {
 
-    public InsertNewVariableHandler() {
-        super(E4InsertNewHandler.class);
+    public MoveVariableDownHandler() {
+        super(E4MoveVariableDownHandler.class);
     }
 
-    public static class E4InsertNewHandler {
+    public static class E4MoveVariableDownHandler {
 
         @Inject
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public Object addNewVariable(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public Object moveVariableDown(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final RobotVariable selectedVariable = Selections.getSingleElement(selection, RobotVariable.class);
             final RobotSuiteFileSection variablesSection = (RobotSuiteFileSection) selectedVariable.getParent();
             final int index = variablesSection.getChildren().indexOf(selectedVariable);
-            
-            stack.execute(new CreateFreshVariableCommand(variablesSection, index));
+
+            stack.execute(new MoveVariableDownCommand(variablesSection, index));
             return null;
         }
     }

@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -10,7 +10,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.cmd.MoveVariableUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.MoveVariableUpHandler.E4MoveVariableUpHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler.E4MoveVariableUpHandler;
 import org.robotframework.viewers.Selections;
 
 public class MoveVariableUpHandler extends DIHandler<E4MoveVariableUpHandler> {

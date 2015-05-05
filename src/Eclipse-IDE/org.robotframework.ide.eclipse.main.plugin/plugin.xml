@@ -450,7 +450,7 @@
  <extension
        point="org.eclipse.ui.handlers">
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteVariablesHandler"
           commandId="org.eclipse.ui.edit.delete">
        <activeWhen>
           <reference
@@ -477,7 +477,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertNewVariableHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler"
           commandId="org.robotframework.ide.eclipse.insertNew">
        <activeWhen>
           <reference
@@ -491,7 +491,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.MoveVariableUpHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler"
           commandId="org.robotframework.ide.eclipse.moveElementUp">
        <activeWhen>
           <reference
@@ -505,7 +505,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.MoveVariableDownHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableDownHandler"
           commandId="org.robotframework.ide.eclipse.moveElementDown">
        <activeWhen>
           <reference
@@ -519,7 +519,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.SortVariablesHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.SortVariablesHandler"
           commandId="org.robotframework.ide.eclipse.sortElements">
        <activeWhen>
           <reference
