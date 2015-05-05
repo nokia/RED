@@ -31,7 +31,7 @@ public class SettingsEditorPage extends SectionEditorPage {
     private static final String ID = "org.robotframework.ide.eclipse.editor.settingsPage";
     private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.context";
 
-    private GeneralSettingsFormPart settingsPart;
+    private GeneralSettingsFormPart generalPart;
     private MetadataSettingsFormPart metadataPart;
     private ImportsSettingsFormPart importsPart;
 
@@ -76,15 +76,15 @@ public class SettingsEditorPage extends SectionEditorPage {
     public void revealElement(final RobotElement element) {
         final RobotSetting setting = (RobotSetting) element;
         if (setting.getGroup() == SettingsGroup.NO_GROUP) {
-            settingsPart.revealSetting(setting);
+            generalPart.revealSetting(setting);
             metadataPart.clearSettingsSelection();
             importsPart.clearSettingsSelection();
         } else if (setting.getGroup() == SettingsGroup.METADATA) {
-            settingsPart.clearSettingsSelection();
+            generalPart.clearSettingsSelection();
             metadataPart.revealSetting(setting);
             importsPart.clearSettingsSelection();
         } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
-            settingsPart.clearSettingsSelection();
+            generalPart.clearSettingsSelection();
             metadataPart.clearSettingsSelection();
             importsPart.revealSetting(setting);
         }
@@ -92,15 +92,16 @@ public class SettingsEditorPage extends SectionEditorPage {
 
     @Override
     protected List<? extends IFormPart> createPageParts(final IEditorSite editorSite) {
-        settingsPart = new GeneralSettingsFormPart(editorSite);
+        generalPart = new GeneralSettingsFormPart(editorSite);
         metadataPart = new MetadataSettingsFormPart(editorSite);
         importsPart = new ImportsSettingsFormPart(editorSite);
-        return Arrays.asList(settingsPart, metadataPart, importsPart);
+        return Arrays.asList(generalPart, metadataPart, importsPart);
     }
 
     @Override
     protected ISelectionProvider getSelectionProvider() {
-        return settingsPart.getViewer();
+        return new SettingsEditorPageSelectionProvider(generalPart.getViewer(),
+                metadataPart.getViewer(), importsPart.getViewer());
     }
 
     @Override
