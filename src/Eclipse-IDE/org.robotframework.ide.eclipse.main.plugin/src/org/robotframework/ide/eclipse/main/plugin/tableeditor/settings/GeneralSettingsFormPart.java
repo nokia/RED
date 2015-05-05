@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
@@ -24,12 +25,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
@@ -95,6 +100,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
         createDocumentationControl(panel);
         createViewer(panel);
+        createContextMenu();
 
         setInput();
         viewer.packFirstColumn();
@@ -216,6 +222,27 @@ class GeneralSettingsFormPart extends AbstractFormPart {
             }
         }
         return max;
+    }
+
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu";
+
+        final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
+        final Table control = viewer.getTable();
+        control.addMenuDetectListener(new MenuDetectListener() {
+
+            @Override
+            public void menuDetected(final MenuDetectEvent e) {
+                e.doit = !isClickedOnHeader(e);
+            }
+
+            private boolean isClickedOnHeader(final MenuDetectEvent e) {
+                return control.toControl(e.x, e.y).y <= control.getHeaderHeight();
+            }
+        });
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
     }
 
     private void setInput() {
