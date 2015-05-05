@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SortVariablesCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.SortVariablesHandler.E4SortVariablesHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.SortVariablesHandler.E4SortVariablesHandler;
 
 import com.google.common.base.Optional;
 
