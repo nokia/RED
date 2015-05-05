@@ -52,13 +52,14 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     private ILaunchConfigurationType launchConfigurationType;
 
     private ILaunchManager manager;
-
-    private IEventBroker broker;
+    
+    private RobotEventBroker robotEventBroker;
 
     public RobotLaunchConfigurationDelegate() {
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(ROBOT_LAUNCH_CONFIGURATION_TYPE);
-        broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        IEventBroker broker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        robotEventBroker = new RobotEventBroker(broker);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
 
                         @Override
                         public void handleLine(String line) {
-                            broker.send("MessageLogView/AppendLine", line);
+                            robotEventBroker.sendAppendLineEventToMessageLogView(line);
                         }
                     });
                     process = DebugPlugin.exec(cmd, project.getLocation().toFile());
@@ -144,10 +145,10 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
                         IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, executorNameAttribute);
                         printCommandOnConsole(cmd, executorNameAttribute);
 
-                        robotPartListener = new RobotPartListener(broker);
+                        robotPartListener = new RobotPartListener(robotEventBroker);
                         new TogglePartListenerJob(robotPartListener, false).schedule();
 
-                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file, robotPartListener);
+                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file, robotPartListener, robotEventBroker);
                         launch.addDebugTarget(target);
                     }
                 }
@@ -305,7 +306,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     }
 
     private void clearMessageLogView() {
-        broker.send("MessageLogView/Clear", "");
+        robotEventBroker.sendClearEventToMessageLogView();
     }
 
     private void printCommandOnConsole(String[] cmd, String executor) {
