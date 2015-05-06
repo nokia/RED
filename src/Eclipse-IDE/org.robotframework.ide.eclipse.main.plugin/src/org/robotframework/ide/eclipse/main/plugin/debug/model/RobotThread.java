@@ -22,6 +22,8 @@ public class RobotThread extends RobotDebugElement implements IThread {
     private boolean isStepping = false;
     
     private boolean isSteppingOver = false;
+    
+    private boolean isSteppingReturn = false;
 
     /**
      * Constructs a new thread for the given target
@@ -163,7 +165,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.IStep#canStepReturn()
      */
     public boolean canStepReturn() {
-        return false;
+        return isSuspended() && ((RobotDebugTarget) getDebugTarget()).getCurrentFrames().size() > 1;
     }
 
     /*
@@ -196,6 +198,8 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.IStep#stepReturn()
      */
     public void stepReturn() throws DebugException {
+        isSteppingReturn = true;
+        ((RobotDebugTarget) getDebugTarget()).stepReturn();
     }
 
     /*
@@ -238,5 +242,13 @@ public class RobotThread extends RobotDebugElement implements IThread {
     
     public boolean isSteppingOver() {
         return isSteppingOver;
+    }
+    
+    public void setSteppingReturn(boolean stepping) {
+        isSteppingReturn = stepping;
+    }
+    
+    public boolean isSteppingReturn() {
+        return isSteppingReturn;
     }
 }

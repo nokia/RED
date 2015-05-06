@@ -2,7 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.util.Map;
 
-public class ActiveKeyword {
+public class KeywordContext {
 
     private Map<String, String> variables;
 
@@ -10,10 +10,13 @@ public class ActiveKeyword {
     
     private int lineNumber;
 
-    public ActiveKeyword(Map<String, String> variables, String fileName, int lineNumber) {
+    public KeywordContext(Map<String, String> variables, String fileName, int lineNumber) {
         this.variables = variables;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
+    }
+    
+    public KeywordContext() {
     }
 
     public Map<String, String> getVariables() {

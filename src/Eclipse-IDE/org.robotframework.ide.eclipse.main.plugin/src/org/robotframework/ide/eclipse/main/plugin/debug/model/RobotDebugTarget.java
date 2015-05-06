@@ -23,7 +23,7 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.robotframework.ide.eclipse.main.plugin.debug.ActiveKeyword;
+import org.robotframework.ide.eclipse.main.plugin.debug.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
@@ -62,11 +62,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private IThread[] threads;
 
-    private Map<String, ActiveKeyword> currentFrames;
+    private Map<String, KeywordContext> currentFrames;
 
     private IStackFrame[] stackFrames;
 
     private int currentStepOverLevel = 0;
+    
+    private int currentStepReturnLevel = 0;
 
     private RobotPartListener partListener;
 
@@ -261,6 +263,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         currentStepOverLevel = currentFrames.size();
         step();
     }
+    
+    protected void stepReturn() {
+        currentStepReturnLevel = currentFrames.size();
+        step();
+    }
 
     /**
      * Notification the target has resumed for the given reason
@@ -401,10 +408,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             stackFrames = new IStackFrame[currentFrames.size()];
             int i = 1;
             for (String key : currentFrames.keySet()) {
-                ActiveKeyword activeKeyword = currentFrames.get(key);
+                KeywordContext keywordContext = currentFrames.get(key);
 
-                stackFrames[currentFrames.size() - i] = new RobotStackFrame(thread, activeKeyword.getFileName(), key,
-                        activeKeyword.getLineNumber(), activeKeyword.getVariables(), i);
+                stackFrames[currentFrames.size() - i] = new RobotStackFrame(thread, keywordContext.getFileName(), key,
+                        keywordContext.getLineNumber(), keywordContext.getVariables(), i);
                 i++;
             }
         }
@@ -463,6 +470,15 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         return false;
     }
+    
+    public boolean hasStepReturn() {
+
+        if (thread.isSteppingReturn() && currentStepReturnLevel <= currentFrames.size()+1) {
+            return true;
+        }
+
+        return false;
+    }
 
     public RobotPartListener getPartListener() {
         return partListener;
@@ -476,11 +492,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return thread;
     }
 
-    public Map<String, ActiveKeyword> getCurrentFrames() {
+    public Map<String, KeywordContext> getCurrentFrames() {
         return currentFrames;
     }
 
-    public ActiveKeyword getLastKeywordFromCurrentFrames() {
-        return (ActiveKeyword) currentFrames.values().toArray()[currentFrames.size() - 1];
+    public KeywordContext getLastKeywordFromCurrentFrames() {
+        if(currentFrames.size() > 0) {
+            return (KeywordContext) currentFrames.values().toArray()[currentFrames.size() - 1];
+        }
+        return new KeywordContext();
     }
 }

@@ -45,7 +45,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         // TODO: take resource file from keyword name, set here to automatically show it in editor
         this.fileName = fileName;
         this.lineNumber = lineNumber;
-        name = keywordName;
+        name = keywordName + " (line:" + lineNumber + ")";
         initVariables(keywordName, vars);
     }
 
