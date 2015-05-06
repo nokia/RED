@@ -1,0 +1,42 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.workspace
+Element-Name: SimpleRobotScript
+Element-Type: context
+Element-Version: 2.0
+Id: _BKQ44PPhEeSMPvaw5tnGMw
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 5/6/15 1:21 PM
+
+------=_contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot-9d9b2701-707a-3cab-8878-2a5e28a69be5
+Content-Type: q7/binary
+Entry-Name: contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnTT0tJSCEssykxMykktVtDS0uLlUqku
+gwrUchrycvFyAUUVglNLSjLz0qFKIGIhqcUlCs6JxTCNaZlFxSUgQV4uTp/8dE4kg4AiyMYCTYPbymlo
+gFU9xA7v1Mry/KIUsA1cAFBLBwgJIAu4YgAAAK0AAABQSwECFAAUAAgICAAAACEACSALuGIAAACtAAAA
+CAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAAmAAAAAAA
+------=_contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot-9d9b2701-707a-3cab-8878-2a5e28a69be5--
+------=_contents/RunRobotScriptInDebugPerspective/.project-04ee61e3-3f3a-3a5f-885e-6b42b76e5d51
+Content-Type: q7/binary
+Entry-Name: contents/RunRobotScriptInDebugPerspective/.project
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnRVT8sOgjAQPGviPxDuFr15KHghJl6M
+Af0AKCup0m3TB/r5tlU0nHZnd2Z2lu5fYkhG0IZLzNMt2aQJIJMdxz5Pr5fDepfui9WSKi3vwGwJhmmu
+rGf76YJiI6CoHFaylbaOqyOW0Lr+7D2VV/ARaBZpgc+kEIC2oNnUhenX3ESQzVDr+NDV3uizm0NsrNMQ
+iRMopO6JDmlu2h99Sv0gvAMCbODKABENR6IG1/sSaacoCxGjPF75+/7SzB9/A1BLBwhgAGSwvAAAADcB
+AABQSwECFAAUAAgICAAAACEAYABksLwAAAA3AQAACAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUG
+AAAAAAEAAQA2AAAA8gAAAAAA
+------=_contents/RunRobotScriptInDebugPerspective/.project-04ee61e3-3f3a-3a5f-885e-6b42b76e5d51--
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf
+Content-Type: q7/binary
+Entry-Name: .q7.content
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnSVkU9LxDAQxe+C3yHkbqKygpTWBVeR
+RQt1d0Fv0mZnu9E2Cen0z8d3uttWD6J4y4TfezNvJpx3ZcEa8JW2JuIX4pwzMMputckjXuPu7JrPb05P
+QutzAarQrgLhlUMUCjvRWv9RuVRB8DK+FtYgdMi6UgeT72XvS51MFdB/xPeILpCybVthy1yQuXyNlyPy
+R69JPjK9/MBJ4uTEcWbSkui1Ll0BK5tZXCuvHXKmtxF/u318ns2SZH8P6zhp0vYKzUPcckrLWKj6GAYP
+BZXO23dQWA2Wq9p881uaO8jqPKG0jiDdAB90pNzpAkaZGGxoxx2oGtOsoF/0NXD5s+I4+5PNczrIBipc
+pP1S+t6/mIRynPcYRn6lCeV/L0miT1BLBwjfYlhUHAEAACYCAABQSwECFAAUAAgICAAAACEA32JYVBwB
+AAAmAgAACAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAAUgEAAAAA
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
