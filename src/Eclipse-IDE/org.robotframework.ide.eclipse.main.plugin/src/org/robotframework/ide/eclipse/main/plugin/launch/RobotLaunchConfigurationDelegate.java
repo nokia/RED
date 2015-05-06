@@ -25,6 +25,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.debug.internal.ui.views.console.ProcessConsole;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -45,7 +46,8 @@ import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationMainTab;
 
-public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDelegate, ILaunchShortcut {
+public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
+        ILaunchConfigurationDelegate, ILaunchShortcut {
 
     private static final String ROBOT_LAUNCH_CONFIGURATION_TYPE = "org.robotframework.ide.robotLaunchConfiguration";
 
@@ -65,7 +67,7 @@ public class RobotLaunchConfigurationDelegate implements ILaunchConfigurationDel
     @Override
     public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException {
-
+        
         String projectNameAttribute = configuration.getAttribute(
                 RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE, "");
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameAttribute);
