@@ -7,7 +7,6 @@ import org.eclipse.debug.core.model.IVariable;
 
 /**
  * @author mmarzec
- *
  */
 public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
@@ -15,26 +14,20 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     private RobotDebugValue robotValue;
 
-    private RobotStackFrame stackFrame;
-
     private boolean hasValueChanged;
 
     /**
-     * Constructs a variable contained in the given stack frame
-     * with the given name.
+     * Constructs a variable
      * 
-     * @param frame
-     *            owning stack frame
      * @param name
      *            variable name
      * @param value
      *            variable value
      */
-    public RobotDebugVariable(RobotStackFrame frame, String name, String value) {
-        super((RobotDebugTarget) frame.getDebugTarget());
-        this.stackFrame = frame;
+    public RobotDebugVariable(RobotDebugTarget target, String name, String value) {
+        super(target);
         this.name = name;
-        robotValue = new RobotDebugValue((RobotDebugTarget) frame.getDebugTarget(), value);
+        robotValue = new RobotDebugValue(target, value);
     }
 
     /*
@@ -77,7 +70,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         robotValue.setValue(expression);
         hasValueChanged = true;
         fireEvent(new DebugEvent(this, DebugEvent.CHANGE, DebugEvent.CLIENT_REQUEST));
-        ((RobotDebugTarget) stackFrame.getDebugTarget()).sendChangeVariableRequest(name, expression);
+        ((RobotDebugTarget) this.getDebugTarget()).sendChangeVariableRequest(name, expression);
     }
 
     /*
@@ -116,12 +109,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return true;
     }
 
-    /**
-     * Returns the stack frame owning this variable.
-     * 
-     * @return the stack frame owning this variable
-     */
-    protected RobotStackFrame getStackFrame() {
-        return stackFrame;
+    public void setHasValueChanged(boolean valueChanged) {
+        hasValueChanged = valueChanged;
     }
 }
