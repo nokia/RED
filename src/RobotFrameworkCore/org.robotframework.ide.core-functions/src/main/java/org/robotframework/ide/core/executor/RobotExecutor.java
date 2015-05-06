@@ -23,7 +23,7 @@ public class RobotExecutor {
         if (OS.isFamilyWindows()) {
             robotExecutorName += ".bat";
         } else {
-            robotExecutorName += ".sh";
+            robotExecutorName += "";
         }
         cmdElements.add(robotExecutorName);
 
