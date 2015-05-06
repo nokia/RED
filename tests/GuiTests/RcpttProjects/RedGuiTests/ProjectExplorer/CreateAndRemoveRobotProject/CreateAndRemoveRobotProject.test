@@ -6,17 +6,23 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4yqgcPJOEeSCcsRB43rQCw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/4/15 3:14 PM
+Save-Time: 5/6/15 11:52 AM
 Testcase-Type: ecl
+Verifications: _yllk8PPUEeSZ7tiwCS22GA
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+get-button "Open Perspective" | click
+with [get-window "Open Perspective"] {
+    get-table | select Robot
+    get-button OK | click
+}
+
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Project" | click
 with [get-window "New Robot project"] {
     with [get-editbox -after [get-label "Project name:"]] {
-
         set-text CreateRobotProject
     }
     get-button Finish | click
@@ -31,16 +37,26 @@ with [get-window "New Robot Test Suites folder"] {
 get-view "Project Explorer" | get-tree | select CreateRobotProject | get-menu "New/Robot Test Suite" | click
 with [get-window "New Robot Test Suite"] {
     with [get-editbox -after [get-label "File name:"]] {
-        set-text CreateRob
         set-text "CreateRobotTestFile.robot"
     }
     get-button Finish | click
 }
+
+get-view "Project Explorer" | get-tree | get-item CreateRobotProject | get-property caption | equals CreateRobotProject 
+    | verify-true
+with [get-view "Project Explorer" | get-tree] {
+    get-item "CreateRobotProject/CreateRobotTestSuiteDirectory" | get-property caption 
+        | equals CreateRobotTestSuiteDirectory | verify-true
+    get-item "CreateRobotProject/CreateRobotTestFile.robot" | get-property caption | equals "CreateRobotTestFile.robot" 
+        | verify-true
+}
+    
 get-view "Project Explorer" | get-tree | select CreateRobotProject | get-menu Delete | click
 get-window "Delete Resources" | get-button "Delete project contents on disk (cannot be undone)" | check
 exec-with-options {
     get-window "Delete Resources" | get-button OK | click
 
 } -allowStatusDialog
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
