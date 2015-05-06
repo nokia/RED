@@ -26,6 +26,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.robotframework.ide.eclipse.main.plugin.debug.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -73,6 +74,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private RobotPartListener partListener;
 
     private RobotEventBroker robotEventBroker;
+    
+    private RobotVariablesManager robotVariablesManager;
 
     public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile,
             RobotPartListener partListener, RobotEventBroker robotEventBroker) throws CoreException {
@@ -83,6 +86,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         this.partListener = partListener;
         this.robotEventBroker = robotEventBroker;
         currentFrames = new LinkedHashMap<>();
+        robotVariablesManager = new RobotVariablesManager(this);
 
         try {
             serverSocket = new ServerSocket(54470);
@@ -501,5 +505,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             return (KeywordContext) currentFrames.values().toArray()[currentFrames.size() - 1];
         }
         return new KeywordContext();
+    }
+    
+    public RobotVariablesManager getRobotVariablesManager() {
+        return robotVariablesManager;
     }
 }
