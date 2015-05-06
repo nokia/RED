@@ -28,7 +28,7 @@ public class DeleteSectionHandler extends DIHandler<E4DeleteSection> {
     public static class E4DeleteSection {
 
         @Execute
-        public Object deleteVariables(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public Object deleteSectionFromActivePage(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack stack) {
             final IEditorPart activeEditor = editor.getActiveEditor();
 
