@@ -156,10 +156,11 @@ public class RobotDebugEventDispatcher extends Job {
                         }
                     }
 
-                    if ((isBreakpoint || target.getRobotThread().isStepping()) && !target.hasStepOver()) {
+                    if ((isBreakpoint || target.getRobotThread().isStepping()) && !target.hasStepOver() && !target.hasStepReturn()) {
 
                         if (target.getRobotThread().isStepping()) {
                             target.getRobotThread().setSteppingOver(false);
+                            target.getRobotThread().setSteppingReturn(false);
                             robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
                         }
                         target.clearStackFrames();
@@ -172,7 +173,7 @@ public class RobotDebugEventDispatcher extends Job {
                     if (!currentResourceFiles.isEmpty()) {
                         fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
                     }
-                    target.getCurrentFrames().put(currentKeyword, new ActiveKeyword(null, fileName, keywordLine));
+                    target.getCurrentFrames().put(currentKeyword, new KeywordContext(null, fileName, keywordLine));
 
                     // first keyword with resource name is in old file, so until second keyword
                     // there is a need to switch between files
