@@ -41,7 +41,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Debug As/1 Robot Test" | click
 }
 get-view Console | get-text-viewer | get-property text 
-    | contains "==============================================================================\n"
+    | matches  "==============================================================================\n"
     + "RunRobotScriptInDebugPerspective                                              \n"
     + "==============================================================================\n"
     + "RunRobotScriptInDebugPerspective.SimpleLoggingTestCase                        \n"
@@ -56,9 +56,9 @@ get-view Console | get-text-viewer | get-property text
     + "1 critical test, 1 passed, 0 failed\n"
     + "1 test total, 1 passed, 0 failed\n"
     + "==============================================================================\n"
-    + "Output:  D:\\RED\\svn\\RedWorkspace\\RunRobotScriptInDebugPerspective\\output.xml\n"
-    + "Log:     D:\\RED\\svn\\RedWorkspace\\RunRobotScriptInDebugPerspective\\log.html\n"
-    + "Report:  D:\\RED\\svn\\RedWorkspace\\RunRobotScriptInDebugPerspective\\report.html" | verify-true
+    + "Output:  \.*\\RunRobotScriptInDebugPerspective\\output.xml\n"
+    + "Log:     \.*\\RunRobotScriptInDebugPerspective\\log.html\n"
+    + "Report:  \.*\\RunRobotScriptInDebugPerspective\\report.html" | verify-true
     
 
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : 1\n" | verify-true
