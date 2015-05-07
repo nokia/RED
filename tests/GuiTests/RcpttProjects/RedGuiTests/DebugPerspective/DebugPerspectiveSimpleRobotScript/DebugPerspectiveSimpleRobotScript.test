@@ -56,9 +56,9 @@ get-view Console | get-text-viewer | get-property text
     + "1 critical test, 1 passed, 0 failed\n"
     + "1 test total, 1 passed, 0 failed\n"
     + "==============================================================================\n"
-    + "Output:  .*\\RunRobotScriptInDebugPerspective\\output.xml\n"
-    + "Log:     .*\\RunRobotScriptInDebugPerspective\\log.html\n"
-    + "Report:  .*\\RunRobotScriptInDebugPerspective\\report.html" | verify-true
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
     
 
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : 1\n" | verify-true
