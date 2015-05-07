@@ -59,7 +59,7 @@ public class RobotExecutor {
         File agentFile = new File("");
         try {
             tempDir = Files.createTempDirectory("RobotTempDir");
-            agentFile = new File(tempDir.toString() + "\\TestRunnerAgent.py");
+            agentFile = new File(tempDir.toString() + File.separator + "TestRunnerAgent.py");
             Files.copy(RobotExecutor.class.getResourceAsStream("TestRunnerAgent.py"), agentFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
