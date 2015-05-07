@@ -41,7 +41,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Debug As/1 Robot Test" | click
 }
 get-view Console | get-text-viewer | get-property text 
-    | contains  "PASS" | verify-true
+    |  matches  "(.*\| PASS \|.*){3}(output.xml)(.*log.html.*)(.*report.html.*)"  | verify-true
     
 
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : 1\n" | verify-true
