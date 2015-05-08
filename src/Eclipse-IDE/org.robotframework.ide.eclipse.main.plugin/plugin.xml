@@ -841,5 +841,12 @@
             id="org.eclipse.debug.robot.sourcePathComputer">
       </sourcePathComputer>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.detailPaneFactories">
+      <detailFactories
+            class="org.robotframework.ide.eclipse.main.plugin.debug.BreakpointDetailPaneFactory"
+            id="org.eclipse.debug.robot.detailFactories">
+      </detailFactories>
+   </extension>
 
 </plugin>
