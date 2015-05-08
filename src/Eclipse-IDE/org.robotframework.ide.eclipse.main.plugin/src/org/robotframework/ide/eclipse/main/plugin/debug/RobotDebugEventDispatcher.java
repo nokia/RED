@@ -24,6 +24,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -50,8 +51,8 @@ public class RobotDebugEventDispatcher extends Job {
 
     private Map<String, List<Integer>> currentExecutionLinesInFile;
 
-    private Map<String, List<Integer>> executedBreakpointsInFile;
-
+    private Map<String, List<BreakpointContext>> executedBreakpointsInFile;
+    
     private Map<String, String> currentResourceFiles;
 
     public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile,
@@ -66,7 +67,6 @@ public class RobotDebugEventDispatcher extends Job {
         currentExecutionLinesInFile = new LinkedHashMap<>();
         executedBreakpointsInFile = new LinkedHashMap<>();
         currentResourceFiles = new LinkedHashMap<>();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -135,21 +135,43 @@ public class RobotDebugEventDispatcher extends Job {
                             if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
                                 int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                                         IMarker.LINE_NUMBER);
-                                List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
-                                if (executedBreakpointsLines == null) {
-                                    executedBreakpointsLines = new ArrayList<Integer>();
-                                    executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
-                                }
-                                if (!executedBreakpointsLines.contains(breakpointLineNum)
-                                        && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint,
-                                                breakpointLineNum, currentKeyword, args, keywordLine)) {
-                                    executedBreakpointsLines.add(breakpointLineNum);
-                                    isBreakpoint = true;
-                                    target.breakpointHit(currentBreakpoint);
-                                    robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite,
-                                            breakpointLineNum);
-                                }
+                                
+                                if (keywordFinder.isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
+                                        currentKeyword, args, keywordLine)) {
 
+                                    List<BreakpointContext> executedBreakpoints = executedBreakpointsInFile.get(currentFile.getName());
+                                    if (executedBreakpoints == null) {
+                                        executedBreakpoints = new ArrayList<BreakpointContext>();
+                                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpoints);
+                                    }
+
+                                    BreakpointContext breakpointContext = null;
+                                    for (BreakpointContext context : executedBreakpoints) {
+                                        if (context.getBreakpoint().equals(currentBreakpoint)) {
+                                            breakpointContext = context;
+                                        }
+                                    }
+                                    if (breakpointContext == null) {
+                                        breakpointContext = new BreakpointContext(currentBreakpoint);
+                                        executedBreakpoints.add(breakpointContext);
+                                    }
+                                    breakpointContext.incrementCurrentHitCount();
+
+                                    boolean hasHitCount = false;
+                                    int breakpointHitCount = (Integer) currentBreakpoint.getMarker().getAttribute(
+                                            RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                                    int currentHitCount = breakpointContext.getCurrentHitCount();
+                                    if (currentHitCount == breakpointHitCount) {
+                                        hasHitCount = true;
+                                    }
+
+                                    if (hasHitCount) {
+                                        isBreakpoint = true;
+                                        target.breakpointHit(currentBreakpoint);
+                                        robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite,
+                                                breakpointLineNum);
+                                    }
+                                }
                             }
                         } catch (CoreException e) {
                             e.printStackTrace();
