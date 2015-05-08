@@ -13,6 +13,8 @@ import org.eclipse.debug.core.model.LineBreakpoint;
  *
  */
 public class RobotLineBreakpoint extends LineBreakpoint {
+    
+    public static final String HIT_COUNT_ATTRIBUTE = "robot.breakpoint.hit.count";
 
     /**
      * Default constructor is required for the breakpoint manager
