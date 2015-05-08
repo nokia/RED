@@ -8,19 +8,20 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.exec.OS;
 
 public class RobotExecutor {
 
     private Path testRunnerAgentFilePath;
 
-    public String[] createCommand(File projectLocation, String executorName, List<String> testArguments,
-            String userArguments, boolean isDebugging) {
+
+    public String[] createCommand(File projectLocation, String executorName,
+            List<String> testArguments, String userArguments,
+            boolean isDebugging) {
 
         List<String> cmdElements = new ArrayList<String>();
 
         String robotExecutorName = executorName;
-        if (OS.isFamilyWindows()) {
+        if (isWindows()) {
             robotExecutorName += ".bat";
         } else {
             robotExecutorName += "";
@@ -32,14 +33,16 @@ public class RobotExecutor {
             debugEnabled = "True";
         }
         cmdElements.add("--listener");
-        cmdElements.add(testRunnerAgentFilePath.toString() + ":54470:" + debugEnabled);
+        cmdElements.add(testRunnerAgentFilePath.toString() + ":54470:"
+                + debugEnabled);
 
         for (String suite : testArguments) {
             cmdElements.add("--suite");
             cmdElements.add(suite);
         }
 
-        if (!userArguments.equals("") && (userArguments.contains("--") || userArguments.contains("-"))) {
+        if (!userArguments.equals("")
+                && (userArguments.contains("--") || userArguments.contains("-"))) {
             List<String> userArgsList = new ArrayList<String>();
             this.extractArguments(userArgsList, userArguments);
             for (String arg : userArgsList) {
@@ -54,19 +57,23 @@ public class RobotExecutor {
         return cmdElements.toArray(new String[cmdElements.size()]);
     }
 
+
     public void createTestRunnerAgentFile() {
         Path tempDir = null;
         File agentFile = new File("");
         try {
             tempDir = Files.createTempDirectory("RobotTempDir");
-            agentFile = new File(tempDir.toString() + File.separator + "TestRunnerAgent.py");
-            Files.copy(RobotExecutor.class.getResourceAsStream("TestRunnerAgent.py"), agentFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+            agentFile = new File(tempDir.toString() + File.separator
+                    + "TestRunnerAgent.py");
+            Files.copy(RobotExecutor.class
+                    .getResourceAsStream("TestRunnerAgent.py"), agentFile
+                    .toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
         testRunnerAgentFilePath = agentFile.toPath();
     }
+
 
     public void removeTestRunnerAgentFile() {
         Path dir = testRunnerAgentFilePath.getParent();
@@ -80,8 +87,10 @@ public class RobotExecutor {
             e.printStackTrace();
         }
     }
-    
-    public void startTestRunnerAgentHandler(IRobotOutputListener messageLogListener) {
+
+
+    public void startTestRunnerAgentHandler(
+            IRobotOutputListener messageLogListener) {
         MessageLogParser messageLogParser = new MessageLogParser();
         messageLogParser.setMessageLogListener(messageLogListener);
         TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler();
@@ -89,6 +98,7 @@ public class RobotExecutor {
         Thread handler = new Thread(testRunnerAgentHandler);
         handler.start();
     }
+
 
     private void extractArguments(List<String> arguments, String str) {
 
@@ -153,5 +163,10 @@ public class RobotExecutor {
             arguments.add(argValue);
         if (end != str.length())
             extractArguments(arguments, str.substring(end));
+    }
+
+
+    public boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 }
