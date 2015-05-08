@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -41,15 +42,9 @@ public class RobotExecutor {
             cmdElements.add(suite);
         }
 
-        if (!userArguments.equals("")
-                && (userArguments.contains("--") || userArguments.contains("-"))) {
-            List<String> userArgsList = new ArrayList<String>();
-            this.extractArguments(userArgsList, userArguments);
-            for (String arg : userArgsList) {
-                if (!arg.equals(" ")) {
-                    cmdElements.add(arg);
-                }
-            }
+        if (!userArguments.equals("")) {
+            cmdElements
+                    .addAll(fromJavaArgsToPythonLike(convertToJavaMainLikeArgs(userArguments)));
         }
 
         cmdElements.add(projectLocation.getAbsolutePath());
@@ -100,69 +95,78 @@ public class RobotExecutor {
     }
 
 
-    private void extractArguments(List<String> arguments, String str) {
+    private List<String> fromJavaArgsToPythonLike(List<String> javaLikeArgs) {
+        List<String> args = new LinkedList<String>();
 
-        String argName = "";
-        String argValue = "";
-        int end = 0;
-        if (str.substring(0, 2).equals("--")) {
-            int argNameEnd = str.indexOf(' ');
-            if (argNameEnd < 0) {
-                argName = str.substring(2, str.length());
-                arguments.add("--" + argName);
-                return;
-            }
-            argName = str.substring(2, argNameEnd);
-            int argValueEnd1 = str.indexOf(" -", argNameEnd);
-            int argValueEnd2 = str.indexOf(" --", argNameEnd);
-            if (argValueEnd2 > 0 || argValueEnd1 > 0) {
-                if (argValueEnd2 < argValueEnd1 && argValueEnd2 > 0) {
-                    if (argNameEnd < argValueEnd2)
-                        argValue = str.substring(argNameEnd + 1, argValueEnd2);
-                    end = argValueEnd2 + 1;
-                } else {
-                    if (argNameEnd < argValueEnd1)
-                        argValue = str.substring(argNameEnd + 1, argValueEnd1);
-                    end = argValueEnd1 + 1;
+        StringBuilder current = new StringBuilder();
+        for (String arg : javaLikeArgs) {
+            System.out.println(arg);
+            if (arg.startsWith("-")) {
+                if (current.length() > 0) {
+                    args.add(current.toString());
+                    current = new StringBuilder();
                 }
+
+                args.add(arg);
             } else {
-                argValue = str.substring(argNameEnd + 1);
-                end = str.length();
-            }
-            arguments.add("--" + argName);
-        } else if (str.substring(0, 1).equals("-")) {
-            int argNameEnd = str.indexOf(' ');
-            if (argNameEnd < 0) {
-                argName = str.substring(1, str.length());
-                arguments.add("-" + argName);
-                return;
-            }
-            argName = str.substring(1, argNameEnd);
-            int argValueEnd1 = str.indexOf(" -", argNameEnd);
-            int argValueEnd2 = str.indexOf(" --", argNameEnd);
-            if (argValueEnd2 > 0 || argValueEnd1 > 0) {
-                if (argValueEnd2 < argValueEnd1 && argValueEnd2 > 0) {
-                    if (argNameEnd < argValueEnd2)
-                        argValue = str.substring(argNameEnd + 1, argValueEnd2);
-                    end = argValueEnd2 + 1;
-                } else {
-                    if (argNameEnd < argValueEnd1)
-                        argValue = str.substring(argNameEnd + 1, argValueEnd1);
-                    end = argValueEnd1 + 1;
+                if (current.length() > 0) {
+                    current.append(' ');
                 }
-            } else {
-                argValue = str.substring(argNameEnd + 1);
-                end = str.length();
+                current.append(arg);
             }
-            arguments.add("-" + argName);
-        } else {
-            return;
         }
 
-        if (!argValue.equals(""))
-            arguments.add(argValue);
-        if (end != str.length())
-            extractArguments(arguments, str.substring(end));
+        if (current.length() > 0) {
+            args.add(current.toString());
+        }
+
+        return args;
+    }
+
+
+    private List<String> convertToJavaMainLikeArgs(String text) {
+        List<String> args = new LinkedList<String>();
+        char chars[] = text.toCharArray();
+        char previousToken = ' ';
+        boolean wasQuotationMark = false;
+        StringBuilder currentToken = new StringBuilder();
+        for (char c : chars) {
+            if (c == ' ') {
+                if (wasQuotationMark) {
+                    currentToken.append(c);
+                } else {
+                    if (currentToken.length() > 0) {
+                        args.add(currentToken.toString());
+                        currentToken = new StringBuilder();
+                    }
+                }
+            } else if (c == '\"') {
+                if (previousToken == '\\') {
+                    currentToken.append(c);
+                } else {
+                    if (wasQuotationMark) {
+                        currentToken.append(c);
+                        args.add(currentToken.toString());
+                        currentToken = new StringBuilder();
+
+                        wasQuotationMark = false;
+                    } else {
+                        currentToken.append(c);
+                        wasQuotationMark = true;
+                    }
+                }
+            } else {
+                currentToken.append(c);
+            }
+
+            previousToken = c;
+        }
+
+        if (currentToken.length() > 0) {
+            args.add(currentToken.toString());
+        }
+
+        return args;
     }
 
 
