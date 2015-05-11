@@ -15,6 +15,8 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 public class RobotLineBreakpoint extends LineBreakpoint {
     
     public static final String HIT_COUNT_ATTRIBUTE = "robot.breakpoint.hit.count";
+    
+    public static final String CONDITIONAL_ATTRIBUTE = "robot.breakpoint.conditional";
 
     /**
      * Default constructor is required for the breakpoint manager
