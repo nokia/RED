@@ -6,9 +6,19 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6f0ikPV_EeSOBqdItMO82A
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/11/15 8:24 AM
+Save-Time: 5/11/15 11:20 AM
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Testcase:
+1. creates a simple robot script
+2. adds a breakpoint
+3. runs robot script in debug mode and goes through the script with "Step Into" command to get inside keyword execution, verifies line by line if correct log prints appear
+4. runs robot script in debog mode for the second time, this time we use Step Over option - whole keyword should execute at once, verifies if all log prints appear correctly
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -77,36 +87,44 @@ with [get-editor "RobotSuite.robot" | get-text-viewer] {
     type-text "End of Keyword"
     key-type "M1+s"
 }
+
+
+
 get-editor "RobotSuite.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 8
 get-view "Project Explorer" | get-tree | select "RobotProject/RobotSuite.robot" | get-menu "Debug As/1 Robot Test" 
     | click
 
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : Lets start keyword" | verify-true
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : First line of keyword" | verify-false
-get-button "Step Into (F5)" | click
+
+get-button "Step Into (F5)" | click	//We should get inside keyword, execute it step by step
 get-button "Step Into (F5)" | click
 
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : First line of keyword" | verify-true
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : Second line of keyword" | verify-false
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : First line of keyword" | verify-true
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : Second line of keyword" | verify-false
 get-button "Step Into (F5)" | click
 
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : Second line of keyword" | verify-true
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : Third line of keyword" | verify-false
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : Second line of keyword" | verify-true
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : Third line of keyword" | verify-false
 get-button "Step Into (F5)" | click
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : Third line of keyword" | verify-true
-//get-view "Message Log" | get-editbox | get-property text | contains "INFO : End of Keyword" | verify-false
-get-button "Step Over (F6)" | click
 
-get-eclipse-window | key-type F11
+
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : Third line of keyword" | verify-true
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : End of Keyword" | verify-false
+get-button "Step Over (F6)" | click	//Robot script execution should end here
+
+
+get-eclipse-window | key-type F11	//Rerun the same testcase in debug mode second time (F11 = Run -> Debug)
+
 
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : Lets start keyword" | verify-true
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : First line of keyword" | verify-false
+get-button "Step Over (F6)" | click	//Do not enter into keyword 
 
-get-button "Step Over (F6)" | click
+
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : First line of keyword" | verify-true
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : Second line of keyword" | verify-true
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : Third line of keyword" | verify-true
-
 get-button "Resume (F8)" | click
 
 get-view Console | get-button "Clear Console" | click
