@@ -6,12 +6,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6f0ikPV_EeSOBqdItMO82A
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/8/15 3:55 PM
+Save-Time: 5/11/15 8:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+set-q7-option jobHangTimeout 1000
 
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
 with [get-window "New Robot Test Suite"] {
