@@ -11,9 +11,4 @@ public class TextEditorWrapper extends DIEditorPart<TextEditor>{
 	public TextEditorWrapper() {
 		super(TextEditor.class);
 	}
-
-	@Override
-    public void setPartName(final String name) {
-	    super.setPartName(name);
-	}
 }

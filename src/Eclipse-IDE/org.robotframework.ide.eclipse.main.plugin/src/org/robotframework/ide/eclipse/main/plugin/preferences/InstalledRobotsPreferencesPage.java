@@ -3,7 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.apache.commons.exec.LogOutputStream;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -40,6 +39,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment.ProcessLineHandler;
 import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
@@ -244,15 +244,15 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                                 InterruptedException {
                             monitor.beginTask("Installing Robot Framework", IProgressMonitor.UNKNOWN);
                             try {
-                                final LogOutputStream stream = new LogOutputStream() {
+                                final ProcessLineHandler linesHandler = new ProcessLineHandler() {
                                     @Override
-                                    protected void processLine(final String line, final int level) {
+                                    public void processLine(final String line, final int level) {
                                         if (!line.startsWith(" ")) {
                                             monitor.subTask(line);
                                         }
                                     }
                                 };
-                                selectedInstalation.installRobotUsingPip(stream, downloadStableVersion);
+                                selectedInstalation.installRobotUsingPip(linesHandler, downloadStableVersion);
                                 dirty = true;
                             } catch (final RobotEnvironmentException e) {
                                 StatusManager.getManager().handle(

@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -60,6 +61,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.internal.texteditor.AnnotationType;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -69,6 +71,7 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistProcessor;
@@ -100,9 +103,6 @@ public class TextEditor {
 	
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
-	    
-	    ((TextEditorWrapper)editorPart).setPartName(input.getName());
-	    
 	    this.input = input;
 
 		final FillLayout layout = new FillLayout();
@@ -273,8 +273,10 @@ public class TextEditor {
 	
 	@Inject
     @Optional
-    private void highlightLineEvent(@UIEventTopic("TextEditor/HighlightLine") final org.osgi.service.event.Event event) {
+    private void highlightLineEvent(@UIEventTopic("TextEditor/HighlightLine") final org.osgi.service.event.Event event,
+            @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
 	    if(((String) event.getProperty("file")).equals(editedFile.getName())) {
+            editor.activateSourcePage();
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
         	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
@@ -283,18 +285,15 @@ public class TextEditor {
 	        }
 	    }
     }
-	
-	@Inject
+
+    @Inject
     @Optional
-    private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final String file) {
-	    if("".equals(file)) {
+    private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final String file,
+            @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
+        if ("".equals(file) || editedFile.getName().equals(file)) {
+            editor.activateSourcePage();
 	        viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
 	        breakpointLine = 0;
-	    } else {
-	        if(editedFile.getName().equals(file)) {
-	            viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
-	            breakpointLine = 0;
-	        }
 	    }
     }
 	
@@ -331,28 +330,6 @@ public class TextEditor {
 			for (int i = 0; i < markers.length; i++) {
 				markers[i].delete();
 			}
-		} catch (final CoreException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void createMarkers() {
-		
-		try {
-		    
-			final IMarker marker = editedFile.createMarker(IMarker.PROBLEM);
-			marker.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
-			marker.setAttribute(IMarker.MESSAGE, "test 1");
-			marker.setAttribute(IMarker.LINE_NUMBER, 1);
-			marker.setAttribute(IMarker.CHAR_START, 0);
-			marker.setAttribute(IMarker.CHAR_END, 18);
-			
-			final IMarker marker1 = editedFile.createMarker(IBreakpoint.LINE_BREAKPOINT_MARKER);
-			marker1.setAttribute(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
-			marker1.setAttribute(IMarker.MESSAGE, "test 2");
-			marker1.setAttribute(IMarker.LINE_NUMBER, 2);
-			marker1.setAttribute(IMarker.CHAR_START, 20);
-			marker1.setAttribute(IMarker.CHAR_END, 25);
 		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
