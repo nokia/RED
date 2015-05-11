@@ -1,6 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 public class RobotImages {
 
@@ -62,5 +65,20 @@ public class RobotImages {
 
     public static ImageDescriptor getTooltipProhibitedImage() {
         return RobotFramework.getImageDescriptor("resources/tooltip_prohibited.png");
+    }
+
+    /**
+     * For given image descriptor the gray version descriptor is created.
+     * 
+     * @param descriptor
+     * @return Gray version of image from parameter.
+     */
+    public static ImageDescriptor getGreyedImage(final ImageDescriptor descriptor) {
+        final Image image = descriptor.createImage();
+        final Image gray = new Image(Display.getCurrent(), image, SWT.IMAGE_GRAY);
+        final ImageDescriptor grayDescriptor = ImageDescriptor.createFromImageData(gray.getImageData());
+        image.dispose();
+        gray.dispose();
+        return grayDescriptor;
     }
 }
