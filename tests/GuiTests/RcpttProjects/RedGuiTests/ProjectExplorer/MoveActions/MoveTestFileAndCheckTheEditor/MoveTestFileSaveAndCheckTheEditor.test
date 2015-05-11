@@ -1,0 +1,74 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: MoveTestFileSaveAndCheckTheEditor
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _f52ioPfGEeSx2Y7ZMEilqw
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 5/11/15 1:19 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    with [get-editbox -after [get-label "File name:"]] {
+        set-text "TestFileToMove.robot"
+    }
+    get-button Finish | click
+}
+
+
+with [get-editor "TestFileToMove.robot"] {
+    get-tab-folder | get-tab-item Variables | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+}
+
+with [get-editor "TestFileToMove.robot" | get-table] {
+    get-cell 0 0 | double-click
+    get-cell 0 0 | mouse down -count 2
+    double-click
+    select "${var}" | activate-cell-edit
+    with [get-editbox] {
+        click-text 3 6
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    apply-cell-edit -deactivate
+}
+
+with [get-editor "TestFileToMove.robot" | get-table] {
+    get-cell 0 1 | click
+    get-cell 0 1 | mouse down -count 2
+    double-click
+    select "${var}" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text TestValue
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    key-type "M1+s"
+}
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFileToMove.robot"
+    get-item "RobotProject/TestFileToMove.robot" | drag-start 44 12
+    get-item "RobotProject/TestFileToMove.robot" | drag-enter 51 3 -detail move
+    get-item "RobotProject/TestFileToMove.robot" | drag-over 52 0 -detail copy
+    get-item "RobotProject/TestFile.robot" | drag-over 55 0 -detail copy
+    get-item "RobotProject/TestSuiteFolder" | drag-over 56 9 -detail move
+    get-item "RobotProject/TestFileToMove.robot" | drag-exit
+    get-item "RobotProject/TestSuiteFolder" | drag-accept 56 9 -detail move
+    drag-set-data
+    get-item "RobotProject/TestSuiteFolder" | drop 56 9 -detail move
+    drag-end -detail move
+    select "RobotProject/TestSuiteFolder/TestFileToMove.robot" | double-click
+}
+get-editor "TestFileToMove.robot" | get-tab-folder | get-tab-item Variables | click
+with [get-editor "TestFileToMove.robot" | get-table] {
+    get-item "${var}" | get-property caption | equals "${var}" | verify-true
+    get-item "${var}" | get-property "values['Variable']" | equals "${var}" | verify-true
+    get-item "${var}" | get-property "values['Value']" | equals TestValue | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
