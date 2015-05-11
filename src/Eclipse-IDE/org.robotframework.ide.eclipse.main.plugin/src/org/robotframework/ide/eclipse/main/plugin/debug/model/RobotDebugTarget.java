@@ -313,7 +313,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         fireTerminateEvent();
 
         try {
-            serverSocket.close();
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

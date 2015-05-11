@@ -5,13 +5,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
+/**
+ * @author mmarzec
+ */
 public class RobotPartListener implements IPartListener {
 
-    private String fileName;
-
-    private int lineNumber;
-
     private RobotEventBroker robotEventBroker;
+
+    private BreakpointContext breakpointContext;
 
     public RobotPartListener(RobotEventBroker robotEventBroker) {
         this.robotEventBroker = robotEventBroker;
@@ -24,8 +25,10 @@ public class RobotPartListener implements IPartListener {
             if (texteditor != null) {
                 String editorInputName = texteditor.getEditorInput().getName();
 
+                String fileName = breakpointContext.getFile();
+                int line = breakpointContext.getLine();
                 if (editorInputName.equals(fileName)) {
-                    robotEventBroker.sendHighlightLineEventToTextEditor(fileName, lineNumber);
+                    robotEventBroker.sendHighlightLineEventToTextEditor(fileName, line);
                 }
             }
         }
@@ -47,20 +50,8 @@ public class RobotPartListener implements IPartListener {
     public void partActivated(IWorkbenchPart part) {
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
+    public void setBreakpointContext(BreakpointContext context) {
+        this.breakpointContext = context;
     }
 
 }

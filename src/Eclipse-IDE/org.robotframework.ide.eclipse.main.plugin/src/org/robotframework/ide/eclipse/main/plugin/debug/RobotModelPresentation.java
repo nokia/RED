@@ -56,12 +56,12 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
             } else if (element instanceof IStackFrame) {
                 return ((IStackFrame) element).getName();
             } else if (element instanceof RobotLineBreakpoint) {
-                final IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
-                final String file = breakpointMarker.getAttribute(IMarker.LOCATION, "");
-                final Integer line = (Integer) breakpointMarker.getAttribute(IMarker.LINE_NUMBER);
+                IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
+                String file = breakpointMarker.getAttribute(IMarker.LOCATION, "");
+                Integer line = (Integer) breakpointMarker.getAttribute(IMarker.LINE_NUMBER);
                 return file + " [line: " + line + "]";
             }
-        } catch (final CoreException e) {
+        } catch (CoreException e) {
             e.printStackTrace();
         }
 
@@ -79,7 +79,7 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
         String detail = "";
         try {
             detail = value.getValueString();
-        } catch (final DebugException e) {
+        } catch (DebugException e) {
         }
         listener.detailComputed(value, detail);
     }
