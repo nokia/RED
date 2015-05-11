@@ -1,0 +1,96 @@
+package org.robotframework.ide.eclipse.main.plugin.preferences;
+
+import java.util.Arrays;
+
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment;
+
+abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
+
+    private final CheckboxTableViewer viewer;
+
+    InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
+        this.viewer = viewer;
+    }
+
+    @Override
+    public Color getForeground(final Object element) {
+        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        if (!env.isValidPythonInstallation()) {
+            return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_RED);
+        } else if (!env.hasRobotInstalled()) {
+            return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW);
+        }
+        return null;
+    }
+
+    @Override
+    public Font getFont(final Object element) {
+        if (Arrays.asList(viewer.getCheckedElements()).contains(element)) {
+            Font font = viewer.getTable().getFont();
+            final Font currentFont = font == null ? Display.getCurrent().getSystemFont() : font;
+            final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(SWT.BOLD);
+            font = fontDescriptor.createFont(currentFont.getDevice());
+            return font;
+        }
+        return super.getFont(element);
+    }
+
+    @Override
+    public String getToolTipText(final Object element) {
+        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        if (!env.isValidPythonInstallation()) {
+            return "The location " + env.getFile().getAbsolutePath() + " does not seem to be a valid python directory.";
+        } else if (!env.hasRobotInstalled()) {
+            return "The python installation " + env.getFile().getAbsolutePath()
+                    + " does not seem to have robot framework installed\n\n"
+                    + "If there is a pip available you can try to click 'Install Robot' button or you have "
+                    + "to do it manually (see Robot Framework manual for details).";
+        }
+        return "Python installation in " + env.getFile().getAbsolutePath() + " has " + env.getVersion();
+    }
+
+    @Override
+    public Image getToolTipImage(final Object element) {
+        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        if (!env.isValidPythonInstallation()) {
+            return RobotImages.getTooltipProhibitedImage().createImage();
+        } else if (!env.hasRobotInstalled()) {
+            return RobotImages.getTooltipWarnImage().createImage();
+        }
+        return RobotImages.getTooltipImage().createImage();
+    }
+
+    static class InstalledRobotsNamesLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
+
+        InstalledRobotsNamesLabelProvider(final CheckboxTableViewer viewer) {
+            super(viewer);
+        }
+
+        @Override
+        public String getText(final Object element) {
+            final String version = ((RobotRuntimeEnvironment) element).getVersion();
+            return version == null ? "<unknown>" : version;
+        }
+    }
+
+    static class InstalledRobotsPathsLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
+
+        InstalledRobotsPathsLabelProvider(final CheckboxTableViewer viewer) {
+            super(viewer);
+        }
+
+        @Override
+        public String getText(final Object element) {
+            return ((RobotRuntimeEnvironment) element).getFile().getAbsolutePath();
+        }
+    }
+}
