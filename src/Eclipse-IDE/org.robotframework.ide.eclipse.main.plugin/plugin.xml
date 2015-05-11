@@ -153,20 +153,19 @@
 	<extension
             point="org.eclipse.ui.editors">
         <editor
-                name="Robot Text Editor"
-                extensions="txt,robot"
-                default="false"
-                icon="resources/robot_file.png"
-                class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
-                id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
-        </editor>
-        <editor
               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor"
               default="true"
               extensions="txt,robot"
               icon="resources/robot_file.png"
               id="org.robotframework.ide.tableditor"
               name="Robot Table Editor">
+        </editor>
+        <editor
+                name="Robot Text Editor"
+                extensions="txt,robot"
+                default="false"
+                class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
+                id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
         </editor>
     </extension>
  <extension

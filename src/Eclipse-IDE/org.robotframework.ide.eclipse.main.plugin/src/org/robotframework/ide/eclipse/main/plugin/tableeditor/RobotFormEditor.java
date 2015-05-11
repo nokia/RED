@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPage;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
 public class RobotFormEditor extends FormEditor {
 
@@ -96,6 +97,10 @@ public class RobotFormEditor extends FormEditor {
             addPage(new CasesEditorPage(this));
             addPage(new SettingsEditorPage(this));
             addPage(new VariablesEditorPage(this));
+
+            final int sourceEditorIndex = addPage(new TextEditorWrapper(), getEditorInput());
+            setPageText(sourceEditorIndex, "Source");
+            setActivePage(sourceEditorIndex);
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
         }
@@ -190,6 +195,20 @@ public class RobotFormEditor extends FormEditor {
             final SectionEditorPage page = (SectionEditorPage) getActiveEditor();
             page.updateMessages();
             page.updateToolbars();
+        }
+    }
+
+    public void activateSourcePage() {
+        if (getActiveEditor() instanceof TextEditorWrapper) {
+            return;
+        }
+
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editor = getEditor(i);
+            if (editor instanceof TextEditorWrapper) {
+                setActiveEditor(editor);
+                break;
+            }
         }
     }
 
