@@ -113,7 +113,7 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
 
 
-class TestRunnerAgent:
+class TestRunnerAgent_test:
     """Pass all listener events to a remote listener
 
     If called with one argument, that argument is a port
@@ -205,14 +205,33 @@ class TestRunnerAgent:
 
     def _check_breakpoint(self):
         data = ''
+        self._send_socket('check_condition')
         while data != 'stop' and data != 'run' and data != 'interrupt':
             data = self.sock.recv(4096)
+            if data != 'stop' and data != 'run' and data != 'interrupt':
+                self._run_keyword(data)
         if data == 'stop':
             return True
         if data == 'run':
             return False
         if data == 'interrupt':
             sys.exit()
+
+    def _run_keyword(self, data):
+        if _JSONAVAIL:
+            json_decoder = json.JSONDecoder(strict=False).decode
+            try:
+                condition = json_decoder(data)
+                list = condition['keywordCondition']
+                keywordName = list[0]
+                argList = list[1]
+                from robot.libraries.BuiltIn import BuiltIn
+                result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
+                self._send_socket('condition_result', result)
+            except Exception, e:
+                self._send_socket('condition_error', str(e))
+                pass
+        self._send_socket('condition_checked')
 
     def _check_changed_variable(self, data):
         self._send_socket(data)

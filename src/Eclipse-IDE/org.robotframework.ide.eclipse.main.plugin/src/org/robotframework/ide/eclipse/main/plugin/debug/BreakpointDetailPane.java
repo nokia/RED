@@ -12,6 +12,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -22,6 +23,9 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 
+/**
+ * @author mmarzec
+ */
 public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     public static final String BREAKPOINT_DETAIL_PANE_ID = "robot.breakpoint.detail.pane.id";
@@ -32,11 +36,11 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     private boolean isDirty;
 
-    private boolean isHitCountSelected;
+    private boolean isHitCountSelected, isConditionalSelected;
 
-    private Text txtHitCount;
+    private Text txtHitCount, txtConditional;
 
-    private Button btnHitCount;
+    private Button btnHitCount, btnConditional;
 
     private IMarker currentMarker;
 
@@ -46,6 +50,10 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     private HitCountModifyListener modifyListener;
 
+    private ConditionalSelectionListener conditionalSelectionListener;
+
+    private ConditionalModifyListener conditionalModifyListener;
+
     @Override
     public void init(IWorkbenchPartSite partSite) {
         isDirty = false;
@@ -53,14 +61,17 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
         selectionListener = new HitCountSelectionListener();
         modifyListener = new HitCountModifyListener();
+        conditionalSelectionListener = new ConditionalSelectionListener();
+        conditionalModifyListener = new ConditionalModifyListener();
     }
 
     @Override
     public Control createControl(Composite parent) {
         parent.setBackground(SWTResourceManager.getColor(255, 255, 255));
-
+        
         Composite control = new Composite(parent, SWT.NONE);
         control.setLayout(new GridLayout(2, false));
+        control.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 
         btnHitCount = new Button(control, SWT.CHECK);
         btnHitCount.setText("Hit count:");
@@ -68,9 +79,15 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         txtHitCount = new Text(control, SWT.BORDER);
         txtHitCount.setEnabled(false);
 
+        btnConditional = new Button(control, SWT.CHECK);
+        btnConditional.setText("Conditional");
+
+        txtConditional = new Text(control, SWT.BORDER);
+        txtConditional.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+
         isDirty = false;
 
-        return parent;
+        return control;
     }
 
     @Override
@@ -83,6 +100,8 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         if (selection != null && selection.size() > 0) {
             btnHitCount.removeSelectionListener(selectionListener);
             txtHitCount.removeModifyListener(modifyListener);
+            btnConditional.removeSelectionListener(conditionalSelectionListener);
+            txtConditional.removeModifyListener(conditionalModifyListener);
 
             Object element = selection.getFirstElement();
             if (element instanceof RobotLineBreakpoint) {
@@ -98,11 +117,23 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
                     txtHitCount.setEnabled(false);
                     txtHitCount.setText("");
                 }
+
+                String condition = marker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                if (!"".equals(condition)) {
+                    btnConditional.setSelection(true);
+                    txtConditional.setEnabled(true);
+                    txtConditional.setText(condition);
+                } else {
+                    btnConditional.setSelection(false);
+                    txtConditional.setEnabled(false);
+                    txtConditional.setText("");
+                }
             }
 
             btnHitCount.addSelectionListener(selectionListener);
             txtHitCount.addModifyListener(modifyListener);
-
+            btnConditional.addSelectionListener(conditionalSelectionListener);
+            txtConditional.addModifyListener(conditionalModifyListener);
         }
     }
 
@@ -132,7 +163,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         fireDirty();
 
         if (currentMarker != null) {
-            if (btnHitCount.getSelection() && txtHitCount.getText() != "") {
+            if (btnHitCount.getSelection() && !"".equals(txtHitCount.getText())) {
                 String hitCount = txtHitCount.getText();
                 try {
                     int count = Integer.parseInt(hitCount);
@@ -143,6 +174,21 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
             } else {
                 try {
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (btnConditional.getSelection() && !"".equals(txtConditional.getText())) {
+                String condition = txtConditional.getText();
+                try {
+                    currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, condition);
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                 } catch (CoreException e) {
                     e.printStackTrace();
                 }
@@ -206,6 +252,34 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     private class HitCountModifyListener implements ModifyListener {
+
+        @Override
+        public void modifyText(ModifyEvent e) {
+            isDirty = true;
+            fireDirty();
+        }
+    }
+
+    private class ConditionalSelectionListener implements SelectionListener {
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            if (!isConditionalSelected && btnConditional.getSelection()) {
+                isConditionalSelected = true;
+            } else if (isConditionalSelected && !btnConditional.getSelection()) {
+                isConditionalSelected = false;
+            }
+            txtConditional.setEnabled(isConditionalSelected);
+            isDirty = true;
+            fireDirty();
+        }
+
+        @Override
+        public void widgetDefaultSelected(SelectionEvent e) {
+        }
+    }
+
+    private class ConditionalModifyListener implements ModifyListener {
 
         @Override
         public void modifyText(ModifyEvent e) {
