@@ -1,21 +1,41 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.LogOutputStream;
-import org.apache.commons.exec.OS;
-import org.apache.commons.exec.PumpStreamHandler;
-
 import com.google.common.base.Objects;
 
 public class RobotRuntimeEnvironment {
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+    }
+
+    private static int runExternalProcess(final List<String> command, final ProcessLineHandler linesHandler) {
+        try {
+            final Process process = new ProcessBuilder(command).start();
+
+            final InputStream inputStream = process.getInputStream();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                linesHandler.processLine(line, 0);
+            }
+            return process.waitFor();
+        } catch (final IOException | InterruptedException e) {
+            // FIXME : handle that
+            e.printStackTrace();
+            return -100;
+        }
+    }
 
     /**
      * Locates directory in which python pointed in environment path is located.
@@ -25,32 +45,21 @@ public class RobotRuntimeEnvironment {
      *         python.
      */
     public static PythonInstallationDirectory whereIsDefaultPython() {
-        final String cmd = OS.isFamilyWindows() ? "where python" : "which python";
+        final String cmd = isWindows() ? "where" : "which";
+
         final StringBuilder whereOutput = new StringBuilder();
-
-        final PumpStreamHandler handler = new PumpStreamHandler(new LogOutputStream() {
-
+        final int returnCode = runExternalProcess(Arrays.asList(cmd, "python"), new ProcessLineHandler() {
             @Override
-            protected void processLine(final String line, final int level) {
-                whereOutput.append(line).append(System.lineSeparator());
+            public void processLine(final String line, final int level) {
+                whereOutput.append(line);
             }
         });
-
-        final CommandLine cmdLine = CommandLine.parse(cmd);
-        final DefaultExecutor executor = new DefaultExecutor();
-        executor.setStreamHandler(handler);
-        try {
-            final int returnCode = executor.execute(cmdLine);
-            if (returnCode == 0) {
-                final URI dirUri = new File(whereOutput.toString()).getParentFile().toURI();
-                return new PythonInstallationDirectory(dirUri);
-            }
-        } catch (final IOException e) {
+        if (returnCode == 0) {
+            final URI dirUri = new File(whereOutput.toString()).getParentFile().toURI();
+            return new PythonInstallationDirectory(dirUri);
+        } else {
             return null;
         }
-        // FIXME : this probably does not work on linux since usually there are
-        // symlinks defined, so they should be followed
-        return null;
     }
 
     /**
@@ -69,7 +78,7 @@ public class RobotRuntimeEnvironment {
      */
     private static PythonInstallationDirectory checkPythonInstallationDir(final File location)
             throws IllegalArgumentException {
-        if (OS.isFamilyWindows()) {
+        if (isWindows()) {
             if (!location.isDirectory()) {
                 throw new IllegalArgumentException("The location " + location.getAbsolutePath()
                         + " is not a directory.");
@@ -94,27 +103,16 @@ public class RobotRuntimeEnvironment {
      * @return Robot version as returned by robot
      */
     private static String getRobotFrameworkVersion(final PythonInstallationDirectory pythonLocation) {
-        final String pythonExe = OS.isFamilyWindows() ? "python.exe" : "python";
-        final String cmd = findFile(pythonLocation, pythonExe).getAbsolutePath() + " -m robot.run --version";
+        final String pythonExe = isWindows() ? "python.exe" : "python";
+        final String cmd = findFile(pythonLocation, pythonExe).getAbsolutePath();
+
         final StringBuilder whereOutput = new StringBuilder();
-
-        final PumpStreamHandler handler = new PumpStreamHandler(new LogOutputStream() {
-
+        runExternalProcess(Arrays.asList(cmd, "-m", "robot.run", "--version"), new ProcessLineHandler() {
             @Override
-            protected void processLine(final String line, final int level) {
+            public void processLine(final String line, final int level) {
                 whereOutput.append(line).append(System.lineSeparator());
             }
         });
-
-        final CommandLine cmdLine = CommandLine.parse(cmd);
-        final DefaultExecutor executor = new DefaultExecutor();
-        executor.setStreamHandler(handler);
-        try {
-            executor.execute(cmdLine);
-        } catch (final IOException e) {
-            // the python -m robot.run --version call returns non zero code even if everything is fine
-        }
-
         final String output = whereOutput.toString();
         return isProperVersion(output) ? output.trim() : null;
     }
@@ -166,28 +164,19 @@ public class RobotRuntimeEnvironment {
         return location;
     }
 
-    public void installRobotUsingPip(final OutputStream stream, final boolean useStableVersion)
+    public void installRobotUsingPip(final ProcessLineHandler linesHandler, final boolean useStableVersion)
             throws RobotEnvironmentException {
         if (isValidPythonInstallation()) {
-            final String pythonExec = OS.isFamilyWindows() ? "python.exe" : "python";
-            final CommandLine cmdLine = new CommandLine(findFile(location, pythonExec));
-            cmdLine.addArgument("-m");
-            cmdLine.addArgument("pip");
-            cmdLine.addArgument("install");
-            cmdLine.addArgument("--upgrade");
+            
+            final String pythonExec = isWindows() ? "python.exe" : "python";
+            final List<String> cmdLine = newArrayList();
+            cmdLine.addAll(Arrays.asList(pythonExec, "-m", "pip", "install", "-upagrade"));
             if (!useStableVersion) {
-                cmdLine.addArgument("--pre");
+                cmdLine.add("--pre");
             }
-            cmdLine.addArgument("robotframework");
-            final DefaultExecutor executor = new DefaultExecutor();
-            executor.setStreamHandler(new PumpStreamHandler(stream));
-            try {
-                executor.execute(cmdLine);
-                version = getRobotFrameworkVersion((PythonInstallationDirectory) location);
-            } catch (final IOException e) {
-                throw new RobotEnvironmentException(
-                        "There was a problem installing Robot Framework. Check if this Python installation has pip module provided.");
-            }
+            cmdLine.add("robotframework");
+            runExternalProcess(cmdLine, linesHandler);
+            version = getRobotFrameworkVersion((PythonInstallationDirectory) location);
         }
     }
 
@@ -209,6 +198,10 @@ public class RobotRuntimeEnvironment {
         }
         final RobotRuntimeEnvironment other = (RobotRuntimeEnvironment) obj;
         return Objects.equal(location, other.location) && Objects.equal(version, other.version);
+    }
+
+    public interface ProcessLineHandler {
+        public void processLine(final String line, final int level);
     }
 
     public static class RobotEnvironmentException extends Exception {

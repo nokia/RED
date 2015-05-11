@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 /**
  * @author mmarzec
@@ -28,14 +29,16 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
      * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String,
      * java.lang.Object)
      */
-    public void setAttribute(String attribute, Object value) {
+    @Override
+    public void setAttribute(final String attribute, final Object value) {
     }
 
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
      */
-    public Image getImage(Object element) {
+    @Override
+    public Image getImage(final Object element) {
         return null;
     }
 
@@ -43,7 +46,8 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
      * (non-Javadoc)
      * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
      */
-    public String getText(Object element) {
+    @Override
+    public String getText(final Object element) {
         try {
             if (element instanceof IThread) {
                 return ((IThread) element).getName();
@@ -52,12 +56,12 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
             } else if (element instanceof IStackFrame) {
                 return ((IStackFrame) element).getName();
             } else if (element instanceof RobotLineBreakpoint) {
-                IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
-                String file = breakpointMarker.getAttribute(IMarker.LOCATION, "");
-                Integer line = (Integer) breakpointMarker.getAttribute(IMarker.LINE_NUMBER);
+                final IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
+                final String file = breakpointMarker.getAttribute(IMarker.LOCATION, "");
+                final Integer line = (Integer) breakpointMarker.getAttribute(IMarker.LINE_NUMBER);
                 return file + " [line: " + line + "]";
             }
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
         }
 
@@ -70,11 +74,12 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
      * org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse.debug.core.model.IValue
      * , org.eclipse.debug.ui.IValueDetailListener)
      */
-    public void computeDetail(IValue value, IValueDetailListener listener) {
+    @Override
+    public void computeDetail(final IValue value, final IValueDetailListener listener) {
         String detail = "";
         try {
             detail = value.getValueString();
-        } catch (DebugException e) {
+        } catch (final DebugException e) {
         }
         listener.detailComputed(value, detail);
     }
@@ -83,7 +88,8 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
      * (non-Javadoc)
      * @see org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
      */
-    public IEditorInput getEditorInput(Object element) {
+    @Override
+    public IEditorInput getEditorInput(final Object element) {
         if (element instanceof IFile) {
             return new FileEditorInput((IFile) element);
         }
@@ -98,9 +104,10 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
      * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput,
      * java.lang.Object)
      */
-    public String getEditorId(IEditorInput input, Object element) {
+    @Override
+    public String getEditorId(final IEditorInput input, final Object element) {
         if (element instanceof IFile || element instanceof ILineBreakpoint) {
-            return "org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper";
+            return RobotFormEditor.ID;
         }
         return null;
     }
