@@ -113,7 +113,7 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
 
 
-class TestRunnerAgent_test:
+class TestRunnerAgent:
     """Pass all listener events to a remote listener
 
     If called with one argument, that argument is a port
