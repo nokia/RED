@@ -41,7 +41,7 @@ public class ElementAddingToken {
         if (enabled) {
             return descriptor.createImage();
         } else {
-            return new Image(Display.getCurrent(), descriptor.createImage(), SWT.IMAGE_GRAY);
+            return RobotImages.getGreyedImage(descriptor).createImage();
         }
     }
 

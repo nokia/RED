@@ -41,12 +41,15 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature">
+               class="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature">
          </run>
       </runtime>
       <options
             allowLinking="false">
       </options>
+      <builder
+            id="org.robotframework.ide.eclipse.main.plugin.robotLibrariesBuilder">
+      </builder>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
@@ -55,6 +58,33 @@
             id="org.robotframework.ide.eclipse.main.plugin.robotNature.img"
             natureId="org.robotframework.ide.eclipse.main.plugin.robotNature">
       </image>
+   </extension>
+   <extension
+         id="robotLibrariesBuilder"
+         name="Robot Libraries Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.robotframework.ide.eclipse.main.plugin.project.build.RobotProjectBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixesGenerator"
+            markerType="org.eclipse.core.resources.problemmarker">
+      </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.robotframework.ide.eclipse.main.plugin.project.properties.RobotProjectPropertyPage"
+            id="org.robotframework.ide.eclipse.main.plugin.project.properties"
+            name="Robot "
+            objectClass="org.eclipse.core.resources.IProject">
+      </page>
    </extension>
  <extension
        point="org.eclipse.ui.decorators">
@@ -334,6 +364,27 @@
           </with>
        </enablement>
     </commonWizard>
+    <navigatorContent
+          contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesContentProvider"
+          id="org.robotframework.content.librariesContent"
+          labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesLabelProvider"
+          name="Robot Libraries">
+       <triggerPoints>
+          <and>
+             <instanceof
+                   value="org.eclipse.core.resources.IProject">
+             </instanceof>
+             <test
+                   property="org.eclipse.core.resources.projectNature"
+                   value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+             </test>
+          </and></triggerPoints>
+       <possibleChildren>
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.navigator.RobotLibrary">
+          </instanceof>
+       </possibleChildren>
+    </navigatorContent>
  </extension>
  <extension
        point="org.eclipse.ui.themes">
@@ -840,6 +891,26 @@
             class="org.robotframework.ide.eclipse.main.plugin.debug.RobotSourcePathComputerDelegate"
             id="org.eclipse.debug.robot.sourcePathComputer">
       </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotPreferencesPage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            name="Robot Framework">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.installed"
+            name="Installed frameworks">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotPreferencesInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.debug.ui.detailPaneFactories">

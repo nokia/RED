@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 public class RobotSuitesDecorator implements ILightweightLabelDecorator {
 

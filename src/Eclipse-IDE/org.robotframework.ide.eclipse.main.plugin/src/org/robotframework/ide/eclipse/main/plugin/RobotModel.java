@@ -14,7 +14,7 @@ public class RobotModel implements RobotElement {
 
     private final List<RobotElement> projects = new ArrayList<>();
 
-    RobotProject createRobotProject(final IProject project) {
+    public RobotProject createRobotProject(final IProject project) {
         if (project == null) {
             return null;
         }

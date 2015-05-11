@@ -9,6 +9,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
 import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
@@ -184,10 +185,12 @@ class ImportsSettingsFormPart extends AbstractFormPart {
                 .createFor(viewer);
 
         final int newColumnsStartingPosition = max + 1;
-        
+
+        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
+                .getGreyedImage(RobotImages.getAddImage());
         ViewerColumnsFactory.newColumn("").withWidth(28).resizable(false)
                 .withTooltip("Activate cell in this column to add new arguments columns")
-                .withImage(RobotImages.getAddImage().createImage())
+                .withImage(addImage.createImage())
                 .labelsProvidedBy(new ColumnAddingLabelProvider())
                 .editingSupportedBy(
                         new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {

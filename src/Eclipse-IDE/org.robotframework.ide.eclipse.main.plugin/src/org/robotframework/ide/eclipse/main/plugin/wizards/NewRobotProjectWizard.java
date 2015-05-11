@@ -19,7 +19,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 public class NewRobotProjectWizard extends BasicNewResourceWizard {
 

@@ -12,6 +12,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
 import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
 import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
@@ -116,6 +117,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
     private void createDocumentationControl(final Composite panel) {
         documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI);
+        documentation.setEditable(fileModel.isEditable());
         documentation.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(final PaintEvent e) {
@@ -128,22 +130,24 @@ class GeneralSettingsFormPart extends AbstractFormPart {
                 }
             }
         });
-        documentation.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(final FocusEvent e) {
-                final String newDocumentation = documentation.getText();
-                final RobotSetting currentSetting = model.getDocumentationSetting();
+        if (fileModel.isEditable()) {
+            documentation.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(final FocusEvent e) {
+                    final String newDocumentation = documentation.getText();
+                    final RobotSetting currentSetting = model.getDocumentationSetting();
 
-                if (currentSetting == null && !newDocumentation.isEmpty()) {
-                    commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
-                            newArrayList(newDocumentation)));
-                } else if (currentSetting != null && newDocumentation.isEmpty()) {
-                    commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
-                } else if (currentSetting != null) {
-                    commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
+                    if (currentSetting == null && !newDocumentation.isEmpty()) {
+                        commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
+                                newArrayList(newDocumentation)));
+                    } else if (currentSetting != null && newDocumentation.isEmpty()) {
+                        commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
+                    } else if (currentSetting != null) {
+                        commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
+                    }
                 }
-            }
-        });
+            });
+        }
 
         GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 120).applyTo(documentation);
     }
@@ -193,9 +197,11 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
         final int newColumnsStartingPosition = max + 1;
         
+        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
+                .getGreyedImage(RobotImages.getAddImage());
         ViewerColumnsFactory.newColumn("").withWidth(28).resizable(false)
                 .withTooltip("Activate cell in this column to add new arguments columns")
-                .withImage(RobotImages.getAddImage().createImage())
+                .withImage(addImage.createImage())
                 .labelsProvidedBy(new ColumnAddingLabelProvider())
                 .editingSupportedBy(
                         new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {

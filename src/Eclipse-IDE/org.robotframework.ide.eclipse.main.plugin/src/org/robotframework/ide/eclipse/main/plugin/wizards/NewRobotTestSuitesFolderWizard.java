@@ -10,7 +10,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.robotframework.ide.eclipse.main.plugin.nature.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
 
