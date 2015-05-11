@@ -100,7 +100,6 @@ public class RobotExecutor {
 
         StringBuilder current = new StringBuilder();
         for (String arg : javaLikeArgs) {
-            System.out.println(arg);
             if (arg.startsWith("-")) {
                 if (current.length() > 0) {
                     args.add(current.toString());

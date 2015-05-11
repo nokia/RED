@@ -8,6 +8,10 @@ import org.eclipse.debug.ui.IDetailPaneFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class BreakpointDetailPaneFactory implements IDetailPaneFactory {
 
     @Override

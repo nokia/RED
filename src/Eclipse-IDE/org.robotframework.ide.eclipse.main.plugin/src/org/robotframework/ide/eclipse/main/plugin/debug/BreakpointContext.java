@@ -1,39 +1,36 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
-import org.eclipse.debug.core.model.IBreakpoint;
-
-
+/**
+ * @author mmarzec
+ */
 public class BreakpointContext {
 
-    private IBreakpoint breakpoint;
-    
-    private int currentHitCount = 0;
+    private String file;
 
-    public BreakpointContext(IBreakpoint breakpoint) {
-        this.breakpoint = breakpoint;
-    }
-    
-    public IBreakpoint getBreakpoint() {
-        return breakpoint;
+    private int line = 0;
+
+    public BreakpointContext() {
+
     }
 
-    
-    public void setBreakpoint(IBreakpoint breakpoint) {
-        this.breakpoint = breakpoint;
+    public String getFile() {
+        return file;
     }
 
-    
-    public int getCurrentHitCount() {
-        return currentHitCount;
+    public void setFile(String file) {
+        this.file = file;
     }
 
-    
-    public void setCurrentHitCount(int hitCount) {
-        this.currentHitCount = hitCount;
+    public int getLine() {
+        return line;
     }
-    
-    public void incrementCurrentHitCount() {
-        currentHitCount++;
+
+    public void setLine(int line) {
+        this.line = line;
     }
-    
+
+    public void setContext(String file, int line) {
+        this.file = file;
+        this.line = line;
+    }
 }

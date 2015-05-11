@@ -2,6 +2,10 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.util.Map;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class KeywordContext {
 
     private Map<String, String> variables;

@@ -1,12 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.core.resources.IContainer;
@@ -22,6 +25,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
@@ -46,20 +52,30 @@ public class RobotDebugEventDispatcher extends Job {
     private String currentKeyword = "";
 
     private String currentSuite = "";
+    
+    private String breakpointCondition = "";
+    
+    private boolean isBreakpointConditionFulfilled;
+    
+    private BreakpointContext currentBreakpointContext = new BreakpointContext();
 
     private KeywordFinder keywordFinder = new KeywordFinder();
 
     private Map<String, List<Integer>> currentExecutionLinesInFile;
 
-    private Map<String, List<BreakpointContext>> executedBreakpointsInFile;
+    private Map<String, List<Integer>> executedBreakpointsInFile;
+    
+    private Map<IBreakpoint, Integer> breakpointHitCounts;
     
     private Map<String, String> currentResourceFiles;
+    
+    private boolean isStopping;
 
     public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile,
             RobotEventBroker robotEventBroker) {
         super("Robot Event Dispatcher");
         setSystem(true);
-
+        
         this.target = target;
         this.executedFile = executedFile;
         this.robotEventBroker = robotEventBroker;
@@ -67,6 +83,7 @@ public class RobotDebugEventDispatcher extends Job {
         currentExecutionLinesInFile = new LinkedHashMap<>();
         executedBreakpointsInFile = new LinkedHashMap<>();
         currentResourceFiles = new LinkedHashMap<>();
+        breakpointHitCounts = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,7 +95,7 @@ public class RobotDebugEventDispatcher extends Job {
             while (!target.isTerminated() && messageReader != null && (event = messageReader.readLine()) != null) {
 
                 Map<String, Object> map = mapper.readValue(event, Map.class);
-
+                
                 if (map.containsKey("pid")) {
                     robotEventBroker.sendClearEventToMessageLogView();
                     target.started();
@@ -136,40 +153,40 @@ public class RobotDebugEventDispatcher extends Job {
                                 int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                                         IMarker.LINE_NUMBER);
                                 
-                                if (keywordFinder.isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
-                                        currentKeyword, args, keywordLine)) {
-
-                                    List<BreakpointContext> executedBreakpoints = executedBreakpointsInFile.get(currentFile.getName());
-                                    if (executedBreakpoints == null) {
-                                        executedBreakpoints = new ArrayList<BreakpointContext>();
-                                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpoints);
-                                    }
-
-                                    BreakpointContext breakpointContext = null;
-                                    for (BreakpointContext context : executedBreakpoints) {
-                                        if (context.getBreakpoint().equals(currentBreakpoint)) {
-                                            breakpointContext = context;
-                                        }
-                                    }
-                                    if (breakpointContext == null) {
-                                        breakpointContext = new BreakpointContext(currentBreakpoint);
-                                        executedBreakpoints.add(breakpointContext);
-                                    }
-                                    breakpointContext.incrementCurrentHitCount();
-
+                                List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
+                                if (executedBreakpointsLines == null) {
+                                    executedBreakpointsLines = new ArrayList<Integer>();
+                                    executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
+                                }
+                                if (!executedBreakpointsLines.contains(breakpointLineNum)
+                                        && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint,
+                                                breakpointLineNum, currentKeyword, args, keywordLine)) {
+                                    
                                     boolean hasHitCount = false;
                                     int breakpointHitCount = (Integer) currentBreakpoint.getMarker().getAttribute(
                                             RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                                    int currentHitCount = breakpointContext.getCurrentHitCount();
-                                    if (currentHitCount == breakpointHitCount) {
+                                    if(breakpointHitCount>1) {
+                                        if(breakpointHitCounts.containsKey(currentBreakpoint)) {
+                                            int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
+                                            if (currentHitCount == breakpointHitCount) {
+                                                hasHitCount = true;
+                                            } 
+                                            breakpointHitCounts.put(currentBreakpoint, currentHitCount);
+                                        } else {
+                                            breakpointHitCounts.put(currentBreakpoint, 1);
+                                        }
+                                    } else {
                                         hasHitCount = true;
                                     }
-
-                                    if (hasHitCount) {
+                                    
+                                    if(hasHitCount ) {
+                                        executedBreakpointsLines.add(breakpointLineNum);
+                                        breakpointCondition = currentBreakpoint.getMarker().getAttribute(
+                                                RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                                         isBreakpoint = true;
                                         target.breakpointHit(currentBreakpoint);
-                                        robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite,
-                                                breakpointLineNum);
+                                        //robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, breakpointLineNum);
+                                        currentBreakpointContext.setContext(executedSuite, breakpointLineNum);
                                     }
                                 }
                             }
@@ -183,14 +200,19 @@ public class RobotDebugEventDispatcher extends Job {
                         if (target.getRobotThread().isStepping()) {
                             target.getRobotThread().setSteppingOver(false);
                             target.getRobotThread().setSteppingReturn(false);
-                            robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
+                            //robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
+                            currentBreakpointContext.setContext(executedSuite, keywordLine);
                         }
                         target.clearStackFrames();
-                        target.sendMessageToAgent("stop");
+                        //target.sendMessageToAgent("stop");
+                        isStopping = true;
                     } else {
-                        target.sendMessageToAgent("run");
+                        //target.sendMessageToAgent("run");
+                        isStopping = false;
                     }
-
+                    
+                    target.getPartListener().setBreakpointContext(currentBreakpointContext);
+                    
                     String fileName = currentSuite;
                     if (!currentResourceFiles.isEmpty()) {
                         fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
@@ -225,7 +247,56 @@ public class RobotDebugEventDispatcher extends Job {
 
                     target.getLastKeywordFromCurrentFrames().setVariables(vars);
                 }
-
+                
+                if (map.containsKey("check_condition")) {
+                    
+                    if(!"".equals(breakpointCondition)) {
+                        String conditionJson = createJsonFromBreakpointCondition();
+                        target.sendMessageToAgent(conditionJson);
+                    } else {
+                        if(isStopping) {
+                            target.sendMessageToAgent("stop");
+                            robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
+                                    currentBreakpointContext.getLine());
+                        } else {
+                            target.sendMessageToAgent("run");
+                        }
+                    }
+                }
+                
+                if (map.containsKey("condition_result")) {
+                    List<Object> list = (List<Object>) map.get("condition_result");
+                    Boolean result = (Boolean) list.get(0);
+                    if(result) {
+                        isBreakpointConditionFulfilled = true;
+                    }
+                }
+                
+                if (map.containsKey("condition_error")) {
+                    isBreakpointConditionFulfilled = false;
+                    List<Object> list = (List<Object>) map.get("condition_error");
+                    String error = (String) list.get(0);
+                    ShowDebugErrorJob showDebugErrorJob = new ShowDebugErrorJob("Conditional Breakpoint Error",
+                            "Reason:\n" + error);
+                    showDebugErrorJob.schedule();
+                }
+                
+                if (map.containsKey("condition_checked")) {
+                    if(isStopping && isBreakpointConditionFulfilled) {
+                        target.sendMessageToAgent("stop");
+                        robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
+                                currentBreakpointContext.getLine());
+                    } else {
+                        target.sendMessageToAgent("run");
+                    }
+                    isBreakpointConditionFulfilled = false;
+                    breakpointCondition = "";
+                }
+                
+                if (map.containsKey("paused")) {
+                    target.suspended(DebugEvent.CLIENT_REQUEST);
+                }
+                
                 if (map.containsKey("end_keyword")) {
                     List<Object> list = (List<Object>) map.get("end_keyword");
                     String keyword = (String) list.get(0);
@@ -240,10 +311,6 @@ public class RobotDebugEventDispatcher extends Job {
 
                         currentResourceFiles.remove(keyword);
                     }
-                }
-
-                if (map.containsKey("paused")) {
-                    target.suspended(DebugEvent.CLIENT_REQUEST);
                 }
 
                 if (map.containsKey("close")) {
@@ -286,5 +353,60 @@ public class RobotDebugEventDispatcher extends Job {
 
         return "";
     }
+    
+    private String createJsonFromBreakpointCondition() {
+        List<String> list = new ArrayList<String>();
+        Scanner scanner = null;
+        try (InputStream is = new ByteArrayInputStream(breakpointCondition.getBytes())) {
+            scanner = new Scanner(is).useDelimiter("  ");
+            while (scanner.hasNext()) {
+                list.add(scanner.next());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        StringBuilder condition = new StringBuilder();
+        condition.append("{\"keywordCondition\":[");
+        condition.append("\""+list.get(0)+"\"");
+        if(list.size() > 1) {
+            condition.append(", [");
+            for (int i = 1; i < list.size(); i++) {
+                condition.append("\""+list.get(i)+"\"");
+                if(!(i+1==list.size())) {
+                    condition.append(",");
+                }
+            }
+            condition.append("]]}");
+        } else {
+            condition.append("]}");
+        }
+        
+        return condition.toString();
+    }
 
+    
+    private class ShowDebugErrorJob extends UIJob {
+
+        private String title;
+        private String message;
+
+        public ShowDebugErrorJob(String title, String message) {
+            super("Show Debug Error");
+            setSystem(true);
+            setPriority(Job.INTERACTIVE);
+            this.message = message;
+            this.title = title;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+            MessageDialog.openError(PlatformUI.getWorkbench().getDisplay().getActiveShell(), title, message);
+            return Status.OK_STATUS;
+        }
+    }
 }
