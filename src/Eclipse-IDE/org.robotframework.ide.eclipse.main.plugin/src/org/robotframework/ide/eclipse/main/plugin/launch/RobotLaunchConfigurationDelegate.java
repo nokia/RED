@@ -29,6 +29,7 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.debug.internal.ui.views.console.ProcessConsole;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
@@ -119,8 +120,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                     }
                     String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(), executorNameAttribute,
                             suites, executorArgsAttribute, false);
+                    
+                    this.checkPort(robotExecutor);
 
-                    robotExecutor.startTestRunnerAgentHandler(new IRobotOutputListener() {
+                    robotExecutor.startTestRunnerAgentHandler(robotExecutor.getAgentPort(), new IRobotOutputListener() {
 
                         @Override
                         public void handleLine(String line) {
@@ -150,6 +153,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                         String[] cmd = robotExecutor.createCommand(project.getLocation().toFile(),
                                 executorNameAttribute, suiteList, executorArgsAttribute, true);
 
+                        this.checkPort(robotExecutor);
+                        
                         process = DebugPlugin.exec(cmd, project.getLocation().toFile());
                         IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, executorNameAttribute);
                         printCommandOnConsole(cmd, executorNameAttribute);
@@ -157,7 +162,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                         robotPartListener = new RobotPartListener(robotEventBroker);
                         new TogglePartListenerJob(robotPartListener, false).schedule();
 
-                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, 0, file, robotPartListener, robotEventBroker);
+                        IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess,
+                                robotExecutor.getAgentPort(), file, robotPartListener, robotEventBroker);
                         launch.addDebugTarget(target);
                     }
                 }
@@ -397,4 +403,12 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
     }
 
+    private void checkPort(RobotExecutor robotExecutor) throws CoreException {
+        if (robotExecutor.getAgentPort() < 0) {
+            robotExecutor.removeTestRunnerAgentFile();
+            isConfigurationRunning = false;
+            throw new CoreException(new Status(IStatus.ERROR, "org.robotframework.ide.eclipse.main.plugin", 0,
+                    "Unable to find free port", null));
+        }
+    }
 }
