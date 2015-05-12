@@ -18,4 +18,7 @@ class RobotProjectDependencies {
         return RobotModelManager.getInstance().getModel().createRobotProject(project).getStandardLibraries();
     }
 
+    public String getVersion() {
+        return RobotModelManager.getInstance().getModel().createRobotProject(project).getVersion();
+    }
 }
