@@ -6,9 +6,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7EzTMPfVEeSx2Y7ZMEilqw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/11/15 2:08 PM
+Save-Time: 5/12/15 12:40 PM
 Testcase-Type: ecl
-Verifications: _v_fysPfVEeSx2Y7ZMEilqw
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -73,5 +72,11 @@ get-editor "newFile.robot" -index 1 | get-tab-folder | get-tab-item Variables | 
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "*newFile.robot" | verify-true
     get-property "pages[1]" | equals "newFile.robot" | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-property "selection[0].path[0]" | equals RobotProject | verify-true
+    get-property "selection[0].path[1]" | equals TestSuiteFolder | verify-true
+    get-property "selection[0].path[2]" | equals NewFolder | verify-true
+    get-property "selection[0].path[3]" | equals "newFile.robot" | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
