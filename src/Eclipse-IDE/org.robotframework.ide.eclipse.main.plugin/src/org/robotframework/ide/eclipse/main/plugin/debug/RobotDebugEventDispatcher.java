@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.core.resources.IContainer;
@@ -52,11 +53,11 @@ public class RobotDebugEventDispatcher extends Job {
     private String currentKeyword = "";
 
     private String currentSuite = "";
-    
+
     private String breakpointCondition = "";
-    
+
     private boolean isBreakpointConditionFulfilled;
-    
+
     private BreakpointContext currentBreakpointContext = new BreakpointContext();
 
     private KeywordFinder keywordFinder = new KeywordFinder();
@@ -64,18 +65,17 @@ public class RobotDebugEventDispatcher extends Job {
     private Map<String, List<Integer>> currentExecutionLinesInFile;
 
     private Map<String, List<Integer>> executedBreakpointsInFile;
-    
+
     private Map<IBreakpoint, Integer> breakpointHitCounts;
-    
+
     private Map<String, String> currentResourceFiles;
-    
+
     private boolean isStopping;
 
-    public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile,
-            RobotEventBroker robotEventBroker) {
+    public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile, RobotEventBroker robotEventBroker) {
         super("Robot Event Dispatcher");
         setSystem(true);
-        
+
         this.target = target;
         this.executedFile = executedFile;
         this.robotEventBroker = robotEventBroker;
@@ -90,241 +90,234 @@ public class RobotDebugEventDispatcher extends Job {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
         try {
-            BufferedReader messageReader = target.getMessageReader();
+            BufferedReader eventReader = target.getEventReader();
+            Map<String, Object> eventMap = null;
             String event;
-            while (!target.isTerminated() && messageReader != null && (event = messageReader.readLine()) != null) {
+            while (!target.isTerminated() && eventReader != null && (event = eventReader.readLine()) != null) {
 
-                Map<String, Object> map = mapper.readValue(event, Map.class);
-                
-                if (map.containsKey("pid")) {
-                    robotEventBroker.sendClearEventToMessageLogView();
-                    target.started();
+                eventMap = mapper.readValue(event, Map.class);
+                String eventType = null;
+                if (eventMap != null) {
+                    Set<String> keySet = eventMap.keySet();
+                    if (!keySet.isEmpty()) {
+                        eventType = keySet.iterator().next();
+                    }
+                }
+                if (eventType == null) {
+                    continue;
                 }
 
-                if (map.containsKey("start_suite")) {
-                    List<Object> list = (List<Object>) map.get("start_suite");
-                    Map<String, String> elements = (Map<String, String>) list.get(1);
-                    currentSuite = new File(elements.get("source")).getName();
-                }
+                switch (eventType) {
+                    case "pid":
+                        robotEventBroker.sendClearEventToMessageLogView();
+                        target.started();
+                        break;
+                    case "start_suite":
+                        List<Object> suiteList = (List<Object>) eventMap.get("start_suite");
+                        Map<String, String> suiteElements = (Map<String, String>) suiteList.get(1);
+                        currentSuite = new File(suiteElements.get("source")).getName();
+                        break;
+                    case "start_keyword":
+                        List<Object> startList = (List<Object>) eventMap.get("start_keyword");
+                        currentKeyword = (String) startList.get(0);
+                        Map<String, Object> startElements = (Map<String, Object>) startList.get(1);
+                        List<String> args = (List<String>) startElements.get("args");
 
-                if (map.containsKey("start_keyword")) {
-                    List<Object> list = (List<Object>) map.get("start_keyword");
-                    currentKeyword = (String) list.get(0);
-                    Map<String, Object> elements = (Map<String, Object>) list.get(1);
-                    List<String> args = (List<String>) elements.get("args");
-
-                    String executedSuite = "";
-                    IFile currentFile = null;
-                    if (!currentResourceFiles.isEmpty()) {
-                        String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
-                        currentFile = executedFile.getProject().getFile(resource);
-                        if (!currentFile.exists()) {
-                            currentFile = executedFile.getProject().getFile(
-                                    executedFile.getParent().getName() + "/" + resource);
-                        }
-                        executedSuite = resource;
-                    } else {
-                        currentFile = executedFile;
-                        executedSuite = currentSuite;
-                    }
-
-                    // TODO: check keywords in currentFrames and search keywords only after
-                    // parent keywords
-                    int keywordLine = keywordFinder.getKeywordLine(currentFile, currentKeyword, args,
-                            currentExecutionLinesInFile.get(currentFile.getName()));
-                    if (keywordLine >= 0) {
-                        List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
-                        if (executionLines == null) {
-                            executionLines = new ArrayList<Integer>();
-                            currentExecutionLinesInFile.put(currentFile.getName(), executionLines);
-                        }
-                        executionLines.add(keywordLine);
-                    }
-
-                    boolean isBreakpoint = false;
-                    IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
-                            .getBreakpointManager()
-                            .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
-                    for (int i = 0; i < currentBreakpoints.length; i++) {
-                        IBreakpoint currentBreakpoint = currentBreakpoints[i];
-                        String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
-                        try {
-                            if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
-                                int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
-                                        IMarker.LINE_NUMBER);
-                                
-                                List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
-                                if (executedBreakpointsLines == null) {
-                                    executedBreakpointsLines = new ArrayList<Integer>();
-                                    executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
-                                }
-                                if (!executedBreakpointsLines.contains(breakpointLineNum)
-                                        && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint,
-                                                breakpointLineNum, currentKeyword, args, keywordLine)) {
-                                    
-                                    boolean hasHitCount = false;
-                                    int breakpointHitCount = (Integer) currentBreakpoint.getMarker().getAttribute(
-                                            RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                                    if(breakpointHitCount>1) {
-                                        if(breakpointHitCounts.containsKey(currentBreakpoint)) {
-                                            int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
-                                            if (currentHitCount == breakpointHitCount) {
-                                                hasHitCount = true;
-                                            } 
-                                            breakpointHitCounts.put(currentBreakpoint, currentHitCount);
-                                        } else {
-                                            breakpointHitCounts.put(currentBreakpoint, 1);
-                                        }
-                                    } else {
-                                        hasHitCount = true;
-                                    }
-                                    
-                                    if(hasHitCount ) {
-                                        executedBreakpointsLines.add(breakpointLineNum);
-                                        breakpointCondition = currentBreakpoint.getMarker().getAttribute(
-                                                RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                                        isBreakpoint = true;
-                                        target.breakpointHit(currentBreakpoint);
-                                        //robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, breakpointLineNum);
-                                        currentBreakpointContext.setContext(executedSuite, breakpointLineNum);
-                                    }
-                                }
+                        String executedSuite = "";
+                        IFile currentFile = null;
+                        if (!currentResourceFiles.isEmpty()) {
+                            String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
+                            currentFile = executedFile.getProject().getFile(resource);
+                            if (!currentFile.exists()) {
+                                currentFile = executedFile.getProject().getFile(
+                                        executedFile.getParent().getName() + "/" + resource);
                             }
-                        } catch (CoreException e) {
-                            e.printStackTrace();
+                            executedSuite = resource;
+                        } else {
+                            currentFile = executedFile;
+                            executedSuite = currentSuite;
                         }
-                    }
 
-                    if ((isBreakpoint || target.getRobotThread().isStepping()) && !target.hasStepOver() && !target.hasStepReturn()) {
-
-                        if (target.getRobotThread().isStepping()) {
-                            target.getRobotThread().setSteppingOver(false);
-                            target.getRobotThread().setSteppingReturn(false);
-                            //robotEventBroker.sendHighlightLineEventToTextEditor(executedSuite, keywordLine);
-                            currentBreakpointContext.setContext(executedSuite, keywordLine);
+                        // TODO: check keywords in currentFrames and search keywords only after
+                        // parent keywords
+                        int keywordLine = keywordFinder.getKeywordLine(currentFile, currentKeyword, args,
+                                currentExecutionLinesInFile.get(currentFile.getName()));
+                        if (keywordLine >= 0) {
+                            List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
+                            if (executionLines == null) {
+                                executionLines = new ArrayList<Integer>();
+                                currentExecutionLinesInFile.put(currentFile.getName(), executionLines);
+                            }
+                            executionLines.add(keywordLine);
                         }
-                        target.clearStackFrames();
-                        //target.sendMessageToAgent("stop");
-                        isStopping = true;
-                    } else {
-                        //target.sendMessageToAgent("run");
-                        isStopping = false;
-                    }
-                    
-                    target.getPartListener().setBreakpointContext(currentBreakpointContext);
-                    
-                    String fileName = currentSuite;
-                    if (!currentResourceFiles.isEmpty()) {
-                        fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
-                    }
-                    target.getCurrentFrames().put(currentKeyword, new KeywordContext(null, fileName, keywordLine));
 
-                    // first keyword with resource name is in old file, so until second keyword
-                    // there is a need to switch between files
-                    String[] keywordNameParts = currentKeyword.split("\\.");
-                    if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
-                        // next keyword from here will be in another file
-                        String resourceName = keywordNameParts[0];
+                        boolean isBreakpoint = false;
+                        IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
+                                .getBreakpointManager()
+                                .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
+                        for (int i = 0; i < currentBreakpoints.length; i++) {
+                            IBreakpoint currentBreakpoint = currentBreakpoints[i];
+                            String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
+                            try {
+                                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
+                                    int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
+                                            IMarker.LINE_NUMBER);
 
-                        // TODO: get somehow name with extension of resource file
-                        String resourceFileName = findResourceName(resourceName);
-                        if (!resourceFileName.equals("")) {
-                            currentResourceFiles.put(currentKeyword, resourceFileName);
+                                    List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
+                                    if (executedBreakpointsLines == null) {
+                                        executedBreakpointsLines = new ArrayList<Integer>();
+                                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
+                                    }
+                                    if (!executedBreakpointsLines.contains(breakpointLineNum)
+                                            && keywordFinder.isKeywordInBreakpointLine(currentBreakpoint,
+                                                    breakpointLineNum, currentKeyword, args, keywordLine)) {
+
+                                        boolean hasHitCount = false;
+                                        int breakpointHitCount = (Integer) currentBreakpoint.getMarker().getAttribute(
+                                                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                                        if (breakpointHitCount > 1) {
+                                            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
+                                                int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
+                                                if (currentHitCount == breakpointHitCount) {
+                                                    hasHitCount = true;
+                                                }
+                                                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
+                                            } else {
+                                                breakpointHitCounts.put(currentBreakpoint, 1);
+                                            }
+                                        } else {
+                                            hasHitCount = true;
+                                        }
+
+                                        if (hasHitCount) {
+                                            executedBreakpointsLines.add(breakpointLineNum);
+                                            breakpointCondition = currentBreakpoint.getMarker().getAttribute(
+                                                    RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                                            isBreakpoint = true;
+                                            target.breakpointHit(currentBreakpoint);
+                                            currentBreakpointContext.setContext(executedSuite, breakpointLineNum);
+                                        }
+                                    }
+                                }
+                            } catch (CoreException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                }
 
-                if (map.containsKey("vars")) {
-                    List<Object> list = (List<Object>) map.get("vars");
-                    Map<String, String> vars = (Map<String, String>) list.get(1);
+                        if ((isBreakpoint || target.getRobotThread().isStepping()) && !target.hasStepOver()
+                                && !target.hasStepReturn()) {
 
-                    // String fileName = currentSuite;
-                    // if(!currentResourceFiles.isEmpty()) {
-                    // fileName = (String)
-                    // currentResourceFiles.values().toArray()[currentResourceFiles.size()-1];
-                    // }
-                    // currentFrames.put(currentKeyword, new ActiveKeyword(vars, fileName));
+                            if (target.getRobotThread().isStepping()) {
+                                target.getRobotThread().setSteppingOver(false);
+                                target.getRobotThread().setSteppingReturn(false);
+                                currentBreakpointContext.setContext(executedSuite, keywordLine);
+                            }
+                            target.clearStackFrames();
+                            isStopping = true;
+                        } else {
+                            isStopping = false;
+                        }
 
-                    target.getLastKeywordFromCurrentFrames().setVariables(vars);
-                }
-                
-                if (map.containsKey("check_condition")) {
-                    
-                    if(!"".equals(breakpointCondition) && !target.getRobotThread().isStepping()) {
-                        String conditionJson = createJsonFromBreakpointCondition();
-                        target.sendMessageToAgent(conditionJson);
-                    } else {
-                        if(isStopping) {
-                            target.sendMessageToAgent("stop");
+                        target.getPartListener().setBreakpointContext(currentBreakpointContext);
+
+                        String fileName = currentSuite;
+                        if (!currentResourceFiles.isEmpty()) {
+                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
+                        }
+                        target.getCurrentFrames().put(currentKeyword, new KeywordContext(null, fileName, keywordLine));
+
+                        // first keyword with resource name is in old file, so until second keyword
+                        // there is a need to switch between files
+                        String[] keywordNameParts = currentKeyword.split("\\.");
+                        if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
+                            // next keyword from here will be in another file
+                            String resourceName = keywordNameParts[0];
+
+                            // TODO: get somehow name with extension of resource file
+                            String resourceFileName = findResourceName(resourceName);
+                            if (!resourceFileName.equals("")) {
+                                currentResourceFiles.put(currentKeyword, resourceFileName);
+                            }
+                        }
+                        break;
+                    case "vars":
+                        List<Object> varList = (List<Object>) eventMap.get("vars");
+                        Map<String, String> vars = (Map<String, String>) varList.get(1);
+                        target.getLastKeywordFromCurrentFrames().setVariables(vars);
+                        break;
+                    case "check_condition":
+                        if (!"".equals(breakpointCondition) && !target.getRobotThread().isStepping()) {
+                            String conditionJson = createJsonFromBreakpointCondition();
+                            target.sendEventToAgent(conditionJson);
+                        } else {
+                            if (isStopping) {
+                                target.sendEventToAgent("stop");
+                                robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
+                                        currentBreakpointContext.getLine());
+                            } else {
+                                target.sendEventToAgent("run");
+                            }
+                        }
+                        break;
+                    case "condition_result":
+                        List<Object> resultList = (List<Object>) eventMap.get("condition_result");
+                        Boolean result = (Boolean) resultList.get(0);
+                        if (result) {
+                            isBreakpointConditionFulfilled = true;
+                        }
+                        break;
+                    case "condition_error":
+                        isBreakpointConditionFulfilled = false;
+                        List<Object> errorList = (List<Object>) eventMap.get("condition_error");
+                        String error = (String) errorList.get(0);
+                        ShowDebugErrorJob showDebugErrorJob = new ShowDebugErrorJob("Conditional Breakpoint Error",
+                                "Reason:\n" + error);
+                        showDebugErrorJob.schedule();
+                        break;
+                    case "condition_checked":
+                        if (isStopping && isBreakpointConditionFulfilled) {
+                            target.sendEventToAgent("stop");
                             robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
                                     currentBreakpointContext.getLine());
                         } else {
-                            target.sendMessageToAgent("run");
+                            target.sendEventToAgent("run");
                         }
-                    }
-                }
-                
-                if (map.containsKey("condition_result")) {
-                    List<Object> list = (List<Object>) map.get("condition_result");
-                    Boolean result = (Boolean) list.get(0);
-                    if(result) {
-                        isBreakpointConditionFulfilled = true;
-                    }
-                }
-                
-                if (map.containsKey("condition_error")) {
-                    isBreakpointConditionFulfilled = false;
-                    List<Object> list = (List<Object>) map.get("condition_error");
-                    String error = (String) list.get(0);
-                    ShowDebugErrorJob showDebugErrorJob = new ShowDebugErrorJob("Conditional Breakpoint Error",
-                            "Reason:\n" + error);
-                    showDebugErrorJob.schedule();
-                }
-                
-                if (map.containsKey("condition_checked")) {
-                    if(isStopping && isBreakpointConditionFulfilled) {
-                        target.sendMessageToAgent("stop");
-                        robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
-                                currentBreakpointContext.getLine());
-                    } else {
-                        target.sendMessageToAgent("run");
-                    }
-                    isBreakpointConditionFulfilled = false;
-                    breakpointCondition = "";
-                }
-                
-                if (map.containsKey("paused")) {
-                    target.suspended(DebugEvent.CLIENT_REQUEST);
-                }
-                
-                if (map.containsKey("end_keyword")) {
-                    List<Object> list = (List<Object>) map.get("end_keyword");
-                    String keyword = (String) list.get(0);
-                    target.getCurrentFrames().remove(keyword);
+                        isBreakpointConditionFulfilled = false;
+                        breakpointCondition = "";
+                        break;
+                    case "paused":
+                        target.suspended(DebugEvent.CLIENT_REQUEST);
+                        break;
+                    case "end_keyword":
+                        List<Object> endList = (List<Object>) eventMap.get("end_keyword");
+                        String keyword = (String) endList.get(0);
+                        target.getCurrentFrames().remove(keyword);
 
-                    String[] keywordNameParts = keyword.split("\\.");
-                    if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
-                        String fileName = currentResourceFiles.get(keyword);
-                        currentExecutionLinesInFile.remove(fileName);
-                        executedBreakpointsInFile.remove(fileName);
-                        robotEventBroker.sendClearEventToTextEditor(fileName);
+                        String[] endKeywordNameParts = keyword.split("\\.");
+                        if (endKeywordNameParts.length > 1 && !endKeywordNameParts[0].equals("BuiltIn")) {
+                            String resourceFileName = currentResourceFiles.get(keyword);
+                            currentExecutionLinesInFile.remove(resourceFileName);
+                            executedBreakpointsInFile.remove(resourceFileName);
+                            robotEventBroker.sendClearEventToTextEditor(resourceFileName);
 
-                        currentResourceFiles.remove(keyword);
-                    }
+                            currentResourceFiles.remove(keyword);
+                        }
+                        break;
+                    case "close":
+                        robotEventBroker.sendClearAllEventToTextEditor();
+                        target.terminated();
+                        break;
+                    case "log_message":
+                        List<Object> messageList = (List<Object>) eventMap.get("log_message");
+                        Map<String, String> messageElements = (Map<String, String>) messageList.get(0);
+                        String line = messageElements.get("timestamp") + " : " + messageElements.get("level") + " : "
+                                + messageElements.get("message") + '\n';
+                        robotEventBroker.sendAppendLineEventToMessageLogView(line);
+                        break;
+                    default:
+                        break;
                 }
 
-                if (map.containsKey("close")) {
-                    robotEventBroker.sendClearAllEventToTextEditor();
-                    target.terminated();
-                }
-
-                if (map.containsKey("log_message")) {
-                    List<Object> list = (List<Object>) map.get("log_message");
-                    Map<String, String> elements = (Map<String, String>) list.get(0);
-                    String line = elements.get("timestamp") + " : " + elements.get("level") + " : "
-                            + elements.get("message") + '\n';
-                    robotEventBroker.sendAppendLineEventToMessageLogView(line);
-                }
             }
         } catch (IOException e) {
             target.terminated();
@@ -353,7 +346,7 @@ public class RobotDebugEventDispatcher extends Job {
 
         return "";
     }
-    
+
     private String createJsonFromBreakpointCondition() {
         List<String> list = new ArrayList<String>();
         Scanner scanner = null;
@@ -367,12 +360,12 @@ public class RobotDebugEventDispatcher extends Job {
         }
         StringBuilder condition = new StringBuilder();
         condition.append("{\"keywordCondition\":[");
-        condition.append("\""+list.get(0)+"\"");
-        if(list.size() > 1) {
+        condition.append("\"" + list.get(0) + "\"");
+        if (list.size() > 1) {
             condition.append(", [");
             for (int i = 1; i < list.size(); i++) {
-                condition.append("\""+list.get(i)+"\"");
-                if(!(i+1==list.size())) {
+                condition.append("\"" + list.get(i) + "\"");
+                if (!(i + 1 == list.size())) {
                     condition.append(",");
                 }
             }
@@ -380,14 +373,14 @@ public class RobotDebugEventDispatcher extends Job {
         } else {
             condition.append("]}");
         }
-        
+
         return condition.toString();
     }
 
-    
     private class ShowDebugErrorJob extends UIJob {
 
         private String title;
+
         private String message;
 
         public ShowDebugErrorJob(String title, String message) {
