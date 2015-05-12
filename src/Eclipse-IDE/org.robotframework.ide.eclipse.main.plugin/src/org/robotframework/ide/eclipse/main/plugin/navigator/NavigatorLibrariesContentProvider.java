@@ -40,7 +40,7 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
 
     @Override
     public boolean hasChildren(final Object element) {
-        return true;
+        return element instanceof RobotProjectDependencies;
     }
 
 }

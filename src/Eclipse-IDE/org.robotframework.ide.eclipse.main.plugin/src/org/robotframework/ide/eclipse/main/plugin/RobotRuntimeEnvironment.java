@@ -19,7 +19,8 @@ public class RobotRuntimeEnvironment {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 
-    private static int runExternalProcess(final List<String> command, final ProcessLineHandler linesHandler) {
+    private static int runExternalProcess(final List<String> command, final ProcessLineHandler linesHandler)
+            throws IOException {
         try {
             final Process process = new ProcessBuilder(command).start();
 
@@ -27,13 +28,11 @@ public class RobotRuntimeEnvironment {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
-                linesHandler.processLine(line, 0);
+                linesHandler.processLine(line);
             }
             return process.waitFor();
-        } catch (final IOException | InterruptedException e) {
-            // FIXME : handle that
-            e.printStackTrace();
-            return -100;
+        } catch (final InterruptedException e) {
+            throw new IOException(e);
         }
     }
 
@@ -45,19 +44,24 @@ public class RobotRuntimeEnvironment {
      *         python.
      */
     public static PythonInstallationDirectory whereIsDefaultPython() {
-        final String cmd = isWindows() ? "where" : "which";
-
         final StringBuilder whereOutput = new StringBuilder();
-        final int returnCode = runExternalProcess(Arrays.asList(cmd, "python"), new ProcessLineHandler() {
+        final ProcessLineHandler linesProcessor = new ProcessLineHandler() {
             @Override
-            public void processLine(final String line, final int level) {
+            public void processLine(final String line) {
                 whereOutput.append(line);
             }
-        });
-        if (returnCode == 0) {
-            final URI dirUri = new File(whereOutput.toString()).getParentFile().toURI();
-            return new PythonInstallationDirectory(dirUri);
-        } else {
+        };
+
+        try {
+            final String cmd = isWindows() ? "where" : "which";
+            final int returnCode = runExternalProcess(Arrays.asList(cmd, "python"), linesProcessor);
+            if (returnCode == 0) {
+                final URI dirUri = new File(whereOutput.toString()).getParentFile().toURI();
+                return new PythonInstallationDirectory(dirUri);
+            } else {
+                return null;
+            }
+        } catch (final IOException e) {
             return null;
         }
     }
@@ -103,22 +107,23 @@ public class RobotRuntimeEnvironment {
      * @return Robot version as returned by robot
      */
     private static String getRobotFrameworkVersion(final PythonInstallationDirectory pythonLocation) {
-        final String pythonExe = isWindows() ? "python.exe" : "python";
-        final String cmd = findFile(pythonLocation, pythonExe).getAbsolutePath();
-
-        final StringBuilder whereOutput = new StringBuilder();
-        runExternalProcess(Arrays.asList(cmd, "-m", "robot.run", "--version"), new ProcessLineHandler() {
+        final StringBuilder versionOutput = new StringBuilder();
+        final ProcessLineHandler linesHandler = new ProcessLineHandler() {
             @Override
-            public void processLine(final String line, final int level) {
-                whereOutput.append(line).append(System.lineSeparator());
+            public void processLine(final String line) {
+                versionOutput.append(line);
             }
-        });
-        final String output = whereOutput.toString();
-        return isProperVersion(output) ? output.trim() : null;
-    }
+        };
 
-    private static boolean isProperVersion(final String output) {
-        return output.startsWith("Robot Framework");
+        try {
+            final String pythonExe = isWindows() ? "python.exe" : "python";
+            final String cmd = findFile(pythonLocation, pythonExe).getAbsolutePath();
+            runExternalProcess(Arrays.asList(cmd, "-m", "robot.run", "--version"), linesHandler);
+            final String output = versionOutput.toString();
+            return output.startsWith("Robot Framework") ? output.trim() : null;
+        } catch (final IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private static File findFile(final File pythonLocation, final String name) {
@@ -140,11 +145,15 @@ public class RobotRuntimeEnvironment {
     }
 
     public static RobotRuntimeEnvironment create(final String pathToPython) {
+        return create(new File(pathToPython));
+    }
+
+    public static RobotRuntimeEnvironment create(final File pathToPython) {
         try {
-            final PythonInstallationDirectory location = checkPythonInstallationDir(new File(pathToPython));
+            final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
             return new RobotRuntimeEnvironment(location, getRobotFrameworkVersion(location));
         } catch (final IllegalArgumentException e) {
-            return new RobotRuntimeEnvironment(new File(pathToPython), null);
+            return new RobotRuntimeEnvironment(pathToPython, null);
         }
     }
 
@@ -167,16 +176,48 @@ public class RobotRuntimeEnvironment {
     public void installRobotUsingPip(final ProcessLineHandler linesHandler, final boolean useStableVersion)
             throws RobotEnvironmentException {
         if (isValidPythonInstallation()) {
-            
             final String pythonExec = isWindows() ? "python.exe" : "python";
+            final String cmd = findFile(location, pythonExec).getAbsolutePath();
             final List<String> cmdLine = newArrayList();
-            cmdLine.addAll(Arrays.asList(pythonExec, "-m", "pip", "install", "-upagrade"));
+            cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install", "-upgrade"));
             if (!useStableVersion) {
                 cmdLine.add("--pre");
             }
             cmdLine.add("robotframework");
-            runExternalProcess(cmdLine, linesHandler);
-            version = getRobotFrameworkVersion((PythonInstallationDirectory) location);
+            try {
+                final int returnCode = runExternalProcess(cmdLine, linesHandler);
+                if (returnCode != 0) {
+                    throw new RobotEnvironmentException("Unable to upgrade Robot installation");
+                }
+                version = getRobotFrameworkVersion((PythonInstallationDirectory) location);
+            } catch (final IOException e) {
+                throw new RobotEnvironmentException("Unable to upgrade Robot installation", e);
+            }
+        }
+    }
+
+    public List<String> getStandardLibrariesNames() {
+        if (hasRobotInstalled()) {
+            final String pythonExec = isWindows() ? "python.exe" : "python";
+            final String cmd = findFile(location, pythonExec).getAbsolutePath();
+            final String pythonCode = "import robot.running.namespace; print('\\n'.join(robot.running.namespace.STDLIB_NAMES))";
+            final List<String> cmdLine = newArrayList(cmd, "-c", "\"" + pythonCode + "\"");
+            final List<String> stdLibs = newArrayList();
+            final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+                @Override
+                public void processLine(final String line) {
+                    stdLibs.add(line.trim());
+                }
+            };
+
+            try {
+                runExternalProcess(cmdLine, linesHandler);
+                return stdLibs;
+            } catch (final IOException e) {
+                return stdLibs;
+            }
+        } else {
+            return newArrayList();
         }
     }
 
@@ -201,13 +242,17 @@ public class RobotRuntimeEnvironment {
     }
 
     public interface ProcessLineHandler {
-        public void processLine(final String line, final int level);
+        public void processLine(final String line);
     }
 
     public static class RobotEnvironmentException extends Exception {
 
         public RobotEnvironmentException(final String message) {
             super(message);
+        }
+
+        public RobotEnvironmentException(final String message, final Throwable cause) {
+            super(message, cause);
         }
     }
 

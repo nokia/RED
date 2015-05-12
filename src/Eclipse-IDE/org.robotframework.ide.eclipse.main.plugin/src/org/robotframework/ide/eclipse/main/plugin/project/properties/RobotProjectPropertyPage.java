@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotModelManager;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 
@@ -23,6 +25,8 @@ public class RobotProjectPropertyPage extends PropertyPage implements IWorkbench
         noDefaultAndApplyButton();
         final IProject project = (IProject) getElement();
         if (RobotProjectNature.hasRobotNature(project)) {
+            final RobotProject robotProject = RobotModelManager.getInstance().getModel().createRobotProject(project);
+
             createConfigurationButton(parent, project, true);
         } else {
             createConfigurationButton(parent, project, false);
