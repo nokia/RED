@@ -250,7 +250,7 @@ public class RobotDebugEventDispatcher extends Job {
                 
                 if (map.containsKey("check_condition")) {
                     
-                    if(!"".equals(breakpointCondition)) {
+                    if(!"".equals(breakpointCondition) && !target.getRobotThread().isStepping()) {
                         String conditionJson = createJsonFromBreakpointCondition();
                         target.sendMessageToAgent(conditionJson);
                     } else {
