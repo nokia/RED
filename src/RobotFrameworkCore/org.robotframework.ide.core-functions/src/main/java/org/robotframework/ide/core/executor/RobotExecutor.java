@@ -2,6 +2,7 @@ package org.robotframework.ide.core.executor;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -14,6 +15,7 @@ public class RobotExecutor {
 
     private Path testRunnerAgentFilePath;
 
+    private int agentPort = -1;
 
     public String[] createCommand(File projectLocation, String executorName,
             List<String> testArguments, String userArguments,
@@ -33,9 +35,11 @@ public class RobotExecutor {
         if (isDebugging) {
             debugEnabled = "True";
         }
+        
+        agentPort = findFreePort();
+        
         cmdElements.add("--listener");
-        cmdElements.add(testRunnerAgentFilePath.toString() + ":54470:"
-                + debugEnabled);
+        cmdElements.add(testRunnerAgentFilePath.toString() + ":" + agentPort + ":" + debugEnabled);
 
         for (String suite : testArguments) {
             cmdElements.add("--suite");
@@ -84,17 +88,40 @@ public class RobotExecutor {
     }
 
 
-    public void startTestRunnerAgentHandler(
-            IRobotOutputListener messageLogListener) {
+    public void startTestRunnerAgentHandler(int port, IRobotOutputListener messageLogListener) {
         MessageLogParser messageLogParser = new MessageLogParser();
         messageLogParser.setMessageLogListener(messageLogListener);
-        TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler();
+        TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
         testRunnerAgentHandler.addListener(messageLogParser);
         Thread handler = new Thread(testRunnerAgentHandler);
         handler.start();
     }
 
-
+    public boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+    }
+    
+    public int getAgentPort() {
+        return agentPort;
+    }
+    
+    private static int findFreePort() {
+        ServerSocket socket = null;
+        try {
+            socket = new ServerSocket(0);
+            return socket.getLocalPort();
+        } catch (IOException e) {
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return -1;
+    } 
+    
     private List<String> fromJavaArgsToPythonLike(List<String> javaLikeArgs) {
         List<String> args = new LinkedList<String>();
 
@@ -166,10 +193,5 @@ public class RobotExecutor {
         }
 
         return args;
-    }
-
-
-    public boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 }

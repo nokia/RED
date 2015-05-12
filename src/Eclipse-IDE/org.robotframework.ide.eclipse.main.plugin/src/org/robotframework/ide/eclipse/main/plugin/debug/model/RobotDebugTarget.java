@@ -77,7 +77,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private RobotVariablesManager robotVariablesManager;
 
-    public RobotDebugTarget(ILaunch launch, IProcess process, int requestPort, IFile executedFile,
+    public RobotDebugTarget(ILaunch launch, IProcess process, int port, IFile executedFile,
             RobotPartListener partListener, RobotEventBroker robotEventBroker) throws CoreException {
         super(null);
         target = this;
@@ -89,7 +89,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         robotVariablesManager = new RobotVariablesManager(this);
 
         try {
-            serverSocket = new ServerSocket(54470);
+            serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
             messageSocket = serverSocket.accept();
             messageReader = new BufferedReader(new InputStreamReader(messageSocket.getInputStream()));
@@ -311,7 +311,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         isSuspended = false;
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
-
+       
         try {
             if (serverSocket != null) {
                 serverSocket.close();

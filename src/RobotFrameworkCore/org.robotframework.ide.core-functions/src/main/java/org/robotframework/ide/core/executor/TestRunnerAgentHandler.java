@@ -3,7 +3,6 @@ package org.robotframework.ide.core.executor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -17,20 +16,20 @@ public class TestRunnerAgentHandler implements Runnable {
 
     private List<IRobotOutputListener> listeners;
     
-    private PrintWriter writer;
-
-    public TestRunnerAgentHandler() {
+    private int port;
+    
+    public TestRunnerAgentHandler(int port) {
         listeners = new ArrayList<>();
+        this.port = port;
     }
 
     @Override
     public void run() {
-        try (ServerSocket socket = new ServerSocket(54470)) {
+        try (ServerSocket socket = new ServerSocket(port)) {
             socket.setReuseAddress(true);
             Socket client = socket.accept();
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            writer = new PrintWriter(client.getOutputStream(), true);
-
+            
             String line;
             while ((line = reader.readLine()) != null) {
                 for (IRobotOutputListener listener : listeners) {
@@ -50,7 +49,4 @@ public class TestRunnerAgentHandler implements Runnable {
         listeners.remove(listener);
     }
     
-    public PrintWriter getWriter() {
-        return writer;
-    }
 }
