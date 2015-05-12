@@ -114,6 +114,10 @@ public class TextEditor {
         FileEditorInput fileEditorInput = null;
         if(input instanceof FileEditorInput) {
         	fileEditorInput = (FileEditorInput) input;
+        } else {
+            // FIXME : there are other inputs when editor is opened via history
+            // for example!
+            return;
         }
         
         editedFile = fileEditorInput.getFile();

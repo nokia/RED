@@ -115,19 +115,20 @@ public abstract class SectionEditorPage extends FormPage {
 
     private void addFormMessages() {
         final RobotSuiteFile fileModel = ((RobotFormEditor) getEditor()).provideSuiteModel();
-        final com.google.common.base.Optional<RobotElement> variablesSection = provideSection(fileModel);
         final Form form = getManagedForm().getForm().getForm();
-        if (!variablesSection.isPresent() && fileModel.isEditable()) {
+        if (!fileModel.isEditable()) {
+            form.setMessage("The file is read-only!", IMessageProvider.WARNING);
+            return;
+        }
+
+        final com.google.common.base.Optional<RobotElement> section = provideSection(fileModel);
+        if (section.isPresent()) {
+            form.removeMessageHyperlinkListener(createSectionLinkListener);
+            form.setMessage(null, 0);
+        } else {
             createSectionLinkListener = createHyperlinkListener(fileModel);
             form.addMessageHyperlinkListener(createSectionLinkListener);
             form.setMessage("Section is not yet defined, do you want to create it?", IMessageProvider.ERROR);
-        } else {
-            form.removeMessageHyperlinkListener(createSectionLinkListener);
-            if (((RobotSuiteFileSection) variablesSection.get()).isReadOnly()) {
-                form.setMessage("Section is read-only!", IMessageProvider.WARNING);
-            } else {
-                form.setMessage(null, 0);
-            }
         }
     }
 
