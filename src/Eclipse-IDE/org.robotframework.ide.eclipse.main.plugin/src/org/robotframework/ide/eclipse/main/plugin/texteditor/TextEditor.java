@@ -241,7 +241,7 @@ public class TextEditor {
                     }
 
                     final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
-
+                    
                     for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
                         if (point.getMarker().getResource().equals(editedFile)
                                 && point.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == line) {
@@ -280,7 +280,9 @@ public class TextEditor {
     private void highlightLineEvent(@UIEventTopic("TextEditor/HighlightLine") final org.osgi.service.event.Event event,
             @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
 	    if(((String) event.getProperty("file")).equals(editedFile.getName())) {
-            editor.activateSourcePage();
+            if (editor != null) {
+                editor.activateSourcePage();
+            }
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
         	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
