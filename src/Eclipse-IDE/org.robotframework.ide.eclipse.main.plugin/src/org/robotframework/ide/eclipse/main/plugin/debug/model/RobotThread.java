@@ -117,7 +117,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
      */
     public boolean canSuspend() {
-        return !isSuspended();
+        return !isSuspended() && !isTerminated();
     }
 
     /*
