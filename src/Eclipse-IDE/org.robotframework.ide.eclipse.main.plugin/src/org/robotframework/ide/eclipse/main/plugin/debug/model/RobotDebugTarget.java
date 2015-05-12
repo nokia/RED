@@ -44,11 +44,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private String name;
 
     // socket to communicate with Agent
-    private Socket messageSocket;
+    private Socket eventSocket;
 
-    private PrintWriter messageWriter;
+    private PrintWriter eventWriter;
 
-    private BufferedReader messageReader;
+    private BufferedReader eventReader;
 
     private ServerSocket serverSocket;
 
@@ -91,9 +91,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
-            messageSocket = serverSocket.accept();
-            messageReader = new BufferedReader(new InputStreamReader(messageSocket.getInputStream()));
-            messageWriter = new PrintWriter(messageSocket.getOutputStream(), true);
+            eventSocket = serverSocket.accept();
+            eventReader = new BufferedReader(new InputStreamReader(eventSocket.getInputStream()));
+            eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -205,8 +205,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @see org.eclipse.debug.core.model.ITerminate#terminate()
      */
     public void terminate() throws DebugException {
-        if (messageSocket != null) {
-            sendMessageToAgent("interrupt");
+        if (eventSocket != null) {
+            sendEventToAgent("interrupt");
         }
         terminated();
 
@@ -251,7 +251,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void resume() throws DebugException {
         thread.setStepping(false);
-        sendMessageToAgent("resume");
+        sendEventToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
 
         robotEventBroker.sendClearAllEventToTextEditor();
@@ -259,7 +259,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     protected void step() {
         thread.setStepping(true);
-        sendMessageToAgent("resume");
+        sendEventToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
@@ -444,13 +444,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     /**
      * Sends a message to the TestRunnerAgent
      * 
-     * @param message
+     * @param event
      */
-    public void sendMessageToAgent(String message) {
+    public void sendEventToAgent(String event) {
 
-        synchronized (messageSocket) {
-            messageWriter.print(message);
-            messageWriter.flush();
+        synchronized (eventSocket) {
+            eventWriter.print(event);
+            eventWriter.flush();
         }
     }
 
@@ -462,9 +462,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void sendChangeVariableRequest(String variable, String value) {
 
-        synchronized (messageSocket) {
-            messageWriter.print("{\"" + variable + "\":\"" + value + "\"}");
-            messageWriter.flush();
+        synchronized (eventSocket) {
+            eventWriter.print("{\"" + variable + "\":\"" + value + "\"}");
+            eventWriter.flush();
         }
     }
 
@@ -490,8 +490,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return partListener;
     }
 
-    public BufferedReader getMessageReader() {
-        return messageReader;
+    public BufferedReader getEventReader() {
+        return eventReader;
     }
 
     public RobotThread getRobotThread() {
