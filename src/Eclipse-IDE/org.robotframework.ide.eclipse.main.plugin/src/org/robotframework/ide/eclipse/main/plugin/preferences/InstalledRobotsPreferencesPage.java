@@ -246,7 +246,10 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                             try {
                                 final ProcessLineHandler linesHandler = new ProcessLineHandler() {
                                     @Override
-                                    public void processLine(final String line, final int level) {
+                                    public void processLine(final String line) {
+                                        // pip is indenting some minor messages
+                                        // with spaces, so we
+                                        // will only show major ones in progress
                                         if (!line.startsWith(" ")) {
                                             monitor.subTask(line);
                                         }

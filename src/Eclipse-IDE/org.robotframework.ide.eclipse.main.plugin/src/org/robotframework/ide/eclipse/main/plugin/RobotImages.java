@@ -67,6 +67,14 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/tooltip_prohibited.png");
     }
 
+    public static ImageDescriptor getLibraryImage() {
+        return RobotFramework.getImageDescriptor("resources/library.png");
+    }
+
+    public static ImageDescriptor getBookImage() {
+        return RobotFramework.getImageDescriptor("resources/book.png");
+    }
+
     /**
      * For given image descriptor the gray version descriptor is created.
      * 
