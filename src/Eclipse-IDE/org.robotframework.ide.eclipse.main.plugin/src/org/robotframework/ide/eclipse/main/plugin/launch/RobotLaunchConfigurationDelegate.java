@@ -56,7 +56,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     private ILaunchManager manager;
     
     private RobotEventBroker robotEventBroker;
-
+    
+    private boolean isConfigurationRunning;
+    
     public RobotLaunchConfigurationDelegate() {
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(ROBOT_LAUNCH_CONFIGURATION_TYPE);
@@ -67,6 +69,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     @Override
     public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException {
+        
+        if(isConfigurationRunning) {
+            return;
+        }
+        isConfigurationRunning = true;
         
         String projectNameAttribute = configuration.getAttribute(
                 RobotLaunchConfigurationMainTab.PROJECT_NAME_ATTRIBUTE, "");
@@ -166,6 +173,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                         new TogglePartListenerJob(robotPartListener, true).schedule();
                     }
                     robotExecutor.removeTestRunnerAgentFile();
+                    isConfigurationRunning = false;
                 }
             }
         }
@@ -346,7 +354,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
          */
         @Override
         public IStatus runInUIThread(IProgressMonitor monitor) {
-
+            
             IWorkbench workbench = PlatformUI.getWorkbench();
             try {
                 workbench.showPerspective("org.eclipse.debug.ui.DebugPerspective", workbench.getActiveWorkbenchWindow());
