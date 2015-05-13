@@ -1,15 +1,12 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -348,33 +345,25 @@ public class RobotDebugEventDispatcher extends Job {
     }
 
     private String createJsonFromBreakpointCondition() {
-        List<String> list = new ArrayList<String>();
-        Scanner scanner = null;
-        try (InputStream is = new ByteArrayInputStream(breakpointCondition.getBytes())) {
-            scanner = new Scanner(is).useDelimiter("  ");
-            while (scanner.hasNext()) {
-                list.add(scanner.next());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        StringBuilder condition = new StringBuilder();
-        condition.append("{\"keywordCondition\":[");
-        condition.append("\"" + list.get(0) + "\"");
-        if (list.size() > 1) {
-            condition.append(", [");
-            for (int i = 1; i < list.size(); i++) {
-                condition.append("\"" + list.get(i) + "\"");
-                if (!(i + 1 == list.size())) {
-                    condition.append(",");
+        String[] conditionElements = breakpointCondition.split("(\\s{2,}|\t)"); // two or more spaces or tab
+
+        StringBuilder conditionJson = new StringBuilder();
+        conditionJson.append("{\"keywordCondition\":[");
+        conditionJson.append("\"" + conditionElements[0] + "\"");
+        if (conditionElements.length > 1) {
+            conditionJson.append(", [");
+            for (int i = 1; i < conditionElements.length; i++) {
+                conditionJson.append("\"" + conditionElements[i] + "\"");
+                if (!(i + 1 == conditionElements.length)) {
+                    conditionJson.append(",");
                 }
             }
-            condition.append("]]}");
+            conditionJson.append("]]}");
         } else {
-            condition.append("]}");
+            conditionJson.append("]}");
         }
 
-        return condition.toString();
+        return conditionJson.toString();
     }
 
     private class ShowDebugErrorJob extends UIJob {
