@@ -201,8 +201,8 @@ public class RobotDebugEventDispatcher extends Job {
                             }
                         }
 
-                        if ((isBreakpoint || target.getRobotThread().isStepping()) && !target.hasStepOver()
-                                && !target.hasStepReturn()) {
+                        if (isBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
+                                && !target.hasStepReturn())) {
 
                             if (target.getRobotThread().isStepping()) {
                                 target.getRobotThread().setSteppingOver(false);
