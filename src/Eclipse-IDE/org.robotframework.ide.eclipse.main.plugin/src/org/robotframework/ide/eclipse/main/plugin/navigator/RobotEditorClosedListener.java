@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -34,7 +35,8 @@ public class RobotEditorClosedListener implements IPartListener {
             final RobotFormEditor robotEditor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = robotEditor.provideSuiteModel();
             
-            if (suiteModel.exists()) {
+            final IFile file = suiteModel.getFile();
+            if (file != null && file.exists()) {
                 suiteModel.refreshOnFileChange();
 
                 broker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, RobotElementChange.createChangedElement(suiteModel));
