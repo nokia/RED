@@ -35,6 +35,8 @@ public class TxtRobotFileLexer {
 
                     currentColumn = -1;
                 } else {
+                    tokens.add(new RobotToken(RobotTokenType.END_OF_LINE,
+                            matchedToken.getStartPos()));
                     currentLine++;
                     currentColumn = -1;
                     RobotToken startLine = new RobotToken(
@@ -61,6 +63,8 @@ public class TxtRobotFileLexer {
             RobotToken previousTokenNotStart, RobotToken matchedToken) {
         // remove last start token information
         tokens.remove(tokens.size() - 1);
+        // remove end line token information
+        tokens.remove(tokens.size() - 2);
         LinearFilePosition lastNotStartPos = previousTokenNotStart
                 .getStartPos();
         LinearFilePosition newPosition = new LinearFilePosition(
@@ -68,6 +72,8 @@ public class TxtRobotFileLexer {
         RobotToken fixed = new RobotToken(matchedToken.getType(), newPosition);
         fixed.setEndPos(newPosition);
         tokens.add(tokens.size() - 1, fixed);
+        tokens.add(tokens.size() - 1, new RobotToken(
+                RobotTokenType.END_OF_LINE, newPosition));
     }
 
 

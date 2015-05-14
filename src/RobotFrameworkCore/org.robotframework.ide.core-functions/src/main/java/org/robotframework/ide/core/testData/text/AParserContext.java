@@ -6,6 +6,7 @@ import java.util.List;
 
 public abstract class AParserContext {
 
+    protected final List<RobotToken> subContexts = new LinkedList<>();
     protected final List<RobotToken> tokens = new LinkedList<>();
 
 
