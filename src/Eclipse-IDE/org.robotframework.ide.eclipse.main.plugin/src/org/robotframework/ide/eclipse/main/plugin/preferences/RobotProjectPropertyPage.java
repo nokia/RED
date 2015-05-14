@@ -74,6 +74,10 @@ public class RobotProjectPropertyPage extends PropertyPage implements IWorkbench
                 }
             });
 
+            final Label label = new Label(parent, SWT.WRAP);
+            label.setText("Choose project-specific execution environment:");
+            GridDataFactory.fillDefaults().span(2, 1).grab(true, false).hint(200, SWT.DEFAULT).applyTo(label);
+
             createViewer(parent);
 
             final Button button = createConfigurationButton(parent, project, true);
@@ -159,27 +163,33 @@ public class RobotProjectPropertyPage extends PropertyPage implements IWorkbench
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 viewer.getTable().setEnabled(!usePreferencesButton.getSelection());
-                if (!usePreferencesButton.getSelection()) {
-                    setViewerInput();
-                }
+                setViewerInput(usePreferencesButton.getSelection());
             }
         };
     }
 
     private void setInput(final IProject project) {
         metadata = new BuildpathFile(project).read();
+        if (metadata == null) {
+            final String msg = "The robot build paths file does not exist. Please rebuild your project";
+            MessageDialog.openError(getShell(), "Invalid project state", msg);
+            throw new IllegalStateException(msg);
+        }
 
         final boolean shouldUseActiveFromPreferences = metadata.getPythonLocation() == null;
         usePreferencesButton.setSelection(shouldUseActiveFromPreferences);
-        viewer.getTable().setEnabled(!shouldUseActiveFromPreferences);
-        if (!shouldUseActiveFromPreferences) {
-            setViewerInput();
-        }
+
+        setViewerInput(shouldUseActiveFromPreferences);
     }
 
-    private void setViewerInput() {
+    private void setViewerInput(final boolean shouldUseActiveFromPreferences) {
+        viewer.getTable().setEnabled(!shouldUseActiveFromPreferences);
         viewer.setInput(RobotFramework.getDefault().getAllRuntimeEnvironments());
-        viewer.setChecked(RobotFramework.getDefault().getActiveRobotInstallation(), true);
+        if (!shouldUseActiveFromPreferences) {
+            viewer.setChecked(RobotRuntimeEnvironment.create(metadata.getPythonLocation()), true);
+        } else {
+            viewer.setChecked(RobotFramework.getDefault().getActiveRobotInstallation(), true);
+        }
         viewer.refresh();
     }
 
