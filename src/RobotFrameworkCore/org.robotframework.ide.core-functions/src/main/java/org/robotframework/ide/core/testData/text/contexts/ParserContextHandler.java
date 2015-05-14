@@ -23,7 +23,7 @@ public class ParserContextHandler {
 
 
     public void giveToken(RobotToken token, Separator sep) {
-        // handler jest opdowiedzialny ze poczyszczenie align z separatorem
+        // handler jest odpowiedzialny ze poczyszczenie align z separatorem
     }
 
 
