@@ -1,0 +1,101 @@
+package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.ProcessLineHandler;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectMetadata;
+
+
+public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
+
+    @Override
+    public String getLabel() {
+        return "Try to install Robot using PIP";
+    }
+
+    @Override
+    public void run(final IMarker marker) {
+        final IProject project = marker.getResource().getProject();
+        final RobotProjectMetadata projectMetadata = new BuildpathFile(project).read();
+
+        if (projectMetadata.getPythonLocation() == null) {
+            updateRobotFramework(getActiveShell(), RobotFramework.getDefault().getActiveRobotInstallation());
+        } else {
+            updateRobotFramework(getActiveShell(), RobotRuntimeEnvironment.create(projectMetadata.getPythonLocation()));
+        }
+
+        try {
+            project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+            project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+        } catch (final CoreException e) {
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+                    StatusManager.SHOW);
+        }
+    }
+
+    public static void updateRobotFramework(final Shell shell, final RobotRuntimeEnvironment selectedInstalation) {
+        try {
+            final boolean downloadStableVersion = MessageDialog.openQuestion(shell, "Installing Robot Framework",
+                    "Do you want to install/upgrade to current stable version? Choose "
+                            + "'No' if you prefer preview version (which may be unstable).");
+
+            final ProgressMonitorDialog progressDialog = new ProgressMonitorDialog(shell);
+            progressDialog.getProgressMonitor().setTaskName("Installing Robot Framework");
+            progressDialog.run(true, false, new IRunnableWithProgress() {
+
+                @Override
+                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                    monitor.beginTask("Installing Robot Framework", IProgressMonitor.UNKNOWN);
+                    try {
+                        final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+                            @Override
+                            public void processLine(final String line) {
+                                // pip is indenting some minor messages
+                                // with spaces, so we
+                                // will only show major ones in progress
+                                if (!line.startsWith(" ")) {
+                                    monitor.subTask(line);
+                                }
+                            }
+                        };
+                        selectedInstalation.installRobotUsingPip(linesHandler, downloadStableVersion);
+                    } catch (final RobotEnvironmentException e) {
+                        StatusManager.getManager().handle(
+                                new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+                                StatusManager.BLOCK);
+                    }
+                }
+            });
+
+        } catch (InvocationTargetException | InterruptedException e) {
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+                    StatusManager.SHOW);
+        }
+    }
+
+    private static Shell getActiveShell() {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        final IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
+        return workbenchWindow != null ? workbenchWindow.getShell() : null;
+    }
+}

@@ -14,7 +14,12 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
 
     @Override
     public boolean hasResolutions(final IMarker marker) {
-        return marker.getAttribute(RobotProblem.CAUSE_ATTRIBUTE, null) != null;
+        final String causeStr = marker.getAttribute(RobotProblem.CAUSE_ATTRIBUTE, null);
+        if (causeStr != null) {
+            final Cause cause = Cause.valueOf(causeStr);
+            return cause.hasResolution();
+        }
+        return false;
     }
 
     @Override
@@ -22,9 +27,7 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
         final List<IMarkerResolution> resolutions = newArrayList();
 
         final Cause problemCause = Cause.valueOf(marker.getAttribute(RobotProblem.CAUSE_ATTRIBUTE, ""));
-        if (Cause.MISSING_BUILDPATHS_FILE == problemCause) {
-            resolutions.add(new BuildpathFileFixer());
-        }
+        resolutions.addAll(problemCause.createFixer());
 
         return resolutions.toArray(new IMarkerResolution[0]);
     }

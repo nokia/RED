@@ -235,11 +235,6 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
         RobotFramework.getModelManager().getModel().createRobotProject(getProject()).clearMetadata();
-
-        final IFolder libspecsFolder = getProject().getFolder(LIBSPECS_FOLDER_NAME);
-        if (libspecsFolder.exists()) {
-            libspecsFolder.delete(true, monitor);
-        }
     }
 
     private static class UnableToBuildLibrariesException extends RuntimeException {

@@ -3,13 +3,13 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -40,13 +40,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.ProcessLineHandler;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
 import org.robotframework.viewers.Selections;
 
 import com.google.common.base.Function;
@@ -235,46 +233,8 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             public void widgetSelected(final SelectionEvent event) {
                 final RobotRuntimeEnvironment selectedInstalation = getSelectedInstalation();
 
-                try {
-                    final boolean downloadStableVersion = MessageDialog.openQuestion(getShell(),
-                                    "Installing Robot Framework",
-                            "Do you want to install/upgrade to current stable version? Choose "
-                            + "'No' if you prefer preview version (which may be unstable).");
-                    
-                    final ProgressMonitorDialog progressDialog = new ProgressMonitorDialog(getShell());
-                    progressDialog.getProgressMonitor().setTaskName("Installing Robot Framework");
-                    progressDialog.run(true, false, new IRunnableWithProgress() {
-
-                        @Override
-                        public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                                InterruptedException {
-                            monitor.beginTask("Installing Robot Framework", IProgressMonitor.UNKNOWN);
-                            try {
-                                final ProcessLineHandler linesHandler = new ProcessLineHandler() {
-                                    @Override
-                                    public void processLine(final String line) {
-                                        // pip is indenting some minor messages
-                                        // with spaces, so we
-                                        // will only show major ones in progress
-                                        if (!line.startsWith(" ")) {
-                                            monitor.subTask(line);
-                                        }
-                                    }
-                                };
-                                selectedInstalation.installRobotUsingPip(linesHandler, downloadStableVersion);
-                                dirty = true;
-                            } catch (final RobotEnvironmentException e) {
-                                StatusManager.getManager().handle(
-                                        new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
-                                        StatusManager.BLOCK);
-                            }
-                        }
-                    });
-
-                } catch (InvocationTargetException | InterruptedException e) {
-                    StatusManager.getManager().handle(
-                            new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()), StatusManager.SHOW);
-                }
+                InstallRobotUsingPipFixer.updateRobotFramework(getShell(), selectedInstalation);
+                dirty = true;
 
                 viewer.setSelection(StructuredSelection.EMPTY);
                 viewer.refresh();
@@ -286,13 +246,10 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
     public boolean performOk() {
         if (dirty) {
             final Object[] checkedElement = viewer.getCheckedElements();
-            if (checkedElement.length != 1) {
-                MessageDialog.openError(getShell(), "Installed frameworks",
-                        "Please check framework which will be added to build path of new projects.");
-                return false;
-            }
+            final RobotRuntimeEnvironment checkedEnv = checkedElement.length == 0 ? null
+                    : (RobotRuntimeEnvironment) checkedElement[0];
 
-            final String activePath = ((RobotRuntimeEnvironment) checkedElement[0]).getFile().getAbsolutePath();
+            final String activePath = checkedEnv == null ? "" : checkedEnv.getFile().getAbsolutePath();
             final String allPaths = Joiner.on(';').join(
                     Iterables.transform(installations, new Function<RobotRuntimeEnvironment, String>() {
                         @Override
@@ -321,6 +278,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                         InterruptedException {
                     for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
                         try {
+                            project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
                             project.build(IncrementalProjectBuilder.FULL_BUILD, null);
                         } catch (final CoreException e) {
                             MessageDialog.openError(getShell(), "Workspace rebuild",

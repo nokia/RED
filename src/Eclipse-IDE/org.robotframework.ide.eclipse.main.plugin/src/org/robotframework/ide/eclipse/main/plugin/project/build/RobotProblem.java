@@ -1,9 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MissingPythonInstallationFixer;
 
 public class RobotProblem {
 
@@ -51,10 +57,44 @@ public class RobotProblem {
     }
 
     public enum Cause {
-        MISSING_BUILDPATHS_FILE,
-        NO_ACTIVE_INSTALLATION,
-        INVALID_PYTHON_DIRECTORY,
-        MISSING_ROBOT
+        NO_ACTIVE_INSTALLATION {
+
+            @Override
+            public boolean hasResolution() {
+                return true;
+            }
+
+            @Override
+            public List<? extends IMarkerResolution> createFixer() {
+                return Arrays.asList(new MissingPythonInstallationFixer());
+            }
+        },
+        INVALID_PYTHON_DIRECTORY {
+            @Override
+            public boolean hasResolution() {
+                return true;
+            }
+
+            @Override
+            public List<? extends IMarkerResolution> createFixer() {
+                return Arrays.asList(new MissingPythonInstallationFixer());
+            }
+        },
+        MISSING_ROBOT {
+            @Override
+            public boolean hasResolution() {
+                return true;
+            }
+
+            @Override
+            public List<? extends IMarkerResolution> createFixer() {
+                return Arrays.asList(new InstallRobotUsingPipFixer(), new MissingPythonInstallationFixer());
+            }
+        };
+
+        public abstract boolean hasResolution();
+
+        public abstract List<? extends IMarkerResolution> createFixer();
     }
 
     public enum Severity {
