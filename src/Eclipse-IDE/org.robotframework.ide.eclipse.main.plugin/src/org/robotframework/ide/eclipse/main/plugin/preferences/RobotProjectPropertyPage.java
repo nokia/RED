@@ -2,7 +2,9 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -240,6 +242,7 @@ public class RobotProjectPropertyPage extends PropertyPage implements IWorkbench
                 @Override
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     try {
+                        project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
                         project.build(IncrementalProjectBuilder.FULL_BUILD, null);
                     } catch (final CoreException e) {
                         MessageDialog.openError(getShell(), "Workspace rebuild",
