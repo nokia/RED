@@ -55,6 +55,8 @@ import com.google.common.collect.Iterables;
 
 public class InstalledRobotsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
+    public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
+
     private CheckboxTableViewer viewer;
     private List<RobotRuntimeEnvironment> installations;
     private Button removeButton;
@@ -304,28 +306,32 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
 
-            try {
-                new ProgressMonitorDialog(getShell()).run(true, true, new IRunnableWithProgress() {
-                    @Override
-                    public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                            InterruptedException {
-                        for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
-                            try {
-                                project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-                            } catch (final CoreException e) {
-                                MessageDialog.openError(getShell(), "Workspace rebuild",
-                                        "Problems occured during workspace build " + e.getMessage());
-                            }
-                        }
-                    }
-                });
-            } catch (InvocationTargetException | InterruptedException e) {
-                MessageDialog.openError(getShell(), "Workspace rebuild",
-                        "Problems occured during workspace build " + e.getMessage());
-            }
+            rebuildWorkspace();
             return true;
         } else {
             return true;
+        }
+    }
+
+    private void rebuildWorkspace() {
+        try {
+            new ProgressMonitorDialog(getShell()).run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                        InterruptedException {
+                    for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
+                        try {
+                            project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+                        } catch (final CoreException e) {
+                            MessageDialog.openError(getShell(), "Workspace rebuild",
+                                    "Problems occured during workspace build " + e.getMessage());
+                        }
+                    }
+                }
+            });
+        } catch (InvocationTargetException | InterruptedException e) {
+            MessageDialog.openError(getShell(), "Workspace rebuild",
+                    "Problems occured during workspace build " + e.getMessage());
         }
     }
 }
