@@ -15,12 +15,21 @@ public class ParserContextHandler {
 
 
     public ParserContextHandler() {
-        // jezeli bedzie spacja a nie ma separatora kontekstu do go dodaj jesli
+        // jezeli bedzie spacja albo inny separator dostepny a nie ma separatora
+        // kontekstu do go dodaj jesli
         // jest to nic nie rob
+        renewContexts();
     }
 
 
     public void giveToken(RobotToken token, Separator sep) {
+        // handler jest opdowiedzialny ze poczyszczenie align z separatorem
+    }
 
+
+    private void renewContexts() {
+        openContexts.clear();
+        openContexts.add(new SeparatorContext());
+        openContexts.add(new PrettyAlignContext());
     }
 }
