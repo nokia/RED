@@ -1,12 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 
-public class NavigatorLabelProvider implements ILabelProvider {
+public class NavigatorLabelProvider extends ColumnLabelProvider {
 
 	@Override
 	public void addListener(final ILabelProviderListener listener) {
@@ -31,7 +32,8 @@ public class NavigatorLabelProvider implements ILabelProvider {
 	@Override
 	public Image getImage(final Object element) {
         if (element instanceof RobotElement) {
-            return ((RobotElement) element).getImage().createImage();
+            final ImageDescriptor image = ((RobotElement) element).getImage();
+            return image == null ? null : image.createImage();
         }
         return null;
 	}

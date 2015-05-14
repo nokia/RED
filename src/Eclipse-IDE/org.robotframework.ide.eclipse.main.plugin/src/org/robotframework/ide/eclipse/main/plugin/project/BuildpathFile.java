@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -38,7 +39,8 @@ public class BuildpathFile {
         final XMLMemento root = XMLMemento.createWriteRoot(ROOT_NODE);
 
         final IMemento execEnv = root.createChild(EXEC_ENVIRONMENT_ROOT);
-        execEnv.putString(PATH_ATTR, metadata.getPythonLocation().getAbsolutePath());
+        final File pythonLocation = metadata.getPythonLocation();
+        execEnv.putString(PATH_ATTR, pythonLocation == null ? null : pythonLocation.getAbsolutePath());
         execEnv.putString(VERSION_ATTR, metadata.getVersion());
 
         for (final String libName : metadata.getStdLibrariesNames()) {
@@ -55,7 +57,7 @@ public class BuildpathFile {
         if (initFile.exists()) {
             initFile.setContents(source, true, true, monitor);
         } else {
-            initFile.create(source, true, monitor);
+            initFile.create(source, IResource.FORCE | IResource.DERIVED, monitor);
         }
     }
 
@@ -66,34 +68,19 @@ public class BuildpathFile {
                     .getLocation().toFile()));
             final IMemento[] children = rootNode.getChildren(EXEC_ENVIRONMENT_ROOT);
             if (children.length == 1) {
-                final File path = new File(children[0].getString(PATH_ATTR));
+                final String pathStr = children[0].getString(PATH_ATTR);
+                final File path = pathStr == null ? null : new File(pathStr);
                 final String version = children[0].getString(VERSION_ATTR);
 
                 final List<String> stdLibs = newArrayList();
                 for (final IMemento lib : children[0].getChildren(STDLIB_NODE)) {
                     stdLibs.add(lib.getTextData());
                 }
-
                 return new RobotProjectMetadata(path, version, stdLibs);
             }
             return null;
         } catch (WorkbenchException | FileNotFoundException e) {
             return null;
         }
-
     }
-
-    public File readPythonLocation() {
-        XMLMemento rootNode;
-        try {
-            rootNode = XMLMemento.createReadRoot(new FileReader(project.getFile(RobotProjectNature.BUILDPATH_FILE)
-                    .getLocation().toFile()));
-            final IMemento[] children = rootNode.getChildren(EXEC_ENVIRONMENT_ROOT);
-            final String absolutePath = children[0].getString(PATH_ATTR);
-            return new File(absolutePath);
-        } catch (WorkbenchException | FileNotFoundException e) {
-            return null;
-        }
-    }
-
 }

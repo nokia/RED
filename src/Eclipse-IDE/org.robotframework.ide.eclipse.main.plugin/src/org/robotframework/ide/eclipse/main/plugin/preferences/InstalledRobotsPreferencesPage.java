@@ -3,6 +3,10 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -37,10 +41,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.ProcessLineHandler;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment.ProcessLineHandler;
-import org.robotframework.ide.eclipse.main.plugin.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.viewers.Selections;
@@ -297,6 +301,28 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             getPreferenceStore().putValue(InstalledRobotEnvironments.ACTIVE_RUNTIME, activePath);
             getPreferenceStore().putValue(InstalledRobotEnvironments.OTHER_RUNTIMES, allPaths);
             
+            MessageDialog.openInformation(getShell(), "Rebuild required",
+                    "The changes you've made requires full workspace rebuild.");
+
+            try {
+                new ProgressMonitorDialog(getShell()).run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                            InterruptedException {
+                        for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
+                            try {
+                                project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+                            } catch (final CoreException e) {
+                                MessageDialog.openError(getShell(), "Workspace rebuild",
+                                        "Problems occured during workspace build " + e.getMessage());
+                            }
+                        }
+                    }
+                });
+            } catch (InvocationTargetException | InterruptedException e) {
+                MessageDialog.openError(getShell(), "Workspace rebuild",
+                        "Problems occured during workspace build " + e.getMessage());
+            }
             return true;
         } else {
             return true;

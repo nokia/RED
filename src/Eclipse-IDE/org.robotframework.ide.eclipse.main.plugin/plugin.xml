@@ -328,6 +328,14 @@
           name="Non-Robot projects"
           visibleInUI="true">
     </commonFilter>
+    <commonFilter
+          activeByDefault="true"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.LibspecDirectoryFilter"
+          description="Hide all directories containing generated library specification files"
+          id="org.robotframework.filters.libspec"
+          name="Robot libspec directory"
+          visibleInUI="true">
+    </commonFilter>
     <commonWizard
           type="new"
           wizardId="org.robotframework.ide.eclipse.wizards.newRobotProject">
@@ -365,6 +373,7 @@
     </commonWizard>
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesContentProvider"
+          icon="resources/library.png"
           id="org.robotframework.content.librariesContent"
           labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesLabelProvider"
           name="Robot Libraries">

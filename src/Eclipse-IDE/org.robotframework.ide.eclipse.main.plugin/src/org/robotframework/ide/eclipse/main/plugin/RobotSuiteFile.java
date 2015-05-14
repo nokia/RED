@@ -98,7 +98,7 @@ public class RobotSuiteFile implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return null;
+        return RobotImages.getRobotImage();
     }
 
     @Override
