@@ -47,4 +47,8 @@ public class RobotFramework extends AbstractUIPlugin {
     public RobotRuntimeEnvironment getActiveRobotInstallation() {
         return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferenceStore());
     }
+
+    public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
+        return InstalledRobotEnvironments.readFromPreferences(getPreferenceStore());
+    }
 }
