@@ -12,7 +12,8 @@ public enum RobotTokenType {
             "<TAB>"), UNICODE_LETTER("<UNICODE_LETTER>"), DIGIT("[DIGIT]"), VERTICAL_TAB(
             "[U+000B<VT>]"), FORM_FEED("[U+000C<FF>]"), NEXT_LINE(
             "[U+0085<NEL>]"), LINE_SEPARATOR("[U+2028<LS>]"), PARAGRAPH_SEPARATOR(
-            "[U+2029<PS>]"), UNKNOWN_CHARACTER("<UNKNOWN>");
+            "[U+2029<PS>]"), UNKNOWN_CHARACTER("<UNKNOWN>"), END_OF_LINE(
+            "<END_OF_LINE>");
 
     private String toStringRepresentation = "";
 
