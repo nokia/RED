@@ -80,7 +80,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="org.robotframework.ide.eclipse.main.plugin.project.properties.RobotProjectPropertyPage"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotProjectPropertyPage"
             id="org.robotframework.ide.eclipse.main.plugin.project.properties"
             name="Robot "
             objectClass="org.eclipse.core.resources.IProject">

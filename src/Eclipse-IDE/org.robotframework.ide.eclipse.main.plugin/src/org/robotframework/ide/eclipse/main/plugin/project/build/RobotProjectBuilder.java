@@ -113,7 +113,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         try {
             subMonitor.subTask("checking Robot execution environment");
 
-            final RobotProjectMetadata projectMetadata = provideBuildpathsFileExists(subMonitor.newChild(10), project);
+            final RobotProjectMetadata projectMetadata = provideBuildpathsFile(subMonitor.newChild(10), project);
             if (subMonitor.isCanceled()) {
                 return null;
             }
@@ -151,7 +151,8 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             RobotFramework.getModelManager().getModel().createRobotProject(project).clearMetadata();
 
             subMonitor.done();
-            return RobotProjectMetadata.create(runtimeEnvironment.getVersion(), runtimeEnvironment.getStandardLibrariesNames());
+            return RobotProjectMetadata.create(projectMetadata.getPythonLocation(), runtimeEnvironment.getVersion(),
+                    runtimeEnvironment.getStandardLibrariesNames());
 
         } catch (final UnableToBuildLibrariesException e) {
             // we're not going to build anything since there are fatal problems;
@@ -160,22 +161,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         }
     }
 
-    private List<String> provideLibrariesToRegenerate(final SubMonitor subMonitor,
-            final RobotProjectMetadata projectMetadata, final RobotRuntimeEnvironment runtimeEnvironment) {
-        final List<String> librariesToRegenerate = runtimeEnvironment.getStandardLibrariesNames();
-        if (projectMetadata.getVersion() != null
-                && projectMetadata.getVersion().equals(runtimeEnvironment.getVersion())) {
-            for (final String libName : newArrayList(librariesToRegenerate)) {
-                if (projectMetadata.getStdLibrariesNames().contains(libName)) {
-                    librariesToRegenerate.remove(libName);
-                }
-            }
-        }
-        subMonitor.done();
-        return librariesToRegenerate;
-    }
-
-    private RobotProjectMetadata provideBuildpathsFileExists(final SubMonitor subMonitor, final IProject project) {
+    private RobotProjectMetadata provideBuildpathsFile(final SubMonitor subMonitor, final IProject project) {
         final RobotProjectMetadata projectMetadata = new BuildpathFile(project).read();
         if (projectMetadata != null) {
             subMonitor.done();
@@ -230,6 +216,21 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         return runtimeEnvironment;
     }
 
+    private List<String> provideLibrariesToRegenerate(final SubMonitor subMonitor,
+            final RobotProjectMetadata projectMetadata, final RobotRuntimeEnvironment runtimeEnvironment) {
+        final List<String> librariesToRegenerate = runtimeEnvironment.getStandardLibrariesNames();
+        if (projectMetadata.getVersion() != null
+                && projectMetadata.getVersion().equals(runtimeEnvironment.getVersion())) {
+            for (final String libName : newArrayList(librariesToRegenerate)) {
+                if (projectMetadata.getStdLibrariesNames().contains(libName)) {
+                    librariesToRegenerate.remove(libName);
+                }
+            }
+        }
+        subMonitor.done();
+        return librariesToRegenerate;
+    }
+
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
@@ -239,7 +240,6 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         if (libspecsFolder.exists()) {
             libspecsFolder.delete(true, monitor);
         }
-        new BuildpathFile(getProject()).write(RobotProjectMetadata.createEmpty());
     }
 
     private static class UnableToBuildLibrariesException extends RuntimeException {
