@@ -3,7 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.ICommand;
@@ -76,8 +75,7 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        final File pythonInstallation = RobotFramework.getDefault().getActiveRobotInstallation().getFile();
-        new BuildpathFile(project).write(RobotProjectMetadata.create(pythonInstallation));
+        new BuildpathFile(project).write(RobotProjectMetadata.createEmpty());
 	}
 
 	@Override

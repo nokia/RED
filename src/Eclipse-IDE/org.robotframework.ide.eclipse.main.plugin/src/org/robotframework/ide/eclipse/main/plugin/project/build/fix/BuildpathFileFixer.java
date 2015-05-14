@@ -1,12 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectMetadata;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
@@ -21,8 +18,8 @@ public class BuildpathFileFixer implements IMarkerResolution {
     @Override
     public void run(final IMarker marker) {
         try {
-            final File pythonInstallation = RobotFramework.getDefault().getActiveRobotInstallation().getFile();
-            new BuildpathFile((IProject) marker.getResource()).write(RobotProjectMetadata.create(pythonInstallation));
+            final IProject project = (IProject) marker.getResource();
+            new BuildpathFile(project).write(RobotProjectMetadata.createEmpty());
 
             marker.delete();
         } catch (final CoreException e) {

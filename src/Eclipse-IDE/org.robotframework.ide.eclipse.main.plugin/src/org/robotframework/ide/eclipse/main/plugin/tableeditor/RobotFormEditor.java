@@ -19,6 +19,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -176,7 +177,7 @@ public class RobotFormEditor extends FormEditor {
         } else {
             final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);
             try {
-                suiteModel = new RobotSuiteStreamFile(storage.getContents(), storage.isReadOnly());
+                suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
             } catch (final CoreException e) {
                 throw new RuntimeException("Unable to provide model for given input", e);
             }
@@ -227,6 +228,14 @@ public class RobotFormEditor extends FormEditor {
             return (IEditorPart) pages.get(index);
         }
         return null;
+    }
+
+    @Override
+    public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
+        if (adapter == IContentOutlinePage.class) {
+            return new RobotOutlinePage(suiteModel);
+        }
+        return super.getAdapter(adapter);
     }
 
     @Inject
