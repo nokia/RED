@@ -29,7 +29,7 @@ public class ParserContextHandler {
 
     private void renewContexts() {
         openContexts.clear();
-        openContexts.add(new SeparatorContext());
-        openContexts.add(new PrettyAlignContext());
+        // openContexts.add(new SeparatorContext());
+        // openContexts.add(new PrettyAlignContext());
     }
 }
