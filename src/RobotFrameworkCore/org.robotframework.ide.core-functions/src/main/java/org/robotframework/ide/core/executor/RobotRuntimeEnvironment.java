@@ -189,7 +189,7 @@ public class RobotRuntimeEnvironment {
             final String pythonExec = isWindows() ? "python.exe" : "python";
             final String cmd = findFile(location, pythonExec).getAbsolutePath();
             final List<String> cmdLine = new ArrayList<>();
-            cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install", "-upgrade"));
+            cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install", "--upgrade"));
             if (!useStableVersion) {
                 cmdLine.add("--pre");
             }
