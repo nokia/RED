@@ -1,34 +1,248 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectMetadata;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem.Cause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem.Severity;
 
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
+    private static final String LIBSPECS_FOLDER_NAME = "libspecs";
+
     @Override
     protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor) throws CoreException {
-        if (kind == FULL_BUILD) {
-            new RobotProjectValidator().validate(getProject(), monitor);
+        try {
+            final IFolder libspecsFolder = getProject().getFolder(LIBSPECS_FOLDER_NAME);
+            if (!libspecsFolder.exists()) {
+                libspecsFolder.create(IResource.FORCE | IResource.DERIVED, true, null);
+            }
 
-            // get list of standard libraries
-            // (?) get list of external libraries
-            // for each standard library:
-            //      generate spec
-            // for each external library:
-            //      generate spec
+            final IProgressMonitor progressMonitor = Job.getJobManager().createProgressGroup();
+
+            final Job buildJob = createBuildJob(kind == IncrementalProjectBuilder.FULL_BUILD
+                    || getDelta(getProject()).findMember(getProject().getFile(".robotbuild").getProjectRelativePath()) != null);
+            final Job validationJob = new RobotProjectValidator().createValidationJob(getProject());
+            try {
+                final String projectPath = getProject().getFullPath().toString();
+
+                progressMonitor.beginTask("Building and validating " + projectPath + " project", 200);
+                buildJob.setProgressGroup(progressMonitor, 100);
+                buildJob.schedule();
+
+                validationJob.setProgressGroup(progressMonitor, 100);
+                validationJob.schedule();
+
+                monitor.subTask("waiting for project " + projectPath + " build end");
+                buildJob.join();
+
+                final QualifiedName key = new QualifiedName(RobotFramework.PLUGIN_ID, "buildResult");
+                final RobotProjectMetadata property = (RobotProjectMetadata) buildJob.getProperty(key);
+                if (property != null) {
+                    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+                    new BuildpathFile(getProject()).write(property);
+                    buildJob.setProperty(key, null);
+                }
+                if (!monitor.isCanceled()) {
+                    monitor.subTask("waiting for project validation end");
+                    validationJob.join();
+                }
+            } catch (final InterruptedException e) {
+                throw new CoreException(Status.CANCEL_STATUS);
+            } finally {
+                progressMonitor.done();
+            }
+            return new IProject[0];
+        } finally {
+            monitor.worked(1);
         }
-        return new IProject[0];
+    }
+
+    private Job createBuildJob(final boolean buildingIsNeeded) {
+        if (!buildingIsNeeded) {
+            return new Job("Skipping build") {
+                @Override
+                protected IStatus run(final IProgressMonitor monitor) {
+                    monitor.done();
+                    return Status.OK_STATUS;
+                }
+            };
+        } else {
+            return new Job("Building") {
+                @Override
+                protected IStatus run(final IProgressMonitor monitor) {
+                    try {
+                        final RobotProjectMetadata metadata = buildLibrariesSpecs(getProject(), monitor);
+                        setProperty(new QualifiedName(RobotFramework.PLUGIN_ID, "buildResult"), metadata);
+                        return Status.OK_STATUS;
+                    } catch (final CoreException e) {
+                        return Status.CANCEL_STATUS;
+                    }
+                }
+            };
+        }
+    }
+
+    private RobotProjectMetadata buildLibrariesSpecs(final IProject project, final IProgressMonitor monitor) throws CoreException {
+        if (monitor.isCanceled()) {
+            return null;
+        }
+        final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+        subMonitor.beginTask("Building", 100);
+        try {
+            subMonitor.subTask("checking Robot execution environment");
+
+            final RobotProjectMetadata projectMetadata = provideBuildpathsFileExists(subMonitor.newChild(10), project);
+            if (subMonitor.isCanceled()) {
+                return null;
+            }
+
+            final File savedLocation = providePythonInstallationDirectory(subMonitor.newChild(10), project,
+                    projectMetadata);
+            if (subMonitor.isCanceled()) {
+                return null;
+            }
+
+            final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(subMonitor.newChild(10),
+                    project, savedLocation);
+            if (subMonitor.isCanceled()) {
+                return null;
+            }
+
+            final List<String> librariesToRegenerate = provideLibrariesToRegenerate(subMonitor.newChild(20),
+                    projectMetadata, runtimeEnvironment);
+            if (subMonitor.isCanceled()) {
+                return null;
+            }
+
+            subMonitor.setWorkRemaining(librariesToRegenerate.size());
+            final IFolder libspecsFolder = getProject().getFolder(LIBSPECS_FOLDER_NAME);
+            for (final String libName : librariesToRegenerate) {
+                if (subMonitor.isCanceled()) {
+                    return null;
+                }
+                subMonitor.subTask("generating libdoc for " + libName + " library");
+                runtimeEnvironment.createLibdocForStdLibrary(libName,
+                        libspecsFolder.getLocation().append(libName.toLowerCase() + ".libspec").toFile());
+                subMonitor.worked(1);
+            }
+
+            RobotFramework.getModelManager().getModel().createRobotProject(project).clearMetadata();
+
+            subMonitor.done();
+            return RobotProjectMetadata.create(runtimeEnvironment.getVersion(), runtimeEnvironment.getStandardLibrariesNames());
+
+        } catch (final UnableToBuildLibrariesException e) {
+            // we're not going to build anything since there are fatal problems;
+            // user has to deal with them
+            return null;
+        }
+    }
+
+    private List<String> provideLibrariesToRegenerate(final SubMonitor subMonitor,
+            final RobotProjectMetadata projectMetadata, final RobotRuntimeEnvironment runtimeEnvironment) {
+        final List<String> librariesToRegenerate = runtimeEnvironment.getStandardLibrariesNames();
+        if (projectMetadata.getVersion() != null
+                && projectMetadata.getVersion().equals(runtimeEnvironment.getVersion())) {
+            for (final String libName : newArrayList(librariesToRegenerate)) {
+                if (projectMetadata.getStdLibrariesNames().contains(libName)) {
+                    librariesToRegenerate.remove(libName);
+                }
+            }
+        }
+        subMonitor.done();
+        return librariesToRegenerate;
+    }
+
+    private RobotProjectMetadata provideBuildpathsFileExists(final SubMonitor subMonitor, final IProject project) {
+        final RobotProjectMetadata projectMetadata = new BuildpathFile(project).read();
+        if (projectMetadata != null) {
+            subMonitor.done();
+            return projectMetadata;
+        }
+        return RobotProjectMetadata.createEmpty();
+    }
+
+    private File providePythonInstallationDirectory(final SubMonitor subMonitor, final IProject project,
+            final RobotProjectMetadata projectMetadata) {
+        final File savedLocation = projectMetadata.getPythonLocation();
+        if (savedLocation != null) {
+            subMonitor.done();
+            return savedLocation;
+        }
+        final RobotRuntimeEnvironment activeRobotInstallation = RobotFramework.getDefault()
+                .getActiveRobotInstallation();
+        if (activeRobotInstallation != null) {
+            subMonitor.done();
+            return activeRobotInstallation.getFile();
+        }
+
+        final RobotProblem problem = new RobotProblem(Severity.ERROR, Cause.NO_ACTIVE_INSTALLATION,
+                "FATAL: the build paths definitions file does not specify any Python location and there is"
+                        + " also no active installation specified in preferences. Fix this problem to build project");
+        final IFile resource = project.getFile(RobotProjectNature.BUILDPATH_FILE);
+        problem.createMarker(resource, 1);
+        subMonitor.done();
+        throw new UnableToBuildLibrariesException();
+    }
+
+    private RobotRuntimeEnvironment provideRuntimeEnvironment(final SubMonitor subMonitor, final IProject project,
+            final File savedLocation) {
+        final RobotRuntimeEnvironment runtimeEnvironment = RobotRuntimeEnvironment.create(savedLocation);
+        if (!runtimeEnvironment.isValidPythonInstallation()) {
+            final RobotProblem problem = new RobotProblem(Severity.ERROR, Cause.INVALID_PYTHON_DIRECTORY, "FATAL: "
+                    + runtimeEnvironment.getFile()
+                    + " is not a Python installation directory. Fix this problem to build project");
+            final IFile resource = project.getFile(RobotProjectNature.BUILDPATH_FILE);
+            problem.createMarker(resource, 1);
+            subMonitor.done();
+            throw new UnableToBuildLibrariesException();
+        } else if (!runtimeEnvironment.hasRobotInstalled()) {
+            final RobotProblem problem = new RobotProblem(Severity.ERROR, Cause.MISSING_ROBOT,
+                    "FATAL: Python instalation " + runtimeEnvironment.getFile() + " has no Robot installed");
+            final IFile resource = project.getFile(RobotProjectNature.BUILDPATH_FILE);
+            problem.createMarker(resource, 1);
+            subMonitor.done();
+            throw new UnableToBuildLibrariesException();
+        }
+        subMonitor.done();
+        return runtimeEnvironment;
     }
 
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+        RobotFramework.getModelManager().getModel().createRobotProject(getProject()).clearMetadata();
+
+        final IFolder libspecsFolder = getProject().getFolder(LIBSPECS_FOLDER_NAME);
+        if (libspecsFolder.exists()) {
+            libspecsFolder.delete(true, monitor);
+        }
+        new BuildpathFile(getProject()).write(RobotProjectMetadata.createEmpty());
     }
 
+    private static class UnableToBuildLibrariesException extends RuntimeException {
+
+    }
 }

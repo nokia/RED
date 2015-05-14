@@ -24,12 +24,12 @@ public class RobotProject extends RobotContainer {
     }
 
     public String getVersion() {
-        readProjectMetadata();
+        readProjectMetadataIfNeeded();
         return metadata == null ? "???" : metadata.getVersion();
     }
 
     public List<RobotLibrary> getStandardLibraries() {
-        readProjectMetadata();
+        readProjectMetadataIfNeeded();
         if (metadata == null) {
             return newArrayList();
         }
@@ -43,10 +43,14 @@ public class RobotProject extends RobotContainer {
                 }));
     }
 
-    private synchronized RobotProjectMetadata readProjectMetadata() {
+    private synchronized RobotProjectMetadata readProjectMetadataIfNeeded() {
         if (metadata == null) {
             metadata = new BuildpathFile(getProject()).read();
         }
         return metadata;
+    }
+
+    public void clearMetadata() {
+        metadata = null;
     }
 }
