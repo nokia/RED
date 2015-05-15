@@ -4,6 +4,7 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotVariablesManager;
 
 /**
  * @author mmarzec
@@ -88,6 +89,9 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @see org.eclipse.debug.core.model.IValueModification#supportsValueModification()
      */
     public boolean supportsValueModification() {
+        if(name.equals(RobotVariablesManager.GLOBAL_VARIABLE_NAME)) {
+            return false;
+        }
         return true;
     }
 
@@ -111,5 +115,9 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     public void setHasValueChanged(boolean valueChanged) {
         hasValueChanged = valueChanged;
+    }
+    
+    public void setNewRobotDebugValue(RobotDebugValue value) {
+        this.robotValue = value;
     }
 }

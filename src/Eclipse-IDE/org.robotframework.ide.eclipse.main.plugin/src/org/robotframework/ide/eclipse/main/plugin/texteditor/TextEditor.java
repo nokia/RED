@@ -287,6 +287,7 @@ public class TextEditor {
 	        if(line > 0) {
         	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
         	    viewer.getTextWidget().setLineBackground(line-1, 1, SWTResourceManager.getColor(198, 219, 174));
+        	    viewer.getTextWidget().setTopIndex(line - 1);
         	    breakpointLine = line-1;
 	        }
 	    }

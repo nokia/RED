@@ -11,10 +11,13 @@ import org.eclipse.debug.core.model.IVariable;
 public class RobotDebugValue extends RobotDebugElement implements IValue {
 
     private String value;
+    
+    private IVariable[] nestedVariables;
 
     public RobotDebugValue(RobotDebugTarget target, String value) {
         super(target);
         this.value = value;
+        nestedVariables = new IVariable[0];
     }
 
     /*
@@ -51,7 +54,7 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
      * @see org.eclipse.debug.core.model.IValue#getVariables()
      */
     public IVariable[] getVariables() throws DebugException {
-        return new IVariable[0];
+        return nestedVariables;
     }
 
     /*
@@ -59,10 +62,19 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
      * @see org.eclipse.debug.core.model.IValue#hasVariables()
      */
     public boolean hasVariables() throws DebugException {
-        return false;
+        return nestedVariables.length > 0;
     }
 
     public void setValue(String v) {
         value = v;
     }
+
+    public IVariable[] getNestedVariables() {
+        return nestedVariables;
+    }
+
+    public void setNestedVariables(IVariable[] nestedVariables) {
+        this.nestedVariables = nestedVariables;
+    }
+
 }
