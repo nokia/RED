@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: CommonActionScripts
+Element-Type: context
+Element-Version: 2.0
+Id: _KiZXcProEeSnR8gxEs97XQ
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 5/15/15 12:07 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc CreateVariablesInTableEditor [val EditorTitle] {
+// input - Editor title - filename
+// editor must be opened beforehand , section need to be created
+
+//focus on editor file
+with [get-editor $EditorTitle] {
+    get-tab-folder | get-tab-item Variables | click}
+
+//create 2 variables
+with [get-editor $EditorTitle | get-table] {
+    get-cell 0 0 | double-click
+    get-cell 0 0 | mouse down -count 2
+    double-click
+    select "${var}" | activate-cell-edit
+    with [get-editbox] {
+        click-text 3 6
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    apply-cell-edit -deactivate
+}
+
+with [get-editor $EditorTitle | get-table] {
+    get-cell 1 0 | double-click
+    get-cell 1 0 | mouse down -count 2
+    double-click
+    select "${var1}" | activate-cell-edit
+    with [get-editbox] {
+        click-text 3 6
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    apply-cell-edit -deactivate
+}
+}
+
+proc Create2MetadataInTableEditor [val EditorTitle]{
+// create 2 variables in table editor Vriables tab
+// input - Editor title - filename
+// editor must be opened beforehand , section need to be created
+
+	with [get-editor $EditorTitle] {
+		get-tab-folder | get-tab-item Settings | click}
+
+	with [get-editor $EditorTitle | get-section Metadata | get-table] {
+		get-cell 0 0 | double-click
+		get-cell 0 0 | mouse down -count 2
+		double-click
+		select "data" | activate-cell-edit
+		with [get-editbox] {
+			set-text data1
+			key-type Enter
+		}
+
+		apply-cell-edit -deactivate
+	}
+
+
+	with [get-editor $EditorTitle | get-section Metadata | get-table] {
+		select data1 | double-click
+		select data1 | activate-cell-edit -column 1
+		with [get-editbox] {
+			set-text "data-value1"
+			key-type Enter
+		}
+		apply-cell-edit -deactivate
+	}
+
+	with [get-editor $EditorTitle | get-section Metadata | get-table] {
+		get-cell 1 0 | double-click
+		get-cell 1 0 | mouse down -count 2
+		double-click
+		select "data" | activate-cell-edit
+		with [get-editbox] {
+			set-text data2
+			key-type Enter
+		}
+
+		apply-cell-edit -deactivate
+	}
+
+
+
+	with [get-editor $EditorTitle | get-section Metadata | get-table] {
+		select data2 | double-click
+		select data2 | activate-cell-edit -column 1
+		with [get-editbox] {
+				set-text "data-value2"
+				key-type Enter
+    	}
+    	apply-cell-edit -deactivate
+	}
+}
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
