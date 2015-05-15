@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _sebHYPfPEeSx2Y7ZMEilqw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/15/15 9:52 AM
+Save-Time: 5/15/15 1:44 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -19,6 +19,8 @@ RED-82 , if fixed this test will fail
 Content-Type: text/ecl
 Entry-Name: .content
 
+
+// create file
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
 with [get-window "New Robot Test Suite"] {
     with [get-editbox -after [get-label "File name:"]] {
@@ -27,23 +29,14 @@ with [get-window "New Robot Test Suite"] {
     get-button Finish | click
 }
 
-
+// edit file and do not save
 with [get-editor "TestFileToMove.robot"] {
     get-tab-folder | get-tab-item Variables | click
     get-link "Section is not yet defined, do you want to create it?" | click
 }
 
-with [get-editor "TestFileToMove.robot" | get-table] {
-    get-cell 0 0 | double-click
-    get-cell 0 0 | mouse down -count 2
-    double-click
-    select "${var}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 6
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
-}
+CreateVariablesInTableEditor "TestFileToMove.robot"
+
 
 with [get-editor "TestFileToMove.robot" | get-table] {
     get-cell 0 1 | click
@@ -56,6 +49,8 @@ with [get-editor "TestFileToMove.robot" | get-table] {
     }
     apply-cell-edit -deactivate
 }
+
+// move file 
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFileToMove.robot"
     get-item "RobotProject/TestFileToMove.robot" | drag-start 38 7
@@ -68,18 +63,10 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/TestSuiteFolder" | drop 41 7 -detail move
     drag-end -detail move
 }
+// Save from move prompt
 get-window "Save Resource" | get-button Yes | click
-with [get-editor "TestFileToMove.robot" | get-table] {
-    get-cell 0 1 | click
-    get-cell 0 1 | mouse down -count 2
-    double-click
-    select "${var}" | activate-cell-edit -column 1
-    with [get-editbox] {
-        set-text TestValue2
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
-}
+
+// verify new file content - new file should have one variable var with TestValue
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder/TestFileToMove.robot" 
     | get-menu "Open With/Robot Table Editor" | click
 get-editor "TestFileToMove.robot" -index 1 | get-tab-folder | get-tab-item Variables | click
@@ -87,4 +74,12 @@ get-editor "TestFileToMove.robot" -index 1 | get-table | get-property "columns[0
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder"
 get-view "Project Explorer" | get-tree | get-item "RobotProject/TestSuiteFolder/TestFileToMove.robot" 
     | get-property caption | equals "TestFileToMove.robot" | verify-true
+
+// verify Editor names - old one dirty , new one clean
+with [get-tab-folder -index 1] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().CTabItem[0].getText()" | equals "*TestFileToMove.robot" | verify-true
+    get-property "getItems().CTabItem[1].getToolTipText()" | equals "RobotProject/TestSuiteFolder/TestFileToMove.robot" 
+        | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
