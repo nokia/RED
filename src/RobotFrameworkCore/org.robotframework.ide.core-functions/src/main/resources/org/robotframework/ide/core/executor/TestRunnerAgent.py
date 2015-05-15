@@ -147,6 +147,12 @@ class TestRunnerAgent:
 
     def _send_pid(self):
         self._send_socket("pid", os.getpid())
+        from robot.variables import GLOBAL_VARIABLES
+        variables = GLOBAL_VARIABLES
+        data = {}
+        for k in variables.keys():
+            data[k] = str(variables[k])
+        self._send_socket('global_vars','global_vars',data)
 
     def _send_server_port(self, port):
         self._send_socket("port", port)

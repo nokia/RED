@@ -242,6 +242,11 @@ public class RobotDebugEventDispatcher extends Job {
                         Map<String, String> vars = (Map<String, String>) varList.get(1);
                         target.getLastKeywordFromCurrentFrames().setVariables(vars);
                         break;
+                    case "global_vars":
+                        List<Object> globalVarList = (List<Object>) eventMap.get("global_vars");
+                        Map<String, String> globalVars = (Map<String, String>) globalVarList.get(1);
+                        target.getRobotVariablesManager().setGlobalVariables(globalVars);
+                        break;
                     case "check_condition":
                         if (!"".equals(breakpointCondition) && !target.getRobotThread().isStepping()) {
                             String conditionJson = createJsonFromBreakpointCondition();
