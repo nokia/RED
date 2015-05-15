@@ -6,9 +6,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _57l1QPPsEeSRSqmeMHfJYA
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/6/15 2:40 PM
+Save-Time: 5/15/15 1:57 PM
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+test for RED-70 , if jira fixed , test will fail
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
