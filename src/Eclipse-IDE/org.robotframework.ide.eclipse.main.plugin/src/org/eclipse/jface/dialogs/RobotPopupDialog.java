@@ -1,7 +1,6 @@
 package org.eclipse.jface.dialogs;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -25,10 +24,4 @@ public abstract class RobotPopupDialog extends PopupDialog {
     }
 
     protected abstract Control createDialogControls(Composite parent);
-
-    @Override
-    protected Point getInitialLocation(final Point initialSize) {
-        final Point point = getShell().getDisplay().getCursorLocation();
-        return new Point(point.x + 3, point.y - 30);
-    }
 }

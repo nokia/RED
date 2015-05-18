@@ -3,11 +3,15 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
 
@@ -19,17 +23,30 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
         listener = new IResourceChangeListener() {
             @Override
             public void resourceChanged(final IResourceChangeEvent event) {
-                if (event.getBuildKind() != 0) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            viewer.refresh();
-                        }
-                    });
+                if (event.getDelta() != null) {
+                    try {
+                        event.getDelta().accept(new IResourceDeltaVisitor() {
+                            @Override
+                            public boolean visit(final IResourceDelta delta) throws CoreException {
+                                if (delta.getResource().getName().equals(RobotProjectNature.BUILDPATH_FILE)) {
+                                    Display.getDefault().asyncExec(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            viewer.refresh();
+                                        }
+                                    });
+                                    return false;
+                                }
+                                return true;
+                            }
+                        });
+                    } catch (final CoreException e) {
+                        // nothing to do
+                    }
                 }
             }
         };
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_BUILD);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override

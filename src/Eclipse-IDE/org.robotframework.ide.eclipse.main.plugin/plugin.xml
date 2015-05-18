@@ -45,7 +45,7 @@
          </run>
       </runtime>
       <options
-            allowLinking="false">
+            allowLinking="true">
       </options>
       <builder
             id="org.robotframework.ide.eclipse.main.plugin.robotLibrariesBuilder">
@@ -293,7 +293,7 @@
        </possibleChildren>
        <actionProvider
              class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorActionsProvider"
-             id="org.robotframework.actions.provider">
+             id="org.robotframework.robotelement.actions.provider">
        </actionProvider>
        <commonSorter
              class="org.robotframework.ide.eclipse.main.plugin.navigator.VariablesSectionSorter">
@@ -311,6 +311,53 @@
              </instanceof>
           </parentExpression>
        </commonSorter>
+    </navigatorContent>
+    <navigatorContent
+          contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesContentProvider"
+          icon="resources/library.png"
+          id="org.robotframework.content.librariesContent"
+          labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesLabelProvider"
+          name="Robot Libraries">
+       <triggerPoints>
+          <and>
+             <instanceof
+                   value="org.eclipse.core.resources.IProject">
+             </instanceof>
+             <test
+                   property="org.eclipse.core.resources.projectNature"
+                   value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+             </test>
+          </and></triggerPoints>
+       <possibleChildren>
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification">
+          </instanceof>
+       </possibleChildren>
+       <actionProvider
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesActionsProvider"
+             id="org.robotframework.library.actions.provider">
+       </actionProvider>
+    </navigatorContent>
+    <navigatorContent
+          contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordsContentProvider"
+          icon="resources/keyword.png"
+          id="org.robotframework.content.keywordsContent"
+          labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordsLabelProvider"
+          name="Library Keywords">
+       <triggerPoints>
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification">
+          </instanceof>
+       </triggerPoints>
+       <possibleChildren>
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification">
+          </instanceof>
+       </possibleChildren>
+       <actionProvider
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordActionsProvider"
+             id="org.robotframework.keyword.actions.provider">
+       </actionProvider>
     </navigatorContent>
     <commonFilter
           activeByDefault="false"
@@ -371,28 +418,6 @@
           </with>
        </enablement>
     </commonWizard>
-    <navigatorContent
-          contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesContentProvider"
-          icon="resources/library.png"
-          id="org.robotframework.content.librariesContent"
-          labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesLabelProvider"
-          name="Robot Libraries">
-       <triggerPoints>
-          <and>
-             <instanceof
-                   value="org.eclipse.core.resources.IProject">
-             </instanceof>
-             <test
-                   property="org.eclipse.core.resources.projectNature"
-                   value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-             </test>
-          </and></triggerPoints>
-       <possibleChildren>
-          <instanceof
-                value="org.robotframework.ide.eclipse.main.plugin.navigator.RobotLibrary">
-          </instanceof>
-       </possibleChildren>
-    </navigatorContent>
  </extension>
  <extension
        point="org.eclipse.ui.themes">
