@@ -1,0 +1,40 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2APkAP1CEeS5jLC3g3M4Lw
+Element-Name: DebugPerspectiveFor200Loop
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _1FqyIP1CEeS5jLC3g3M4Lw
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 5/18/15 12:12 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
+    | select "For200Project/For200TestSuite.robot" | get-menu "Open With/Robot Text Editor" | click
+get-editor "Robot Text Editor" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 8
+get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
+    | get-menu "Debug As/1 Robot Test" | click
+    
+
+exec-with-options -disableJobWaiting -command {
+	wait 200
+   
+	loop [val i [int 0]] {
+		if [$i | lt 20] {
+			get-button "Step Over (F6)" | click
+			wait 200
+			recur [$i | plus 1]
+   		}
+	}
+}
+
+get-button "Terminate (M1+F2)" | click
+
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : 19" | verify-true
+get-view Console | get-text-viewer | get-property text | contains "[ ERROR ] Execution stopped by user" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
