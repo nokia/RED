@@ -130,7 +130,7 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public void commitChanges(final IProgressMonitor monitor) throws CoreException {
-        file.setContents(new FilesSectionsEmiter(this).emit(), true, true, monitor);
+        file.setContents(new FileSectionsEmiter(this).emit(), true, true, monitor);
     }
 
     public Optional<RobotElement> findSection(final Class<? extends RobotElement> sectionClass) {

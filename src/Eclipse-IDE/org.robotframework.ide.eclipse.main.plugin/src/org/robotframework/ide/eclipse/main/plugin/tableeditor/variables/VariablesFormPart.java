@@ -175,6 +175,26 @@ public class VariablesFormPart extends AbstractFormPart {
 
     @Inject
     @Optional
+    private void whenSectionIsCreated(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
+        if (file == fileModel && viewer.getInput() == null) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenSectionIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
+        if (file == fileModel && viewer.getInput() != null) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenVariableDetailChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
         if (variable.getSuiteFile() == fileModel) {
@@ -199,26 +219,6 @@ public class VariablesFormPart extends AbstractFormPart {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             setInput();
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenSectionIsCreated(
-            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
-        if (file == fileModel && viewer.getInput() == null) {
-            setInput();
-            markDirty();
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenSectionIsRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
-        if (file == fileModel && viewer.getInput() != null) {
-            setInput();
-            markDirty();
         }
     }
 }
