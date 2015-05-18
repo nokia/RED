@@ -259,6 +259,34 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    public File getStandardLibraryPath(final String libraryName) {
+        if (hasRobotInstalled()) {
+            final String pythonExec = isWindows() ? "python.exe" : "python";
+            final String cmd = findFile(location, pythonExec).getAbsolutePath();
+            final List<String> cmdLine = Arrays.asList(cmd, "-c", "import robot.libraries." + libraryName
+                    + ";print(robot.libraries." + libraryName + ".__file__)");
+            final StringBuilder path = new StringBuilder();
+            final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+                @Override
+                public void processLine(final String line) {
+                    path.append(line);
+                }
+            };
+
+            try {
+                runExternalProcess(cmdLine, linesHandler);
+                final String pycPath = path.toString().trim();
+                if (pycPath.endsWith(".pyc")) {
+                    return new File(pycPath.substring(0, pycPath.length() - 1));
+                }
+                return null;
+            } catch (final IOException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(location, version);
