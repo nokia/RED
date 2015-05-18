@@ -154,9 +154,9 @@ public class RobotProjectPropertyPage extends PropertyPage implements IWorkbench
         ColumnViewerToolTipSupport.enableFor(viewer);
 
         viewer.setContentProvider(new InstalledRobotsContentProvider());
-        ViewerColumnsFactory.newColumn("Name").withWidth(300).resizable(true)
+        ViewerColumnsFactory.newColumn("Name").withWidth(300)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer)).createFor(viewer);
-        ViewerColumnsFactory.newColumn("Path").withWidth(200).resizable(true)
+        ViewerColumnsFactory.newColumn("Path").withWidth(200)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer)).createFor(viewer);
     }
 
