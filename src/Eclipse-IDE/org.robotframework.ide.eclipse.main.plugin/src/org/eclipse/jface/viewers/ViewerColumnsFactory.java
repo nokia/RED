@@ -11,7 +11,7 @@ public class ViewerColumnsFactory {
     private final String name;
     private int width;
     private CellLabelProvider labelProvider;
-    private boolean resizable;
+    private boolean resizable = true;
     private Image image;
     private String tooltip;
     private EditingSupport editingSupport;
