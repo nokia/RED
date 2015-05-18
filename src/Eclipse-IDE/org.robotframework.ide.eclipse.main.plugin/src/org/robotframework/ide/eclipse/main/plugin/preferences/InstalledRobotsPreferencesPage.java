@@ -155,10 +155,9 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
         viewer.setContentProvider(new InstalledRobotsContentProvider());
         ViewerColumnsFactory.newColumn("Name").withWidth(300)
-            .resizable(true)
             .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
             .createFor(viewer);
-        ViewerColumnsFactory.newColumn("Path").withWidth(200).resizable(true)
+        ViewerColumnsFactory.newColumn("Path").withWidth(200)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer)).createFor(viewer);
     }
 
