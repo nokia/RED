@@ -116,7 +116,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI);
+        documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI | SWT.SEARCH);
         documentation.setEditable(fileModel.isEditable());
         documentation.addPaintListener(new PaintListener() {
             @Override

@@ -1,0 +1,61 @@
+package org.robotframework.ide.eclipse.main.plugin.project.library;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
+public class KeywordSpecification {
+
+    private String name;
+    private String format;
+    private String documentation;
+
+    private List<String> arguments;
+
+    public String getName() {
+        return name;
+    }
+
+    @XmlAttribute
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setFormat(final String format) {
+        this.format = format;
+    }
+
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    @XmlElement(name = "doc")
+    public void setDocumentation(final String documentation) {
+        this.documentation = documentation;
+    }
+
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    @XmlElementWrapper(name = "arguments")
+    @XmlElement(name = "arg")
+    public void setArguments(final List<String> arguments) {
+        this.arguments = arguments;
+    }
+
+    public boolean canBeConvertedToHtml() {
+        return "ROBOT".equals(format);
+    }
+
+    public String getDocumentationAsHtml() {
+        if ("ROBOT".equals(format)) {
+            return new RobotToHtmlConverter().convert(documentation);
+        }
+        throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
+    }
+}
