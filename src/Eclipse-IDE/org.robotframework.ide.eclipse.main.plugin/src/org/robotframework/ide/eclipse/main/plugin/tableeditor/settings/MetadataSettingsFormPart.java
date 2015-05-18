@@ -31,6 +31,8 @@ import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
@@ -200,6 +202,17 @@ class MetadataSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Optional
+    private void whenSettingDetailsChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+        final List<?> input = (List<?>) viewer.getInput();
+        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
@@ -210,12 +223,10 @@ class MetadataSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Optional
-    private void whenSettingDetailsChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        final List<?> input = (List<?>) viewer.getInput();
-        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
+    private void whenFileChangedExternally(
+            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
+        if (change.getKind() == Kind.CHANGED) {
             setInput();
-            markDirty();
         }
     }
 }
