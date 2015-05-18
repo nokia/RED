@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.DisposeEvent;
@@ -16,6 +17,7 @@ import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -93,6 +95,17 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
         return form;
     }
 
+    protected final void setFormImage(final ImageDescriptor image) {
+        final Image img = image.createImage();
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                img.dispose();
+            }
+        });
+        form.setImage(img);
+    }
+
     private Composite createBodyComposite(final Composite parent) {
         final Composite innerComposite = formToolkit.createComposite(parent, SWT.NONE);
         stackLayout = new StackLayout();
@@ -135,11 +148,10 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
 
             @Override
             public void done(final IJobChangeEvent event) {
-                fillControl(((InputJob) event.getJob()).input);
                 getDisplay().syncExec(new Runnable() {
-
                     @Override
                     public void run() {
+                        fillControl(((InputJob) event.getJob()).input);
                         if (!innerComposite.isDisposed()) {
                             switchControl();
                             innerComposite.layout();

@@ -3,8 +3,8 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.robotframework.ide.eclipse.main.plugin.RobotLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelManager;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 class RobotProjectDependencies {
 
@@ -14,7 +14,7 @@ class RobotProjectDependencies {
         this.project = project;
     }
 
-    public List<RobotLibrary> getStandardLibraries() {
+    public List<LibrarySpecification> getStandardLibraries() {
         return RobotModelManager.getInstance().getModel().createRobotProject(project).getStandardLibraries();
     }
 
