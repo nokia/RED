@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -38,11 +39,14 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             if (!libspecsFolder.exists()) {
                 libspecsFolder.create(IResource.FORCE | IResource.DERIVED, true, null);
             }
-
+            final boolean rebuildNeeded = shouldRebuildLibraries(kind);
+            if (rebuildNeeded) {
+                clearLinksToLibSources();
+            }
+            
             final IProgressMonitor progressMonitor = Job.getJobManager().createProgressGroup();
 
-            final Job buildJob = createBuildJob(kind == IncrementalProjectBuilder.FULL_BUILD
-                    || getDelta(getProject()).findMember(getProject().getFile(".robotbuild").getProjectRelativePath()) != null);
+            final Job buildJob = createBuildJob(rebuildNeeded);
             final Job validationJob = new RobotProjectValidator().createValidationJob(getProject());
             try {
                 final String projectPath = getProject().getFullPath().toString();
@@ -58,12 +62,12 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 buildJob.join();
 
                 final QualifiedName key = new QualifiedName(RobotFramework.PLUGIN_ID, "buildResult");
-                final RobotProjectMetadata property = (RobotProjectMetadata) buildJob.getProperty(key);
-                if (property != null) {
-                    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-                    new BuildpathFile(getProject()).write(property);
+                final RobotProjectMetadata metadata = (RobotProjectMetadata) buildJob.getProperty(key);
+                if (metadata != null) {
+                    new BuildpathFile(getProject()).write(metadata);
                     buildJob.setProperty(key, null);
                 }
+                getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
                 if (!monitor.isCanceled()) {
                     monitor.subTask("waiting for project validation end");
                     validationJob.join();
@@ -77,6 +81,12 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         } finally {
             monitor.worked(1);
         }
+    }
+
+    private boolean shouldRebuildLibraries(final int kind) {
+        return kind == IncrementalProjectBuilder.FULL_BUILD
+                || getDelta(getProject()).findMember(
+                        getProject().getFile(RobotProjectNature.BUILDPATH_FILE).getProjectRelativePath()) != null;
     }
 
     private Job createBuildJob(final boolean buildingIsNeeded) {
@@ -151,8 +161,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             RobotFramework.getModelManager().getModel().createRobotProject(project).clearMetadata();
 
             subMonitor.done();
-            return RobotProjectMetadata.create(projectMetadata.getPythonLocation(), runtimeEnvironment.getVersion(),
+            final RobotProjectMetadata result = RobotProjectMetadata.create(projectMetadata.getPythonLocation(), runtimeEnvironment.getVersion(),
                     runtimeEnvironment.getStandardLibrariesNames());
+            return result.equals(projectMetadata) ? null : result;
 
         } catch (final UnableToBuildLibrariesException e) {
             // we're not going to build anything since there are fatal problems;
@@ -235,6 +246,16 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
         RobotFramework.getModelManager().getModel().createRobotProject(getProject()).clearMetadata();
+
+        clearLinksToLibSources();
+    }
+
+    private void clearLinksToLibSources() throws CoreException {
+        for (final IResource resource : getProject().getFolder("libspecs").members(IContainer.INCLUDE_HIDDEN)) {
+            if (resource.exists() && resource.isHidden()) {
+                resource.delete(true, null);
+            }
+        }
     }
 
     private static class UnableToBuildLibrariesException extends RuntimeException {

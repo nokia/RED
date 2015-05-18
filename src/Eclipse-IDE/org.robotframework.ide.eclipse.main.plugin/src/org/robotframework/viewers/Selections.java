@@ -5,7 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 
 import com.google.common.collect.Iterables;
 
@@ -17,9 +16,8 @@ public class Selections {
         return newArrayList(Iterables.filter(selection.toList(), elementsClass));
     }
 
-    public static RobotVariable getSingleElement(final IStructuredSelection selection,
-            final Class<RobotVariable> elementsClass) {
-        final List<RobotVariable> elements = getElements(selection, elementsClass);
+    public static <T> T getSingleElement(final IStructuredSelection selection, final Class<T> elementsClass) {
+        final List<T> elements = getElements(selection, elementsClass);
         if (elements.size() == 1) {
             return elements.get(0);
         }
