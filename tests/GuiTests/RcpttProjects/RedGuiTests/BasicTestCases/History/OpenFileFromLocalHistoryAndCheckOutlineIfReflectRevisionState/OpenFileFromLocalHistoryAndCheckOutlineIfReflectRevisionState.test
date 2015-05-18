@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _V2VBgPoyEeSBeM10W7Y1ng
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/14/15 2:56 PM
+Save-Time: 5/18/15 2:19 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,38 +70,38 @@ with [get-view Outline | get-tree] {
     get-item "TestFile.robot/Variables" | get-property "getItems().length" | equals 1 | verify-true
     get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
 }
-get-view History | get-tree | select ".*" | double-click
-get-view Outline | get-tree | select "TestFile.robot/Variables/var1"
-with [get-view Outline | get-tree] {
-    get-item "TestFile.robot/Variables" | get-property childCount | equals 2 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[1].getText()" | equals var1 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 2 | verify-true
-}
-
-//click on oppened file tab revisions and check if outline updates
-
-//click on tab
-get-editor "TestFile.robot" | get-table | get-cell 0 0 | click
-//check outline
-with [get-view Outline | get-tree] {
-    get-item "TestFile.robot/Variables" | get-property childCount | equals 2 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[1].getText()" | equals var1 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 2 | verify-true
-}
-
-//click on tab
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table | get-cell 1 1 | click
-//check outline
-with [get-view Outline | get-tree] {
-    get-item "TestFile.robot/Variables" | get-property childCount | equals 1 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().length" | equals 1 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 1 | verify-true
-}
-//click on tab
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-table | get-column-header Variable | click
-//check outline
-get-view Outline | get-tree | get-item "TestFile.robot" | get-property childCount | equals 0 | verify-true
+//get-view History | get-tree | select ".*" | double-click
+//get-view Outline | get-tree | select "TestFile.robot/Variables/var1"
+//with [get-view Outline | get-tree] {
+//    get-item "TestFile.robot/Variables" | get-property childCount | equals 2 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[1].getText()" | equals var1 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 2 | verify-true
+//}
+//
+////click on oppened file tab revisions and check if outline updates
+//
+////click on tab
+//get-editor "TestFile.robot" | get-table | get-cell 0 0 | click
+////check outline
+//with [get-view Outline | get-tree] {
+//    get-item "TestFile.robot/Variables" | get-property childCount | equals 2 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[1].getText()" | equals var1 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 2 | verify-true
+//}
+//
+////click on tab
+//get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table | get-cell 1 1 | click
+////check outline
+//with [get-view Outline | get-tree] {
+//    get-item "TestFile.robot/Variables" | get-property childCount | equals 1 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().length" | equals 1 | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
+//    get-item "TestFile.robot/Variables" | get-property "getItemCount()" | equals 1 | verify-true
+//}
+////click on tab
+//get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-table | get-column-header Variable | click
+////check outline
+//get-view Outline | get-tree | get-item "TestFile.robot" | get-property childCount | equals 0 | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
