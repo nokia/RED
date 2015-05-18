@@ -7,11 +7,11 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
-class FilesSectionsEmiter {
+class FileSectionsEmiter {
 
     private final RobotSuiteFile file;
 
-    public FilesSectionsEmiter(final RobotSuiteFile robotSuiteFile) {
+    public FileSectionsEmiter(final RobotSuiteFile robotSuiteFile) {
         this.file = robotSuiteFile;
     }
 

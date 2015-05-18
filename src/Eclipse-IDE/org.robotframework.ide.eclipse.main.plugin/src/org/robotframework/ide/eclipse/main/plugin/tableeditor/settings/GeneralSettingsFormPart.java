@@ -24,10 +24,10 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -43,6 +43,8 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
@@ -116,7 +118,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI | SWT.SEARCH);
+        documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI);
         documentation.setEditable(fileModel.isEditable());
         documentation.addPaintListener(new PaintListener() {
             @Override
@@ -131,19 +133,11 @@ class GeneralSettingsFormPart extends AbstractFormPart {
             }
         });
         if (fileModel.isEditable()) {
-            documentation.addFocusListener(new FocusAdapter() {
+            documentation.addModifyListener(new ModifyListener() {
                 @Override
-                public void focusLost(final FocusEvent e) {
-                    final String newDocumentation = documentation.getText();
-                    final RobotSetting currentSetting = model.getDocumentationSetting();
-
-                    if (currentSetting == null && !newDocumentation.isEmpty()) {
-                        commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
-                                newArrayList(newDocumentation)));
-                    } else if (currentSetting != null && newDocumentation.isEmpty()) {
-                        commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
-                    } else if (currentSetting != null) {
-                        commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
+                public void modifyText(final ModifyEvent e) {
+                    if (!((Text) e.getSource()).getText().equals(model.getDocumentation())) {
+                        markDirty();
                     }
                 }
             });
@@ -288,6 +282,23 @@ class GeneralSettingsFormPart extends AbstractFormPart {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
+    @Override
+    public void commit(final boolean onSave) {
+        super.commit(onSave);
+
+        final String newDocumentation = documentation.getText().replaceAll("\t", " ").replaceAll("  +", " ");
+        final RobotSetting currentSetting = model.getDocumentationSetting();
+
+        if (currentSetting == null && !newDocumentation.isEmpty()) {
+            commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
+                    newArrayList(newDocumentation)));
+        } else if (currentSetting != null && newDocumentation.isEmpty()) {
+            commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
+        } else if (currentSetting != null) {
+            commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
+        }
+    }
+
     @Inject
     @Optional
     private void whenSectionIsCreated(
@@ -310,6 +321,16 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
     @Inject
     @Optional
+    private void whenSettingDetailsChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+        if (setting.getSuiteFile() == fileModel && model.contains(setting)) {
+            setInput();
+            markDirty();
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section == model.getSection()) {
@@ -317,14 +338,13 @@ class GeneralSettingsFormPart extends AbstractFormPart {
             markDirty();
         }
     }
-    
+
     @Inject
     @Optional
-    private void whenSettingDetailsChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        if (setting.getSuiteFile() == fileModel && model.contains(setting)) {
+    private void whenFileChangedExternally(
+            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
+        if (change.getKind() == Kind.CHANGED) {
             setInput();
-            markDirty();
         }
     }
 }

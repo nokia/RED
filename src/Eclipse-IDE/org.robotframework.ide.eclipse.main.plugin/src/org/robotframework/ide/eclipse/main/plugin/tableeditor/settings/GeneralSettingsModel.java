@@ -24,6 +24,10 @@ class GeneralSettingsModel {
         settings.put("Default Tags", null);
     }
 
+    public GeneralSettingsModel() {
+        System.err.println(1);
+    }
+
     private RobotSuiteSettingsSection settingsSection = null;
 
     private RobotSetting documentation = null;
@@ -69,7 +73,7 @@ class GeneralSettingsModel {
         return settings.entrySet();
     }
 
-    public boolean contains(final RobotSetting setting) {
+    boolean contains(final RobotSetting setting) {
         return settings.values().contains(setting);
     }
 }
