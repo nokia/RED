@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 class LibraryDocumentationPopup extends RobotPopupDialog {
 
-    private InputLoadingFormComposite<Composite> composite;
+    private InputLoadingFormComposite composite;
     private final LibrarySpecification specification;
 
     LibraryDocumentationPopup(final Shell parent, final LibrarySpecification spec) {
