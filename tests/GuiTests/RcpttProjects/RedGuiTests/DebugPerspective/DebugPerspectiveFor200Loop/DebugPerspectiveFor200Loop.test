@@ -31,7 +31,7 @@ get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.r
 			}
 			wait 200
 			//next line could verify if ${i} is changing correctly, but step get-item "${i}" fails randomly
-			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $i | verify-true
+			//get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $i | verify-true
 			recur [$i | plus 1]
    		}
 	}
