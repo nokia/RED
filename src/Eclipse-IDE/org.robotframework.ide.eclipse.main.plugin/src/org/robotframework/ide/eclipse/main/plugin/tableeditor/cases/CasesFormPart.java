@@ -53,8 +53,14 @@ public class CasesFormPart extends AbstractFormPart {
     }
 
     @Override
+    public void commit(final boolean onSave) {
+        if (onSave) {
+            super.commit(onSave);
+        }
+    }
+
+    @Override
     public void refresh() {
         super.refresh();
     }
-
 }
