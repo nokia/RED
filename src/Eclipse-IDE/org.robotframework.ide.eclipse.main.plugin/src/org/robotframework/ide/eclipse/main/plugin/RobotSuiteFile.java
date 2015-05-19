@@ -8,8 +8,12 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -23,6 +27,8 @@ public class RobotSuiteFile implements RobotElement {
     private final IFile file;
 
     private List<RobotElement> sections = null;
+
+    private RobotEditorClosedListener2 listener;
 
 
     public RobotSuiteFile(final RobotElement parent, final IFile file) {
@@ -54,6 +60,13 @@ public class RobotSuiteFile implements RobotElement {
             sections = new ArrayList<>();
             try {
                 sections.addAll(createParser().parseRobotFileSections(this));
+
+                final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
+
+                listener = new RobotEditorClosedListener2();
+                ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
+                service.addPartListener(listener);
+
             } catch (final IOException e) {
                 throw new RuntimeException("Unable to read sections");
             }
@@ -61,16 +74,26 @@ public class RobotSuiteFile implements RobotElement {
         return sections;
     }
 
+    private IEclipseContext getContext() {
+        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+    }
+
+    void dispose() {
+        ContextInjectionFactory.uninject(listener, getContext().getActiveLeaf());
+        sections = null;
+        listener = null;
+    }
+
     protected FileSectionsParser createParser() {
         return new FileSectionsParser(file);
     }
 
-    public void refreshOnFileChange() {
+    protected void refreshOnFileChange() {
         sections = null;
         getSections();
     }
 
-    public List<RobotElementChange> synchronizeChanges() {
+    List<RobotElementChange> synchronizeChanges() {
         refreshOnFileChange();
         return new ArrayList<>();
     }
@@ -88,7 +111,7 @@ public class RobotSuiteFile implements RobotElement {
 
     @Override
     public int hashCode() {
-        return file.hashCode();
+        return Objects.hash(file);
     }
 
     @Override
@@ -127,6 +150,10 @@ public class RobotSuiteFile implements RobotElement {
     @Override
     public RobotSuiteFile getSuiteFile() {
         return this;
+    }
+
+    public RobotProject getProject() {
+        return RobotFramework.getModelManager().getModel().createRobotProject(file.getProject());
     }
 
     public void commitChanges(final IProgressMonitor monitor) throws CoreException {

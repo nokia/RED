@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 
 class KeywordDocumentationPopup extends RobotPopupDialog {
 
-    private InputLoadingFormComposite<Composite> composite;
+    private InputLoadingFormComposite composite;
     private final KeywordSpecification specification;
 
     KeywordDocumentationPopup(final Shell parent, final KeywordSpecification spec) {

@@ -50,4 +50,6 @@ public class RobotModelEvents {
 
     public static final String EXTERNAL_MODEL_CHANGE = "robot/model/external";
 
+    public static final String SUITE_MODEL_DISPOSED = "robot/model/disposed";
+
 }
