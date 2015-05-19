@@ -8,7 +8,7 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
-class RobotEditorClosedListener2 implements IPartListener {
+class RobotEditorClosedListener implements IPartListener {
 
     @Inject
     private IEventBroker broker;
