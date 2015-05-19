@@ -12,7 +12,7 @@ import org.junit.Test;
 public class TestLinearPosition {
 
     @Test
-    public void test_simpleCheckOfCoherence() {
+    public void test_simpleCheckOfCoherence_between_constructorAndGetterMethods() {
         // prepare
         int line = 0;
         int column = 1;
