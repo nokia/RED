@@ -100,6 +100,7 @@ public class TextEditor {
 	
 	private int breakpointLine = 0; 
 	
+	private CompositeRuler compositeRuler;
 	
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
@@ -132,7 +133,7 @@ public class TextEditor {
 		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
 		final ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
 		
-		final CompositeRuler compositeRuler = new CompositeRuler(1);
+		compositeRuler = new CompositeRuler(1);
 		compositeRuler.setModel(markerAnnotationModel);
 		
 		final OverviewRuler overviewRuler = new OverviewRuler(markerAnnotationAccess, 15, new SharedTextColors());
@@ -287,11 +288,23 @@ public class TextEditor {
 	        if(line > 0) {
         	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
         	    viewer.getTextWidget().setLineBackground(line-1, 1, SWTResourceManager.getColor(198, 219, 174));
-        	    viewer.getTextWidget().setTopIndex(line - 1);
+        	    showHighlightedLine(line);
+        	    compositeRuler.immediateUpdate();
         	    breakpointLine = line-1;
 	        }
 	    }
     }
+	
+	private void showHighlightedLine(int lineNumber) {
+	    int visibleLinesNumber = viewer.getTextWidget().getClientArea().height / viewer.getTextWidget().getLineHeight();
+	    int linesToCenter = visibleLinesNumber / 2;
+	    int topIndexPosiiton = lineNumber - linesToCenter;
+	    if(topIndexPosiiton >= 0) {
+	        viewer.getTextWidget().setTopIndex(topIndexPosiiton);
+	    } else {
+	        viewer.getTextWidget().setTopIndex(lineNumber-1);
+	    }
+	}
 
     @Inject
     @Optional
