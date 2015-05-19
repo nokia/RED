@@ -28,4 +28,9 @@ public class LinearPosition {
     public int getColumn() {
         return column;
     }
+
+
+    public String toString() {
+        return String.format("[line=%s, column=%s]", line, column);
+    }
 }
