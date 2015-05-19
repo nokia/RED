@@ -23,6 +23,9 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     private int lineNumber;
 
+    /**
+     * Level in stack.
+     */
     private int id;
 
     /**
@@ -48,7 +51,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         initVariables(vars);
     }
 
-    private void initVariables(Map<String, String> vars) {
+    public void initVariables(Map<String, String> vars) {
 
         variables = ((RobotDebugTarget) thread.getDebugTarget()).getRobotVariablesManager().extractRobotDebugVariables(
                 id, vars);
@@ -281,12 +284,28 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         return getSourceName().hashCode() + id;
     }
 
-    /**
-     * Returns this stack frame's unique identifier within its thread
-     * 
-     * @return this stack frame's unique identifier within its thread
-     */
-    protected int getIdentifier() {
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public int getId() {
         return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
 }
