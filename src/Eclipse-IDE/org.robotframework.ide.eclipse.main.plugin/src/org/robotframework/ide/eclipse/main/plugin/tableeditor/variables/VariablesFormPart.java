@@ -173,6 +173,13 @@ public class VariablesFormPart extends AbstractFormPart {
         viewer.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
 
+    @Override
+    public void commit(final boolean onSave) {
+        if (onSave) {
+            super.commit(onSave);
+        }
+    }
+
     @Inject
     @Optional
     private void whenSectionIsCreated(
