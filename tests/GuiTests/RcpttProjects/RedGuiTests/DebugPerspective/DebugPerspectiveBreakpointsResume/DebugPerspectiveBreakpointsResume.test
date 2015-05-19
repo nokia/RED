@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xf9_cPS5EeSLOvIIpQkwfQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/18/15 4:16 PM
+Save-Time: 5/19/15 10:14 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -35,13 +35,7 @@ get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspectiv
 
 wait 200
 
-with [get-view Variables | get-tree] {
-   	get-item "${variable}" | get-property "values['Name']" | equals "${variable}" | verify-true
-   	get-item "${variable}" | get-property "values['Value']" | equals 1 | verify-true
-}
-
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : 1" | verify-true
-get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${variable} = 10" | verify-false
 
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
@@ -49,9 +43,6 @@ exec-with-options -disableJobWaiting -command {
 wait 200
 	
 get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${variable} = 10" | verify-true
-with [get-view Variables | get-tree] {
-    get-item "${variable}" | get-property "values['Value']" | equals 10 | verify-true
-}
 	
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
