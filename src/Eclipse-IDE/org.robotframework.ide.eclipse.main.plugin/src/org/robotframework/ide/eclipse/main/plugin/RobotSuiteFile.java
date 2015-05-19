@@ -28,7 +28,7 @@ public class RobotSuiteFile implements RobotElement {
 
     private List<RobotElement> sections = null;
 
-    private RobotEditorClosedListener2 listener;
+    private RobotEditorClosedListener listener;
 
 
     public RobotSuiteFile(final RobotElement parent, final IFile file) {
@@ -43,6 +43,8 @@ public class RobotSuiteFile implements RobotElement {
             section = new RobotVariablesSection(this, readOnly);
         } else if (name.equals(RobotSuiteSettingsSection.SECTION_NAME)) {
             section = new RobotSuiteSettingsSection(this, readOnly);
+        } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
+            section = new RobotCasesSection(this, readOnly);
         } else {
             section = new RobotSuiteFileSection(this, name, readOnly);
         }
@@ -63,7 +65,7 @@ public class RobotSuiteFile implements RobotElement {
 
                 final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
 
-                listener = new RobotEditorClosedListener2();
+                listener = new RobotEditorClosedListener();
                 ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
                 service.addPartListener(listener);
 
