@@ -284,7 +284,9 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
     @Override
     public void commit(final boolean onSave) {
-        super.commit(onSave);
+        if (onSave) {
+            super.commit(onSave);
+        }
 
         final String newDocumentation = documentation.getText().replaceAll("\t", " ").replaceAll("  +", " ");
         final RobotSetting currentSetting = model.getDocumentationSetting();
