@@ -5,19 +5,25 @@ import org.eclipse.jface.dialogs.RobotPopupDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 public class ImportLibraryPopup extends RobotPopupDialog {
 
-    private InputLoadingFormComposite<Tree> composite;
+    private InputLoadingFormComposite composite;
+    private final RobotEditorCommandsStack commandsStack;
+    private final RobotSuiteFile fileModel;
 
-    public ImportLibraryPopup(final Shell parent) {
+    public ImportLibraryPopup(final Shell parent, final RobotEditorCommandsStack commandsStack,
+            final RobotSuiteFile fileModel) {
         super(parent);
+        this.commandsStack = commandsStack;
+        this.fileModel = fileModel;
     }
 
     @Override
     protected Control createDialogControls(final Composite parent) {
-        composite = new ImportLibraryComposite(parent, "Import Library");
+        composite = new ImportLibraryComposite(parent, commandsStack, fileModel);
         return composite;
     }
 

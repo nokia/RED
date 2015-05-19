@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
-class KeywordDocumentationComposite extends InputLoadingFormComposite<Composite> {
+class KeywordDocumentationComposite extends InputLoadingFormComposite {
 
     private InputLoadingFormComposite.InputJob collectingJob;
     private FormText argumentsText;
@@ -81,6 +81,11 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite<Composite>
             }
         });
         return actualComposite;
+    }
+
+    @Override
+    protected Composite getControl() {
+        return (Composite) super.getControl();
     }
 
     private HyperlinkAdapter createHyperlinkListener() {

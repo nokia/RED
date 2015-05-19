@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.navigator;
+package org.robotframework.ide.eclipse.main.plugin;
 
 import javax.inject.Inject;
 
@@ -6,12 +6,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
-public class RobotEditorClosedListener implements IPartListener {
+class RobotEditorClosedListener2 implements IPartListener {
 
     @Inject
     private IEventBroker broker;
@@ -37,9 +34,9 @@ public class RobotEditorClosedListener implements IPartListener {
             
             final IFile file = suiteModel.getFile();
             if (file != null && file.exists()) {
-                suiteModel.refreshOnFileChange();
+                suiteModel.dispose();
 
-                broker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, RobotElementChange.createChangedElement(suiteModel));
+                broker.post(RobotModelEvents.SUITE_MODEL_DISPOSED, RobotElementChange.createChangedElement(suiteModel));
             }
         }
     }

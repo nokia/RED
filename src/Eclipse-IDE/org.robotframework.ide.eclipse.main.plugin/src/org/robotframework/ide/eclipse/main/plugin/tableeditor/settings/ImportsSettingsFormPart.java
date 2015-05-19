@@ -46,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportLibraryPopup;
 
 class ImportsSettingsFormPart extends AbstractFormPart {
 
@@ -164,16 +165,18 @@ class ImportsSettingsFormPart extends AbstractFormPart {
     }
 
     private void createColumns(final boolean createFirst) {
+        final NewElementsCreator creator = newElementsCreator();
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Import").withWidth(100)
                     .labelsProvidedBy(new SettingsCallNameLabelProvider())
+                    .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
+                    .editingEnabledOnlyWhen(fileModel.isEditable())
                     .createFor(viewer);
         }
         if (viewer.getInput() == null) {
             return;
         }
 
-        final NewElementsCreator creator = newElementsCreator();
 
         final int max = calcualateLongestArgumentsLength();
         createArgumentColumn("Name / Path", 0, creator);
@@ -205,10 +208,11 @@ class ImportsSettingsFormPart extends AbstractFormPart {
                 .createFor(viewer);
     }
 
-    private static NewElementsCreator newElementsCreator() {
+    private NewElementsCreator newElementsCreator() {
         return new NewElementsCreator() {
             @Override
             public RobotElement createNew() {
+                new ImportLibraryPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
                 return null;
             }
         };

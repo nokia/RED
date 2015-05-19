@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-class LibraryDocumentationComposite extends InputLoadingFormComposite<Composite> {
+class LibraryDocumentationComposite extends InputLoadingFormComposite {
 
     private InputLoadingFormComposite.InputJob collectingJob;
     private Label versionLabel;
@@ -94,6 +94,11 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite<Composite>
             }
         });
         return actualComposite;
+    }
+
+    @Override
+    protected Composite getControl() {
+        return (Composite) super.getControl();
     }
 
     private HyperlinkAdapter createHyperlinkListener() {

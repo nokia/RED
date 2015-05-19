@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -87,6 +88,10 @@ public class LibrarySpecification {
         for (final KeywordSpecification kwSpec : keywords) {
             kwSpec.setFormat(format);
         }
+    }
+
+    public boolean isAccessibleWithoutImport() {
+        return Arrays.asList("BuiltIn", "Easter", "Reserved").contains(name);
     }
 
     public boolean canBeConvertedToHtml() {
