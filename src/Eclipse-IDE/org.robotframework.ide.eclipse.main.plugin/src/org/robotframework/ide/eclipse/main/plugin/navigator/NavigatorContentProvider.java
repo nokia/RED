@@ -41,24 +41,15 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     @Named(ISources.ACTIVE_SITE_NAME)
     private IViewSite site;
 
-    private final RobotEditorClosedListener partListener;
-
     public NavigatorContentProvider() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
         ContextInjectionFactory.inject(this, activeContext);
-
-        partListener = new RobotEditorClosedListener();
-        ContextInjectionFactory.inject(partListener, activeContext);
-        site.getPage().getWorkbenchWindow().getPartService().addPartListener(partListener);
     }
 
 	@Override
 	public void dispose() {
-        site.getPage().getWorkbenchWindow().getPartService().removePartListener(partListener);
-
         final IEclipseContext activeContext = getContext().getActiveLeaf();
         ContextInjectionFactory.uninject(this, activeContext);
-        ContextInjectionFactory.uninject(partListener, activeContext);
 	}
 
     private IEclipseContext getContext() {
@@ -148,6 +139,15 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     @Optional
     private void whenSectionChanges(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
+        if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
+            viewer.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenModelIsDisposed(
+            @UIEventTopic(RobotModelEvents.SUITE_MODEL_DISPOSED) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
             viewer.refresh();
         }

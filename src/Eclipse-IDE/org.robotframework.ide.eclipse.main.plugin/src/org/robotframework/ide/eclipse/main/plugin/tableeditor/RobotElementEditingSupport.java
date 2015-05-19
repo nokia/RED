@@ -53,7 +53,9 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
             @Override
             public void run() {
                 getViewer().refresh();
-                getViewer().editElement(value, cellColumnToActivate);
+                if (value != null) {
+                    getViewer().editElement(value, cellColumnToActivate);
+                }
             }
         });
     }

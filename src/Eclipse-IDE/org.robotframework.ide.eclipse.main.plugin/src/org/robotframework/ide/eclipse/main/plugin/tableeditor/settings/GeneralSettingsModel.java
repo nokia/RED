@@ -24,10 +24,6 @@ class GeneralSettingsModel {
         settings.put("Default Tags", null);
     }
 
-    public GeneralSettingsModel() {
-        System.err.println(1);
-    }
-
     private RobotSuiteSettingsSection settingsSection = null;
 
     private RobotSetting documentation = null;

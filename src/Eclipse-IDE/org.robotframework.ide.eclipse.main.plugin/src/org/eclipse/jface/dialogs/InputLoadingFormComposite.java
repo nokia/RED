@@ -29,7 +29,7 @@ import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public abstract class InputLoadingFormComposite<C extends Control> extends Composite {
+public abstract class InputLoadingFormComposite extends Composite {
 
     private final String title;
 
@@ -39,14 +39,14 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
 
     private StackLayout stackLayout;
     private Control loadingControl;
-    private C control;
+    private Control control;
 
     public InputLoadingFormComposite(final Composite parent, final int style, final String title) {
         super(parent, style);
         this.title = title;
     }
 
-    protected final C getControl() {
+    protected Control getControl() {
         return control;
     }
 
@@ -120,7 +120,7 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
         return loadingLabel;
     }
 
-    protected abstract C createControl(Composite parent);
+    protected abstract Control createControl(Composite parent);
 
     protected abstract void createActions();
 
@@ -148,6 +148,9 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
 
             @Override
             public void done(final IJobChangeEvent event) {
+                if (isDisposed()) {
+                    return;
+                }
                 getDisplay().syncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -157,11 +160,13 @@ public abstract class InputLoadingFormComposite<C extends Control> extends Compo
                             innerComposite.layout();
                             getControl().setFocus();
                         }
+                        form.setBusy(false);
                     }
                 });
             }
         });
         job.schedule();
+        form.setBusy(true);
     }
 
     protected abstract InputJob provideInputCollectingJob();
