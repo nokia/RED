@@ -119,6 +119,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             // actually the sorting may have been affected, so we need to
             // refresh parent
             viewer.refresh(variable.getParent());
+            viewer.expandAll();
         }
     }
 
@@ -129,6 +130,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotSuiteFile affectedFile) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh();
+            viewer.expandAll();
         }
     }
 
@@ -139,6 +141,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null
                 && !viewer.getTree().isDisposed()) {
             viewer.refresh();
+            viewer.expandAll();
         }
     }
 
@@ -148,6 +151,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(section);
+            viewer.expandAll();
         }
     }
 
@@ -157,6 +161,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(section);
+            viewer.expandAll();
         }
     }
 }
