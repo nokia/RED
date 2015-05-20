@@ -38,32 +38,36 @@ public class RobotRuntimeEnvironment {
     }
 
     /**
-     * Locates directory in which python pointed in environment path is located.
-     * Uses where command in Windwows and which command under Unix.
+     * Locates directories in which python pointed in environment path is
+     * located. Uses where command in Windows and which command under Unix.
      * 
-     * @return Directory where python is installed or null if there is no
-     *         python.
+     * @return Directories where python is installed or empty list if there is
+     *         no python.
      */
-    public static PythonInstallationDirectory whereIsDefaultPython() {
-        final StringBuilder whereOutput = new StringBuilder();
+    public static List<PythonInstallationDirectory> whereIsDefaultPython() {
+        final List<String> paths = new ArrayList<>();
         final ProcessLineHandler linesProcessor = new ProcessLineHandler() {
             @Override
             public void processLine(final String line) {
-                whereOutput.append(line);
+                paths.add(line);
             }
         };
-
         try {
             final String cmd = isWindows() ? "where" : "which";
             final int returnCode = runExternalProcess(Arrays.asList(cmd, "python"), linesProcessor);
             if (returnCode == 0) {
-                final URI dirUri = new File(whereOutput.toString()).getParentFile().toURI();
-                return new PythonInstallationDirectory(dirUri);
+                final List<PythonInstallationDirectory> installationDirectories = new ArrayList<>();
+
+                for (final String path : paths) {
+                    final URI dirUri = new File(path).getParentFile().toURI();
+                    installationDirectories.add(new PythonInstallationDirectory(dirUri));
+                }
+                return installationDirectories;
             } else {
-                return null;
+                return new ArrayList<>();
             }
         } catch (final IOException e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
