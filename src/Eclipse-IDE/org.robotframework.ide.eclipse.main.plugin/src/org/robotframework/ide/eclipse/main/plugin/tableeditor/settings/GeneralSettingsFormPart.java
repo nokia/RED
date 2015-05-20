@@ -214,7 +214,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     }
 
     private int calcualateLongestArgumentsLength() {
-        int max = 1;
+        int max = 2;
         for (final Entry<String, RobotElement> entry : model.getEntries()) {
             final RobotSetting setting = (RobotSetting) entry.getValue();
             if (setting != null) {
@@ -251,7 +251,9 @@ class GeneralSettingsFormPart extends AbstractFormPart {
         model.update(settingsSection);
 
         documentation.setEnabled(settingsSection.isPresent());
-        documentation.setText(model.getDocumentation());
+        if (!isDirty()) {
+            documentation.setText(model.getDocumentation());
+        }
 
         viewer.setInput(model);
         viewer.removeColumns(1);
