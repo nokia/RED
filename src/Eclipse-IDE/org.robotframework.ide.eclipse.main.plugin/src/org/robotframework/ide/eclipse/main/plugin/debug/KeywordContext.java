@@ -8,13 +8,13 @@ import java.util.Map;
  */
 public class KeywordContext {
 
-    private Map<String, String> variables;
+    private Map<String, Object> variables;
 
     private String fileName;
     
     private int lineNumber;
 
-    public KeywordContext(Map<String, String> variables, String fileName, int lineNumber) {
+    public KeywordContext(Map<String, Object> variables, String fileName, int lineNumber) {
         this.variables = variables;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
@@ -23,11 +23,11 @@ public class KeywordContext {
     public KeywordContext() {
     }
 
-    public Map<String, String> getVariables() {
+    public Map<String, Object> getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, String> variables) {
+    public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
     }
 

@@ -297,6 +297,10 @@ public class TextEditor {
 	
 	private void showHighlightedLine(int lineNumber) {
 	    int visibleLinesNumber = viewer.getTextWidget().getClientArea().height / viewer.getTextWidget().getLineHeight();
+	    if (visibleLinesNumber < 2) {
+	        viewer.getTextWidget().setTopIndex(lineNumber-1);
+	        return;
+	    }
 	    int linesToCenter = visibleLinesNumber / 2;
 	    int topIndexPosiiton = lineNumber - linesToCenter;
 	    if(topIndexPosiiton >= 0) {
