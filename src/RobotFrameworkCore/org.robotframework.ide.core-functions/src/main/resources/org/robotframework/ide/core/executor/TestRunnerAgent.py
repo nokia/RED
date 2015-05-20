@@ -204,10 +204,23 @@ class TestRunnerAgent:
             vars = BuiltIn().get_variables()
             data = {}
             for k in vars.keys():
-                data[k] = str(vars[k])
+                if type(vars[k]) is list:
+                    data[k] = self.fix_unicode(vars[k])
+                else:
+                    data[k] = str(vars[k])
             self._send_socket('vars','vars',data)
         except AttributeError:
             self._send_socket('error')
+
+    def fix_unicode(self,data):
+       if isinstance(data, unicode):
+           return data.encode('utf-8')
+       elif isinstance(data, dict):
+           data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
+       elif isinstance(data, list):
+           for i in xrange(0, len(data)):
+               data[i] = self.fix_unicode(data[i])
+       return data
 
     def _check_breakpoint(self):
         data = ''
@@ -249,7 +262,27 @@ class TestRunnerAgent:
                 vars = BuiltIn().get_variables()
                 for key in js.keys():
                     if key in vars:
-                        BuiltIn().set_test_variable(key, js[key])
+                        if len(js[key]) > 1:
+                            from robot.libraries.Collections import Collections
+                            if len(js[key]) == 2:
+                                Collections().set_list_value(vars[key],js[key][0],js[key][1])
+                            else:
+                                nestedList = vars[key]
+                                newValue = ''
+                                newValueIndex = 0
+                                indexList = 1
+                                for value in js[key]:
+                                    if indexList < (len(js[key])-1):
+                                        nestedList = Collections().get_from_list(nestedList, int(value))
+                                        indexList = indexList + 1
+                                    elif indexList == (len(js[key])-1):
+                                        newValueIndex = int(value)
+                                        indexList = indexList + 1
+                                    elif indexList == len(js[key]):
+                                        newValue = value
+                                Collections().set_list_value(nestedList,newValueIndex,newValue)
+                        else:
+                            BuiltIn().set_test_variable(key, js[key][0])
             except:
                 pass
 
