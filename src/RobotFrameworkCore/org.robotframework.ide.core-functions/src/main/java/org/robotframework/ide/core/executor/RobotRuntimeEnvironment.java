@@ -87,20 +87,15 @@ public class RobotRuntimeEnvironment {
      */
     private static PythonInstallationDirectory checkPythonInstallationDir(final File location)
             throws IllegalArgumentException {
-        if (isWindows()) {
-            if (!location.isDirectory()) {
-                throw new IllegalArgumentException("The location " + location.getAbsolutePath()
-                        + " is not a directory.");
-            }
-            final List<String> names = Arrays.asList(location.list());
-            if (!names.contains("python.exe")) {
-                throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
-                        + " does not seem to be a valid python installation directory");
-            }
-            return new PythonInstallationDirectory(location.toURI());
+        if (!location.isDirectory()) {
+            throw new IllegalArgumentException("The location " + location.getAbsolutePath() + " is not a directory.");
         }
-        // FIXME : check in linux
-        throw new IllegalArgumentException("This is not yet implemented on unix!");
+        final List<String> names = Arrays.asList(location.list());
+        if (!names.contains("python.exe") || !names.contains("python")) {
+            throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
+                    + " does not seem to be a valid python installation directory");
+        }
+        return new PythonInstallationDirectory(location.toURI());
     }
 
 
