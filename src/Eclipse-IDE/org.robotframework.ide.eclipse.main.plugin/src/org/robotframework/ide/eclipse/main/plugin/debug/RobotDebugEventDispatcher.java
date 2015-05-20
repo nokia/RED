@@ -239,7 +239,7 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "vars":
                         List<Object> varList = (List<Object>) eventMap.get("vars");
-                        Map<String, String> vars = (Map<String, String>) varList.get(1);
+                        Map<String, Object> vars = (Map<String, Object>) varList.get(1);
                         target.getLastKeywordFromCurrentFrames().setVariables(vars);
                         break;
                     case "global_vars":
