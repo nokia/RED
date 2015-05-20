@@ -41,7 +41,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
      *            stack frame id (1 is the bottom of the stack)
      */
     public RobotStackFrame(RobotThread thread, String fileName, String keywordName, int lineNumber,
-            Map<String, String> vars, int id) {
+            Map<String, Object> vars, int id) {
         super((RobotDebugTarget) thread.getDebugTarget());
         this.id = id;
         this.thread = thread;
@@ -51,7 +51,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         initVariables(vars);
     }
 
-    public void initVariables(Map<String, String> vars) {
+    public void initVariables(Map<String, Object> vars) {
 
         variables = ((RobotDebugTarget) thread.getDebugTarget()).getRobotVariablesManager().extractRobotDebugVariables(
                 id, vars);

@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -463,7 +464,27 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     public void sendChangeVariableRequest(String variable, String value) {
 
         synchronized (eventSocket) {
-            eventWriter.print("{\"" + variable + "\":\"" + value + "\"}");
+            eventWriter.print("{\"" + variable + "\":[\"" + value + "\"]}");
+            eventWriter.flush();
+        }
+    }
+    
+    /**
+     * Sends a message with change variable request to the TestRunnerAgent
+     * 
+     * @param variable
+     * @param indexList
+     * @param value
+     */
+    public void sendChangeListRequest(String variable, List<String> indexList, String value) {
+        StringBuilder requestJson = new StringBuilder();
+        requestJson.append("{\"" + variable + "\":[");
+        for (int i = 0; i < indexList.size(); i++) {
+            requestJson.append("\"" + indexList.get(i) + "\",");
+        }
+        requestJson.append("\"" + value + "\"]}");
+        synchronized (eventSocket) {
+            eventWriter.print(requestJson.toString());
             eventWriter.flush();
         }
     }
