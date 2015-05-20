@@ -1,0 +1,45 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: EditDescription
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Z5QR0P4LEeSvjNrJkS7N6Q
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 5/19/15 4:36 PM
+Testcase-Type: ecl
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Testcase:
+1. Creates 'Settings' section
+2. Sets description, verifies if it appeared in text view
+
+Currently updating description and multiline description does not work, TC needs to be updated when functionality is there.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+    get-section General | get-editbox -index 1 | set-text "This is test documentation."
+}
+
+//get-menu "File/Save" | click
+//get-button "Save (M1+S)" | click
+
+get-editor "TestFile.robot" | close
+get-window "Save Resource" | get-button Yes | click
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "*** Settings ***\r\n"
+    + "Documentation    This is test documentation." | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
