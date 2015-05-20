@@ -1,5 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
@@ -16,7 +19,11 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     private RobotDebugValue robotValue;
 
     private boolean hasValueChanged;
-    
+
+    private RobotDebugVariable parent;
+
+    private boolean isValueModificationEnabled = true;
+
     /**
      * position in variables list in RobotVariablesManager
      */
@@ -30,14 +37,21 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @param value
      *            variable value
      */
-    public RobotDebugVariable(RobotDebugTarget target, String name, String value) {
+    public RobotDebugVariable(RobotDebugTarget target, String name, Object value, RobotDebugVariable parent) {
         super(target);
         this.name = name;
-        robotValue = new RobotDebugValue(target, value);
+        this.parent = parent;
+        if (value instanceof List<?>) {
+            robotValue = new RobotDebugValue(target, (List<Object>) value, this);
+            isValueModificationEnabled = false;
+        } else {
+            robotValue = new RobotDebugValue(target, value.toString());
+        }
     }
-    
-    public RobotDebugVariable(RobotDebugTarget target, String name, String value, int position) {
-        this(target, name, value);
+
+    public RobotDebugVariable(RobotDebugTarget target, String name, Object value, RobotDebugVariable parent,
+            int position) {
+        this(target, name, value, parent);
         this.position = position;
     }
 
@@ -81,7 +95,13 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         robotValue.setValue(expression);
         hasValueChanged = true;
         fireEvent(new DebugEvent(this, DebugEvent.CHANGE, DebugEvent.CLIENT_REQUEST));
-        ((RobotDebugTarget) this.getDebugTarget()).sendChangeVariableRequest(name, expression);
+        if (parent != null) {
+            LinkedList<String> indexList = new LinkedList<String>();
+            String root = extractVariableRoot(parent, indexList);
+            ((RobotDebugTarget) this.getDebugTarget()).sendChangeListRequest(root, indexList, expression);
+        } else {
+            ((RobotDebugTarget) this.getDebugTarget()).sendChangeVariableRequest(name, expression);
+        }
     }
 
     /*
@@ -99,10 +119,10 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @see org.eclipse.debug.core.model.IValueModification#supportsValueModification()
      */
     public boolean supportsValueModification() {
-        if(name.equals(RobotVariablesManager.GLOBAL_VARIABLE_NAME)) {
+        if (name.equals(RobotVariablesManager.GLOBAL_VARIABLE_NAME)) {
             return false;
         }
-        return true;
+        return isValueModificationEnabled;
     }
 
     /*
@@ -126,7 +146,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     public void setHasValueChanged(boolean valueChanged) {
         hasValueChanged = valueChanged;
     }
-    
+
     public void setNewRobotDebugValue(RobotDebugValue value) {
         this.robotValue = value;
     }
@@ -137,6 +157,34 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public RobotDebugVariable getParent() {
+        return parent;
+    }
+
+    private String extractVariableRoot(RobotDebugVariable parent, LinkedList<String> indexList) {
+        String parentName = "";
+        try {
+            parentName = parent.getName();
+        } catch (DebugException e) {
+            e.printStackTrace();
+        }
+        if (parent.getParent() == null) {
+            indexList.add(extractVariableIndex(name));
+            return parentName;
+        } else {
+            indexList.addFirst(extractVariableIndex(parentName));
+            return extractVariableRoot(parent.getParent(), indexList);
+        }
+    }
+
+    private String extractVariableIndex(String name) {
+        return name.substring(1, name.indexOf("]"));
+    }
+
+    public boolean isValueModificationEnabled() {
+        return isValueModificationEnabled;
     }
 
 }

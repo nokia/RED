@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import java.util.List;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
@@ -18,6 +20,15 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
         super(target);
         this.value = value;
         nestedVariables = new IVariable[0];
+    }
+    
+    public RobotDebugValue(RobotDebugTarget target, List<Object> value, RobotDebugVariable parent) {
+        super(target);
+        this.value = "List[" + value.size() + "]";
+        nestedVariables = new IVariable[value.size()];
+        for (int i = 0; i < value.size(); i++) {
+            nestedVariables[i] = new RobotDebugVariable(target, "[" + i + "]" , value.get(i), parent);
+        }
     }
 
     /*
