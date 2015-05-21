@@ -98,8 +98,9 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     private void createDescription(final Composite parent) {
         final Label lbl = new Label(parent, SWT.WRAP);
-        lbl.setText("Add or remove Robot frameworks definitions. By default the checked "
-                + "framework is addded to the build path of newly created Robot projects.");
+        lbl.setText("Add or remove Robot frameworks environments (location of Python with Robot library "
+                + "installed). The check-selected environment will be used by project unless it is explicitely "
+                + "overridden in project properties.");
         GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(lbl);
     }
 
