@@ -8,6 +8,9 @@ import java.util.List;
 
 public class TxtRobotFileLexer {
 
+    private static final String TABULATOR = "\t";
+    private static final String SPACE = " ";
+    private static final String PIPE = "|";
     private static final int END_OF_FILE = -1;
     private static final String CARRITAGE_RETURN = "\r";
 
@@ -15,102 +18,100 @@ public class TxtRobotFileLexer {
     public List<String> aggregateSeparators(List<String> extractedWords) {
         List<String> consolidated = new LinkedList<>();
 
-        boolean containsPipe = false;
+        ConsolidationHelper helper = new ConsolidationHelper();
 
-        StringBuilder tempData = new StringBuilder();
         for (int i = 0; i < extractedWords.size(); i++) {
             String word = extractedWords.get(i);
 
-            int currentDataLength = tempData.length();
-
-            if ("|".equals(word)) {
-                if (containsPipe) {
-                    consolidated.add(tempData.toString().intern());
-                    tempData = new StringBuilder();
-                    containsPipe = false;
+            if (PIPE.equals(word)) {
+                if (helper.containsPipe) {
+                    consolidated.add(helper.text.toString().intern());
+                    helper.clean();
                 } else {
-                    tempData.append(word);
-                    containsPipe = true;
+                    helper.text.append(word);
+                    helper.containsPipe = true;
                 }
-            } else if (" ".equals(word)) {
-                if (currentDataLength > 0) {
-                    char lastChar = tempData.charAt(currentDataLength - 1);
-                    if (lastChar == ' ') {
-                        tempData.append(word);
-                    } else if (lastChar == '|') {
-                        tempData.append(word);
-                        consolidated.add(tempData.toString().intern());
-                        tempData = new StringBuilder();
-                        containsPipe = false;
-                    } else {
-                        consolidated.add(tempData.toString().intern());
-                        tempData = new StringBuilder();
-                        containsPipe = false;
-                    }
-                } else {
-                    tempData.append(word);
+            } else if (SPACE.equals(word)) {
+                char expectedLastChar = ' ';
 
-                    if (i + 1 < extractedWords.size()) {
-                        String nextWord = extractedWords.get(i + 1);
-                        if (nextWord.length() > 1 && nextWord.startsWith("|")) {
-                            String extracted = nextWord.substring(1,
-                                    nextWord.length() - 1);
-                            extractedWords.set(i + 1, extracted);
-                            tempData.append("|");
-                            containsPipe = true;
-                        }
-                    }
-                }
-            } else if ("\t".equals(word)) {
-                if (currentDataLength > 0) {
-                    char lastChar = tempData.charAt(currentDataLength - 1);
-                    if (lastChar == '\t') {
-                        tempData.append(word);
-                    } else if (lastChar == '|') {
-                        tempData.append(word);
-                        consolidated.add(tempData.toString().intern());
-                        tempData = new StringBuilder();
-                        containsPipe = false;
-                    } else {
-                        consolidated.add(tempData.toString().intern());
-                        tempData = new StringBuilder();
-                        containsPipe = false;
-                    }
-                } else {
-                    tempData.append(word);
-
-                    if (i + 1 < extractedWords.size()) {
-                        String nextWord = extractedWords.get(i + 1);
-                        if (nextWord.length() > 1 && nextWord.startsWith("|")) {
-                            String extracted = nextWord.substring(1,
-                                    nextWord.length() - 1);
-                            extractedWords.set(i + 1, extracted);
-                            tempData.append("|");
-                            containsPipe = true;
-                        }
-                    }
-                }
+                handleSpecialCharSeparator(extractedWords, consolidated,
+                        helper, i, word, expectedLastChar);
+            } else if (TABULATOR.equals(word)) {
+                char expectedLastChar = '\t';
+                handleSpecialCharSeparator(extractedWords, consolidated,
+                        helper, i, word, expectedLastChar);
             } else {
-                List<String> splittedByPipe = splitNotEscapedPipes(word);
-                for (int index = 0; index < splittedByPipe.size(); index++) {
-                    String currentWord = splittedByPipe.get(index);
-                    if (currentDataLength > 0) {
-                        consolidated.add(tempData.toString().intern());
-                        tempData = new StringBuilder();
-                    }
-                    containsPipe = false;
-
-                    if (currentWord.equals("|")
-                            && index == (splittedByPipe.size() - 1)) {
-                        extractedWords.add("|");
-                    } else {
-                        consolidated.add(currentWord);
-                    }
-                }
+                handleWordsWithPossiblePipeSeparatorInside(extractedWords,
+                        consolidated, helper, word);
             }
         }
 
         return consolidated;
+    }
+
+
+    private void handleWordsWithPossiblePipeSeparatorInside(
+            List<String> extractedWords, List<String> consolidated,
+            ConsolidationHelper helper, String word) {
+        List<String> splittedByPipe = splitNotEscapedPipes(word);
+        for (int index = 0; index < splittedByPipe.size(); index++) {
+            String currentWord = splittedByPipe.get(index);
+            if (helper.text.length() > 0) {
+                consolidated.add(helper.text.toString().intern());
+            }
+            helper.clean();
+
+            if (currentWord.equals(PIPE)
+                    && index == (splittedByPipe.size() - 1)) {
+                extractedWords.add(PIPE);
+            } else {
+                consolidated.add(currentWord);
+            }
+        }
+    }
+
+
+    private void handleSpecialCharSeparator(List<String> extractedWords,
+            List<String> consolidated, ConsolidationHelper helper, int i,
+            String word, char expectedLastChar) {
+        if (helper.text.length() > 0) {
+            char lastChar = helper.text.charAt(helper.text.length() - 1);
+            if (lastChar == expectedLastChar) {
+                helper.text.append(word);
+            } else if (lastChar == '|') {
+                helper.text.append(word);
+                consolidated.add(helper.text.toString().intern());
+                helper.clean();
+            } else {
+                consolidated.add(helper.text.toString().intern());
+                helper.clean();
+            }
+        } else {
+            helper.text.append(word);
+
+            if (i + 1 < extractedWords.size()) {
+                String nextWord = extractedWords.get(i + 1);
+                if (nextWord.length() > 1 && nextWord.startsWith(PIPE)) {
+                    String extracted = nextWord.substring(1,
+                            nextWord.length() - 1);
+                    extractedWords.set(i + 1, extracted);
+                    helper.text.append(PIPE);
+                    helper.clean();
+                }
+            }
+        }
+    }
+
+    private class ConsolidationHelper {
+
+        private boolean containsPipe = false;
+        private StringBuilder text = new StringBuilder();
+
+
+        private void clean() {
+            containsPipe = false;
+            text = new StringBuilder();
+        }
     }
 
 
@@ -132,7 +133,7 @@ public class TxtRobotFileLexer {
                         builder = new StringBuilder();
                     }
 
-                    splitted.add("|".intern());
+                    splitted.add(PIPE.intern());
                 }
             } else if (c == '\\') {
                 isEscaped = !isEscaped;
@@ -191,7 +192,7 @@ public class TxtRobotFileLexer {
             int numberOfWords = words.size();
             if (numberOfWords >= 2) {
                 String previousWord = words.get(numberOfWords - 2);
-                if (previousWord.equals(CARRITAGE_RETURN)) {
+                if (CARRITAGE_RETURN.equals(previousWord)) {
                     // CR+LF case (\r\n)
                     words.set(numberOfWords - 2, previousWord + currentChar);
                     words.remove(numberOfWords - 1); // remove since it was
