@@ -138,8 +138,8 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 if (event.getChecked()) {
                     viewer.setCheckedElements(new Object[] { event.getElement() });
                     viewer.refresh();
-                    dirty = true;
                 }
+                dirty = true;
             }
         };
         viewer.addSelectionChangedListener(selectionListener);
