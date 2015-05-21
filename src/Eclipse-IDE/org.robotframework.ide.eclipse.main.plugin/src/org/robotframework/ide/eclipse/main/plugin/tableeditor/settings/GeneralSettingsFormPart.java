@@ -21,11 +21,10 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerControlConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -229,17 +228,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
         final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
         final Table control = viewer.getTable();
-        control.addMenuDetectListener(new MenuDetectListener() {
-
-            @Override
-            public void menuDetected(final MenuDetectEvent e) {
-                e.doit = !isClickedOnHeader(e);
-            }
-
-            private boolean isClickedOnHeader(final MenuDetectEvent e) {
-                return control.toControl(e.x, e.y).y <= control.getHeaderHeight();
-            }
-        });
+        ViewerControlConfigurator.disableContextMenuOnHeader(control);
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
