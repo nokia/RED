@@ -91,9 +91,16 @@ public class RobotRuntimeEnvironment {
             throw new IllegalArgumentException("The location " + location.getAbsolutePath() + " is not a directory.");
         }
         final List<String> names = Arrays.asList(location.list());
-        if (!names.contains("python.exe") || !names.contains("python")) {
+        if (!names.contains("python.exe") && !names.contains("python")) {
             throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
                     + " does not seem to be a valid python installation directory");
+        } else if (names.contains("python")) {
+            for (final File file : location.listFiles()) {
+                if (file.getName().equals("python") && file.isDirectory()) {
+                    throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
+                            + " does not seem to be a valid python installation directory");
+                }
+            }
         }
         return new PythonInstallationDirectory(location.toURI());
     }
