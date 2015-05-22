@@ -2,208 +2,157 @@ package org.robotframework.ide.core.testData.text;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 
 public class TxtRobotFileLexer {
 
-    private static final String TABULATOR = "\t";
-    private static final String SPACE = " ";
-    private static final String PIPE = "|";
+    private static final char LINE_FEED = '\n';
+    private static final char CARRITAGE_RETURN = '\r';
+    private static final char PIPE = '|';
+    private static final char SPACE = ' ';
+    private static final char TABULATOR = '\t';
+    private static final char ASTERISK_CHAR = '*';
+    private static final char ESCAPE_CHAR = '\\';
+    private static final char DOT_CAN_BE_CONTINOUE = '.';
+    private static final char QUOTES = '\"';
+    private static final char EQUALS = '=';
+    private static final char SCARAL_VARIABLE_BEGIN = '$';
+    private static final char LIST_VARIABLE_BEGIN = '@';
+    private static final char ENVIRONMENT_VARIABLE_BEGIN = '%';
+    private static final char COMMON_VARIABLE_BEGIN = '{';
+    private static final char COMMON_VARIABLE_END = '}';
+    private static final char COMMENT_BEGIN = '#';
+    private static final char COLON_FOR_BEGIN = ':';
+    private static final char ELEMENT_INDEX_POSITION_BEGIN_MARKER = '[';
+    private static final char ELEMENT_INDEX_POSITION_END_MARKER = ']';
     private static final int END_OF_FILE = -1;
-    private static final String CARRITAGE_RETURN = "\r";
+
+    private static final List<Character> SPECIAL_CHARS = Arrays.asList(PIPE,
+            SPACE, TABULATOR, ASTERISK_CHAR, ESCAPE_CHAR, DOT_CAN_BE_CONTINOUE,
+            QUOTES, EQUALS, SCARAL_VARIABLE_BEGIN, LIST_VARIABLE_BEGIN,
+            ENVIRONMENT_VARIABLE_BEGIN, COMMENT_BEGIN, COMMON_VARIABLE_BEGIN,
+            COMMON_VARIABLE_END, COLON_FOR_BEGIN,
+            ELEMENT_INDEX_POSITION_BEGIN_MARKER,
+            ELEMENT_INDEX_POSITION_END_MARKER);
 
 
-    public List<String> aggregateSeparators(List<String> extractedWords) {
-        List<String> consolidated = new LinkedList<>();
-
-        ConsolidationHelper helper = new ConsolidationHelper();
-
-        for (int i = 0; i < extractedWords.size(); i++) {
-            String word = extractedWords.get(i);
-
-            if (PIPE.equals(word)) {
-                if (helper.containsPipe) {
-                    consolidated.add(helper.text.toString().intern());
-                    helper.clean();
-                } else {
-                    helper.text.append(word);
-                    helper.containsPipe = true;
-                }
-            } else if (SPACE.equals(word)) {
-                char expectedLastChar = ' ';
-
-                handleSpecialCharSeparator(extractedWords, consolidated,
-                        helper, i, word, expectedLastChar);
-            } else if (TABULATOR.equals(word)) {
-                char expectedLastChar = '\t';
-                handleSpecialCharSeparator(extractedWords, consolidated,
-                        helper, i, word, expectedLastChar);
-            } else {
-                handleWordsWithPossiblePipeSeparatorInside(extractedWords,
-                        consolidated, helper, word);
-            }
-        }
-
-        return consolidated;
-    }
-
-
-    private void handleWordsWithPossiblePipeSeparatorInside(
-            List<String> extractedWords, List<String> consolidated,
-            ConsolidationHelper helper, String word) {
-        List<String> splittedByPipe = splitNotEscapedPipes(word);
-        for (int index = 0; index < splittedByPipe.size(); index++) {
-            String currentWord = splittedByPipe.get(index);
-            if (helper.text.length() > 0) {
-                consolidated.add(helper.text.toString().intern());
-            }
-            helper.clean();
-
-            if (currentWord.equals(PIPE)
-                    && index == (splittedByPipe.size() - 1)) {
-                extractedWords.add(PIPE);
-            } else {
-                consolidated.add(currentWord);
-            }
-        }
-    }
-
-
-    private void handleSpecialCharSeparator(List<String> extractedWords,
-            List<String> consolidated, ConsolidationHelper helper, int i,
-            String word, char expectedLastChar) {
-        if (helper.text.length() > 0) {
-            char lastChar = helper.text.charAt(helper.text.length() - 1);
-            if (lastChar == expectedLastChar) {
-                helper.text.append(word);
-            } else if (lastChar == '|') {
-                helper.text.append(word);
-                consolidated.add(helper.text.toString().intern());
-                helper.clean();
-            } else {
-                consolidated.add(helper.text.toString().intern());
-                helper.clean();
-            }
-        } else {
-            helper.text.append(word);
-
-            if (i + 1 < extractedWords.size()) {
-                String nextWord = extractedWords.get(i + 1);
-                if (nextWord.length() > 1 && nextWord.startsWith(PIPE)) {
-                    String extracted = nextWord.substring(1,
-                            nextWord.length() - 1);
-                    extractedWords.set(i + 1, extracted);
-                    helper.text.append(PIPE);
-                    helper.clean();
-                }
-            }
-        }
-    }
-
-    private class ConsolidationHelper {
-
-        private boolean containsPipe = false;
-        private StringBuilder text = new StringBuilder();
-
-
-        private void clean() {
-            containsPipe = false;
-            text = new StringBuilder();
-        }
-    }
-
-
-    public List<String> splitNotEscapedPipes(String word) {
-        char[] chars = (word != null) ? word.toCharArray() : new char[0];
-        List<String> splitted = new LinkedList<String>();
-
-        StringBuilder builder = new StringBuilder();
-
-        boolean isEscaped = false;
-        for (char c : chars) {
-            if (c == '|') {
-                if (isEscaped) {
-                    builder.append(c);
-                    isEscaped = false;
-                } else {
-                    if (builder.length() > 0) {
-                        splitted.add(builder.toString().intern());
-                        builder = new StringBuilder();
-                    }
-
-                    splitted.add(PIPE.intern());
-                }
-            } else if (c == '\\') {
-                isEscaped = !isEscaped;
-                builder.append(c);
-            } else {
-                isEscaped = false;
-                builder.append(c);
-            }
-        }
-
-        if (builder.length() > 0) {
-            splitted.add(builder.toString().intern());
-            builder = null;
-        }
-
-        return splitted;
-    }
-
-
-    public List<String> extractWords(InputStreamReader reader)
-            throws IOException {
-        List<String> words = new LinkedList<>();
+    public List<StringBuilder> separatePossibleTokensFromText(
+            InputStreamReader reader) throws IOException {
+        List<StringBuilder> extractedTokens = new LinkedList<>();
 
         StringBuilder unfinishedText = new StringBuilder();
         int currentChar = END_OF_FILE;
+        int previousChar = END_OF_FILE;
         while((currentChar = reader.read()) != END_OF_FILE) {
-            unfinishedText = splitWordsBySpaceTabulatorOrNewLine(words,
-                    unfinishedText, (char) currentChar);
+            unfinishedText = splitTextFromTokens(extractedTokens,
+                    unfinishedText, (char) currentChar, (char) previousChar);
+            previousChar = currentChar;
         }
 
         if (unfinishedText.length() > 0) {
-            words.add(unfinishedText.toString().intern());
+            extractedTokens.add(unfinishedText);
         }
 
-        unfinishedText = null;
-
-        return words;
+        return extractedTokens;
     }
 
 
-    private StringBuilder splitWordsBySpaceTabulatorOrNewLine(
-            List<String> words, StringBuilder unfinishedText, char currentChar) {
-        if (currentChar == ' ' || currentChar == '\t' || currentChar == '\r'
-                || currentChar == '\n') {
-            if (unfinishedText.length() > 0) {
-                words.add(unfinishedText.toString().intern());
-                unfinishedText = new StringBuilder();
-            }
+    private StringBuilder splitTextFromTokens(
+            List<StringBuilder> extractedTokens, StringBuilder unfinishedText,
+            char currentChar, char previousChar) {
+        StringBuilder currentValidStream = unfinishedText;
 
-            words.add(("" + currentChar).intern());
+        if (SPECIAL_CHARS.contains(currentChar)) {
+            currentValidStream = ifPreviousIsTheSameContinoue(extractedTokens,
+                    unfinishedText, currentChar, previousChar);
+        } else if (currentChar == CARRITAGE_RETURN) {
+            currentValidStream = closePreviousCharStreamAndStoreItValue(
+                    extractedTokens, unfinishedText,
+                    new StringBuilder().append(CARRITAGE_RETURN));
+        } else if (currentChar == LINE_FEED) {
+            currentValidStream = closePreviousCharStreamAndStoreItValue(
+                    extractedTokens, unfinishedText, null);
+            handleCarritageReturnFollowByLineFeedCharacters(extractedTokens);
         } else {
-            unfinishedText.append(currentChar);
-        }
-
-        if (currentChar == '\n') {
-            int numberOfWords = words.size();
-            if (numberOfWords >= 2) {
-                String previousWord = words.get(numberOfWords - 2);
-                if (CARRITAGE_RETURN.equals(previousWord)) {
-                    // CR+LF case (\r\n)
-                    words.set(numberOfWords - 2, previousWord + currentChar);
-                    words.remove(numberOfWords - 1); // remove since it was
-                                                     // added in previous
-                                                     // condition check
+            if (SPECIAL_CHARS.contains(previousChar)) {
+                if (unfinishedText.length() > 0) {
+                    extractedTokens.add(unfinishedText);
+                    currentValidStream = new StringBuilder()
+                            .append(currentChar);
+                } else {
+                    unfinishedText.append(currentChar);
                 }
             } else {
-                words.add(("" + currentChar).intern());
+                unfinishedText.append(currentChar);
             }
         }
 
-        return unfinishedText;
+        return currentValidStream;
+    }
+
+
+    private StringBuilder ifPreviousIsTheSameContinoue(
+            List<StringBuilder> extractedTokens, StringBuilder unfinishedText,
+            char currentChar, char previousChar) {
+        StringBuilder currentValidStream = unfinishedText;
+        if (previousChar == currentChar) {
+            currentValidStream.append(currentChar);
+        } else {
+            if (unfinishedText.length() > 0) {
+                extractedTokens.add(unfinishedText);
+                currentValidStream = new StringBuilder().append(currentChar);
+            } else {
+                currentValidStream.append(currentChar);
+            }
+        }
+
+        return currentValidStream;
+    }
+
+
+    private StringBuilder closePreviousCharStreamAndStoreItValue(
+            List<StringBuilder> extractedTokens, StringBuilder otherToken,
+            StringBuilder streamClosingToken) {
+        StringBuilder newStreamToken;
+
+        if (otherToken.length() > 0) {
+            extractedTokens.add(otherToken);
+            newStreamToken = new StringBuilder();
+        } else {
+            newStreamToken = otherToken;
+        }
+
+        if (streamClosingToken != null) {
+            extractedTokens.add(streamClosingToken);
+        }
+
+        return newStreamToken;
+    }
+
+
+    private void handleCarritageReturnFollowByLineFeedCharacters(
+            List<StringBuilder> extractedTokens) {
+        int numberOfTokens = extractedTokens.size();
+
+        StringBuilder tokenToAdd = null;
+        if (numberOfTokens > 0) {
+            StringBuilder previousToken = extractedTokens
+                    .get(numberOfTokens - 1);
+            if (previousToken.capacity() == 1
+                    && previousToken.charAt(0) == CARRITAGE_RETURN) {
+                tokenToAdd = previousToken;
+                extractedTokens.remove(numberOfTokens - 1);
+            }
+        }
+
+        if (tokenToAdd == null) {
+            tokenToAdd = new StringBuilder();
+        }
+
+        extractedTokens.add(tokenToAdd);
+        tokenToAdd.append(LINE_FEED);
     }
 }
