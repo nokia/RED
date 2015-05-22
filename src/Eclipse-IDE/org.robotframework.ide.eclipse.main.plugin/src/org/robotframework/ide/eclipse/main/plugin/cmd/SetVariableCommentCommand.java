@@ -20,7 +20,11 @@ public class SetVariableCommentCommand extends EditorCommand {
             return;
         }
         variable.setComment(newComment);
-        
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_COMMENT_CHANGE, variable);
+
+        // it has to be send, not posted
+        // otherwise it is not possible to traverse between cells, because the cell
+        // is traversed and then main thread has to handle incoming posted event which
+        // closes currently active cell editor
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_COMMENT_CHANGE, variable);
     }
 }
