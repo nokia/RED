@@ -9,25 +9,25 @@ import java.util.List;
 
 public class TxtRobotFileLexer {
 
-    private static final char LINE_FEED = '\n';
-    private static final char CARRITAGE_RETURN = '\r';
-    private static final char PIPE = '|';
-    private static final char SPACE = ' ';
-    private static final char TABULATOR = '\t';
-    private static final char ASTERISK_CHAR = '*';
-    private static final char ESCAPE_CHAR = '\\';
-    private static final char DOT_CAN_BE_CONTINOUE = '.';
-    private static final char QUOTES = '\"';
-    private static final char EQUALS = '=';
-    private static final char SCARAL_VARIABLE_BEGIN = '$';
-    private static final char LIST_VARIABLE_BEGIN = '@';
-    private static final char ENVIRONMENT_VARIABLE_BEGIN = '%';
-    private static final char COMMON_VARIABLE_BEGIN = '{';
-    private static final char COMMON_VARIABLE_END = '}';
-    private static final char COMMENT_BEGIN = '#';
-    private static final char COLON_FOR_BEGIN = ':';
-    private static final char ELEMENT_INDEX_POSITION_BEGIN_MARKER = '[';
-    private static final char ELEMENT_INDEX_POSITION_END_MARKER = ']';
+    public static final char LINE_FEED = '\n';
+    public static final char CARRITAGE_RETURN = '\r';
+    public static final char PIPE = '|';
+    public static final char SPACE = ' ';
+    public static final char TABULATOR = '\t';
+    public static final char ASTERISK_CHAR = '*';
+    public static final char ESCAPE_CHAR = '\\';
+    public static final char DOT_CAN_BE_CONTINOUE = '.';
+    public static final char QUOTES = '\"';
+    public static final char EQUALS = '=';
+    public static final char SCARAL_VARIABLE_BEGIN = '$';
+    public static final char LIST_VARIABLE_BEGIN = '@';
+    public static final char ENVIRONMENT_VARIABLE_BEGIN = '%';
+    public static final char COMMON_VARIABLE_BEGIN = '{';
+    public static final char COMMON_VARIABLE_END = '}';
+    public static final char COMMENT_BEGIN = '#';
+    public static final char COLON_FOR_BEGIN = ':';
+    public static final char ELEMENT_INDEX_POSITION_BEGIN_MARKER = '[';
+    public static final char ELEMENT_INDEX_POSITION_END_MARKER = ']';
     private static final int END_OF_FILE = -1;
 
     private static final List<Character> SPECIAL_CHARS = Arrays.asList(PIPE,
