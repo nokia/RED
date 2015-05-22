@@ -14,6 +14,11 @@ public class LinearPosition {
     private final int column;
 
 
+    public LinearPosition() {
+        this(-1, -1);
+    }
+
+
     public LinearPosition(final int line, final int column) {
         this.line = line;
         this.column = column;
