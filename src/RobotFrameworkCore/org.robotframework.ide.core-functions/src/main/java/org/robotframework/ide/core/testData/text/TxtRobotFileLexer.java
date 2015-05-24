@@ -86,6 +86,13 @@ public class TxtRobotFileLexer {
         SPECIAL_WORDS.put("tags", RobotTokenType.WORD_TAGS);
         SPECIAL_WORDS.put("template", RobotTokenType.WORD_TEMPLATE);
         SPECIAL_WORDS.put("timeout", RobotTokenType.WORD_TIMEOUT);
+        SPECIAL_WORDS.put("arguments", RobotTokenType.WORD_ARGUMENTS);
+        SPECIAL_WORDS.put("return", RobotTokenType.WORD_RETURN);
+        SPECIAL_WORDS.put("for", RobotTokenType.WORD_FOR);
+        SPECIAL_WORDS.put("in", RobotTokenType.WORD_IN);
+        SPECIAL_WORDS.put("range", RobotTokenType.WORD_RANGE);
+        SPECIAL_WORDS.put("with", RobotTokenType.WORD_WITH);
+        SPECIAL_WORDS.put("name", RobotTokenType.WORD_NAME);
     }
 
     private static final List<Character> SPECIAL_CHARS = Arrays.asList(PIPE,
@@ -106,8 +113,8 @@ public class TxtRobotFileLexer {
             tokens.add(buildStartLineToken(0));
         }
 
-        int currentLine = 0;
-        int currentColumn = 0;
+        int currentLine = 1;
+        int currentColumn = 1;
         RobotTokenType lineSeparator = RobotTokenType.UNKNOWN;
         for (StringBuilder currentText : possibleTokensSplitted) {
             RobotToken recognizedToken = match(tokens, tempStore, currentText,
@@ -116,7 +123,7 @@ public class TxtRobotFileLexer {
 
             if (recognizedToken.getType() == RobotTokenType.END_OF_LINE) {
                 currentLine++;
-                currentColumn = 0;
+                currentColumn = 1;
 
                 if (!tempStore.isEmpty()) {
                     // clean-up in the end
@@ -133,8 +140,10 @@ public class TxtRobotFileLexer {
                 lineSeparator = matchLineSeparator(tokens, tempStore,
                         currentText, new LinearPosition(currentLine,
                                 currentColumn));
+                currentColumn = recognizedToken.getEndPos().getColumn();
             } else {
                 tempStore.add(recognizedToken);
+                currentColumn = recognizedToken.getEndPos().getColumn();
             }
 
             merge(tokens, tempStore, lineSeparator);
@@ -231,18 +240,17 @@ public class TxtRobotFileLexer {
 
     private RobotToken matchSpecialChars(StringBuilder currentText,
             LinearPosition lp) {
-        RobotToken rt = new RobotToken(RobotTokenType.UNKNOWN);
-        if (currentText.length() == 1) {
+        RobotTokenType type = RobotTokenType.UNKNOWN;
+
+        if (currentText.length() > 0) {
             char c = currentText.charAt(0);
-            RobotTokenType type = SPECIAL_ROBOT_TOKENS.get(c);
-            if (type != null) {
-                rt = new RobotToken(type);
-                rt.setStartPos(lp);
-                rt.setEndPos(lp);
-                rt.setText(currentText);
+            type = SPECIAL_ROBOT_TOKENS.get(c);
+            if (type == null) {
+                type = RobotTokenType.UNKNOWN;
             }
         }
 
+        RobotToken rt = buildToken(currentText, lp, type);
         return rt;
     }
 
