@@ -16,12 +16,12 @@ public class BreakpointDetailPaneFactory implements IDetailPaneFactory {
 
     @Override
     public Set<String> getDetailPaneTypes(IStructuredSelection selection) {
-        Set<String> set = new HashSet<String>();
+        Set<String> typeSet = new HashSet<String>();
         if (selection != null && !selection.isEmpty() && selection.getFirstElement() instanceof RobotLineBreakpoint) {
-            set.add(BreakpointDetailPane.BREAKPOINT_DETAIL_PANE_ID);
+            typeSet.add(BreakpointDetailPane.BREAKPOINT_DETAIL_PANE_ID);
         }
 
-        return set;
+        return typeSet;
     }
 
     @Override
