@@ -39,6 +39,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/gear.png");
     }
 
+    public static ImageDescriptor getTestCaseImage() {
+        return RobotFramework.getImageDescriptor("resources/case.png");
+    }
+
     public static ImageDescriptor getAddImage() {
         return RobotFramework.getImageDescriptor("resources/add.png");
     }

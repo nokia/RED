@@ -1,23 +1,27 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class RobotKeywordCall implements RobotElement {
+public class RobotCase implements RobotElement {
 
-    private final RobotElement parent;
+    private final RobotCasesSection parent;
     private final String name;
-    private final List<String> args;
-    private String comment;
+    protected final List<RobotElement> elements = new ArrayList<>();
 
-    RobotKeywordCall(final RobotElement parent, final String name, final List<String> args, final String comment) {
+    public RobotCase(final RobotCasesSection parent, final String name) {
         this.parent = parent;
         this.name = name;
-        this.args = args;
-        this.comment = comment;
+    }
+
+    public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, name, Arrays.asList(args), comment);
+        elements.add(call);
+        return call;
     }
 
     @Override
@@ -37,28 +41,17 @@ public class RobotKeywordCall implements RobotElement {
 
     @Override
     public List<RobotElement> getChildren() {
-        return new ArrayList<>();
+        return elements;
     }
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getKeywordImage();
-    }
-
-    public List<String> getArguments() {
-        return args;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(final String comment) {
-        this.comment = comment;
+        return RobotImages.getTestCaseImage();
     }
 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new OpenStrategy();
     }
+
 }
