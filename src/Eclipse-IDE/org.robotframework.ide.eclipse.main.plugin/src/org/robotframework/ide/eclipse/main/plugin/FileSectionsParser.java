@@ -42,6 +42,7 @@ class FileSectionsParser {
 
             RobotVariablesSection varSection = null;
             RobotCasesSection casesSection = null;
+            RobotCase testCase = null;
             RobotSuiteSettingsSection settingSection = null;
             while (line != null) {
                 if (line.trim().isEmpty()) {
@@ -50,6 +51,8 @@ class FileSectionsParser {
                 } else if (line.startsWith("*")) {
                     varSection = null;
                     casesSection = null;
+                    testCase = null;
+                    settingSection = null;
                     final String sectionName = extractSectionName(line);
                     if (RobotVariablesSection.SECTION_NAME.equals(sectionName)) {
                         varSection = new RobotVariablesSection(parent, readOnly);
@@ -76,7 +79,19 @@ class FileSectionsParser {
                         varSection.createScalarVariable(name, value, comment);
                     }
                 } else if (casesSection != null) {
-                    // parse cases
+                    if (line.startsWith("  ") && testCase != null) {
+                        final String comment = extractComment(line);
+                        final String lineWithoutComment = removeComment(line);
+
+                        final String[] split = lineWithoutComment.split("  +");
+                        final String name = split[0];
+                        final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
+                                split.length);
+
+                        testCase.createKeywordCall(name, args, comment);
+                    } else {
+                        testCase = casesSection.createTestCase(line);
+                    }
                 } else if (settingSection != null) {
                     final String comment = extractComment(line);
                     final String lineWithoutComment = removeComment(line);

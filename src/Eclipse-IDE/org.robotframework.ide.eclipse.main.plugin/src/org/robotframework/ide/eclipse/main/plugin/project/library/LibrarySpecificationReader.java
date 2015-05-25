@@ -27,7 +27,7 @@ public class LibrarySpecificationReader {
 
     public static class CannotReadlibrarySpecificationException extends RuntimeException {
 
-        public CannotReadlibrarySpecificationException(final String message, final JAXBException cause) {
+        public CannotReadlibrarySpecificationException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }

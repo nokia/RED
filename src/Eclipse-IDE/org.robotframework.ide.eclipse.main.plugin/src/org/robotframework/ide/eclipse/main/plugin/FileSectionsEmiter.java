@@ -56,26 +56,36 @@ class FileSectionsEmiter {
                     builder.append("# ");
                     builder.append(variable.getComment());
                 }
-
                 builder.append('\n');
             } else if (element instanceof RobotSetting) {
                 final RobotSetting setting = (RobotSetting) element;
-                
-                builder.append(setting.getName());
-                
-                if (!setting.getArguments().isEmpty()) {
-                    builder.append(getCellsSeparator());
-                    builder.append(Joiner.on(getCellsSeparator()).join(setting.getArguments()));
-                }
+                emitKeywordCall(builder, setting);
+            } else if (element instanceof RobotCase) {
+                builder.append(element.getName());
+                builder.append('\n');
 
-                if (!setting.getComment().isEmpty()) {
-                    builder.append(getCellsSeparator());
-                    builder.append("# ");
-                    builder.append(setting.getComment());
+                for (final RobotElement el : element.getChildren()) {
+                    emitKeywordCall(builder, (RobotKeywordCall) el);
                 }
                 builder.append('\n');
             }
         }
+    }
+
+    private void emitKeywordCall(final StringBuilder builder, final RobotKeywordCall call) {
+        builder.append(call.getName());
+
+        if (!call.getArguments().isEmpty()) {
+            builder.append(getCellsSeparator());
+            builder.append(Joiner.on(getCellsSeparator()).join(call.getArguments()));
+        }
+
+        if (!call.getComment().isEmpty()) {
+            builder.append(getCellsSeparator());
+            builder.append("# ");
+            builder.append(call.getComment());
+        }
+        builder.append('\n');
     }
 
     private String getCellsSeparator() {

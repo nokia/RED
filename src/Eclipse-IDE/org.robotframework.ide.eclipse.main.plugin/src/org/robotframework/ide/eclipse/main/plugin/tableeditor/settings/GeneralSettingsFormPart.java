@@ -92,25 +92,24 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
     private void createContent(final Composite parent) {
         final FormToolkit toolkit = getManagedForm().getToolkit();
-        final Section section = toolkit.createSection(parent,
-                Section.EXPANDED | Section.TITLE_BAR | Section.DESCRIPTION);
+        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
+                | Section.DESCRIPTION);
         section.setText("General");
-        section.setDescription("Provide general suite settings");
+        section.setDescription("Provide test suite documentation and general settings");
         GridDataFactory.fillDefaults().grab(true, true).span(1, 2).indent(0, 10).applyTo(section);
         
         final Composite panel = createPanel(section);
-
         createDocumentationControl(panel);
         createViewer(panel);
+
         createContextMenu();
 
         setInput();
-        viewer.packFirstColumn();
     }
 
     private Composite createPanel(final Section section) {
         final Composite panel = getManagedForm().getToolkit().createComposite(section);
-        GridDataFactory.fillDefaults().indent(0, 0).applyTo(panel);
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(panel);
         GridLayoutFactory.fillDefaults().applyTo(panel);
         section.setClient(panel);
         return panel;
@@ -142,22 +141,21 @@ class GeneralSettingsFormPart extends AbstractFormPart {
             });
         }
 
-        GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 120).applyTo(documentation);
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).applyTo(documentation);
     }
 
     private void createViewer(final Composite panel) {
         viewer = new RowExposingTableViewer(panel, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
-
             @Override
             public void handleEvent(final Event event) {
-                event.height = event.gc.getFontMetrics().getHeight() * 2;
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 2).intValue();
             }
         });
         viewer.setContentProvider(new GeneralSettingsContentProvider());
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(viewer.getTable());
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
@@ -247,6 +245,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
         viewer.setInput(model);
         viewer.removeColumns(1);
         createColumns(false);
+        viewer.packFirstColumn();
 
         viewer.refresh();
     }
@@ -254,6 +253,10 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
+
+        // there is some problem with measuring table row height sometimes, so
+        // the table needs to be laid out in its parent
+        viewer.getTable().getParent().layout();
     }
 
     public void revealSetting(final RobotSetting setting) {

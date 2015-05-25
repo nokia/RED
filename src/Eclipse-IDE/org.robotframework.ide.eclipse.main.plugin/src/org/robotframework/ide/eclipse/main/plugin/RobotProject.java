@@ -11,6 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectMetadata;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadlibrarySpecificationException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -37,8 +38,11 @@ public class RobotProject extends RobotContainer {
         readProjectMetadataIfNeeded();
         if (metadata == null) {
             return newArrayList();
+        } else if (librariesSpecs != null) {
+            return librariesSpecs;
         }
-        if (librariesSpecs == null) {
+
+        try {
             librariesSpecs = newArrayList(Iterables.transform(metadata.getStdLibrariesNames(),
                     new Function<String, LibrarySpecification>() {
                         @Override
@@ -48,8 +52,10 @@ public class RobotProject extends RobotContainer {
                             return LibrarySpecificationReader.readSpecification(RobotProject.this, file);
                         }
                     }));
+            return librariesSpecs;
+        } catch (final CannotReadlibrarySpecificationException e) {
+            return newArrayList();
         }
-        return librariesSpecs;
     }
 
     private synchronized RobotProjectMetadata readProjectMetadataIfNeeded() {
