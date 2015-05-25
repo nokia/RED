@@ -68,7 +68,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     @Override
     public Control createControl(Composite parent) {
         parent.setBackground(SWTResourceManager.getColor(255, 255, 255));
-        
+
         Composite control = new Composite(parent, SWT.NONE);
         control.setLayout(new GridLayout(2, false));
         control.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
@@ -163,35 +163,27 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         fireDirty();
 
         if (currentMarker != null) {
-            if (btnHitCount.getSelection() && !"".equals(txtHitCount.getText())) {
-                String hitCount = txtHitCount.getText();
-                try {
+            try {
+                if (btnHitCount.getSelection() && !"".equals(txtHitCount.getText())) {
+                    String hitCount = txtHitCount.getText();
                     int count = Integer.parseInt(hitCount);
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, count);
-                } catch (NumberFormatException | CoreException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
+                } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                } catch (CoreException e) {
-                    e.printStackTrace();
                 }
+            } catch (NumberFormatException | CoreException e) {
+                e.printStackTrace();
             }
 
-            if (btnConditional.getSelection() && !"".equals(txtConditional.getText())) {
-                String condition = txtConditional.getText();
-                try {
+            try {
+                if (btnConditional.getSelection() && !"".equals(txtConditional.getText())) {
+                    String condition = txtConditional.getText();
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, condition);
-                } catch (CoreException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
+                } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                } catch (CoreException e) {
-                    e.printStackTrace();
                 }
+            } catch (CoreException e) {
+                e.printStackTrace();
             }
         }
     }
