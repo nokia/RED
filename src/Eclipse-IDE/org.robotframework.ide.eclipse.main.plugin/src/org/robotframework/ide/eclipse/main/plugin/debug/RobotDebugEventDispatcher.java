@@ -68,7 +68,7 @@ public class RobotDebugEventDispatcher extends Job {
     private Map<String, String> currentResourceFiles;
 
     private boolean isStopping;
-
+    
     public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile, RobotEventBroker robotEventBroker) {
         super("Robot Event Dispatcher");
         setSystem(true);
@@ -241,6 +241,7 @@ public class RobotDebugEventDispatcher extends Job {
                         List<Object> varList = (List<Object>) eventMap.get("vars");
                         Map<String, Object> vars = (Map<String, Object>) varList.get(1);
                         target.getLastKeywordFromCurrentFrames().setVariables(vars);
+                        target.getRobotVariablesManager().extractVariablesPositions(vars);
                         break;
                     case "global_vars":
                         List<Object> globalVarList = (List<Object>) eventMap.get("global_vars");
@@ -289,6 +290,8 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "paused":
                         target.suspended(DebugEvent.CLIENT_REQUEST);
+                        target.getRobotVariablesManager().setIsItemVisibleInVariablesViewer(false);
+                        target.getRobotVariablesManager().startAddVariablesViewerListenerJob();
                         break;
                     case "end_keyword":
                         List<Object> endList = (List<Object>) eventMap.get("end_keyword");
@@ -307,6 +310,7 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "close":
                         robotEventBroker.sendClearAllEventToTextEditor();
+                        target.getRobotVariablesManager().startRemoveVariablesViewerListenerJob();
                         target.terminated();
                         break;
                     case "log_message":
@@ -396,4 +400,5 @@ public class RobotDebugEventDispatcher extends Job {
             return Status.OK_STATUS;
         }
     }
+    
 }
