@@ -9,8 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
+import org.eclipse.debug.internal.ui.views.variables.VariablesView;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
@@ -32,9 +45,17 @@ public class RobotVariablesManager {
 
     private Map<String, String> globalVariables;
 
+    private Map<String, Integer> variablesPosition;
+
+    private boolean hasVariablesViewerListener;
+
+    private VariablesViewerUpdateListener variablesViewerUpdateListener;
+
     public RobotVariablesManager(RobotDebugTarget target) {
         this.target = target;
         previousVariables = new LinkedList<>();
+        variablesPosition = new LinkedHashMap<>();
+        variablesViewerUpdateListener = new VariablesViewerUpdateListener();
     }
 
     /**
@@ -67,17 +88,17 @@ public class RobotVariablesManager {
         Map<String, IVariable> currentVariablesMap = new LinkedHashMap<>();
         if (previousVariablesMap == null) {
             currentVariablesMap.put(GLOBAL_VARIABLE_NAME, createGlobalVariable(createNestedGlobalVariables()));
-            int positionCounter = 1;
+            int position = 1;
             for (String newVarName : newVariables.keySet()) {
                 if (!globalVariables.containsKey(newVarName)) {
-                    nonGlobalVariablesMap.put(newVarName, new RobotDebugVariable(target, newVarName, newVariables.get(newVarName), null, positionCounter));
-                    positionCounter++;
+                    position = variablesPosition.get(newVarName);
+                    nonGlobalVariablesMap.put(newVarName,
+                            new RobotDebugVariable(target, newVarName, newVariables.get(newVarName), null, position));
                 }
             }
         } else {
 
             IVariable[] nestedGlobalVariables = new IVariable[globalVariables.size()];
-            int variablesSize = previousVariablesMap.size();
             int nestedIndex = 0;
 
             for (String newVarName : newVariables.keySet()) {
@@ -89,7 +110,8 @@ public class RobotVariablesManager {
                             RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
                             String variableOldValue = previousVariable.getValue().getValueString();
                             String variableNewValue = newVariables.get(newVarName).toString();
-                            if (variableOldValue!= null && !variableOldValue.equals(variableNewValue) && previousVariable.isValueModificationEnabled()) {
+                            if (variableOldValue != null && !variableOldValue.equals(variableNewValue)
+                                    && previousVariable.isValueModificationEnabled()) {
                                 newVariable.setHasValueChanged(true);
                             }
                             newVariable.setPosition(previousVariable.getPosition());
@@ -97,8 +119,7 @@ public class RobotVariablesManager {
                             e.printStackTrace();
                         }
                     } else {
-                        newVariable.setPosition(variablesSize + 1);
-                        variablesSize++;
+                        newVariable.setPosition(variablesPosition.get(newVarName));
                     }
                     nonGlobalVariablesMap.put(newVarName, newVariable);
                 } else {
@@ -186,5 +207,153 @@ public class RobotVariablesManager {
         }
         return nested;
     }
-    
+
+    public LinkedList<RobotVariablesContext> getPreviousVariables() {
+        return previousVariables;
+    }
+
+    public Map<String, Integer> getVariablesPosition() {
+        return variablesPosition;
+    }
+
+    public void extractVariablesPositions(Map<String, Object> vars) {
+        int position = 1;
+        if (variablesPosition.size() > 0) {
+            position = variablesPosition.size() + 1;
+        }
+        Set<String> variableNameSet = vars.keySet();
+        for (String varName : variableNameSet) {
+            if (!variablesPosition.containsKey(varName)) {
+                variablesPosition.put(varName, position);
+                position++;
+            }
+        }
+    }
+
+    public void startAddVariablesViewerListenerJob() {
+        if (!hasVariablesViewerListener) {
+            new AddVariablesViewerListenerJob().schedule();
+        }
+    }
+
+    public void startRemoveVariablesViewerListenerJob() {
+        new RemoveVariablesViewerListenerJob().schedule();
+    }
+
+    public void setIsItemVisibleInVariablesViewer(boolean isVisible) {
+        variablesViewerUpdateListener.setItemVisible(isVisible);
+    }
+
+    private class AddVariablesViewerListenerJob extends UIJob {
+
+        public AddVariablesViewerListenerJob() {
+            super("Add Variables Viewer Listener");
+            setSystem(true);
+            setPriority(Job.INTERACTIVE);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        @SuppressWarnings("restriction")
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .findView("org.eclipse.debug.ui.VariableView");
+            if (viewPart != null && viewPart instanceof VariablesView) {
+                VariablesView variablesView = (VariablesView) viewPart;
+                final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
+                if (variablesTreeModelViewer != null) {
+                    variablesViewerUpdateListener.setTree(variablesTreeModelViewer.getTree());
+                    variablesTreeModelViewer.addViewerUpdateListener(variablesViewerUpdateListener);
+                    hasVariablesViewerListener = true;
+                }
+            }
+            return Status.OK_STATUS;
+        }
+    }
+
+    private class RemoveVariablesViewerListenerJob extends UIJob {
+
+        public RemoveVariablesViewerListenerJob() {
+            super("Remove Variables Viewer Listener");
+            setSystem(true);
+            setPriority(Job.INTERACTIVE);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        @SuppressWarnings("restriction")
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .findView("org.eclipse.debug.ui.VariableView");
+            if (viewPart != null && viewPart instanceof VariablesView) {
+                VariablesView variablesView = (VariablesView) viewPart;
+                final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
+                if (variablesTreeModelViewer != null) {
+                    variablesTreeModelViewer.removeViewerUpdateListener(variablesViewerUpdateListener);
+                }
+            }
+            return Status.OK_STATUS;
+        }
+    }
+
+    @SuppressWarnings("restriction")
+    public class VariablesViewerUpdateListener implements IViewerUpdateListener {
+
+        private Tree tree;
+
+        private boolean isItemVisible;
+
+        public VariablesViewerUpdateListener() {
+        }
+
+        @Override
+        public void viewerUpdatesBegin() {
+        }
+
+        @Override
+        public void viewerUpdatesComplete() {
+            if (!isItemVisible && tree != null) {
+                int itemCount = tree.getItemCount();
+                if (itemCount > 0) {
+                    try {
+                        TreeItem item = tree.getItem(itemCount - 1);
+                        tree.showItem(item);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } finally {
+                        isItemVisible = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void updateStarted(IViewerUpdate update) {
+        }
+
+        @Override
+        public void updateComplete(IViewerUpdate update) {
+        }
+
+        public void setItemVisible(boolean isItemVisible) {
+            this.isItemVisible = isItemVisible;
+        }
+
+        public void setTree(Tree tree) {
+            this.tree = tree;
+        }
+
+    }
 }
