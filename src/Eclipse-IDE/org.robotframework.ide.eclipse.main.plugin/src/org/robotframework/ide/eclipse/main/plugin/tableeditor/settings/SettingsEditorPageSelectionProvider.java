@@ -66,7 +66,7 @@ class SettingsEditorPageSelectionProvider implements ISelectionProvider {
     @Override
     public ISelection getSelection() {
         if (activeViewer == null) {
-            return null;
+            return StructuredSelection.EMPTY;
         }
         return translateEntriesToSettings(activeViewer.getSelection());
     }

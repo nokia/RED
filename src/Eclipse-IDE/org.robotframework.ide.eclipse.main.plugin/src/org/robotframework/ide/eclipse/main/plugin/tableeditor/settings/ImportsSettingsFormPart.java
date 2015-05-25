@@ -94,7 +94,7 @@ class ImportsSettingsFormPart extends AbstractFormPart {
 
             @Override
             public void handleEvent(final Event event) {
-                event.height = event.gc.getFontMetrics().getHeight() * 2;
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
         viewer.setContentProvider(new ImportsSettingsContentProvider(fileModel.isEditable()));
