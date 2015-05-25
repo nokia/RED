@@ -30,6 +30,6 @@ public class CreateSettingKeywordCall extends EditorCommand {
     public void execute() throws CommandExecutionException {
         settingsSection.createSetting(keywordName, comment, args.toArray(new String[0]));
 
-        eventBroker.post(RobotModelEvents.ROBOT_SETTING_ADDED, settingsSection);
+        eventBroker.send(RobotModelEvents.ROBOT_SETTING_ADDED, settingsSection);
     }
 }

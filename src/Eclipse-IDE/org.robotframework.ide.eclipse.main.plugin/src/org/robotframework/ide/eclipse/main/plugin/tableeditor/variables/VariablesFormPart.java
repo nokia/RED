@@ -19,6 +19,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
@@ -72,6 +74,12 @@ public class VariablesFormPart extends AbstractFormPart {
 
         viewer.setContentProvider(new VariablesContentProvider());
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
+        viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
+            }
+        });
 
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
