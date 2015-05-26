@@ -717,7 +717,7 @@
  <extension
        point="org.eclipse.core.expressions.propertyTesters">
     <propertyTester
-          class="org.robotframework.ide.eclipse.main.plugin.propertyTester.RobotEditorPropertTester"
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
           properties="editorModelIsEditable,editorModelHasSection,activeSectionEditorHasSection"

@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.propertyTester;
+package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.ui.IEditorPart;
@@ -8,7 +8,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPage;
 
 import com.google.common.base.Preconditions;
 
-public class RobotEditorPropertTester extends PropertyTester {
+public class RobotEditorPropertyTester extends PropertyTester {
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
