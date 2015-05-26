@@ -252,7 +252,11 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     }
 
     private void clearLinksToLibSources() throws CoreException {
-        for (final IResource resource : getProject().getFolder("libspecs").members(IContainer.INCLUDE_HIDDEN)) {
+        final IFolder folder = getProject().getFolder("libspecs");
+        if (!folder.exists()) {
+            return;
+        }
+        for (final IResource resource : folder.members(IContainer.INCLUDE_HIDDEN)) {
             if (resource.exists() && resource.isHidden()) {
                 resource.delete(true, null);
             }
