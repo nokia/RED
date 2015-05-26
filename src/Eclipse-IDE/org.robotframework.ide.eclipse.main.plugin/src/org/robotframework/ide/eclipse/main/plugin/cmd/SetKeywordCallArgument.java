@@ -24,11 +24,9 @@ abstract class SetKeywordCallArgument extends EditorCommand {
         final List<String> arguments = keywordCall.getArguments();
         boolean changed = false;
 
-        int i = arguments.size();
-        while (i <= index) {
+        for (int i = arguments.size(); i <= index; i++) {
             arguments.add("");
             changed = true;
-            i++;
         }
         if (!arguments.get(index).equals(value)) {
             arguments.remove(index);
