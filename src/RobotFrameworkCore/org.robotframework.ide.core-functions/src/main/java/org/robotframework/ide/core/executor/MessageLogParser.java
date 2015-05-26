@@ -10,7 +10,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 /**
  * @author mmarzec
  */
-public class MessageLogParser implements IRobotOutputListener {
+class MessageLogParser implements ILineHandler {
 
     private static final String LOG_MESSAGE_NAME = "log_message";
 
@@ -18,49 +18,45 @@ public class MessageLogParser implements IRobotOutputListener {
 
     private static final String END_TEST_NAME = "end_test";
 
-    private IRobotOutputListener messageLogListener;
-
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
     private Map<String, Object> parsedLine;
 
-    public MessageLogParser() {
-        mapper = new ObjectMapper();
-        parsedLine = new HashMap<String, Object>();
+    private final ILineHandler lineHandler;
+
+    MessageLogParser(final ILineHandler lineHandler) {
+        this.mapper = new ObjectMapper();
+        this.parsedLine = new HashMap<String, Object>();
+        this.lineHandler = lineHandler;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void handleLine(String line) {
-
+    public void processLine(final String line) {
         try {
             parsedLine = mapper.readValue(line, Map.class);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         if (parsedLine.containsKey(LOG_MESSAGE_NAME)) {
-            Map<String, String> elements = extractElementsFromLine(parsedLine, LOG_MESSAGE_NAME, 0);
-            messageLogListener.handleLine(elements.get("timestamp") + " : " + elements.get("level") + " : "
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, LOG_MESSAGE_NAME, 0);
+            lineHandler.processLine(elements.get("timestamp") + " : " + elements.get("level") + " : "
                     + elements.get("message") + '\n');
         }
         if (parsedLine.containsKey(START_TEST_NAME)) {
-            Map<String, String> elements = extractElementsFromLine(parsedLine, START_TEST_NAME, 1);
-            messageLogListener.handleLine("Starting test: " + elements.get("longname") + '\n');
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, START_TEST_NAME, 1);
+            lineHandler.processLine("Starting test: " + elements.get("longname") + '\n');
         }
         if (parsedLine.containsKey(END_TEST_NAME)) {
-            Map<String, String> elements = extractElementsFromLine(parsedLine, END_TEST_NAME, 1);
-            messageLogListener.handleLine("Ending test: " + elements.get("longname") + '\n');
-            messageLogListener.handleLine("\n");
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, END_TEST_NAME, 1);
+            lineHandler.processLine("Ending test: " + elements.get("longname") + '\n');
+            lineHandler.processLine("\n");
         }
-    }
-
-    public void setMessageLogListener(IRobotOutputListener messageLogListener) {
-        this.messageLogListener = messageLogListener;
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> extractElementsFromLine(Map<String, Object> map, String lineName, int elementsPosition) {
-        List<Object> list = (List<Object>) map.get(lineName);
+    private Map<String, String> extractElementsFromLine(final Map<String, Object> map, final String lineName, final int elementsPosition) {
+        final List<Object> list = (List<Object>) map.get(lineName);
         return (Map<String, String>) list.get(elementsPosition);
     }
 }
