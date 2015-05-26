@@ -51,8 +51,6 @@ import com.google.common.collect.Lists;
  *
  */
 public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
-    
-    private final List<IPath> suitePaths = newArrayList();
 
     private Text projectText;
     private Text argumentsText;
@@ -71,14 +69,13 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
             projectText.setText(projectName);
             argumentsText.setText(robotConfig.getExecutorArguments());
-            suitePaths.clear();
-            suitePaths.addAll(Lists.transform(robotConfig.getSuitePaths(), new Function<String, IPath>() {
+            final List<IPath> suites = Lists.transform(robotConfig.getSuitePaths(), new Function<String, IPath>() {
                 @Override
                 public IPath apply(final String pathStr) {
                     return Path.fromPortableString(pathStr);
                 }
-            }));
-            viewer.setInput(suitePaths);
+            });
+            viewer.setInput(newArrayList(suites));
             viewer.refresh();
 
         } catch (final CoreException e) {
@@ -91,7 +88,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(projectText.getText());
         robotConfig.setExecutorArguments(argumentsText.getText());
-        robotConfig.setSuitePaths(Lists.transform(suitePaths, new Function<IPath, String>() {
+        robotConfig.setSuitePaths(Lists.transform(getSuites(), new Function<IPath, String>() {
             @Override
             public String apply(final IPath path) {
                 return path.toPortableString();
@@ -160,6 +157,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public String getMessage() {
         return "Please select a project";
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<IPath> getSuites() {
+        return (List<IPath>) viewer.getInput();
     }
     
     @Override
@@ -275,10 +277,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 });
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
                 if (dialog.open() == Window.OK) {
+                    final List<IPath> suites = getSuites();
                     for (final Object obj : dialog.getResult()) {
-                        suitePaths.add(((IResource) obj).getProjectRelativePath());
+                        suites.add(((IResource) obj).getProjectRelativePath());
                     }
-                    viewer.setInput(suitePaths);
+                    viewer.setInput(suites);
                     updateLaunchConfigurationDialog();
                 }
             }
@@ -290,10 +293,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         removeSuite.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
+                final List<IPath> suites = getSuites();
                 final List<IPath> selectedElements = Selections.getElements(
                         (IStructuredSelection) viewer.getSelection(), IPath.class);
-                suitePaths.removeAll(selectedElements);
-                viewer.setInput(suitePaths);
+                suites.removeAll(selectedElements);
+                viewer.setInput(suites);
                 updateLaunchConfigurationDialog();
             }
         });
