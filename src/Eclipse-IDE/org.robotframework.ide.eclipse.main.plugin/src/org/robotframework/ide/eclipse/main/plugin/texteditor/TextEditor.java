@@ -236,7 +236,7 @@ public class TextEditor {
             @Override
             public void mouseDoubleClick(final MouseEvent e) {
                 try {
-                    final int line = e.y / viewer.getTextWidget().getLineHeight() + 1;
+                    final int line = (e.y / viewer.getTextWidget().getLineHeight() + 1) + viewer.getTopIndex(); 
                     if (line > viewer.getTextWidget().getLineCount()) {
                         return;
                     }
