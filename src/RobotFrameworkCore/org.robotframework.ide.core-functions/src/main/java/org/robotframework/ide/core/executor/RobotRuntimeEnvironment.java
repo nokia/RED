@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,11 +17,17 @@ import java.util.Objects;
 
 public class RobotRuntimeEnvironment {
 
+    private static Path temporaryDirectory = null;
+
+    private final File location;
+
+    private String version;
+
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 
-    private static int runExternalProcess(final List<String> command, final ProcessLineHandler linesHandler)
+    private static int runExternalProcess(final List<String> command, final ILineHandler linesHandler)
             throws IOException {
         try {
             final Process process = new ProcessBuilder(command).start();
@@ -46,7 +53,7 @@ public class RobotRuntimeEnvironment {
      */
     public static List<PythonInstallationDirectory> whereIsDefaultPython() {
         final List<String> paths = new ArrayList<>();
-        final ProcessLineHandler linesProcessor = new ProcessLineHandler() {
+        final ILineHandler linesProcessor = new ILineHandler() {
             @Override
             public void processLine(final String line) {
                 paths.add(line);
@@ -115,7 +122,7 @@ public class RobotRuntimeEnvironment {
      */
     private static String getRobotFrameworkVersion(final PythonInstallationDirectory pythonLocation) {
         final StringBuilder versionOutput = new StringBuilder();
-        final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+        final ILineHandler linesHandler = new ILineHandler() {
             @Override
             public void processLine(final String line) {
                 versionOutput.append(line);
@@ -142,9 +149,22 @@ public class RobotRuntimeEnvironment {
         return null;
     }
 
-    private final File location;
+    private static File copyResourceFile(final String filename) throws IOException {
+        final Path tempDir = createTemporaryDirectory();
+        final File scriptFile = new File(tempDir.toString() + File.separator + filename);
+        Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(filename), scriptFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
+        return scriptFile;
+    }
 
-    private String version;
+    private static synchronized Path createTemporaryDirectory() throws IOException {
+        if (temporaryDirectory != null) {
+            return temporaryDirectory;
+        }
+        temporaryDirectory = Files.createTempDirectory("RobotTempDir");
+        temporaryDirectory.toFile().deleteOnExit();
+        return temporaryDirectory;
+    }
 
     private RobotRuntimeEnvironment(final File location, final String version) {
         this.location = location;
@@ -180,16 +200,7 @@ public class RobotRuntimeEnvironment {
         return location;
     }
 
-    private File copyResourceFile(final String filename) throws IOException {
-        final Path tempDir = Files.createTempDirectory("RobotTempDir");
-        tempDir.toFile().deleteOnExit();
-        final File scriptFile = new File(tempDir.toString() + File.separator + filename);
-        Files.copy(RobotExecutor.class.getResourceAsStream(filename), scriptFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING);
-        return scriptFile;
-    }
-
-    public void installRobotUsingPip(final ProcessLineHandler linesHandler, final boolean useStableVersion)
+    public void installRobotUsingPip(final ILineHandler linesHandler, final boolean useStableVersion)
             throws RobotEnvironmentException {
         if (isValidPythonInstallation()) {
             final String pythonExec = isWindows() ? "python.exe" : "python";
@@ -218,7 +229,7 @@ public class RobotRuntimeEnvironment {
             final String cmd = findFile(location, pythonExec).getAbsolutePath();
             final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", libName,
                     file.getAbsolutePath());
-            final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+            final ILineHandler linesHandler = new ILineHandler() {
                 @Override
                 public void processLine(final String line) {
                     // nothing to do
@@ -242,7 +253,7 @@ public class RobotRuntimeEnvironment {
                 final String cmd = findFile(location, pythonExec).getAbsolutePath();
                 final List<String> cmdLine = Arrays.asList(cmd, scriptFile.getAbsolutePath());
                 final List<String> stdLibs = new ArrayList<>();
-                final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+                final ILineHandler linesHandler = new ILineHandler() {
                     @Override
                     public void processLine(final String line) {
                         final String libName = line.trim();
@@ -272,7 +283,7 @@ public class RobotRuntimeEnvironment {
             final List<String> cmdLine = Arrays.asList(cmd, "-c", "import robot.libraries." + libraryName
                     + ";print(robot.libraries." + libraryName + ".__file__)");
             final StringBuilder path = new StringBuilder();
-            final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+            final ILineHandler linesHandler = new ILineHandler() {
                 @Override
                 public void processLine(final String line) {
                     path.append(line);
@@ -291,6 +302,48 @@ public class RobotRuntimeEnvironment {
             }
         }
         return null;
+    }
+
+    public RunCommandLine createCommandLineCall(final File projectLocation, final List<String> suites,
+            final String userArguments, final boolean isDebugging) throws IOException {
+
+        final String pythonExec = isWindows() ? "python.exe" : "python";
+        final String python = findFile(location, pythonExec).getAbsolutePath();
+
+        final String debugInfo = isDebugging ? "True" : "False";
+        final int port = findFreePort();
+        final List<String> cmdLine = new ArrayList<String>();
+        cmdLine.add(python);
+        cmdLine.add("-m");
+        cmdLine.add("robot.run");
+        cmdLine.add("--listener");
+        cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
+
+        for (final String suite : suites) {
+            cmdLine.add("--suite");
+            cmdLine.add(suite);
+        }
+        if (!userArguments.trim().isEmpty()) {
+            cmdLine.addAll(ArgumentsConverter.fromJavaArgsToPythonLike(ArgumentsConverter
+                    .convertToJavaMainLikeArgs(userArguments)));
+        }
+        cmdLine.add(projectLocation.getAbsolutePath());
+        return new RunCommandLine(cmdLine, port);
+    }
+
+    private static int findFreePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (final IOException e) {
+            return -1;
+        }
+    }
+
+    public void startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler) {
+        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
+        testRunnerAgentHandler.addListener(new MessageLogParser(lineHandler));
+        final Thread handlerThread = new Thread(testRunnerAgentHandler);
+        handlerThread.start();
     }
 
     @Override
@@ -313,10 +366,6 @@ public class RobotRuntimeEnvironment {
         return Objects.equals(location, other.location) && Objects.equals(version, other.version);
     }
 
-    public interface ProcessLineHandler {
-        public void processLine(final String line);
-    }
-
     public static class RobotEnvironmentException extends Exception {
 
         public RobotEnvironmentException(final String message) {
@@ -334,6 +383,24 @@ public class RobotRuntimeEnvironment {
         // when given uri is valid python location
         private PythonInstallationDirectory(final URI uri) {
             super(uri);
+        }
+    }
+
+    public static class RunCommandLine {
+        private final List<String> commandLine;
+        private final int port;
+
+        RunCommandLine(final List<String> commandLine, final int port) {
+            this.commandLine = new ArrayList<String>(commandLine);
+            this.port = port;
+        }
+
+        public String[] getCommandLine() {
+            return commandLine.toArray(new String[0]);
+        }
+
+        public int getPort() {
+            return port;
         }
     }
 }
