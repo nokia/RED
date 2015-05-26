@@ -47,7 +47,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final RobotProject robotProject = spec.getRobotProject();
             final IFile file = robotProject.getProject().getFolder("libspecs").getFile(libName);
             if (!file.exists()) {
-                final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+                final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getActiveRuntimeEnvironment();
                 final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
                 final IPath location = new Path(standardLibraryPath.getAbsolutePath());
                 file.createLink(location, IResource.HIDDEN, null);

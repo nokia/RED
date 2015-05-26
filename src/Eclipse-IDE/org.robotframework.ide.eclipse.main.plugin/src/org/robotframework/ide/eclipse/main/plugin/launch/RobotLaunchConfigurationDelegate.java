@@ -200,6 +200,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final IProject project) throws CoreException {
         final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        if (runtimeEnvironment == null) {
+            throw newCoreException("There is no active runtime environment for project '" + project.getName() + "'",
+                    null);
+        }
         if (!runtimeEnvironment.hasRobotInstalled()) {
             throw newCoreException("The runtime environment " + runtimeEnvironment.getFile().getAbsolutePath()
                     + " is either not a python installation or it has no Robot installed", null);
