@@ -18,8 +18,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.ProcessLineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
@@ -67,7 +67,7 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Installing Robot Framework", IProgressMonitor.UNKNOWN);
                     try {
-                        final ProcessLineHandler linesHandler = new ProcessLineHandler() {
+                        final ILineHandler linesHandler = new ILineHandler() {
                             @Override
                             public void processLine(final String line) {
                                 // pip is indenting some minor messages
