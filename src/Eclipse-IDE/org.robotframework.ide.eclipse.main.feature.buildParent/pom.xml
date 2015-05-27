@@ -19,5 +19,8 @@
   	<module>${core.functions.dir}/org.robotframework.ide.core-functions</module>
   	<module>../org.robotframework.ide.eclipse.main.plugin</module>
   	<module>../org.robotframework.ide.eclipse.main.feature</module>
+  	<module>
+  		../org.robotframework.ide.eclipse.main.plugin.tests
+  	</module>
   </modules>
 </project>
