@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -31,6 +32,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -38,12 +40,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.viewers.Selections;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 /**
@@ -52,8 +56,9 @@ import com.google.common.collect.Lists;
  */
 public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
-    private Text projectText;
+    private Combo comboExecutorName;
     private Text argumentsText;
+    private Text projectText;
     private ListViewer viewer;
 
     @Override
@@ -67,14 +72,19 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             final String projectName = robotConfig.getProjectName();
 
-            projectText.setText(projectName);
-            argumentsText.setText(robotConfig.getExecutorArguments());
+            final List<String> executorNames = getSuiteExecutorNames();
             final List<IPath> suites = Lists.transform(robotConfig.getSuitePaths(), new Function<String, IPath>() {
                 @Override
                 public IPath apply(final String pathStr) {
                     return Path.fromPortableString(pathStr);
                 }
             });
+
+            comboExecutorName.setItems(executorNames.toArray(new String[0]));
+            comboExecutorName.select(executorNames.indexOf(robotConfig.getExecutor().getName()));
+
+            projectText.setText(projectName);
+            argumentsText.setText(robotConfig.getExecutorArguments());
             viewer.setInput(newArrayList(suites));
             viewer.refresh();
 
@@ -83,9 +93,21 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         }
     }
 
+    private List<String> getSuiteExecutorNames() {
+        final EnumSet<SuiteExecutor> executors = EnumSet.allOf(SuiteExecutor.class);
+        return newArrayList(Collections2.transform(executors, new Function<SuiteExecutor, String>() {
+            @Override
+            public String apply(final SuiteExecutor executor) {
+                return executor.getName();
+            }
+        }));
+    }
+
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig
+                .setExecutor(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())));
         robotConfig.setProjectName(projectText.getText());
         robotConfig.setExecutorArguments(argumentsText.getText());
         robotConfig.setSuitePaths(Lists.transform(getSuites(), new Function<IPath, String>() {
@@ -180,7 +202,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Group executorGroup = new Group(topControl, SWT.NONE);
         executorGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         executorGroup.setText("Executor");
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(executorGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(executorGroup);
+
+        comboExecutorName = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        comboExecutorName.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
 
         final Label lblArgs = new Label(executorGroup, SWT.NONE);
         lblArgs.setText("Arguments:");
