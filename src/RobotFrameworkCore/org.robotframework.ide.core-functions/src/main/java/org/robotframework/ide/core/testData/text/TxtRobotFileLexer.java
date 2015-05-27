@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.robotframework.ide.core.testData.text.context.SettingsTableHeaderMatcher;
+
 
 public class TxtRobotFileLexer {
 
@@ -34,6 +36,7 @@ public class TxtRobotFileLexer {
     public void matchContexts(TokenizatorOutput tokenizatedOutput)
             throws InterruptedException, ExecutionException {
         List<AContextMatcher> matchers = new LinkedList<>();
+        matchers.add(new SettingsTableHeaderMatcher(tokenizatedOutput));
 
         List<Integer> lineNumbersInTokenStream = tokenizatedOutput
                 .getStartLineTokensPosition();
@@ -45,23 +48,30 @@ public class TxtRobotFileLexer {
     }
 
 
-    private List<Context> matchForSingleLine(List<AContextMatcher> matchers,
+    private List<RobotTokenContext> matchForSingleLine(
+            List<AContextMatcher> matchers,
             TokenizatorOutput tokenizatedOutput, int lineNumber)
             throws InterruptedException, ExecutionException {
+        List<RobotTokenContext> contextsForThisLine = new LinkedList<>();
+
         ExecutorService execServ = Executors.newFixedThreadPool(16);
-        ExecutorCompletionService<List<Context>> completeService = new ExecutorCompletionService<>(
+        ExecutorCompletionService<List<RobotTokenContext>> completeService = new ExecutorCompletionService<>(
                 execServ);
 
-        List<Future<List<Context>>> tasks = new LinkedList<>();
+        List<Future<List<RobotTokenContext>>> tasks = new LinkedList<>();
 
         for (AContextMatcher matcher : matchers) {
-            Future<List<Context>> task = completeService.submit(matcher);
+            matcher.setLineToMatch(lineNumber);
+            Future<List<RobotTokenContext>> task = completeService
+                    .submit(matcher);
             tasks.add(task);
         }
 
         try {
             for (int taskId = 0; taskId < tasks.size(); taskId++) {
-                completeService.take().get();
+                List<RobotTokenContext> ctxForMatcher = completeService.take()
+                        .get();
+                contextsForThisLine.addAll(ctxForMatcher);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw e;
@@ -69,7 +79,7 @@ public class TxtRobotFileLexer {
             execServ.shutdownNow();
         }
 
-        return null;
+        return contextsForThisLine;
     }
 
 
@@ -124,7 +134,7 @@ public class TxtRobotFileLexer {
 
         private List<RobotToken> tokens = new LinkedList<>();
         private List<Integer> linePositionInTokensList = new LinkedList<>();
-        private List<List<Context>> contextsPerLine = new LinkedList<>();
+        private List<List<RobotTokenContext>> contextsPerLine = new LinkedList<>();
         private List<Exception> problemCatched = new LinkedList<>();
 
 
@@ -138,7 +148,7 @@ public class TxtRobotFileLexer {
         }
 
 
-        public List<List<Context>> getContextsPerLine() {
+        public List<List<RobotTokenContext>> getContextsPerLine() {
             return contextsPerLine;
         }
 
