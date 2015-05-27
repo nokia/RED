@@ -1,123 +1,93 @@
 package org.robotframework.ide.core.testData.text;
 
+import static org.robotframework.ide.core.testData.text.NamedElementsStore.CARRITAGE_RETURN;
+import static org.robotframework.ide.core.testData.text.NamedElementsStore.LINE_FEED;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.nio.CharBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class TxtRobotFileLexer {
 
-    private static final char LINE_FEED = '\n';
-    private static final char CARRITAGE_RETURN = '\r';
-    private static final char PIPE = '|';
-    private static final char SPACE = ' ';
-    private static final char TABULATOR = '\t';
-    private static final char ASTERISK_CHAR = '*';
-    private static final char ESCAPE_CHAR = '\\';
-    private static final char DOT_CAN_BE_CONTINOUE = '.';
-    private static final char QUOTES = '\"';
-    private static final char EQUALS = '=';
-    private static final char SCALAR_VARIABLE_BEGIN = '$';
-    private static final char LIST_VARIABLE_BEGIN = '@';
-    private static final char ENVIRONMENT_VARIABLE_BEGIN = '%';
-    private static final char COMMON_VARIABLE_BEGIN = '{';
-    private static final char COMMON_VARIABLE_END = '}';
-    private static final char COMMENT_BEGIN = '#';
-    private static final char COLON_FOR_BEGIN = ':';
-    private static final char ELEMENT_INDEX_POSITION_BEGIN_MARKER = '[';
-    private static final char ELEMENT_INDEX_POSITION_END_MARKER = ']';
-    private static final int END_OF_FILE = -1;
+    public TokenizatorOutput lexemes(final InputStreamReader reader)
+            throws IOException {
+        List<StringBuilder> possibleTokens = separatePossibleTokensFromText(reader);
+        TokenizatorOutput out = buildTokens(possibleTokens);
+        try {
+            matchContexts(out);
+        } catch (InterruptedException | ExecutionException e) {
+            out.getProblems().add(e);
+        }
 
-    private static final Map<Character, RobotTokenType> SPECIAL_ROBOT_TOKENS = new HashMap<>();
-    static {
-        SPECIAL_ROBOT_TOKENS.put(PIPE, RobotTokenType.PIPE);
-        SPECIAL_ROBOT_TOKENS.put(SPACE, RobotTokenType.SPACE);
-        SPECIAL_ROBOT_TOKENS.put(TABULATOR, RobotTokenType.TABULATOR);
-        SPECIAL_ROBOT_TOKENS.put(ASTERISK_CHAR, RobotTokenType.TABLE_ASTERISK);
-        SPECIAL_ROBOT_TOKENS.put(ESCAPE_CHAR, RobotTokenType.ESCAPE_ANY_CHAR);
-        SPECIAL_ROBOT_TOKENS.put(DOT_CAN_BE_CONTINOUE, RobotTokenType.DOT);
-        SPECIAL_ROBOT_TOKENS.put(QUOTES, RobotTokenType.QUOTES);
-        SPECIAL_ROBOT_TOKENS.put(EQUALS, RobotTokenType.EQUALS);
-        SPECIAL_ROBOT_TOKENS.put(SCALAR_VARIABLE_BEGIN,
-                RobotTokenType.SCALAR_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(LIST_VARIABLE_BEGIN,
-                RobotTokenType.LIST_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(ENVIRONMENT_VARIABLE_BEGIN,
-                RobotTokenType.ENVIRONMENT_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(COMMON_VARIABLE_BEGIN,
-                RobotTokenType.VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(COMMON_VARIABLE_END,
-                RobotTokenType.VARIABLE_END);
-        SPECIAL_ROBOT_TOKENS.put(COMMENT_BEGIN, RobotTokenType.COMMENT_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(COLON_FOR_BEGIN, RobotTokenType.COLON);
-        SPECIAL_ROBOT_TOKENS.put(ELEMENT_INDEX_POSITION_BEGIN_MARKER,
-                RobotTokenType.INDEX_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(ELEMENT_INDEX_POSITION_END_MARKER,
-                RobotTokenType.INDEX_END);
+        return out;
     }
 
-    private static final Map<String, RobotTokenType> SPECIAL_WORDS = new HashMap<>();
-    static {
-        SPECIAL_WORDS.put("setting", RobotTokenType.WORD_SETTING);
-        SPECIAL_WORDS.put("settings", RobotTokenType.WORD_SETTING);
-        SPECIAL_WORDS.put("variable", RobotTokenType.WORD_VARIABLE);
-        SPECIAL_WORDS.put("variables", RobotTokenType.WORD_VARIABLE);
-        SPECIAL_WORDS.put("test", RobotTokenType.WORD_TEST);
-        SPECIAL_WORDS.put("case", RobotTokenType.WORD_CASE);
-        SPECIAL_WORDS.put("cases", RobotTokenType.WORD_CASE);
-        SPECIAL_WORDS.put("metadata", RobotTokenType.WORD_METADATA);
-        SPECIAL_WORDS.put("keyword", RobotTokenType.WORD_KEYWORD);
-        SPECIAL_WORDS.put("keywords", RobotTokenType.WORD_KEYWORD);
-        SPECIAL_WORDS.put("user", RobotTokenType.WORD_USER);
-        SPECIAL_WORDS.put("setup", RobotTokenType.WORD_SETUP);
-        SPECIAL_WORDS.put("precondition", RobotTokenType.WORD_PRECONDITION);
-        SPECIAL_WORDS.put("teardown", RobotTokenType.WORD_TEARDOWN);
-        SPECIAL_WORDS.put("postcondition", RobotTokenType.WORD_POSTCONDITION);
-        SPECIAL_WORDS.put("library", RobotTokenType.WORD_LIBRARY);
-        SPECIAL_WORDS.put("resource", RobotTokenType.WORD_RESOURCE);
-        SPECIAL_WORDS.put("documentation", RobotTokenType.WORD_DOCUMENTATION);
-        SPECIAL_WORDS.put("suite", RobotTokenType.WORD_SUITE);
-        SPECIAL_WORDS.put("force", RobotTokenType.WORD_FORCE);
-        SPECIAL_WORDS.put("default", RobotTokenType.WORD_DEFAULT);
-        SPECIAL_WORDS.put("tags", RobotTokenType.WORD_TAGS);
-        SPECIAL_WORDS.put("template", RobotTokenType.WORD_TEMPLATE);
-        SPECIAL_WORDS.put("timeout", RobotTokenType.WORD_TIMEOUT);
-        SPECIAL_WORDS.put("arguments", RobotTokenType.WORD_ARGUMENTS);
-        SPECIAL_WORDS.put("return", RobotTokenType.WORD_RETURN);
-        SPECIAL_WORDS.put("for", RobotTokenType.WORD_FOR);
-        SPECIAL_WORDS.put("in", RobotTokenType.WORD_IN);
-        SPECIAL_WORDS.put("range", RobotTokenType.WORD_RANGE);
-        SPECIAL_WORDS.put("with", RobotTokenType.WORD_WITH);
-        SPECIAL_WORDS.put("name", RobotTokenType.WORD_NAME);
+
+    public void matchContexts(TokenizatorOutput tokenizatedOutput)
+            throws InterruptedException, ExecutionException {
+        List<AContextMatcher> matchers = new LinkedList<>();
+
+        List<Integer> lineNumbersInTokenStream = tokenizatedOutput
+                .getStartLineTokensPosition();
+        for (int lineNumber : lineNumbersInTokenStream) {
+            tokenizatedOutput.getContextsPerLine()
+                    .add(matchForSingleLine(matchers, tokenizatedOutput,
+                            lineNumber));
+        }
     }
 
-    private static final List<Character> SPECIAL_CHARS = Arrays.asList(PIPE,
-            SPACE, TABULATOR, ASTERISK_CHAR, ESCAPE_CHAR, DOT_CAN_BE_CONTINOUE,
-            QUOTES, EQUALS, SCALAR_VARIABLE_BEGIN, LIST_VARIABLE_BEGIN,
-            ENVIRONMENT_VARIABLE_BEGIN, COMMENT_BEGIN, COMMON_VARIABLE_BEGIN,
-            COMMON_VARIABLE_END, COLON_FOR_BEGIN,
-            ELEMENT_INDEX_POSITION_BEGIN_MARKER,
-            ELEMENT_INDEX_POSITION_END_MARKER);
+
+    private List<Context> matchForSingleLine(List<AContextMatcher> matchers,
+            TokenizatorOutput tokenizatedOutput, int lineNumber)
+            throws InterruptedException, ExecutionException {
+        ExecutorService execServ = Executors.newFixedThreadPool(16);
+        ExecutorCompletionService<List<Context>> completeService = new ExecutorCompletionService<>(
+                execServ);
+
+        List<Future<List<Context>>> tasks = new LinkedList<>();
+
+        for (AContextMatcher matcher : matchers) {
+            Future<List<Context>> task = completeService.submit(matcher);
+            tasks.add(task);
+        }
+
+        try {
+            for (int taskId = 0; taskId < tasks.size(); taskId++) {
+                completeService.take().get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw e;
+        } finally {
+            execServ.shutdownNow();
+        }
+
+        return null;
+    }
 
 
-    public List<RobotToken> buildTokens(
+    public TokenizatorOutput buildTokens(
             List<StringBuilder> possibleTokensSplitted) {
-        List<RobotToken> tokens = new LinkedList<>();
-        List<RobotToken> tempStore = new LinkedList<>();
+        TokenizatorOutput out = new TokenizatorOutput();
 
         if (possibleTokensSplitted.size() > 0) {
-            tokens.add(buildStartLineToken(0));
+            out.tokens.add(buildStartLineToken(1));
+            out.linePositionInTokensList.add(0);
         }
 
         int currentLine = 1;
         int currentColumn = 1;
+        int lastStartLineTokenPosition = 0;
         RobotTokenType lineSeparator = RobotTokenType.UNKNOWN;
         for (StringBuilder currentText : possibleTokensSplitted) {
-            RobotToken recognizedToken = match(tokens, tempStore, currentText,
+            RobotToken recognizedToken = match(out.tokens, currentText,
                     new LinearPosition(currentLine, currentColumn),
                     lineSeparator);
 
@@ -125,48 +95,99 @@ public class TxtRobotFileLexer {
                 currentLine++;
                 currentColumn = 1;
 
-                if (!tempStore.isEmpty()) {
-                    // clean-up in the end
-                    // merge to word possible
+                RobotToken startLine = buildStartLineToken(currentLine);
+                out.tokens.add(recognizedToken);
+                out.tokens.add(startLine);
+                lastStartLineTokenPosition = out.tokens.size() - 1;
+                out.linePositionInTokensList.add(lastStartLineTokenPosition);
 
-                    // throw new IllegalStateException();
-                }
-
-                tokens.add(recognizedToken);
-                tokens.add(buildStartLineToken(currentLine));
                 lineSeparator = RobotTokenType.UNKNOWN;
             } else if (lineSeparator == RobotTokenType.UNKNOWN) {
-                tempStore.add(recognizedToken);
-                lineSeparator = matchLineSeparator(tokens, tempStore,
-                        currentText, new LinearPosition(currentLine,
-                                currentColumn));
+                out.tokens.add(recognizedToken);
+                lineSeparator = matchLineSeparator(out.tokens, currentText,
+                        new LinearPosition(currentLine, currentColumn),
+                        lastStartLineTokenPosition);
                 currentColumn = recognizedToken.getEndPos().getColumn();
             } else {
-                tempStore.add(recognizedToken);
+                out.tokens.add(recognizedToken);
                 currentColumn = recognizedToken.getEndPos().getColumn();
             }
 
-            merge(tokens, tempStore, lineSeparator);
-
         }
 
-        System.out.println(tempStore);
+        out.tokens.add(buildEndOfFileToken(currentLine, currentColumn));
 
-        tokens.add(buildEndOfFileToken(currentLine, currentColumn));
+        return out;
+    }
 
-        return tokens;
+    public class TokenizatorOutput {
+
+        private List<RobotToken> tokens = new LinkedList<>();
+        private List<Integer> linePositionInTokensList = new LinkedList<>();
+        private List<List<Context>> contextsPerLine = new LinkedList<>();
+        private List<Exception> problemCatched = new LinkedList<>();
+
+
+        public List<RobotToken> getTokens() {
+            return tokens;
+        }
+
+
+        public List<Integer> getStartLineTokensPosition() {
+            return linePositionInTokensList;
+        }
+
+
+        public List<List<Context>> getContextsPerLine() {
+            return contextsPerLine;
+        }
+
+
+        public List<Exception> getProblems() {
+            return problemCatched;
+        }
     }
 
 
-    private void merge(List<RobotToken> tokens, List<RobotToken> tempStore,
-            RobotTokenType lineSeparator) {
+    private RobotTokenType matchLineSeparator(List<RobotToken> tokens,
+            StringBuilder currentText, LinearPosition linearPosition,
+            int nearestStartLineToken) {
+        RobotTokenType type = RobotTokenType.UNKNOWN;
+        int pipeOrOtherSign = nearestStartLineToken + 1;
+        if (pipeOrOtherSign < tokens.size()) {
+            RobotToken theFirstTokenAfterStartLine = tokens
+                    .get(pipeOrOtherSign);
+            if (theFirstTokenAfterStartLine.getType() == RobotTokenType.PIPE) {
+                if (pipeOrOtherSign + 3 == tokens.size()) {
+                    RobotTokenType theSecondTokenType = tokens.get(
+                            pipeOrOtherSign + 1).getType();
+                    if (theSecondTokenType == RobotTokenType.SPACE
+                            || theSecondTokenType == RobotTokenType.TABULATOR) {
+                        type = RobotTokenType.PIPE_SEPARATOR;
+                    } else {
+                        type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
+                    }
+                }
+            } else {
+                type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
+            }
+        }
 
+        if (type != RobotTokenType.UNKNOWN) {
+            RobotToken startLineToken = tokens.get(nearestStartLineToken);
+            RobotToken separatorForLine = new RobotToken(type);
+            separatorForLine.setStartPos(startLineToken.getStartPos());
+            separatorForLine.setEndPos(startLineToken.getEndPos());
+            startLineToken.addNextSubToken(separatorForLine, false);
+        }
+
+        return type;
     }
 
 
     private RobotToken match(List<RobotToken> tokens,
-            List<RobotToken> tempStore, StringBuilder currentText,
-            LinearPosition lp, RobotTokenType lineSeparator) {
+            StringBuilder currentText, LinearPosition lp,
+            RobotTokenType lineSeparator) {
         RobotToken rt = matchSpecialChars(currentText, lp);
         if (rt.getType() == RobotTokenType.UNKNOWN) {
             rt = matchSpecialWords(currentText, lp);
@@ -188,7 +209,7 @@ public class TxtRobotFileLexer {
             LinearPosition lp) {
 
         String text = currentText.toString().toLowerCase().intern();
-        RobotTokenType type = SPECIAL_WORDS.get(text);
+        RobotTokenType type = NamedElementsStore.SPECIAL_WORDS_STORE.get(text);
         if (type == null) {
             type = RobotTokenType.UNKNOWN;
         }
@@ -212,39 +233,13 @@ public class TxtRobotFileLexer {
     }
 
 
-    private RobotTokenType matchLineSeparator(List<RobotToken> tokens,
-            List<RobotToken> tempStore, StringBuilder currentText,
-            LinearPosition linearPosition) {
-        RobotTokenType type = RobotTokenType.UNKNOWN;
-        if (!tempStore.isEmpty()) {
-            RobotToken theFirstToken = tempStore.get(0);
-            if (theFirstToken.getType() == RobotTokenType.PIPE) {
-                if (tempStore.size() == 3) {
-                    RobotTokenType theSecondTokenType = tempStore.get(1)
-                            .getType();
-                    if (theSecondTokenType == RobotTokenType.SPACE
-                            || theSecondTokenType == RobotTokenType.TABULATOR) {
-                        type = RobotTokenType.PIPE_SEPARATOR;
-                    } else {
-                        type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
-                    }
-                }
-            } else {
-                type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
-            }
-        }
-
-        return type;
-    }
-
-
     private RobotToken matchSpecialChars(StringBuilder currentText,
             LinearPosition lp) {
         RobotTokenType type = RobotTokenType.UNKNOWN;
 
         if (currentText.length() > 0) {
             char c = currentText.charAt(0);
-            type = SPECIAL_ROBOT_TOKENS.get(c);
+            type = NamedElementsStore.SPECIAL_ROBOT_TOKENS_STORE.get(c);
             if (type == null) {
                 type = RobotTokenType.UNKNOWN;
             }
@@ -315,12 +310,16 @@ public class TxtRobotFileLexer {
         List<StringBuilder> extractedTokens = new LinkedList<>();
 
         StringBuilder unfinishedText = new StringBuilder();
-        int currentChar = END_OF_FILE;
-        int previousChar = END_OF_FILE;
-        while((currentChar = reader.read()) != END_OF_FILE) {
-            unfinishedText = splitTextFromTokens(extractedTokens,
-                    unfinishedText, (char) currentChar, (char) previousChar);
-            previousChar = currentChar;
+        int readLength = -1;
+        char previousChar = 0;
+        CharBuffer charBuffer = CharBuffer.allocate(4096);
+        while((readLength = reader.read(charBuffer)) > 0) {
+            for (int i = 0; i < readLength; i++) {
+                char currentChar = charBuffer.get(i);
+                unfinishedText = splitTextFromTokens(extractedTokens,
+                        unfinishedText, currentChar, previousChar);
+                previousChar = currentChar;
+            }
         }
 
         if (unfinishedText.length() > 0) {
@@ -336,7 +335,7 @@ public class TxtRobotFileLexer {
             char currentChar, char previousChar) {
         StringBuilder currentValidStream = unfinishedText;
 
-        if (SPECIAL_CHARS.contains(currentChar)) {
+        if (NamedElementsStore.SPECIAL_CHARS_STORE.contains(currentChar)) {
             currentValidStream = ifPreviousIsTheSameContinoue(extractedTokens,
                     unfinishedText, currentChar, previousChar);
         } else if (currentChar == CARRITAGE_RETURN) {
@@ -348,7 +347,7 @@ public class TxtRobotFileLexer {
                     extractedTokens, unfinishedText, null);
             handleCarritageReturnFollowByLineFeedCharacters(extractedTokens);
         } else {
-            if (SPECIAL_CHARS.contains(previousChar)) {
+            if (NamedElementsStore.SPECIAL_CHARS_STORE.contains(previousChar)) {
                 if (unfinishedText.length() > 0) {
                     extractedTokens.add(unfinishedText);
                     currentValidStream = new StringBuilder()
