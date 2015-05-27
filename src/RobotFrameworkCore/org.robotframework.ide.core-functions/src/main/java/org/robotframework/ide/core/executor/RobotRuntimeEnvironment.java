@@ -130,14 +130,43 @@ public class RobotRuntimeEnvironment {
         };
 
         try {
-            final String pythonExe = isWindows() ? "python.exe" : "python";
-            final String cmd = findFile(pythonLocation, pythonExe).getAbsolutePath();
-            runExternalProcess(Arrays.asList(cmd, "-m", "robot.run", "--version"), linesHandler);
+            runExternalProcess(Arrays.asList(getPythonExecutablePath(pythonLocation), "-m", "robot.run", "--version"),
+                    linesHandler);
             final String output = versionOutput.toString();
             return output.startsWith("Robot Framework") ? output.trim() : null;
         } catch (final IOException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private static String getRunModulePath(final PythonInstallationDirectory pythonLocation) {
+        final StringBuilder versionOutput = new StringBuilder();
+        final ILineHandler linesHandler = new ILineHandler() {
+            @Override
+            public void processLine(final String line) {
+                versionOutput.append(line);
+            }
+        };
+
+        try {
+            runExternalProcess(
+                    Arrays.asList(getPythonExecutablePath(pythonLocation), "-c", "import robot;print(robot.__file__)"),
+                    linesHandler);
+            final String output = versionOutput.toString();
+            for (final File file : new File(output.trim()).getParentFile().listFiles()) {
+                if (file.getName().equals("run.py")) {
+                    return file.getAbsolutePath();
+                }
+            }
+            throw new IllegalArgumentException("Unable to find robot.run module");
+        } catch (final IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static String getPythonExecutablePath(final File location) {
+        final String pythonExec = SuiteExecutor.PYTHON.executableName();
+        return findFile(location, pythonExec).getAbsolutePath();
     }
 
     private static File findFile(final File pythonLocation, final String name) {
@@ -196,6 +225,32 @@ public class RobotRuntimeEnvironment {
         return version;
     }
 
+    public String getVersion(final SuiteExecutor executor) {
+        final boolean isPython = executor == SuiteExecutor.PYTHON;
+        if (isPython) {
+            return version;
+        } else {
+            final List<String> cmdLine = getRunCommandLine(executor);
+            cmdLine.add("--version");
+            try {
+                final StringBuilder versionOutput = new StringBuilder();
+                final ILineHandler linesHandler = new ILineHandler() {
+                    @Override
+                    public void processLine(final String line) {
+                        versionOutput.append(line);
+                    }
+                };
+
+                runExternalProcess(cmdLine, linesHandler);
+                final String ver = versionOutput.toString();
+                return ver.startsWith("Robot") ? ver + " (using " + location.getAbsolutePath() + " robot library)"
+                        : version;
+            } catch (final IOException e) {
+                return version;
+            }
+        }
+    }
+
     public File getFile() {
         return location;
     }
@@ -203,8 +258,7 @@ public class RobotRuntimeEnvironment {
     public void installRobotUsingPip(final ILineHandler linesHandler, final boolean useStableVersion)
             throws RobotEnvironmentException {
         if (isValidPythonInstallation()) {
-            final String pythonExec = isWindows() ? "python.exe" : "python";
-            final String cmd = findFile(location, pythonExec).getAbsolutePath();
+            final String cmd = getPythonExecutablePath(location);
             final List<String> cmdLine = new ArrayList<>();
             cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install", "--upgrade"));
             if (!useStableVersion) {
@@ -225,8 +279,7 @@ public class RobotRuntimeEnvironment {
 
     public void createLibdocForStdLibrary(final String libName, final File file) {
         if (hasRobotInstalled()) {
-            final String pythonExec = isWindows() ? "python.exe" : "python";
-            final String cmd = findFile(location, pythonExec).getAbsolutePath();
+            final String cmd = getPythonExecutablePath(location);
             final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", libName,
                     file.getAbsolutePath());
             final ILineHandler linesHandler = new ILineHandler() {
@@ -249,8 +302,7 @@ public class RobotRuntimeEnvironment {
             try {
                 final File scriptFile = copyResourceFile("StdLibrariesReader.py");
 
-                final String pythonExec = isWindows() ? "python.exe" : "python";
-                final String cmd = findFile(location, pythonExec).getAbsolutePath();
+                final String cmd = getPythonExecutablePath(location);
                 final List<String> cmdLine = Arrays.asList(cmd, scriptFile.getAbsolutePath());
                 final List<String> stdLibs = new ArrayList<>();
                 final ILineHandler linesHandler = new ILineHandler() {
@@ -278,8 +330,7 @@ public class RobotRuntimeEnvironment {
 
     public File getStandardLibraryPath(final String libraryName) {
         if (hasRobotInstalled()) {
-            final String pythonExec = isWindows() ? "python.exe" : "python";
-            final String cmd = findFile(location, pythonExec).getAbsolutePath();
+            final String cmd = getPythonExecutablePath(location);
             final List<String> cmdLine = Arrays.asList(cmd, "-c", "import robot.libraries." + libraryName
                     + ";print(robot.libraries." + libraryName + ".__file__)");
             final StringBuilder path = new StringBuilder();
@@ -304,18 +355,12 @@ public class RobotRuntimeEnvironment {
         return null;
     }
 
-    public RunCommandLine createCommandLineCall(final File projectLocation, final List<String> suites,
-            final String userArguments, final boolean isDebugging) throws IOException {
-
-        final String pythonExec = isWindows() ? "python.exe" : "python";
-        final String python = findFile(location, pythonExec).getAbsolutePath();
-
+    public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final File projectLocation,
+            final List<String> suites, final String userArguments, final boolean isDebugging) throws IOException {
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
-        final List<String> cmdLine = new ArrayList<String>();
-        cmdLine.add(python);
-        cmdLine.add("-m");
-        cmdLine.add("robot.run");
+
+        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor));
         cmdLine.add("--listener");
         cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
 
@@ -329,6 +374,19 @@ public class RobotRuntimeEnvironment {
         }
         cmdLine.add(projectLocation.getAbsolutePath());
         return new RunCommandLine(cmdLine, port);
+    }
+
+    private List<String> getRunCommandLine(final SuiteExecutor executor) {
+        final List<String> cmdLine = new ArrayList<String>();
+        if (executor == SuiteExecutor.PYTHON) {
+            cmdLine.add(getPythonExecutablePath(location));
+            cmdLine.add("-m");
+            cmdLine.add("robot.run");
+        } else {
+            cmdLine.add(executor.executableName());
+            cmdLine.add("\"" + getRunModulePath((PythonInstallationDirectory) location) + "\"");
+        }
+        return cmdLine;
     }
 
     private static int findFreePort() {
