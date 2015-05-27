@@ -14,11 +14,11 @@ import java.util.List;
  */
 public class TestRunnerAgentHandler implements Runnable {
 
-    private List<IRobotOutputListener> listeners;
+    private final List<ILineHandler> listeners;
     
-    private int port;
+    private final int port;
     
-    public TestRunnerAgentHandler(int port) {
+    public TestRunnerAgentHandler(final int port) {
         listeners = new ArrayList<>();
         this.port = port;
     }
@@ -27,25 +27,25 @@ public class TestRunnerAgentHandler implements Runnable {
     public void run() {
         try (ServerSocket socket = new ServerSocket(port)) {
             socket.setReuseAddress(true);
-            Socket client = socket.accept();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            final Socket client = socket.accept();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             
             String line;
             while ((line = reader.readLine()) != null) {
-                for (IRobotOutputListener listener : listeners) {
-                    listener.handleLine(line);
+                for (final ILineHandler listener : listeners) {
+                    listener.processLine(line);
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addListener(IRobotOutputListener listener) {
+    public void addListener(final ILineHandler listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(IRobotOutputListener listener) {
+    public void removeListener(final ILineHandler listener) {
         listeners.remove(listener);
     }
     
