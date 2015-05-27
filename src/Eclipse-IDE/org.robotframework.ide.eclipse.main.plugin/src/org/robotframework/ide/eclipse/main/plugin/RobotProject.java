@@ -70,18 +70,10 @@ public class RobotProject extends RobotContainer {
         librariesSpecs = null;
     }
 
-    public RobotRuntimeEnvironment getActiveRuntimeEnvironment() {
-        readProjectMetadataIfNeeded();
-        if (metadata == null || metadata.getPythonLocation() == null) {
-            return RobotFramework.getDefault().getActiveRobotInstallation();
-        }
-        return RobotRuntimeEnvironment.create(metadata.getPythonLocation());
-    }
-
     public RobotRuntimeEnvironment getRuntimeEnvironment() {
         readProjectMetadataIfNeeded();
         if (metadata == null || metadata.getPythonLocation() == null) {
-            return null;
+            return RobotFramework.getDefault().getActiveRobotInstallation();
         }
         return RobotRuntimeEnvironment.create(metadata.getPythonLocation());
     }
