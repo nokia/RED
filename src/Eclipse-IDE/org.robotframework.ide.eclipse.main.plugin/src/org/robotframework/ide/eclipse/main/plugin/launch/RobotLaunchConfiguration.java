@@ -13,6 +13,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.robotframework.ide.core.executor.SuiteExecutor;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -21,6 +22,7 @@ public class RobotLaunchConfiguration {
 
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
+    private static final String EXECUTOR_NAME = "Executor";
     private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
@@ -43,15 +45,17 @@ public class RobotLaunchConfiguration {
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setProjectName("");
+        robotConfig.setExecutor(SuiteExecutor.PYTHON);
         robotConfig.setExecutorArguments("");
+        robotConfig.setProjectName("");
         robotConfig.setSuitePaths(new ArrayList<String>());
     }
 
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setProjectName(resources.get(0).getProject().getName());
+        robotConfig.setExecutor(SuiteExecutor.PYTHON);
         robotConfig.setExecutorArguments("");
+        robotConfig.setProjectName(resources.get(0).getProject().getName());
         robotConfig.setSuitePaths(newArrayList(Lists.transform(resources, new Function<IResource, String>() {
             @Override
             public String apply(final IResource resource) {
@@ -69,10 +73,10 @@ public class RobotLaunchConfiguration {
                 : null;
     }
     
-    public void setProjectName(final String projectName) {
+    public void setExecutor(final SuiteExecutor executor) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
-            launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
+            launchCopy.setAttribute(EXECUTOR_NAME, executor.getName());
         }
     }
 
@@ -83,6 +87,13 @@ public class RobotLaunchConfiguration {
         }
     }
 
+    public void setProjectName(final String projectName) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
+        }
+    }
+
     public void setSuitePaths(final List<String> names) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
@@ -90,12 +101,16 @@ public class RobotLaunchConfiguration {
         }
     }
 
-    public String getProjectName() throws CoreException {
-        return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
+    public SuiteExecutor getExecutor() throws CoreException {
+        return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.PYTHON.getName()));
     }
 
     public String getExecutorArguments() throws CoreException {
         return configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
+    }
+
+    public String getProjectName() throws CoreException {
+        return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
     }
 
     public List<String> getSuitePaths() throws CoreException {

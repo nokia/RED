@@ -42,6 +42,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
+import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
@@ -146,6 +147,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         // possibility
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final SuiteExecutor executor = robotConfig.getExecutor();
         final IProject project = getProject(robotConfig);
         final List<IResource> suiteResources = getSuiteResources(robotConfig, project);
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(project);
@@ -154,8 +156,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         final List<String> suites = getSuitesToRun(suiteResources);
         final String userArguments = robotConfig.getExecutorArguments();
-        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(project.getLocation().toFile(), suites,
-                userArguments, isDebugging);
+        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, project.getLocation()
+                .toFile(), suites, userArguments, isDebugging);
+        final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
         }
@@ -172,7 +175,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
-        printCommandOnConsole(cmdLine.getCommandLine(), configuration, description);
+        printCommandOnConsole(cmdLine.getCommandLine(), executorVersion, configuration, description);
 
         RobotPartListener robotPartListener = null;
         if (isDebugging) {
@@ -264,14 +267,16 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return Joiner.on('.').join(upperCased);
     }
 
-    private void printCommandOnConsole(final String[] cmd, final ILaunchConfiguration configuration,
+    private void printCommandOnConsole(final String[] cmd, final String executorVersion,
+            final ILaunchConfiguration configuration,
             final String description) throws IOException {
         final String consoleName = configuration.getName() + " [Robot] " + description;
         final IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
         for (final IConsole console : existingConsoles) {
             if (console instanceof IOConsole && console.getName().contains(consoleName)) {
                 final String command = "Command: " + Joiner.on(' ').join(cmd) + "\n";
-                ((IOConsole) console).newOutputStream().write(command);
+                final String env = "Suite Executor: " + executorVersion + "\n";
+                ((IOConsole) console).newOutputStream().write(command + env);
             }
         }
     }
