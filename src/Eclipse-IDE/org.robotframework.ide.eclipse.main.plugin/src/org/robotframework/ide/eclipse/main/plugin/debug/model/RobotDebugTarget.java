@@ -473,14 +473,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * Sends a message with change variable request to the TestRunnerAgent
      * 
      * @param variable
-     * @param indexList
+     * @param childList
      * @param value
      */
-    public void sendChangeListRequest(String variable, List<String> indexList, String value) {
+    public void sendChangeCollectionRequest(String variable, List<String> childList, String value) {
         StringBuilder requestJson = new StringBuilder();
         requestJson.append("{\"" + variable + "\":[");
-        for (int i = 0; i < indexList.size(); i++) {
-            requestJson.append("\"" + indexList.get(i) + "\",");
+        for (int i = 0; i < childList.size(); i++) {
+            requestJson.append("\"" + childList.get(i) + "\",");
         }
         requestJson.append("\"" + value + "\"]}");
         synchronized (eventSocket) {
