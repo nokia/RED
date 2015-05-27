@@ -66,6 +66,18 @@ public class RobotToken {
 
 
     public void addNextSubToken(RobotToken rt) {
+        addNextSubToken(rt, true);
+    }
+
+
+    public void addNextSubToken(RobotToken rt, boolean withSetPosition) {
+        if (withSetPosition) {
+            if (this.startPos.getLine() == -1) {
+                this.startPos = rt.getStartPos();
+            }
+            this.endPos = rt.getEndPos();
+        }
+
         subTokens.add(rt);
     }
 
