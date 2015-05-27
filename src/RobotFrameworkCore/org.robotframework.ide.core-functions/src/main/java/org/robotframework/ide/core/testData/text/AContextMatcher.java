@@ -7,7 +7,8 @@ import java.util.concurrent.Callable;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
-public abstract class AContextMatcher implements Callable<List<Context>> {
+public abstract class AContextMatcher implements
+        Callable<List<RobotTokenContext>> {
 
     protected final TokenizatorOutput tokenProvider;
     private int lineNumber;
@@ -19,7 +20,7 @@ public abstract class AContextMatcher implements Callable<List<Context>> {
     }
 
 
-    public abstract List<Context> findContexts(int lineNumber);
+    public abstract List<RobotTokenContext> findContexts(int lineNumber);
 
 
     public void setLineToMatch(int lineNumber) {
@@ -28,8 +29,8 @@ public abstract class AContextMatcher implements Callable<List<Context>> {
 
 
     @Override
-    public List<Context> call() throws Exception {
-        List<Context> placesOfContext = findContexts(lineNumber);
+    public List<RobotTokenContext> call() throws Exception {
+        List<RobotTokenContext> placesOfContext = findContexts(lineNumber);
 
         if (placesOfContext == null) {
             placesOfContext = new LinkedList<>();
