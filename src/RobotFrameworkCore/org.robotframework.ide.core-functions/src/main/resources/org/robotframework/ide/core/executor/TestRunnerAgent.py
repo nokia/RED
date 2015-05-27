@@ -147,12 +147,24 @@ class TestRunnerAgent:
 
     def _send_pid(self):
         self._send_socket("pid", os.getpid())
-        from robot.variables import GLOBAL_VARIABLES
-        variables = GLOBAL_VARIABLES
-        data = {}
-        for k in variables.keys():
-            data[k] = str(variables[k])
-        self._send_socket('global_vars','global_vars',data)
+        try:
+            from robot.version import get_version
+            robotVersion = str(get_version(naked=True))[:3]
+            robotVersion = float(robotVersion)
+            from robot.variables import GLOBAL_VARIABLES
+            variables = GLOBAL_VARIABLES
+            if robotVersion >= 2.9:
+                variables = variables.store.data
+            data = {}
+            for k in variables.keys():
+                if not (k.startswith('${') or k.startswith('@{')):
+                    key = '${' + k + '}'
+                else:
+                    key = k
+                data[key] = str(variables[k])
+            self._send_socket('global_vars','global_vars',data)
+        except Exception:
+            pass
 
     def _send_server_port(self, port):
         self._send_socket("port", port)
@@ -204,7 +216,7 @@ class TestRunnerAgent:
             vars = BuiltIn().get_variables()
             data = {}
             for k in vars.keys():
-                if type(vars[k]) is list:
+                if (type(vars[k]) is list) or (isinstance(vars[k], dict)):
                     data[k] = self.fix_unicode(vars[k])
                 else:
                     data[k] = str(vars[k])
@@ -253,7 +265,6 @@ class TestRunnerAgent:
         self._send_socket('condition_checked')
 
     def _check_changed_variable(self, data):
-        self._send_socket(data)
         if _JSONAVAIL:
             json_decoder = json.JSONDecoder(strict=False).decode
             try:
@@ -265,7 +276,10 @@ class TestRunnerAgent:
                         if len(js[key]) > 1:
                             from robot.libraries.Collections import Collections
                             if len(js[key]) == 2:
-                                Collections().set_list_value(vars[key],js[key][0],js[key][1])
+                                if isinstance(vars[key], dict):
+                                    Collections().set_to_dictionary(vars[key],js[key][0],js[key][1])
+                                else:
+                                    Collections().set_list_value(vars[key],js[key][0],js[key][1])
                             else:
                                 nestedList = vars[key]
                                 newValue = ''
