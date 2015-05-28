@@ -13,6 +13,16 @@ import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOu
 
 public class ContextsMatcher {
 
+    private int numberOfThreads = 16;
+
+
+    public void setNumberOfThreads(int numberOfThreads) {
+        if (numberOfThreads > 0) {
+            this.numberOfThreads = numberOfThreads;
+        }
+    }
+
+
     public void matchContexts(TokenizatorOutput tokenizatedOutput)
             throws InterruptedException, ExecutionException {
         List<AContextMatcher> matchers = new LinkedList<>();
@@ -33,7 +43,8 @@ public class ContextsMatcher {
             throws InterruptedException, ExecutionException {
         List<RobotTokenContext> contextsForThisLine = new LinkedList<>();
 
-        ExecutorService execServ = Executors.newFixedThreadPool(16);
+        ExecutorService execServ = Executors
+                .newFixedThreadPool(numberOfThreads);
         ExecutorCompletionService<List<RobotTokenContext>> completeService = new ExecutorCompletionService<>(
                 execServ);
 
