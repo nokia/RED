@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.debug;
+package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,11 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
@@ -22,8 +19,8 @@ import org.eclipse.debug.internal.ui.views.variables.VariablesView;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
@@ -31,7 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable
 /**
  * @author mmarzec
  */
-public class RobotVariablesManager {
+public class RobotDebugVariablesManager {
 
     public static final String GLOBAL_VARIABLE_NAME = "Global Variables";
 
@@ -41,7 +38,7 @@ public class RobotVariablesManager {
 
     private RobotDebugTarget target;
 
-    private LinkedList<RobotVariablesContext> previousVariables;
+    private LinkedList<RobotDebugVariablesContext> previousVariables;
 
     private Map<String, String> globalVariables;
 
@@ -51,7 +48,7 @@ public class RobotVariablesManager {
 
     private VariablesViewerUpdateListener variablesViewerUpdateListener;
 
-    public RobotVariablesManager(RobotDebugTarget target) {
+    public RobotDebugVariablesManager(RobotDebugTarget target) {
         this.target = target;
         previousVariables = new LinkedList<>();
         variablesPosition = new LinkedHashMap<>();
@@ -64,23 +61,19 @@ public class RobotVariablesManager {
      * compared with previous state.
      * If current level of StackTrace has not any previous state, then previous state will be
      * variables from level below. This is
-     * for saving previous order of variables in above levels.
+     * for saving previous order of variables in higher levels.
      * 
      * @param stackTraceId
      * @param newVariables
      * @return
      */
     public IVariable[] extractRobotDebugVariables(int stackTraceId, Map<String, Object> newVariables) {
+
+        RobotDebugVariablesContext currentVariablesContext = findCurrentVariablesContext(stackTraceId);
         Map<String, IVariable> previousVariablesMap = null;
-        RobotVariablesContext currentVariablesContext = null;
-        for (RobotVariablesContext variablesContext : previousVariables) {
-            if (variablesContext.getStackTraceId() == stackTraceId) {
-                previousVariablesMap = variablesContext.getVariablesMap();
-                currentVariablesContext = variablesContext;
-                break;
-            }
-        }
-        if (currentVariablesContext == null && !previousVariables.isEmpty()) {
+        if (currentVariablesContext != null) {
+            previousVariablesMap = currentVariablesContext.getVariablesMap();
+        } else if (!previousVariables.isEmpty()) {
             previousVariablesMap = previousVariables.getLast().getVariablesMap();
         }
 
@@ -99,38 +92,23 @@ public class RobotVariablesManager {
         } else {
 
             IVariable[] nestedGlobalVariables = new IVariable[globalVariables.size()];
-            int nestedIndex = 0;
+            int nestedGlobalVarIndex = 0;
 
             for (String newVarName : newVariables.keySet()) {
                 if (!globalVariables.containsKey(newVarName)) {
                     RobotDebugVariable newVariable = new RobotDebugVariable(target, newVarName,
                             newVariables.get(newVarName), null);
-                    if (previousVariablesMap.containsKey(newVarName)) {
-                        try {
-                            RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
-                            String variableOldValue = previousVariable.getValue().getValueString();
-                            String variableNewValue = newVariables.get(newVarName).toString();
-                            if (variableOldValue != null && !variableOldValue.equals(variableNewValue)
-                                    && previousVariable.isValueModificationEnabled()) {
-                                newVariable.setHasValueChanged(true);
-                            }
-                            newVariable.setPosition(previousVariable.getPosition());
-                        } catch (DebugException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        newVariable.setPosition(variablesPosition.get(newVarName));
-                    }
+                    newVariable.setHasValueChanged(this.hasValueChanged(newVarName, newVariable, newVariables, previousVariablesMap));
+                    newVariable.setPosition(variablesPosition.get(newVarName));
                     nonGlobalVariablesMap.put(newVarName, newVariable);
                 } else {
-                    nestedGlobalVariables[nestedIndex] = new RobotDebugVariable(target, newVarName,
+                    nestedGlobalVariables[nestedGlobalVarIndex] = new RobotDebugVariable(target, newVarName,
                             newVariables.get(newVarName), null);
-                    nestedIndex++;
+                    nestedGlobalVarIndex++;
                 }
             }
 
-            RobotDebugVariable globalVariable = createGlobalVariable(nestedGlobalVariables);
-            currentVariablesMap.put(GLOBAL_VARIABLE_NAME, globalVariable);
+            currentVariablesMap.put(GLOBAL_VARIABLE_NAME, createGlobalVariable(nestedGlobalVariables));
         }
 
         nonGlobalVariablesMap = sortNonGlobalVariablesMap(nonGlobalVariablesMap);
@@ -139,10 +117,56 @@ public class RobotVariablesManager {
         if (currentVariablesContext != null) {
             currentVariablesContext.setVariablesMap(nonGlobalVariablesMap);
         } else {
-            previousVariables.add(new RobotVariablesContext(stackTraceId, nonGlobalVariablesMap));
+            previousVariables.add(new RobotDebugVariablesContext(stackTraceId, nonGlobalVariablesMap));
         }
 
         return currentVariablesMap.values().toArray(new IVariable[currentVariablesMap.size()]);
+    }
+
+    private boolean hasValueChanged(String newVarName, RobotDebugVariable newVariable, Map<String, Object> newVariables,
+            Map<String, IVariable> previousVariablesMap) {
+
+        if (previousVariablesMap.containsKey(newVarName)) {
+            try {
+                RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
+                if(newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
+                    return compareNestedVariables(newVariable.getValue().getVariables(), previousVariable.getValue().getVariables());
+                }
+                String variablePreviousValue = previousVariable.getValue().getValueString();
+                String variableNewValue = newVariable.getValue().getValueString();
+                if (variablePreviousValue != null && !variablePreviousValue.equals(variableNewValue)
+                        && previousVariable.isValueModificationEnabled()) {
+                    return true;
+                }
+            } catch (DebugException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+    
+    private boolean compareNestedVariables(IVariable[] newNestedVars, IVariable[] prevNestedVars) {
+
+        if (newNestedVars.length != prevNestedVars.length) {
+            return true;
+        }
+        boolean hasNestedValueChanged = false;
+        try {
+            for (int i = 0; i < newNestedVars.length; i++) {
+                IValue newValue = newNestedVars[i].getValue();
+                IValue previousValue = prevNestedVars[i].getValue();
+                if (newValue.hasVariables() && previousValue.hasVariables()) {
+                    compareNestedVariables(newValue.getVariables(), previousValue.getVariables());
+                } else if (previousValue.getValueString() != null
+                        && !previousValue.getValueString().equals(newValue.getValueString())) {
+                    ((RobotDebugVariable) newNestedVars[i]).setHasValueChanged(true);
+                    hasNestedValueChanged = true;
+                }
+            }
+        } catch (DebugException e) {
+            e.printStackTrace();
+        }
+        return hasNestedValueChanged;
     }
 
     private Map<String, IVariable> sortNonGlobalVariablesMap(final Map<String, IVariable> nonGlobalVariablesMap) {
@@ -180,6 +204,15 @@ public class RobotVariablesManager {
         return sortedMap;
     }
 
+    private RobotDebugVariablesContext findCurrentVariablesContext(int stackTraceId) {
+        for (RobotDebugVariablesContext variablesContext : previousVariables) {
+            if (variablesContext.getStackTraceId() == stackTraceId) {
+                return variablesContext;
+            }
+        }
+        return null;
+    }
+
     public Map<String, String> getGlobalVariables() {
         return globalVariables;
     }
@@ -190,9 +223,9 @@ public class RobotVariablesManager {
 
     private RobotDebugVariable createGlobalVariable(IVariable[] nestedVariables) {
         RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, "", null);
-        RobotDebugValue value = new RobotDebugValue(target, "");
-        value.setNestedVariables(nestedVariables);
-        variable.setNewRobotDebugValue(value);
+        variable.setValueModificationEnabled(false);
+        RobotDebugValue value = new RobotDebugValue(target, "", nestedVariables);
+        variable.setRobotDebugValue(value);
 
         return variable;
     }
@@ -208,7 +241,7 @@ public class RobotVariablesManager {
         return nested;
     }
 
-    public LinkedList<RobotVariablesContext> getPreviousVariables() {
+    public LinkedList<RobotDebugVariablesContext> getPreviousVariables() {
         return previousVariables;
     }
 
@@ -230,82 +263,86 @@ public class RobotVariablesManager {
         }
     }
 
-    public void startAddVariablesViewerListenerJob() {
-        if (!hasVariablesViewerListener) {
-            new AddVariablesViewerListenerJob().schedule();
+    public String extractVariableRootAndChilds(RobotDebugVariable parent, LinkedList<String> childNameList,
+            String variableName) {
+        String parentName = "";
+        try {
+            parentName = parent.getName();
+        } catch (DebugException e) {
+            e.printStackTrace();
+        }
+        if (parent.getParent() == null) {
+            childNameList.add(extractChildName(variableName));
+            return parentName;
+        } else {
+            childNameList.addFirst(extractChildName(parentName));
+            return extractVariableRootAndChilds(parent.getParent(), childNameList, variableName);
         }
     }
 
-    public void startRemoveVariablesViewerListenerJob() {
-        new RemoveVariablesViewerListenerJob().schedule();
+    private String extractChildName(String variableName) {
+        if (variableName.indexOf("[") >= 0 && variableName.indexOf("]") >= 0) {
+            return variableName.substring(1, variableName.indexOf("]"));
+        }
+        return variableName;
+    }
+
+    public void addVariablesViewerListener() {
+        if (!hasVariablesViewerListener) {
+            registerViewerUpdateListener();
+        }
+    }
+
+    public void removeVariablesViewerListener() {
+        unregisterViewerUpdateListener();
     }
 
     public void setIsItemVisibleInVariablesViewer(boolean isVisible) {
         variablesViewerUpdateListener.setItemVisible(isVisible);
     }
 
-    private class AddVariablesViewerListenerJob extends UIJob {
+    private void registerViewerUpdateListener() {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        workbench.getDisplay().syncExec(new Runnable() {
 
-        public AddVariablesViewerListenerJob() {
-            super("Add Variables Viewer Listener");
-            setSystem(true);
-            setPriority(Job.INTERACTIVE);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-         */
-        @SuppressWarnings("restriction")
-        @Override
-        public IStatus runInUIThread(IProgressMonitor monitor) {
-            IViewPart viewPart = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .findView("org.eclipse.debug.ui.VariableView");
-            if (viewPart != null && viewPart instanceof VariablesView) {
-                VariablesView variablesView = (VariablesView) viewPart;
-                final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
-                if (variablesTreeModelViewer != null) {
-                    variablesViewerUpdateListener.setTree(variablesTreeModelViewer.getTree());
-                    variablesTreeModelViewer.addViewerUpdateListener(variablesViewerUpdateListener);
-                    hasVariablesViewerListener = true;
+            @Override
+            public void run() {
+                IViewPart viewPart = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .findView("org.eclipse.debug.ui.VariableView");
+                if (viewPart != null && viewPart instanceof VariablesView) {
+                    VariablesView variablesView = (VariablesView) viewPart;
+                    final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
+                    if (variablesTreeModelViewer != null) {
+                        variablesViewerUpdateListener.setTree(variablesTreeModelViewer.getTree());
+                        variablesTreeModelViewer.addViewerUpdateListener(variablesViewerUpdateListener);
+                        hasVariablesViewerListener = true;
+                    }
                 }
             }
-            return Status.OK_STATUS;
-        }
+        });
     }
 
-    private class RemoveVariablesViewerListenerJob extends UIJob {
+    private void unregisterViewerUpdateListener() {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        workbench.getDisplay().syncExec(new Runnable() {
 
-        public RemoveVariablesViewerListenerJob() {
-            super("Remove Variables Viewer Listener");
-            setSystem(true);
-            setPriority(Job.INTERACTIVE);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-         */
-        @SuppressWarnings("restriction")
-        @Override
-        public IStatus runInUIThread(IProgressMonitor monitor) {
-            IViewPart viewPart = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .findView("org.eclipse.debug.ui.VariableView");
-            if (viewPart != null && viewPart instanceof VariablesView) {
-                VariablesView variablesView = (VariablesView) viewPart;
-                final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
-                if (variablesTreeModelViewer != null) {
-                    variablesTreeModelViewer.removeViewerUpdateListener(variablesViewerUpdateListener);
+            @Override
+            public void run() {
+                IViewPart viewPart = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .findView("org.eclipse.debug.ui.VariableView");
+                if (viewPart != null && viewPart instanceof VariablesView) {
+                    VariablesView variablesView = (VariablesView) viewPart;
+                    final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
+                    if (variablesTreeModelViewer != null) {
+                        variablesTreeModelViewer.removeViewerUpdateListener(variablesViewerUpdateListener);
+                    }
                 }
             }
-            return Status.OK_STATUS;
-        }
+        });
     }
 
     @SuppressWarnings("restriction")
@@ -328,6 +365,7 @@ public class RobotVariablesManager {
                 int itemCount = tree.getItemCount();
                 if (itemCount > 0) {
                     try {
+                        tree.deselectAll();
                         TreeItem item = tree.getItem(itemCount - 1);
                         tree.showItem(item);
                     } catch (IllegalArgumentException e) {
@@ -354,6 +392,5 @@ public class RobotVariablesManager {
         public void setTree(Tree tree) {
             this.tree = tree;
         }
-
     }
 }

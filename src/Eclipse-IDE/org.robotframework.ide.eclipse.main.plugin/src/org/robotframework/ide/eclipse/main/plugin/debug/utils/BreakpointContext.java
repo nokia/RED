@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.debug;
+package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 /**
  * @author mmarzec

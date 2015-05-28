@@ -29,6 +29,9 @@ import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.BreakpointContext;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordFinder;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -291,7 +294,7 @@ public class RobotDebugEventDispatcher extends Job {
                     case "paused":
                         target.suspended(DebugEvent.CLIENT_REQUEST);
                         target.getRobotVariablesManager().setIsItemVisibleInVariablesViewer(false);
-                        target.getRobotVariablesManager().startAddVariablesViewerListenerJob();
+                        target.getRobotVariablesManager().addVariablesViewerListener();
                         break;
                     case "end_keyword":
                         List<Object> endList = (List<Object>) eventMap.get("end_keyword");
@@ -310,7 +313,7 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "close":
                         robotEventBroker.sendClearAllEventToTextEditor();
-                        target.getRobotVariablesManager().startRemoveVariablesViewerListenerJob();
+                        target.getRobotVariablesManager().removeVariablesViewerListener();
                         target.terminated();
                         break;
                     case "log_message":
@@ -319,6 +322,8 @@ public class RobotDebugEventDispatcher extends Job {
                         String line = messageElements.get("timestamp") + " : " + messageElements.get("level") + " : "
                                 + messageElements.get("message") + '\n';
                         robotEventBroker.sendAppendLineEventToMessageLogView(line);
+                        break;
+                    case "error":
                         break;
                     default:
                         break;
