@@ -30,27 +30,36 @@ public class NamedElementsStore {
     public static final char ELEMENT_INDEX_POSITION_END_MARKER = ']';
     public static final int END_OF_FILE = -1;
 
+    private static volatile Map<Character, RobotTokenType> SPECIAL_ROBOT_SINGLE_CHAR = new HashMap<>();
+    static {
+        SPECIAL_ROBOT_SINGLE_CHAR.put(ASTERISK_CHAR,
+                RobotTokenType.TABLE_ASTERISK);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(ESCAPE_CHAR,
+                RobotTokenType.ESCAPE_ANY_CHAR);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(DOT_CAN_BE_CONTINOUE, RobotTokenType.DOT);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(SCALAR_VARIABLE_BEGIN,
+                RobotTokenType.SCALAR_VARIABLE_BEGIN);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(LIST_VARIABLE_BEGIN,
+                RobotTokenType.LIST_VARIABLE_BEGIN);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(ENVIRONMENT_VARIABLE_BEGIN,
+                RobotTokenType.ENVIRONMENT_VARIABLE_BEGIN);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(COMMON_VARIABLE_BEGIN,
+                RobotTokenType.VARIABLE_BEGIN);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(COMMON_VARIABLE_END,
+                RobotTokenType.VARIABLE_END);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(COMMENT_BEGIN,
+                RobotTokenType.COMMENT_BEGIN);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(EQUALS, RobotTokenType.EQUALS);
+        SPECIAL_ROBOT_SINGLE_CHAR.put(QUOTES, RobotTokenType.QUOTES);
+    }
+    public volatile static Map<Character, RobotTokenType> SPECIAL_ROBOT_SINGLE_CHAR_STORE = Collections
+            .unmodifiableMap(SPECIAL_ROBOT_SINGLE_CHAR);
+
     private static volatile Map<Character, RobotTokenType> SPECIAL_ROBOT_TOKENS = new HashMap<>();
     static {
         SPECIAL_ROBOT_TOKENS.put(PIPE, RobotTokenType.PIPE);
         SPECIAL_ROBOT_TOKENS.put(SPACE, RobotTokenType.SPACE);
         SPECIAL_ROBOT_TOKENS.put(TABULATOR, RobotTokenType.TABULATOR);
-        SPECIAL_ROBOT_TOKENS.put(ASTERISK_CHAR, RobotTokenType.TABLE_ASTERISK);
-        SPECIAL_ROBOT_TOKENS.put(ESCAPE_CHAR, RobotTokenType.ESCAPE_ANY_CHAR);
-        SPECIAL_ROBOT_TOKENS.put(DOT_CAN_BE_CONTINOUE, RobotTokenType.DOT);
-        SPECIAL_ROBOT_TOKENS.put(QUOTES, RobotTokenType.QUOTES);
-        SPECIAL_ROBOT_TOKENS.put(EQUALS, RobotTokenType.EQUALS);
-        SPECIAL_ROBOT_TOKENS.put(SCALAR_VARIABLE_BEGIN,
-                RobotTokenType.SCALAR_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(LIST_VARIABLE_BEGIN,
-                RobotTokenType.LIST_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(ENVIRONMENT_VARIABLE_BEGIN,
-                RobotTokenType.ENVIRONMENT_VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(COMMON_VARIABLE_BEGIN,
-                RobotTokenType.VARIABLE_BEGIN);
-        SPECIAL_ROBOT_TOKENS.put(COMMON_VARIABLE_END,
-                RobotTokenType.VARIABLE_END);
-        SPECIAL_ROBOT_TOKENS.put(COMMENT_BEGIN, RobotTokenType.COMMENT_BEGIN);
         SPECIAL_ROBOT_TOKENS.put(COLON_FOR_BEGIN, RobotTokenType.COLON);
         SPECIAL_ROBOT_TOKENS.put(ELEMENT_INDEX_POSITION_BEGIN_MARKER,
                 RobotTokenType.INDEX_BEGIN);
