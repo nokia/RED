@@ -11,26 +11,20 @@ public abstract class AContextMatcher implements
         Callable<List<RobotTokenContext>> {
 
     protected final TokenizatorOutput tokenProvider;
-    private int lineNumber;
 
 
     public AContextMatcher(final TokenizatorOutput tokenProvider) {
         this.tokenProvider = tokenProvider;
-        this.lineNumber = -1;
     }
 
 
-    public void setLineToMatch(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-
-    protected abstract List<RobotTokenContext> findContexts(int lineNumber);
+    protected abstract List<RobotTokenContext> findContexts(
+            final TokenizatorOutput tokenProvider);
 
 
     @Override
     public List<RobotTokenContext> call() throws Exception {
-        List<RobotTokenContext> placesOfContext = findContexts(lineNumber);
+        List<RobotTokenContext> placesOfContext = findContexts(tokenProvider);
 
         if (placesOfContext == null) {
             placesOfContext = new LinkedList<>();
