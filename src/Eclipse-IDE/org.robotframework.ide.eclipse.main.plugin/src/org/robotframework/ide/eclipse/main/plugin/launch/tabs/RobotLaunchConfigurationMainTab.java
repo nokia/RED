@@ -123,6 +123,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
+        setWarningMessage(null);
         try {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
@@ -131,12 +132,20 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 setErrorMessage("Invalid project specified");
                 return false;
             }
-
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-
             if (!project.exists()) {
                 setErrorMessage("Project '" + projectName + "' does not exist in workspace");
                 return false;
+            }
+
+            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final SuiteExecutor selectedExecutor = SuiteExecutor.fromName(comboExecutorName.getText());
+            final SuiteExecutor projectInterpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+            if (selectedExecutor != projectInterpreter) {
+                setWarningMessage("The selected '" + comboExecutorName.getText() + "' interpreter is different "
+                        + "than the interpreter used by '" + projectName + "' (" + projectInterpreter + "). The test "
+                        + "will  be launched using " + comboExecutorName.getText()
+                        + " interpreter as defined in PATH environment variable");
             }
             final List<String> suitePaths = robotConfig.getSuitePaths();
 
