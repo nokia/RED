@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.debug;
+package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

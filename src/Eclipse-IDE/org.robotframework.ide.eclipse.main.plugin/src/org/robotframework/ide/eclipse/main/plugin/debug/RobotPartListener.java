@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.BreakpointContext;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 

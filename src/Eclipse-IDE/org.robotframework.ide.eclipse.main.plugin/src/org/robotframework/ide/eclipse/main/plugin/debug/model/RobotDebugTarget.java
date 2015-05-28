@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,11 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.robotframework.ide.eclipse.main.plugin.debug.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotVariablesManager;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -76,7 +78,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private RobotEventBroker robotEventBroker;
     
-    private RobotVariablesManager robotVariablesManager;
+    private RobotDebugVariablesManager robotVariablesManager;
+    
+    private RobotDebugValueManager robotDebugValueManager;
 
     public RobotDebugTarget(ILaunch launch, IProcess process, int port, IFile executedFile,
             RobotPartListener partListener, RobotEventBroker robotEventBroker) throws CoreException {
@@ -87,7 +91,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         this.partListener = partListener;
         this.robotEventBroker = robotEventBroker;
         currentFrames = new LinkedHashMap<>();
-        robotVariablesManager = new RobotVariablesManager(this);
+        robotVariablesManager = new RobotDebugVariablesManager(this);
+        robotDebugValueManager = new RobotDebugValueManager();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -413,13 +418,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         if (stackFrames == null) {
             stackFrames = new IStackFrame[currentFrames.size()];
-            int i = 1;
+            int id = 1;
             for (String key : currentFrames.keySet()) {
                 KeywordContext keywordContext = currentFrames.get(key);
 
-                stackFrames[currentFrames.size() - i] = new RobotStackFrame(thread, keywordContext.getFileName(), key,
-                        keywordContext.getLineNumber(), keywordContext.getVariables(), i);
-                i++;
+                stackFrames[currentFrames.size() - id] = new RobotStackFrame(thread, keywordContext.getFileName(), key,
+                        keywordContext.getLineNumber(), keywordContext.getVariables(), id);
+                id++;
             }
         }
 
@@ -463,10 +468,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void sendChangeVariableRequest(String variable, String value) {
 
-        synchronized (eventSocket) {
-            eventWriter.print("{\"" + variable + "\":[\"" + value + "\"]}");
-            eventWriter.flush();
-        }
+        sendEventToAgent("{\"" + variable + "\":[\"" + value + "\"]}");
     }
     
     /**
@@ -477,15 +479,24 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param value
      */
     public void sendChangeCollectionRequest(String variable, List<String> childList, String value) {
+        
         StringBuilder requestJson = new StringBuilder();
         requestJson.append("{\"" + variable + "\":[");
         for (int i = 0; i < childList.size(); i++) {
             requestJson.append("\"" + childList.get(i) + "\",");
         }
         requestJson.append("\"" + value + "\"]}");
-        synchronized (eventSocket) {
-            eventWriter.print(requestJson.toString());
-            eventWriter.flush();
+        sendEventToAgent(requestJson.toString());
+    }
+    
+    public void sendChangeRequest(String expression, String variableName, RobotDebugVariable parent) {
+        
+        if (parent != null) {
+            LinkedList<String> childNameList = new LinkedList<String>();
+            String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
+            sendChangeCollectionRequest(root, childNameList, expression);
+        } else {
+            sendChangeVariableRequest(name, expression);
         }
     }
 
@@ -530,7 +541,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return new KeywordContext();
     }
     
-    public RobotVariablesManager getRobotVariablesManager() {
+    public RobotDebugVariablesManager getRobotVariablesManager() {
         return robotVariablesManager;
     }
+
+    public RobotDebugValueManager getRobotDebugValueManager() {
+        return robotDebugValueManager;
+    }
+
 }
