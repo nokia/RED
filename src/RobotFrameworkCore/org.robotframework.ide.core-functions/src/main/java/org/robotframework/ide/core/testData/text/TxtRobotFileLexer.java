@@ -6,15 +6,10 @@ import static org.robotframework.ide.core.testData.text.NamedElementsStore.LINE_
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.robotframework.ide.core.testData.text.context.SettingsTableHeaderMatcher;
+import java.util.Map;
 
 
 public class TxtRobotFileLexer {
@@ -23,63 +18,8 @@ public class TxtRobotFileLexer {
             throws IOException {
         List<StringBuilder> possibleTokens = separatePossibleTokensFromText(reader);
         TokenizatorOutput out = buildTokens(possibleTokens);
-        try {
-            matchContexts(out);
-        } catch (InterruptedException | ExecutionException e) {
-            out.getProblems().add(e);
-        }
 
         return out;
-    }
-
-
-    public void matchContexts(TokenizatorOutput tokenizatedOutput)
-            throws InterruptedException, ExecutionException {
-        List<AContextMatcher> matchers = new LinkedList<>();
-        matchers.add(new SettingsTableHeaderMatcher(tokenizatedOutput));
-
-        List<Integer> lineNumbersInTokenStream = tokenizatedOutput
-                .getStartLineTokensPosition();
-        for (int lineNumber : lineNumbersInTokenStream) {
-            tokenizatedOutput.getContextsPerLine()
-                    .add(matchForSingleLine(matchers, tokenizatedOutput,
-                            lineNumber));
-        }
-    }
-
-
-    private List<RobotTokenContext> matchForSingleLine(
-            List<AContextMatcher> matchers,
-            TokenizatorOutput tokenizatedOutput, int lineNumber)
-            throws InterruptedException, ExecutionException {
-        List<RobotTokenContext> contextsForThisLine = new LinkedList<>();
-
-        ExecutorService execServ = Executors.newFixedThreadPool(16);
-        ExecutorCompletionService<List<RobotTokenContext>> completeService = new ExecutorCompletionService<>(
-                execServ);
-
-        List<Future<List<RobotTokenContext>>> tasks = new LinkedList<>();
-
-        for (AContextMatcher matcher : matchers) {
-            matcher.setLineToMatch(lineNumber);
-            Future<List<RobotTokenContext>> task = completeService
-                    .submit(matcher);
-            tasks.add(task);
-        }
-
-        try {
-            for (int taskId = 0; taskId < tasks.size(); taskId++) {
-                List<RobotTokenContext> ctxForMatcher = completeService.take()
-                        .get();
-                contextsForThisLine.addAll(ctxForMatcher);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw e;
-        } finally {
-            execServ.shutdownNow();
-        }
-
-        return contextsForThisLine;
     }
 
 
@@ -97,7 +37,7 @@ public class TxtRobotFileLexer {
         int lastStartLineTokenPosition = 0;
         RobotTokenType lineSeparator = RobotTokenType.UNKNOWN;
         for (StringBuilder currentText : possibleTokensSplitted) {
-            RobotToken recognizedToken = match(out.tokens, currentText,
+            RobotToken recognizedToken = match(out, currentText,
                     new LinearPosition(currentLine, currentColumn),
                     lineSeparator);
 
@@ -134,7 +74,8 @@ public class TxtRobotFileLexer {
 
         private List<RobotToken> tokens = new LinkedList<>();
         private List<Integer> linePositionInTokensList = new LinkedList<>();
-        private List<List<RobotTokenContext>> contextsPerLine = new LinkedList<>();
+        private Map<RobotTokenType, List<Integer>> indexesForSpecial = new HashMap<>();
+        private int firstIndexOfSpecialWord = -1;
         private List<Exception> problemCatched = new LinkedList<>();
 
 
@@ -148,13 +89,33 @@ public class TxtRobotFileLexer {
         }
 
 
-        public List<List<RobotTokenContext>> getContextsPerLine() {
-            return contextsPerLine;
+        public List<Exception> getProblems() {
+            return problemCatched;
         }
 
 
-        public List<Exception> getProblems() {
-            return problemCatched;
+        public Map<RobotTokenType, List<Integer>> getIndexesOfSpecial() {
+            return indexesForSpecial;
+        }
+
+
+        public int getFirstIndexOfSpecialWord() {
+            return firstIndexOfSpecialWord;
+        }
+
+
+        public void addNextIndexOfSpecial(RobotToken token) {
+            if (firstIndexOfSpecialWord == -1) {
+                firstIndexOfSpecialWord = tokens.size();
+            }
+            List<Integer> forThisSpecial = indexesForSpecial.get(token
+                    .getType());
+            if (forThisSpecial == null) {
+                forThisSpecial = new LinkedList<>();
+                indexesForSpecial.put(token.getType(), forThisSpecial);
+            }
+
+            forThisSpecial.add(tokens.size());
         }
     }
 
@@ -195,12 +156,11 @@ public class TxtRobotFileLexer {
     }
 
 
-    private RobotToken match(List<RobotToken> tokens,
-            StringBuilder currentText, LinearPosition lp,
-            RobotTokenType lineSeparator) {
-        RobotToken rt = matchSpecialChars(currentText, lp);
+    private RobotToken match(TokenizatorOutput out, StringBuilder currentText,
+            LinearPosition lp, RobotTokenType lineSeparator) {
+        RobotToken rt = matchSpecialChars(out, currentText, lp);
         if (rt.getType() == RobotTokenType.UNKNOWN) {
-            rt = matchSpecialWords(currentText, lp);
+            rt = matchSpecialWords(out, currentText, lp);
         }
 
         if (rt.getType() == RobotTokenType.UNKNOWN) {
@@ -215,16 +175,22 @@ public class TxtRobotFileLexer {
     }
 
 
-    private RobotToken matchSpecialWords(StringBuilder currentText,
-            LinearPosition lp) {
+    private RobotToken matchSpecialWords(TokenizatorOutput out,
+            StringBuilder currentText, LinearPosition lp) {
 
+        boolean isSpecialWord = false;
         String text = currentText.toString().toLowerCase().intern();
         RobotTokenType type = NamedElementsStore.SPECIAL_WORDS_STORE.get(text);
         if (type == null) {
             type = RobotTokenType.UNKNOWN;
+        } else {
+            isSpecialWord = true;
         }
 
         RobotToken rt = buildToken(currentText, lp, type);
+        if (isSpecialWord) {
+            out.addNextIndexOfSpecial(rt);
+        }
 
         return rt;
     }
@@ -243,19 +209,30 @@ public class TxtRobotFileLexer {
     }
 
 
-    private RobotToken matchSpecialChars(StringBuilder currentText,
-            LinearPosition lp) {
+    private RobotToken matchSpecialChars(TokenizatorOutput out,
+            StringBuilder currentText, LinearPosition lp) {
         RobotTokenType type = RobotTokenType.UNKNOWN;
 
+        boolean shouldBeTreatAsSpecial = false;
         if (currentText.length() > 0) {
             char c = currentText.charAt(0);
             type = NamedElementsStore.SPECIAL_ROBOT_TOKENS_STORE.get(c);
             if (type == null) {
-                type = RobotTokenType.UNKNOWN;
+                type = NamedElementsStore.SPECIAL_ROBOT_SINGLE_CHAR_STORE
+                        .get(c);
+                if (type == null) {
+                    type = RobotTokenType.UNKNOWN;
+                } else {
+                    shouldBeTreatAsSpecial = true;
+                }
             }
         }
 
         RobotToken rt = buildToken(currentText, lp, type);
+        if (shouldBeTreatAsSpecial) {
+            out.addNextIndexOfSpecial(rt);
+        }
+
         return rt;
     }
 
@@ -319,24 +296,45 @@ public class TxtRobotFileLexer {
             InputStreamReader reader) throws IOException {
         List<StringBuilder> extractedTokens = new LinkedList<>();
 
-        StringBuilder unfinishedText = new StringBuilder();
-        int readLength = -1;
-        char previousChar = 0;
+        ReadHelpObject readerHelper = new ReadHelpObject();
+        readerHelper.unfinishedText = new StringBuilder();
+        readerHelper.numberOfCharsToRead = -1;
         CharBuffer charBuffer = CharBuffer.allocate(4096);
-        while((readLength = reader.read(charBuffer)) > 0) {
-            for (int i = 0; i < readLength; i++) {
-                char currentChar = charBuffer.get(i);
-                unfinishedText = splitTextFromTokens(extractedTokens,
-                        unfinishedText, currentChar, previousChar);
-                previousChar = currentChar;
-            }
+        readerHelper.charBuffer = charBuffer;
+        while((readerHelper.numberOfCharsToRead = reader.read(charBuffer)) > 0) {
+            readerHelper = read(readerHelper, extractedTokens);
         }
 
-        if (unfinishedText.length() > 0) {
-            extractedTokens.add(unfinishedText);
+        if (readerHelper.unfinishedText.length() > 0) {
+            extractedTokens.add(readerHelper.unfinishedText);
         }
 
         return extractedTokens;
+    }
+
+
+    private ReadHelpObject read(ReadHelpObject readerHelper,
+            List<StringBuilder> extractedTokens) {
+        int readLength = readerHelper.numberOfCharsToRead;
+        CharBuffer charBuffer = readerHelper.charBuffer;
+
+        for (int i = 0; i < readLength; i++) {
+            char currentChar = charBuffer.get(i);
+            readerHelper.unfinishedText = splitTextFromTokens(extractedTokens,
+                    readerHelper.unfinishedText, currentChar,
+                    readerHelper.previousChar);
+            readerHelper.previousChar = currentChar;
+        }
+
+        return readerHelper;
+    }
+
+    private class ReadHelpObject {
+
+        private StringBuilder unfinishedText = new StringBuilder();
+        private char previousChar = 0;
+        private CharBuffer charBuffer = CharBuffer.allocate(0);
+        private int numberOfCharsToRead = 0;
     }
 
 
