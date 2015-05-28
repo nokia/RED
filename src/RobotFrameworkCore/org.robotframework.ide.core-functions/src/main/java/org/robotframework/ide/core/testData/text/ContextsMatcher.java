@@ -25,23 +25,8 @@ public class ContextsMatcher {
 
     public void matchContexts(TokenizatorOutput tokenizatedOutput)
             throws InterruptedException, ExecutionException {
+        List<RobotTokenContext> contexts = new LinkedList<>();
         List<AContextMatcher> matchers = new LinkedList<>();
-
-        List<Integer> lineNumbersInTokenStream = tokenizatedOutput
-                .getStartLineTokensPosition();
-        for (int lineNumber : lineNumbersInTokenStream) {
-            tokenizatedOutput.getContextsPerLine()
-                    .add(matchForSingleLine(matchers, tokenizatedOutput,
-                            lineNumber));
-        }
-    }
-
-
-    private List<RobotTokenContext> matchForSingleLine(
-            List<AContextMatcher> matchers,
-            TokenizatorOutput tokenizatedOutput, int lineNumber)
-            throws InterruptedException, ExecutionException {
-        List<RobotTokenContext> contextsForThisLine = new LinkedList<>();
 
         ExecutorService execServ = Executors
                 .newFixedThreadPool(numberOfThreads);
@@ -51,7 +36,6 @@ public class ContextsMatcher {
         List<Future<List<RobotTokenContext>>> tasks = new LinkedList<>();
 
         for (AContextMatcher matcher : matchers) {
-            matcher.setLineToMatch(lineNumber);
             Future<List<RobotTokenContext>> task = completeService
                     .submit(matcher);
             tasks.add(task);
@@ -61,7 +45,7 @@ public class ContextsMatcher {
             for (int taskId = 0; taskId < tasks.size(); taskId++) {
                 List<RobotTokenContext> ctxForMatcher = completeService.take()
                         .get();
-                contextsForThisLine.addAll(ctxForMatcher);
+                contexts.addAll(ctxForMatcher);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw e;
@@ -69,6 +53,10 @@ public class ContextsMatcher {
             execServ.shutdownNow();
         }
 
-        return contextsForThisLine;
+        // merge contexts per line
+        // temp solution adding it to one
+        List<RobotTokenContext> oneLineTemp = new LinkedList<>();
+        oneLineTemp.addAll(contexts);
+        tokenizatedOutput.getContextsPerLine().add(oneLineTemp);
     }
 }
