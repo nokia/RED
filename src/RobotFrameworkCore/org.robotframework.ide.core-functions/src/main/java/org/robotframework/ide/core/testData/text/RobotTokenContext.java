@@ -6,27 +6,31 @@ import java.util.List;
 
 public class RobotTokenContext {
 
-    private Context ctx;
+    private ContextType ctx = ContextType.UNKNOWN;
+    private List<Integer> tokensId = new LinkedList<>();
 
 
-    public RobotTokenContext(final Context ctx) {
+    public RobotTokenContext(final ContextType ctx) {
         this.ctx = ctx;
     }
 
-    private List<RobotToken> tokensIncluded = new LinkedList<>();
 
-
-    public void addToken(final RobotToken token) {
-        this.tokensIncluded.add(token);
+    public void addToken(final int tokenId) {
+        tokensId.add(tokenId);
     }
 
 
-    public List<RobotToken> getTokens() {
-        return tokensIncluded;
+    public List<Integer> getTokensId() {
+        return tokensId;
     }
 
 
-    public Context getContext() {
+    public ContextType getContext() {
         return ctx;
+    }
+
+
+    public void changeContext(final ContextType ctx) {
+        this.ctx = ctx;
     }
 }
