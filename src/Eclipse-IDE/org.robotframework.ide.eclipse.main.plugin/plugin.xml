@@ -205,23 +205,6 @@
     </launchConfigurationType>
  </extension>
  <extension
-       point="org.eclipse.debug.core.launchModes">
-    <launchMode
-          label="Run"
-          mode="org.robotframework.ide.robotRunLaunch">
-    </launchMode>
- </extension>
- <extension
-       point="org.eclipse.debug.ui.launchGroups">
-    <launchGroup
-          bannerImage="resources/robot.png"
-          id="org.robotframework.ide.robotLaunchConfigurationGroup"
-          image="resources/robot.png"
-          label="Robot Framework"
-          mode="org.robotframework.ide.robotRunLaunch">
-    </launchGroup>
- </extension>
- <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
     <launchConfigurationTabGroup
           class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationTabGroup"
@@ -247,6 +230,9 @@
         <contextualLaunch>
             <enablement>
                 <with variable="selection">
+                   <count
+                         value="+">
+                   </count>
                 </with>
             </enablement>
         </contextualLaunch>
