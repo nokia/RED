@@ -21,7 +21,7 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
         final IScopeContext scope = DefaultScope.INSTANCE;
         final IEclipsePreferences preferences = scope.getNode(RobotFramework.PLUGIN_ID);
 
-        final List<PythonInstallationDirectory> pybotPaths = RobotRuntimeEnvironment.whereIsDefaultPython();
+        final List<PythonInstallationDirectory> pybotPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
         if (!pybotPaths.isEmpty()) {
             final String activePath = pybotPaths.get(0).getAbsolutePath();
             final String allPaths = Joiner.on(';').join(

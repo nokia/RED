@@ -200,6 +200,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
     }
 
+    protected final RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotLaunchConfiguration robotConfig)
+            throws CoreException {
+        return getRobotRuntimeEnvironment(getProject(robotConfig));
+    }
+
     private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final IProject project) throws CoreException {
         final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();

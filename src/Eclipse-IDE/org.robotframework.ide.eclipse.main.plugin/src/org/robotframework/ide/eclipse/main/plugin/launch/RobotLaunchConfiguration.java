@@ -14,6 +14,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -45,7 +47,7 @@ public class RobotLaunchConfiguration {
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setExecutor(SuiteExecutor.PYTHON);
+        robotConfig.setExecutor(SuiteExecutor.Python);
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName("");
         robotConfig.setSuitePaths(new ArrayList<String>());
@@ -53,9 +55,13 @@ public class RobotLaunchConfiguration {
 
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setExecutor(SuiteExecutor.PYTHON);
+        final IProject project = resources.get(0).getProject();
+        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+
+        robotConfig.setExecutor(interpreter);
         robotConfig.setExecutorArguments("");
-        robotConfig.setProjectName(resources.get(0).getProject().getName());
+        robotConfig.setProjectName(project.getName());
         robotConfig.setSuitePaths(newArrayList(Lists.transform(resources, new Function<IResource, String>() {
             @Override
             public String apply(final IResource resource) {
@@ -76,7 +82,7 @@ public class RobotLaunchConfiguration {
     public void setExecutor(final SuiteExecutor executor) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
-            launchCopy.setAttribute(EXECUTOR_NAME, executor.getName());
+            launchCopy.setAttribute(EXECUTOR_NAME, executor.name());
         }
     }
 
@@ -102,7 +108,7 @@ public class RobotLaunchConfiguration {
     }
 
     public SuiteExecutor getExecutor() throws CoreException {
-        return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.PYTHON.getName()));
+        return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
     }
 
     public String getExecutorArguments() throws CoreException {

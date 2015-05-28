@@ -10,6 +10,12 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,7 +42,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -55,12 +63,15 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
 
+    private ProgressBar progressBar;
     private CheckboxTableViewer viewer;
     private List<RobotRuntimeEnvironment> installations;
     private Button removeButton;
     private Button installButton;
 
     private boolean dirty = false;
+
+    private Button addButton;
 
     public InstalledRobotsPreferencesPage() {
         super("Installed Robot Frameworks");
@@ -82,23 +93,34 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         GridLayoutFactory.fillDefaults().applyTo(parent);
 
         createDescription(parent);
-        final Composite tableParent = createParentForTable(parent);
 
+        final Composite tableParent = createParentForTable(parent);
         createViewer(tableParent);
-        createButton(tableParent, "Add...", createAddListener());
+
+        addButton = createButton(tableParent, "Add...", createAddListener());
+        addButton.setEnabled(false);
         removeButton = createButton(tableParent, "Remove", createRemoveListener());
         removeButton.setEnabled(false);
         installButton = createButton(tableParent, "Install Robot", createInstallListener());
         installButton.setEnabled(false);
         createSpacer(tableParent);
 
+        progressBar = createProgress(parent);
+
         initializeValues();
         return parent;
     }
 
+    private ProgressBar createProgress(final Composite tableParent) {
+        final ProgressBar pb = new ProgressBar(tableParent, SWT.SMOOTH | SWT.INDETERMINATE);
+        pb.setToolTipText("Looking for Python interpreters");
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(pb);
+        return pb;
+    }
+
     private void createDescription(final Composite parent) {
         final Label lbl = new Label(parent, SWT.WRAP);
-        lbl.setText("Add or remove Robot frameworks environments (location of Python with Robot library "
+        lbl.setText("Add or remove Robot frameworks environments (location of Python interpreter with Robot library "
                 + "installed). The check-selected environment will be used by project unless it is explicitely "
                 + "overridden in project properties.");
         GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(lbl);
@@ -176,15 +198,44 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
     }
 
     private void initializeValues() {
-        final IPreferenceStore store = getPreferenceStore();
-        installations = InstalledRobotEnvironments.readFromPreferences(store);
-
-        viewer.setInput(installations);
-        final RobotRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(store);
-        if (active != null) {
-            viewer.setChecked(active, true);
-            viewer.refresh();
-        }
+        final QualifiedName key = new QualifiedName(RobotFramework.PLUGIN_ID, "result");
+        final Job job = new Job("Looking for python installations") {
+            @Override
+            protected IStatus run(final IProgressMonitor monitor) {
+                final IPreferenceStore store = getPreferenceStore();
+                installations = InstalledRobotEnvironments.readFromPreferences(store);
+                final RobotRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(store);
+                setProperty(key, active);
+                return Status.OK_STATUS;
+            }
+        };
+        job.schedule();
+        job.addJobChangeListener(new JobChangeAdapter() {
+            @Override
+            public void done(final IJobChangeEvent event) {
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob()
+                                .getProperty(key);
+                        final Control control = InstalledRobotsPreferencesPage.this.getControl();
+                        if (control == null || control.isDisposed()) {
+                            return;
+                        }
+                        viewer.setInput(installations);
+                        if (active != null) {
+                            viewer.setChecked(active, true);
+                            viewer.refresh();
+                        }
+                        addButton.setEnabled(true);
+                        final Composite parent = progressBar.getParent();
+                        progressBar.dispose();
+                        progressBar = null;
+                        parent.layout();
+                    }
+                });
+            }
+        });
     }
 
     private RobotRuntimeEnvironment getSelectedInstalation() {
