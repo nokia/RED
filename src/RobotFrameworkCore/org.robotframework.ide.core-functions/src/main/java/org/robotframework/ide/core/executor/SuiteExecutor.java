@@ -1,59 +1,46 @@
 package org.robotframework.ide.core.executor;
 
 
+
 public enum SuiteExecutor {
 
-    PYTHON {
-        @Override
-        public String getName() {
-            return "pybot";
-        }
-
+    Python {
         @Override
         public String executableName() {
-            return isWindows() ? "python.exe" : "python";
+            return "python" + getExtension();
         }
     },
-    JYTHON {
-        @Override
-        public String getName() {
-            return "jybot";
-        }
-
+    Jython {
         @Override
         public String executableName() {
-            return isWindows() ? "jython.exe" : "jython";
+            return "jython" + getExtension();
         }
     },
-    IRONPYTHON {
-        @Override
-        public String getName() {
-            return "ipybot";
-        }
-
+    IronPython {
         @Override
         public String executableName() {
-            return isWindows() ? "ipy.exe" : "ipy";
+            return "ipy" + getExtension();
+        }
+    },
+    PyPy {
+        @Override
+        public String executableName() {
+            return "pypy" + getExtension();
         }
     };
 
     public static SuiteExecutor fromName(final String name) {
-        if ("pybot".equals(name)) {
-            return PYTHON;
-        } else if ("jybot".equals(name)) {
-            return JYTHON;
-        } else if ("ipybot".equals(name)) {
-            return IRONPYTHON;
-        }
-        throw new IllegalArgumentException("Unrecognized executor: name");
+        return SuiteExecutor.valueOf(name);
+    }
+
+    public abstract String executableName();
+
+    private static String getExtension() {
+        return isWindows() ? ".exe" : "";
     }
 
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
-
-    public abstract String getName();
-
-    public abstract String executableName();
 
 }
