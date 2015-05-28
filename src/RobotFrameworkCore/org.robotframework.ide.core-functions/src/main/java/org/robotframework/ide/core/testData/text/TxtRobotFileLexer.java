@@ -10,22 +10,31 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 
 public class TxtRobotFileLexer {
 
-    private TokenMatcher matcher;
+    private TokenMatcher tokenMatcher;
+    private ContextsMatcher contextMatcher;
 
 
     public TxtRobotFileLexer() {
-        matcher = new TokenMatcher();
+        tokenMatcher = new TokenMatcher();
+        contextMatcher = new ContextsMatcher();
     }
 
 
-    public TokenizatorOutput lexemes(final InputStreamReader reader)
-            throws IOException {
-        List<StringBuilder> possibleTokens = separatePossibleTokensFromText(reader);
-        TokenizatorOutput out = buildTokens(possibleTokens);
+    public TokenizatorOutput performLexicalAnalysis(
+            final InputStreamReader reader) {
+        TokenizatorOutput out = new TokenizatorOutput();
+        try {
+            List<StringBuilder> possibleTokens = separatePossibleTokensFromText(reader);
+            out = buildTokens(possibleTokens);
+            contextMatcher.matchContexts(out);
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            out.getProblems().add(e);
+        }
 
         return out;
     }
@@ -45,7 +54,7 @@ public class TxtRobotFileLexer {
         int lastStartLineTokenPosition = 0;
         RobotTokenType lineSeparator = RobotTokenType.UNKNOWN;
         for (StringBuilder currentText : possibleTokensSplitted) {
-            RobotToken recognizedToken = matcher.match(out, currentText,
+            RobotToken recognizedToken = tokenMatcher.match(out, currentText,
                     new LinearPosition(currentLine, currentColumn),
                     lineSeparator);
 
@@ -62,7 +71,7 @@ public class TxtRobotFileLexer {
                 lineSeparator = RobotTokenType.UNKNOWN;
             } else if (lineSeparator == RobotTokenType.UNKNOWN) {
                 out.tokens.add(recognizedToken);
-                lineSeparator = matcher.matchLineSeparator(out.tokens,
+                lineSeparator = tokenMatcher.matchLineSeparator(out.tokens,
                         currentText, new LinearPosition(currentLine,
                                 currentColumn), lastStartLineTokenPosition);
                 currentColumn = recognizedToken.getEndPos().getColumn();
@@ -127,6 +136,10 @@ public class TxtRobotFileLexer {
             forThisSpecial.add(tokens.size());
         }
 
+
+        public List<List<RobotTokenContext>> getContextsPerLine() {
+            return contextsPerLine;
+        }
     }
 
 
