@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.debug;
+package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 import java.util.Map;
 
@@ -8,13 +8,13 @@ import org.eclipse.debug.core.model.IVariable;
  * @author mmarzec
  *
  */
-public class RobotVariablesContext {
+public class RobotDebugVariablesContext {
 
     private Map<String, IVariable> variablesMap;
 
     private int stackTraceId;
 
-    public RobotVariablesContext(int stackTraceId, Map<String, IVariable> variablesMap) {
+    public RobotDebugVariablesContext(int stackTraceId, Map<String, IVariable> variablesMap) {
         this.variablesMap = variablesMap;
         this.stackTraceId = stackTraceId;
     }

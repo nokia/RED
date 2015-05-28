@@ -1,14 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotVariablesManager;
 
 /**
  * @author mmarzec
@@ -17,13 +12,13 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     private String name;
 
-    private RobotDebugValue robotValue;
-
-    private boolean hasValueChanged;
+    private RobotDebugValue debugValue;
 
     private RobotDebugVariable parent;
 
     private boolean isValueModificationEnabled = true;
+
+    private boolean hasValueChanged;
 
     /**
      * position in variables list in RobotVariablesManager
@@ -42,15 +37,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         super(target);
         this.name = name;
         this.parent = parent;
-        if (value instanceof List<?>) {
-            robotValue = new RobotDebugValue(target, (List<Object>) value, this);
-            isValueModificationEnabled = false;
-        } else if (value instanceof Map<?, ?>) {
-            robotValue = new RobotDebugValue(target, (Map<Object, Object>) value, this);
-            isValueModificationEnabled = false;
-        } else {
-            robotValue = new RobotDebugValue(target, value.toString());
-        }
+        debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
     }
 
     public RobotDebugVariable(RobotDebugTarget target, String name, Object value, RobotDebugVariable parent,
@@ -64,7 +51,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @see org.eclipse.debug.core.model.IVariable#getValue()
      */
     public IValue getValue() throws DebugException {
-        return robotValue;
+        return debugValue;
     }
 
     /*
@@ -96,16 +83,10 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @see org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String)
      */
     public void setValue(String expression) throws DebugException {
-        robotValue.setValue(expression);
+        debugValue.setValue(expression);
         hasValueChanged = true;
         fireEvent(new DebugEvent(this, DebugEvent.CHANGE, DebugEvent.CLIENT_REQUEST));
-        if (parent != null) {
-            LinkedList<String> childNameList = new LinkedList<String>();
-            String root = extractVariableRootAndChilds(parent, childNameList);
-            ((RobotDebugTarget) this.getDebugTarget()).sendChangeCollectionRequest(root, childNameList, expression);
-        } else {
-            ((RobotDebugTarget) this.getDebugTarget()).sendChangeVariableRequest(name, expression);
-        }
+        ((RobotDebugTarget) this.getDebugTarget()).sendChangeRequest(expression, name, parent);
     }
 
     /*
@@ -114,7 +95,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.debug.core.model.IValue)
      */
     public void setValue(IValue value) throws DebugException {
-        robotValue.setValue(value.getValueString());
+        debugValue.setValue(value.getValueString());
         hasValueChanged = true;
     }
 
@@ -123,9 +104,6 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @see org.eclipse.debug.core.model.IValueModification#supportsValueModification()
      */
     public boolean supportsValueModification() {
-        if (name.equals(RobotVariablesManager.GLOBAL_VARIABLE_NAME)) {
-            return false;
-        }
         return isValueModificationEnabled;
     }
 
@@ -151,8 +129,8 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         hasValueChanged = valueChanged;
     }
 
-    public void setNewRobotDebugValue(RobotDebugValue value) {
-        this.robotValue = value;
+    public void setRobotDebugValue(RobotDebugValue value) {
+        this.debugValue = value;
     }
 
     public int getPosition() {
@@ -167,31 +145,12 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return parent;
     }
 
-    private String extractVariableRootAndChilds(RobotDebugVariable parent, LinkedList<String> childNameList) {
-        String parentName = "";
-        try {
-            parentName = parent.getName();
-        } catch (DebugException e) {
-            e.printStackTrace();
-        }
-        if (parent.getParent() == null) {
-            childNameList.add(extractChildName(name));
-            return parentName;
-        } else {
-            childNameList.addFirst(extractChildName(parentName));
-            return extractVariableRootAndChilds(parent.getParent(), childNameList);
-        }
-    }
-
-    private String extractChildName(String name) {
-        if(name.indexOf("[") >= 0 && name.indexOf("]") >= 0) {
-            return name.substring(1, name.indexOf("]"));
-        }
-        return name;
-    }
-
     public boolean isValueModificationEnabled() {
         return isValueModificationEnabled;
+    }
+
+    public void setValueModificationEnabled(boolean isValueModificationEnabled) {
+        this.isValueModificationEnabled = isValueModificationEnabled;
     }
 
 }
