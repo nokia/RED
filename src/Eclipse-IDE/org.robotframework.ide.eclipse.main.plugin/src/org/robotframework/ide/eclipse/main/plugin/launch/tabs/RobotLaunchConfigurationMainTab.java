@@ -41,7 +41,9 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.viewers.Selections;
 
@@ -81,7 +83,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             });
 
             comboExecutorName.setItems(executorNames.toArray(new String[0]));
-            comboExecutorName.select(executorNames.indexOf(robotConfig.getExecutor().getName()));
+            comboExecutorName.select(executorNames.indexOf(robotConfig.getExecutor().name()));
 
             projectText.setText(projectName);
             argumentsText.setText(robotConfig.getExecutorArguments());
@@ -98,7 +100,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         return newArrayList(Collections2.transform(executors, new Function<SuiteExecutor, String>() {
             @Override
             public String apply(final SuiteExecutor executor) {
-                return executor.getName();
+                return executor.name();
             }
         }));
     }
@@ -259,7 +261,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 dialog.setAllowMultiple(false);
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
                 if (dialog.open() == Window.OK) {
-                    projectText.setText(((IResource) dialog.getFirstResult()).getName());
+                    final IProject project = (IProject) dialog.getFirstResult();
+                    final RobotProject robotProject = RobotFramework.getModelManager().getModel()
+                            .createRobotProject(project);
+                    final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+                    if (interpreter != null) {
+                        final int index = newArrayList(comboExecutorName.getItems()).indexOf(interpreter.name());
+                        comboExecutorName.select(index);
+                    }
+                    projectText.setText(project.getName());
                     updateLaunchConfigurationDialog();
                 }
             }
