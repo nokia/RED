@@ -1,0 +1,41 @@
+package org.robotframework.ide.core.testData.text;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
+
+
+public abstract class AContextMatcher implements
+        Callable<List<RobotTokenContext>> {
+
+    protected final TokenizatorOutput tokenProvider;
+    private int lineNumber;
+
+
+    public AContextMatcher(final TokenizatorOutput tokenProvider) {
+        this.tokenProvider = tokenProvider;
+        this.lineNumber = -1;
+    }
+
+
+    public void setLineToMatch(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+
+    protected abstract List<RobotTokenContext> findContexts(int lineNumber);
+
+
+    @Override
+    public List<RobotTokenContext> call() throws Exception {
+        List<RobotTokenContext> placesOfContext = findContexts(lineNumber);
+
+        if (placesOfContext == null) {
+            placesOfContext = new LinkedList<>();
+        }
+
+        return placesOfContext;
+    }
+}
