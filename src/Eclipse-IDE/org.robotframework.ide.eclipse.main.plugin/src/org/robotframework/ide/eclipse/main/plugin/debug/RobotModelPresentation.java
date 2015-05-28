@@ -9,12 +9,14 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
@@ -78,12 +80,19 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
     public void computeDetail(final IValue value, final IValueDetailListener listener) {
         String detail = "";
         try {
-            detail = value.getValueString();
+            if(value.hasVariables()) {
+                StringBuilder detailBuilder = new StringBuilder();
+                ((RobotDebugTarget) value.getDebugTarget()).getRobotDebugValueManager().extractValueDetail(value.getVariables(), detailBuilder);
+                detail = detailBuilder.toString();
+            } else {
+                detail = value.getValueString();
+            }
         } catch (DebugException e) {
+            e.printStackTrace();
         }
         listener.detailComputed(value, detail);
     }
-
+    
     /*
      * (non-Javadoc)
      * @see org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
