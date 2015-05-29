@@ -6,14 +6,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.ui.IDetailPane;
 import org.eclipse.debug.ui.IDetailPane3;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,11 +36,9 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     private boolean isDirty;
 
-    private boolean isHitCountSelected, isConditionalSelected;
+    private Text hitCountTxt, conditionalTxt;
 
-    private Text txtHitCount, txtConditional;
-
-    private Button btnHitCount, btnConditional;
+    private Button hitCountBtn, conditionalBtn;
 
     private IMarker currentMarker;
 
@@ -70,20 +68,25 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         parent.setBackground(SWTResourceManager.getColor(255, 255, 255));
 
         Composite control = new Composite(parent, SWT.NONE);
-        control.setLayout(new GridLayout(2, false));
-        control.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(control);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(control);
 
-        btnHitCount = new Button(control, SWT.CHECK);
-        btnHitCount.setText("Hit count:");
+        hitCountBtn = new Button(control, SWT.CHECK);
+        hitCountBtn.setText("Hit count:");
 
-        txtHitCount = new Text(control, SWT.BORDER);
-        txtHitCount.setEnabled(false);
+        hitCountTxt = new Text(control, SWT.BORDER);
+        hitCountTxt.setEnabled(false);
+        GridDataFactory.fillDefaults()
+                .align(SWT.BEGINNING, SWT.CENTER)
+                .grab(true, false)
+                .minSize(80, 20)
+                .applyTo(hitCountTxt);
 
-        btnConditional = new Button(control, SWT.CHECK);
-        btnConditional.setText("Conditional");
+        conditionalBtn = new Button(control, SWT.CHECK);
+        conditionalBtn.setText("Conditional");
 
-        txtConditional = new Text(control, SWT.BORDER);
-        txtConditional.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+        conditionalTxt = new Text(control, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(conditionalTxt);
 
         isDirty = false;
 
@@ -98,42 +101,21 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     @Override
     public void display(IStructuredSelection selection) {
         if (selection != null && selection.size() > 0) {
-            btnHitCount.removeSelectionListener(selectionListener);
-            txtHitCount.removeModifyListener(modifyListener);
-            btnConditional.removeSelectionListener(conditionalSelectionListener);
-            txtConditional.removeModifyListener(conditionalModifyListener);
+            removeAllListeners();
 
             Object element = selection.getFirstElement();
             if (element instanceof RobotLineBreakpoint) {
                 IMarker marker = ((RobotLineBreakpoint) element).getMarker();
                 currentMarker = marker;
+
                 int hitCount = marker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                if (hitCount > 1) {
-                    btnHitCount.setSelection(true);
-                    txtHitCount.setEnabled(true);
-                    txtHitCount.setText(Integer.toString(hitCount));
-                } else {
-                    btnHitCount.setSelection(false);
-                    txtHitCount.setEnabled(false);
-                    txtHitCount.setText("");
-                }
+                setupHitCountControls(hitCount);
 
                 String condition = marker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                if (!"".equals(condition)) {
-                    btnConditional.setSelection(true);
-                    txtConditional.setEnabled(true);
-                    txtConditional.setText(condition);
-                } else {
-                    btnConditional.setSelection(false);
-                    txtConditional.setEnabled(false);
-                    txtConditional.setText("");
-                }
+                setupConditionalControls(condition);
             }
 
-            btnHitCount.addSelectionListener(selectionListener);
-            txtHitCount.addModifyListener(modifyListener);
-            btnConditional.addSelectionListener(conditionalSelectionListener);
-            txtConditional.addModifyListener(conditionalModifyListener);
+            addAllListeners();
         }
     }
 
@@ -164,10 +146,9 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
         if (currentMarker != null) {
             try {
-                if (btnHitCount.getSelection() && !"".equals(txtHitCount.getText())) {
-                    String hitCount = txtHitCount.getText();
-                    int count = Integer.parseInt(hitCount);
-                    currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, count);
+                if (hitCountBtn.getSelection() && !"".equals(hitCountTxt.getText())) {
+                    int hitCount = Integer.parseInt(hitCountTxt.getText());
+                    currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, hitCount);
                 } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
                 }
@@ -176,8 +157,8 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
             }
 
             try {
-                if (btnConditional.getSelection() && !"".equals(txtConditional.getText())) {
-                    String condition = txtConditional.getText();
+                if (conditionalBtn.getSelection() && !"".equals(conditionalTxt.getText())) {
+                    String condition = conditionalTxt.getText();
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, condition);
                 } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
@@ -224,16 +205,47 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         }
     }
 
+    private void setupHitCountControls(int hitCount) {
+        boolean isEnabled = hitCount > 1;
+        hitCountBtn.setSelection(isEnabled);
+        hitCountTxt.setEnabled(isEnabled);
+        if (isEnabled) {
+            hitCountTxt.setText(Integer.toString(hitCount));
+        } else {
+            hitCountTxt.setText("");
+        }
+    }
+
+    private void setupConditionalControls(String condition) {
+        boolean isEnabled = !"".equals(condition);
+        conditionalBtn.setSelection(isEnabled);
+        conditionalTxt.setEnabled(isEnabled);
+        if (isEnabled) {
+            conditionalTxt.setText(condition);
+        } else {
+            conditionalTxt.setText("");
+        }
+    }
+
+    private void removeAllListeners() {
+        hitCountBtn.removeSelectionListener(selectionListener);
+        hitCountTxt.removeModifyListener(modifyListener);
+        conditionalBtn.removeSelectionListener(conditionalSelectionListener);
+        conditionalTxt.removeModifyListener(conditionalModifyListener);
+    }
+
+    private void addAllListeners() {
+        hitCountBtn.addSelectionListener(selectionListener);
+        hitCountTxt.addModifyListener(modifyListener);
+        conditionalBtn.addSelectionListener(conditionalSelectionListener);
+        conditionalTxt.addModifyListener(conditionalModifyListener);
+    }
+
     private class HitCountSelectionListener implements SelectionListener {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            if (!isHitCountSelected && btnHitCount.getSelection()) {
-                isHitCountSelected = true;
-            } else if (isHitCountSelected && !btnHitCount.getSelection()) {
-                isHitCountSelected = false;
-            }
-            txtHitCount.setEnabled(isHitCountSelected);
+            hitCountTxt.setEnabled(hitCountBtn.getSelection());
             isDirty = true;
             fireDirty();
         }
@@ -256,12 +268,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            if (!isConditionalSelected && btnConditional.getSelection()) {
-                isConditionalSelected = true;
-            } else if (isConditionalSelected && !btnConditional.getSelection()) {
-                isConditionalSelected = false;
-            }
-            txtConditional.setEnabled(isConditionalSelected);
+            conditionalTxt.setEnabled(conditionalBtn.getSelection());
             isDirty = true;
             fireDirty();
         }
