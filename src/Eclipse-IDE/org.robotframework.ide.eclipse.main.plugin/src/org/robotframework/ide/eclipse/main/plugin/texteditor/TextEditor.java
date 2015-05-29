@@ -236,11 +236,12 @@ public class TextEditor {
             @Override
             public void mouseDoubleClick(final MouseEvent e) {
                 try {
-                    final int line = (e.y / viewer.getTextWidget().getLineHeight() + 1) + viewer.getTopIndex(); 
+                    int line = computeBreakpointLineNumber(e.y);
+                    
                     if (line > viewer.getTextWidget().getLineCount()) {
                         return;
                     }
-
+                    
                     final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
                     
                     for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
@@ -443,4 +444,18 @@ public class TextEditor {
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		return reconciler;
 	}
+	
+	private int computeBreakpointLineNumber(int eventY) {
+        int lineHeight = viewer.getTextWidget().getLineHeight();
+        int line = (int) Math.round((eventY / (double) lineHeight)) + viewer.getTopIndex();
+
+        int lineTopPixel = viewer.getTextWidget().getLinePixel(line);
+        int lineBottomPixel = lineTopPixel - lineHeight;
+        if (eventY < lineBottomPixel) {
+            line--;
+        } else if ((eventY - lineBottomPixel) > lineHeight) {
+            line++;
+        }
+        return line;
+    }
 }

@@ -9,7 +9,6 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
-import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -59,9 +58,18 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
                 return ((IStackFrame) element).getName();
             } else if (element instanceof RobotLineBreakpoint) {
                 IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
-                String file = breakpointMarker.getAttribute(IMarker.LOCATION, "");
-                Integer line = (Integer) breakpointMarker.getAttribute(IMarker.LINE_NUMBER);
-                return file + " [line: " + line + "]";
+                String breakpointName = "";
+                breakpointName += breakpointMarker.getAttribute(IMarker.LOCATION, "");
+                breakpointName += " [line: " + breakpointMarker.getAttribute(IMarker.LINE_NUMBER) + "]";
+                int hitCount = breakpointMarker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                if (hitCount > 1) {
+                    breakpointName += " [hit count: " + hitCount + "]";
+                }
+                String condition = breakpointMarker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                if (!"".equals(condition)) {
+                    breakpointName += " [conditional]";
+                }
+                return breakpointName;
             }
         } catch (CoreException e) {
             e.printStackTrace();
@@ -80,10 +88,9 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
     public void computeDetail(final IValue value, final IValueDetailListener listener) {
         String detail = "";
         try {
-            if(value.hasVariables()) {
-                StringBuilder detailBuilder = new StringBuilder();
-                ((RobotDebugTarget) value.getDebugTarget()).getRobotDebugValueManager().extractValueDetail(value.getVariables(), detailBuilder);
-                detail = detailBuilder.toString();
+            if (value.hasVariables()) {
+                detail = ((RobotDebugTarget) value.getDebugTarget()).getRobotDebugValueManager().extractValueDetail(
+                        value.getVariables());
             } else {
                 detail = value.getValueString();
             }
