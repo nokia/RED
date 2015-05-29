@@ -28,8 +28,68 @@ public class SettingsTableHeaderSearcher extends AContextMatcher {
         // in the end we just building context if we could and we are adding
         // them to the list
         List<Integer> temp = getJoinedSortedWordTokenIds(tokenProvider);
+        for (Integer settingsOrMetadataTokenId : temp) {
+            RobotTokenContext context = new RobotTokenContext(
+                    ContextType.SETTINGS_TABLE_HEADER);
+            int prefixAsterisksId = findNearestPrefixAsterisks(tokenProvider,
+                    settingsOrMetadataTokenId);
+            if (prefixAsterisksId > -1) {
+                context.addToken(prefixAsterisksId);
+            }
+
+            context.addToken(settingsOrMetadataTokenId);
+
+            int suffixAsterisksId = findNearestSuffixAsterisks(tokenProvider,
+                    settingsOrMetadataTokenId);
+            if (suffixAsterisksId > -1) {
+                context.addToken(suffixAsterisksId);
+            }
+
+            contexts.add(context);
+        }
 
         return contexts;
+    }
+
+
+    private int findNearestPrefixAsterisks(TokenizatorOutput tokenProvider,
+            int currentTableWord) {
+        int id = -1;
+
+        List<Integer> positionOfAsterisks = tokenProvider.getIndexesOfSpecial()
+                .get(RobotTokenType.TABLE_ASTERISK);
+        if (positionOfAsterisks != null) {
+            for (int currentAsteriskIndex : positionOfAsterisks) {
+                // check if asterisk is before metadata or settings
+                if (currentAsteriskIndex < currentTableWord) {
+                    // check if current index is greater than previous one
+                    if (id < currentAsteriskIndex) {
+                        id = currentAsteriskIndex;
+                    }
+                }
+            }
+        }
+
+        return id;
+    }
+
+
+    private int findNearestSuffixAsterisks(TokenizatorOutput tokenProvider,
+            int currentTableWord) {
+        int id = -1;
+
+        List<Integer> positionOfAsterisks = tokenProvider.getIndexesOfSpecial()
+                .get(RobotTokenType.TABLE_ASTERISK);
+        if (positionOfAsterisks != null) {
+            for (int currentAsteriskIndex : positionOfAsterisks) {
+                if (currentAsteriskIndex > currentTableWord) {
+                    id = currentAsteriskIndex;
+                    break;
+                }
+            }
+        }
+
+        return id;
     }
 
 
