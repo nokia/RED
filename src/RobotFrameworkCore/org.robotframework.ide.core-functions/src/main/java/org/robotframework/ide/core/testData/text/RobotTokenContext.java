@@ -33,4 +33,11 @@ public class RobotTokenContext {
     public void changeContext(final ContextType ctx) {
         this.ctx = ctx;
     }
+
+
+    @Override
+    public String toString() {
+        return String.format("RobotTokenContext [context=%s, tokensId=%s]",
+                ctx, tokensId);
+    }
 }
