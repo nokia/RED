@@ -58,11 +58,17 @@ public class RobotDebugValueManager {
         return "Dictionary[" + value.size() + "]";
     }
     
-    public void extractValueDetail(IVariable[] variables, StringBuilder detailBuilder) throws DebugException {
+    public String extractValueDetail(IVariable[] variables) throws DebugException {
+        StringBuilder detailBuilder = new StringBuilder();
+        extractNestedVariablesDetails(variables, detailBuilder);
+        return detailBuilder.toString();
+    }
+    
+    public void extractNestedVariablesDetails(IVariable[] variables, StringBuilder detailBuilder) throws DebugException {
         detailBuilder.append("[");
         for (int i = 0; i < variables.length; i++) {
             if(variables[i].getValue().hasVariables()) {
-                extractValueDetail(variables[i].getValue().getVariables(), detailBuilder);
+                extractNestedVariablesDetails(variables[i].getValue().getVariables(), detailBuilder);
             } else {
                 detailBuilder.append(extractValue(variables[i]));
                 if(i < variables.length-1) {
