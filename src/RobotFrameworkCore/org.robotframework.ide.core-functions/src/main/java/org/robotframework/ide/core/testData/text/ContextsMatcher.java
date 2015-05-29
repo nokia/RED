@@ -27,6 +27,7 @@ public class ContextsMatcher {
             throws InterruptedException, ExecutionException {
         List<RobotTokenContext> contexts = new LinkedList<>();
         List<AContextMatcher> matchers = new LinkedList<>();
+        matchers.add(new SettingsTableHeaderSearcher(tokenizatedOutput));
 
         ExecutorService execServ = Executors
                 .newFixedThreadPool(numberOfThreads);
