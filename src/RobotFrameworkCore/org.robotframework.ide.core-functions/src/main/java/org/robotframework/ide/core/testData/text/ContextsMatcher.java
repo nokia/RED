@@ -9,6 +9,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
+import org.robotframework.ide.core.testData.text.contexts.KeywordsTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.SettingsTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.TestCaseTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSearcher;
 
 
 public class ContextsMatcher {
