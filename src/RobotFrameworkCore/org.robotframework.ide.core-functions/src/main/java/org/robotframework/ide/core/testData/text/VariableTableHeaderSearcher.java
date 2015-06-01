@@ -5,9 +5,9 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
-public class SettingsTableHeaderSearcher extends AContextMatcher {
+public class VariableTableHeaderSearcher extends AContextMatcher {
 
-    public SettingsTableHeaderSearcher(TokenizatorOutput tokenProvider) {
+    public VariableTableHeaderSearcher(TokenizatorOutput tokenProvider) {
         super(tokenProvider);
     }
 
@@ -15,8 +15,7 @@ public class SettingsTableHeaderSearcher extends AContextMatcher {
     @Override
     protected List<RobotTokenContext> findContexts(
             TokenizatorOutput tokenProvider) {
-
-        ContextType type = ContextType.SETTINGS_TABLE_HEADER;
+        ContextType type = ContextType.VARIABLES_TABLE_HEADER;
 
         return null;
     }
