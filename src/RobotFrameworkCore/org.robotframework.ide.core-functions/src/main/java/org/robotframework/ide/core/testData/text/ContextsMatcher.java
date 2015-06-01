@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.text;
 
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -53,9 +54,12 @@ public class ContextsMatcher {
             for (int taskId = 0; taskId < tasks.size(); taskId++) {
                 List<RobotTokenContext> ctxForMatcher = completeService.take()
                         .get();
-                contexts.addAll(ctxForMatcher);
+                if (ctxForMatcher != null) {
+                    contexts.addAll(ctxForMatcher);
+                }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException
+                | ConcurrentModificationException e) {
             throw e;
         } finally {
             execServ.shutdownNow();
