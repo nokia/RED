@@ -28,6 +28,9 @@ public class ContextsMatcher {
         List<RobotTokenContext> contexts = new LinkedList<>();
         List<AContextMatcher> matchers = new LinkedList<>();
         matchers.add(new SettingsTableHeaderSearcher(tokenizatedOutput));
+        matchers.add(new VariableTableHeaderSearcher(tokenizatedOutput));
+        matchers.add(new TestCaseTableHeaderSearcher(tokenizatedOutput));
+        matchers.add(new KeywordsTableHeaderSearcher(tokenizatedOutput));
 
         ExecutorService execServ = Executors
                 .newFixedThreadPool(numberOfThreads);
