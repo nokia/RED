@@ -293,7 +293,7 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "paused":
                         target.suspended(DebugEvent.CLIENT_REQUEST);
-                        target.getRobotVariablesManager().setIsItemVisibleInVariablesViewer(false);
+                        target.getRobotVariablesManager().setIsVariablesViewerUpdated(false);
                         target.getRobotVariablesManager().addVariablesViewerListener();
                         break;
                     case "end_keyword":

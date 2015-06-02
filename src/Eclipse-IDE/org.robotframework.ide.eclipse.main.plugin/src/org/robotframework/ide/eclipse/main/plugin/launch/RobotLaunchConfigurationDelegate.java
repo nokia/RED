@@ -197,6 +197,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             if (robotPartListener != null) {
                 unregisterPartListener(robotPartListener);
             }
+            runtimeEnvironment.removeTemporaryDirectory();
         }
     }
 
