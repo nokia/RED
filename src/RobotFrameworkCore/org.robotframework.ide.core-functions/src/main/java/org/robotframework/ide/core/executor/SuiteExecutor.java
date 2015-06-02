@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.executor;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 
 public enum SuiteExecutor {
@@ -31,6 +34,14 @@ public enum SuiteExecutor {
 
     public static SuiteExecutor fromName(final String name) {
         return SuiteExecutor.valueOf(name);
+    }
+
+    public static List<String> allExecutorNames() {
+        final List<String> names = new ArrayList<>();
+        for (final SuiteExecutor executor : EnumSet.allOf(SuiteExecutor.class)) {
+            names.add(executor.name());
+        }
+        return names;
     }
 
     public abstract String executableName();
