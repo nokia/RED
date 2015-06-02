@@ -80,7 +80,6 @@ public class RobotDebugVariablesManager {
         Map<String, IVariable> nonGlobalVariablesMap = new LinkedHashMap<>();
         Map<String, IVariable> currentVariablesMap = new LinkedHashMap<>();
         if (previousVariablesMap == null) {
-            currentVariablesMap.put(GLOBAL_VARIABLE_NAME, createGlobalVariable(createNestedGlobalVariables()));
             int position = 1;
             for (String newVarName : newVariables.keySet()) {
                 if (!globalVariables.containsKey(newVarName)) {
@@ -89,6 +88,9 @@ public class RobotDebugVariablesManager {
                             new RobotDebugVariable(target, newVarName, newVariables.get(newVarName), null, position));
                 }
             }
+            nonGlobalVariablesMap = sortNonGlobalVariablesMap(nonGlobalVariablesMap);
+            currentVariablesMap.putAll(nonGlobalVariablesMap);
+            currentVariablesMap.put(GLOBAL_VARIABLE_NAME, createGlobalVariable(createNestedGlobalVariables()));
         } else {
 
             IVariable[] nestedGlobalVariables = new IVariable[globalVariables.size()];
@@ -108,11 +110,10 @@ public class RobotDebugVariablesManager {
                 }
             }
 
+            nonGlobalVariablesMap = sortNonGlobalVariablesMap(nonGlobalVariablesMap);
+            currentVariablesMap.putAll(nonGlobalVariablesMap);
             currentVariablesMap.put(GLOBAL_VARIABLE_NAME, createGlobalVariable(nestedGlobalVariables));
         }
-
-        nonGlobalVariablesMap = sortNonGlobalVariablesMap(nonGlobalVariablesMap);
-        currentVariablesMap.putAll(nonGlobalVariablesMap);
 
         if (currentVariablesContext != null) {
             currentVariablesContext.setVariablesMap(nonGlobalVariablesMap);
@@ -177,19 +178,19 @@ public class RobotDebugVariablesManager {
             @Override
             public int compare(String key1, String key2) {
                 if (key1.contains(TEST_VARIABLE_PREFIX) && key2.contains(SUITE_VARIABLE_PREFIX)) {
-                    return 1;
+                    return -1;
                 }
                 if (key1.contains(SUITE_VARIABLE_PREFIX) || key1.contains(TEST_VARIABLE_PREFIX)) {
-                    return -1;
+                    return 1;
                 }
                 if (key2.contains(SUITE_VARIABLE_PREFIX) || key2.contains(TEST_VARIABLE_PREFIX)) {
-                    return 1;
-                }
-                if (((RobotDebugVariable) nonGlobalVariablesMap.get(key1)).getPosition() < ((RobotDebugVariable) nonGlobalVariablesMap.get(key2)).getPosition()) {
                     return -1;
                 }
-                if (((RobotDebugVariable) nonGlobalVariablesMap.get(key2)).getPosition() < ((RobotDebugVariable) nonGlobalVariablesMap.get(key1)).getPosition()) {
+                if (((RobotDebugVariable) nonGlobalVariablesMap.get(key1)).getPosition() < ((RobotDebugVariable) nonGlobalVariablesMap.get(key2)).getPosition()) {
                     return 1;
+                }
+                if (((RobotDebugVariable) nonGlobalVariablesMap.get(key2)).getPosition() < ((RobotDebugVariable) nonGlobalVariablesMap.get(key1)).getPosition()) {
+                    return -1;
                 }
 
                 return 0;
@@ -297,8 +298,8 @@ public class RobotDebugVariablesManager {
         unregisterViewerUpdateListener();
     }
 
-    public void setIsItemVisibleInVariablesViewer(boolean isVisible) {
-        variablesViewerUpdateListener.setItemVisible(isVisible);
+    public void setIsVariablesViewerUpdated(boolean isUpdated) {
+        variablesViewerUpdateListener.setViewerUpdated(isUpdated);
     }
 
     private void registerViewerUpdateListener() {
@@ -315,7 +316,7 @@ public class RobotDebugVariablesManager {
                     VariablesView variablesView = (VariablesView) viewPart;
                     final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
                     if (variablesTreeModelViewer != null) {
-                        variablesViewerUpdateListener.setTree(variablesTreeModelViewer.getTree());
+                        variablesViewerUpdateListener.setTreeModelViewer(variablesTreeModelViewer);
                         variablesTreeModelViewer.addViewerUpdateListener(variablesViewerUpdateListener);
                         hasVariablesViewerListener = true;
                     }
@@ -348,9 +349,9 @@ public class RobotDebugVariablesManager {
     @SuppressWarnings("restriction")
     public class VariablesViewerUpdateListener implements IViewerUpdateListener {
 
-        private Tree tree;
+        private TreeModelViewer treeModelViewer;
 
-        private boolean isItemVisible;
+        private boolean isViewerUpdated;
 
         public VariablesViewerUpdateListener() {
         }
@@ -361,17 +362,16 @@ public class RobotDebugVariablesManager {
 
         @Override
         public void viewerUpdatesComplete() {
-            if (!isItemVisible && tree != null) {
-                int itemCount = tree.getItemCount();
+            if (!isViewerUpdated) {
+                int itemCount = treeModelViewer.getTree().getItemCount();
                 if (itemCount > 0) {
                     try {
-                        tree.deselectAll();
-                        TreeItem item = tree.getItem(itemCount - 1);
-                        tree.showItem(item);
+                        treeModelViewer.getTree().deselectAll();
+                        treeModelViewer.collapseAll();
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } finally {
-                        isItemVisible = true;
+                        isViewerUpdated = true;
                     }
                 }
             }
@@ -385,12 +385,12 @@ public class RobotDebugVariablesManager {
         public void updateComplete(IViewerUpdate update) {
         }
 
-        public void setItemVisible(boolean isItemVisible) {
-            this.isItemVisible = isItemVisible;
+        public void setViewerUpdated(boolean isViewerUpdated) {
+            this.isViewerUpdated = isViewerUpdated;
         }
 
-        public void setTree(Tree tree) {
-            this.tree = tree;
+        public void setTreeModelViewer(TreeModelViewer treeModelViewer) {
+            this.treeModelViewer = treeModelViewer;
         }
     }
 }
