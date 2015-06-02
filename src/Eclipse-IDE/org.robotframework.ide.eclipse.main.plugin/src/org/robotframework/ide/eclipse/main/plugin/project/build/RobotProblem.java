@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,50 +15,74 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MissingPytho
 
 public class RobotProblem {
 
+    public static final String CAUSE_ENUM_CLASS = "class";
     public static final String CAUSE_ATTRIBUTE = "cause";
 
-    private final Severity severity;
-    private final Cause cause;
+    private final IProblemCause cause;
     private final String location;
-    private final String message;
+    private Object[] objects;
 
-    public RobotProblem(final Severity severity, final Cause cause, final String message) {
-        this(severity, cause, message, null);
+    private RobotProblem(final IProblemCause cause) {
+        this(cause, null);
     }
 
-    public RobotProblem(final Severity severity, final Cause cause, final String message, final String location) {
-        this.severity = severity;
+    private RobotProblem(final IProblemCause cause, final String location) {
         this.cause = cause;
-        this.message = message;
         this.location = location;
+        this.objects = null;
+    }
+
+    public static RobotProblem causedBy(final IProblemCause cause) {
+        return new RobotProblem(cause);
+    }
+
+    public void fillFormattedMessageWith(final Object... objects) {
+        this.objects = objects;
     }
 
     public void createMarker(final IResource resource) {
         try {
             final IMarker marker = resource.createMarker(IMarker.PROBLEM);
-            marker.setAttribute(IMarker.MESSAGE, message);
-            marker.setAttribute(IMarker.SEVERITY, severity.getLevel());
+            marker.setAttribute(IMarker.MESSAGE, getMessage());
+            marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
             marker.setAttribute(IMarker.LOCATION, location);
+            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
             marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create marker!", e);
         }
     }
 
+    private String getMessage() {
+        return cause.getFormattedProblemDescription(objects == null ? new Object[0] : objects);
+    }
+
     public void createMarker(final IFile resource, final int lineNumber) {
         try {
             final IMarker marker = resource.createMarker(IMarker.PROBLEM);
-            marker.setAttribute(IMarker.MESSAGE, message);
-            marker.setAttribute(IMarker.SEVERITY, severity.getLevel());
+            marker.setAttribute(IMarker.MESSAGE, getMessage());
+            marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
             marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);
-            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
             marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
+            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create marker!", e);
         }
     }
 
     public enum Cause {
+        CONFIG_FILE_PROBLEM {
+            @Override
+            public boolean hasResolution() {
+                return false;
+            }
+
+            @Override
+            public List<? extends IMarkerResolution> createFixer() {
+                return newArrayList();
+            }
+        },
         NO_ACTIVE_INSTALLATION {
 
             @Override
@@ -97,26 +123,5 @@ public class RobotProblem {
         public abstract List<? extends IMarkerResolution> createFixer();
     }
 
-    public enum Severity {
-        ERROR {
-            @Override
-            int getLevel() {
-                return IMarker.SEVERITY_ERROR;
-            }
-        },
-        WARNING {
-            @Override
-            int getLevel() {
-                return IMarker.SEVERITY_WARNING;
-            }
-        },
-        INFO {
-            @Override
-            int getLevel() {
-                return IMarker.SEVERITY_INFO;
-            }
-        };
 
-        abstract int getLevel();
-    }
 }

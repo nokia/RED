@@ -18,6 +18,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.viewers.Selections;
 
@@ -45,16 +46,17 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         try {
             final String libName = spec.getName() + ".py";
             final RobotProject robotProject = spec.getRobotProject();
-            final IFile file = robotProject.getProject().getFolder("libspecs").getFile(libName);
-            if (!file.exists()) {
-                final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-                final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
-                final IPath location = new Path(standardLibraryPath.getAbsolutePath());
-                file.createLink(location, IResource.HIDDEN, null);
-            }
+            final IFile file = LibspecsFolder.get(robotProject.getProject()).getFile(libName);
+
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
+            final IPath location = new Path(standardLibraryPath.getAbsolutePath());
+            file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
 
             IEditorDescriptor desc = IDE.getEditorDescriptor(file);
             if (!desc.isInternal()) {
+                // we don't want to open .py file with interpreter, so if there
+                // is no internal editor, then we will use default text editor
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
                 desc = editorRegistry.findEditor("org.eclipse.ui.DefaultTextEditor");
                 if (desc == null) {
