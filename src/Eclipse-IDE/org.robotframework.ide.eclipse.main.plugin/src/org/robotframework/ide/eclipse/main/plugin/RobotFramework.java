@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -48,7 +49,21 @@ public class RobotFramework extends AbstractUIPlugin {
         return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferenceStore());
     }
 
+    public RobotRuntimeEnvironment getRobotInstallation(final File file) {
+        for (final RobotRuntimeEnvironment env : getAllRuntimeEnvironments()) {
+            if (file.equals(env.getFile())) {
+                return env;
+            }
+        }
+        return null;
+    }
+
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
-        return InstalledRobotEnvironments.readFromPreferences(getPreferenceStore());
+        return InstalledRobotEnvironments.getAllRobotInstallation(getPreferenceStore());
+    }
+
+    public static void log(final int severity, final String message) {
+        getDefault().getLog().log(new Status(severity, PLUGIN_ID, message));
+
     }
 }

@@ -18,12 +18,9 @@ import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 
 public class RobotProjectNature implements IProjectNature {
 
-
     private static String ROBOT_NATURE = RobotFramework.PLUGIN_ID + ".robotNature";
 
     private static String ROBOT_LIBRARIES_BUILDER = RobotFramework.PLUGIN_ID + ".robotLibrariesBuilder";
-
-    public static final String BUILDPATH_FILE = ".robotbuild";
 
     private static String SUITE_INIT_FILE = "__init__.robot";
 
@@ -75,16 +72,15 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        new BuildpathFile(project).write(RobotProjectMetadata.createEmpty());
+        new RobotProjectConfigurationFile(project).write(RobotProjectConfiguration.create());
 	}
 
 	@Override
 	public void deconfigure() throws CoreException {
         removeFromBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        final IProject project1 = project;
-        final IFile initFile = project1.getFile(BUILDPATH_FILE);
-        if (initFile.exists()) {
-            initFile.delete(true, new NullProgressMonitor());
+        final IFile cfgFile = project.getFile(RobotProjectConfigurationFile.FILENAME);
+        if (cfgFile.exists()) {
+            cfgFile.delete(true, null);
         }
 	}
 
