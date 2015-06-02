@@ -77,19 +77,6 @@
             markerType="org.eclipse.core.resources.problemmarker">
       </markerResolutionGenerator>
    </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotProjectPropertyPage"
-            id="org.robotframework.ide.eclipse.main.plugin.project.properties"
-            name="Robot ">
-         <enabledWhen>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </enabledWhen>
-      </page>
-   </extension>
  <extension
        point="org.eclipse.ui.decorators">
     <decorator
@@ -163,6 +150,14 @@
               icon="resources/robot_file.png"
               id="org.robotframework.ide.tableditor"
               name="Robot Table Editor">
+        </editor>
+        <editor
+              class="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor"
+              default="true"
+              filenames="red.xml"
+              icon="resources/config.png"
+              id="org.robotframework.ide.project.editor"
+              name="Robot Project Editor">
         </editor>
         <editor
                 name="Robot Text Editor"
