@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
@@ -121,8 +122,9 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
     private void createDescription(final Composite parent) {
         final Label lbl = new Label(parent, SWT.WRAP);
         lbl.setText("Add or remove Robot frameworks environments (location of Python interpreter with Robot library "
-                + "installed). The check-selected environment will be used by project unless it is explicitely "
-                + "overridden in project properties.");
+                + "installed, currently " + Joiner.on(", ").join(SuiteExecutor.allExecutorNames())
+                + " are supported). The check-selected environment will be used by project unless it is explicitely "
+                + "overridden in project configuration.");
         GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(lbl);
     }
 
@@ -203,7 +205,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 final IPreferenceStore store = getPreferenceStore();
-                installations = InstalledRobotEnvironments.readFromPreferences(store);
+                installations = InstalledRobotEnvironments.getAllRobotInstallation(store);
                 final RobotRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(store);
                 setProperty(key, active);
                 return Status.OK_STATUS;

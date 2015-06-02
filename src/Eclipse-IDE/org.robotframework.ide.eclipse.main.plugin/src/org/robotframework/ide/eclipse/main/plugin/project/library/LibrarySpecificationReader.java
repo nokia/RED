@@ -11,6 +11,10 @@ import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 
 public class LibrarySpecificationReader {
 
+    public static LibrarySpecification readSpecification(final IFile libraryFile) {
+        return readSpecification(null, libraryFile);
+    }
+
     public static LibrarySpecification readSpecification(final RobotProject robotProject, final IFile libraryFile) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(LibrarySpecification.class);
