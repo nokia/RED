@@ -22,8 +22,7 @@ import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.project.BuildpathFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectMetadata;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 
 
 public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
@@ -36,15 +35,11 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
     @Override
     public void run(final IMarker marker) {
         final IProject project = marker.getResource().getProject();
-        final RobotProjectMetadata projectMetadata = new BuildpathFile(project).read();
-
-        if (projectMetadata.getPythonLocation() == null) {
-            updateRobotFramework(getActiveShell(), RobotFramework.getDefault().getActiveRobotInstallation());
-        } else {
-            updateRobotFramework(getActiveShell(), RobotRuntimeEnvironment.create(projectMetadata.getPythonLocation()));
-        }
+        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
         try {
+            updateRobotFramework(getActiveShell(), runtimeEnvironment);
             project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
             project.build(IncrementalProjectBuilder.FULL_BUILD, null);
         } catch (final CoreException e) {
@@ -76,7 +71,7 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
                                 if (!line.startsWith(" ")) {
                                     monitor.subTask(line);
                                 }
-                            }
+                                }
                         };
                         selectedInstalation.installRobotUsingPip(linesHandler, downloadStableVersion);
                     } catch (final RobotEnvironmentException e) {
@@ -84,9 +79,8 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
                                 new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
                                 StatusManager.BLOCK);
                     }
-                }
+                    }
             });
-
         } catch (InvocationTargetException | InterruptedException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
                     StatusManager.SHOW);
