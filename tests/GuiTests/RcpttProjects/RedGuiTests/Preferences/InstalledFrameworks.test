@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/2/15 2:05 PM
+Runtime-Version: 1.5.3.201409120955
+Save-Time: 5/25/15 12:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,27 +68,25 @@ if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{
 	    get-label "Installed frameworks" | get-property caption | equals "Installed frameworks" | verify-true
 			with [get-table] {
 		        get-item ".*" | get-property "columns[0]" 
-		            | equals "Robot Framework.*" | verify-true
-		            //Robot Framework.*
-		            //equals "Robot Framework 2.8.7 (Python 2.7.8 on win32)" 
+		            | equals "Robot Framework 2.8.7 (Python 2.7.8 on win32)" | verify-true
 		        get-item ".*" | get-property "columns[1]" 
 		            | equals "c:\\Python27" | verify-true
 		    }
 		    
 	    }
-	get-window Preferences | get-table | select "Robot Framework.*"
+	get-window Preferences | get-table | select "Robot Framework 2.8.7 \\(Python 2.7.8 on win32\\)"
 }-else {
 	with [get-window Preferences] {        
 	    get-label "Installed frameworks" | get-property caption | equals "Installed frameworks" | verify-true
 			with [get-table] {
 		        get-item ".*" | get-property "columns[0]" 
-		            | equals "Robot Framework.*"  | verify-true
+		            | equals "Robot Framework 2.8.7 \\(Python 2.7.3 on linux2\\)"  | verify-true
 		        get-item ".*" | get-property "columns[1]" 
 		            | equals "/usr/bin" | verify-true
 		    }
 		    
 	    }
-	get-window Preferences | get-table | select "Robot Framework.*" 
+	get-window Preferences | get-table | select "Robot Framework 2.8.7 \\(Python 2.7.3 on linux2\\)" 
 
 
 }
@@ -126,14 +124,14 @@ with [get-window "New Robot project"] {
 //check if has label
 if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{ 
 	with [get-view "Project Explorer" | get-tree] {
-	    get-item "To_remove/Robot Standard libraries \\[Robot Framework.*" 
-	        | get-property caption | equals "Robot Standard libraries \\[Robot Framework.*" 
+	    get-item "To_remove/Robot Standard libraries \\[Robot Framework 2.8.7 \\(Python 2.7.8 on win32\\)\\]" 
+	        | get-property caption | equals "Robot Standard libraries [Robot Framework 2.8.7 (Python 2.7.8 on win32)]" 
 	        | verify-true
 	}
 }-else{
 	 get-view "Project Explorer" | get-tree 
-    | get-item "To_remove/Robot Standard libraries \\[Robot Framework.*" 
-    | get-property caption | equals "Robot Standard libraries [Robot Framework.*" 
+    | get-item "To_remove/Robot Standard libraries \\[Robot Framework 2.8.7 \\(Python 2.7.3 on linux2\\)\\]" 
+    | get-property caption | equals "Robot Standard libraries [Robot Framework 2.8.7 (Python 2.7.3 on linux2)]" 
     | verify-true
 	
 }
