@@ -205,21 +205,28 @@ public class RobotRuntimeEnvironment {
             return temporaryDirectory;
         }
         temporaryDirectory = Files.createTempDirectory("RobotTempDir");
+        addRemoveTemporaryDirectoryHook();
         return temporaryDirectory;
     }
     
-    public void removeTemporaryDirectory() {
-        if (temporaryDirectory != null) {
-            File[] files = new File(temporaryDirectory.toString()).listFiles();
-            try {
-                for (int i = 0; i < files.length; i++) {
-                    Files.delete(files[i].toPath());
+    private static void addRemoveTemporaryDirectoryHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            public void run() {
+
+                if (temporaryDirectory != null) {
+                    File[] files = new File(temporaryDirectory.toString()).listFiles();
+                    try {
+                        for (int i = 0; i < files.length; i++) {
+                            Files.delete(files[i].toPath());
+                        }
+                        Files.delete(temporaryDirectory);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                Files.delete(temporaryDirectory);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        }
+        });
     }
 
     private RobotRuntimeEnvironment(final File location, final String version) {
@@ -354,8 +361,6 @@ public class RobotRuntimeEnvironment {
                 return stdLibs;
             } catch (final IOException e) {
                 return new ArrayList<>();
-            } finally {
-                removeTemporaryDirectory();
             }
         } else {
             return new ArrayList<>();

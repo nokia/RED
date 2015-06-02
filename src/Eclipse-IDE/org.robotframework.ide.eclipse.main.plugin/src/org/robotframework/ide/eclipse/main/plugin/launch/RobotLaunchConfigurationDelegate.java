@@ -35,6 +35,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
@@ -179,6 +180,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         RobotPartListener robotPartListener = null;
         if (isDebugging) {
+            showDebugPerspective();
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
 
@@ -197,7 +199,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             if (robotPartListener != null) {
                 unregisterPartListener(robotPartListener);
             }
-            runtimeEnvironment.removeTemporaryDirectory();
         }
     }
 
@@ -303,6 +304,20 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             @Override
             public void run() {
                 workbench.getActiveWorkbenchWindow().getActivePage().removePartListener(listener);
+            }
+        });
+    }
+    
+    private static void showDebugPerspective() {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        workbench.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    workbench.showPerspective("org.eclipse.debug.ui.DebugPerspective", workbench.getActiveWorkbenchWindow());
+                } catch (WorkbenchException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
