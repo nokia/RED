@@ -218,13 +218,9 @@ public class RobotDebugEventDispatcher extends Job {
                             isStopping = false;
                         }
 
-                        target.getPartListener().setBreakpointContext(currentBreakpointContext);
-
-                        String fileName = currentSuite;
-                        if (!currentResourceFiles.isEmpty()) {
-                            fileName = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
-                        }
-                        target.getCurrentFrames().put(currentKeyword, new KeywordContext(null, fileName, keywordLine));
+                        KeywordContext keywordContext = new KeywordContext(null, executedSuite, keywordLine);
+                        target.getPartListener().setKeywordContext(keywordContext);
+                        target.getCurrentFrames().put(currentKeyword, keywordContext);
 
                         // first keyword with resource name is in old file, so until second keyword
                         // there is a need to switch between files

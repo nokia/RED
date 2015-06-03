@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.BreakpointContext;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
@@ -12,8 +13,8 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 public class RobotPartListener implements IPartListener {
 
     private RobotEventBroker robotEventBroker;
-
-    private BreakpointContext breakpointContext;
+    
+    private KeywordContext keywordContext;
 
     public RobotPartListener(RobotEventBroker robotEventBroker) {
         this.robotEventBroker = robotEventBroker;
@@ -26,8 +27,8 @@ public class RobotPartListener implements IPartListener {
             if (texteditor != null) {
                 String editorInputName = texteditor.getEditorInput().getName();
 
-                String fileName = breakpointContext.getFile();
-                int line = breakpointContext.getLine();
+                String fileName = keywordContext.getFileName();
+                int line = keywordContext.getLineNumber();
                 if (editorInputName.equals(fileName)) {
                     robotEventBroker.sendHighlightLineEventToTextEditor(fileName, line);
                 }
@@ -51,8 +52,8 @@ public class RobotPartListener implements IPartListener {
     public void partActivated(IWorkbenchPart part) {
     }
 
-    public void setBreakpointContext(BreakpointContext context) {
-        this.breakpointContext = context;
+    public void setKeywordContext(KeywordContext keywordContext) {
+        this.keywordContext = keywordContext;
     }
 
 }
