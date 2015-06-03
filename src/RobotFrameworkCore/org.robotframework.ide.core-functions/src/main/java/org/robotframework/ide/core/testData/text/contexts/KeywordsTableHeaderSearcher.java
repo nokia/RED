@@ -1,8 +1,10 @@
 package org.robotframework.ide.core.testData.text.contexts;
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.robotframework.ide.core.testData.text.AContextMatcher;
 import org.robotframework.ide.core.testData.text.ContextType;
@@ -20,7 +22,9 @@ public class KeywordsTableHeaderSearcher extends AContextMatcher {
 
     @Override
     protected List<RobotTokenContext> findContexts(
-            TokenizatorOutput tokenProvider) {
+            TokenizatorOutput tokenProvider)
+            throws ConcurrentModificationException, InterruptedException,
+            ExecutionException {
         ContextType type = ContextType.KEYWORDS_TABLE_HEADER;
         List<List<RobotTokenType>> combinationsExpected = new LinkedList<>();
         combinationsExpected.add(Arrays
