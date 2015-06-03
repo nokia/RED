@@ -255,7 +255,10 @@ class TestRunnerAgent:
                 condition = json_decoder(data)
                 list = condition['keywordCondition']
                 keywordName = list[0]
-                argList = list[1]
+                if len(list) == 1:
+                    argList = []
+                else:
+                    argList = list[1]
                 from robot.libraries.BuiltIn import BuiltIn
                 result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
                 self._send_socket('condition_result', result)
