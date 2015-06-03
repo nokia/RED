@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerControlConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -39,6 +38,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
@@ -85,18 +85,17 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     @Override
     public final void initialize(final IManagedForm managedForm) {
         super.initialize(managedForm);
-        final SashForm sash = (SashForm) managedForm.getForm().getBody().getChildren()[0];
-        final Composite leftPanel = (Composite) sash.getChildren()[0];
-        createContent(leftPanel);
+        createContent(managedForm.getForm().getBody());
     }
 
     private void createContent(final Composite parent) {
         final FormToolkit toolkit = getManagedForm().getToolkit();
-        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
-                | Section.DESCRIPTION);
+        final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE
+                | ExpandableComposite.TITLE_BAR);
+        section.setExpanded(true);
         section.setText("General");
         section.setDescription("Provide test suite documentation and general settings");
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).indent(0, 10).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
         
         final Composite panel = createPanel(section);
         createDocumentationControl(panel);
