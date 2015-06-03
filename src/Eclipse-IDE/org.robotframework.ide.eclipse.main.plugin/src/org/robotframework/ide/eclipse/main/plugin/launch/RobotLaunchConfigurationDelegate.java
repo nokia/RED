@@ -180,7 +180,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         RobotPartListener robotPartListener = null;
         if (isDebugging) {
-            showDebugPerspective();
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
 
@@ -304,20 +303,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             @Override
             public void run() {
                 workbench.getActiveWorkbenchWindow().getActivePage().removePartListener(listener);
-            }
-        });
-    }
-    
-    private static void showDebugPerspective() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    workbench.showPerspective("org.eclipse.debug.ui.DebugPerspective", workbench.getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    e.printStackTrace();
-                }
             }
         });
     }
