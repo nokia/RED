@@ -22,7 +22,7 @@ public abstract class AContextMatcher implements
 
 
     protected abstract List<RobotTokenContext> findContexts(
-            final TokenizatorOutput tokenProvider);
+            final TokenizatorOutput tokenProvider) throws Exception;
 
 
     @Override
