@@ -2,8 +2,6 @@ package org.robotframework.ide.core.testData.text;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +41,10 @@ public abstract class AContextMatcher implements
             TokenizatorOutput tokenProvider, ContextType contextType,
             List<List<RobotTokenType>> combinationOfWordsToGet) {
         List<RobotTokenContext> contexts = new LinkedList<>();
-        List<List<Integer>> matchedNameCombinations = getJoinedSortedWordTokensId(
+        List<List<Integer>> possibleCombinations = prepareListOfCombinations(
                 tokenProvider, combinationOfWordsToGet);
-        for (List<Integer> currentCombinations : matchedNameCombinations) {
+
+        for (List<Integer> currentCombinations : possibleCombinations) {
             if (currentCombinations != null && !currentCombinations.isEmpty()) {
                 RobotTokenContext context = new RobotTokenContext(contextType);
                 int firstTokenId = currentCombinations.get(0);
@@ -73,111 +72,6 @@ public abstract class AContextMatcher implements
         }
 
         return contexts;
-    }
-
-
-    protected List<List<Integer>> getJoinedSortedWordTokensId(
-            TokenizatorOutput tokenProvider,
-            List<List<RobotTokenType>> combinationOfWordsToGet) {
-        List<List<Integer>> temp = new LinkedList<>();
-        for (List<RobotTokenType> combination : combinationOfWordsToGet) {
-            List<List<Integer>> p = matchAsMatchAsPossibleFromCombination(
-                    tokenProvider, combination);
-            if (p != null) {
-                temp.addAll(p);
-            }
-        }
-
-        Collections.sort(temp, new ListInListComparator());
-
-        return temp;
-    }
-
-
-    private List<List<Integer>> matchAsMatchAsPossibleFromCombination(
-            TokenizatorOutput tokenProvider, List<RobotTokenType> combination) {
-        /*
-         * Algorithm for this method base on idea that tokens can't repeat, we
-         * just search for tokens expected to see in special tokens dictionary,
-         * extract them tokens id to joined list. Next we just sort this list of
-         * tokens id and we iterate over them with marking position in list of
-         * matched elements. In case element was matched previously, we are
-         * getting it id and set next element as start position for build next
-         * possible combination.
-         */
-        List<List<Integer>> combinationMatched = new LinkedList<>();
-
-        List<RobotToken> tokens = tokenProvider.getTokens();
-
-        Map<RobotTokenType, Integer> tokenTypeToCurrentPositionInTempList = new HashMap<>();
-        clearPosition(tokenTypeToCurrentPositionInTempList, combination);
-
-        List<Integer> joined = getJoinedStoredWordTokenIds(tokenProvider,
-                combination);
-        List<Integer> currentIds = new LinkedList<>();
-        for (int i = 0; i < joined.size(); i++) {
-            Integer tokenId = joined.get(i);
-            RobotTokenType type = tokens.get(tokenId).getType();
-            Integer positionOfOccurancyInJoinedList = tokenTypeToCurrentPositionInTempList
-                    .get(type);
-            if (positionOfOccurancyInJoinedList != null) {
-                if (positionOfOccurancyInJoinedList > -1) {
-                    i = positionOfOccurancyInJoinedList + 1;
-                    if (!currentIds.isEmpty()) {
-                        combinationMatched.add(currentIds);
-                        currentIds = new LinkedList<>();
-                        clearPosition(tokenTypeToCurrentPositionInTempList,
-                                combination);
-                    }
-
-                    // special for last one in case previous was the same
-                    if (i == joined.size() - 1) {
-                        currentIds.add(tokenId);
-                    }
-                } else {
-                    tokenTypeToCurrentPositionInTempList.put(type, i);
-                    currentIds.add(tokenId);
-                }
-            } else {
-                throw new ConcurrentModificationException(
-                        "List of tokens and special token list are not coherent, expected one of token types "
-                                + combination + ", but got " + type);
-            }
-        }
-
-        if (!currentIds.isEmpty()) {
-            combinationMatched.add(currentIds);
-        }
-
-        return combinationMatched;
-    }
-
-
-    private void clearPosition(
-            Map<RobotTokenType, Integer> tokenTypeToCurrentPositionInTempList,
-            List<RobotTokenType> combination) {
-        for (RobotTokenType type : combination) {
-            tokenTypeToCurrentPositionInTempList.put(type, -1);
-        }
-    }
-
-
-    private List<Integer> getJoinedStoredWordTokenIds(
-            TokenizatorOutput tokenProvider, List<RobotTokenType> combination) {
-        List<Integer> temp = new LinkedList<>();
-        Map<RobotTokenType, List<Integer>> indexesOfSpecial = tokenProvider
-                .getIndexesOfSpecial();
-        for (RobotTokenType combinationElementToken : combination) {
-            List<Integer> posInTokenList = indexesOfSpecial
-                    .get(combinationElementToken);
-            if (posInTokenList != null) {
-                temp.addAll(posInTokenList);
-            }
-        }
-
-        Collections.sort(temp);
-
-        return temp;
     }
 
 
@@ -219,6 +113,80 @@ public abstract class AContextMatcher implements
         }
 
         return id;
+    }
+
+
+    private List<List<Integer>> prepareListOfCombinations(
+            TokenizatorOutput tokenProvider,
+            List<List<RobotTokenType>> combinationOfWordsToGet) {
+        List<List<Integer>> possibleCombinations = new LinkedList<>();
+        for (List<RobotTokenType> rtts : combinationOfWordsToGet) {
+            possibleCombinations.addAll(computePossibleCombinations(
+                    tokenProvider, rtts));
+        }
+
+        Collections.sort(possibleCombinations, new ListInListComparator());
+
+        return possibleCombinations;
+    }
+
+
+    private List<List<Integer>> computePossibleCombinations(
+            TokenizatorOutput tokenProvider, List<RobotTokenType> combination) {
+        /*
+         * The idea how it works is very simple, we are getting list of expected
+         * type of elements to appear in pattern. We are go one-by-one over this
+         * {@code RobotTokenType} pattern elements with retrieve all occurances
+         * of single element. Next we extend current combination list by adding
+         * to each currently available element each element position of current
+         * token. It means that in example if we have currently in combination
+         * list 2 elements after extend it by list of 3 elements we will have 2
+         * time 3 elements - 6 exactly.
+         */
+        List<List<Integer>> allPossibleCombinations = new LinkedList<>();
+
+        Map<RobotTokenType, List<Integer>> indexesOfSpecial = tokenProvider
+                .getIndexesOfSpecial();
+        for (RobotTokenType currentCombinationItem : combination) {
+            List<Integer> elements = indexesOfSpecial
+                    .get(currentCombinationItem);
+            if (elements != null && !elements.isEmpty()) {
+                if (allPossibleCombinations.isEmpty()) {
+                    for (Integer element : elements) {
+                        List<Integer> current = new LinkedList<>();
+                        current.add(element);
+                        allPossibleCombinations.add(current);
+                    }
+                } else {
+                    mergeAllOccurancyOfCurrentElementWith(
+                            allPossibleCombinations, elements);
+                }
+            }
+        }
+
+        return allPossibleCombinations;
+    }
+
+
+    protected void mergeAllOccurancyOfCurrentElementWith(
+            List<List<Integer>> allPossibleCombinations,
+            List<Integer> occurancyOfCurrentElement) {
+        int currentNumberOfCombinations = allPossibleCombinations.size();
+        int numberOfElementsInThisItem = occurancyOfCurrentElement.size();
+        for (int i = 0; i < currentNumberOfCombinations; i++) {
+            int startPoint = i * numberOfElementsInThisItem;
+            List<Integer> elementToPopulate = allPossibleCombinations
+                    .get(startPoint);
+            for (int j = 0; j < numberOfElementsInThisItem; j++) {
+                List<Integer> withNewElement = new LinkedList<>(
+                        elementToPopulate);
+                withNewElement.add(occurancyOfCurrentElement.get(j));
+                allPossibleCombinations.add(startPoint, withNewElement);
+            }
+
+            allPossibleCombinations.remove(startPoint
+                    + numberOfElementsInThisItem);
+        }
     }
 
     private final class ListInListComparator implements
