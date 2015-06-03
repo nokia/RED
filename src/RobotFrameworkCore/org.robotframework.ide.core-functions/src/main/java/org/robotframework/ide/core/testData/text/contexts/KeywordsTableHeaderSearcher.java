@@ -1,11 +1,13 @@
 package org.robotframework.ide.core.testData.text.contexts;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.AContextMatcher;
 import org.robotframework.ide.core.testData.text.ContextType;
 import org.robotframework.ide.core.testData.text.RobotTokenContext;
-import org.robotframework.ide.core.testData.text.TxtRobotFileLexer;
+import org.robotframework.ide.core.testData.text.RobotTokenType;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
@@ -20,7 +22,12 @@ public class KeywordsTableHeaderSearcher extends AContextMatcher {
     protected List<RobotTokenContext> findContexts(
             TokenizatorOutput tokenProvider) {
         ContextType type = ContextType.KEYWORDS_TABLE_HEADER;
-
-        return null;
+        List<List<RobotTokenType>> combinationsExpected = new LinkedList<>();
+        combinationsExpected.add(Arrays
+                .asList(new RobotTokenType[] { RobotTokenType.WORD_KEYWORD }));
+        combinationsExpected.add(Arrays.asList(new RobotTokenType[] {
+                RobotTokenType.WORD_USER, RobotTokenType.WORD_KEYWORD }));
+        return buildTableHeaderContext(tokenProvider, type,
+                combinationsExpected);
     }
 }
