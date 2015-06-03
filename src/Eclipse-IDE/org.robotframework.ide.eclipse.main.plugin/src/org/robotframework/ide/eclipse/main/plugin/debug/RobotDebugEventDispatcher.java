@@ -252,7 +252,7 @@ public class RobotDebugEventDispatcher extends Job {
                         target.getRobotVariablesManager().setGlobalVariables(globalVars);
                         break;
                     case "check_condition":
-                        if (!"".equals(breakpointCondition) && !target.getRobotThread().isStepping()) {
+                        if (!"".equals(breakpointCondition)) {
                             String conditionJson = createJsonFromBreakpointCondition();
                             target.sendEventToAgent(conditionJson);
                         } else {
@@ -267,13 +267,13 @@ public class RobotDebugEventDispatcher extends Job {
                         break;
                     case "condition_result":
                         List<Object> resultList = (List<Object>) eventMap.get("condition_result");
-                        Boolean result = (Boolean) resultList.get(0);
-                        if (result) {
-                            isBreakpointConditionFulfilled = true;
+                        Object result = resultList.get(0);
+                        if (result instanceof Boolean) {
+                            isBreakpointConditionFulfilled = (Boolean) result;
                         }
                         break;
                     case "condition_error":
-                        isBreakpointConditionFulfilled = false;
+                        isBreakpointConditionFulfilled = true;
                         List<Object> errorList = (List<Object>) eventMap.get("condition_error");
                         String error = (String) errorList.get(0);
                         ShowDebugErrorJob showDebugErrorJob = new ShowDebugErrorJob("Conditional Breakpoint Error",
