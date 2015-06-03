@@ -1,13 +1,8 @@
 package org.robotframework.ide.core.testData.text;
 
-import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 import org.robotframework.ide.core.testData.text.contexts.KeywordsTableHeaderSearcher;
@@ -18,7 +13,8 @@ import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSea
 
 public class ContextsMatcher {
 
-    private int numberOfThreads = 16;
+    private final MultiThreadUtility<List<RobotTokenContext>, AContextMatcher> multiThread = new MultiThreadUtility<>();
+    private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 
     public void setNumberOfThreads(int numberOfThreads) {
@@ -37,38 +33,13 @@ public class ContextsMatcher {
         matchers.add(new TestCaseTableHeaderSearcher(tokenizatedOutput));
         matchers.add(new KeywordsTableHeaderSearcher(tokenizatedOutput));
 
-        ExecutorService execServ = Executors
-                .newFixedThreadPool(numberOfThreads);
-        ExecutorCompletionService<List<RobotTokenContext>> completeService = new ExecutorCompletionService<>(
-                execServ);
-
-        List<Future<List<RobotTokenContext>>> tasks = new LinkedList<>();
-
-        for (AContextMatcher matcher : matchers) {
-            Future<List<RobotTokenContext>> task = completeService
-                    .submit(matcher);
-            tasks.add(task);
-        }
-
-        try {
-            for (int taskId = 0; taskId < tasks.size(); taskId++) {
-                List<RobotTokenContext> ctxForMatcher = completeService.take()
-                        .get();
-                if (ctxForMatcher != null) {
-                    contexts.addAll(ctxForMatcher);
-                }
-            }
-        } catch (InterruptedException | ExecutionException
-                | ConcurrentModificationException e) {
-            throw e;
-        } finally {
-            execServ.shutdownNow();
+        List<List<RobotTokenContext>> computed = multiThread.compute(matchers);
+        for (List<RobotTokenContext> context : computed) {
+            contexts.addAll(context);
         }
 
         // merge contexts per line
         // temp solution adding it to one
-        List<RobotTokenContext> oneLineTemp = new LinkedList<>();
-        oneLineTemp.addAll(contexts);
-        tokenizatedOutput.getContextsPerLine().add(oneLineTemp);
+        tokenizatedOutput.getContextsPerLine().add(contexts);
     }
 }
