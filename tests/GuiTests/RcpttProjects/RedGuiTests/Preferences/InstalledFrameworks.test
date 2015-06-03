@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/3/15 2:36 PM
+Save-Time: 6/3/15 2:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,26 +25,13 @@ get-window Preferences | get-tree | select "Robot Framework/Installed frameworks
 //        | verify-true
 //}
         
-//Check installed table properites
-with [get-window Preferences] {        
-    get-label "Installed frameworks" | get-property caption | equals "Installed frameworks" | verify-true
-    with [get-table] {
-        get-property itemCount | equals 1 | verify-true
-        get-property "columns[0].caption" | equals Name | verify-true
-        get-property "columns[1].caption" | equals Path | verify-true
-        //check if it is selcted
-        get-item ".*" | get-property selected | equals false 
-            | verify-true
-        //check if it is checked
-        get-item ".*" | get-property checked | equals true | verify-true
-        
-	}
-}
 
+//Save RF version to varaible to further use
 let [val RobotDisplayedVersion [get-window Preferences | get-table | get-item "Robot Framework 2.8.5 \\(Python 2.7.9 on win32\\)" 
     | get-property caption -raw ] ] {
-    concat $RobotDisplayedVersion "test" | show-alert $RobotDisplayedVersion
+
     
+//Check installed table properites
   
 
 //check how looks buttons   
