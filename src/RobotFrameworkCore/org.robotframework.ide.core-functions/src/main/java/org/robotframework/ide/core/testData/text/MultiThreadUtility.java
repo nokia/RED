@@ -50,6 +50,9 @@ public class MultiThreadUtility<Result, Task extends Callable<Result>> {
             execServ.shutdownNow();
         }
 
+        futures.clear();
+        futures = null;
+
         return resultsComputed;
     }
 }
