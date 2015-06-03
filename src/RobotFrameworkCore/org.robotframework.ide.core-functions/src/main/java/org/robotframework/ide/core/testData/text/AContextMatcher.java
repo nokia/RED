@@ -2,10 +2,12 @@ package org.robotframework.ide.core.testData.text;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
@@ -39,7 +41,9 @@ public abstract class AContextMatcher implements
 
     protected List<RobotTokenContext> buildTableHeaderContext(
             TokenizatorOutput tokenProvider, ContextType contextType,
-            List<List<RobotTokenType>> combinationOfWordsToGet) {
+            List<List<RobotTokenType>> combinationOfWordsToGet)
+            throws ConcurrentModificationException, InterruptedException,
+            ExecutionException {
         List<RobotTokenContext> contexts = new LinkedList<>();
         List<List<Integer>> possibleCombinations = prepareListOfCombinations(
                 tokenProvider, combinationOfWordsToGet);
@@ -118,11 +122,17 @@ public abstract class AContextMatcher implements
 
     private List<List<Integer>> prepareListOfCombinations(
             TokenizatorOutput tokenProvider,
-            List<List<RobotTokenType>> combinationOfWordsToGet) {
+            List<List<RobotTokenType>> combinationOfWordsToGet)
+            throws ConcurrentModificationException, InterruptedException,
+            ExecutionException {
         List<List<Integer>> possibleCombinations = new LinkedList<>();
+
         for (List<RobotTokenType> rtts : combinationOfWordsToGet) {
-            possibleCombinations.addAll(computePossibleCombinations(
-                    tokenProvider, rtts));
+            List<List<Integer>> possibility = computePossibleCombinations(
+                    tokenProvider, rtts);
+            possibleCombinations.addAll(possibility);
+            possibility.clear();
+            possibility = null;
         }
 
         Collections.sort(possibleCombinations, new ListInListComparator());
