@@ -6,14 +6,11 @@ import java.util.List;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
@@ -50,26 +47,7 @@ public class SettingsEditorPage extends SectionEditorPage {
         final ScrolledForm form = managedForm.getForm();
 
         GridDataFactory.fillDefaults().applyTo(form.getBody());
-        GridLayoutFactory.fillDefaults().applyTo(form.getBody());
-
-        final FormToolkit toolkit = managedForm.getToolkit();
-
-        final SashForm mainSash = new SashForm(form.getBody(), SWT.SMOOTH | SWT.HORIZONTAL);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(mainSash);
-        toolkit.adapt(mainSash);
-        toolkit.paintBordersFor(mainSash);
-
-        GridLayoutFactory.fillDefaults().applyTo(toolkit.createComposite(mainSash, SWT.NONE));
-        final SashForm rightPanelSash = new SashForm(mainSash, SWT.SMOOTH | SWT.VERTICAL);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(rightPanelSash);
-        toolkit.adapt(rightPanelSash);
-        toolkit.paintBordersFor(rightPanelSash);
-
-        GridLayoutFactory.fillDefaults().applyTo(toolkit.createComposite(rightPanelSash, SWT.NONE));
-        GridLayoutFactory.fillDefaults().applyTo(toolkit.createComposite(rightPanelSash, SWT.NONE));
-
-        mainSash.setWeights(new int[] { 50, 50 });
-        rightPanelSash.setWeights(new int[] { 50, 50 });
+        GridLayoutFactory.fillDefaults().extendedMargins(3, 3, 10, 10).applyTo(form.getBody());
     }
 
     @Override
@@ -100,8 +78,8 @@ public class SettingsEditorPage extends SectionEditorPage {
 
     @Override
     protected ISelectionProvider getSelectionProvider() {
-        return new SettingsEditorPageSelectionProvider(generalPart.getViewer(),
-                metadataPart.getViewer(), importsPart.getViewer());
+        return new SettingsEditorPageSelectionProvider(generalPart.getViewer(), metadataPart.getViewer(),
+                importsPart.getViewer());
     }
 
     @Override

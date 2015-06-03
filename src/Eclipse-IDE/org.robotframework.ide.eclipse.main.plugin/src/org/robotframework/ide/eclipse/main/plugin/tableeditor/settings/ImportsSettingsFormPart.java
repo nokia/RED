@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerControlConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -71,19 +70,15 @@ class ImportsSettingsFormPart extends AbstractFormPart {
     @Override
     public final void initialize(final IManagedForm managedForm) {
         super.initialize(managedForm);
-        final SashForm sash = (SashForm) managedForm.getForm().getBody().getChildren()[0];
-        final SashForm rightPanelSash = (SashForm) sash.getChildren()[1];
-        final Composite rightPanelBottomComposite = (Composite) rightPanelSash.getChildren()[1];
-
-        createContent(rightPanelBottomComposite);
+        createContent(managedForm.getForm().getBody());
     }
 
     private void createContent(final Composite parent) {
         final ExpandableComposite section = getManagedForm().getToolkit().createSection(parent,
                 ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setText("Imports");
-        section.setExpanded(true);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        section.setExpanded(false);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
 
         viewer = new RowExposingTableViewer(section, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
