@@ -29,7 +29,6 @@ import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.BreakpointContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordFinder;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
@@ -58,7 +57,7 @@ public class RobotDebugEventDispatcher extends Job {
 
     private boolean isBreakpointConditionFulfilled;
 
-    private BreakpointContext currentBreakpointContext = new BreakpointContext();
+    private KeywordContext currentKeywordContext = new KeywordContext();
 
     private KeywordFinder keywordFinder = new KeywordFinder();
 
@@ -195,7 +194,6 @@ public class RobotDebugEventDispatcher extends Job {
                                                     RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                                             isBreakpoint = true;
                                             target.breakpointHit(currentBreakpoint);
-                                            currentBreakpointContext.setContext(executedSuite, breakpointLineNum);
                                         }
                                     }
                                 }
@@ -210,17 +208,16 @@ public class RobotDebugEventDispatcher extends Job {
                             if (target.getRobotThread().isStepping()) {
                                 target.getRobotThread().setSteppingOver(false);
                                 target.getRobotThread().setSteppingReturn(false);
-                                currentBreakpointContext.setContext(executedSuite, keywordLine);
                             }
-                            target.clearStackFrames();
+                            target.setHasStackFramesCreated(false);
                             isStopping = true;
                         } else {
                             isStopping = false;
                         }
 
-                        KeywordContext keywordContext = new KeywordContext(null, executedSuite, keywordLine);
-                        target.getPartListener().setKeywordContext(keywordContext);
-                        target.getCurrentFrames().put(currentKeyword, keywordContext);
+                        currentKeywordContext = new KeywordContext(null, executedSuite, keywordLine);
+                        target.getPartListener().setKeywordContext(currentKeywordContext);
+                        target.getCurrentFrames().put(currentKeyword, currentKeywordContext);
 
                         // first keyword with resource name is in old file, so until second keyword
                         // there is a need to switch between files
@@ -240,7 +237,7 @@ public class RobotDebugEventDispatcher extends Job {
                         List<Object> varList = (List<Object>) eventMap.get("vars");
                         Map<String, Object> vars = (Map<String, Object>) varList.get(1);
                         target.getLastKeywordFromCurrentFrames().setVariables(vars);
-                        target.getRobotVariablesManager().extractVariablesPositions(vars);
+                        target.getRobotVariablesManager().sortVariablesNames(vars);
                         break;
                     case "global_vars":
                         List<Object> globalVarList = (List<Object>) eventMap.get("global_vars");
@@ -254,8 +251,8 @@ public class RobotDebugEventDispatcher extends Job {
                         } else {
                             if (isStopping) {
                                 target.sendEventToAgent("stop");
-                                robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
-                                        currentBreakpointContext.getLine());
+                                robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
+                                        currentKeywordContext.getLineNumber());
                             } else {
                                 target.sendEventToAgent("run");
                             }
@@ -279,8 +276,8 @@ public class RobotDebugEventDispatcher extends Job {
                     case "condition_checked":
                         if (isStopping && isBreakpointConditionFulfilled) {
                             target.sendEventToAgent("stop");
-                            robotEventBroker.sendHighlightLineEventToTextEditor(currentBreakpointContext.getFile(),
-                                    currentBreakpointContext.getLine());
+                            robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
+                                    currentKeywordContext.getLineNumber());
                         } else {
                             target.sendEventToAgent("run");
                         }

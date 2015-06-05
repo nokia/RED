@@ -60,6 +60,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     // terminated state
     private boolean isTerminated = false;
+    
+    private boolean hasStackFramesCreated;
 
     // threads
     private RobotThread thread;
@@ -69,7 +71,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private Map<String, KeywordContext> currentFrames;
 
     private IStackFrame[] stackFrames;
-
+    
     private int currentStepOverLevel = 0;
     
     private int currentStepReturnLevel = 0;
@@ -416,23 +418,36 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     protected IStackFrame[] getStackFrames() {
 
-        if (stackFrames == null) {
-            stackFrames = new IStackFrame[currentFrames.size()];
+        if (!hasStackFramesCreated) {
+
+            int previousStackFramesSize = 0;
+            if (stackFrames != null) {
+                previousStackFramesSize = stackFrames.length;
+            }
+
+            IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
             int id = 1;
             for (String key : currentFrames.keySet()) {
                 KeywordContext keywordContext = currentFrames.get(key);
-
-                stackFrames[currentFrames.size() - id] = new RobotStackFrame(thread, keywordContext.getFileName(), key,
-                        keywordContext.getLineNumber(), keywordContext.getVariables(), id);
+                //only the highest level of StackFrames is created, lower levels are copied from previous StackFrames
+                if (id >= currentFrames.size() || previousStackFramesSize == 0) {
+                    newStackFrames[currentFrames.size() - id] = new RobotStackFrame(thread,
+                            keywordContext.getFileName(), key, keywordContext.getLineNumber(),
+                            keywordContext.getVariables(), id);
+                } else {
+                    newStackFrames[currentFrames.size() - id] = stackFrames[previousStackFramesSize - id];
+                }
                 id++;
             }
+            stackFrames = newStackFrames;
+            hasStackFramesCreated = true;
         }
 
         return stackFrames;
     }
 
-    public void clearStackFrames() {
-        stackFrames = null;
+    public void setHasStackFramesCreated(boolean hasCreated) {
+        hasStackFramesCreated = hasCreated;
     }
 
     /**
