@@ -21,11 +21,6 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     private boolean hasValueChanged;
 
     /**
-     * position in variables list in RobotVariablesManager
-     */
-    private int position = 0;
-
-    /**
      * Constructs a variable
      * 
      * @param name
@@ -38,12 +33,6 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         this.name = name;
         this.parent = parent;
         debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
-    }
-
-    public RobotDebugVariable(RobotDebugTarget target, String name, Object value, RobotDebugVariable parent,
-            int position) {
-        this(target, name, value, parent);
-        this.position = position;
     }
 
     /*
@@ -131,14 +120,6 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     public void setRobotDebugValue(RobotDebugValue value) {
         this.debugValue = value;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 
     public RobotDebugVariable getParent() {
