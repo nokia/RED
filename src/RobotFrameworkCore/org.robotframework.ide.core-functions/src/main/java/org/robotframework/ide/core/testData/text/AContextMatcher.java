@@ -128,7 +128,7 @@ public abstract class AContextMatcher implements
         List<List<Integer>> possibleCombinations = new LinkedList<>();
 
         for (List<RobotTokenType> rtts : combinationOfWordsToGet) {
-            List<List<Integer>> possibility = computePossibleCombinations(
+            List<List<Integer>> possibility = generatePossibleCombinations(
                     tokenProvider, rtts);
             possibleCombinations.addAll(possibility);
             possibility.clear();
@@ -141,7 +141,7 @@ public abstract class AContextMatcher implements
     }
 
 
-    private List<List<Integer>> computePossibleCombinations(
+    private List<List<Integer>> generatePossibleCombinations(
             TokenizatorOutput tokenProvider, List<RobotTokenType> combination) {
         /*
          * The idea how it works is very simple, we are getting list of expected
