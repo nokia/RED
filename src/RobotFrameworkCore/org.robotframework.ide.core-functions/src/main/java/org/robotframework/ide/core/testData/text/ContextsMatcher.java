@@ -14,14 +14,6 @@ import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSea
 public class ContextsMatcher {
 
     private final MultiThreadUtility<List<RobotTokenContext>, AContextMatcher> multiThread = new MultiThreadUtility<>();
-    private int numberOfThreads = Runtime.getRuntime().availableProcessors();
-
-
-    public void setNumberOfThreads(int numberOfThreads) {
-        if (numberOfThreads > 0) {
-            this.numberOfThreads = numberOfThreads;
-        }
-    }
 
 
     public void matchContexts(TokenizatorOutput tokenizatedOutput)
