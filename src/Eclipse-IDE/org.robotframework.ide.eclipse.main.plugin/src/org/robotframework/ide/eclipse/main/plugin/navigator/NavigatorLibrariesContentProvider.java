@@ -12,7 +12,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
 
@@ -32,7 +32,7 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
                         event.getDelta().accept(new IResourceDeltaVisitor() {
                             @Override
                             public boolean visit(final IResourceDelta delta) throws CoreException {
-                                if (delta.getResource().getName().equals(RobotProjectConfigurationFile.FILENAME)) {
+                                if (delta.getResource().getName().equals(RobotProjectConfig.FILENAME)) {
                                     refreshViewer();
                                     return false;
                                 }

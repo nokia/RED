@@ -12,7 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
 
@@ -82,7 +82,7 @@ public class LibspecsFolder {
             return true;
         }
 
-        final IFile cfgFile = folder.getProject().getFile(RobotProjectConfigurationFile.FILENAME);
+        final IFile cfgFile = folder.getProject().getFile(RobotProjectConfig.FILENAME);
         // full build is being perfomed or config file has changed
         return kind == IncrementalProjectBuilder.FULL_BUILD
                 || delta.findMember(cfgFile.getProjectRelativePath()) != null

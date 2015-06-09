@@ -80,7 +80,7 @@ public abstract class SectionEditorPage extends FormPage {
         GridDataFactory.fillDefaults().applyTo(form.getBody());
     }
 
-    protected abstract List<? extends IFormPart> createPageParts(IEditorSite iEditorSite);
+    protected abstract List<? extends IFormPart> createPageParts(IEditorSite editorSite);
 
     private void prepareEclipseContext(final List<? extends IFormPart> parts) {
         commandsStack = new RobotEditorCommandsStack();

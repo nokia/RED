@@ -236,7 +236,7 @@ public class TextEditor {
             @Override
             public void mouseDoubleClick(final MouseEvent e) {
                 try {
-                    int line = computeBreakpointLineNumber(e.y);
+                    final int line = computeBreakpointLineNumber(e.y);
                     
                     if (line > viewer.getTextWidget().getLineCount()) {
                         return;
@@ -274,7 +274,7 @@ public class TextEditor {
 
 	@Focus
 	public void onFocus() {
-		
+        viewer.getTextWidget().setFocus();
 	}
 	
 	@Inject
@@ -296,14 +296,14 @@ public class TextEditor {
 	    }
     }
 	
-	private void showHighlightedLine(int lineNumber) {
-	    int visibleLinesNumber = viewer.getTextWidget().getClientArea().height / viewer.getTextWidget().getLineHeight();
+	private void showHighlightedLine(final int lineNumber) {
+	    final int visibleLinesNumber = viewer.getTextWidget().getClientArea().height / viewer.getTextWidget().getLineHeight();
 	    if (visibleLinesNumber < 2) {
 	        viewer.getTextWidget().setTopIndex(lineNumber-1);
 	        return;
 	    }
-	    int linesToCenter = visibleLinesNumber / 2;
-	    int topIndexPosiiton = lineNumber - linesToCenter;
+	    final int linesToCenter = visibleLinesNumber / 2;
+	    final int topIndexPosiiton = lineNumber - linesToCenter;
 	    if(topIndexPosiiton >= 0) {
 	        viewer.getTextWidget().setTopIndex(topIndexPosiiton);
 	    } else {
@@ -445,12 +445,12 @@ public class TextEditor {
 		return reconciler;
 	}
 	
-	private int computeBreakpointLineNumber(int eventY) {
-        int lineHeight = viewer.getTextWidget().getLineHeight();
+	private int computeBreakpointLineNumber(final int eventY) {
+        final int lineHeight = viewer.getTextWidget().getLineHeight();
         int line = (int) Math.round((eventY / (double) lineHeight)) + viewer.getTopIndex();
 
-        int lineTopPixel = viewer.getTextWidget().getLinePixel(line);
-        int lineBottomPixel = lineTopPixel - lineHeight;
+        final int lineTopPixel = viewer.getTextWidget().getLinePixel(line);
+        final int lineBottomPixel = lineTopPixel - lineHeight;
         if (eventY < lineBottomPixel) {
             line--;
         } else if ((eventY - lineBottomPixel) > lineHeight) {

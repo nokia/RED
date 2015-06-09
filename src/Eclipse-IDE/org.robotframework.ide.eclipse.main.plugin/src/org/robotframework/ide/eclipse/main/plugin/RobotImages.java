@@ -83,6 +83,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/keyword.png");
     }
 
+    public static ImageDescriptor getRobotProjectConfigFile() {
+        return RobotFramework.getImageDescriptor("resources/config.png");
+    }
+
     /**
      * For given image descriptor the gray version descriptor is created.
      * 

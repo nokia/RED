@@ -157,7 +157,7 @@
               filenames="red.xml"
               icon="resources/config.png"
               id="org.robotframework.ide.project.editor"
-              name="Robot Project Editor">
+              name="RED Project Editor">
         </editor>
         <editor
                 name="Robot Text Editor"
@@ -936,6 +936,17 @@
             class="org.robotframework.ide.eclipse.main.plugin.debug.BreakpointDetailPaneFactory"
             id="org.eclipse.debug.robot.detailFactories">
       </detailFactories>
+   </extension>
+   <extension
+         id="robotProblem"
+         name="Robot Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
 
 </plugin>
