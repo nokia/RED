@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-class InstalledRobotsContentProvider implements IStructuredContentProvider {
+public class InstalledRobotsContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {

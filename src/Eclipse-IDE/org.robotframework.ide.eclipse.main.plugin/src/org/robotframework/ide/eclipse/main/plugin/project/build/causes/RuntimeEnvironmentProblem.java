@@ -16,7 +16,7 @@ public enum RuntimeEnvironmentProblem implements IProblemCause {
 
         @Override
         public String getFormattedProblemDescription(final Object... objects) {
-            return null;
+            return String.format("FATAL: %s is not defined in preferences. Fix this problem to build project", objects);
         }
     },
     NON_PYTHON_INSTALLATION {
@@ -39,7 +39,8 @@ public enum RuntimeEnvironmentProblem implements IProblemCause {
 
         @Override
         public String getFormattedProblemDescription(final Object... objects) {
-            return String.format("FATAL: Python instalation %s has no Robot installed", objects);
+            return String.format(
+                    "FATAL: Python instalation %s has no Robot installed. Fix this problem to build project", objects);
         }
     };
 
