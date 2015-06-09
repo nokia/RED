@@ -7,9 +7,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile.InvalidConfigurationFileException;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
@@ -21,7 +21,7 @@ import com.google.common.collect.Iterables;
 public class RobotProject extends RobotContainer {
 
     private List<LibrarySpecification> librariesSpecs;
-    private RobotProjectConfiguration configuration;
+    private RobotProjectConfig configuration;
 
     RobotProject(final IProject project) {
         super(null, project);
@@ -61,11 +61,11 @@ public class RobotProject extends RobotContainer {
         }
     }
 
-    private synchronized RobotProjectConfiguration readProjectConfigurationIfNeeded() {
+    private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
         if (configuration == null) {
             try {
-                configuration = new RobotProjectConfigurationFile(getProject()).read();
-            } catch (final InvalidConfigurationFileException e) {
+                configuration = new RobotProjectConfigReader().readConfiguration(getProject());
+            } catch (final CannotReadProjectConfigurationException e) {
                 // oh well...
             }
         }
@@ -86,7 +86,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public IFile getConfigurationFile() {
-        return getProject().getFile(RobotProjectConfigurationFile.FILENAME);
+        return getProject().getFile(RobotProjectConfig.FILENAME);
     }
 
     public IFile getFile(final String filename) {

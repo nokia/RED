@@ -72,13 +72,13 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        new RobotProjectConfigurationFile(project).write(RobotProjectConfiguration.create());
+        new RobotProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
 	}
 
 	@Override
 	public void deconfigure() throws CoreException {
         removeFromBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        final IFile cfgFile = project.getFile(RobotProjectConfigurationFile.FILENAME);
+        final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
         if (cfgFile.exists()) {
             cfgFile.delete(true, null);
         }

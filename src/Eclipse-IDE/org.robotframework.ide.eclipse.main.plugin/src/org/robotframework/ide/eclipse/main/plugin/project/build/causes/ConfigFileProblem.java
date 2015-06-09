@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateConfigurationFileFixer;
 
@@ -23,7 +23,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getFormattedProblemDescription(final Object... objects) {
-            return "FATAL: project configuration file " + RobotProjectConfigurationFile.FILENAME + " does not exist";
+            return "FATAL: project configuration file " + RobotProjectConfig.FILENAME + " does not exist";
         }
 
 
@@ -41,7 +41,9 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getFormattedProblemDescription(final Object... objects) {
-            return "FATAL: unable to read configuration file. Fix this problem in order to properly build project";
+            return String.format(
+                    "FATAL: unable to read configuration file. %s Fix this problem in order to properly build project",
+                            objects);
         }
     };
 
