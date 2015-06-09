@@ -40,14 +40,14 @@ public class InstalledRobotEnvironments {
     public static final String OTHER_RUNTIMES = "otherRuntimes";
     public static final String ACTIVE_RUNTIME = "activeRuntime";
 
-    public static RobotRuntimeEnvironment getActiveRobotInstallation(final IPreferenceStore store) {
+    public static synchronized RobotRuntimeEnvironment getActiveRobotInstallation(final IPreferenceStore store) {
         if (ACTIVE == null) {
             ACTIVE = readActiveFromPreferences(store);
         }
         return ACTIVE;
     }
     
-    public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final IPreferenceStore store) {
+    public static synchronized List<RobotRuntimeEnvironment> getAllRobotInstallation(final IPreferenceStore store) {
         if (ALL == null) {
             ALL = readALLFromPreferences(store);
         }

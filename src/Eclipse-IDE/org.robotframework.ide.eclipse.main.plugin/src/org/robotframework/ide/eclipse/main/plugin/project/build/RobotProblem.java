@@ -10,10 +10,13 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MissingPythonInstallationFixer;
 
 public class RobotProblem {
+
+    public static final String TYPE_ID = RobotFramework.PLUGIN_ID + ".robotProblem";
 
     public static final String CAUSE_ENUM_CLASS = "class";
     public static final String CAUSE_ATTRIBUTE = "cause";
@@ -42,7 +45,7 @@ public class RobotProblem {
 
     public void createMarker(final IResource resource) {
         try {
-            final IMarker marker = resource.createMarker(IMarker.PROBLEM);
+            final IMarker marker = resource.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage());
             marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
             marker.setAttribute(IMarker.LOCATION, location);
@@ -59,7 +62,7 @@ public class RobotProblem {
 
     public void createMarker(final IFile resource, final int lineNumber) {
         try {
-            final IMarker marker = resource.createMarker(IMarker.PROBLEM);
+            final IMarker marker = resource.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage());
             marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
             marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);

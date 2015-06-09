@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigurationFile.InvalidConfigurationFileException;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.FatalProblemsReporter.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RuntimeEnvironmentProblem;
@@ -84,6 +84,14 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 @Override
                 protected IStatus run(final IProgressMonitor monitor) {
                     try {
+                        try {
+                            getProject().getFile(".project").deleteMarkers(IMarker.PROBLEM, true,
+                                    IResource.DEPTH_INFINITE);
+                            getProject().getFile(RobotProjectConfig.FILENAME).deleteMarkers(IMarker.PROBLEM, true,
+                                    IResource.DEPTH_INFINITE);
+                        } catch (final CoreException e) {
+                            // that's fine, lets try to build project
+                        }
                         buildLibrariesSpecs(getProject(), monitor, new FatalProblemsReporter());
                         monitor.done();
                         return Status.OK_STATUS;
@@ -113,14 +121,13 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         subMonitor.subTask("checking Robot execution environment");
 
         final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
-        final RobotProjectConfiguration configuration = provideConfiguration(subMonitor.newChild(10), robotProject,
-                reporter);
+        final RobotProjectConfig configuration = provideConfiguration(subMonitor.newChild(10), robotProject, reporter);
         if (subMonitor.isCanceled()) {
             return;
         }
 
         final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(subMonitor.newChild(10),
-                robotProject, reporter);
+                robotProject, configuration, reporter);
         if (subMonitor.isCanceled()) {
             return;
         }
@@ -149,17 +156,18 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         }
     }
 
-    private RobotProjectConfiguration provideConfiguration(final IProgressMonitor monitor,
+    private RobotProjectConfig provideConfiguration(final IProgressMonitor monitor,
             final RobotProject robotProject, final IProblemsReporter reporter) {
         try {
             if (!robotProject.getConfigurationFile().exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.DOES_NOT_EXIST);
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
-            return new RobotProjectConfigurationFile(robotProject).read();
-        } catch (final InvalidConfigurationFileException e) {
+            return new RobotProjectConfigReader().readConfiguration(robotProject);
+        } catch (final CannotReadProjectConfigurationException e) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.OTHER_PROBLEM);
-            reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+            problem.fillFormattedMessageWith(e.getMessage());
+            reporter.handleProblem(problem, robotProject.getConfigurationFile(), e.getLineNumber());
             return null;
         } finally {
             monitor.done();
@@ -167,11 +175,13 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     }
 
     private RobotRuntimeEnvironment provideRuntimeEnvironment(final IProgressMonitor monitor,
-            final RobotProject robotProject, final IProblemsReporter reporter) {
+            final RobotProject robotProject, final RobotProjectConfig configuration,
+            final IProblemsReporter reporter) {
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
                 final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT);
+                problem.fillFormattedMessageWith(configuration.getPythonLocation());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.isValidPythonInstallation()) {
                 final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION);

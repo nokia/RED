@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
-abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
+public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
 
     private final CheckboxTableViewer viewer;
 
@@ -69,9 +69,9 @@ abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvi
         return RobotImages.getTooltipImage().createImage();
     }
 
-    static class InstalledRobotsNamesLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
+    public static class InstalledRobotsNamesLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
 
-        InstalledRobotsNamesLabelProvider(final CheckboxTableViewer viewer) {
+        public InstalledRobotsNamesLabelProvider(final CheckboxTableViewer viewer) {
             super(viewer);
         }
 
@@ -82,9 +82,9 @@ abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvi
         }
     }
 
-    static class InstalledRobotsPathsLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
+    public static class InstalledRobotsPathsLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
 
-        InstalledRobotsPathsLabelProvider(final CheckboxTableViewer viewer) {
+        public InstalledRobotsPathsLabelProvider(final CheckboxTableViewer viewer) {
             super(viewer);
         }
 
