@@ -212,16 +212,17 @@ public class RobotRuntimeEnvironment {
     private static void addRemoveTemporaryDirectoryHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
+            @Override
             public void run() {
 
                 if (temporaryDirectory != null) {
-                    File[] files = new File(temporaryDirectory.toString()).listFiles();
+                    final File[] files = new File(temporaryDirectory.toString()).listFiles();
                     try {
                         for (int i = 0; i < files.length; i++) {
                             Files.delete(files[i].toPath());
                         }
                         Files.delete(temporaryDirectory);
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -383,8 +384,12 @@ public class RobotRuntimeEnvironment {
             try {
                 runExternalProcess(cmdLine, linesHandler);
                 final String pycPath = path.toString().trim();
-                if (pycPath.endsWith(".pyc")) {
+                if (pycPath.endsWith(".py")) {
+                    return new File(pycPath);
+                } else if (pycPath.endsWith(".pyc")) {
                     return new File(pycPath.substring(0, pycPath.length() - 1));
+                } else if (pycPath.endsWith("$py.class")) {
+                    return new File(pycPath.substring(0, pycPath.length() - 9) + ".py");
                 }
                 return null;
             } catch (final IOException e) {
