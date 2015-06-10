@@ -20,7 +20,8 @@ import com.google.common.collect.Iterables;
 
 public class RobotProject extends RobotContainer {
 
-    private List<LibrarySpecification> librariesSpecs;
+    private List<LibrarySpecification> stdLibsSpecs;
+    private List<LibrarySpecification> refLibsSpecs;
     private RobotProjectConfig configuration;
 
     RobotProject(final IProject project) {
@@ -42,12 +43,12 @@ public class RobotProject extends RobotContainer {
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
         if (env == null) {
             return newArrayList();
-        } else if (librariesSpecs != null) {
-            return librariesSpecs;
+        } else if (stdLibsSpecs != null) {
+            return stdLibsSpecs;
         }
 
         try {
-            librariesSpecs = newArrayList(Iterables.transform(env.getStandardLibrariesNames(),
+            stdLibsSpecs = newArrayList(Iterables.transform(env.getStandardLibrariesNames(),
                     new Function<String, LibrarySpecification>() {
                         @Override
                         public LibrarySpecification apply(final String libraryName) {
@@ -55,10 +56,27 @@ public class RobotProject extends RobotContainer {
                             return LibrarySpecificationReader.readSpecification(RobotProject.this, file);
                         }
                     }));
-            return librariesSpecs;
+            return stdLibsSpecs;
         } catch (final CannotReadlibrarySpecificationException e) {
             return newArrayList();
         }
+    }
+
+    public boolean hasReferencedLibraries() {
+        readProjectConfigurationIfNeeded();
+        if (refLibsSpecs != null) {
+            return true;
+        }
+        return configuration.hasReferencedLibraries();
+    }
+
+    public List<LibrarySpecification> getReferencedLibraries() {
+        readProjectConfigurationIfNeeded();
+        if (refLibsSpecs != null) {
+            return refLibsSpecs;
+        }
+        refLibsSpecs = configuration.getReferencedLibraries();
+        return refLibsSpecs;
     }
 
     private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
@@ -74,7 +92,8 @@ public class RobotProject extends RobotContainer {
 
     public void clear() {
         configuration = null;
-        librariesSpecs = null;
+        stdLibsSpecs = null;
+        refLibsSpecs = null;
     }
 
     public RobotRuntimeEnvironment getRuntimeEnvironment() {

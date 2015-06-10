@@ -2,23 +2,27 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelManager;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 class RobotProjectDependencies {
 
-    private final IProject project;
+    protected final RobotProject project;
 
-    public RobotProjectDependencies(final IProject project) {
-        this.project = project;
+    public RobotProjectDependencies(final RobotProject robotProject) {
+        this.project = robotProject;
     }
 
-    public List<LibrarySpecification> getStandardLibraries() {
-        return RobotModelManager.getInstance().getModel().createRobotProject(project).getStandardLibraries();
+    List<LibrarySpecification> getLibraries() {
+        return project.getStandardLibraries();
     }
 
-    public String getVersion() {
-        return RobotModelManager.getInstance().getModel().createRobotProject(project).getVersion();
+    String getAdditionalInformation() {
+        final String version = project.getVersion();
+        return version == null ? "[???]" : "[" + version + "]";
+    }
+
+    String getName() {
+        return "Robot Standard libraries";
     }
 }

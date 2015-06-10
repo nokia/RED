@@ -36,11 +36,13 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotProjectDependencies) {
             final RobotProjectDependencies dependencies = (RobotProjectDependencies) element;
-            final String version = dependencies.getVersion();
 
-            final StyledString styled = new StyledString("Robot Standard libraries");
-            styled.append(" ");
-            return styled.append("[" + (version == null ? "???" : version) + "]", new Styler() {
+            final StyledString styled = new StyledString(dependencies.getName());
+            final String additionalInfo = dependencies.getAdditionalInformation();
+            if (!additionalInfo.isEmpty()) {
+                styled.append(" ");
+            }
+            return styled.append(additionalInfo, new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = RobotTheme.getEclipseDecorationColor();
