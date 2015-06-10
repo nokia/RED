@@ -14,7 +14,7 @@ import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowKeywordDocumentationAction;
 
-public class NavigatorKeywordActionsProvider extends CommonActionProvider {
+public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
 
     private ISelectionProvider selectionProvider;
 
