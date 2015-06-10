@@ -1,11 +1,14 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 @XmlRootElement(name = "projectConfiguration")
 public class RobotProjectConfig {
@@ -62,6 +65,14 @@ public class RobotProjectConfig {
             executionEnvironment = new ExecutionEnvironment();
         }
         executionEnvironment.path = location.getAbsolutePath();
+    }
+
+    public boolean hasReferencedLibraries() {
+        return false;
+    }
+
+    public List<LibrarySpecification> getReferencedLibraries() {
+        return null;
     }
 
     @Override

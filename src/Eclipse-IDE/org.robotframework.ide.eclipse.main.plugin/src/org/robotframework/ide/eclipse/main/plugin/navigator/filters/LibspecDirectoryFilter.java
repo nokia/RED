@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.navigator;
+package org.robotframework.ide.eclipse.main.plugin.navigator.filters;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;

@@ -322,6 +322,14 @@
              class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesActionsProvider"
              id="org.robotframework.library.actions.provider">
        </actionProvider>
+       <commonSorter
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.ProjectSorter">
+          <parentExpression>
+             <instanceof
+                   value="org.eclipse.core.resources.IProject">
+             </instanceof>
+          </parentExpression>
+       </commonSorter>
     </navigatorContent>
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordsContentProvider"
@@ -340,13 +348,13 @@
           </instanceof>
        </possibleChildren>
        <actionProvider
-             class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordActionsProvider"
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorKeywordsActionsProvider"
              id="org.robotframework.keyword.actions.provider">
        </actionProvider>
     </navigatorContent>
     <commonFilter
           activeByDefault="false"
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.SuiteInitFilesFilter"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.SuiteInitFilesFilter"
           description="Hides all Robot Suite initialization files (__init__.robot)"
           id="org.robotframework.filters.initFilesFilter"
           name="Robot Suite initialization files"
@@ -354,7 +362,7 @@
     </commonFilter>
     <commonFilter
           activeByDefault="true"
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.NonRobotProjectsFilter"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.NonRobotProjectsFilter"
           description="Hide all non-Robot projects"
           id="org.robotframework.filters.nonRobotProjectsFilter"
           name="Non-Robot projects"
@@ -362,7 +370,7 @@
     </commonFilter>
     <commonFilter
           activeByDefault="true"
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.LibspecDirectoryFilter"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.LibspecDirectoryFilter"
           description="Hide all directories containing generated library specification files"
           id="org.robotframework.filters.libspec"
           name="Robot libspec directory"
