@@ -30,6 +30,7 @@ public class ContextsMatcher {
             contexts.addAll(context);
         }
 
+        matchers.clear();
         // merge contexts per line
         // temp solution adding it to one
         tokenizatedOutput.getContextsPerLine().add(contexts);
