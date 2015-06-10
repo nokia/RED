@@ -170,7 +170,7 @@ public class TxtRobotFileLexer {
         ReadHelpObject readerHelper = new ReadHelpObject();
         readerHelper.unfinishedText = new StringBuilder();
         readerHelper.numberOfCharsToRead = -1;
-        CharBuffer charBuffer = CharBuffer.allocate(4096);
+        CharBuffer charBuffer = CharBuffer.allocate(2048);
         readerHelper.charBuffer = charBuffer;
         while((readerHelper.numberOfCharsToRead = reader.read(charBuffer)) > 0) {
             readerHelper = read(readerHelper, extractedTokens);
