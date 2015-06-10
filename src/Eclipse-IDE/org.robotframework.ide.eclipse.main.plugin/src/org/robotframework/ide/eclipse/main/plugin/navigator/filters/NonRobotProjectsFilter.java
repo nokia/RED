@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.navigator;
+package org.robotframework.ide.eclipse.main.plugin.navigator.filters;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.Viewer;
@@ -15,5 +15,4 @@ public class NonRobotProjectsFilter extends ViewerFilter {
         }
         return true;
     }
-
 }

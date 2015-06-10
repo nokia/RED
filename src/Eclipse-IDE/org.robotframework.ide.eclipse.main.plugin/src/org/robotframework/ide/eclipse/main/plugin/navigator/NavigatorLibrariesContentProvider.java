@@ -1,5 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -12,6 +16,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
@@ -76,9 +82,15 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof IProject) {
-            return new Object[] { new RobotProjectDependencies((IProject) parentElement) };
+            final IProject project = (IProject) parentElement;
+            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final List<RobotProjectDependencies> dependencies = newArrayList(new RobotProjectDependencies(robotProject));
+            if (robotProject.hasReferencedLibraries()) {
+                dependencies.add(new RobotProjectExternalDependencies(robotProject));
+            }
+            return dependencies.toArray();
         } else if (parentElement instanceof RobotProjectDependencies) {
-            return ((RobotProjectDependencies) parentElement).getStandardLibraries().toArray();
+            return ((RobotProjectDependencies) parentElement).getLibraries().toArray();
         }
         return new Object[0];
     }
