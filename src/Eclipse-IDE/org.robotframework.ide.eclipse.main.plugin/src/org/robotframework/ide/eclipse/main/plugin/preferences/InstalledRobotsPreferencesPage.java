@@ -123,7 +123,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         final Label lbl = new Label(parent, SWT.WRAP);
         lbl.setText("Add or remove Robot frameworks environments (location of Python interpreter with Robot library "
                 + "installed, currently " + Joiner.on(", ").join(SuiteExecutor.allExecutorNames())
-                + " are supported). The check-selected environment will be used by project unless it is explicitely "
+                + " are supported). The selected environment will be used by project unless it is explicitly "
                 + "overridden in project configuration.");
         GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(lbl);
     }
