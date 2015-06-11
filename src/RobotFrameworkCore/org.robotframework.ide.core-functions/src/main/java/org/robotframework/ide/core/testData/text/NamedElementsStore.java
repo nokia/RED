@@ -102,7 +102,7 @@ public class NamedElementsStore {
         SPECIAL_WORDS.put("range", RobotTokenType.WORD_RANGE);
         SPECIAL_WORDS.put("with", RobotTokenType.WORD_WITH);
         SPECIAL_WORDS.put("name", RobotTokenType.WORD_NAME);
-        SPECIAL_WORDS.put("comment", RobotTokenType.WORD_NAME);
+        SPECIAL_WORDS.put("comment", RobotTokenType.WORD_COMMENT);
     }
     public volatile static Map<String, RobotTokenType> SPECIAL_WORDS_STORE = Collections
             .unmodifiableMap(SPECIAL_WORDS);
