@@ -39,88 +39,7 @@ public abstract class AContextMatcher implements
     }
 
 
-    protected List<RobotTokenContext> buildTableHeaderContext(
-            TokenizatorOutput tokenProvider, ContextType contextType,
-            List<List<RobotTokenType>> combinationOfWordsToGet)
-            throws ConcurrentModificationException, InterruptedException,
-            ExecutionException {
-        List<RobotTokenContext> contexts = new LinkedList<>();
-        List<List<Integer>> possibleCombinations = prepareListOfCombinations(
-                tokenProvider, combinationOfWordsToGet);
-
-        for (List<Integer> currentCombinations : possibleCombinations) {
-            if (currentCombinations != null && !currentCombinations.isEmpty()) {
-                RobotTokenContext context = new RobotTokenContext(contextType);
-                int firstTokenId = currentCombinations.get(0);
-                int lastTokenId = currentCombinations.get(currentCombinations
-                        .size() - 1);
-
-                int prefixAsterisksId = findNearestPrefixAsterisks(
-                        tokenProvider, firstTokenId);
-                if (prefixAsterisksId > -1) {
-                    context.addToken(prefixAsterisksId);
-                }
-
-                for (Integer tokenId : currentCombinations) {
-                    context.addToken(tokenId);
-                }
-
-                int suffixAsterisksId = findNearestSuffixAsterisks(
-                        tokenProvider, lastTokenId);
-                if (suffixAsterisksId > -1) {
-                    context.addToken(suffixAsterisksId);
-                }
-
-                contexts.add(context);
-            }
-        }
-
-        return contexts;
-    }
-
-
-    private int findNearestPrefixAsterisks(TokenizatorOutput tokenProvider,
-            int currentTableWord) {
-        int id = -1;
-
-        List<Integer> positionOfAsterisks = tokenProvider.getIndexesOfSpecial()
-                .get(RobotTokenType.TABLE_ASTERISK);
-        if (positionOfAsterisks != null) {
-            for (int currentAsteriskIndex : positionOfAsterisks) {
-                // check if asterisk is before metadata or settings
-                if (currentAsteriskIndex < currentTableWord) {
-                    // check if current index is greater than previous one
-                    if (id < currentAsteriskIndex) {
-                        id = currentAsteriskIndex;
-                    }
-                }
-            }
-        }
-
-        return id;
-    }
-
-
-    private int findNearestSuffixAsterisks(TokenizatorOutput tokenProvider,
-            int currentTableWord) {
-        int id = -1;
-
-        List<Integer> positionOfAsterisks = tokenProvider.getIndexesOfSpecial()
-                .get(RobotTokenType.TABLE_ASTERISK);
-        if (positionOfAsterisks != null) {
-            for (int currentAsteriskIndex : positionOfAsterisks) {
-                if (currentAsteriskIndex > currentTableWord) {
-                    id = currentAsteriskIndex;
-                    break;
-                }
-            }
-        }
-
-        return id;
-    }
-
-
-    private List<List<Integer>> prepareListOfCombinations(
+    protected List<List<Integer>> prepareListOfCombinations(
             TokenizatorOutput tokenProvider,
             List<List<RobotTokenType>> combinationOfWordsToGet)
             throws ConcurrentModificationException, InterruptedException,
@@ -178,7 +97,7 @@ public abstract class AContextMatcher implements
     }
 
 
-    protected void mergeAllOccurancyOfCurrentElementWith(
+    private void mergeAllOccurancyOfCurrentElementWith(
             List<List<Integer>> allPossibleCombinations,
             List<Integer> occurancyOfCurrentElement) {
         int currentNumberOfCombinations = allPossibleCombinations.size();
