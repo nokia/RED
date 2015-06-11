@@ -6,14 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.robotframework.ide.core.testData.text.AContextMatcher;
+import org.robotframework.ide.core.testData.text.ATableContextMatcher;
 import org.robotframework.ide.core.testData.text.ContextType;
 import org.robotframework.ide.core.testData.text.RobotTokenContext;
 import org.robotframework.ide.core.testData.text.RobotTokenType;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
-public class SettingsTableHeaderSearcher extends AContextMatcher {
+public class SettingsTableHeaderSearcher extends ATableContextMatcher {
 
     public SettingsTableHeaderSearcher(TokenizatorOutput tokenProvider) {
         super(tokenProvider);
