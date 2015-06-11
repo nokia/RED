@@ -23,7 +23,6 @@ public class CommentsSearcher extends AContextMatcher {
     @Override
     protected List<RobotTokenContext> findContexts(
             TokenizatorOutput tokenProvider) throws Exception {
-        List<RobotTokenContext> contexts = new LinkedList<>();
         List<RobotToken> tokens = tokenProvider.getTokens();
         Map<RobotTokenType, List<Integer>> indexesOfSpecial = tokenProvider
                 .getIndexesOfSpecial();
@@ -35,6 +34,15 @@ public class CommentsSearcher extends AContextMatcher {
         List<Integer> joinedList = getSortedJoinedList(wordsCommentIndexes,
                 hashCharsIndexes);
 
+        List<RobotTokenContext> contexts = handleAllComments(tokens, joinedList);
+
+        return contexts;
+    }
+
+
+    protected List<RobotTokenContext> handleAllComments(
+            List<RobotToken> tokens, List<Integer> joinedList) {
+        List<RobotTokenContext> contexts = new LinkedList<>();
         for (int currentCommentId = 0; currentCommentId < joinedList.size(); currentCommentId++) {
             RobotTokenContext commentCtx = new RobotTokenContext(
                     ContextType.COMMENT);
@@ -71,7 +79,6 @@ public class CommentsSearcher extends AContextMatcher {
 
             contexts.add(commentCtx);
         }
-
         return contexts;
     }
 
