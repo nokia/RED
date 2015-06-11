@@ -52,11 +52,9 @@ public class TxtRobotFileLexer {
         int currentLine = 1;
         int currentColumn = 1;
         int lastStartLineTokenPosition = 0;
-        RobotTokenType lineSeparator = RobotTokenType.UNKNOWN;
         for (StringBuilder currentText : possibleTokensSplitted) {
             RobotToken recognizedToken = tokenMatcher.match(out, currentText,
-                    new LinearPosition(currentLine, currentColumn),
-                    lineSeparator);
+                    new LinearPosition(currentLine, currentColumn));
 
             if (recognizedToken.getType() == RobotTokenType.END_OF_LINE) {
                 currentLine++;
@@ -67,14 +65,6 @@ public class TxtRobotFileLexer {
                 out.tokens.add(startLine);
                 lastStartLineTokenPosition = out.tokens.size() - 1;
                 out.linePositionInTokensList.add(lastStartLineTokenPosition);
-
-                lineSeparator = RobotTokenType.UNKNOWN;
-            } else if (lineSeparator == RobotTokenType.UNKNOWN) {
-                out.tokens.add(recognizedToken);
-                lineSeparator = tokenMatcher.matchLineSeparator(out.tokens,
-                        currentText, new LinearPosition(currentLine,
-                                currentColumn), lastStartLineTokenPosition);
-                currentColumn = recognizedToken.getEndPos().getColumn();
             } else {
                 out.tokens.add(recognizedToken);
                 currentColumn = recognizedToken.getEndPos().getColumn();

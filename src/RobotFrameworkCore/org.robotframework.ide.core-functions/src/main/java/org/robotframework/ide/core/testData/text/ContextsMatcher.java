@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 import org.robotframework.ide.core.testData.text.contexts.CommentsSearcher;
 import org.robotframework.ide.core.testData.text.contexts.KeywordsTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.PipeLineSeparatorSearcher;
 import org.robotframework.ide.core.testData.text.contexts.SettingsTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.TestCaseTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSearcher;
@@ -33,6 +34,7 @@ public class ContextsMatcher {
 
         matchers.clear();
         matchers.add(new CommentsSearcher(tokenizatedOutput));
+        matchers.add(new PipeLineSeparatorSearcher(tokenizatedOutput));
         computed = multiThread.compute(matchers);
         for (List<RobotTokenContext> context : computed) {
             contexts.addAll(context);
