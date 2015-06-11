@@ -40,8 +40,8 @@ public class CommentsSearcher extends AContextMatcher {
     }
 
 
-    protected List<RobotTokenContext> handleAllComments(
-            List<RobotToken> tokens, List<Integer> joinedList) {
+    private List<RobotTokenContext> handleAllComments(List<RobotToken> tokens,
+            List<Integer> joinedList) {
         List<RobotTokenContext> contexts = new LinkedList<>();
         for (int currentCommentId = 0; currentCommentId < joinedList.size(); currentCommentId++) {
             RobotTokenContext commentCtx = new RobotTokenContext(
