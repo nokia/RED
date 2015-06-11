@@ -83,7 +83,7 @@ public class CommentsSearcher extends AContextMatcher {
     }
 
 
-    protected List<Integer> getSortedJoinedList(
+    private List<Integer> getSortedJoinedList(
             List<Integer> wordsCommentIndexes, List<Integer> hashCharsIndexes) {
         List<Integer> joinedList = new LinkedList<>();
         if (wordsCommentIndexes != null && !wordsCommentIndexes.isEmpty()) {

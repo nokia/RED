@@ -53,6 +53,11 @@ public class TokenMatcher {
             out.addNextIndexOfSpecial(rt);
         }
 
+        if (type == RobotTokenType.PIPE || type == RobotTokenType.SPACE
+                || type == RobotTokenType.TABULATOR) {
+            out.addNextIndexOfSeparator(rt);
+        }
+
         return rt;
     }
 

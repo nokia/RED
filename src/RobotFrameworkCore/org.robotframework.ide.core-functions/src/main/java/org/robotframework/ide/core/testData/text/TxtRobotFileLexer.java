@@ -94,6 +94,7 @@ public class TxtRobotFileLexer {
         private Map<RobotTokenType, List<Integer>> indexesForSpecial = new HashMap<>();
         private int firstIndexOfSpecialWord = -1;
         private List<Exception> problemCatched = new LinkedList<>();
+        private Map<RobotTokenType, List<Integer>> indexesForSeparator = new HashMap<>();
         private List<List<RobotTokenContext>> contextsPerLine = new LinkedList<>();
 
 
@@ -117,8 +118,25 @@ public class TxtRobotFileLexer {
         }
 
 
+        public Map<RobotTokenType, List<Integer>> getIndexesForSeparator() {
+            return indexesForSeparator;
+        }
+
+
         public int getFirstIndexOfSpecialWord() {
             return firstIndexOfSpecialWord;
+        }
+
+
+        public void addNextIndexOfSeparator(RobotToken token) {
+            List<Integer> forThisSeparator = indexesForSeparator.get(token
+                    .getType());
+            if (forThisSeparator == null) {
+                forThisSeparator = new LinkedList<>();
+                indexesForSeparator.put(token.getType(), forThisSeparator);
+            }
+
+            forThisSeparator.add(tokens.size());
         }
 
 
