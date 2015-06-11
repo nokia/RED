@@ -3,15 +3,13 @@ package org.robotframework.ide.core.testData.text;
 import static org.robotframework.ide.core.testData.text.NamedElementsStore.CARRITAGE_RETURN;
 import static org.robotframework.ide.core.testData.text.NamedElementsStore.LINE_FEED;
 
-import java.util.List;
-
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
 public class TokenMatcher {
 
     public RobotToken match(TokenizatorOutput out, StringBuilder currentText,
-            LinearPosition lp, RobotTokenType lineSeparator) {
+            LinearPosition lp) {
         RobotToken rt = matchSpecialChars(out, currentText, lp);
         if (rt.getType() == RobotTokenType.UNKNOWN) {
             rt = matchSpecialWords(out, currentText, lp);
@@ -101,42 +99,6 @@ public class TokenMatcher {
         }
 
         return rt;
-    }
-
-
-    public RobotTokenType matchLineSeparator(List<RobotToken> tokens,
-            StringBuilder currentText, LinearPosition linearPosition,
-            int nearestStartLineToken) {
-        RobotTokenType type = RobotTokenType.UNKNOWN;
-        int pipeOrOtherSign = nearestStartLineToken + 1;
-        if (pipeOrOtherSign < tokens.size()) {
-            RobotToken theFirstTokenAfterStartLine = tokens
-                    .get(pipeOrOtherSign);
-            if (theFirstTokenAfterStartLine.getType() == RobotTokenType.PIPE) {
-                if (pipeOrOtherSign + 3 == tokens.size()) {
-                    RobotTokenType theSecondTokenType = tokens.get(
-                            pipeOrOtherSign + 1).getType();
-                    if (theSecondTokenType == RobotTokenType.SPACE
-                            || theSecondTokenType == RobotTokenType.TABULATOR) {
-                        type = RobotTokenType.PIPE_SEPARATOR;
-                    } else {
-                        type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
-                    }
-                }
-            } else {
-                type = RobotTokenType.DOUBLE_SPACE_OR_TAB_SEPARATOR;
-            }
-        }
-
-        if (type != RobotTokenType.UNKNOWN) {
-            RobotToken startLineToken = tokens.get(nearestStartLineToken);
-            RobotToken separatorForLine = new RobotToken(type);
-            separatorForLine.setStartPos(startLineToken.getStartPos());
-            separatorForLine.setEndPos(startLineToken.getEndPos());
-            startLineToken.addNextSubToken(separatorForLine, false);
-        }
-
-        return type;
     }
 
 
