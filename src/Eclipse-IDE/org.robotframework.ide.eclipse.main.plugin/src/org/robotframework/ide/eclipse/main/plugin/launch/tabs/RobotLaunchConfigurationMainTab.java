@@ -328,7 +328,10 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 if (dialog.open() == Window.OK) {
                     final List<IPath> suites = getSuites();
                     for (final Object obj : dialog.getResult()) {
-                        suites.add(((IResource) obj).getProjectRelativePath());
+                        final IPath pathToAdd = ((IResource) obj).getProjectRelativePath();
+                        if (!suites.contains(pathToAdd)) {
+                            suites.add(pathToAdd);
+                        }
                     }
                     viewer.setInput(suites);
                     updateLaunchConfigurationDialog();
