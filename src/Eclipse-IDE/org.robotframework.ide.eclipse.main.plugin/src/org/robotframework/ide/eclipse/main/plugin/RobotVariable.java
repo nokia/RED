@@ -40,7 +40,7 @@ public class RobotVariable implements RobotElement {
 
             @Override
             public ImageDescriptor getImage() {
-                return RobotImages.getRobotListVariableImage();
+                return RobotImages.getRobotDictionaryVariableImage();
             }
         };
 
