@@ -35,6 +35,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/variable_list.png");
     }
 
+    public static ImageDescriptor getRobotDictionaryVariableImage() {
+        return RobotFramework.getImageDescriptor("resources/variable_dict.png");
+    }
+
     public static ImageDescriptor getRobotSettingImage() {
         return RobotFramework.getImageDescriptor("resources/gear.png");
     }
