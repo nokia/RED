@@ -87,6 +87,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/config.png");
     }
 
+    public static ImageDescriptor getFocusSectionImage() {
+        return RobotFramework.getImageDescriptor("resources/focus_section.png");
+    }
+
     /**
      * For given image descriptor the gray version descriptor is created.
      * 

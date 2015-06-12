@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,11 +38,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.AbstractFormPart;
-import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.forms.RedFormToolkit;
+import org.robotframework.forms.Sections;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -53,12 +54,16 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
-class GeneralSettingsFormPart extends AbstractFormPart {
+public class GeneralSettingsFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEditorSite site;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -67,47 +72,46 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     @Inject
     private RobotEditorCommandsStack commandsStack;
 
-    private final IEditorSite site;
+    @Inject
+    private IDirtyProviderService dirtyProviderService;
+
+    @Inject
+    private RedFormToolkit toolkit;
+
     private RowExposingTableViewer viewer;
 
     private Text documentation;
 
     private final GeneralSettingsModel model = new GeneralSettingsModel();
 
-    public GeneralSettingsFormPart(final IEditorSite site) {
-        this.site = site;
-    }
+    private Section section;
 
     TableViewer getViewer() {
         return viewer;
     }
 
     @Override
-    public final void initialize(final IManagedForm managedForm) {
-        super.initialize(managedForm);
-        createContent(managedForm.getForm().getBody());
-    }
-
-    private void createContent(final Composite parent) {
-        final FormToolkit toolkit = getManagedForm().getToolkit();
-        final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE
-                | ExpandableComposite.TITLE_BAR);
+    public void initialize(final Composite parent) {
+        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE
+                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setExpanded(true);
         section.setText("General");
         section.setDescription("Provide test suite documentation and general settings");
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
-        
+        GridDataFactory.fillDefaults().grab(true, true).minSize(1, 22).indent(0, 5).applyTo(section);
+        Sections.switchGridCellGrabbingOnExpansion(section);
+        Sections.installMaximazingPossibility(section);
+
         final Composite panel = createPanel(section);
         createDocumentationControl(panel);
         createViewer(panel);
 
         createContextMenu();
 
-        setInput();
+        setInput(true);
     }
 
     private Composite createPanel(final Section section) {
-        final Composite panel = getManagedForm().getToolkit().createComposite(section);
+        final Composite panel = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(panel);
         GridLayoutFactory.fillDefaults().applyTo(panel);
         section.setClient(panel);
@@ -115,7 +119,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = getManagedForm().getToolkit().createText(panel, "", SWT.MULTI);
+        documentation = toolkit.createText(panel, "", SWT.MULTI);
         documentation.setEditable(fileModel.isEditable());
         documentation.addPaintListener(new PaintListener() {
             @Override
@@ -134,13 +138,14 @@ class GeneralSettingsFormPart extends AbstractFormPart {
                 @Override
                 public void modifyText(final ModifyEvent e) {
                     if (!((Text) e.getSource()).getText().equals(model.getDocumentation())) {
-                        markDirty();
+                        dirtyProviderService.setDirtyState(true);
                     }
                 }
             });
         }
 
-        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).applyTo(documentation);
+        GridDataFactory.fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 60).hint(SWT.DEFAULT, 100)
+                .applyTo(documentation);
     }
 
     private void createViewer(final Composite panel) {
@@ -154,7 +159,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
             }
         });
         viewer.setContentProvider(new GeneralSettingsContentProvider());
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
@@ -164,8 +169,9 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void createColumns(final boolean createFirst) {
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Setting").withWidth(100)
-                    .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
-                    .createFor(viewer);
+                .shouldGrabAllTheSpaceLeft(!model.areSettingsExist()).withMinWidth(100)
+                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
+                .createFor(viewer);
         }
         if (!model.areSettingsExist()) {
             return;
@@ -173,23 +179,25 @@ class GeneralSettingsFormPart extends AbstractFormPart {
 
         final int max = calcualateLongestArgumentsLength();
         for (int i = 0; i < max; i++) {
-            ViewerColumnsFactory.newColumn("").withWidth(80)
-                    .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(i))
-                    .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
-                    .editingEnabledOnlyWhen(fileModel.isEditable())
-                    .createFor(viewer);
-        }
-        ViewerColumnsFactory.newColumn("Comment").withWidth(100)
-                .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider())
-                .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
+            ViewerColumnsFactory.newColumn("").withWidth(120)
+                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(i))
+                .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
+        }
+        ViewerColumnsFactory.newColumn("Comment").withWidth(200)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider())
+            .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
 
         final int newColumnsStartingPosition = max + 1;
-        
+
         final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
                 .getGreyedImage(RobotImages.getAddImage());
-        ViewerColumnsFactory.newColumn("").withWidth(28).resizable(false)
+        ViewerColumnsFactory.newColumn("").withWidth(28)
+                .resizable(false)
                 .withTooltip("Activate cell in this column to add new arguments columns")
                 .withImage(addImage.createImage())
                 .labelsProvidedBy(new ColumnAddingLabelProvider())
@@ -197,12 +205,13 @@ class GeneralSettingsFormPart extends AbstractFormPart {
                         new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
                             @Override
                             public void createColumn(final int index) {
-                                ViewerColumnsFactory.newColumn("").withWidth(80)
+                                ViewerColumnsFactory
+                                        .newColumn("")
+                                        .withWidth(80)
                                         .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(index - 1))
                                         .editingSupportedBy(
                                                 new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack))
-                                        .editingEnabledOnlyWhen(fileModel.isEditable())
-                                        .createFor(viewer);
+                                        .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
                             }
                         }))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
@@ -231,13 +240,13 @@ class GeneralSettingsFormPart extends AbstractFormPart {
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
     }
 
-    private void setInput() {
+    private void setInput(final boolean setDocumentation) {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
                 .findSection(RobotSuiteSettingsSection.class);
         model.update(settingsSection);
 
         documentation.setEnabled(settingsSection.isPresent());
-        if (!isDirty()) {
+        if (setDocumentation) {
             documentation.setText(model.getDocumentation());
         }
 
@@ -259,15 +268,18 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     }
 
     public void revealSetting(final RobotSetting setting) {
+        Sections.maximizeChosenSectionAndMinimalizeOthers(section);
         if ("Documentation".equals(setting.getName())) {
             documentation.forceFocus();
             documentation.selectAll();
             viewer.setSelection(StructuredSelection.EMPTY);
-        }
-        for (final Entry<String, RobotElement> entry : model.getEntries()) {
-            if (entry.getValue() == setting) {
-                viewer.setSelection(new StructuredSelection(entry));
+        } else {
+            for (final Entry<String, RobotElement> entry : model.getEntries()) {
+                if (entry.getValue() == setting) {
+                    viewer.setSelection(new StructuredSelection(entry));
+                }
             }
+            setFocus();
         }
     }
 
@@ -275,12 +287,8 @@ class GeneralSettingsFormPart extends AbstractFormPart {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
-    @Override
-    public void commit(final boolean onSave) {
-        if (onSave) {
-            super.commit(onSave);
-        }
-
+    @Persist
+    public void whenSaving() {
         final String newDocumentation = documentation.getText().replaceAll("\t", " ").replaceAll("  +", " ");
         final RobotSetting currentSetting = model.getDocumentationSetting();
 
@@ -299,8 +307,8 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
-            markDirty();
+            setInput(false);
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -309,8 +317,8 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
-            markDirty();
+            setInput(false);
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -319,8 +327,8 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && model.contains(setting)) {
-            setInput();
-            markDirty();
+            setInput(false);
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -329,8 +337,8 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section == model.getSection()) {
-            setInput();
-            markDirty();
+            setInput(false);
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -339,7 +347,7 @@ class GeneralSettingsFormPart extends AbstractFormPart {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
-            setInput();
+            setInput(false);
         }
     }
 }

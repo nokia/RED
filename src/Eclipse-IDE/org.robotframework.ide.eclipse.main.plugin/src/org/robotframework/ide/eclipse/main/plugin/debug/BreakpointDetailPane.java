@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 
 /**
@@ -42,7 +41,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     private IMarker currentMarker;
 
-    private ListenerList listenersList = new ListenerList();
+    private final ListenerList listenersList = new ListenerList();
 
     private HitCountSelectionListener selectionListener;
 
@@ -53,7 +52,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     private ConditionalModifyListener conditionalModifyListener;
 
     @Override
-    public void init(IWorkbenchPartSite partSite) {
+    public void init(final IWorkbenchPartSite partSite) {
         isDirty = false;
         listenersList.clear();
 
@@ -64,10 +63,10 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     @Override
-    public Control createControl(Composite parent) {
-        parent.setBackground(SWTResourceManager.getColor(255, 255, 255));
+    public Control createControl(final Composite parent) {
+        parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-        Composite control = new Composite(parent, SWT.NONE);
+        final Composite control = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(control);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(control);
 
@@ -99,19 +98,19 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     @Override
-    public void display(IStructuredSelection selection) {
+    public void display(final IStructuredSelection selection) {
         if (selection != null && selection.size() > 0) {
             removeAllListeners();
 
-            Object element = selection.getFirstElement();
+            final Object element = selection.getFirstElement();
             if (element instanceof RobotLineBreakpoint) {
-                IMarker marker = ((RobotLineBreakpoint) element).getMarker();
+                final IMarker marker = ((RobotLineBreakpoint) element).getMarker();
                 currentMarker = marker;
 
-                int hitCount = marker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                final int hitCount = marker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
                 setupHitCountControls(hitCount);
 
-                String condition = marker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                final String condition = marker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                 setupConditionalControls(condition);
             }
 
@@ -140,14 +139,14 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     @Override
-    public void doSave(IProgressMonitor monitor) {
+    public void doSave(final IProgressMonitor monitor) {
         isDirty = false;
         fireDirty();
 
         if (currentMarker != null) {
             try {
                 if (hitCountBtn.getSelection() && !"".equals(hitCountTxt.getText())) {
-                    int hitCount = Integer.parseInt(hitCountTxt.getText());
+                    final int hitCount = Integer.parseInt(hitCountTxt.getText());
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, hitCount);
                 } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
@@ -158,12 +157,12 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
             try {
                 if (conditionalBtn.getSelection() && !"".equals(conditionalTxt.getText())) {
-                    String condition = conditionalTxt.getText();
+                    final String condition = conditionalTxt.getText();
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, condition);
                 } else {
                     currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                 }
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 e.printStackTrace();
             }
         }
@@ -189,24 +188,24 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     @Override
-    public void addPropertyListener(IPropertyListener listener) {
+    public void addPropertyListener(final IPropertyListener listener) {
         listenersList.add(listener);
     }
 
     @Override
-    public void removePropertyListener(IPropertyListener listener) {
+    public void removePropertyListener(final IPropertyListener listener) {
         listenersList.remove(listener);
     }
 
     private void fireDirty() {
-        Object[] listeners = listenersList.getListeners();
+        final Object[] listeners = listenersList.getListeners();
         for (int i = 0; i < listeners.length; i++) {
             ((IPropertyListener) listeners[i]).propertyChanged(this, PROP_DIRTY);
         }
     }
 
-    private void setupHitCountControls(int hitCount) {
-        boolean isEnabled = hitCount > 1;
+    private void setupHitCountControls(final int hitCount) {
+        final boolean isEnabled = hitCount > 1;
         hitCountBtn.setSelection(isEnabled);
         hitCountTxt.setEnabled(isEnabled);
         if (isEnabled) {
@@ -216,8 +215,8 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         }
     }
 
-    private void setupConditionalControls(String condition) {
-        boolean isEnabled = !"".equals(condition);
+    private void setupConditionalControls(final String condition) {
+        final boolean isEnabled = !"".equals(condition);
         conditionalBtn.setSelection(isEnabled);
         conditionalTxt.setEnabled(isEnabled);
         if (isEnabled) {
@@ -244,21 +243,21 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     private class HitCountSelectionListener implements SelectionListener {
 
         @Override
-        public void widgetSelected(SelectionEvent e) {
+        public void widgetSelected(final SelectionEvent e) {
             hitCountTxt.setEnabled(hitCountBtn.getSelection());
             isDirty = true;
             fireDirty();
         }
 
         @Override
-        public void widgetDefaultSelected(SelectionEvent e) {
+        public void widgetDefaultSelected(final SelectionEvent e) {
         }
     }
 
     private class HitCountModifyListener implements ModifyListener {
 
         @Override
-        public void modifyText(ModifyEvent e) {
+        public void modifyText(final ModifyEvent e) {
             isDirty = true;
             fireDirty();
         }
@@ -267,21 +266,21 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     private class ConditionalSelectionListener implements SelectionListener {
 
         @Override
-        public void widgetSelected(SelectionEvent e) {
+        public void widgetSelected(final SelectionEvent e) {
             conditionalTxt.setEnabled(conditionalBtn.getSelection());
             isDirty = true;
             fireDirty();
         }
 
         @Override
-        public void widgetDefaultSelected(SelectionEvent e) {
+        public void widgetDefaultSelected(final SelectionEvent e) {
         }
     }
 
     private class ConditionalModifyListener implements ModifyListener {
 
         @Override
-        public void modifyText(ModifyEvent e) {
+        public void modifyText(final ModifyEvent e) {
             isDirty = true;
             fireDirty();
         }

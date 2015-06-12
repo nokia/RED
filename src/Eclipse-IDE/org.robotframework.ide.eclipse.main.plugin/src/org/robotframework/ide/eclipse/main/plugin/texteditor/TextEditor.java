@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -53,6 +54,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -69,7 +71,6 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
@@ -94,6 +95,8 @@ public class TextEditor {
 	@Inject
 	IDirtyProviderService dirtyProviderService;
 	
+    private Color highlightingColor; // this should probably be moved to themes
+
 	private IFile editedFile;
 	private IEditorInput input;
 	private SourceViewer viewer;
@@ -101,9 +104,13 @@ public class TextEditor {
 	private int breakpointLine = 0; 
 	
 	private CompositeRuler compositeRuler;
+
+    private TxtScanner txtScanner;
 	
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
+        highlightingColor = new Color(parent.getDisplay(), 198, 219, 174);
+
 	    this.input = input;
 
 		final FillLayout layout = new FillLayout();
@@ -151,8 +158,8 @@ public class TextEditor {
 		annotationColumn.addAnnotationType(breakpointAnnotationType.getType());
 		
 		final LineNumberRulerColumn lineNumberColumn = new LineNumberRulerColumn();
-		lineNumberColumn.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		lineNumberColumn.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+        lineNumberColumn.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+        lineNumberColumn.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
 		lineNumberColumn.setFont(JFaceResources.getTextFont());
 		
 		viewer.addVerticalRulerColumn(annotationColumn);
@@ -287,28 +294,31 @@ public class TextEditor {
             }
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
-        	    viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
-        	    viewer.getTextWidget().setLineBackground(line-1, 1, SWTResourceManager.getColor(198, 219, 174));
-        	    showHighlightedLine(line);
-        	    compositeRuler.immediateUpdate();
-        	    breakpointLine = line-1;
+                final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
+
+                viewer.getTextWidget().setLineBackground(breakpointLine, 1, whiteColor);
+                viewer.getTextWidget().setLineBackground(line - 1, 1, highlightingColor);
+                showHighlightedLine(line);
+                compositeRuler.immediateUpdate();
+                breakpointLine = line - 1;
 	        }
 	    }
     }
 	
 	private void showHighlightedLine(final int lineNumber) {
-	    final int visibleLinesNumber = viewer.getTextWidget().getClientArea().height / viewer.getTextWidget().getLineHeight();
-	    if (visibleLinesNumber < 2) {
-	        viewer.getTextWidget().setTopIndex(lineNumber-1);
-	        return;
-	    }
-	    final int linesToCenter = visibleLinesNumber / 2;
-	    final int topIndexPosiiton = lineNumber - linesToCenter;
-	    if(topIndexPosiiton >= 0) {
-	        viewer.getTextWidget().setTopIndex(topIndexPosiiton);
-	    } else {
-	        viewer.getTextWidget().setTopIndex(lineNumber-1);
-	    }
+        final int visibleLinesNumber = viewer.getTextWidget().getClientArea().height
+                / viewer.getTextWidget().getLineHeight();
+        if (visibleLinesNumber < 2) {
+            viewer.getTextWidget().setTopIndex(lineNumber - 1);
+            return;
+        }
+        final int linesToCenter = visibleLinesNumber / 2;
+        final int topIndexPosiiton = lineNumber - linesToCenter;
+        if (topIndexPosiiton >= 0) {
+            viewer.getTextWidget().setTopIndex(topIndexPosiiton);
+        } else {
+            viewer.getTextWidget().setTopIndex(lineNumber - 1);
+        }
 	}
 
     @Inject
@@ -316,8 +326,10 @@ public class TextEditor {
     private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final String file,
             @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
         if ("".equals(file) || editedFile.getName().equals(file)) {
+            final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
+
             editor.activateSourcePage();
-	        viewer.getTextWidget().setLineBackground(breakpointLine, 1, SWTResourceManager.getColor(255, 255, 255));
+            viewer.getTextWidget().setLineBackground(breakpointLine, 1, whiteColor);
 	        breakpointLine = 0;
 	    }
     }
@@ -336,16 +348,17 @@ public class TextEditor {
 	private String extractTextFromFile() {
 		Scanner scanner = null;
         final StringBuilder text = new StringBuilder("");
-        try(InputStream is = editedFile.getContents()) {
-        	 scanner = new Scanner(is).useDelimiter("\\n");
-    		while(scanner.hasNext()) {
-    			text.append(scanner.next() + "\n");
-    		}
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
-		}
-		scanner.close();
-		
+        try (InputStream is = editedFile.getContents()) {
+            scanner = new Scanner(is).useDelimiter("\\n");
+            while (scanner.hasNext()) {
+                text.append(scanner.next() + "\n");
+            }
+        } catch (CoreException | IOException e) {
+            throw new TextEditorInitializationException("Unable to get file content", e);
+        }
+        if (scanner != null) {
+            scanner.close();
+        }
 		return text.toString();
 	}
 	
@@ -438,7 +451,7 @@ public class TextEditor {
 	
 	private PresentationReconciler createPresentationReconciler() {
 		final PresentationReconciler reconciler = new PresentationReconciler();
-		final TxtScanner txtScanner = new TxtScanner();
+        txtScanner = new TxtScanner(viewer.getTextWidget().getDisplay());
 		final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(txtScanner);
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -457,5 +470,20 @@ public class TextEditor {
             line++;
         }
         return line;
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        highlightingColor.dispose();
+        if (txtScanner != null) {
+            txtScanner.disposeResources();
+        }
+    }
+
+    public class TextEditorInitializationException extends RuntimeException {
+
+        public TextEditorInitializationException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 }

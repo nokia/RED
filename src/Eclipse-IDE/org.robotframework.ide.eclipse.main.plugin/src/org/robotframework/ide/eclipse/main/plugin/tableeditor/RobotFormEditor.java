@@ -1,5 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
@@ -11,13 +15,14 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
@@ -30,9 +35,9 @@ import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPage;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPage;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPage;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
 public class RobotFormEditor extends FormEditor {
@@ -95,16 +100,26 @@ public class RobotFormEditor extends FormEditor {
         try {
             prepareCommandsContext();
 
-            addPage(new CasesEditorPage(this));
-            addPage(new SettingsEditorPage(this));
-            addPage(new VariablesEditorPage(this));
+            addEditorPart(new CasesEditorPart(), "Test Cases");
+            addEditorPart(new SettingsEditorPart(), "Settings");
+            addEditorPart(new VariablesEditorPart(), "Variables");
+            addEditorPart(new TextEditorWrapper(), "Source", null);
 
-            final int sourceEditorIndex = addPage(new TextEditorWrapper(), getEditorInput());
-            setPageText(sourceEditorIndex, "Source");
-            setActivePage(sourceEditorIndex);
+            setActivePage(3);
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
         }
+    }
+
+    private void addEditorPart(final EditorPart editorPart, final String partName) throws PartInitException {
+        addEditorPart(editorPart, partName, editorPart.getTitleImage());
+    }
+
+    private void addEditorPart(final EditorPart editorPart, final String partName, final Image image)
+            throws PartInitException {
+        final int newVariablesPart = addPage(editorPart, getEditorInput());
+        setPageImage(newVariablesPart, image);
+        setPageText(newVariablesPart, partName);
     }
 
     private void prepareCommandsContext() {
@@ -112,32 +127,40 @@ public class RobotFormEditor extends FormEditor {
         commandsContext.activateContext(EDITOR_CONTEXT_ID);
     }
 
-    private void addPage(final FormPage page) throws PartInitException {
-        final int index = addPage(page, getEditorInput());
-        setPageImage(index, page.getTitleImage());
-    }
-
     @Override
     public void doSave(final IProgressMonitor monitor) {
-        commitPages(true);
         try {
+            for (final IEditorPart dirtyEditor : getDirtyEditors()) {
+                dirtyEditor.doSave(monitor);
+            }
+
             suiteModel = provideSuiteModel();
             suiteModel.commitChanges(monitor);
             suiteModel = null;
-            firePropertyChange(PROP_DIRTY);
         } catch (final CoreException e) {
             monitor.setCanceled(true);
         }
     }
 
+    private List<? extends IEditorPart> getDirtyEditors() {
+        final List<IEditorPart> dirtyEditors = newArrayList();
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart != null && editorPart.isDirty()) {
+                dirtyEditors.add(editorPart);
+            }
+        }
+        return dirtyEditors;
+    }
+
     @Override
     public boolean isSaveAsAllowed() {
-        return false; // FIXME : getActiveEditor() != null && getActiveEditor().isSaveAsAllowed();
+        return false;
     }
 
     @Override
     public void doSaveAs() {
-        // FIXME : implement
+        // it is not allowed currently
     }
 
     @Override
@@ -192,10 +215,9 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void updateActivePage() {
-        if (getActiveEditor() instanceof SectionEditorPage) {
-            final SectionEditorPage page = (SectionEditorPage) getActiveEditor();
-            page.updateMessages();
-            page.updateToolbars();
+        if (getActiveEditor() instanceof ISectionEditorPart) {
+            final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
+            page.updateOnActivation();
         }
     }
 
@@ -213,19 +235,19 @@ public class RobotFormEditor extends FormEditor {
         }
     }
 
-    public IEditorPart activatePage(final RobotSuiteFileSection section) {
+    public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {
         int index = -1;
 
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart part = (IEditorPart) pages.get(i);
-            if (part instanceof SectionEditorPage && ((SectionEditorPage) part).isPartFor(section)) {
+            if (part instanceof ISectionEditorPart && ((ISectionEditorPart) part).isPartFor(section)) {
                 index = i;
                 break;
             }
         }
         if (index >= 0) {
             setActivePage(index);
-            return (IEditorPart) pages.get(index);
+            return (ISectionEditorPart) pages.get(index);
         }
         return null;
     }
