@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xf9_cPS5EeSLOvIIpQkwfQ
 Runtime-Version: 1.5.3.201409120955
-Save-Time: 6/10/15 11:40 AM
+Save-Time: 6/10/15 3:33 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -25,6 +25,15 @@ Testcase:
 Content-Type: text/ecl
 Entry-Name: .content
 
+proc concat_str_with_regex [val log_list]
+{
+	concat [$log_list |each [val single ] 
+	{
+		concat $msg_log_regex_INFO $single
+	}] 
+
+}
+
 get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" 
     | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Open With/Robot Text Editor" 
     | click
@@ -36,19 +45,23 @@ get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspectiv
 
 wait 200
 
-get-view "Message Log" | get-editbox | get-property text | contains "INFO : 1" | verify-true
+get-view "Message Log" | get-editbox | get-property text | matches [concat $msg_log_regex_INFO "1" ] | verify-true
 
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
 }
 wait 200
 	
-get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${variable} = 10" | verify-true
+get-view "Message Log" | get-editbox | get-property text | matches [concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10"]]| verify-true
 	
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
 }
 wait 200
-get-view "Message Log" | get-editbox | get-property text | contains "INFO : 10" | verify-true
+
+
+
+get-view "Message Log" | get-editbox | get-property text | matches [concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"  "10"]]| verify-true
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

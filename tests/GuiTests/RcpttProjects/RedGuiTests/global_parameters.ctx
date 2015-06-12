@@ -1,0 +1,18 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.parameters
+Element-Name: global_parameters
+Element-Type: context
+Element-Version: 2.0
+Id: _Mir2gA9oEeWFTuCZGHkLuQ
+Runtime-Version: 1.5.3.201409120955
+Save-Time: 6/10/15 2:10 PM
+
+------=_.parameters.context-2e023de5-3294-36a9-ac1d-6701f05a40ee
+Content-Type: text/properties
+Entry-Name: .parameters.context
+
+#Wed Jun 10 14:10:32 CEST 2015
+msg_log_regex_INFO=\\d{8} (\\d\\d\:){2}\\d\\d.\\d{3} \: INFO \: 
+
+------=_.parameters.context-2e023de5-3294-36a9-ac1d-6701f05a40ee--
