@@ -55,11 +55,9 @@ public class TxtRobotFileLexer {
         for (StringBuilder currentText : possibleTokensSplitted) {
             RobotToken recognizedToken = tokenMatcher.match(out, currentText,
                     new LinearPosition(currentLine, currentColumn));
-
             if (recognizedToken.getType() == RobotTokenType.END_OF_LINE) {
                 currentLine++;
                 currentColumn = 1;
-
                 RobotToken startLine = buildStartLineToken(currentLine);
                 out.tokens.add(recognizedToken);
                 out.tokens.add(startLine);
@@ -182,6 +180,7 @@ public class TxtRobotFileLexer {
         readerHelper.charBuffer = charBuffer;
         while((readerHelper.numberOfCharsToRead = reader.read(charBuffer)) > 0) {
             readerHelper = read(readerHelper, extractedTokens);
+            charBuffer.clear();
         }
 
         if (readerHelper.unfinishedText.length() > 0) {
@@ -196,7 +195,6 @@ public class TxtRobotFileLexer {
             List<StringBuilder> extractedTokens) {
         int readLength = readerHelper.numberOfCharsToRead;
         CharBuffer charBuffer = readerHelper.charBuffer;
-
         for (int i = 0; i < readLength; i++) {
             char currentChar = charBuffer.get(i);
             readerHelper.unfinishedText = splitTextFromTokens(extractedTokens,
