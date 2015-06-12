@@ -31,6 +31,17 @@ public class RobotVariable implements RobotElement {
             public ImageDescriptor getImage() {
                 return RobotImages.getRobotListVariableImage();
             }
+        },
+        DICTIONARY {
+            @Override
+            public String getMark() {
+                return "&";
+            }
+
+            @Override
+            public ImageDescriptor getImage() {
+                return RobotImages.getRobotListVariableImage();
+            }
         };
 
         public abstract String getMark();

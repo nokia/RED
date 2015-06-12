@@ -75,6 +75,8 @@ class FileSectionsParser {
 
                     if (lineWithoutComment.startsWith("@")) {
                         varSection.createListVariable(name, value, comment);
+                    } else if (lineWithoutComment.startsWith("&")) {
+                        varSection.createDictionaryVariable(name, value, comment);
                     } else {
                         varSection.createScalarVariable(name, value, comment);
                     }
