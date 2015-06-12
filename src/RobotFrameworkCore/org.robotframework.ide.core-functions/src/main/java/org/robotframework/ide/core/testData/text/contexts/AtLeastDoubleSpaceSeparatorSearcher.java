@@ -12,9 +12,9 @@ import org.robotframework.ide.core.testData.text.RobotTokenType;
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
 
 
-public class WhitespaceSeparatorSearcher extends AContextMatcher {
+public class AtLeastDoubleSpaceSeparatorSearcher extends AContextMatcher {
 
-    public WhitespaceSeparatorSearcher(TokenizatorOutput tokenProvider) {
+    public AtLeastDoubleSpaceSeparatorSearcher(TokenizatorOutput tokenProvider) {
         super(tokenProvider);
     }
 
@@ -39,17 +39,6 @@ public class WhitespaceSeparatorSearcher extends AContextMatcher {
                     ctx.addToken(spaceIndex);
                     contexts.add(ctx);
                 }
-            }
-        }
-
-        List<Integer> tabulators = indexesForSeparator
-                .get(RobotTokenType.TABULATOR);
-        if (tabulators != null) {
-            for (Integer tabulatorIndex : tabulators) {
-                RobotTokenContext ctx = new RobotTokenContext(
-                        ContextType.TABULATOR_SEPARATOR);
-                ctx.addToken(tabulatorIndex);
-                contexts.add(ctx);
             }
         }
 
