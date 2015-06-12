@@ -35,7 +35,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
@@ -232,9 +231,12 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 return project.findMember(org.eclipse.core.runtime.Path.fromPortableString(suitePath));
             }
         });
-        for (final IResource resource : suiteResources) {
+
+        for (int i = 0; i < suitePaths.size(); i++) {
+            final String path = suitePaths.get(i);
+            final IResource resource = suiteResources.get(i);
             if (resource == null || !resource.exists()) {
-                throw newCoreException("Suite '" + resource.getFullPath().toString() + "' does not exist in project '"
+                throw newCoreException("Suite '" + path + "' does not exist in project '"
                         + project.getName() + "'", null);
             }
         }
