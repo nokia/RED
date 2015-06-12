@@ -15,6 +15,12 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         elements.add(robotVariable);
         return robotVariable;
     }
+    
+    RobotVariable createDictionaryVariable(final String name, final String value, final String comment) {
+        final RobotVariable robotVariable = new RobotVariable(this, Type.DICTIONARY, name, value, comment);
+        elements.add(robotVariable);
+        return robotVariable;
+    }
 
     RobotVariable createScalarVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.SCALAR, name, value, comment);

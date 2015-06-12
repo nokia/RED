@@ -95,7 +95,7 @@ public class VariablesFormPart extends AbstractFormPart {
 
         ViewerColumnsFactory.newColumn("Value").withWidth(270)
             .labelsProvidedBy(new VariableValueLabelProvider())
-            .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator))
+            .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator, site))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
 
