@@ -1,6 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -12,10 +11,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 
 class VariableValueEditingSupport extends RobotElementEditingSupport {
 
-    private IEditorSite site;
+    private final IEditorSite site;
     
     VariableValueEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator, IEditorSite site) {
+            final NewElementsCreator creator, final IEditorSite site) {
         super(viewer, 1, commandsStack, creator);
         this.site = site;
     }
