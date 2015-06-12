@@ -9,8 +9,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement.OpenStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPage;
 
 import com.google.common.base.Optional;
 
@@ -40,11 +40,14 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
         final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
         try {
             final IEditorPart ed = page.openEditor(new FileEditorInput(file), desc.getId());
-            final RobotFormEditor editor = (RobotFormEditor) ed;
-            final SectionEditorPage activatedPage = (SectionEditorPage) editor.activatePage(section);
-            
-            if (elementToReveal.isPresent()) {
-                activatedPage.revealElement(elementToReveal.get());
+            if (ed instanceof RobotFormEditor) { // it can be ErrorEditorPart if something went wrong
+                final RobotFormEditor editor = (RobotFormEditor) ed;
+                final ISectionEditorPart activatedPage = editor.activatePage(section);
+                activatedPage.setFocus();
+
+                if (elementToReveal.isPresent()) {
+                    activatedPage.revealElement(elementToReveal.get());
+                }
             }
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to open editor for file: " + file.getName(), e);

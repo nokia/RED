@@ -3,10 +3,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -17,16 +17,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.AbstractFormPart;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 
-public class CasesFormPart extends AbstractFormPart {
+public class CasesEditorFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEditorSite site;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -35,26 +37,16 @@ public class CasesFormPart extends AbstractFormPart {
     @Inject
     private RobotEditorCommandsStack commandsStack;
 
-    private final IEditorSite site;
+    @Inject
+    private IDirtyProviderService dirtyProviderService;
+
+    @Inject
+    private RedFormToolkit toolkit;
+
     private RowExposingTableViewer viewer;
 
-    public CasesFormPart(final IEditorSite site) {
-        this.site = site;
-    }
-
-    TableViewer getViewer() {
-        return viewer;
-    }
-
     @Override
-    public final void initialize(final IManagedForm managedForm) {
-        super.initialize(managedForm);
-        createContent(managedForm.getForm().getBody());
-    }
-
-    private void createContent(final Composite parent) {
-        final FormToolkit toolkit = getManagedForm().getToolkit();
-
+    public void initialize(final Composite parent) {
         final SashForm mainSash = new SashForm(parent, SWT.SMOOTH | SWT.HORIZONTAL);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(mainSash);
         toolkit.adapt(mainSash);
@@ -69,9 +61,9 @@ public class CasesFormPart extends AbstractFormPart {
                 event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
-        viewer.setContentProvider(new TestCasesContentProvider());
+        viewer.setContentProvider(new CasesContentProvider());
 
-        ViewerColumnsFactory.newColumn("").withWidth(150).labelsProvidedBy(new TestCasesNameLabelProvider())
+        ViewerColumnsFactory.newColumn("").withWidth(150).labelsProvidedBy(new CasesNameLabelProvider())
         // .editingSupportedBy(new TestCaseNameEditingSupport(viewer,
         // commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
@@ -95,11 +87,6 @@ public class CasesFormPart extends AbstractFormPart {
         setInput();
     }
 
-    @Override
-    public void setFocus() {
-        viewer.getTable().setFocus();
-    }
-
     private void setInput() {
         final com.google.common.base.Optional<RobotElement> casesSection = fileModel
                 .findSection(RobotCasesSection.class);
@@ -112,14 +99,7 @@ public class CasesFormPart extends AbstractFormPart {
     }
 
     @Override
-    public void commit(final boolean onSave) {
-        if (onSave) {
-            super.commit(onSave);
-        }
-    }
-
-    @Override
-    public void refresh() {
-        super.refresh();
+    public void setFocus() {
+        viewer.getTable().setFocus();
     }
 }

@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -27,9 +28,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.AbstractFormPart;
-import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.forms.RedFormToolkit;
+import org.robotframework.forms.Sections;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -39,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
@@ -46,7 +49,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivatio
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportLibraryPopup;
 
-class ImportsSettingsFormPart extends AbstractFormPart {
+public class ImportSettingsFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEditorSite site;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -55,30 +61,28 @@ class ImportsSettingsFormPart extends AbstractFormPart {
     @Inject
     private RobotEditorCommandsStack commandsStack;
 
-    private final IEditorSite site;
+    @Inject
+    private IDirtyProviderService dirtyProviderService;
+
+    @Inject
+    private RedFormToolkit toolkit;
 
     private RowExposingTableViewer viewer;
 
-    public ImportsSettingsFormPart(final IEditorSite site) {
-        this.site = site;
-    }
+    private Section section;
 
     TableViewer getViewer() {
         return viewer;
     }
 
     @Override
-    public final void initialize(final IManagedForm managedForm) {
-        super.initialize(managedForm);
-        createContent(managedForm.getForm().getBody());
-    }
-
-    private void createContent(final Composite parent) {
-        final ExpandableComposite section = getManagedForm().getToolkit().createSection(parent,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+    public void initialize(final Composite parent) {
+        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setText("Imports");
         section.setExpanded(false);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
+        Sections.switchGridCellGrabbingOnExpansion(section);
+        Sections.installMaximazingPossibility(section);
 
         viewer = new RowExposingTableViewer(section, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
@@ -92,7 +96,7 @@ class ImportsSettingsFormPart extends AbstractFormPart {
                 event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
-        viewer.setContentProvider(new ImportsSettingsContentProvider(fileModel.isEditable()));
+        viewer.setContentProvider(new ImportSettingsContentProvider(fileModel.isEditable()));
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
@@ -102,6 +106,82 @@ class ImportsSettingsFormPart extends AbstractFormPart {
         createColumns(true);
         viewer.refresh();
         viewer.packFirstColumn();
+    }
+
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+
+        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
+        final Table control = viewer.getTable();
+        ViewerControlConfigurator.disableContextMenuOnHeader(control);
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
+    }
+
+    private List<RobotElement> getImportElements() {
+        final RobotSuiteSettingsSection section = getSettingsSection();
+        return section != null ? section.getImportSettings() : null;
+    }
+
+    private RobotSuiteSettingsSection getSettingsSection() {
+        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
+                .findSection(RobotSuiteSettingsSection.class);
+        return (RobotSuiteSettingsSection) settingsSection.orNull();
+    }
+
+    private void createColumns(final boolean createFirst) {
+        final NewElementsCreator creator = newElementsCreator();
+        if (createFirst) {
+            ViewerColumnsFactory.newColumn("Import").withWidth(100)
+                .shouldGrabAllTheSpaceLeft(viewer.getInput() == null).withMinWidth(100)
+                .labelsProvidedBy(new SettingsCallNameLabelProvider())
+                .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable())
+                .createFor(viewer);
+        }
+        if (viewer.getInput() == null) {
+            return;
+        }
+
+        final int max = calcualateLongestArgumentsLength();
+        createArgumentColumn("Name / Path", 0, creator);
+        for (int i = 1; i < max; i++) {
+            createArgumentColumn("", i, creator);
+        }
+        ViewerColumnsFactory.newColumn("Comment").withWidth(200)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .labelsProvidedBy(new SettingsCommentsLabelProvider())
+            .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
+
+        final int newColumnsStartingPosition = max + 1;
+
+        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
+                .getGreyedImage(RobotImages.getAddImage());
+        ViewerColumnsFactory.newColumn("").withWidth(28)
+                .resizable(false)
+                .withTooltip("Activate cell in this column to add new arguments columns")
+                .withImage(addImage.createImage())
+                .labelsProvidedBy(new ColumnAddingLabelProvider())
+                .editingSupportedBy(
+                        new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
+                            @Override
+                            public void createColumn(final int index) {
+                                createArgumentColumn("", index - 1, creator);
+                            }
+                        })).editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
+    }
+
+    private NewElementsCreator newElementsCreator() {
+        return new NewElementsCreator() {
+            @Override
+            public RobotElement createNew() {
+                new ImportLibraryPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
+                return null;
+            }
+        };
     }
 
     private int calcualateLongestArgumentsLength() {
@@ -118,15 +198,25 @@ class ImportsSettingsFormPart extends AbstractFormPart {
         return max;
     }
 
-    private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+    private void createArgumentColumn(final String name, final int index, final NewElementsCreator creator) {
+        ViewerColumnsFactory.newColumn(name).withWidth(120).labelsProvidedBy(new SettingsArgsLabelProvider(index))
+                .editingSupportedBy(new SettingsArgsEditingSupport(viewer, index, commandsStack, creator))
+                .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
+    }
 
-        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
-        final Table control = viewer.getTable();
-        ViewerControlConfigurator.disableContextMenuOnHeader(control);
-        final Menu menu = manager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
+    @Override
+    public void setFocus() {
+        viewer.getTable().setFocus();
+    }
+
+    public void revealSetting(final RobotSetting setting) {
+        Sections.maximizeChosenSectionAndMinimalizeOthers(section);
+        viewer.setSelection(new StructuredSelection(setting));
+        setFocus();
+    }
+
+    public void clearSettingsSelection() {
+        viewer.setSelection(StructuredSelection.EMPTY);
     }
 
     private void refreshInput() {
@@ -137,106 +227,13 @@ class ImportsSettingsFormPart extends AbstractFormPart {
         viewer.packFirstColumn();
     }
 
-    private List<RobotElement> getImportElements() {
-        final RobotSuiteSettingsSection section = getSection();
-        return section != null ? section.getImportSettings() : null;
-    }
-
-    private RobotSuiteSettingsSection getSection() {
-        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSuiteSettingsSection.class);
-        return (RobotSuiteSettingsSection) settingsSection.orNull();
-    }
-
-    private void createColumns(final boolean createFirst) {
-        final NewElementsCreator creator = newElementsCreator();
-        if (createFirst) {
-            ViewerColumnsFactory.newColumn("Import").withWidth(100)
-                    .labelsProvidedBy(new SettingsCallNameLabelProvider())
-                    .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
-                    .editingEnabledOnlyWhen(fileModel.isEditable())
-                    .createFor(viewer);
-        }
-        if (viewer.getInput() == null) {
-            return;
-        }
-
-
-        final int max = calcualateLongestArgumentsLength();
-        createArgumentColumn("Name / Path", 0, creator);
-        for (int i = 1; i < max; i++) {
-            createArgumentColumn("", i, creator);
-        }
-        ViewerColumnsFactory.newColumn("Comment").withWidth(100)
-                .labelsProvidedBy(new SettingsCommentsLabelProvider())
-                .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
-                .editingEnabledOnlyWhen(fileModel.isEditable())
-                .createFor(viewer);
-
-        final int newColumnsStartingPosition = max + 1;
-
-        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
-                .getGreyedImage(RobotImages.getAddImage());
-        ViewerColumnsFactory.newColumn("").withWidth(28).resizable(false)
-                .withTooltip("Activate cell in this column to add new arguments columns")
-                .withImage(addImage.createImage())
-                .labelsProvidedBy(new ColumnAddingLabelProvider())
-                .editingSupportedBy(
-                        new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
-                            @Override
-                            public void createColumn(final int index) {
-                                createArgumentColumn("", index - 1, creator);
-                            }
-                        }))
-                .editingEnabledOnlyWhen(fileModel.isEditable())
-                .createFor(viewer);
-    }
-
-    private NewElementsCreator newElementsCreator() {
-        return new NewElementsCreator() {
-            @Override
-            public RobotElement createNew() {
-                new ImportLibraryPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
-                return null;
-            }
-        };
-    }
-    
-    private void createArgumentColumn(final String name, final int index, final NewElementsCreator creator) {
-        ViewerColumnsFactory.newColumn(name).withWidth(80)
-            .labelsProvidedBy(new SettingsArgsLabelProvider(index))
-            .editingSupportedBy(new SettingsArgsEditingSupport(viewer, index, commandsStack, creator))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
-    }
-
-    @Override
-    public void setFocus() {
-        viewer.getTable().setFocus();
-    }
-
-    public void revealSetting(final RobotSetting setting) {
-        viewer.setSelection(new StructuredSelection(setting));
-    }
-
-    public void clearSettingsSelection() {
-        viewer.setSelection(StructuredSelection.EMPTY);
-    }
-
-    @Override
-    public void commit(final boolean onSave) {
-        if (onSave) {
-            super.commit(onSave);
-        }
-    }
-
     @Inject
     @Optional
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
             refreshInput();
-            markDirty();
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -246,7 +243,7 @@ class ImportsSettingsFormPart extends AbstractFormPart {
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
             refreshInput();
-            markDirty();
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -257,7 +254,7 @@ class ImportsSettingsFormPart extends AbstractFormPart {
         final List<?> input = (List<?>) viewer.getInput();
         if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
             refreshInput();
-            markDirty();
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -267,7 +264,7 @@ class ImportsSettingsFormPart extends AbstractFormPart {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             refreshInput();
-            markDirty();
+            dirtyProviderService.setDirtyState(true);
         }
     }
 
@@ -279,4 +276,5 @@ class ImportsSettingsFormPart extends AbstractFormPart {
             refreshInput();
         }
     }
+
 }
