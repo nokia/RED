@@ -1,17 +1,22 @@
 package org.robotframework.ide.core.testData.text;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.robotframework.ide.core.testData.text.TxtRobotFileLexer.TokenizatorOutput;
+import org.robotframework.ide.core.testData.text.contexts.AtLeastDoubleSpaceSeparatorSearcher;
 import org.robotframework.ide.core.testData.text.contexts.CommentsSearcher;
+import org.robotframework.ide.core.testData.text.contexts.DotContinoueBlockSearcher;
+import org.robotframework.ide.core.testData.text.contexts.EscapedCharsBlockSearcher;
 import org.robotframework.ide.core.testData.text.contexts.KeywordsTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.PipeLineSeparatorSearcher;
 import org.robotframework.ide.core.testData.text.contexts.SettingsTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.TabulatedSeparatorSearcher;
 import org.robotframework.ide.core.testData.text.contexts.TestCaseTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSearcher;
-import org.robotframework.ide.core.testData.text.contexts.WhitespaceSeparatorSearcher;
 
 
 public class ContextsMatcher {
@@ -21,29 +26,66 @@ public class ContextsMatcher {
 
     public void matchContexts(TokenizatorOutput tokenizatedOutput)
             throws InterruptedException, ExecutionException {
-        List<RobotTokenContext> contexts = new LinkedList<>();
-        List<AContextMatcher> matchers = new LinkedList<>();
-        matchers.add(new SettingsTableHeaderSearcher(tokenizatedOutput));
-        matchers.add(new VariableTableHeaderSearcher(tokenizatedOutput));
-        matchers.add(new TestCaseTableHeaderSearcher(tokenizatedOutput));
-        matchers.add(new KeywordsTableHeaderSearcher(tokenizatedOutput));
-        matchers.add(new CommentsSearcher(tokenizatedOutput));
-        matchers.add(new PipeLineSeparatorSearcher(tokenizatedOutput));
-        matchers.add(new WhitespaceSeparatorSearcher(tokenizatedOutput));
+        Map<ContextType, List<RobotTokenContext>> contexts = new LinkedHashMap<>();
+        List<AContextMatcher> matchersForIndependElements = createIndependentContextMatchers(tokenizatedOutput);
 
-        List<List<RobotTokenContext>> computed = multiThread.compute(matchers);
-        for (List<RobotTokenContext> context : computed) {
-            contexts.addAll(context);
-        }
+        List<List<RobotTokenContext>> computed = multiThread
+                .compute(matchersForIndependElements);
+        fillContextMap(contexts, computed);
 
         computed = null;
-        matchers = null;
+        matchersForIndependElements = null;
         // computed = multiThread.compute(matchers);
         // for (List<RobotTokenContext> context : computed) {
         // contexts.addAll(context);
         // }
         // merge contexts per line
         // temp solution adding it to one
-        tokenizatedOutput.getContextsPerLine().add(contexts);
+        tokenizatedOutput.getContexts().putAll(contexts);
+    }
+
+
+    private List<AContextMatcher> createIndependentContextMatchers(
+            TokenizatorOutput tokenizatedOutput) {
+        List<AContextMatcher> matchersForNotDependElements = new LinkedList<>();
+        matchersForNotDependElements.add(new SettingsTableHeaderSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements.add(new VariableTableHeaderSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements.add(new TestCaseTableHeaderSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements.add(new KeywordsTableHeaderSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements
+                .add(new CommentsSearcher(tokenizatedOutput));
+        matchersForNotDependElements.add(new PipeLineSeparatorSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements
+                .add(new AtLeastDoubleSpaceSeparatorSearcher(tokenizatedOutput));
+        matchersForNotDependElements.add(new TabulatedSeparatorSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements.add(new DotContinoueBlockSearcher(
+                tokenizatedOutput));
+        matchersForNotDependElements.add(new EscapedCharsBlockSearcher(
+                tokenizatedOutput));
+        return matchersForNotDependElements;
+    }
+
+
+    private void fillContextMap(
+            Map<ContextType, List<RobotTokenContext>> contexts,
+            List<List<RobotTokenContext>> computed) {
+        for (List<RobotTokenContext> context : computed) {
+            if (context != null && !context.isEmpty()) {
+                RobotTokenContext ctx = context.get(0);
+                List<RobotTokenContext> elements = contexts.get(ctx
+                        .getContext());
+                if (elements == null) {
+                    contexts.put(ctx.getContext(), context);
+                } else {
+                    elements.addAll(context);
+                }
+            }
+        }
     }
 }

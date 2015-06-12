@@ -6,7 +6,7 @@ import static org.robotframework.ide.core.testData.text.NamedElementsStore.LINE_
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,11 +79,11 @@ public class TxtRobotFileLexer {
 
         private List<RobotToken> tokens = new LinkedList<>();
         private List<Integer> linePositionInTokensList = new LinkedList<>();
-        private Map<RobotTokenType, List<Integer>> indexesForSpecial = new HashMap<>();
+        private Map<RobotTokenType, List<Integer>> indexesForSpecial = new LinkedHashMap<>();
         private int firstIndexOfSpecialWord = -1;
         private List<Exception> problemCatched = new LinkedList<>();
-        private Map<RobotTokenType, List<Integer>> indexesForSeparator = new HashMap<>();
-        private List<List<RobotTokenContext>> contextsPerLine = new LinkedList<>();
+        private Map<RobotTokenType, List<Integer>> indexesForSeparator = new LinkedHashMap<>();
+        private Map<ContextType, List<RobotTokenContext>> contextsPerLine = new LinkedHashMap<>();
 
 
         public List<RobotToken> getTokens() {
@@ -143,7 +143,7 @@ public class TxtRobotFileLexer {
         }
 
 
-        public List<List<RobotTokenContext>> getContextsPerLine() {
+        public Map<ContextType, List<RobotTokenContext>> getContexts() {
             return contextsPerLine;
         }
     }
