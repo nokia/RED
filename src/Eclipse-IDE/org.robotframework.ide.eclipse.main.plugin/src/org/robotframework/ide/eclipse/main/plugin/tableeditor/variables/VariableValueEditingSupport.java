@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetVariableValueCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -11,17 +12,21 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 
 class VariableValueEditingSupport extends RobotElementEditingSupport {
 
+    private IEditorSite site;
+    
     VariableValueEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
+            final NewElementsCreator creator, IEditorSite site) {
         super(viewer, 1, commandsStack, creator);
+        this.site = site;
     }
 
     @Override
     protected CellEditor getCellEditor(final Object element) {
         final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotVariable) {
-            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
-                    DETAILS_EDITING_CONTEXT_ID);
+//            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
+//                    DETAILS_EDITING_CONTEXT_ID);
+            return new VariableDialogCellEditor(site, parent, element);
         }
         return super.getCellEditor(element);
     }
