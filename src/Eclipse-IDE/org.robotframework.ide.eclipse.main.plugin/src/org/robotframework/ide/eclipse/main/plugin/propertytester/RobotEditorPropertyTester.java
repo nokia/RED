@@ -3,8 +3,8 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.ui.IEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPage;
 
 import com.google.common.base.Preconditions;
 
@@ -27,7 +27,7 @@ public class RobotEditorPropertyTester extends PropertyTester {
             return editor.provideSuiteModel().isEditable() == expectedValue.booleanValue();
         } else if (property.equals("activeSectionEditorHasSection")) {
             final IEditorPart activeEditor = editor.getActiveEditor();
-            final SectionEditorPage activePage = activeEditor instanceof SectionEditorPage ? (SectionEditorPage) activeEditor
+            final ISectionEditorPart activePage = activeEditor instanceof ISectionEditorPart ? (ISectionEditorPart) activeEditor
                     : null;
             if (activePage != null) {
                 return activePage.provideSection(editor.provideSuiteModel()).isPresent() == expectedValue;

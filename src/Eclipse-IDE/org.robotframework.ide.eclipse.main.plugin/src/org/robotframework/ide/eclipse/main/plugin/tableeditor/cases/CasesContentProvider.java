@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class TestCasesContentProvider implements IStructuredContentProvider {
+public class CasesContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {

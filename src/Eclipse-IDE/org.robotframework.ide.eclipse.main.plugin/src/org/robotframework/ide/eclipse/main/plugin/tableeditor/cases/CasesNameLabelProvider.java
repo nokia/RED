@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class TestCasesNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+public class CasesNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {

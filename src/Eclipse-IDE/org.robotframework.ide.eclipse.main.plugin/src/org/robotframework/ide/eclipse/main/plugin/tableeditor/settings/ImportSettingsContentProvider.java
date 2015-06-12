@@ -7,12 +7,12 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-class ImportsSettingsContentProvider implements IStructuredContentProvider {
+class ImportSettingsContentProvider implements IStructuredContentProvider {
 
     private ElementAddingToken elementAddingToken;
     private final boolean editable;
 
-    ImportsSettingsContentProvider(final boolean editable) {
+    ImportSettingsContentProvider(final boolean editable) {
         this.editable = editable;
     }
 
