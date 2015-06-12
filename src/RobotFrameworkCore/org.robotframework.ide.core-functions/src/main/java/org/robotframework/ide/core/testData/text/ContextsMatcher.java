@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.text.contexts.PipeLineSeparatorSearc
 import org.robotframework.ide.core.testData.text.contexts.SettingsTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.TestCaseTableHeaderSearcher;
 import org.robotframework.ide.core.testData.text.contexts.VariableTableHeaderSearcher;
+import org.robotframework.ide.core.testData.text.contexts.WhitespaceSeparatorSearcher;
 
 
 public class ContextsMatcher {
@@ -26,19 +27,21 @@ public class ContextsMatcher {
         matchers.add(new VariableTableHeaderSearcher(tokenizatedOutput));
         matchers.add(new TestCaseTableHeaderSearcher(tokenizatedOutput));
         matchers.add(new KeywordsTableHeaderSearcher(tokenizatedOutput));
+        matchers.add(new CommentsSearcher(tokenizatedOutput));
+        matchers.add(new PipeLineSeparatorSearcher(tokenizatedOutput));
+        matchers.add(new WhitespaceSeparatorSearcher(tokenizatedOutput));
 
         List<List<RobotTokenContext>> computed = multiThread.compute(matchers);
         for (List<RobotTokenContext> context : computed) {
             contexts.addAll(context);
         }
 
-        matchers.clear();
-        matchers.add(new CommentsSearcher(tokenizatedOutput));
-        matchers.add(new PipeLineSeparatorSearcher(tokenizatedOutput));
-        computed = multiThread.compute(matchers);
-        for (List<RobotTokenContext> context : computed) {
-            contexts.addAll(context);
-        }
+        computed = null;
+        matchers = null;
+        // computed = multiThread.compute(matchers);
+        // for (List<RobotTokenContext> context : computed) {
+        // contexts.addAll(context);
+        // }
         // merge contexts per line
         // temp solution adding it to one
         tokenizatedOutput.getContextsPerLine().add(contexts);
