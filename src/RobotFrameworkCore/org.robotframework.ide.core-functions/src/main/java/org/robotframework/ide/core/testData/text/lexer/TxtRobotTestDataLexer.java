@@ -11,19 +11,28 @@ import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
 import com.google.common.collect.LinkedListMultimap;
 
 
+/**
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ * 
+ */
 public class TxtRobotTestDataLexer {
 
     private int charBufferSize = 4 * 1024;
     private final ReadersProvider readersProvider;
+    private final CharBuffer tempBuffer;
 
 
     public TxtRobotTestDataLexer() {
-        this.readersProvider = new ReadersProvider();
+        this(new ReadersProvider());
     }
 
 
     public TxtRobotTestDataLexer(final ReadersProvider readersProvider) {
         this.readersProvider = readersProvider;
+        this.tempBuffer = readersProvider.newCharBuffer(charBufferSize);
     }
 
 
@@ -49,12 +58,13 @@ public class TxtRobotTestDataLexer {
 
         addTheFirstLineStartToken(tokens);
 
-        CharBuffer buffer = CharBuffer.allocate(charBufferSize);
         int readLength = 0;
-        while((readLength = reader.read(buffer)) != -1) {
+        while((readLength = reader.read(tempBuffer)) != -1) {
             for (int charIndex = 0; charIndex < readLength; charIndex++) {
 
             }
+
+            tempBuffer.clear();
         }
 
         addEndOfFileToken(tokens, line, column);
@@ -81,6 +91,7 @@ public class TxtRobotTestDataLexer {
                 column);
         RobotToken theEndOfFile = new RobotToken(endOfFilePos, null,
                 endOfFilePos);
+        theEndOfFile.setType(RobotTokenType.END_OF_FILE);
         tokens.put(RobotTokenType.END_OF_FILE, theEndOfFile);
     }
 }
