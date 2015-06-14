@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
@@ -32,5 +33,10 @@ public class ReadersProvider {
 
     public Reader create(final File f) throws FileNotFoundException {
         return new InputStreamReader(new FileInputStream(f), charset);
+    }
+
+
+    public CharBuffer newCharBuffer(int charBufferSize) {
+        return CharBuffer.allocate(charBufferSize);
     }
 }
