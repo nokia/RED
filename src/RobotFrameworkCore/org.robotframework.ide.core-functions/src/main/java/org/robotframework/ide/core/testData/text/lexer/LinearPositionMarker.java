@@ -52,4 +52,10 @@ public class LinearPositionMarker {
     public static LinearPositionMarker createMarkerForFirstColumn(final int line) {
         return new LinearPositionMarker(line, THE_FIRST_COLUMN);
     }
+
+
+    @Override
+    public String toString() {
+        return String.format("[line=%s, column=%s]", line, column);
+    }
 }
