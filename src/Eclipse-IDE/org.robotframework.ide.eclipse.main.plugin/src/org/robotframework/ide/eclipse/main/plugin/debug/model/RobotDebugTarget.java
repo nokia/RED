@@ -99,6 +99,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
+            serverSocket.setSoTimeout(10000);
             eventSocket = serverSocket.accept();
             eventReader = new BufferedReader(new InputStreamReader(eventSocket.getInputStream()));
             eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);

@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.BreakpointContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
@@ -24,7 +23,7 @@ public class RobotPartListener implements IPartListener {
     public void partOpened(IWorkbenchPart part) {
         if (part != null) {
             TextEditorWrapper texteditor = (TextEditorWrapper) part.getAdapter(org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper.class);
-            if (texteditor != null) {
+            if (texteditor != null && keywordContext != null) {
                 String editorInputName = texteditor.getEditorInput().getName();
 
                 String fileName = keywordContext.getFileName();
