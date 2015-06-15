@@ -486,12 +486,6 @@
           name="Settings Editor Context"
           parentId="org.robotframework.ide.eclipse.tableeditor.context">
     </context>
-    <context
-          description="Context for Variables value editing"
-          id="org.robotframework.ide.eclipse.details.context.editvalue"
-          name="Value Editor Context"
-          parentId="org.robotframework.ide.eclipse.details.context">
-    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -529,13 +523,6 @@
              optional="false">
        </commandParameter>
     </command>
-    
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.moveValueUp"
-          name="Move value up">
-    </command>
-    
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -626,17 +613,6 @@
           </reference>
        </enabledWhen>
     </handler>
-    
- 	<handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveValueUpHandler"
-          commandId="org.robotframework.ide.eclipse.moveValueUp">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.valueEditorContextIsActive">
-          </reference>
-       </activeWhen>
-    </handler>
-    
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -657,12 +633,6 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+ARROW_DOWN">
-    </key>
-    <key
-          commandId="org.robotframework.ide.eclipse.moveValueUp"
-          contextId="org.robotframework.ide.eclipse.details.context.editvalue"
-          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+ARROW_UP">
     </key>
  </extension>
  <extension
@@ -705,17 +675,6 @@
              style="push">
        </command>
     </menuContribution>
-    
-    <menuContribution
-          allPopups="false"
-          locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.edit.contextMenu?before=additions">
-       <command
-             commandId="org.robotframework.ide.eclipse.moveValueUp"
-             label="Move value up"
-             style="push">
-       </command>
-    </menuContribution>
-    
     <menuContribution
           allPopups="false"
           locationURI="popup:org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu?before=additions">
@@ -893,39 +852,6 @@
           </iterate>
        </with>
     </definition>
-    
-    <definition
-          id="org.robotframework.valueEditorContextIsActive">
-       <with
-             variable="activeContexts">
-          <iterate
-                ifEmpty="false"
-                operator="or">
-             <equals
-                   value="org.robotframework.ide.eclipse.details.context.editvalue">
-             </equals>
-          </iterate>
-       </with>
-    </definition>
-    <definition
-          id="org.robotframework.exactlyOneCollectionElementIsSelected">
-       <with
-             variable="activeMenuSelection">
-          <and>
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement">
-                </instanceof>
-             </iterate>
-             <count
-                   value="1">
-             </count>
-          </and>
-       </with>
-    </definition>
-    
  </extension>
  
   	<extension
