@@ -21,7 +21,7 @@ class VariableValueEditingSupport extends RobotElementEditingSupport {
         if (element instanceof RobotVariable) {
 //            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
 //                    DETAILS_EDITING_CONTEXT_ID);
-            return new VariableDialogCellEditor(parent, element);
+            return new VariableValueDialogCellEditor(parent, element);
         }
         return super.getCellEditor(element);
     }
