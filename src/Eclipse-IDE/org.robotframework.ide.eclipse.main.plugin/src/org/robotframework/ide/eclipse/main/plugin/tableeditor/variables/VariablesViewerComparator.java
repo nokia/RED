@@ -5,6 +5,10 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class VariablesViewerComparator extends ViewerComparator {
 
     private int columnIndex = -1;

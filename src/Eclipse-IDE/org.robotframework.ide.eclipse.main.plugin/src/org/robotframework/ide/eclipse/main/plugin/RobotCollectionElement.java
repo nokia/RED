@@ -1,11 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariableEditFormDialog;
-
-
 public class RobotCollectionElement {
-    
-    private VariableEditFormDialog formDialog;
 
     private int index;
 
@@ -13,14 +8,13 @@ public class RobotCollectionElement {
 
     private String value;
 
-    public RobotCollectionElement(VariableEditFormDialog formDialog, int index, String value) {
-        this.formDialog = formDialog;
+    public RobotCollectionElement(int index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public RobotCollectionElement(VariableEditFormDialog formDialog, int index, String key, String value) {
-        this(formDialog, index, value);
+    public RobotCollectionElement(int index, String key, String value) {
+        this(index, value);
         this.key = key;
     }
 
@@ -51,9 +45,4 @@ public class RobotCollectionElement {
     public void setKey(String key) {
         this.key = key;
     }
-
-    public VariableEditFormDialog getFormDialog() {
-        return formDialog;
-    }
-
 }
