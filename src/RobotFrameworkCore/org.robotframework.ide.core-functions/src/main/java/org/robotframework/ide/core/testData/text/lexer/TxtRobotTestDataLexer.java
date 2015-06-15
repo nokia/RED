@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.nio.CharBuffer;
 
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
+import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher;
 
 import com.google.common.collect.LinkedListMultimap;
 
@@ -23,6 +24,7 @@ public class TxtRobotTestDataLexer {
     private int charBufferSize = 4 * 1024;
     private final ReadersProvider readersProvider;
     private final CharBuffer tempBuffer;
+    private final RobotTokenMatcher tokenMatcher;
 
 
     public TxtRobotTestDataLexer() {
@@ -31,8 +33,15 @@ public class TxtRobotTestDataLexer {
 
 
     public TxtRobotTestDataLexer(final ReadersProvider readersProvider) {
+        this(readersProvider, new RobotTokenMatcher());
+    }
+
+
+    public TxtRobotTestDataLexer(final ReadersProvider readersProvider,
+            final RobotTokenMatcher matcher) {
         this.readersProvider = readersProvider;
         this.tempBuffer = readersProvider.newCharBuffer(charBufferSize);
+        this.tokenMatcher = matcher;
     }
 
 
@@ -61,7 +70,7 @@ public class TxtRobotTestDataLexer {
         int readLength = 0;
         while((readLength = reader.read(tempBuffer)) != -1) {
             for (int charIndex = 0; charIndex < readLength; charIndex++) {
-
+                tokenMatcher.offerChar(tokens, tempBuffer, charIndex);
             }
 
             tempBuffer.clear();
