@@ -45,10 +45,10 @@ public class TxtRobotTestDataLexer {
     }
 
 
-    public LinkedListMultimap<RobotTokenType, RobotToken> extractTokens(
+    public LinkedListMultimap<RobotType, RobotToken> extractTokens(
             final File robotTestDataFile) throws FileNotFoundException,
             IOException {
-        LinkedListMultimap<RobotTokenType, RobotToken> tokens;
+        LinkedListMultimap<RobotType, RobotToken> tokens;
         try (Reader reader = readersProvider.create(robotTestDataFile)) {
             tokens = extractTokens(reader);
         }
@@ -57,9 +57,9 @@ public class TxtRobotTestDataLexer {
     }
 
 
-    private LinkedListMultimap<RobotTokenType, RobotToken> extractTokens(
+    private LinkedListMultimap<RobotType, RobotToken> extractTokens(
             Reader reader) throws IOException {
-        LinkedListMultimap<RobotTokenType, RobotToken> tokens = LinkedListMultimap
+        LinkedListMultimap<RobotType, RobotToken> tokens = LinkedListMultimap
                 .create();
 
         int line = LinearPositionMarker.THE_FIRST_LINE;
@@ -83,7 +83,7 @@ public class TxtRobotTestDataLexer {
 
 
     private void addTheFirstLineStartToken(
-            LinkedListMultimap<RobotTokenType, RobotToken> tokens) {
+            LinkedListMultimap<RobotType, RobotToken> tokens) {
         LinearPositionMarker theFirstPostion = LinearPositionMarker
                 .createMarkerForFirstLineAndColumn();
         RobotToken theFirstLineStart = new RobotToken(theFirstPostion, null,
@@ -94,7 +94,7 @@ public class TxtRobotTestDataLexer {
 
 
     private void addEndOfFileToken(
-            LinkedListMultimap<RobotTokenType, RobotToken> tokens, int line,
+            LinkedListMultimap<RobotType, RobotToken> tokens, int line,
             int column) {
         LinearPositionMarker endOfFilePos = new LinearPositionMarker(line,
                 column);

@@ -83,7 +83,7 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer(readersProvider);
 
         // execute
-        LinkedListMultimap<RobotTokenType, RobotToken> extractTokens = lexer
+        LinkedListMultimap<RobotType, RobotToken> extractTokens = lexer
                 .extractTokens(file);
 
         // verify
