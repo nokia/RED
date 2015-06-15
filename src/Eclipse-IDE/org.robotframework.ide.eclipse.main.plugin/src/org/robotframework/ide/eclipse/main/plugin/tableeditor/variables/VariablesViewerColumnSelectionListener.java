@@ -5,6 +5,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class VariablesViewerColumnSelectionListener extends SelectionAdapter {
 
     private TableViewer viewer;

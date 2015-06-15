@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * @author mmarzec
  */
-public class VariableDialogCellEditor extends DialogCellEditor {
+public class VariableValueDialogCellEditor extends DialogCellEditor {
     
     private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.details.context.editvalue";
 
@@ -22,7 +22,7 @@ public class VariableDialogCellEditor extends DialogCellEditor {
 
     private Object variable;
     
-    public VariableDialogCellEditor(Composite parent, Object variable) {
+    public VariableValueDialogCellEditor(Composite parent, Object variable) {
         super(parent);
         this.variable = variable;
     }
@@ -36,7 +36,7 @@ public class VariableDialogCellEditor extends DialogCellEditor {
 //        contextActivation = service.activateContext(CONTEXT_ID);
         
         
-        VariableEditFormDialog dialog = new VariableEditFormDialog(cellEditorWindow.getShell(), variable);
+        VariableValueEditFormDialog dialog = new VariableValueEditFormDialog(cellEditorWindow.getShell(), variable);
         dialog.create();
         dialog.getShell().setSize(500, 500);
         if (dialog.open() == Window.OK) {

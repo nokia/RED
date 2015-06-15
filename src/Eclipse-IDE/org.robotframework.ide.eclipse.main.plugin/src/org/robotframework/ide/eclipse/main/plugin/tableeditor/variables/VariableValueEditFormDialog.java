@@ -45,7 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivatio
 /**
  * @author mmarzec
  */
-public class VariableEditFormDialog extends FormDialog {
+public class VariableValueEditFormDialog extends FormDialog {
 
     private Text valueTxt;
 
@@ -61,7 +61,7 @@ public class VariableEditFormDialog extends FormDialog {
 
     private RowExposingTableViewer tableViewer;
 
-    public VariableEditFormDialog(Shell shell, Object variable) {
+    public VariableValueEditFormDialog(Shell shell, Object variable) {
         super(shell);
         this.variable = variable;
     }
@@ -213,7 +213,7 @@ public class VariableEditFormDialog extends FormDialog {
     }
 
     private RobotCollectionElement createNewCollectionElement(int index, String key, String value) {
-        return new RobotCollectionElement(this, index, key, value);
+        return new RobotCollectionElement(index, key, value);
     }
 
     private RobotCollectionElement createNewCollectionElement(int index, String value) {
