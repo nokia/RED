@@ -26,6 +26,22 @@ public enum RobotTokenType {
     /**
      * artificial file end marker
      */
-    END_OF_FILE
+    END_OF_FILE,
+    /*
+     * in hex: 0x0D
+     */
+    CARRITAGE_RETURN,
+    /**
+     * in hex: 0x0A
+     */
+    LINE_FEED,
+    /**
+     * in hex: 0x09
+     */
+    SINGLE_TABULATOR,
+    /**
+     * in hex: 0x20
+     */
+    SINGLE_SPACE
 
 }
