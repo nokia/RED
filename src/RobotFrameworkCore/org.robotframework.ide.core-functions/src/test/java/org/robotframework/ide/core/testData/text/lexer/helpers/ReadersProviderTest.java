@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
@@ -33,7 +33,7 @@ public class ReadersProviderTest {
 
     @Test
     public void test_createReader_forThisClassAsInputFile()
-            throws FileNotFoundException, URISyntaxException {
+            throws URISyntaxException, IOException {
         // prepare
         File f = new File(this.getClass()
                 .getResource(this.getClass().getSimpleName() + ".class")
@@ -45,6 +45,10 @@ public class ReadersProviderTest {
         // verify
         assertThat(r).isNotNull();
         assertThat(r).isInstanceOf(InputStreamReader.class);
+        InputStreamReader isr = (InputStreamReader) r;
+        assertThat(isr.getEncoding()).isEqualTo("UTF8");
+
+        r.close();
     }
 
 
