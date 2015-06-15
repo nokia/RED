@@ -80,19 +80,23 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
         viewer.setUseHashlookup(true);
-
+        
         final NewElementsCreator creator = newElementsCreator();
+        
+        final VariablesViewerComparator comparator = new VariablesViewerComparator();
 
         ViewerColumnsFactory.newColumn("Variable").withWidth(270)
                 .labelsProvidedBy(new VariableNameLabelProvider())
                 .editingSupportedBy(new VariableNameEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
+                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 0))
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Value").withWidth(270)
                 .labelsProvidedBy(new VariableValueLabelProvider())
-                .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator, site))
+                .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
+                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 1))
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Comment").withWidth(400)
@@ -100,6 +104,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .labelsProvidedBy(new VariableCommentLabelProvider())
                 .editingSupportedBy(new VariableCommentEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
+                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 2))
                 .createFor(viewer);
 
         createContextMenu();

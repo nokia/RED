@@ -10,10 +10,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 
 /**
  * @author mmarzec
@@ -25,33 +21,29 @@ public class VariableDialogCellEditor extends DialogCellEditor {
     private Text textField;
 
     private Object variable;
-
-    private IEditorSite site;
     
-    public VariableDialogCellEditor(IEditorSite site, Composite parent, Object variable) {
+    public VariableDialogCellEditor(Composite parent, Object variable) {
         super(parent);
         this.variable = variable;
-        this.site = site;
-        
     }
     
     @Override
     protected Object openDialogBox(Control cellEditorWindow) {
         
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(
-                IContextService.class);
-        IContextActivation contextActivation;
-        contextActivation = service.activateContext(CONTEXT_ID);
+//        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(
+//                IContextService.class);
+//        IContextActivation contextActivation;
+//        contextActivation = service.activateContext(CONTEXT_ID);
         
         
-        VariableEditFormDialog dialog = new VariableEditFormDialog(site, cellEditorWindow.getShell(), variable);
+        VariableEditFormDialog dialog = new VariableEditFormDialog(cellEditorWindow.getShell(), variable);
         dialog.create();
         dialog.getShell().setSize(500, 500);
         if (dialog.open() == Window.OK) {
-            service.deactivateContext(contextActivation);
+            //service.deactivateContext(contextActivation);
             return dialog.getValue();
         } else {
-            service.deactivateContext(contextActivation);
+            //service.deactivateContext(contextActivation);
             return null;
         }
     }
