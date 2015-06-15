@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -21,17 +20,23 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.FormDialog;
 import org.eclipse.ui.forms.IManagedForm;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
@@ -53,20 +58,17 @@ public class VariableEditFormDialog extends FormDialog {
     private List<RobotCollectionElement> collectionElements;
 
     private Object variable;
-    
+
     private RowExposingTableViewer tableViewer;
-    
-    private IEditorSite site;
-    
-    public VariableEditFormDialog(IEditorSite site, Shell shell, Object variable) {
+
+    public VariableEditFormDialog(Shell shell, Object variable) {
         super(shell);
         this.variable = variable;
-        this.site = site;
     }
 
     @Override
     protected void createFormContent(IManagedForm mform) {
-       
+
         Composite composite = mform.getForm().getBody();
         GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).applyTo(composite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
@@ -131,8 +133,7 @@ public class VariableEditFormDialog extends FormDialog {
 
     private void createTable(Composite parent, RobotVariable robotVariable) {
 
-        tableViewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION
-                | SWT.H_SCROLL | SWT.V_SCROLL);
+        tableViewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         TableCellsAcivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(tableViewer.getTable());
@@ -146,13 +147,37 @@ public class VariableEditFormDialog extends FormDialog {
         final Table table = tableViewer.getTable();
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-        
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.edit.contextMenu";
-        final MenuManager manager = new MenuManager("Robot value editor context menu", menuId);
-        final Menu contextMenu = manager.createContextMenu(table);
-        table.setMenu(contextMenu);
-        site.registerContextMenu(menuId, manager, tableViewer, false);
-       
+        // final String menuId =
+        // "org.robotframework.ide.eclipse.editor.page.variables.edit.contextMenu";
+        // final MenuManager manager = new MenuManager("Robot value editor context menu", menuId);
+        // final Menu contextMenu = manager.createContextMenu(table);
+        // table.setMenu(contextMenu);
+        // site.registerContextMenu(menuId, manager, tableViewer, false);
+        table.setMenu(createContextMenu(table, tableViewer));
+
+        table.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.stateMask == SWT.CTRL) && (e.keyCode == SWT.ARROW_UP)) {
+                    moveSelectedElementUp(table);
+                }
+                if ((e.stateMask == SWT.CTRL) && (e.keyCode == SWT.ARROW_DOWN)) {
+                    moveSelectedElementDown(table);
+                }
+                if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'n')) {
+                    addNewElement(table);
+                }
+                if (e.keyCode == SWT.DEL) {
+                    deleteElement(table);
+                }
+            }
+        });
+
         tableViewer.setContentProvider(new CollectionContentProvider());
 
         String[] values = robotVariable.getValue().split("(\\s{2,}|\t)"); // two or more spaces or
@@ -186,15 +211,15 @@ public class VariableEditFormDialog extends FormDialog {
             }
         }
     }
-    
+
     private RobotCollectionElement createNewCollectionElement(int index, String key, String value) {
         return new RobotCollectionElement(this, index, key, value);
     }
-    
+
     private RobotCollectionElement createNewCollectionElement(int index, String value) {
         return createNewCollectionElement(index, null, value);
     }
-    
+
     private void createColumnsForList(RowExposingTableViewer tableViewer) {
         ViewerColumnsFactory.newColumn("Index").withWidth(50).labelsProvidedBy(new ColumnLabelProvider() {
 
@@ -255,7 +280,7 @@ public class VariableEditFormDialog extends FormDialog {
         if (strLen > 1 && strBuilder.substring(strLen - 2).equals("  ")) {
             strBuilder.delete(strLen - 2, strLen);
         }
-        
+
         return strBuilder.toString();
     }
 
@@ -279,9 +304,79 @@ public class VariableEditFormDialog extends FormDialog {
         return strBuilder.toString();
     }
     
-    public void moveElementUp(RobotCollectionElement selectedElement) {
-        int selectionIndex = collectionElements.indexOf(selectedElement);
-        if (selectionIndex > 0 && selectionIndex < collectionElements.size()) {
+    private Menu createContextMenu(final Table table, final RowExposingTableViewer tableViewer) {
+
+        final Menu contextMenu = new Menu(table);
+        final MenuItem itemAddValue = new MenuItem(contextMenu, SWT.PUSH);
+        itemAddValue.setText("Add new value\tCtrl+N");
+        itemAddValue.setImage(RobotImages.getAddImage().createImage());
+        itemAddValue.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addNewElement(table);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        new MenuItem(contextMenu, SWT.SEPARATOR);
+        final MenuItem itemMoveUp = new MenuItem(contextMenu, SWT.PUSH);
+        itemMoveUp.setText("Move value up\tCtrl+Up");
+        itemMoveUp.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                moveSelectedElementUp(table);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        final MenuItem itemMoveDown = new MenuItem(contextMenu, SWT.PUSH);
+        itemMoveDown.setText("Move value down\tCtrl+Down");
+        itemMoveDown.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                moveSelectedElementDown(table);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        new MenuItem(contextMenu, SWT.SEPARATOR);
+        final MenuItem itemRemoveValue = new MenuItem(contextMenu, SWT.PUSH);
+        itemRemoveValue.setText("Delete\tDelete");
+        itemRemoveValue.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                deleteElement(table);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        return contextMenu;
+    }
+
+    private void addNewElement(Table table) {
+        int selectionIndex = table.getSelectionIndex();
+        if (selectionIndex >= 0 && table.getSelectionCount() == 1) {
+            collectionElements.add(selectionIndex, createNewCollectionElement(selectionIndex, "", ""));
+            updateIndexesAboveNewElement(selectionIndex);
+            tableViewer.refresh();
+        }
+    }
+
+    private void moveSelectedElementUp(Table table) {
+        int selectionIndex = table.getSelectionIndex();
+        if (selectionIndex > 0 && selectionIndex < collectionElements.size() && table.getSelectionCount() == 1) {
             RobotCollectionElement elementAbove = collectionElements.get(selectionIndex - 1);
             elementAbove.setIndex(elementAbove.getIndex() + 1);
             RobotCollectionElement elementBelow = collectionElements.get(selectionIndex);
@@ -289,6 +384,45 @@ public class VariableEditFormDialog extends FormDialog {
             collectionElements.set(selectionIndex - 1, elementBelow);
             collectionElements.set(selectionIndex, elementAbove);
             tableViewer.refresh();
+        }
+    }
+
+    private void moveSelectedElementDown(Table table) {
+        int selectionIndex = table.getSelectionIndex();
+        if (selectionIndex >= 0 && selectionIndex < collectionElements.size() - 1 && table.getSelectionCount() == 1) {
+            RobotCollectionElement elementAbove = collectionElements.get(selectionIndex);
+            elementAbove.setIndex(elementAbove.getIndex() + 1);
+            RobotCollectionElement elementBelow = collectionElements.get(selectionIndex + 1);
+            elementBelow.setIndex(elementAbove.getIndex() - 1);
+            collectionElements.set(selectionIndex, elementBelow);
+            collectionElements.set(selectionIndex + 1, elementAbove);
+            tableViewer.refresh();
+        }
+    }
+
+    private void deleteElement(Table table) {
+        TableItem[] selectedItems = table.getSelection();
+        for (int i = 0; i < selectedItems.length; i++) {
+            Object element = selectedItems[i].getData();
+            if (element instanceof RobotCollectionElement) {
+                collectionElements.remove(element);
+            }
+        }
+        if (selectedItems.length > 0) {
+            updateIndexes();
+            tableViewer.refresh();
+        }
+    }
+
+    private void updateIndexesAboveNewElement(int newElementIndex) {
+        for (int i = newElementIndex + 1; i < collectionElements.size(); i++) {
+            collectionElements.get(i).incrementIndex();
+        }
+    }
+
+    private void updateIndexes() {
+        for (int i = 0; i < collectionElements.size(); i++) {
+            collectionElements.get(i).setIndex(i);
         }
     }
 
@@ -413,5 +547,4 @@ public class VariableEditFormDialog extends FormDialog {
         }
     }
 
-    
 }

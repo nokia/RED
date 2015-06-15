@@ -6,6 +6,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.TableColumn;
@@ -22,6 +23,7 @@ public class ViewerColumnsFactory {
     private boolean shouldAddEditingSupport;
     private boolean shouldExtend;
     private int minimumWidth;
+    private SelectionListener selectionListener;
 
     public static ViewerColumnsFactory newColumn(final String name) {
         return new ViewerColumnsFactory(name);
@@ -80,6 +82,11 @@ public class ViewerColumnsFactory {
         this.shouldAddEditingSupport = condition;
         return this;
     }
+    
+    public ViewerColumnsFactory withSelectionListener(final SelectionListener selectionListener) {
+        this.selectionListener = selectionListener;
+        return this;
+    }
 
     public TableViewerColumn createFor(final TableViewer viewer) {
         final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
@@ -111,6 +118,11 @@ public class ViewerColumnsFactory {
         if (shouldAddEditingSupport) {
             column.setEditingSupport(editingSupport);
         }
+        
+        if(selectionListener != null) {
+            column.getColumn().addSelectionListener(selectionListener);
+        }
+        
         return column;
     }
 
