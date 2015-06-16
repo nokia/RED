@@ -259,8 +259,7 @@ public class RobotTokenTypeTest {
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
-        assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes.length).isEqualTo(24);
+        assertThat(tokenTypes).hasSize(24);
 
         for (RobotTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
