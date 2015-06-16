@@ -17,6 +17,16 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType.HELPER;
 public class RobotTokenTypeTest {
 
     @Test
+    public void test_typeSINGLE_QUOTE_MARK() {
+        char tokenChar = '"';
+        RobotTokenType type = RobotTokenType.SINGLE_QUOTE_MARK;
+
+        assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
+        assertThat(type.toWrite()).isEqualTo("" + tokenChar);
+    }
+
+
+    @Test
     public void test_typeSINGLE_DOT() {
         char tokenChar = '.';
         RobotTokenType type = RobotTokenType.SINGLE_DOT;
@@ -197,9 +207,9 @@ public class RobotTokenTypeTest {
 
 
     @Test
-    public void test_typeCARRITAGE_RETURN() {
+    public void test_typeCARRIAGE_RETURN() {
         char tokenChar = '\r';
-        RobotTokenType type = RobotTokenType.CARRITAGE_RETURN;
+        RobotTokenType type = RobotTokenType.CARRIAGE_RETURN;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -250,7 +260,7 @@ public class RobotTokenTypeTest {
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes.length).isEqualTo(23);
+        assertThat(tokenTypes.length).isEqualTo(24);
 
         for (RobotTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
