@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/16/15 10:15 AM
+Save-Time: 6/16/15 5:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -110,7 +110,14 @@ proc Create2MetadataInTableEditor [val EditorTitle]{
     	apply-cell-edit -deactivate
 	}
 }
-	
+
+//set python path
+if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{
+	global [val python_exe_path [	exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout]]
+
+}-else{
+	global [val python_exe_path [	exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
+}	
 
 
 //If there are some logprints left in console, delete them.
