@@ -6,7 +6,7 @@ import java.util.Map;
 
 
 /**
- * Declares types of token recognized inside lexer.
+ * Declares single character types of token recognized inside lexer.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -35,7 +35,7 @@ public enum RobotTokenType implements RobotType {
     /*
      * in hex: 0x0D
      */
-    CARRITAGE_RETURN('\r'),
+    CARRIAGE_RETURN('\r'),
     /**
      * in hex: 0x0A
      */
@@ -107,7 +107,11 @@ public enum RobotTokenType implements RobotType {
     /**
      * '.'
      */
-    SINGLE_DOT('.');
+    SINGLE_DOT('.'),
+    /**
+     * '"'
+     */
+    SINGLE_QUOTE_MARK('"');
 
     private final char thisTokenChar;
     private final String toWriteText;
