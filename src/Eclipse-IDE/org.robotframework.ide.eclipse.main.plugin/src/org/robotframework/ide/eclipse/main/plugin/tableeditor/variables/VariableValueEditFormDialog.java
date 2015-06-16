@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.FormDialog;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
@@ -57,50 +58,44 @@ public class VariableValueEditFormDialog extends FormDialog {
 
     private List<RobotCollectionElement> collectionElements;
 
-    private Object variable;
+    private final RobotVariable variable;
 
     private RowExposingTableViewer tableViewer;
 
-    public VariableValueEditFormDialog(Shell shell, Object variable) {
+    public VariableValueEditFormDialog(final Shell shell, final RobotVariable variable) {
         super(shell);
         this.variable = variable;
     }
 
     @Override
-    protected void createFormContent(IManagedForm mform) {
+    protected void createFormContent(final IManagedForm mform) {
+        mform.getForm().setText("Edit Value");
 
-        Composite composite = mform.getForm().getBody();
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).applyTo(composite);
+        final Composite composite = mform.getForm().getBody();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).applyTo(composite);
 
-        Label nameLbl = new Label(composite, SWT.NONE);
-        nameLbl.setText("Name:");
-        Text nameTxt = new Text(composite, SWT.NONE);
+        final FormToolkit toolkit = mform.getToolkit();
+
+        toolkit.createLabel(composite, "Name:");
+        final Text nameTxt = toolkit.createText(composite, variable.getName());
         nameTxt.setEditable(false);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(nameTxt);
 
-        RobotVariable robotVariable = null;
-        if (variable != null && variable instanceof RobotVariable) {
-            robotVariable = (RobotVariable) variable;
-        }
-        if (robotVariable != null) {
-            nameTxt.setText(robotVariable.getName());
-            createEditControls(composite, robotVariable);
-        }
-
-        mform.getForm().setText("Edit Value");
+        createEditControls(composite, toolkit);
     }
 
     @Override
-    protected void buttonPressed(int buttonId) {
+    protected void buttonPressed(final int buttonId) {
         if (buttonId == IDialogConstants.OK_ID) {
             if (isList) {
                 resultValue = convertListToString();
             } else if (isDictionary) {
                 resultValue = convertDictionaryToString();
             } else {
-                if (valueTxt != null)
+                if (valueTxt != null) {
                     resultValue = valueTxt.getText();
+                }
             }
         } else {
             resultValue = null;
@@ -112,27 +107,25 @@ public class VariableValueEditFormDialog extends FormDialog {
         return resultValue;
     }
 
-    private void createEditControls(Composite parent, RobotVariable robotVariable) {
-        Label valueLbl = new Label(parent, SWT.NONE);
+    private void createEditControls(final Composite parent, final FormToolkit toolkit) {
+        final Label valueLbl = toolkit.createLabel(parent, "");
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(valueLbl);
-        if (robotVariable.getType() == RobotVariable.Type.DICTIONARY) {
+        if (variable.getType() == RobotVariable.Type.DICTIONARY) {
             isDictionary = true;
             valueLbl.setText("Dictionary:");
-            createTable(parent, robotVariable);
-        } else if (robotVariable.getType() == RobotVariable.Type.LIST) {
+            createTable(parent);
+        } else if (variable.getType() == RobotVariable.Type.LIST) {
             isList = true;
             valueLbl.setText("List:");
-            createTable(parent, robotVariable);
+            createTable(parent);
         } else {
             valueLbl.setText("Scalar:");
-            valueTxt = new Text(parent, SWT.BORDER);
+            valueTxt = toolkit.createText(parent, variable.getValue());
             GridDataFactory.fillDefaults().grab(true, false).applyTo(valueTxt);
-            valueTxt.setText(robotVariable.getValue());
         }
     }
 
-    private void createTable(Composite parent, RobotVariable robotVariable) {
-
+    private void createTable(final Composite parent) {
         tableViewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         TableCellsAcivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
@@ -158,11 +151,11 @@ public class VariableValueEditFormDialog extends FormDialog {
         table.addKeyListener(new KeyListener() {
 
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(final KeyEvent e) {
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(final KeyEvent e) {
                 if ((e.stateMask == SWT.CTRL) && (e.keyCode == SWT.ARROW_UP)) {
                     moveSelectedElementUp(table);
                 }
@@ -180,7 +173,7 @@ public class VariableValueEditFormDialog extends FormDialog {
 
         tableViewer.setContentProvider(new CollectionContentProvider());
 
-        String[] values = robotVariable.getValue().split("(\\s{2,}|\t)"); // two or more spaces or
+        final String[] values = variable.getValue().split("(\\s{2,}|\t)"); // two or more spaces or
                                                                           // tab
         collectionElements = new ArrayList<RobotCollectionElement>();
         if (isList) {
@@ -192,7 +185,7 @@ public class VariableValueEditFormDialog extends FormDialog {
         tableViewer.setInput(collectionElements);
     }
 
-    private void createInputForList(List<RobotCollectionElement> elements, String[] values) {
+    private void createInputForList(final List<RobotCollectionElement> elements, final String[] values) {
         for (int i = 0; i < values.length; i++) {
             if (!values[i].equals("")) {
                 elements.add(createNewCollectionElement(i, values[i]));
@@ -200,7 +193,7 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private void createInputForDictionary(List<RobotCollectionElement> elements, String[] values) {
+    private void createInputForDictionary(final List<RobotCollectionElement> elements, final String[] values) {
         String[] keyValuePair;
         for (int i = 0; i < values.length; i++) {
             if (!values[i].equals("")) {
@@ -212,19 +205,19 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private RobotCollectionElement createNewCollectionElement(int index, String key, String value) {
+    private RobotCollectionElement createNewCollectionElement(final int index, final String key, final String value) {
         return new RobotCollectionElement(index, key, value);
     }
 
-    private RobotCollectionElement createNewCollectionElement(int index, String value) {
+    private RobotCollectionElement createNewCollectionElement(final int index, final String value) {
         return createNewCollectionElement(index, null, value);
     }
 
-    private void createColumnsForList(RowExposingTableViewer tableViewer) {
+    private void createColumnsForList(final RowExposingTableViewer tableViewer) {
         ViewerColumnsFactory.newColumn("Index").withWidth(50).labelsProvidedBy(new ColumnLabelProvider() {
 
             @Override
-            public String getText(Object element) {
+            public String getText(final Object element) {
                 if (element instanceof RobotCollectionElement) {
                     return String.valueOf(((RobotCollectionElement) element).getIndex());
                 }
@@ -239,11 +232,11 @@ public class VariableValueEditFormDialog extends FormDialog {
                 .createFor(tableViewer);
     }
 
-    private void createColumnsForDictionary(RowExposingTableViewer tableViewer) {
+    private void createColumnsForDictionary(final RowExposingTableViewer tableViewer) {
         ViewerColumnsFactory.newColumn("No.").withWidth(50).labelsProvidedBy(new ColumnLabelProvider() {
 
             @Override
-            public String getText(Object element) {
+            public String getText(final Object element) {
                 if (element instanceof RobotCollectionElement) {
                     return String.valueOf(((RobotCollectionElement) element).getIndex() + 1);
                 }
@@ -265,9 +258,9 @@ public class VariableValueEditFormDialog extends FormDialog {
     }
 
     private String convertListToString() {
-        StringBuilder strBuilder = new StringBuilder();
+        final StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < collectionElements.size(); i++) {
-            String value = collectionElements.get(i).getValue();
+            final String value = collectionElements.get(i).getValue();
             if (!value.equals("")) {
                 strBuilder.append(value);
                 if (i < collectionElements.size() - 1) {
@@ -276,7 +269,7 @@ public class VariableValueEditFormDialog extends FormDialog {
                 }
             }
         }
-        int strLen = strBuilder.length();
+        final int strLen = strBuilder.length();
         if (strLen > 1 && strBuilder.substring(strLen - 2).equals("  ")) {
             strBuilder.delete(strLen - 2, strLen);
         }
@@ -285,10 +278,10 @@ public class VariableValueEditFormDialog extends FormDialog {
     }
 
     private String convertDictionaryToString() {
-        StringBuilder strBuilder = new StringBuilder();
+        final StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < collectionElements.size(); i++) {
-            String key = collectionElements.get(i).getKey();
-            String value = collectionElements.get(i).getValue();
+            final String key = collectionElements.get(i).getKey();
+            final String value = collectionElements.get(i).getValue();
             if (!"".equals(key) && !"".equals(value)) {
                 strBuilder.append(key + "=" + value);
                 if (i < collectionElements.size() - 1) {
@@ -297,7 +290,7 @@ public class VariableValueEditFormDialog extends FormDialog {
                 }
             }
         }
-        int strLen = strBuilder.length();
+        final int strLen = strBuilder.length();
         if (strLen > 1 && strBuilder.substring(strLen - 2).equals("  ")) {
             strBuilder.delete(strLen - 2, strLen);
         }
@@ -313,12 +306,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         itemAddValue.addSelectionListener(new SelectionListener() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 addNewElement(table);
             }
 
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(final SelectionEvent e) {
             }
         });
         new MenuItem(contextMenu, SWT.SEPARATOR);
@@ -327,12 +320,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         itemMoveUp.addSelectionListener(new SelectionListener() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 moveSelectedElementUp(table);
             }
 
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(final SelectionEvent e) {
             }
         });
         final MenuItem itemMoveDown = new MenuItem(contextMenu, SWT.PUSH);
@@ -340,12 +333,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         itemMoveDown.addSelectionListener(new SelectionListener() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 moveSelectedElementDown(table);
             }
 
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(final SelectionEvent e) {
             }
         });
         new MenuItem(contextMenu, SWT.SEPARATOR);
@@ -354,19 +347,19 @@ public class VariableValueEditFormDialog extends FormDialog {
         itemRemoveValue.addSelectionListener(new SelectionListener() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 deleteElement(table);
             }
 
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(final SelectionEvent e) {
             }
         });
         return contextMenu;
     }
 
-    private void addNewElement(Table table) {
-        int selectionIndex = table.getSelectionIndex();
+    private void addNewElement(final Table table) {
+        final int selectionIndex = table.getSelectionIndex();
         if (selectionIndex >= 0 && table.getSelectionCount() == 1) {
             collectionElements.add(selectionIndex, createNewCollectionElement(selectionIndex, "", ""));
             updateIndexesAboveNewElement(selectionIndex);
@@ -374,12 +367,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private void moveSelectedElementUp(Table table) {
-        int selectionIndex = table.getSelectionIndex();
+    private void moveSelectedElementUp(final Table table) {
+        final int selectionIndex = table.getSelectionIndex();
         if (selectionIndex > 0 && selectionIndex < collectionElements.size() && table.getSelectionCount() == 1) {
-            RobotCollectionElement elementAbove = collectionElements.get(selectionIndex - 1);
+            final RobotCollectionElement elementAbove = collectionElements.get(selectionIndex - 1);
             elementAbove.setIndex(elementAbove.getIndex() + 1);
-            RobotCollectionElement elementBelow = collectionElements.get(selectionIndex);
+            final RobotCollectionElement elementBelow = collectionElements.get(selectionIndex);
             elementBelow.setIndex(elementAbove.getIndex() - 1);
             collectionElements.set(selectionIndex - 1, elementBelow);
             collectionElements.set(selectionIndex, elementAbove);
@@ -387,12 +380,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private void moveSelectedElementDown(Table table) {
-        int selectionIndex = table.getSelectionIndex();
+    private void moveSelectedElementDown(final Table table) {
+        final int selectionIndex = table.getSelectionIndex();
         if (selectionIndex >= 0 && selectionIndex < collectionElements.size() - 1 && table.getSelectionCount() == 1) {
-            RobotCollectionElement elementAbove = collectionElements.get(selectionIndex);
+            final RobotCollectionElement elementAbove = collectionElements.get(selectionIndex);
             elementAbove.setIndex(elementAbove.getIndex() + 1);
-            RobotCollectionElement elementBelow = collectionElements.get(selectionIndex + 1);
+            final RobotCollectionElement elementBelow = collectionElements.get(selectionIndex + 1);
             elementBelow.setIndex(elementAbove.getIndex() - 1);
             collectionElements.set(selectionIndex, elementBelow);
             collectionElements.set(selectionIndex + 1, elementAbove);
@@ -400,10 +393,10 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private void deleteElement(Table table) {
-        TableItem[] selectedItems = table.getSelection();
+    private void deleteElement(final Table table) {
+        final TableItem[] selectedItems = table.getSelection();
         for (int i = 0; i < selectedItems.length; i++) {
-            Object element = selectedItems[i].getData();
+            final Object element = selectedItems[i].getData();
             if (element instanceof RobotCollectionElement) {
                 collectionElements.remove(element);
             }
@@ -414,7 +407,7 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
     }
 
-    private void updateIndexesAboveNewElement(int newElementIndex) {
+    private void updateIndexesAboveNewElement(final int newElementIndex) {
         for (int i = newElementIndex + 1; i < collectionElements.size(); i++) {
             collectionElements.get(i).incrementIndex();
         }
@@ -430,16 +423,16 @@ public class VariableValueEditFormDialog extends FormDialog {
 
         private final CellEditor editor;
 
-        private boolean isValueColumn;
+        private final boolean isValueColumn;
 
-        public CollectionEditingSupport(TableViewer viewer, boolean isValueColumn) {
+        public CollectionEditingSupport(final TableViewer viewer, final boolean isValueColumn) {
             super(viewer);
             this.editor = new TextCellEditor(viewer.getTable());
             this.isValueColumn = isValueColumn;
         }
 
         @Override
-        protected CellEditor getCellEditor(Object element) {
+        protected CellEditor getCellEditor(final Object element) {
 
             if (element instanceof ElementAddingToken) {
                 return new AlwaysDeactivatingCellEditor((Composite) getViewer().getControl());
@@ -449,12 +442,12 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
 
         @Override
-        protected boolean canEdit(Object element) {
+        protected boolean canEdit(final Object element) {
             return true;
         }
 
         @Override
-        protected Object getValue(Object element) {
+        protected Object getValue(final Object element) {
             if (element instanceof RobotCollectionElement) {
                 if (isValueColumn) {
                     return ((RobotCollectionElement) element).getValue();
@@ -466,9 +459,9 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
 
         @Override
-        protected void setValue(final Object element, Object userInputValue) {
+        protected void setValue(final Object element, final Object userInputValue) {
             if (element instanceof RobotCollectionElement) {
-                int ind = collectionElements.indexOf(element);
+                final int ind = collectionElements.indexOf(element);
                 if (ind >= 0) {
                     if (isValueColumn) {
                         collectionElements.get(ind).setValue(userInputValue.toString());
@@ -500,11 +493,11 @@ public class VariableValueEditFormDialog extends FormDialog {
         }
 
         @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
         }
 
         @Override
-        public Object[] getElements(Object inputElement) {
+        public Object[] getElements(final Object inputElement) {
 
             final Object[] elements = ((List<?>) inputElement).toArray();
             final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
@@ -516,9 +509,9 @@ public class VariableValueEditFormDialog extends FormDialog {
 
     private class CollectionLabelProvider extends StylersDisposingLabelProvider {
 
-        private boolean isValueColumn;
+        private final boolean isValueColumn;
 
-        public CollectionLabelProvider(boolean isValueColumn) {
+        public CollectionLabelProvider(final boolean isValueColumn) {
             this.isValueColumn = isValueColumn;
         }
 

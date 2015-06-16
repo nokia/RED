@@ -10,6 +10,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 
 /**
  * @author mmarzec
@@ -20,15 +21,15 @@ public class VariableValueDialogCellEditor extends DialogCellEditor {
 
     private Text textField;
 
-    private Object variable;
+    private final RobotVariable variable;
     
-    public VariableValueDialogCellEditor(Composite parent, Object variable) {
+    public VariableValueDialogCellEditor(final Composite parent, final RobotVariable variable) {
         super(parent);
         this.variable = variable;
     }
     
     @Override
-    protected Object openDialogBox(Control cellEditorWindow) {
+    protected Object openDialogBox(final Control cellEditorWindow) {
         
 //        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(
 //                IContextService.class);
@@ -36,7 +37,7 @@ public class VariableValueDialogCellEditor extends DialogCellEditor {
 //        contextActivation = service.activateContext(CONTEXT_ID);
         
         
-        VariableValueEditFormDialog dialog = new VariableValueEditFormDialog(cellEditorWindow.getShell(), variable);
+        final VariableValueEditFormDialog dialog = new VariableValueEditFormDialog(cellEditorWindow.getShell(), variable);
         dialog.create();
         dialog.getShell().setSize(500, 500);
         if (dialog.open() == Window.OK) {
@@ -49,25 +50,27 @@ public class VariableValueDialogCellEditor extends DialogCellEditor {
     }
 
     @Override
-    protected Control createControl(Composite parent) {
+    protected Control createControl(final Composite parent) {
         return super.createControl(parent);
     }
 
     @Override
-    protected Control createContents(Composite cell) {
+    protected Control createContents(final Composite cell) {
         textField = new Text(cell, SWT.NONE);
         textField.setFont(cell.getFont());
         textField.setBackground(cell.getBackground());
         textField.addFocusListener(new FocusAdapter() {
 
-            public void focusLost(FocusEvent event) {
+            @Override
+            public void focusLost(final FocusEvent event) {
 
             }
         });
 
         textField.addKeyListener(new KeyAdapter() {
 
-            public void keyPressed(KeyEvent event) {
+            @Override
+            public void keyPressed(final KeyEvent event) {
 
             }
         });
@@ -75,6 +78,7 @@ public class VariableValueDialogCellEditor extends DialogCellEditor {
         return textField;
     }
 
+    @Override
     protected void doSetFocus() {
         textField.setFocus();
         textField.selectAll();
@@ -86,7 +90,7 @@ public class VariableValueDialogCellEditor extends DialogCellEditor {
     }
 
     @Override
-    protected void doSetValue(Object value) {
+    protected void doSetValue(final Object value) {
         textField.setText(value.toString());
     }
 
