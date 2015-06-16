@@ -2,7 +2,10 @@ package org.robotframework.ide.core.testData.text.lexer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.Test;
+import org.robotframework.ide.core.testHelpers.CombinationGenerator;
 
 
 /**
@@ -15,13 +18,16 @@ import org.junit.Test;
  */
 public class RobotWordTypeTest {
 
+    private CombinationGenerator generator = new CombinationGenerator();
+
+
     @Test
     public void test_typeRANGE_WORD() {
         String text = "RANGE";
         RobotWordType type = RobotWordType.RANGE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toLowerCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -31,7 +37,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.IN_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toLowerCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -41,7 +47,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.FOR_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toLowerCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -51,7 +57,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.RETURN_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -61,7 +67,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.ARGUMENTS_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -71,7 +77,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.TIMEOUT_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -81,7 +87,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.TEMPLATE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -91,7 +97,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.TAGS_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -101,7 +107,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.DEFAULT_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -111,7 +117,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.FORCE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -121,7 +127,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.POSTCONDITION_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -131,7 +137,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.PRECONDITION_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -141,7 +147,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.TEARDOWN_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -151,7 +157,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.SETUP_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -161,7 +167,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.SUITE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -171,7 +177,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.RESOURCE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -181,7 +187,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.DOCUMENTATION_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -191,7 +197,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.NAME_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toLowerCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -201,7 +207,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.WITH_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toLowerCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -211,7 +217,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.LIBRARY_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -221,7 +227,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.USER_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -231,7 +237,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.KEYWORDS_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -241,7 +247,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.KEYWORD_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -251,7 +257,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.CASES_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -261,7 +267,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.CASE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -271,7 +277,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.TEST_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -281,7 +287,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.VARIABLES_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -291,7 +297,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.VARIABLE_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -301,7 +307,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.METADATA_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -311,7 +317,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.SETTINGS_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
     }
 
 
@@ -321,7 +327,19 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.SETTING_WORD;
 
         assertThat(type.toWrite()).isEqualTo(text);
-        assertThat(RobotWordType.getToken(text.toUpperCase())).isEqualTo(type);
+        assertForAllCombinationsOfWord(type, text);
+    }
+
+
+    private void assertForAllCombinationsOfWord(RobotWordType expectedType,
+            String text) {
+        List<String> combinations = generator.combinations(text);
+        assertThat(combinations).hasAtLeastOneElementOfType(String.class);
+
+        for (String combination : combinations) {
+            assertThat(RobotWordType.getToken(combination)).isEqualTo(
+                    expectedType);
+        }
     }
 
 
@@ -341,7 +359,7 @@ public class RobotWordTypeTest {
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes.length).isEqualTo(32);
+        assertThat(tokenTypes).hasSize(32);
 
         for (RobotWordType type : tokenTypes) {
             String thisTokenText = type.toWrite();
