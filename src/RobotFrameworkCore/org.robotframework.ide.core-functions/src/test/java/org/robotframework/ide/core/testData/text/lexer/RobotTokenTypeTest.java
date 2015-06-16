@@ -253,7 +253,7 @@ public class RobotTokenTypeTest {
 
 
     @Test
-    public void test_getToken_checkIfMapOfRobotTokenTypesIsCoherent() {
+    public void test_getToken_checkIfMapOfRobotWordTypesIsCoherent() {
         // prepare
         RobotTokenType[] tokenTypes = RobotTokenType.values();
 
