@@ -57,7 +57,7 @@ public class KeywordDeclarationDebugFinder {
 
 
         public boolean wasLineFound() {
-            return (this.lineNumber > LINE_POSITION_NOT_FOUND);
+            return (this.lineNumber > LINE_POSITION_NOT_FOUND && this.file != null);
         }
     }
 }
