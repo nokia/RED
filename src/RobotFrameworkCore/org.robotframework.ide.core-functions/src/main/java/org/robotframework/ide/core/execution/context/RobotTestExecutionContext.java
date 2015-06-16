@@ -2,12 +2,15 @@ package org.robotframework.ide.core.execution.context;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class RobotTestExecutionContext {
 
     private Map<RobotSuiteExecutionContext, ExecutionStatus> suiteMap;
+    
+    private Map<String, Object> currentVariables;
 
     private LinkedList<RobotTestCaseExecutionContext> currentTestCases;
 
@@ -15,6 +18,7 @@ public class RobotTestExecutionContext {
 
     public RobotTestExecutionContext() {
         suiteMap = new LinkedHashMap<>();
+        currentVariables = new LinkedHashMap<>();
         currentTestCases = new LinkedList<>();
         currentKeywords = new LinkedList<>();
     }
@@ -37,8 +41,8 @@ public class RobotTestExecutionContext {
         currentTestCases.addLast(newTestCase);
     }
 
-    public void startKeyword(String name) {
-        RobotKeywordExecutionContext newKeyword = new RobotKeywordExecutionContext(name);
+    public void startKeyword(String name, String type, List<String> arguments) {
+        RobotKeywordExecutionContext newKeyword = new RobotKeywordExecutionContext(name, type, arguments);
         if (!currentKeywords.isEmpty()) {
             RobotKeywordExecutionContext currentKeyword = currentKeywords.getLast();
             currentKeyword.getKeywordMap().put(newKeyword, ExecutionStatus.RUNNING);
@@ -50,7 +54,7 @@ public class RobotTestExecutionContext {
         currentKeywords.addLast(newKeyword);
     }
 
-    public void endKeyword(String name) {
+    public void endKeyword() {
         if (currentKeywords.size() > 1) {
             RobotKeywordExecutionContext parentKeyword = currentKeywords.get(currentKeywords.size() - 2);
             parentKeyword.getKeywordMap().put(currentKeywords.getLast(), ExecutionStatus.EXECUTED);
@@ -92,6 +96,10 @@ public class RobotTestExecutionContext {
 
     public Map<RobotSuiteExecutionContext, ExecutionStatus> getSuiteMap() {
         return suiteMap;
+    }
+    
+    public void setCurrentVariables(Map<String, Object> currentVariables) {
+        this.currentVariables = currentVariables;
     }
 
 }
