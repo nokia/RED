@@ -42,11 +42,11 @@ public class TestAnswerRecorder {
 
         // verify
         assertThat(answer.getOtherAnswer()).isEqualTo(otherAnswer);
-        assertThat(answer.getInvocations().size()).isEqualTo(1);
+        assertThat(answer.getInvocations()).hasSize(1);
         InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
-        assertThat(invocationOnMock.getArguments().length).isEqualTo(2);
+        assertThat(invocationOnMock.getArguments()).hasSize(2);
         assertThat(invocationOnMock.getArgumentAt(0, String.class)).isEqualTo(
                 name);
         assertThat(invocationOnMock.getArgumentAt(1, String.class)).isEqualTo(
@@ -72,11 +72,11 @@ public class TestAnswerRecorder {
         assertThat(result).isTrue();
         assertThat(answer.getOtherAnswer()).isEqualTo(
                 Mockito.CALLS_REAL_METHODS);
-        assertThat(answer.getInvocations().size()).isEqualTo(1);
+        assertThat(answer.getInvocations()).hasSize(1);
         InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
-        assertThat(invocationOnMock.getArguments().length).isEqualTo(2);
+        assertThat(invocationOnMock.getArguments()).hasSize(2);
         assertThat(invocationOnMock.getArgumentAt(0, String.class)).isEqualTo(
                 name);
         assertThat(invocationOnMock.getArgumentAt(1, String.class)).isEqualTo(
