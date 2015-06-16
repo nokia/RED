@@ -24,7 +24,7 @@ public class KeywordDeclarationDebugFinder {
         KeywordPosition position = null;
 
         return (position == null) ? KeywordPosition
-                .createNotFoundKeywordPosition() : position;
+                .createForNotFound() : position;
     }
 
     public static class KeywordPosition {
@@ -41,7 +41,7 @@ public class KeywordDeclarationDebugFinder {
         }
 
 
-        public static KeywordPosition createNotFoundKeywordPosition() {
+        public static KeywordPosition createForNotFound() {
             return new KeywordPosition(null, LINE_POSITION_NOT_FOUND);
         }
 
