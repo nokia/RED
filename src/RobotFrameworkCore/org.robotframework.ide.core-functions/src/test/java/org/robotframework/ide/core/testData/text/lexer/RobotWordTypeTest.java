@@ -334,7 +334,7 @@ public class RobotWordTypeTest {
     private void assertForAllCombinationsOfWord(RobotWordType expectedType,
             String text) {
         List<String> combinations = generator.combinations(text);
-        assertThat(combinations).hasAtLeastOneElementOfType(String.class);
+        assertThat(combinations).hasSize((int) Math.pow(2, text.length()));
 
         for (String combination : combinations) {
             assertThat(RobotWordType.getToken(combination)).isEqualTo(
