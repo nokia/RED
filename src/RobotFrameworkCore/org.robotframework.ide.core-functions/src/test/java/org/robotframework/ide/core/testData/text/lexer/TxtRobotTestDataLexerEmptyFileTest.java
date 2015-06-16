@@ -63,7 +63,7 @@ public class TxtRobotTestDataLexerEmptyFileTest {
 
         // verify
         List<InvocationOnMock> invocations = recorder.getInvocations();
-        assertThat(invocations.size()).isEqualTo(1);
+        assertThat(invocations).hasSize(1);
         InvocationOnMock invocation = invocations.get(0);
         assertThat(invocation.getArguments().length).isEqualTo(1);
 
@@ -93,7 +93,7 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         List<RobotToken> startLineTokens = extractTokens
                 .get(RobotTokenType.START_LINE);
         assertThat(startLineTokens).isNotNull();
-        assertThat(startLineTokens.size()).isEqualTo(1);
+        assertThat(startLineTokens).hasSize(1);
         RobotToken theFirstStartLineToken = startLineTokens.get(0);
         assertThatTokenIsAsExpected(theFirstStartLineToken,
                 RobotTokenType.START_LINE, LinearPositionMarker.THE_FIRST_LINE,
@@ -105,7 +105,7 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         List<RobotToken> endOfFileTokens = extractTokens
                 .get(RobotTokenType.END_OF_FILE);
         assertThat(endOfFileTokens).isNotNull();
-        assertThat(endOfFileTokens.size()).isEqualTo(1);
+        assertThat(endOfFileTokens).hasSize(1);
         RobotToken theEndOfFileToken = endOfFileTokens.get(0);
         assertThatTokenIsAsExpected(theEndOfFileToken,
                 RobotTokenType.END_OF_FILE,
