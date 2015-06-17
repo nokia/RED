@@ -9,11 +9,11 @@ import org.eclipse.ui.IWorkbenchPage;
 public class RobotKeywordCall implements RobotElement {
 
     private final RobotElement parent;
-    private final String name;
+    private String name;
     private final List<String> args;
     private String comment;
 
-    RobotKeywordCall(final RobotElement parent, final String name, final List<String> args, final String comment) {
+    public RobotKeywordCall(final RobotElement parent, final String name, final List<String> args, final String comment) {
         this.parent = parent;
         this.name = name;
         this.args = args;
@@ -23,6 +23,10 @@ public class RobotKeywordCall implements RobotElement {
     @Override
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override

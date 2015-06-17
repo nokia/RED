@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerControlConfigurator;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -105,6 +105,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         createDocumentationControl(panel);
         createViewer(panel);
 
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
 
         setInput(true);
@@ -169,7 +170,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void createColumns(final boolean createFirst) {
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Setting").withWidth(100)
-                .shouldGrabAllTheSpaceLeft(!model.areSettingsExist()).withMinWidth(100)
+                .shouldGrabAllTheSpaceLeft(!fileModel.findSection(RobotSuiteSettingsSection.class).isPresent()).withMinWidth(100)
                 .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
                 .createFor(viewer);
         }
@@ -234,7 +235,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
         final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
         final Table control = viewer.getTable();
-        ViewerControlConfigurator.disableContextMenuOnHeader(control);
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);

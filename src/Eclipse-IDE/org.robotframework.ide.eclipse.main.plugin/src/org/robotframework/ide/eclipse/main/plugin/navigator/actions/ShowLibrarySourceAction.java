@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -10,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
@@ -17,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -41,12 +44,14 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
 
     @Override
     public void run() {
+        final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
         final LibrarySpecification spec = Selections.getSingleElement(
-                (IStructuredSelection) selectionProvider.getSelection(), LibrarySpecification.class);
+                selection, LibrarySpecification.class);
         try {
             final String libName = spec.getName() + ".py";
-            final RobotProject robotProject = spec.getRobotProject();
-            final IFile file = LibspecsFolder.get(robotProject.getProject()).getFile(libName);
+            final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
+            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final IFile file = LibspecsFolder.get(project).getFile(libName);
 
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());

@@ -7,20 +7,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.core.resources.IFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 
 public class LibrarySpecificationReader {
 
     public static LibrarySpecification readSpecification(final IFile libraryFile) {
-        return readSpecification(null, libraryFile);
-    }
-
-    public static LibrarySpecification readSpecification(final RobotProject robotProject, final IFile libraryFile) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(LibrarySpecification.class);
             final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             final LibrarySpecification specification = (LibrarySpecification) jaxbUnmarshaller.unmarshal(new File(libraryFile.getLocationURI()));
-            specification.setProject(robotProject);
             specification.propagateFormat();
             return specification;
 

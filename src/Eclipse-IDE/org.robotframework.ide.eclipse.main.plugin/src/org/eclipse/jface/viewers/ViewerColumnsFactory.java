@@ -22,6 +22,7 @@ public class ViewerColumnsFactory {
     private EditingSupport editingSupport;
     private boolean shouldAddEditingSupport;
     private boolean shouldExtend;
+    private boolean shouldShowLastSep;
     private int minimumWidth;
     private SelectionListener selectionListener;
 
@@ -40,6 +41,11 @@ public class ViewerColumnsFactory {
 
     public ViewerColumnsFactory shouldGrabAllTheSpaceLeft(final boolean grabSpace) {
         this.shouldExtend = grabSpace;
+        return this;
+    }
+
+    public ViewerColumnsFactory shouldShowLastVerticalSeparator(final boolean shouldShowVerticalBar) {
+        this.shouldShowLastSep = shouldShowVerticalBar;
         return this;
     }
 
@@ -140,7 +146,8 @@ public class ViewerColumnsFactory {
                 }
                 final int scrollbarWidth = getScrollBarWidth(viewer);
 
-                final int widthToOccupy = totalTableWidth - (otherColumnsTotalWidth + scrollbarWidth);
+                final int additional = shouldShowLastSep ? 1 : 0;
+                final int widthToOccupy = totalTableWidth - (otherColumnsTotalWidth + scrollbarWidth + additional);
                 column.setWidth(Math.max(minimumWidth, widthToOccupy));
             }
 

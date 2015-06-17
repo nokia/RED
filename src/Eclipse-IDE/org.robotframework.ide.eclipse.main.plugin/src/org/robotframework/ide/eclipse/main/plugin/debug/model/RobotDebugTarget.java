@@ -38,10 +38,10 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget {
 
     // associated system process (Robot)
-    private IProcess process;
+    private final IProcess process;
 
     // containing launch object
-    private ILaunch launch;
+    private final ILaunch launch;
 
     // program name
     private String name;
@@ -58,17 +58,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     // suspend state
     private boolean isSuspended = false;
 
-    // terminated state
-    private boolean isTerminated = false;
-    
     private boolean hasStackFramesCreated;
 
     // threads
-    private RobotThread thread;
+    private final RobotThread thread;
 
-    private IThread[] threads;
+    private final IThread[] threads;
 
-    private Map<String, KeywordContext> currentFrames;
+    private final Map<String, KeywordContext> currentFrames;
 
     private IStackFrame[] stackFrames;
     
@@ -76,16 +73,16 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private int currentStepReturnLevel = 0;
 
-    private RobotPartListener partListener;
+    private final RobotPartListener partListener;
 
-    private RobotEventBroker robotEventBroker;
+    private final RobotEventBroker robotEventBroker;
     
-    private RobotDebugVariablesManager robotVariablesManager;
+    private final RobotDebugVariablesManager robotVariablesManager;
     
-    private RobotDebugValueManager robotDebugValueManager;
+    private final RobotDebugValueManager robotDebugValueManager;
 
-    public RobotDebugTarget(ILaunch launch, IProcess process, int port, IFile executedFile,
-            RobotPartListener partListener, RobotEventBroker robotEventBroker) throws CoreException {
+    public RobotDebugTarget(final ILaunch launch, final IProcess process, final int port, final IFile executedFile,
+            final RobotPartListener partListener, final RobotEventBroker robotEventBroker) throws CoreException {
         super(null);
         target = this;
         this.launch = launch;
@@ -103,14 +100,14 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             eventSocket = serverSocket.accept();
             eventReader = new BufferedReader(new InputStreamReader(eventSocket.getInputStream()));
             eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
         thread = new RobotThread(this);
         threads = new IThread[] { thread };
 
-        RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, executedFile,
+        final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, executedFile,
                 robotEventBroker);
         eventDispatcher.schedule();
 
@@ -121,6 +118,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
      */
+    @Override
     public IProcess getProcess() {
         return process;
     }
@@ -129,6 +127,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
      */
+    @Override
     public IThread[] getThreads() throws DebugException {
         return threads;
     }
@@ -137,6 +136,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
      */
+    @Override
     public boolean hasThreads() throws DebugException {
         return true;
     }
@@ -145,6 +145,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugTarget#getName()
      */
+    @Override
     public String getName() throws DebugException {
         if (name == null) {
             name = "Robot Test";
@@ -157,6 +158,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
      */
+    @Override
     public IDebugTarget getDebugTarget() {
         return this;
     }
@@ -165,6 +167,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
      */
+    @Override
     public ILaunch getLaunch() {
         return launch;
     }
@@ -173,6 +176,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
      */
+    @Override
     public boolean canDisconnect() {
         return false;
     }
@@ -181,6 +185,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
      */
+    @Override
     public boolean isDisconnected() {
         return false;
     }
@@ -189,6 +194,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
      */
+    @Override
     public void disconnect() throws DebugException {
 
     }
@@ -197,6 +203,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
      */
+    @Override
     public boolean canTerminate() {
         return getProcess().canTerminate();
     }
@@ -205,6 +212,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
      */
+    @Override
     public boolean isTerminated() {
         return getProcess().isTerminated();
     }
@@ -213,6 +221,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ITerminate#terminate()
      */
+    @Override
     public void terminate() throws DebugException {
         if (eventSocket != null) {
             sendEventToAgent("interrupt");
@@ -226,6 +235,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
      */
+    @Override
     public boolean canSuspend() {
         return !isTerminated() && !isSuspended();
     }
@@ -234,6 +244,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
      */
+    @Override
     public boolean isSuspended() {
         return isSuspended;
     }
@@ -242,6 +253,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
      */
+    @Override
     public void suspend() throws DebugException {
 
     }
@@ -250,6 +262,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
      */
+    @Override
     public boolean canResume() {
         return !isTerminated() && isSuspended();
     }
@@ -258,6 +271,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.ISuspendResume#resume()
      */
+    @Override
     public void resume() throws DebugException {
         thread.setStepping(false);
         sendEventToAgent("resume");
@@ -288,7 +302,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param detail
      *            reason for the resume
      */
-    public void resumed(int detail) {
+    public void resumed(final int detail) {
         isSuspended = false;
         thread.fireResumeEvent(detail);
     }
@@ -299,7 +313,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param detail
      *            reason for the suspend
      */
-    public void suspended(int detail) {
+    public void suspended(final int detail) {
         isSuspended = true;
         thread.fireSuspendEvent(detail);
     }
@@ -316,7 +330,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * Called when this debug target terminates.
      */
     public void terminated() {
-        isTerminated = true;
         isSuspended = false;
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
@@ -325,7 +338,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             if (serverSocket != null) {
                 serverSocket.close();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
@@ -335,7 +348,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.
      * IBreakpoint)
      */
-    public void breakpointAdded(IBreakpoint breakpoint) {
+    @Override
+    public void breakpointAdded(final IBreakpoint breakpoint) {
 
     }
 
@@ -345,7 +359,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model
      * .IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
      */
-    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+    @Override
+    public void breakpointRemoved(final IBreakpoint breakpoint, final IMarkerDelta delta) {
         if (supportsBreakpoint(breakpoint)) {
 
         }
@@ -357,7 +372,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model
      * .IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
      */
-    public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+    @Override
+    public void breakpointChanged(final IBreakpoint breakpoint, final IMarkerDelta delta) {
         if (supportsBreakpoint(breakpoint)) {
             try {
                 if (breakpoint.isEnabled()) {
@@ -365,7 +381,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 } else {
                     breakpointRemoved(breakpoint, null);
                 }
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
             }
         }
     }
@@ -376,7 +392,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse.debug.core.model
      * .IBreakpoint)
      */
-    public boolean supportsBreakpoint(IBreakpoint breakpoint) {
+    @Override
+    public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
         if (breakpoint.getModelIdentifier().equals(RobotDebugElement.DEBUG_MODEL_ID)) {
             return true;
         }
@@ -387,6 +404,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval()
      */
+    @Override
     public boolean supportsStorageRetrieval() {
         return false;
     }
@@ -395,7 +413,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * (non-Javadoc)
      * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long, long)
      */
-    public IMemoryBlock getMemoryBlock(long startAddress, long length) throws DebugException {
+    @Override
+    public IMemoryBlock getMemoryBlock(final long startAddress, final long length) throws DebugException {
         return null;
     }
 
@@ -426,10 +445,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 previousStackFramesSize = stackFrames.length;
             }
 
-            IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
+            final IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
             int id = 1;
-            for (String key : currentFrames.keySet()) {
-                KeywordContext keywordContext = currentFrames.get(key);
+            for (final String key : currentFrames.keySet()) {
+                final KeywordContext keywordContext = currentFrames.get(key);
                 //only the highest level of StackFrames is created, lower levels are copied from previous StackFrames
                 if (id >= currentFrames.size() || previousStackFramesSize == 0) {
                     newStackFrames[currentFrames.size() - id] = new RobotStackFrame(thread,
@@ -447,7 +466,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return stackFrames;
     }
 
-    public void setHasStackFramesCreated(boolean hasCreated) {
+    public void setHasStackFramesCreated(final boolean hasCreated) {
         hasStackFramesCreated = hasCreated;
     }
 
@@ -456,7 +475,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * 
      * @param breakpoint
      */
-    public void breakpointHit(IBreakpoint breakpoint) {
+    public void breakpointHit(final IBreakpoint breakpoint) {
 
         if (breakpoint instanceof ILineBreakpoint) {
             thread.setBreakpoints(new IBreakpoint[] { breakpoint });
@@ -468,7 +487,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * 
      * @param event
      */
-    public void sendEventToAgent(String event) {
+    public void sendEventToAgent(final String event) {
 
         synchronized (eventSocket) {
             eventWriter.print(event);
@@ -482,7 +501,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param variable
      * @param value
      */
-    public void sendChangeVariableRequest(String variable, String value) {
+    public void sendChangeVariableRequest(final String variable, final String value) {
 
         sendEventToAgent("{\"" + variable + "\":[\"" + value + "\"]}");
     }
@@ -494,9 +513,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param childList
      * @param value
      */
-    public void sendChangeCollectionRequest(String variable, List<String> childList, String value) {
+    public void sendChangeCollectionRequest(final String variable, final List<String> childList, final String value) {
         
-        StringBuilder requestJson = new StringBuilder();
+        final StringBuilder requestJson = new StringBuilder();
         requestJson.append("{\"" + variable + "\":[");
         for (int i = 0; i < childList.size(); i++) {
             requestJson.append("\"" + childList.get(i) + "\",");
@@ -505,11 +524,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         sendEventToAgent(requestJson.toString());
     }
     
-    public void sendChangeRequest(String expression, String variableName, RobotDebugVariable parent) {
+    public void sendChangeRequest(final String expression, final String variableName, final RobotDebugVariable parent) {
         
         if (parent != null) {
-            LinkedList<String> childNameList = new LinkedList<String>();
-            String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
+            final LinkedList<String> childNameList = new LinkedList<String>();
+            final String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
             sendChangeCollectionRequest(root, childNameList, expression);
         } else {
             sendChangeVariableRequest(name, expression);
