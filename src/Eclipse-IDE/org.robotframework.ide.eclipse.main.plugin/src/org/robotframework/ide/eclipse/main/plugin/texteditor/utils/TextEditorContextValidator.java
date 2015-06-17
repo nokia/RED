@@ -41,13 +41,14 @@ public class TextEditorContextValidator implements IContextInformationValidator{
             return false;
         }
 
-        IContextInformation[] contextInfos = processor.computeContextInformation(viewer, offset);
-        if (contextInfos != null && contextInfos.length > 0) {
-            for (int i = 0; i < contextInfos.length; i++)
-                if (currentContextInformation.equals(contextInfos[i]))
-                    return true;
-        }
-        return false;
+//        IContextInformation[] contextInfos = processor.computeContextInformation(viewer, offset);
+//        if (contextInfos != null && contextInfos.length > 0) {
+//            for (int i = 0; i < contextInfos.length; i++)
+//                if (currentContextInformation.equals(contextInfos[i]))
+//                    return true;
+//        }
+//        return false;
+        return true;
 	}
 	
 }

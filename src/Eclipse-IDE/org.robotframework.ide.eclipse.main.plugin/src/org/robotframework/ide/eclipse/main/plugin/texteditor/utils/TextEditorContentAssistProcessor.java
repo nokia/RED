@@ -7,12 +7,12 @@ import java.util.Map;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
 /**
  * @author mmarzec
@@ -26,31 +26,18 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	
 	private TextEditorContextValidator validator = new TextEditorContextValidator(this);
 	
-	Map<String, String> sections = new LinkedHashMap<>();
+	private Map<String, KeywordSpecification> sections = new LinkedHashMap<>();
 	{
-		sections.put("*** Variables ***", "");
-		sections.put("*** Settings ***", "");
-		sections.put("*** Test Cases ***", "");
-		sections.put("*** Keywords ***", "");
+		sections.put("*** Variables ***", null);
+		sections.put("*** Settings ***", null);
+		sections.put("*** Test Cases ***", null);
+		sections.put("*** Keywords ***", null);
 	}
 	
-	Map<String, String> availableKeywords = new LinkedHashMap<>();
-	{
-		availableKeywords.put("Log", "Logs the given message with the given level.");
-		availableKeywords.put("Log Many", "Logs the given messages as separate entries with the INFO level.");
-		availableKeywords.put("Log Variables", "Logs all variables in the current scope with given log level.");
-		availableKeywords.put("Replace Variables", "Replaces variables in the given text with their current values.");
-		availableKeywords.put("Set Variable", "Returns the given values which can then be assigned to a variables.");
-		 
-	}
+	private Map<String, KeywordSpecification> keywordMap;
 	
-	Map<String, String> args = new LinkedHashMap<>();
-	{
-	    args.put("Log", "Arguments:[ message | level=INFO ]");
-	    args.put("Log Many", "Arguments:[ *messages ]");
-	    args.put("Log Variables", "Arguments:[ level=INFO ]");
-	    args.put("Replace Variables", "Arguments:[ text ]");
-	    args.put("Set Variable", "Arguments:[ *values ]");
+	public TextEditorContentAssistProcessor(Map<String, KeywordSpecification> keywordMap) {
+	    this.keywordMap = keywordMap;
 	}
 
 	@Override
@@ -88,17 +75,17 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 	        	currOffset--;
 	        }
 	        
-	        Map<String, String> suggestions = new LinkedHashMap<>();
-	        for (Iterator<String> i =  availableKeywords.keySet().iterator(); i.hasNext();) {
+	        Map<String, KeywordSpecification> keywordProposals = new LinkedHashMap<>();
+	        for (Iterator<String> i =  keywordMap.keySet().iterator(); i.hasNext();) {
 				String keyword = (String) i.next();
 				if(keyword.startsWith(currWord)) {
-					suggestions.put(keyword, availableKeywords.get(keyword));
+				    keywordProposals.put(keyword, keywordMap.get(keyword));
 				}
 		    }
 	        
 	        ICompletionProposal[] proposals = null;
-	        if (suggestions.size() > 0) {
-	          proposals = buildProposals(suggestions, currWord, offset - currWord.length());
+	        if (keywordProposals.size() > 0) {
+	          proposals = buildProposals(keywordProposals, currWord, offset - currWord.length());
 	          lastError = null;
 	        }
 	        return proposals;
@@ -110,54 +97,48 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 		return null;
 	}
 	
-	private ICompletionProposal[] buildProposals(Map<String, String> suggestions, String replacedWord, int offset) {
+	private ICompletionProposal[] buildProposals(final Map<String, KeywordSpecification> proposals, final String replacedWord, final int offset) {
 		
-		if(suggestions.size() == 0) {
+		if(proposals.size() == 0) {
 			return new ICompletionProposal[0];
 		}
 		    
-		ICompletionProposal[] proposals = new ICompletionProposal[suggestions.size()];
-		    
-	    int index = 0;
-	    for (Iterator<String> i =  suggestions.keySet().iterator(); i.hasNext();) {
-            String keywordSuggestion = (String) i.next();
-            
+        ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
+
+        int index = 0;
+        for (Iterator<String> i = proposals.keySet().iterator(); i.hasNext();) {
+            String proposal = (String) i.next();
+
             ContextInformation contextInfo = null;
-            if(!showSections) {
-                contextInfo = new ContextInformation(keywordSuggestion, args.get(keywordSuggestion));
+            String additionalInfo = null;
+            if (!showSections) {
+                KeywordSpecification spec = proposals.get(proposal);
+                contextInfo = new ContextInformation(proposal, spec.getArguments().toString());
+                additionalInfo = "Arguments: " + spec.getArguments().toString() + System.lineSeparator() + System.lineSeparator() + spec.getDocumentation();
             }
-            
-            proposals[index] = new CompletionProposal(keywordSuggestion, offset, replacedWord.length(),
-                    keywordSuggestion.length(), null, keywordSuggestion, contextInfo, suggestions.get(keywordSuggestion).toString());
+
+            completionProposals[index] = new TextEditorCompletionProposal(proposal, offset, replacedWord.length(), proposal.length(),
+                    null, proposal, contextInfo, additionalInfo);
             index++;
-			
-	    }
-		
-	    return proposals;
+
+        }
+
+        return completionProposals;
 	}
 	
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
 		
-		IContextInformation[] info = new IContextInformation[5];
-		info[0] = new ContextInformation("Log", "Arguments:[ message | level=INFO ]");
-		info[1] = new ContextInformation("Log Many", "Arguments:[ *messages ]");
-		info[2] = new ContextInformation("Log Variables", "Arguments:[ level=INFO ]");
-		info[3] = new ContextInformation("Replace Variables", "Arguments:[ text ]");
-		info[4] = new ContextInformation("Set Variable", "Arguments:[ *values ]");
-		
-		return info;
+		return new IContextInformation[0];
 	}
 
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters() {
-		// TODO Auto-generated method stub
-		return null;
+	    return null;
 	}
 
 	@Override
 	public char[] getContextInformationAutoActivationCharacters() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
