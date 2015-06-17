@@ -141,7 +141,13 @@ public enum RobotTokenType implements RobotType {
 
 
     public static RobotTokenType getToken(char c) {
-        return writeableTypes.get(c);
+        RobotTokenType type = writeableTypes.get(c);
+
+        if (type == null) {
+            type = RobotTokenType.UNKNOWN;
+        }
+
+        return type;
     }
 
 
@@ -150,6 +156,7 @@ public enum RobotTokenType implements RobotType {
     }
 
 
+    @Override
     public String toWrite() {
         return this.toWriteText;
     }
@@ -157,5 +164,11 @@ public enum RobotTokenType implements RobotType {
     static interface HELPER {
 
         public static final char UNWRITABLE_CHARS = '\u0000';
+    }
+
+
+    @Override
+    public boolean isWriteable() {
+        return (HELPER.UNWRITABLE_CHARS != thisTokenChar);
     }
 }
