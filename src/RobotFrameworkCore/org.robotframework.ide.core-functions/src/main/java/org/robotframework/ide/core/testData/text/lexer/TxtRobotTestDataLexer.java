@@ -8,8 +8,7 @@ import java.nio.CharBuffer;
 
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher;
-
-import com.google.common.collect.LinkedListMultimap;
+import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
 /**
@@ -45,62 +44,29 @@ public class TxtRobotTestDataLexer {
     }
 
 
-    public LinkedListMultimap<RobotType, RobotToken> extractTokens(
-            final File robotTestDataFile) throws FileNotFoundException,
-            IOException {
-        LinkedListMultimap<RobotType, RobotToken> tokens;
+    public TokenOutput extractTokens(final File robotTestDataFile)
+            throws FileNotFoundException, IOException {
+        TokenOutput out = new TokenOutput();
         try (Reader reader = readersProvider.create(robotTestDataFile)) {
-            tokens = extractTokens(reader);
+            out = extractTokens(reader);
         }
 
-        return tokens;
+        return out;
     }
 
 
-    private LinkedListMultimap<RobotType, RobotToken> extractTokens(
-            Reader reader) throws IOException {
-        LinkedListMultimap<RobotType, RobotToken> tokens = LinkedListMultimap
-                .create();
-
-        int line = LinearPositionMarker.THE_FIRST_LINE;
-        int column = LinearPositionMarker.THE_FIRST_COLUMN;
-
-        addTheFirstLineStartToken(tokens);
-
+    private TokenOutput extractTokens(Reader reader) throws IOException {
         int readLength = 0;
         while((readLength = reader.read(tempBuffer)) != -1) {
             for (int charIndex = 0; charIndex < readLength; charIndex++) {
-                tokenMatcher.offerChar(tokens, tempBuffer, charIndex);
+                tokenMatcher.offerChar(tempBuffer, charIndex);
             }
 
             tempBuffer.clear();
         }
 
-        addEndOfFileToken(tokens, line, column);
+        TokenOutput buildTokens = tokenMatcher.buildTokens();
 
-        return tokens;
-    }
-
-
-    private void addTheFirstLineStartToken(
-            LinkedListMultimap<RobotType, RobotToken> tokens) {
-        LinearPositionMarker theFirstPostion = LinearPositionMarker
-                .createMarkerForFirstLineAndColumn();
-        RobotToken theFirstLineStart = new RobotToken(theFirstPostion, null,
-                theFirstPostion);
-        theFirstLineStart.setType(RobotTokenType.START_LINE);
-        tokens.put(RobotTokenType.START_LINE, theFirstLineStart);
-    }
-
-
-    private void addEndOfFileToken(
-            LinkedListMultimap<RobotType, RobotToken> tokens, int line,
-            int column) {
-        LinearPositionMarker endOfFilePos = new LinearPositionMarker(line,
-                column);
-        RobotToken theEndOfFile = new RobotToken(endOfFilePos, null,
-                endOfFilePos);
-        theEndOfFile.setType(RobotTokenType.END_OF_FILE);
-        tokens.put(RobotTokenType.END_OF_FILE, theEndOfFile);
+        return buildTokens;
     }
 }
