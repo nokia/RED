@@ -198,8 +198,9 @@ public class RobotDebugVariablesManager {
 
     public void sortVariablesNames(final Map<String, Object> vars) {
 
-        final Set<String> variableNameSet = vars.keySet();
-        for (final String varName : variableNameSet) {
+        String[] varArray = vars.keySet().toArray(new String[vars.keySet().size()]);
+        for (int i = varArray.length-1; i >=0; i--) {
+            String varName = varArray[i];
             if (!sortedVariablesNames.contains(varName)) {
                 if (varName.contains(SUITE_VARIABLE_PREFIX)) {
                     sortedVariablesNames.addLast(varName);

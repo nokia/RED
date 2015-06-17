@@ -16,23 +16,16 @@ public class KeywordRule implements IRule {
 	
 	List<String> keywords = new ArrayList<>();
 	List<String> tempKeywords = new ArrayList<>();
-	
-	{
-		keywords.add("Log");
-		keywords.add("Log Many");
-		keywords.add("Log Variables");
-		keywords.add("Replace Variables");
-		keywords.add("Set Variable");
-	}
-	
+
 	private IToken token;
 	
 	private char prevCharBeforeKeyword = ' ';
 	
 	private int currentReadCount = 0;
 	
-	public KeywordRule(IToken token) {
-		this.token = token;
+	public KeywordRule(IToken token, List<String> keywords) {
+	    this.token = token;
+		this.keywords = keywords;
 	}
 
 	@Override
