@@ -11,4 +11,15 @@ package org.robotframework.ide.core.testData.text.lexer;
  */
 public interface RobotType {
 
+    /**
+     * @return an information if token can be directly write to output stream
+     */
+    boolean isWriteable();
+
+
+    /**
+     * @return text for this token type to write to output stream - this is only
+     *         usefull for tokens like 'Test', asterisks '*'
+     */
+    String toWrite();
 }
