@@ -1,5 +1,6 @@
 package org.eclipse.jface.viewers;
 
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -20,6 +21,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     private final String prefix;
     private final String suffix;
     private final String contextToDeactivate;
+    private ContentProposalAdapter contentProposalAdapter;
 
     /**
      * Instantiates cell editor
@@ -40,7 +42,6 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
         this.prefix = prefix;
         this.suffix = suffix;
         this.contextToDeactivate = contextToDeactivate;
-
         registerActivationListener(viewerEditor);
     }
 
@@ -61,12 +62,42 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     }
 
     @Override
+    protected boolean dependsOnExternalFocusListener() {
+        return false;
+    }
+
+    @Override
+    protected void focusLost() {
+        if ((contentProposalAdapter == null || !isContentProposalFocused()) && isActivated()) {
+            fireApplyEditorValue();
+            deactivate();
+        }
+    }
+
+    protected final boolean isContentProposalFocused() {
+        return contentProposalAdapter != null && contentProposalAdapter.isProposalPopupOpen()
+                && contentProposalAdapter.hasProposalPopupFocus();
+    }
+
+    @Override
     public void activate(final ColumnViewerEditorActivationEvent activationEvent) {
         super.activate(activationEvent);
         if (activationEvent.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED
                 && activationEvent.character != SWT.CR) {
             text.setText(prefix + Character.toString(activationEvent.character) + suffix);
         }
+    }
+
+    public void addContentProposalsSupport(final IContentProposingSupport support) {
+        contentProposalAdapter = new ContentProposalAdapter(text, support.getControlAdapter(text),
+                support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
+        contentProposalAdapter.setLabelProvider(support.getLabelProvider());
+    }
+
+    @Override
+    public void dispose() {
+        contentProposalAdapter = null;
+        super.dispose();
     }
 
     private class EditorActivationListener extends ColumnViewerEditorActivationListener {

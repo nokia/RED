@@ -48,6 +48,32 @@ public class RobotModelEvents {
     public static final String ROBOT_SETTING_COMMENT_CHANGED = "robot/model/editor/file/detail/setting/changed/comment";
 
 
+    public static final String ROBOT_CASE_STRUCTURAL_ALL = "robot/model/editor/file/structural/cases/*";
+    
+    public static final String ROBOT_CASE_ADDED = "robot/model/editor/file/structural/cases/added";
+
+    public static final String ROBOT_CASE_REMOVED = "robot/model/editor/file/structural/cases/removed";
+
+    public static final String ROBOT_CASE_MOVED = "robot/model/editor/file/structural/cases/moved";
+
+
+    public static final String ROBOT_CASE_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/cases/changed/*";
+
+    public static final String ROBOT_CASE_NAME_CHANGE = "robot/model/editor/file/detail/cases/changed/argument";
+    
+
+    public static final String ROBOT_KEYWORD_STRUCTURAL_ALL = "robot/model/editor/file/structural/cases/keywords/*";
+
+    public static final String ROBOT_KEYWORD_CALL_ADDED = "robot/model/editor/file/structural/cases/keywords/added";
+
+    public static final String ROBOT_KEYWORD_CALL_REMOVED = "robot/model/editor/file/structural/cases/keywords/removed";
+    
+    
+    public static final String ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/cases/keywords/changed/*";
+
+    public static final String ROBOT_KEYWORD_CALL_NAME_CHANGE = "robot/model/editor/file/detail/cases/keywords/changed/name";
+    
+
     public static final String EXTERNAL_MODEL_CHANGE = "robot/model/external";
 
     public static final String SUITE_MODEL_DISPOSED = "robot/model/disposed";

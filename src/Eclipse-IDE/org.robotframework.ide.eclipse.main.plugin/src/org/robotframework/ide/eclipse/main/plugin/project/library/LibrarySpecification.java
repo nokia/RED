@@ -7,12 +7,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
-
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
-
-    private RobotProject robotProject;
 
     private String name;
     private String scope;
@@ -74,14 +70,6 @@ public class LibrarySpecification {
     @XmlElement(name = "kw")
     public void setKeywords(final List<KeywordSpecification> keywords) {
         this.keywords = keywords;
-    }
-
-    public RobotProject getRobotProject() {
-        return robotProject;
-    }
-
-    public void setProject(final RobotProject robotProject) {
-        this.robotProject = robotProject;
     }
 
     public void propagateFormat() {

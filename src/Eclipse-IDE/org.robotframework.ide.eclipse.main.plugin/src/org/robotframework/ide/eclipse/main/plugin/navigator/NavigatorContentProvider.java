@@ -129,6 +129,17 @@ public class NavigatorContentProvider implements ITreeContentProvider {
         }
     }
 
+    @Inject
+    @Optional
+    private void whenVariableNameChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE) final RobotVariable variable) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            // actually the sorting may have been affected, so we need to
+            // refresh parent
+            viewer.refresh(variable.getParent());
+        }
+    }
+
     @SuppressWarnings("unused")
     @Inject
     @Optional
@@ -172,6 +183,23 @@ public class NavigatorContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null) {
             viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenCasesSectionChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_CASE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (viewer != null) {
+            viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.refresh(testCase.getParent());
         }
     }
 }

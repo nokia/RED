@@ -48,8 +48,11 @@ class FileSectionsEmiter {
                 builder.append(variable.getName());
                 builder.append(variable.getSuffix());
 
-                builder.append(getCellsSeparator());
-                builder.append(variable.getValue());
+
+                if (!variable.getValue().isEmpty()) {
+                    builder.append(getCellsSeparator());
+                    builder.append(variable.getValue());
+                }
 
                 if (!variable.getComment().isEmpty()) {
                     builder.append(getCellsSeparator());
@@ -65,7 +68,7 @@ class FileSectionsEmiter {
                 builder.append('\n');
 
                 for (final RobotElement el : element.getChildren()) {
-                    emitKeywordCall(builder, (RobotKeywordCall) el);
+                    emitKeywordCall(builder, getCellsSeparator(), (RobotKeywordCall) el);
                 }
                 builder.append('\n');
             }
@@ -73,7 +76,13 @@ class FileSectionsEmiter {
     }
 
     private void emitKeywordCall(final StringBuilder builder, final RobotKeywordCall call) {
-        builder.append(call.getName());
+        emitKeywordCall(builder, "", call);
+    }
+
+    private void emitKeywordCall(final StringBuilder builder, final String indent, final RobotKeywordCall call) {
+        builder.append(indent);
+        final String name = call instanceof RobotCaseSetting ? "[" + call.getName() + "]" : call.getName();
+        builder.append(name);
 
         if (!call.getArguments().isEmpty()) {
             builder.append(getCellsSeparator());
