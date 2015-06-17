@@ -74,7 +74,7 @@
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
             class="org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixesGenerator"
-            markerType="org.eclipse.core.resources.problemmarker">
+            markerType="org.robotframework.ide.eclipse.main.plugin.robotProblem">
       </markerResolutionGenerator>
    </extension>
  <extension
