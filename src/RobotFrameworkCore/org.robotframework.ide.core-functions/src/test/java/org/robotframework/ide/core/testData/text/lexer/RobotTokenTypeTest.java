@@ -264,10 +264,13 @@ public class RobotTokenTypeTest {
         for (RobotTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
             if (thisTokenChar == HELPER.UNWRITABLE_CHARS) {
-                assertThat(RobotTokenType.getToken(thisTokenChar)).isNull();
+                assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
+                        RobotTokenType.UNKNOWN);
+                assertThat(((RobotType) type).isWriteable()).isFalse();
             } else {
                 assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
                         type);
+                assertThat(((RobotType) type).isWriteable()).isTrue();
             }
         }
     }
