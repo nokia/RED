@@ -19,11 +19,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.invocation.InvocationOnMock;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
+import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.AnswerRecorder;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
-
-import com.google.common.collect.LinkedListMultimap;
 
 
 /**
@@ -83,36 +82,9 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer(readersProvider);
 
         // execute
-        LinkedListMultimap<RobotType, RobotToken> extractTokens = lexer
-                .extractTokens(file);
+        TokenOutput out = lexer.extractTokens(file);
 
         // verify
-        assertThat(extractTokens.size()).isEqualTo(2);
-
-        // // verify start line token
-        List<RobotToken> startLineTokens = extractTokens
-                .get(RobotTokenType.START_LINE);
-        assertThat(startLineTokens).isNotNull();
-        assertThat(startLineTokens).hasSize(1);
-        RobotToken theFirstStartLineToken = startLineTokens.get(0);
-        assertThatTokenIsAsExpected(theFirstStartLineToken,
-                RobotTokenType.START_LINE, LinearPositionMarker.THE_FIRST_LINE,
-                LinearPositionMarker.THE_FIRST_COLUMN,
-                LinearPositionMarker.THE_FIRST_LINE,
-                LinearPositionMarker.THE_FIRST_COLUMN, null);
-
-        // // verify end of file token
-        List<RobotToken> endOfFileTokens = extractTokens
-                .get(RobotTokenType.END_OF_FILE);
-        assertThat(endOfFileTokens).isNotNull();
-        assertThat(endOfFileTokens).hasSize(1);
-        RobotToken theEndOfFileToken = endOfFileTokens.get(0);
-        assertThatTokenIsAsExpected(theEndOfFileToken,
-                RobotTokenType.END_OF_FILE,
-                LinearPositionMarker.THE_FIRST_LINE,
-                LinearPositionMarker.THE_FIRST_COLUMN,
-                LinearPositionMarker.THE_FIRST_LINE,
-                LinearPositionMarker.THE_FIRST_COLUMN, null);
     }
 
 
