@@ -11,7 +11,7 @@ package org.robotframework.ide.core.testData.text.lexer;
  */
 public class RobotToken {
 
-    private RobotTokenType type = RobotTokenType.UNKNOWN;
+    private RobotType type = RobotTokenType.UNKNOWN;
     private final LinearPositionMarker startPosition;
     private final StringBuilder text;
     private final LinearPositionMarker endPosition;
@@ -53,12 +53,12 @@ public class RobotToken {
     }
 
 
-    public RobotTokenType getType() {
+    public RobotType getType() {
         return type;
     }
 
 
-    public void setType(RobotTokenType type) {
+    public void setType(RobotType type) {
         this.type = type;
     }
 

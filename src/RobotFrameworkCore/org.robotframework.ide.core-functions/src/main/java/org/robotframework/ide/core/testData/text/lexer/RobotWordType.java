@@ -6,6 +6,7 @@ import java.util.Map;
 
 
 /**
+ * Represents words, which has special meaning in Robot Framework test data.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -158,6 +159,7 @@ public enum RobotWordType implements RobotType {
     }
 
 
+    @Override
     public String toWrite() {
         return toWriteText;
     }
@@ -178,5 +180,11 @@ public enum RobotWordType implements RobotType {
     private RobotWordType(final String aliases, final String toWriteText) {
         this.aliases = aliases;
         this.toWriteText = toWriteText;
+    }
+
+
+    @Override
+    public boolean isWriteable() {
+        return (this.toWriteText != null);
     }
 }
