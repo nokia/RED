@@ -4,7 +4,10 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
@@ -40,6 +43,18 @@ public class KeywordProposalsProvider implements IContentProposalProvider {
 
         Collections.sort(proposals, withProposalsComparator());
         return proposals.toArray(new IContentProposal[0]);
+    }
+    
+    public Map<String, KeywordSpecification> getKeywordsForCompletionProposals() {
+        final List<LibrarySpecification> importedLibraries = suiteFile.getImportedLibraries();
+
+        final Map<String, KeywordSpecification> keywordMap = new HashMap<String, KeywordSpecification>();
+        for (final LibrarySpecification spec : importedLibraries) {
+            for (final KeywordSpecification keyword : spec.getKeywords()) {
+                keywordMap.put(keyword.getName(), keyword);
+            }
+        }
+        return new TreeMap<String, KeywordSpecification>(keywordMap);
     }
 
     private static Comparator<KeywordProposal> withProposalsComparator() {

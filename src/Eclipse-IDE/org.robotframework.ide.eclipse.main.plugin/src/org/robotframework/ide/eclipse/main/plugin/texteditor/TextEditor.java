@@ -3,6 +3,9 @@ package org.robotframework.ide.eclipse.main.plugin.texteditor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
@@ -44,6 +47,7 @@ import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.OverviewRuler;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.viewers.KeywordProposalsProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -71,7 +75,10 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
@@ -130,7 +137,7 @@ public class TextEditor {
         
         editedFile = fileEditorInput.getFile();
         final String text = this.extractTextFromFile();
-
+        
         this.deleteMarkersFromFile();
 		//this.createMarkers();
         
@@ -184,10 +191,14 @@ public class TextEditor {
 		viewer.setUndoManager(undoManager);
 		undoManager.connect(viewer);
 		
-		final ContentAssistant contentAssistant = this.createContentAssistant();
+		RobotSuiteFile suiteFile = RobotFramework.getModelManager().createSuiteFile(editedFile);
+        KeywordProposalsProvider proposalProvider = new KeywordProposalsProvider(suiteFile);
+        Map<String, KeywordSpecification> keywordMap = proposalProvider.getKeywordsForCompletionProposals();
+		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap);
 		contentAssistant.install(viewer);
 		
-		final PresentationReconciler reconciler = this.createPresentationReconciler();
+		List<String> keywordList = new ArrayList<String>(keywordMap.keySet());
+		final PresentationReconciler reconciler = this.createPresentationReconciler(keywordList);
 		reconciler.install(viewer);
 		
 		//TODO Add Listener classes
@@ -432,13 +443,14 @@ public class TextEditor {
 		return menu;
 	}
 	
-	private ContentAssistant createContentAssistant() {
+	private ContentAssistant createContentAssistant(Map<String, KeywordSpecification> keywordMap) {
 		final ContentAssistant contentAssistant = new ContentAssistant();
+		contentAssistant.enableColoredLabels(true);
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
 		contentAssistant.setShowEmptyList(true);
-		contentAssistant.setContentAssistProcessor(new TextEditorContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+		contentAssistant.setContentAssistProcessor(new TextEditorContentAssistProcessor(keywordMap), IDocument.DEFAULT_CONTENT_TYPE);
 		contentAssistant.setEmptyMessage("No proposals");
 		contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
             @Override
@@ -449,9 +461,9 @@ public class TextEditor {
 		return contentAssistant;
 	}
 	
-	private PresentationReconciler createPresentationReconciler() {
+	private PresentationReconciler createPresentationReconciler(List<String> keywordList) {
 		final PresentationReconciler reconciler = new PresentationReconciler();
-        txtScanner = new TxtScanner(viewer.getTextWidget().getDisplay());
+        txtScanner = new TxtScanner(viewer.getTextWidget().getDisplay(), keywordList);
 		final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(txtScanner);
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
