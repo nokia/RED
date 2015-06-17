@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -119,7 +120,15 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             // actually the sorting may have been affected, so we need to
             // refresh parent
             viewer.refresh(variable.getParent());
-            viewer.expandAll();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenVariableNameChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE) final RobotVariable variable) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.update(variable, null);
         }
     }
 
@@ -151,7 +160,6 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(section);
-            viewer.expandAll();
         }
     }
 
@@ -161,7 +169,23 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(section);
-            viewer.expandAll();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenCasesSectionChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_CASE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (viewer != null) {
+            viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.update(testCase, null);
         }
     }
 }

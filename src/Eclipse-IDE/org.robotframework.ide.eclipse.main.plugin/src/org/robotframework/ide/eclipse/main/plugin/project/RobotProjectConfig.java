@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -8,7 +10,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.eclipse.core.runtime.IPath;
 
 @XmlRootElement(name = "projectConfiguration")
 public class RobotProjectConfig {
@@ -20,6 +22,8 @@ public class RobotProjectConfig {
     private String version;
 
     private ExecutionEnvironment executionEnvironment;
+
+    private List<String> librarySpecifications;
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -52,6 +56,22 @@ public class RobotProjectConfig {
         return executionEnvironment;
     }
 
+    @XmlElement(name = "referencedLibspec")
+    public void setLibrarySpecifications(final List<String> librarySpecifications) {
+        this.librarySpecifications = librarySpecifications;
+    }
+
+    public List<String> getLibrarySpecifications() {
+        return librarySpecifications;
+    }
+
+    public void addReferencedLibrarySpecification(final IPath projectRelativePath) {
+        if (librarySpecifications == null) {
+            librarySpecifications = newArrayList();
+        }
+        librarySpecifications.add(projectRelativePath.toPortableString());
+    }
+
     public File getPythonLocation() {
         return executionEnvironment == null ? null : new File(executionEnvironment.path);
     }
@@ -68,11 +88,7 @@ public class RobotProjectConfig {
     }
 
     public boolean hasReferencedLibraries() {
-        return false;
-    }
-
-    public List<LibrarySpecification> getReferencedLibraries() {
-        return null;
+        return librarySpecifications != null && !librarySpecifications.isEmpty();
     }
 
     @Override

@@ -7,7 +7,7 @@ public class MoveValueUpCommand extends EditorCommand {
 
     RobotCollectionElement selectedElement;
     
-    public MoveValueUpCommand(RobotCollectionElement selectedElement) {
+    public MoveValueUpCommand(final RobotCollectionElement selectedElement) {
         this.selectedElement = selectedElement;
     }
 

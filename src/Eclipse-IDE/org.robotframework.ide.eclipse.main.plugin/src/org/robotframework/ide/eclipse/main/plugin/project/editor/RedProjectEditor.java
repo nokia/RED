@@ -1,63 +1,49 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.eclipse.ui.part.MultiPageEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 
-public class RedProjectEditor extends FormEditor {
+public class RedProjectEditor extends MultiPageEditorPart {
 
     public static final String ID = "org.robotframework.ide.project.editor";
 
-    private boolean isEditable;
+    private RedProjectEditorInput redProjectEditorInput;
 
-    private RobotProjectConfig configuration;
+    private IEclipseContext context;
 
-    private IProject project;
-
-    @Override
-    protected void addPages() {
-        try {
-            addPage(new ProjectConfigurationFormPage(this, project, configuration, isEditable));
-        } catch (final PartInitException e) {
-            throw new RuntimeException("Unable to initialize editor", e);
-        }
-    }
-
-    private void addPage(final FormPage page) throws PartInitException {
-        final int index = addPage(page, getEditorInput());
-        setPageImage(index, page.getTitleImage());
-        setPageText(index, page.getPartName());
-    }
+    private RedProjectConfigurationEditorPart projectConfigPart;
 
     @Override
     protected void setInput(final IEditorInput input) {
         if (input instanceof FileEditorInput) {
             final IFile file = ((FileEditorInput) input).getFile();
-            isEditable = !file.isReadOnly();
             setPartName(file.getProject().getName() + "/" + input.getName());
 
-            configuration = new RobotProjectConfigReader().readConfiguration(file);
-            project = file.getProject();
+            redProjectEditorInput = new RedProjectEditorInput(!file.isReadOnly(),
+                    new RobotProjectConfigReader().readConfiguration(file), file.getProject());
         } else {
             final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
             if (storage != null) {
-                isEditable = !storage.isReadOnly();
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
                 try {
-                    configuration = new RobotProjectConfigReader().readConfiguration(storage.getContents());
-                    project = null;
+                    redProjectEditorInput = new RedProjectEditorInput(!storage.isReadOnly(), new RobotProjectConfigReader().readConfiguration(storage.getContents()), null);
                 } catch (final CoreException e) {
                     throw new IllegalProjectConfigurationEditorInputException(
                             "Unable to open editor: unrecognized input of class: " + input.getClass().getName(), e);
@@ -71,22 +57,55 @@ public class RedProjectEditor extends FormEditor {
     }
 
     @Override
-    public void doSave(final IProgressMonitor monitor) {
-        RobotFramework.getModelManager().getModel().createRobotProject(project).clear();
-        new RobotProjectConfigWriter().writeConfiguration(configuration, project);
+    protected void createPages() {
+        try {
+            context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class)).getActiveLeaf();
+            context.set(RedProjectEditorInput.class, redProjectEditorInput);
+            projectConfigPart = new RedProjectConfigurationEditorPart();
+            ContextInjectionFactory.inject(projectConfigPart, context);
 
-        commitPages(true);
-        firePropertyChange(PROP_DIRTY);
+            final int index = addPage(projectConfigPart, getEditorInput());
+            setPageText(index, "RED Project");
+        } catch (final PartInitException e) {
+            throw new RuntimeException("Unable to initialize editor", e);
+        }
+    }
+
+    @Override
+    public void doSave(final IProgressMonitor monitor) {
+        for (final IEditorPart dirtyEditor : getDirtyEditors()) {
+            dirtyEditor.doSave(monitor);
+        }
+        final RobotProject project = redProjectEditorInput.getRobotProject();
+        project.clear();
+        new RobotProjectConfigWriter().writeConfiguration(redProjectEditorInput.getProjectConfiguration(), project);
+    }
+
+    private List<? extends IEditorPart> getDirtyEditors() {
+        final List<IEditorPart> dirtyEditors = newArrayList();
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart != null && editorPart.isDirty()) {
+                dirtyEditors.add(editorPart);
+            }
+        }
+        return dirtyEditors;
     }
 
     @Override
     public void doSaveAs() {
-        // FIXME : implement
+        // TODO : implement if needed
     }
 
     @Override
     public boolean isSaveAsAllowed() {
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        ContextInjectionFactory.uninject(projectConfigPart, context);
     }
 
     private static class IllegalProjectConfigurationEditorInputException extends RuntimeException {

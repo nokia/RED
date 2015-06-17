@@ -13,12 +13,9 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerControlConfigurator;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -107,8 +104,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 2))
                 .createFor(viewer);
 
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
-        registerDeselectionListener();
 
         setInput();
     }
@@ -130,27 +128,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
         final Table control = viewer.getTable();
-        ViewerControlConfigurator.disableContextMenuOnHeader(control);
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, viewer, false);
-    }
-
-    private void registerDeselectionListener() {
-        // sets empty selection when user clicked outside the table items
-        // section
-        viewer.getTable().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseUp(final MouseEvent e) {
-                if (leftClickOutsideTable(e)) {
-                    viewer.setSelection(new StructuredSelection());
-                }
-            }
-
-            private boolean leftClickOutsideTable(final MouseEvent e) {
-                return e.button == 1 && viewer.getTable().getItem(new Point(e.x, e.y)) == null;
-            }
-        });
     }
 
     private void setInput() {
