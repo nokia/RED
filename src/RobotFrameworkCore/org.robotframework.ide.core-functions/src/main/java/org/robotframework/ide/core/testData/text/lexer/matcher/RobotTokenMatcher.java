@@ -25,7 +25,7 @@ import com.google.common.collect.LinkedListMultimap;
 public class RobotTokenMatcher {
 
     private final TokenOutput output = new TokenOutput();
-    private List<ITokenMatcher> oneCharTokenMatchers = new LinkedList<>();
+    private List<ISingleCharTokenMatcher> oneCharTokenMatchers = new LinkedList<>();
 
 
     public RobotTokenMatcher() {
@@ -36,7 +36,7 @@ public class RobotTokenMatcher {
     public void offerChar(final CharBuffer tempBuffer, final int charIndex) {
         boolean wasUsed = false;
 
-        for (ITokenMatcher matcher : oneCharTokenMatchers) {
+        for (ISingleCharTokenMatcher matcher : oneCharTokenMatchers) {
             if (matcher.match(output, tempBuffer, charIndex)) {
                 wasUsed = true;
                 break;

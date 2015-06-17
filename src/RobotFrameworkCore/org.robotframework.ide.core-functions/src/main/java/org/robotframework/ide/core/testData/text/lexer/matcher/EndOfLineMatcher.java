@@ -12,7 +12,15 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 import com.google.common.collect.LinkedListMultimap;
 
 
-public class EndOfLineMatcher implements ITokenMatcher {
+/**
+ * Trying to match <CR>+<LF>, <CR>, <LF>, <LF>+<CR> chars as line separators
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ * 
+ */
+public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
     @Override
     public boolean match(TokenOutput tokenOutput, CharBuffer tempBuffer,
@@ -87,17 +95,23 @@ public class EndOfLineMatcher implements ITokenMatcher {
         List<RobotToken> tokens = tokenOutput.getTokens();
         LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
+        int column = pos.getColumn();
+        if (column > LinearPositionMarker.THE_FIRST_COLUMN) {
+            column += 1;
+        }
+
         LinearPositionMarker newMarker = new LinearPositionMarker(
-                pos.getLine(), pos.getColumn() + 1);
+                pos.getLine(), column);
 
-        RobotToken crToken = new RobotToken(newMarker, new StringBuilder(
+        RobotToken endToken = new RobotToken(newMarker, new StringBuilder(
                 type.toWrite()));
-        crToken.setType(type);
+        endToken.setType(type);
 
-        tokens.add(crToken);
+        tokens.add(endToken);
         tokensPosition.put(type, tokens.size() - 1);
 
-        RobotToken eolToken = new RobotToken(newMarker, null, newMarker);
+        RobotToken eolToken = new RobotToken(endToken.getEndPosition(), null,
+                endToken.getEndPosition());
         eolToken.setType(RobotTokenType.END_OF_LINE);
 
         tokens.add(eolToken);
