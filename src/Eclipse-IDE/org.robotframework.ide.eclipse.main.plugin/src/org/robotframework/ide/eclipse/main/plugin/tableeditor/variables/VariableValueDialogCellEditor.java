@@ -17,7 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
  */
 public class VariableValueDialogCellEditor extends DialogCellEditor {
     
-    private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.details.context.editvalue";
+    // private static final String CONTEXT_ID =
+    // "org.robotframework.ide.eclipse.details.context.editvalue";
 
     private Text textField;
 

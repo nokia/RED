@@ -20,7 +20,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
 
     public static final String DEBUG_MODEL_ID = "org.eclipse.debug.robot";
 
-    public RobotDebugElement(RobotDebugTarget t) {
+    public RobotDebugElement(final RobotDebugTarget t) {
         target = t;
     }
 
@@ -39,14 +39,15 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         return getDebugTarget().getLaunch();
     }
 
-    public Object getAdapter(Class adapter) {
+    @Override
+    public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IDebugElement.class) {
             return this;
         }
         return super.getAdapter(adapter);
     }
 
-    protected void abort(String message, Throwable e) throws DebugException {
+    protected void abort(final String message, final Throwable e) throws DebugException {
         throw new DebugException(new Status(IStatus.ERROR, "org.robotframework.ide.eclipse.main.plugin",
                 "abort message"));
     }
@@ -57,7 +58,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
      * @param event
      *            the event to be fired
      */
-    protected void fireEvent(DebugEvent event) {
+    protected void fireEvent(final DebugEvent event) {
         DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
     }
 
@@ -75,7 +76,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
      * @param detail
      *            event detail code
      */
-    public void fireResumeEvent(int detail) {
+    public void fireResumeEvent(final int detail) {
         fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
     }
 
@@ -86,7 +87,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
      * @param detail
      *            event detail code
      */
-    public void fireSuspendEvent(int detail) {
+    public void fireSuspendEvent(final int detail) {
         fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
     }
 

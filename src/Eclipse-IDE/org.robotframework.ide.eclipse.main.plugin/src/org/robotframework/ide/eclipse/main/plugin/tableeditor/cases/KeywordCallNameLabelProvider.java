@@ -1,14 +1,13 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+public class KeywordCallNameLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
@@ -20,9 +19,9 @@ class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyl
 
     @Override
     public StyledString getStyledText(final Object element) {
-        if (element instanceof RobotSetting) {
-            final RobotSetting setting = (RobotSetting) element;
-            return new StyledString(setting.getName());
+        if (element instanceof RobotKeywordCall) {
+            final RobotKeywordCall keywordCall = (RobotKeywordCall) element;
+            return new StyledString(keywordCall.getName());
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getStyledText();
         }
@@ -31,9 +30,9 @@ class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyl
 
     @Override
     public String getToolTipText(final Object element) {
-        if (element instanceof RobotSetting) {
-            final RobotSetting metadataSetting = (RobotSetting) element;
-            final String name = metadataSetting.getName();
+        if (element instanceof RobotKeywordCall) {
+            final RobotKeywordCall keywordCall = (RobotKeywordCall) element;
+            final String name = keywordCall.getName();
             return name.isEmpty() ? "<empty>" : name;
         }
         return null;
@@ -41,7 +40,7 @@ class SettingsCallNameLabelProvider extends ColumnLabelProvider implements IStyl
 
     @Override
     public Image getToolTipImage(final Object element) {
-        if (element instanceof RobotSetting) {
+        if (element instanceof RobotKeywordCall) {
             return RobotImages.getTooltipImage().createImage();
         }
         return null;

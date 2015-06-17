@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerControlConfigurator;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -114,6 +114,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
 
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
         setInput();
     }
@@ -134,7 +135,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
         final MenuManager manager = new MenuManager("Robot suite editor metadata settings context menu", menuId);
         final Table control = viewer.getTable();
-        ViewerControlConfigurator.disableContextMenuOnHeader(control);
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);

@@ -12,7 +12,8 @@ import org.eclipse.swt.graphics.Point;
  * @author Michal Anglart
  * 
  */
-public class TooltipsEnablingDelegatingStyledCellLabelProvider extends DelegatingStyledCellLabelProvider {
+public class TooltipsEnablingDelegatingStyledCellLabelProvider extends DelegatingStyledCellLabelProvider implements
+        ILabelProvider {
 
     private final IStyledLabelProvider labelProvider;
 
@@ -99,5 +100,10 @@ public class TooltipsEnablingDelegatingStyledCellLabelProvider extends Delegatin
             return ((CellLabelProvider) labelProvider).useNativeToolTip(object);
         }
         return super.useNativeToolTip(object);
+    }
+
+    @Override
+    public String getText(final Object element) {
+        return "";
     }
 }

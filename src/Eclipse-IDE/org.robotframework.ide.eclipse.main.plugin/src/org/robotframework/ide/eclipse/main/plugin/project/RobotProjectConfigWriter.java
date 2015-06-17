@@ -13,9 +13,13 @@ import javax.xml.bind.Marshaller;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 
 public class RobotProjectConfigWriter {
 
+    public void writeConfiguration(final RobotProjectConfig configuration, final RobotProject project) {
+        writeConfiguration(configuration, project.getProject());
+    }
 
     public void writeConfiguration(final RobotProjectConfig configuration, final IProject project) {
         try {

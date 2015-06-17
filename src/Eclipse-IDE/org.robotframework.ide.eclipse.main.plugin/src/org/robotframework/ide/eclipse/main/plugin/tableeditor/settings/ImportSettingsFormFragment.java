@@ -19,7 +19,7 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerControlConfigurator;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -47,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.KeywordCallNameLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportLibraryPopup;
 
 public class ImportSettingsFormFragment implements ISectionFormFragment {
@@ -100,6 +101,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
 
         viewer.setInput(getImportElements());
@@ -113,7 +115,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
         final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
         final Table control = viewer.getTable();
-        ViewerControlConfigurator.disableContextMenuOnHeader(control);
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
@@ -135,7 +136,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Import").withWidth(100)
                 .shouldGrabAllTheSpaceLeft(viewer.getInput() == null).withMinWidth(100)
-                .labelsProvidedBy(new SettingsCallNameLabelProvider())
+                .labelsProvidedBy(new KeywordCallNameLabelProvider())
                 .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);

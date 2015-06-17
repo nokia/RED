@@ -9,7 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 
 class FileSectionsParser {
 
@@ -31,11 +36,14 @@ class FileSectionsParser {
         final List<RobotElement> sections = new ArrayList<>();
 
         InputStream inputStream = null;
+        IMarker[] markers;
         try {
             inputStream = file != null ? file.getContents(true) : stream;
+            markers = file != null ? new IMarker[0] : file.findMarkers(RobotProblem.TYPE_ID, true, 1);
         } catch (final CoreException e) {
             throw new IOException("Unable to get content of file: " + file.getLocation().toString(), e);
         }
+        final Multimap<Integer, IMarker> groupedMarkers = groupMarkersByLine(markers);
 
         try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
             String line = bufferedReader.readLine();
@@ -44,9 +52,11 @@ class FileSectionsParser {
             RobotCasesSection casesSection = null;
             RobotCase testCase = null;
             RobotSuiteSettingsSection settingSection = null;
+            int lineNumber = 1;
             while (line != null) {
                 if (line.trim().isEmpty()) {
                     line = bufferedReader.readLine();
+                    lineNumber++;
                     continue;
                 } else if (line.startsWith("*")) {
                     varSection = null;
@@ -90,7 +100,11 @@ class FileSectionsParser {
                         final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
                                 split.length);
 
-                        testCase.createKeywordCall(name, args, comment);
+                        if (name.startsWith("[") && name.endsWith("]")) {
+                            testCase.createSettting(name, args, comment);
+                        } else {
+                            testCase.createKeywordCall(name, args, comment, groupedMarkers.get(lineNumber));
+                        }
                     } else {
                         testCase = casesSection.createTestCase(line);
                     }
@@ -105,6 +119,7 @@ class FileSectionsParser {
                     settingSection.createSetting(name, comment, args);
                 }
                 line = bufferedReader.readLine();
+                lineNumber++;
             }
         }
         return sections;
@@ -136,6 +151,15 @@ class FileSectionsParser {
 
     private String extractSectionName(final String line) {
         return line.replaceAll("\\*", " ").trim();
+    }
+
+    private static Multimap<Integer, IMarker> groupMarkersByLine(final IMarker[] markers) {
+        final Multimap<Integer, IMarker> groupedMarkers = LinkedListMultimap.create();
+        for (final IMarker marker : markers) {
+            final int line = marker.getAttribute(IMarker.LINE_NUMBER, 0);
+            groupedMarkers.put(line, marker);
+        }
+        return groupedMarkers;
     }
 
 }

@@ -11,7 +11,7 @@ import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
-import org.eclipse.debug.internal.ui.views.variables.VariablesView;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -30,21 +30,21 @@ public class RobotDebugVariablesManager {
 
     public static final String TEST_VARIABLE_PREFIX = "TEST_";
 
-    private RobotDebugTarget target;
+    private final RobotDebugTarget target;
 
-    private LinkedList<RobotDebugVariablesContext> previousVariables;
+    private final LinkedList<RobotDebugVariablesContext> previousVariables;
 
     private Map<String, String> globalVariables;
     
     Map<String, IVariable> nestedGlobalVars;
 
-    private LinkedList<String> sortedVariablesNames = new LinkedList<String>();
+    private final LinkedList<String> sortedVariablesNames = new LinkedList<String>();
 
     private boolean hasVariablesViewerListener;
 
-    private VariablesViewerUpdateListener variablesViewerUpdateListener;
+    private final VariablesViewerUpdateListener variablesViewerUpdateListener;
 
-    public RobotDebugVariablesManager(RobotDebugTarget target) {
+    public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
         previousVariables = new LinkedList<>();
         nestedGlobalVars = new LinkedHashMap<>();
@@ -63,9 +63,9 @@ public class RobotDebugVariablesManager {
      * @param newVariables
      * @return
      */
-    public IVariable[] extractRobotDebugVariables(int stackTraceId, Map<String, Object> newVariables) {
+    public IVariable[] extractRobotDebugVariables(final int stackTraceId, final Map<String, Object> newVariables) {
 
-        RobotDebugVariablesContext currentVariablesContext = findCurrentVariablesContext(stackTraceId);
+        final RobotDebugVariablesContext currentVariablesContext = findCurrentVariablesContext(stackTraceId);
         Map<String, IVariable> previousVariablesMap = null;
         if (currentVariablesContext != null) {
             previousVariablesMap = currentVariablesContext.getVariablesMap();
@@ -73,21 +73,21 @@ public class RobotDebugVariablesManager {
             previousVariablesMap = previousVariables.getLast().getVariablesMap();
         }
 
-        Map<String, IVariable> nonGlobalVariablesMap = new LinkedHashMap<>();
-        LinkedList<IVariable> currentVariablesList = new LinkedList<IVariable>();
+        final Map<String, IVariable> nonGlobalVariablesMap = new LinkedHashMap<>();
+        final LinkedList<IVariable> currentVariablesList = new LinkedList<IVariable>();
         if (previousVariablesMap == null) {
-            for (String variableName : sortedVariablesNames) {
+            for (final String variableName : sortedVariablesNames) {
                 if (!globalVariables.containsKey(variableName) && newVariables.containsKey(variableName)) {
-                    RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
+                    final RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
                             newVariables.get(variableName), null);
                     nonGlobalVariablesMap.put(variableName, newVariable);
                 }
             }
         } else {
-            for (String variableName : sortedVariablesNames) {
+            for (final String variableName : sortedVariablesNames) {
                 if (newVariables.containsKey(variableName)) {
                     if (!globalVariables.containsKey(variableName)) {
-                        RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
+                        final RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
                                 newVariables.get(variableName), null);
                         newVariable.setHasValueChanged(this.hasValueChanged(variableName, newVariable, newVariables,
                                 previousVariablesMap));
@@ -114,29 +114,29 @@ public class RobotDebugVariablesManager {
         return currentVariablesList.toArray(new IVariable[currentVariablesList.size()]);
     }
 
-    private boolean hasValueChanged(String newVarName, RobotDebugVariable newVariable, Map<String, Object> newVariables,
-            Map<String, IVariable> previousVariablesMap) {
+    private boolean hasValueChanged(final String newVarName, final RobotDebugVariable newVariable, final Map<String, Object> newVariables,
+            final Map<String, IVariable> previousVariablesMap) {
 
         if (previousVariablesMap.containsKey(newVarName)) {
             try {
-                RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
+                final RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
                 if(newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
                     return compareNestedVariables(newVariable.getValue().getVariables(), previousVariable.getValue().getVariables());
                 }
-                String variablePreviousValue = previousVariable.getValue().getValueString();
-                String variableNewValue = newVariable.getValue().getValueString();
+                final String variablePreviousValue = previousVariable.getValue().getValueString();
+                final String variableNewValue = newVariable.getValue().getValueString();
                 if (variablePreviousValue != null && !variablePreviousValue.equals(variableNewValue)
                         && previousVariable.isValueModificationEnabled()) {
                     return true;
                 }
-            } catch (DebugException e) {
+            } catch (final DebugException e) {
                 e.printStackTrace();
             }
         }
         return false;
     }
     
-    private boolean compareNestedVariables(IVariable[] newNestedVars, IVariable[] prevNestedVars) {
+    private boolean compareNestedVariables(final IVariable[] newNestedVars, final IVariable[] prevNestedVars) {
 
         if (newNestedVars.length != prevNestedVars.length) {
             return true;
@@ -144,8 +144,8 @@ public class RobotDebugVariablesManager {
         boolean hasNestedValueChanged = false;
         try {
             for (int i = 0; i < newNestedVars.length; i++) {
-                IValue newValue = newNestedVars[i].getValue();
-                IValue previousValue = prevNestedVars[i].getValue();
+                final IValue newValue = newNestedVars[i].getValue();
+                final IValue previousValue = prevNestedVars[i].getValue();
                 if (newValue.hasVariables() && previousValue.hasVariables()) {
                     compareNestedVariables(newValue.getVariables(), previousValue.getVariables());
                 } else if (previousValue.getValueString() != null
@@ -154,14 +154,14 @@ public class RobotDebugVariablesManager {
                     hasNestedValueChanged = true;
                 }
             }
-        } catch (DebugException e) {
+        } catch (final DebugException e) {
             e.printStackTrace();
         }
         return hasNestedValueChanged;
     }
 
-    private RobotDebugVariablesContext findCurrentVariablesContext(int stackTraceId) {
-        for (RobotDebugVariablesContext variablesContext : previousVariables) {
+    private RobotDebugVariablesContext findCurrentVariablesContext(final int stackTraceId) {
+        for (final RobotDebugVariablesContext variablesContext : previousVariables) {
             if (variablesContext.getStackTraceId() == stackTraceId) {
                 return variablesContext;
             }
@@ -173,20 +173,20 @@ public class RobotDebugVariablesManager {
         return globalVariables;
     }
 
-    public void setGlobalVariables(Map<String, String> globalVariables) {
+    public void setGlobalVariables(final Map<String, String> globalVariables) {
         this.globalVariables = globalVariables;
-        Set<String> set = globalVariables.keySet();
-        for (String key : set) {
-            RobotDebugVariable globalVar = new RobotDebugVariable(target, key, globalVariables.get(key), null);
+        final Set<String> set = globalVariables.keySet();
+        for (final String key : set) {
+            final RobotDebugVariable globalVar = new RobotDebugVariable(target, key, globalVariables.get(key), null);
             globalVar.setValueModificationEnabled(false);
             nestedGlobalVars.put(key, globalVar);
         }
     }
     
     private RobotDebugVariable createGlobalVariable() {
-        RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, "", null);
+        final RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, "", null);
         variable.setValueModificationEnabled(false);
-        RobotDebugValue value = new RobotDebugValue(target, "", nestedGlobalVars.values().toArray(new IVariable[nestedGlobalVars.size()]));
+        final RobotDebugValue value = new RobotDebugValue(target, "", nestedGlobalVars.values().toArray(new IVariable[nestedGlobalVars.size()]));
         variable.setRobotDebugValue(value);
 
         return variable;
@@ -196,10 +196,10 @@ public class RobotDebugVariablesManager {
         return previousVariables;
     }
 
-    public void sortVariablesNames(Map<String, Object> vars) {
+    public void sortVariablesNames(final Map<String, Object> vars) {
 
-        Set<String> variableNameSet = vars.keySet();
-        for (String varName : variableNameSet) {
+        final Set<String> variableNameSet = vars.keySet();
+        for (final String varName : variableNameSet) {
             if (!sortedVariablesNames.contains(varName)) {
                 if (varName.contains(SUITE_VARIABLE_PREFIX)) {
                     sortedVariablesNames.addLast(varName);
@@ -212,12 +212,12 @@ public class RobotDebugVariablesManager {
         }
     }
 
-    public String extractVariableRootAndChilds(RobotDebugVariable parent, LinkedList<String> childNameList,
-            String variableName) {
+    public String extractVariableRootAndChilds(final RobotDebugVariable parent, final LinkedList<String> childNameList,
+            final String variableName) {
         String parentName = "";
         try {
             parentName = parent.getName();
-        } catch (DebugException e) {
+        } catch (final DebugException e) {
             e.printStackTrace();
         }
         if (parent.getParent() == null) {
@@ -229,7 +229,7 @@ public class RobotDebugVariablesManager {
         }
     }
 
-    private String extractChildName(String variableName) {
+    private String extractChildName(final String variableName) {
         if (variableName.indexOf("[") >= 0 && variableName.indexOf("]") >= 0) {
             return variableName.substring(1, variableName.indexOf("]"));
         }
@@ -246,7 +246,7 @@ public class RobotDebugVariablesManager {
         unregisterViewerUpdateListener();
     }
 
-    public void setIsVariablesViewerUpdated(boolean isUpdated) {
+    public void setIsVariablesViewerUpdated(final boolean isUpdated) {
         variablesViewerUpdateListener.setViewerUpdated(isUpdated);
     }
 
@@ -256,12 +256,12 @@ public class RobotDebugVariablesManager {
 
             @Override
             public void run() {
-                IViewPart viewPart = PlatformUI.getWorkbench()
+                final IViewPart viewPart = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow()
                         .getActivePage()
                         .findView("org.eclipse.debug.ui.VariableView");
-                if (viewPart != null && viewPart instanceof VariablesView) {
-                    VariablesView variablesView = (VariablesView) viewPart;
+                if (viewPart instanceof IDebugView) {
+                    final IDebugView variablesView = (IDebugView) viewPart;
                     final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
                     if (variablesTreeModelViewer != null) {
                         variablesViewerUpdateListener.setTreeModelViewer(variablesTreeModelViewer);
@@ -279,12 +279,12 @@ public class RobotDebugVariablesManager {
 
             @Override
             public void run() {
-                IViewPart viewPart = PlatformUI.getWorkbench()
+                final IViewPart viewPart = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow()
                         .getActivePage()
                         .findView("org.eclipse.debug.ui.VariableView");
-                if (viewPart != null && viewPart instanceof VariablesView) {
-                    VariablesView variablesView = (VariablesView) viewPart;
+                if (viewPart instanceof IDebugView) {
+                    final IDebugView variablesView = (IDebugView) viewPart;
                     final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
                     if (variablesTreeModelViewer != null) {
                         variablesTreeModelViewer.removeViewerUpdateListener(variablesViewerUpdateListener);
@@ -311,12 +311,12 @@ public class RobotDebugVariablesManager {
         @Override
         public void viewerUpdatesComplete() {
             if (!isViewerUpdated) {
-                int itemCount = treeModelViewer.getTree().getItemCount();
+                final int itemCount = treeModelViewer.getTree().getItemCount();
                 if (itemCount > 0) {
                     try {
                         treeModelViewer.getTree().deselectAll();
                         treeModelViewer.collapseAll();
-                    } catch (IllegalArgumentException e) {
+                    } catch (final IllegalArgumentException e) {
                         e.printStackTrace();
                     } finally {
                         isViewerUpdated = true;
@@ -326,18 +326,18 @@ public class RobotDebugVariablesManager {
         }
 
         @Override
-        public void updateStarted(IViewerUpdate update) {
+        public void updateStarted(final IViewerUpdate update) {
         }
 
         @Override
-        public void updateComplete(IViewerUpdate update) {
+        public void updateComplete(final IViewerUpdate update) {
         }
 
-        public void setViewerUpdated(boolean isViewerUpdated) {
+        public void setViewerUpdated(final boolean isViewerUpdated) {
             this.isViewerUpdated = isViewerUpdated;
         }
 
-        public void setTreeModelViewer(TreeModelViewer treeModelViewer) {
+        public void setTreeModelViewer(final TreeModelViewer treeModelViewer) {
             this.treeModelViewer = treeModelViewer;
         }
     }

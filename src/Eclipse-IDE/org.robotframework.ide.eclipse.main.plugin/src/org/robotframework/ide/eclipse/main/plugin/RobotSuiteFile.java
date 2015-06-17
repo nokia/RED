@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -169,5 +173,31 @@ public class RobotSuiteFile implements RobotElement {
                 return sectionClass.isInstance(element);
             }
         });
+    }
+
+    public List<LibrarySpecification> getImportedLibraries() {
+        final Optional<RobotElement> section = findSection(RobotSuiteSettingsSection.class);
+        final List<String> alreadyImported = newArrayList();
+        if (section.isPresent()) {
+            final List<RobotElement> importSettings = ((RobotSuiteSettingsSection) section.get()).getImportSettings();
+            for (final RobotElement element : importSettings) {
+                final RobotSetting setting = (RobotSetting) element;
+                if (SettingsGroup.LIBRARIES == setting.getGroup()) {
+                    final String name = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
+                    if (name != null) {
+                        alreadyImported.add(name);
+                    }
+                }
+            }
+        }
+
+        final List<LibrarySpecification> imported = newArrayList();
+        final List<LibrarySpecification> standardLibraries = getProject().getStandardLibraries();
+        for (final LibrarySpecification spec : standardLibraries) {
+            if (spec.isAccessibleWithoutImport() || alreadyImported.contains(spec.getName())) {
+                imported.add(spec);
+            }
+        }
+        return imported;
     }
 }

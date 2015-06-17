@@ -527,6 +527,20 @@
  <extension
        point="org.eclipse.ui.handlers">
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeCasesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.atLeastOneCaseIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteVariablesHandler"
           commandId="org.eclipse.ui.edit.delete">
        <activeWhen>
@@ -563,7 +577,21 @@
        </activeWhen>
        <enabledWhen>
           <reference
-                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.InsertNewCaseHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeCasesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -577,7 +605,21 @@
        </activeWhen>
        <enabledWhen>
           <reference
-                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeCasesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -591,7 +633,21 @@
        </activeWhen>
        <enabledWhen>
           <reference
-                definitionId="org.robotframework.exactlyOneVariableIsSelected">
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeCasesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -630,13 +686,46 @@
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.moveElementDown"
-          contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          contextId="org.eclipse.ui.contexts.window"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+ARROW_DOWN">
     </key>
  </extension>
  <extension
        point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.cases.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNew"
+             icon="resources/add.png"
+             label="Add new test case"
+             style="push">
+       </command>
+       <separator
+             name="navigation"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementUp"
+             label="Move test case up"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementDown"
+             label="Move test case down"
+             style="push">
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
     <menuContribution
           allPopups="false"
           locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.contextMenu?before=additions">
@@ -791,7 +880,7 @@
        </with>
     </definition>
     <definition
-          id="org.robotframework.exactlyOneVariableIsSelected">
+          id="org.robotframework.exactlyOneElementIsSelected">
        <with
              variable="selection">
           <and>
@@ -799,7 +888,7 @@
                    ifEmpty="false"
                    operator="and">
                 <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.RobotVariable">
+                      value="org.robotframework.ide.eclipse.main.plugin.RobotElement">
                 </instanceof>
              </iterate>
              <count
@@ -852,6 +941,83 @@
           </iterate>
        </with>
     </definition>
+    <definition
+          id="org.robotframework.activeCasesPartIsEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.cases.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.atLeastOneCaseIsSelected">
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="and">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotCase">
+             </instanceof>
+          </iterate>
+       </with>
+    </definition>
+    
+    <definition
+          id="org.robotframework.valueEditorContextIsActive">
+       <with
+             variable="activeContexts">
+          <iterate
+                ifEmpty="false"
+                operator="or">
+             <equals
+                   value="org.robotframework.ide.eclipse.details.context.editvalue">
+             </equals>
+          </iterate>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.exactlyOneCollectionElementIsSelected">
+       <with
+             variable="activeMenuSelection">
+          <and>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement">
+                </instanceof>
+             </iterate>
+             <count
+                   value="1">
+             </count>
+          </and>
+       </with>
+    </definition>
+    
  </extension>
  
   	<extension

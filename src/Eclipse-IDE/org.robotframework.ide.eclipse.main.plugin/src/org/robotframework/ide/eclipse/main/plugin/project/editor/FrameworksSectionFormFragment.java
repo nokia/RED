@@ -7,13 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -31,6 +32,7 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -43,14 +45,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.forms.AbstractFormPart;
-import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
@@ -61,75 +62,40 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-public class FrameworksFormPart extends AbstractFormPart {
+public class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private static final String IMAGE_FOR_LINK = "image";
     private static final String PATH_LINK = "systemPath";
     private static final String PREFERENCES_LINK = "preferences";
 
-    private final RobotProject project;
-    private final RobotProjectConfig configuration;
-    private final boolean isEditable;
+    @Inject
+    private RedFormToolkit toolkit;
 
-    private FormText currentFramework;
-    private Button sourceButton;
+    @Inject
+    private IDirtyProviderService dirtyProviderService;
+
+    @Inject
+    private Form form;
+
+    @Inject
+    private RedProjectEditorInput editorInput;
+
+
     private CheckboxTableViewer viewer;
 
-    public FrameworksFormPart(final IProject project, final RobotProjectConfig configuration,
-            final boolean isEditable) {
-        this.project = RobotFramework.getModelManager().getModel().createRobotProject(project);
-        this.configuration = configuration;
-        this.isEditable = isEditable;
-    }
+    private FormText currentFramework;
+
+    private Button sourceButton;
 
     @Override
-    public final void initialize(final IManagedForm managedForm) {
-        super.initialize(managedForm);
+    public void initialize(final Composite parent) {
+        installResourceListener();
 
-        final IResourceChangeListener listener = new IResourceChangeListener() {
-            @Override
-            public void resourceChanged(final IResourceChangeEvent event) {
-                if (event.getType() == IResourceChangeEvent.POST_CHANGE && event.getDelta() != null) {
-                    final IResourceDelta delta = event.getDelta();
-                    try {
-                        delta.accept(new IResourceDeltaVisitor() {
-                            @Override
-                            public boolean visit(final IResourceDelta delta) {
-                                if (delta.getResource().getFullPath().segmentCount() > 2) {
-                                    return false;
-                                }
-                                if (delta.getResource().equals(project.getFile(RobotProjectConfig.FILENAME))) {
-                                    reloadInput();
-                                    return false;
-                                }
-                                return true;
-                            }
-                        });
-                    } catch (final CoreException e) {
-                        // nothing to do
-                    }
-                }
-            }
-        };
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
-        managedForm.getForm().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
-            }
-        });
-
-        createContent(managedForm.getForm().getBody());
-    }
-
-    private void createContent(final Composite parent) {
-        GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(parent);
-
-        final FormToolkit toolkit = getManagedForm().getToolkit();
         final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
                 | Section.DESCRIPTION);
         section.setText("Robot framework");
@@ -148,13 +114,42 @@ public class FrameworksFormPart extends AbstractFormPart {
         createViewer(sectionInternal);
 
         setInput();
+
+    }
+
+    private void installResourceListener() {
+        final IProject project = editorInput.getRobotProject().getProject();
+        final IResourceChangeListener listener = new RedProjectConfigurationFileChangeListener(project, new Runnable() {
+            @Override
+            public void run() {
+                currentFramework.setText("", false, false);
+                sourceButton.setEnabled(false);
+                viewer.getTable().setEnabled(false);
+
+                setInput();
+            }
+        });
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+        form.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
+            }
+        });
+    }
+
+    void reloadInput() {
+        currentFramework.setText("", false, false);
+        sourceButton.setEnabled(false);
+        viewer.getTable().setEnabled(false);
+
+        setInput();
     }
 
     private void createCurrentFrameworkInfo(final Composite parent) {
-        final FormToolkit toolkit = getManagedForm().getToolkit();
         currentFramework = toolkit.createFormText(parent, true);
         currentFramework.setImage(IMAGE_FOR_LINK, RobotImages.getRobotImage().createImage());
-        GridDataFactory.fillDefaults().indent(30, 5).applyTo(currentFramework);
+        GridDataFactory.fillDefaults().grab(true, false).indent(15, 5).applyTo(currentFramework);
 
         final IHyperlinkListener hyperlinkListener = createHyperlinkListener();
         currentFramework.addHyperlinkListener(hyperlinkListener);
@@ -191,15 +186,15 @@ public class FrameworksFormPart extends AbstractFormPart {
     }
 
     private void createSeparator(final Composite parent) {
-        final FormToolkit toolkit = getManagedForm().getToolkit();
         final Label separator = toolkit.createSeparator(parent, SWT.HORIZONTAL);
         GridDataFactory.fillDefaults().indent(0, 10).applyTo(separator);
     }
 
     private void createSourceButton(final Composite parent) {
-        final FormToolkit toolkit = getManagedForm().getToolkit();
-        sourceButton = toolkit.createButton(parent, "Use local settings for this project (if not checked, "
-                + "then active framework from preferences is used).", SWT.CHECK);
+        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
+
+        // "Use local settings for this project (if not checked, then active framework from preferences is used)."
+        sourceButton = toolkit.createButton(parent, "Use local settings for this project", SWT.CHECK);
         sourceButton.setEnabled(false);
         sourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -213,7 +208,7 @@ public class FrameworksFormPart extends AbstractFormPart {
                 } else {
                     configuration.setPythonLocation(null);
                 }
-                FrameworksFormPart.this.markDirty();
+                dirtyProviderService.setDirtyState(true);
             }
         });
     }
@@ -245,6 +240,8 @@ public class FrameworksFormPart extends AbstractFormPart {
     }
 
     private ICheckStateListener createCheckListener() {
+        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
+
         final ICheckStateListener checkListener = new ICheckStateListener() {
             @Override
             public void checkStateChanged(final CheckStateChangedEvent event) {
@@ -257,7 +254,7 @@ public class FrameworksFormPart extends AbstractFormPart {
                     viewer.getTable().setEnabled(false);
                     configuration.setPythonLocation(null);
                 }
-                FrameworksFormPart.this.markDirty();
+                dirtyProviderService.setDirtyState(true);
                 viewer.refresh();
             }
         };
@@ -265,6 +262,10 @@ public class FrameworksFormPart extends AbstractFormPart {
     }
 
     private void setInput() {
+        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
+        final boolean isEditable = editorInput.isEditable();
+        final RobotProject project = editorInput.getRobotProject();
+
         final String activeEnv = "activeEnv";
         final String allEnvs = "allEnvs";
 
@@ -308,7 +309,7 @@ public class FrameworksFormPart extends AbstractFormPart {
                             currentFramework.setText(createCurrentFrameworkText("unknown"), true, true);
                             int i = 0;
                             for (final String problem : getProblems()) {
-                                getManagedForm().getMessageManager().addMessage("problems_" + i, problem, null,
+                                form.getMessageManager().addMessage("problems_" + i, problem, null,
                                         IMessageProvider.ERROR, currentFramework);
                                 i++;
                             }
@@ -317,17 +318,22 @@ public class FrameworksFormPart extends AbstractFormPart {
                             currentFramework.setText(createCurrentFrameworkText(activeText), true, true);
                         }
                         currentFramework.getParent().layout();
-                        getManagedForm().getForm().setBusy(false);
+                        form.setBusy(false);
                     }
                 });
             }
         });
-        getManagedForm().getForm().setBusy(true);
+        form.setBusy(true);
         job.schedule();
     }
 
+    private QualifiedName createKey(final String localName) {
+        return new QualifiedName(RobotFramework.PLUGIN_ID, localName);
+    }
+
     private List<String> getProblems() {
-        final IFile file = getFile();
+        final RobotProject project = editorInput.getRobotProject();
+        final IFile file = project != null ? project.getConfigurationFile() : null;
         if (file != null) {
             try {
                 final IMarker[] markers = file.findMarkers(RobotProblem.TYPE_ID, true, 1);
@@ -368,24 +374,12 @@ public class FrameworksFormPart extends AbstractFormPart {
         return activeText.toString();
     }
 
-    private IFile getFile() {
-        return project != null ? project.getConfigurationFile() : null;
-    }
-
-    private QualifiedName createKey(final String localName) {
-        return new QualifiedName(RobotFramework.PLUGIN_ID, localName);
-    }
-
     @Override
     public void setFocus() {
-        currentFramework.setFocus();
+        viewer.getTable().setFocus();
     }
 
-    private void reloadInput() {
-        currentFramework.setText("", false, false);
-        sourceButton.setEnabled(false);
-        viewer.getTable().setEnabled(false);
-
-        setInput();
+    public TableViewer getViewer() {
+        return viewer;
     }
 }

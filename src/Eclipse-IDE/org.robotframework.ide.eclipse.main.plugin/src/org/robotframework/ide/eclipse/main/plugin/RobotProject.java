@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
@@ -16,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadlibrarySpecificationException;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
 public class RobotProject extends RobotContainer {
@@ -53,7 +57,7 @@ public class RobotProject extends RobotContainer {
                         @Override
                         public LibrarySpecification apply(final String libraryName) {
                             final IFile file = LibspecsFolder.get(getProject()).getSpecFile(libraryName);
-                            return LibrarySpecificationReader.readSpecification(RobotProject.this, file);
+                            return LibrarySpecificationReader.readSpecification(file);
                         }
                     }));
             return stdLibsSpecs;
@@ -75,7 +79,23 @@ public class RobotProject extends RobotContainer {
         if (refLibsSpecs != null) {
             return refLibsSpecs;
         }
-        refLibsSpecs = configuration.getReferencedLibraries();
+
+        refLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getLibrarySpecifications(),
+                new Function<String, LibrarySpecification>() {
+                    @Override
+                    public LibrarySpecification apply(final String libspecPath) {
+                        try {
+                            final IPath projectRelativePath = Path.fromPortableString(libspecPath);
+                            final IResource libspec = getProject().findMember(projectRelativePath);
+                            if (libspec.getType() == IResource.FILE) {
+                                return LibrarySpecificationReader.readSpecification((IFile) libspec);
+                            }
+                            return null;
+                        } catch (final CannotReadlibrarySpecificationException e) {
+                            return null;
+                        }
+                    }
+                }), Predicates.<LibrarySpecification> notNull()));
         return refLibsSpecs;
     }
 

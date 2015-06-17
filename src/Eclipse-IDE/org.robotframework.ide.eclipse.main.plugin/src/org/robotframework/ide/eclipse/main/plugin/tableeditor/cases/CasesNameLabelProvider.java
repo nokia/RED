@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 public class CasesNameLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -21,7 +22,9 @@ public class CasesNameLabelProvider extends ColumnLabelProvider implements IStyl
 
     @Override
     public Image getImage(final Object element) {
-        if (element instanceof ElementAddingToken) {
+        if (element instanceof RobotCase) {
+            return RobotImages.getTestCaseImage().createImage();
+        } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getImage();
         }
         return null;
