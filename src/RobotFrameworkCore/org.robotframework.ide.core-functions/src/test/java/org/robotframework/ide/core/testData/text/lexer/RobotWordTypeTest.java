@@ -340,6 +340,8 @@ public class RobotWordTypeTest {
             assertThat(RobotWordType.getToken(combination)).isEqualTo(
                     expectedType);
         }
+
+        assertThat(expectedType.isWriteable()).isTrue();
     }
 
 
@@ -348,6 +350,7 @@ public class RobotWordTypeTest {
         RobotWordType type = RobotWordType.UNKNOWN_WORD;
 
         assertThat(type.toWrite()).isEqualTo(null);
+        assertThat(type.isWriteable()).isFalse();
     }
 
 
