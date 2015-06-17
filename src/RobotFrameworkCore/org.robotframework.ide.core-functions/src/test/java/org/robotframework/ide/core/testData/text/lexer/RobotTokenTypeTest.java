@@ -235,15 +235,6 @@ public class RobotTokenTypeTest {
 
 
     @Test
-    public void test_typeSTART_LINE() {
-        RobotTokenType type = RobotTokenType.START_LINE;
-
-        assertThat(type.getThisTokenChar()).isEqualTo(HELPER.UNWRITABLE_CHARS);
-        assertThat(type.toWrite()).isEmpty();
-    }
-
-
-    @Test
     public void test_typeUNKNOWN() {
         RobotTokenType type = RobotTokenType.UNKNOWN;
 
@@ -259,7 +250,7 @@ public class RobotTokenTypeTest {
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
-        assertThat(tokenTypes).hasSize(24);
+        assertThat(tokenTypes).hasSize(23);
 
         for (RobotTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
