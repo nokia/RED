@@ -21,10 +21,6 @@ public enum RobotTokenType implements RobotType {
      */
     UNKNOWN(HELPER.UNWRITABLE_CHARS),
     /**
-     * artificial line begin marker
-     */
-    START_LINE(HELPER.UNWRITABLE_CHARS),
-    /**
      * line end - it could be: carriage return and optional line feed
      */
     END_OF_LINE(HELPER.UNWRITABLE_CHARS),
