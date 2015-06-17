@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.text.TextAttribute;
@@ -25,21 +26,23 @@ public class TxtScanner extends RuleBasedScanner {
     // mechanism (preferences probably)
 
     private final Set<Resource> resources = newHashSet();
-
-    public TxtScanner(final Display display) {
+    
+    public TxtScanner(final Display display, List<String> keywordList) {
         final Color redSystemColor = display.getSystemColor(SWT.COLOR_RED);
         final Color greenSystemColor = display.getSystemColor(SWT.COLOR_DARK_GREEN);
-        final Color userColor = new Color(display, 0, 174, 249);
+        final Color userColor = new Color(display, 0, 128, 192);
         resources.add(userColor);
 
         final IToken sectionToken = new Token(new TextAttribute(redSystemColor));
         final IToken variableToken = new Token(new TextAttribute(greenSystemColor));
-        final IToken keywordToken = new Token(new TextAttribute(userColor));
+        final IToken keywordToken = new Token(new TextAttribute(userColor, null, SWT.BOLD));
 		
         setRules(new IRule[] { 
                 new SingleLineRule("***", "***", sectionToken),
-                new SingleLineRule("${", "}", variableToken), 
-                new KeywordRule(keywordToken) 
+                new SingleLineRule("${", "}", variableToken),
+                new SingleLineRule("@{", "}", variableToken), 
+                new SingleLineRule("&{", "}", variableToken),
+                new KeywordRule(keywordToken, keywordList) 
         });
 	}
 
