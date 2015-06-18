@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/16/15 5:15 PM
+Save-Time: 6/18/15 5:10 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -119,11 +119,34 @@ if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{
 	global [val python_exe_path [	exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
 }	
 
+//concatenate strings in list with regex to check MEssage Log view (for short log)
+proc concat_str_with_regex [val log_list]
+{
+	concat [$log_list |each [val single ] 
+	{
+		concat $msg_log_regex_INFO $single
+	}] 
 
-//If there are some logprints left in console, delete them.
-try -command {
-	get-view Console | get-button "Remove Launch" | click
-} -catch {
-	//If not, ignore errors.
 }
+
+//select path depends to operating system
+proc "os-specific" [val windowsPath] [val linuxPath] 
+{
+	echo [get-by-os -linux $linuxPath -win $windowsPath]
+}
+
+
+proc "check_if_line_is_highlighted" [val line] [val script_name]{
+	repeat [val index] -times  [get-editor $script_name | get-text-viewer | get-property "getLineCount()" -raw | int] -command
+	{
+	  	if [$index| not-eq $line]{
+	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground 3  | assert-empty
+	  	}-else{
+	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $line | invoke  	toString  | str | equals "Color {198, 219, 174}"
+	  	}
+	  	
+	}
+}
+
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
