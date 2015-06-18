@@ -183,12 +183,12 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     @Persist
     public void onSave() {
-        final IDirtyProviderService dirtyProviderService = context.getActive(IDirtyProviderService.class);
-        dirtyProviderService.setDirtyState(false);
-        
         for (final ISectionFormFragment fragment : formFragments) {
             ContextInjectionFactory.invoke(fragment, Persist.class, context, context, null);
         }
+
+        final IDirtyProviderService dirtyProviderService = context.getActive(IDirtyProviderService.class);
+        dirtyProviderService.setDirtyState(false);
     }
 
     @Override
