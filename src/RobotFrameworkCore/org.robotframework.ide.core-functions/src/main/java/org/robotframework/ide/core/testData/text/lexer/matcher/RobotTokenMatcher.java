@@ -24,7 +24,7 @@ import com.google.common.collect.LinkedListMultimap;
  */
 public class RobotTokenMatcher {
 
-    private final TokenOutput output = new TokenOutput();
+    private TokenOutput output = new TokenOutput();
     private List<ISingleCharTokenMatcher> oneCharTokenMatchers = new LinkedList<>();
 
 
@@ -46,7 +46,10 @@ public class RobotTokenMatcher {
 
 
     public TokenOutput buildTokens() {
-        return output;
+        TokenOutput old = output;
+        output = new TokenOutput();
+
+        return old;
     }
 
     public static class TokenOutput {
