@@ -137,6 +137,8 @@ public class RobotFormEditor extends FormEditor {
             suiteModel = provideSuiteModel();
             suiteModel.commitChanges(monitor);
             suiteModel = null;
+
+            updateActivePage();
         } catch (final CoreException e) {
             monitor.setCanceled(true);
         }
