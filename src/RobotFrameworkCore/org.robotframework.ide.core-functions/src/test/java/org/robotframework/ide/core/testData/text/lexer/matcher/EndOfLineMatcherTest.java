@@ -35,6 +35,33 @@ public class EndOfLineMatcherTest {
 
 
     @Test
+    public void test_match_forEmptyTokensStore_and_LineFeedFollowingByCarriageReturn() {
+        // prepare
+        CharBuffer tempBuffer = CharBuffer.wrap("\n\r");
+        TokenOutput output = new TokenOutput();
+
+        // execute & verify
+        for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
+            assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
+            // plus one because we have also End-Of-Line token
+            assertThat(output.getTokens()).hasSize(charIndex + 2);
+            RobotTokenType[] types;
+            if ((charIndex + 1) % 2 == 0) {
+                types = new RobotTokenType[] { RobotTokenType.LINE_FEED,
+                        RobotTokenType.CARRIAGE_RETURN,
+                        RobotTokenType.END_OF_LINE };
+            } else {
+                types = new RobotTokenType[] { RobotTokenType.LINE_FEED,
+                        RobotTokenType.END_OF_LINE };
+            }
+            assertTokens(output, types, 0, 1);
+            assertCurrentPosition(output);
+            assertPositionMarkers(output);
+        }
+    }
+
+
+    @Test
     public void test_match_forEmptyTokensStore_and_CarriageReturnFollowingByLineFeed() {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\r\n");
