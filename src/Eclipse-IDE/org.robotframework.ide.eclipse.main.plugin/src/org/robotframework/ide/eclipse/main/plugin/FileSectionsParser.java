@@ -44,7 +44,7 @@ class FileSectionsParser {
         IMarker[] markers;
         try {
             inputStream = file != null ? file.getContents(true) : stream;
-            markers = file != null ? new IMarker[0] : file.findMarkers(
+            markers = file == null ? new IMarker[0] : file.findMarkers(
                     RobotProblem.TYPE_ID, true, 1);
         } catch (final CoreException e) {
             throw new IOException("Unable to get content of file: "
