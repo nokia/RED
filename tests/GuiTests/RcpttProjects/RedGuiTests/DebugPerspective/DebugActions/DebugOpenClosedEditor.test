@@ -1,0 +1,45 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_S9K9sBT6EeWWV9IuysVI_A
+Element-Name: DebugOpenClosedEditor
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _j4DzoBXNEeWWV9IuysVI_A
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 6/18/15 6:13 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor, select BP and close editor
+with [get-view "Project Explorer" | get-tree] {
+    select MediumRobotTest | double-click
+    select "MediumRobotTest/Script.robot" | double-click
+}
+with [get-editor "Script.robot"] {
+    with [get-left-ruler | get-ruler-column AnnotationRulerColumn] {
+        double-click-ruler 13
+    }
+    close
+}
+//run test
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | get-menu "Debug As/1 Robot Test" 
+    | click
+    
+    
+wait 200
+
+//check if line is highlighted    
+check_if_line_is_highlighted -line 12 -script_name "Script.robot"
+exec-with-options -disableJobWaiting -command {
+	get-button "Resume (F8)" | click
+}
+
+//check if test is finished
+get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
