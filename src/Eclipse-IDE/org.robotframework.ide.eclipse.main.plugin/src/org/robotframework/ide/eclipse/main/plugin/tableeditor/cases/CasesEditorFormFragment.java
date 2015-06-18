@@ -7,6 +7,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -46,8 +47,6 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordProblem;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -77,6 +76,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private RowExposingTableViewer viewer;
 
     private RowExposingTableViewer caseViewer;
+
+    private Section caseSection;
+
+    private boolean isSaving;
 
     TableViewer getViewer() {
         return viewer;
@@ -127,6 +130,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         createCaseSettingsSection(casesDetailComposite);
         mainSash.setWeights(new int[] { 20, 80 });
 
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
 
@@ -139,7 +143,13 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             public void selectionChanged(final SelectionChangedEvent event) {
                 final List<RobotCase> robotCases = Selections.getElements((IStructuredSelection) event.getSelection(),
                         RobotCase.class);
-                caseViewer.setInput(robotCases.isEmpty() ? null : robotCases.get(0));
+                if (robotCases.isEmpty()) {
+                    caseSection.setText("Case");
+                    caseViewer.setInput(null);
+                } else {
+                    caseSection.setText("Case '" + robotCases.get(0).getName() + "'");
+                    caseViewer.setInput(robotCases.get(0));
+                }
             }
         };
     }
@@ -176,7 +186,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void createCaseSection(final Composite casesDetailComposite) {
-        final Section caseSection = toolkit.createSection(casesDetailComposite, ExpandableComposite.TITLE_BAR);
+        caseSection = toolkit.createSection(casesDetailComposite, ExpandableComposite.TITLE_BAR);
         caseSection.setExpanded(true);
         caseSection.setText("Case");
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 5).applyTo(caseSection);
@@ -202,7 +212,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             }
         });
         caseViewer.setContentProvider(new KeywordCallsContentProvider(fileModel.isEditable()));
-        
+
         final NewElementsCreator creator = newKeywordsCreator();
         ViewerColumnsFactory.newColumn("").withWidth(140)
             .labelsProvidedBy(new KeywordCallNameLabelProvider())
@@ -210,6 +220,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(caseViewer);
 
+        ViewersConfigurator.enableDeselectionPossibility(caseViewer);
     }
 
     private void createCaseSettingsSection(final Composite casesDetailComposite) {
@@ -253,6 +264,11 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
+    }
+
+    @Persist
+    public void onSave() {
+        isSaving = true;
     }
 
     @Inject
@@ -302,15 +318,14 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // FIXME : check if this keyword call is shown in viewer
         caseViewer.update(keywordCall, null);
         dirtyProviderService.setDirtyState(true);
-
-        RobotProblem.causedBy(KeywordProblem.UNKNOWN_KEYWORD).createMarker(fileModel.getFile(), 5);
     }
 
     @Inject
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED) {
+        if (change.getKind() == Kind.CHANGED && !isSaving) {
+            isSaving = false;
             setInput();
         }
     }
