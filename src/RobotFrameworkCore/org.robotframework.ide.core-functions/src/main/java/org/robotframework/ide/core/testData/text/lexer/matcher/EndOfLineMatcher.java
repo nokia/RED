@@ -100,10 +100,7 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
             column += 1;
         }
 
-        LinearPositionMarker newMarker = new LinearPositionMarker(
-                pos.getLine(), column);
-
-        RobotToken endToken = new RobotToken(newMarker, new StringBuilder(
+        RobotToken endToken = new RobotToken(pos, new StringBuilder(
                 type.toWrite()));
         endToken.setType(type);
 
