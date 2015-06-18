@@ -139,7 +139,7 @@ public class TextEditor {
         	
         	IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
         	try {
-        		editedFile = workspace.getRoot().getFileForLocation(historyEditor.getStorage().getFullPath());
+        		editedFile = workspace.getRoot().getFile(historyEditor.getStorage().getFullPath());
 			} catch (CoreException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
