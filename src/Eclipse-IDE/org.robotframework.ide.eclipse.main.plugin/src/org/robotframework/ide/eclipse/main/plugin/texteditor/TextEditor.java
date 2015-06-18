@@ -18,8 +18,11 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
@@ -64,6 +67,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.team.internal.ui.history.FileRevisionEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
@@ -129,13 +133,24 @@ public class TextEditor {
         FileEditorInput fileEditorInput = null;
         if(input instanceof FileEditorInput) {
         	fileEditorInput = (FileEditorInput) input;
+        	editedFile = fileEditorInput.getFile();
+        } else if (input instanceof FileRevisionEditorInput) {
+        	FileRevisionEditorInput historyEditor = (FileRevisionEditorInput) input;
+        	
+        	IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
+        	try {
+        		editedFile = workspace.getRoot().getFileForLocation(historyEditor.getStorage().getFullPath());
+			} catch (CoreException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return;
+			}
         } else {
             // FIXME : there are other inputs when editor is opened via history
             // for example!
             return;
         }
         
-        editedFile = fileEditorInput.getFile();
         final String text = this.extractTextFromFile();
         
         this.deleteMarkersFromFile();
