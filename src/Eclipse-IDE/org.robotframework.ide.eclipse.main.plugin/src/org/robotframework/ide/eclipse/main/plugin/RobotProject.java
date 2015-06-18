@@ -71,7 +71,7 @@ public class RobotProject extends RobotContainer {
         if (refLibsSpecs != null) {
             return true;
         }
-        return configuration.hasReferencedLibraries();
+        return configuration != null && configuration.hasReferencedLibraries();
     }
 
     public List<LibrarySpecification> getReferencedLibraries() {

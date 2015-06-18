@@ -1,8 +1,10 @@
-package org.eclipse.jface.viewers;
+package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-public class KeywordProposalsLabelProvider extends StylersDisposingLabelProvider {
+class KeywordProposalsLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
