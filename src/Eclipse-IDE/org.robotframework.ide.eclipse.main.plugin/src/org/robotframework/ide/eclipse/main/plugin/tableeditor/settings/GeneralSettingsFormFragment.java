@@ -321,6 +321,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
+            documentation.setText("");
             setInput(false);
             dirtyProviderService.setDirtyState(true);
         }
