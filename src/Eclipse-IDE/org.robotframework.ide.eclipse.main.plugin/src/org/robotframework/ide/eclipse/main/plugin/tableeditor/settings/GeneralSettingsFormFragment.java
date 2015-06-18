@@ -292,6 +292,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         final String newDocumentation = documentation.getText().replaceAll("\t", " ").replaceAll("  +", " ");
         final RobotSetting currentSetting = model.getDocumentationSetting();
 
+        if (model.getSection() == null) {
+            return;
+        }
+
         if (currentSetting == null && !newDocumentation.isEmpty()) {
             commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
                     newArrayList(newDocumentation)));
