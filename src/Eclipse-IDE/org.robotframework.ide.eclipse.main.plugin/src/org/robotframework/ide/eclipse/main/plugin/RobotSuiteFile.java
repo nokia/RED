@@ -198,6 +198,10 @@ public class RobotSuiteFile implements RobotElement {
                 imported.add(spec);
             }
         }
+
+        // TODO : go through keyword defined in the file itself and other
+        // imported resources
+
         return imported;
     }
 }

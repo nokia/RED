@@ -1,10 +1,13 @@
 package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.assist.RedContentProposalAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -21,7 +24,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     private final String prefix;
     private final String suffix;
     private final String contextToDeactivate;
-    private ContentProposalAdapter contentProposalAdapter;
+    private RedContentProposalAdapter contentProposalAdapter;
 
     /**
      * Instantiates cell editor
@@ -62,16 +65,40 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     }
 
     @Override
+    protected Control createControl(final Composite parent) {
+        final Control control = super.createControl(parent);
+        control.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(final FocusEvent e) {
+                control.getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        ActivationCharPreservingTextCellEditor.this.focusLostAsync();
+                    }
+                });
+            }
+        });
+        return control;
+    }
+
+    @Override
     protected boolean dependsOnExternalFocusListener() {
         return false;
     }
 
-    @Override
-    protected void focusLost() {
+    protected void focusLostAsync() {
         if ((contentProposalAdapter == null || !isContentProposalFocused()) && isActivated()) {
             fireApplyEditorValue();
             deactivate();
         }
+    }
+
+    @Override
+    protected void focusLost() {
+        // we're using own focus listener, so that popup have a chance to get
+        // the focus actually
+        // in order to make it possible for hasProposalPoupFocus() to return
+        // true
     }
 
     protected final boolean isContentProposalFocused() {
@@ -89,9 +116,12 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     }
 
     public void addContentProposalsSupport(final IContentProposingSupport support) {
-        contentProposalAdapter = new ContentProposalAdapter(text, support.getControlAdapter(text),
+        contentProposalAdapter = new RedContentProposalAdapter(text, support.getControlAdapter(text),
                 support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
         contentProposalAdapter.setLabelProvider(support.getLabelProvider());
+        contentProposalAdapter.setAutoActivationDelay(200);
+        contentProposalAdapter.setAutoActivationCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray());
+        contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_REPLACE);
     }
 
     @Override

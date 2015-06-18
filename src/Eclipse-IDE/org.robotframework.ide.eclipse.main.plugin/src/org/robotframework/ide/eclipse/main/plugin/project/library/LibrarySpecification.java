@@ -92,4 +92,16 @@ public class LibrarySpecification {
         }
         throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
     }
+
+    public KeywordSpecification getKeywordSpecification(final String keywordName) {
+        if (keywords == null) {
+            return null;
+        }
+        for (final KeywordSpecification keywordSpec : keywords) {
+            if (keywordSpec.getName().equals(keywordName)) {
+                return keywordSpec;
+            }
+        }
+        return null;
+    }
 }
