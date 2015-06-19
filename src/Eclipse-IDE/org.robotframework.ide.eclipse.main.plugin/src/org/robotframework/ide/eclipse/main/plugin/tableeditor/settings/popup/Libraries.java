@@ -14,9 +14,11 @@ class Libraries {
 
     static Libraries create(final RobotSuiteFile fileModel) {
         final List<LibrarySpecification> standardLibraries = fileModel.getProject().getStandardLibraries();
+        final List<LibrarySpecification> referencedLibraries = fileModel.getProject().getReferencedLibraries();
 
         final List<LibrarySpecification> imported = fileModel.getImportedLibraries();
         final List<LibrarySpecification> toImport = newArrayList(standardLibraries);
+        toImport.addAll(referencedLibraries);
         toImport.removeAll(imported);
         return new Libraries(toImport, imported);
     }

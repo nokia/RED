@@ -1,8 +1,10 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -11,6 +13,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
@@ -80,17 +84,25 @@ public class RobotProject extends RobotContainer {
             return refLibsSpecs;
         }
 
-        refLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getLibrarySpecifications(),
-                new Function<String, LibrarySpecification>() {
+        refLibsSpecs = newArrayList(Iterables.filter(
+                Iterables.transform(configuration.getLibraries(),
+                new Function<ReferencedLibrary, LibrarySpecification>() {
                     @Override
-                    public LibrarySpecification apply(final String libspecPath) {
+                    public LibrarySpecification apply(final ReferencedLibrary lib) {
                         try {
-                            final IPath projectRelativePath = Path.fromPortableString(libspecPath);
-                            final IResource libspec = getProject().findMember(projectRelativePath);
-                            if (libspec.getType() == IResource.FILE) {
-                                return LibrarySpecificationReader.readSpecification((IFile) libspec);
+                            if (lib.provideType() == LibraryType.VIRTUAL) {
+                                final IPath path = Path.fromPortableString(lib.getPath());
+                                final IResource libspec = getProject().getParent().findMember(path);
+                                if (libspec != null && libspec.getType() == IResource.FILE) {
+                                    return LibrarySpecificationReader.readSpecification((IFile) libspec);
+                                }
+                                return null;
+                            } else if (lib.provideType() == LibraryType.JAVA) {
+                                final IFile file = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
+                                return LibrarySpecificationReader.readSpecification(file);
+                            } else {
+                                return null;
                             }
-                            return null;
                         } catch (final CannotReadlibrarySpecificationException e) {
                             return null;
                         }
@@ -118,10 +130,10 @@ public class RobotProject extends RobotContainer {
 
     public RobotRuntimeEnvironment getRuntimeEnvironment() {
         readProjectConfigurationIfNeeded();
-        if (configuration == null || configuration.getPythonLocation() == null) {
+        if (configuration == null || configuration.usesPreferences()) {
             return RobotFramework.getDefault().getActiveRobotInstallation();
         }
-        return RobotFramework.getDefault().getRobotInstallation(configuration.getPythonLocation());
+        return RobotFramework.getDefault().getRobotInstallation(configuration.providePythonLocation());
     }
 
     public IFile getConfigurationFile() {
@@ -130,5 +142,19 @@ public class RobotProject extends RobotContainer {
 
     public IFile getFile(final String filename) {
         return getProject().getFile(filename);
+    }
+
+    public List<String> getClasspath() {
+        readProjectConfigurationIfNeeded();
+        if (configuration != null) {
+            final Set<String> cp = newHashSet(".");
+            for (final ReferencedLibrary lib : configuration.getLibraries()) {
+                if (lib.provideType() == LibraryType.JAVA) {
+                    cp.add(lib.getPath());
+                }
+            }
+            return newArrayList(cp);
+        }
+        return newArrayList(".");
     }
 }

@@ -192,9 +192,13 @@ public class RobotSuiteFile implements RobotElement {
         }
 
         final List<LibrarySpecification> imported = newArrayList();
-        final List<LibrarySpecification> standardLibraries = getProject().getStandardLibraries();
-        for (final LibrarySpecification spec : standardLibraries) {
+        for (final LibrarySpecification spec : getProject().getStandardLibraries()) {
             if (spec.isAccessibleWithoutImport() || alreadyImported.contains(spec.getName())) {
+                imported.add(spec);
+            }
+        }
+        for (final LibrarySpecification spec : getProject().getReferencedLibraries()) {
+            if (alreadyImported.contains(spec.getName())) {
                 imported.add(spec);
             }
         }
