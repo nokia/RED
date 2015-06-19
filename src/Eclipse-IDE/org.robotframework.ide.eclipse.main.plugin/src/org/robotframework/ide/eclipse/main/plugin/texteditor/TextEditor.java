@@ -22,7 +22,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
@@ -82,12 +81,13 @@ import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.assist.KeywordProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TxtScanner;
 
 /**
@@ -117,6 +117,8 @@ public class TextEditor {
 	private CompositeRuler compositeRuler;
 
     private TxtScanner txtScanner;
+    
+    private TextEditorTextHover textHover;
 	
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
@@ -141,7 +143,6 @@ public class TextEditor {
         	try {
         		editedFile = workspace.getRoot().getFile(historyEditor.getStorage().getFullPath());
 			} catch (CoreException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				return;
 			}
@@ -197,9 +198,6 @@ public class TextEditor {
 		document.set( text );
 		viewer.setDocument( document, markerAnnotationModel );
 		
-		final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration();
-		viewer.configure(svc);
-		
 		final Menu contextMenu = this.createContextMenu(lineNumberColumn, saveAsCommand);
 
 		final TextViewerUndoManager undoManager = new TextViewerUndoManager(3);
@@ -208,7 +206,12 @@ public class TextEditor {
 		
 		final RobotSuiteFile suiteFile = RobotFramework.getModelManager().createSuiteFile(editedFile);
         final KeywordProposalsProvider proposalProvider = new KeywordProposalsProvider(suiteFile);
-        final Map<String, KeywordSpecification> keywordMap = proposalProvider.getKeywordsForCompletionProposals();
+        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = proposalProvider.getKeywordsForCompletionProposals();
+        
+        textHover = new TextEditorTextHover(keywordMap);
+        final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover);
+        viewer.configure(svc);
+        
 		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap);
 		contentAssistant.install(viewer);
 		
@@ -310,7 +313,8 @@ public class TextEditor {
         viewer.getTextWidget().setFocus();
 	}
 	
-	@Inject
+	@SuppressWarnings("unchecked")
+    @Inject
     @Optional
     private void highlightLineEvent(@UIEventTopic("TextEditor/HighlightLine") final org.osgi.service.event.Event event,
             @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
@@ -318,6 +322,7 @@ public class TextEditor {
             if (editor != null) {
                 editor.activateSourcePage();
             }
+            textHover.setDebugVariables((Map<String, Object>) event.getProperty("vars"));
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
                 final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
@@ -352,6 +357,8 @@ public class TextEditor {
     private void clearHighlightedLineEvent(@UIEventTopic("TextEditor/ClearHighlightedLine") final String file,
             @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
         if ("".equals(file) || editedFile.getName().equals(file)) {
+            textHover.setDebugVariables(null);
+            
             final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
 
             editor.activateSourcePage();
@@ -458,7 +465,7 @@ public class TextEditor {
 		return menu;
 	}
 	
-	private ContentAssistant createContentAssistant(final Map<String, KeywordSpecification> keywordMap) {
+	private ContentAssistant createContentAssistant(final Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
 		final ContentAssistant contentAssistant = new ContentAssistant();
 		contentAssistant.enableColoredLabels(true);
 		contentAssistant.enableAutoInsert(true);

@@ -8,12 +8,15 @@ import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
-public class TextEditorCompletionProposal implements ICompletionProposal, ICompletionProposalExtension3 {
+public class TextEditorCompletionProposal implements ICompletionProposal, ICompletionProposalExtension3,
+        ICompletionProposalExtension6 {
 
     /** The string to be displayed in the completion proposal popup. */
     private String displayString;
@@ -39,6 +42,8 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     /** The additional info of this proposal. */
     private String additionalProposalInfo;
 
+    private String sourceName;
+
     /**
      * Creates a new completion proposal. All fields are initialized based on the provided
      * information.
@@ -62,7 +67,7 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
      */
     public TextEditorCompletionProposal(String replacementString, int replacementOffset, int replacementLength,
             int cursorPosition, Image image, String displayString, IContextInformation contextInformation,
-            String additionalProposalInfo) {
+            String additionalProposalInfo, String sourceName) {
         Assert.isNotNull(replacementString);
         Assert.isTrue(replacementOffset >= 0);
         Assert.isTrue(replacementLength >= 0);
@@ -76,6 +81,7 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
         this.displayString = displayString;
         this.contextInformation = contextInformation;
         this.additionalProposalInfo = additionalProposalInfo;
+        this.sourceName = sourceName;
     }
 
     @Override
@@ -120,8 +126,7 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
 
             @Override
             public IInformationControl createInformationControl(Shell parent) {
-                DefaultInformationControl control = new DefaultInformationControl(parent);
-                return control;
+                return new DefaultInformationControl(parent);
             }
         };
     }
@@ -134,6 +139,17 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     @Override
     public int getPrefixCompletionStart(IDocument document, int completionOffset) {
         return 0;
+    }
+
+    @Override
+    public StyledString getStyledDisplayString() {
+        StyledString styledString = new StyledString();
+        styledString.append(getDisplayString());
+        if (sourceName != null) {
+            styledString.append(" - " + sourceName, StyledString.DECORATIONS_STYLER);
+        }
+
+        return styledString;
     }
 
 }

@@ -29,7 +29,7 @@ public class RobotPartListener implements IPartListener {
                 String fileName = keywordContext.getFileName();
                 int line = keywordContext.getLineNumber();
                 if (editorInputName.equals(fileName)) {
-                    robotEventBroker.sendHighlightLineEventToTextEditor(fileName, line);
+                    robotEventBroker.sendHighlightLineEventToTextEditor(fileName, line, keywordContext.getVariables());
                 }
             }
         }
