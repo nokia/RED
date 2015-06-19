@@ -6,7 +6,19 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
@@ -22,8 +34,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.robotframework.forms.RedFormToolkit;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationEditorPart.ProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 
@@ -35,13 +51,20 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
 
     public static class ProjectConfigurationEditor {
 
+        private IEclipseContext context;
+
         protected RedFormToolkit toolkit;
 
         private List<? extends ISectionFormFragment> formFragments;
 
-        private IEclipseContext context;
-
         private FrameworksSectionFormFragment frameworksFragment;
+
+        private ReferencedLibrariesFormFragment referencedFragment;
+
+        private Form form;
+
+        @Inject
+        private RedProjectEditorInput editorInput;
 
         @PostConstruct
         public final void postConstruct(final Composite parent, final IEditorPart editorPart) {
@@ -53,15 +76,18 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
             context.set(RedFormToolkit.class, toolkit);
             context.set(IDirtyProviderService.class, context.get(IDirtyProviderService.class));
 
-            final Form form = createForm(parent, editorPart.getTitleImage());
-            context.set(Form.class, form);
+            form = createForm(parent, editorPart.getTitleImage());
+            context.set(IMessageManager.class, form.getMessageManager());
 
             formFragments = createFormFragments();
             injectToFormParts(context, formFragments);
+            installResourceListener();
             for (final ISectionFormFragment part : formFragments) {
                 part.initialize(form.getBody());
             }
             site.setSelectionProvider(getSelectionProvider());
+
+            setupEnvironmentLoadingJob();
         }
 
         private void adjustParentLayout(final Composite parent) {
@@ -83,7 +109,8 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
 
         protected List<? extends ISectionFormFragment> createFormFragments() {
             frameworksFragment = new FrameworksSectionFormFragment();
-            return newArrayList(frameworksFragment, new ReferencedLibrariesFormFragment());
+            referencedFragment = new ReferencedLibrariesFormFragment();
+            return newArrayList(frameworksFragment, referencedFragment);
         }
 
         private void injectToFormParts(final IEclipseContext context,
@@ -103,8 +130,83 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
             return form;
         }
 
+        private void installResourceListener() {
+            final IProject project = editorInput.getRobotProject().getProject();
+            final IResourceChangeListener listener = new RedProjectConfigurationFileChangeListener(project,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            whenConfigurationFiledChanged();
+                            setupEnvironmentLoadingJob();
+                        }
+                    });
+            ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+            form.addDisposeListener(new DisposeListener() {
+                @Override
+                public void widgetDisposed(final DisposeEvent e) {
+                    ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
+                }
+            });
+        }
+
         protected ISelectionProvider getSelectionProvider() {
             return frameworksFragment.getViewer();
+        }
+
+        private void setupEnvironmentLoadingJob() {
+            final RobotProject project = editorInput.getRobotProject();
+            final String activeEnv = "activeEnv";
+            final String allEnvs = "allEnvs";
+
+            final Job job = new Job("Reading available frameworks") {
+                @Override
+                protected IStatus run(final IProgressMonitor monitor) {
+                    final RobotRuntimeEnvironment activeEnvironment = project == null ? null : project
+                            .getRuntimeEnvironment();
+                    final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RobotFramework.getDefault()
+                            .getAllRuntimeEnvironments();
+                    setProperty(createKey(activeEnv), activeEnvironment);
+                    setProperty(createKey(allEnvs), allRuntimeEnvironments);
+                    return Status.OK_STATUS;
+                }
+            };
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(final IJobChangeEvent event) {
+                    final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) job.getProperty(createKey(activeEnv));
+                    final List<?> allEnvironments = (List<?>) job.getProperty(createKey(allEnvs));
+
+                    whenEnvironmentWasLoaded(env, allEnvironments);
+
+                    form.setBusy(false);
+                }
+            });
+            form.setBusy(true);
+            job.schedule();
+        }
+
+        private QualifiedName createKey(final String localName) {
+            return new QualifiedName(RobotFramework.PLUGIN_ID, localName);
+        }
+
+        private void whenConfigurationFiledChanged() {
+            form.getDisplay().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    frameworksFragment.whenConfigurationFiledChanged();
+                    referencedFragment.whenConfigurationFiledChanged();
+                }
+            });
+        }
+
+        private void whenEnvironmentWasLoaded(final RobotRuntimeEnvironment env, final List<?> allEnvironments) {
+            form.getDisplay().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    frameworksFragment.whenEnvironmentWasLoaded(env, allEnvironments);
+                    referencedFragment.whenEnvironmentWasLoaded(env);
+                }
+            });
         }
 
         @Focus

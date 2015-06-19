@@ -43,7 +43,11 @@ public class RobotProjectConfigReader {
             return (RobotProjectConfig) jaxbContext.createUnmarshaller().unmarshal(reader);
 
         } catch (final JAXBException e) {
-            throw new CannotReadProjectConfigurationException(e.getLinkedException().getMessage(), e);
+            if (e.getLinkedException() != null) {
+                throw new CannotReadProjectConfigurationException(e.getLinkedException().getMessage(), e);
+            } else {
+                throw new CannotReadProjectConfigurationException(e.getMessage(), e);
+            }
         }
     }
 
