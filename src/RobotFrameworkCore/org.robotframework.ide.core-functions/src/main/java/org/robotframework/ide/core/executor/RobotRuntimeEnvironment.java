@@ -17,6 +17,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.common.base.Joiner;
+
 public class RobotRuntimeEnvironment {
 
     private static Path temporaryDirectory = null;
@@ -322,15 +324,25 @@ public class RobotRuntimeEnvironment {
             final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
             final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", libName,
                     file.getAbsolutePath());
-            final ILineHandler linesHandler = new ILineHandler() {
-                @Override
-                public void processLine(final String line) {
-                    // nothing to do
-                }
-            };
-
             try {
-                runExternalProcess(cmdLine, linesHandler);
+                runExternalProcess(cmdLine, new NullLineHandler());
+            } catch (final IOException e) {
+                return;
+            }
+        }
+    }
+
+    public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file) {
+        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
+            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
+
+            final String cpSeparator = isWindows() ? ";" : ":";
+            final String classPath = "\"" + Joiner.on(cpSeparator).join(Arrays.asList(".", jarPath)) + "\"";
+
+            final List<String> cmdLine = Arrays.asList(cmd, "-J-cp", classPath, "-m", "robot.libdoc", "-f", "XML",
+                    libName, file.getAbsolutePath());
+            try {
+                runExternalProcess(cmdLine, new NullLineHandler());
             } catch (final IOException e) {
                 return;
             }
@@ -399,12 +411,13 @@ public class RobotRuntimeEnvironment {
         return null;
     }
 
-    public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final File projectLocation,
+    public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
+            final File projectLocation,
             final List<String> suites, final String userArguments, final boolean isDebugging) throws IOException {
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
 
-        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor));
+        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath));
         cmdLine.add("--listener");
         cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
 
@@ -431,6 +444,29 @@ public class RobotRuntimeEnvironment {
             cmdLine.add("\"" + getRunModulePath((PythonInstallationDirectory) location) + "\"");
         }
         return cmdLine;
+    }
+
+    private List<String> getRunCommandLine(final SuiteExecutor executor, final List<String> classpath) {
+        final List<String> cmdLine = new ArrayList<String>();
+        if (executor == getInterpreter()) {
+            cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
+            augmentClasspath(cmdLine, executor, classpath);
+            cmdLine.add("-m");
+            cmdLine.add("robot.run");
+        } else {
+            cmdLine.add(executor.executableName());
+            augmentClasspath(cmdLine, executor, classpath);
+            cmdLine.add("\"" + getRunModulePath((PythonInstallationDirectory) location) + "\"");
+        }
+        return cmdLine;
+    }
+
+    private void augmentClasspath(final List<String> cmdLine, final SuiteExecutor executor, final List<String> classpath) {
+        if (executor == SuiteExecutor.Jython) {
+            final String cpSeparator = isWindows() ? ";" : ":";
+            cmdLine.add("-J-cp");
+            cmdLine.add("\"" + Joiner.on(cpSeparator).join(classpath) + "\"");
+        }
     }
 
     private static int findFreePort() {
@@ -506,6 +542,13 @@ public class RobotRuntimeEnvironment {
 
         public int getPort() {
             return port;
+        }
+    }
+
+    private static class NullLineHandler implements ILineHandler {
+        @Override
+        public void processLine(final String line) {
+            // nothing to do; this a null object
         }
     }
 }
