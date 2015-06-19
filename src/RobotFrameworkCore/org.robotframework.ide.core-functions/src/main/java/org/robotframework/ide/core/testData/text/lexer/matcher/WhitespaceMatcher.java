@@ -1,12 +1,20 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
 import java.nio.CharBuffer;
+import java.util.List;
 
+import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
+
+import com.google.common.collect.LinkedListMultimap;
 
 
 /**
+ * Matcher responsible for handling {@code SPACE} and {@code TABULATOR}
+ * including also {@code DOUBLE_SPACES} case.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -19,19 +27,70 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
     public boolean match(TokenOutput tokenOutput, CharBuffer tempBuffer,
             int charIndex) {
         boolean wasUsed = false;
+        boolean shouldBeHandleAsSingleSpace = true;
 
         char c = tempBuffer.get(charIndex);
         RobotTokenType type = RobotTokenType.getToken(c);
 
         if (type == RobotTokenType.SINGLE_SPACE) {
-            // jezeli previous jest tez spacja zrob merge'a
-        } else if (type == RobotTokenType.SINGLE_TABULATOR) {
 
+            List<RobotToken> tokens = tokenOutput.getTokens();
+            if (!tokens.isEmpty()) {
+                RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
+                if (lastRobotToken.getType() == RobotTokenType.SINGLE_SPACE) {
+                    RobotType doubleSpacesType = RobotWordType.getToken("  ");
+                    if (doubleSpacesType != null) {
+                        shouldBeHandleAsSingleSpace = false;
+                        replaceLastSingleSpaceByDoubleSpace(tokenOutput, c,
+                                tokens, lastRobotToken);
+                    }
+                }
+            }
+
+            if (shouldBeHandleAsSingleSpace) {
+                RobotToken spaceToken = new RobotToken(
+                        tokenOutput.getCurrentMarker(), new StringBuilder(
+                                type.getThisTokenChar()));
+                tokenOutput.setCurrentMarker(spaceToken.getEndPosition());
+                tokenOutput.getTokensPosition().put(type, tokens.size());
+                tokens.add(spaceToken);
+            }
+
+            wasUsed = true;
+        } else if (type == RobotTokenType.SINGLE_TABULATOR) {
+            List<RobotToken> tokens = tokenOutput.getTokens();
+            RobotToken tabulatorToken = new RobotToken(
+                    tokenOutput.getCurrentMarker(), new StringBuilder(
+                            type.getThisTokenChar()));
+            tokenOutput.setCurrentMarker(tabulatorToken.getEndPosition());
+            tokenOutput.getTokensPosition().put(type, tokens.size());
+            tokens.add(tabulatorToken);
+
+            wasUsed = true;
         }
-        // TODO: sprawdz ostatni czy ma specjalne znaczenie [fix-1] jezeli
-        // zostal uzyty
+
+        if (wasUsed && shouldBeHandleAsSingleSpace) {
+            // TODO: sprawdz ostatni czy ma specjalne znaczenie [fix-1] jezeli
+            // zostal uzyty
+        }
 
         return wasUsed;
+    }
+
+
+    private void replaceLastSingleSpaceByDoubleSpace(TokenOutput tokenOutput,
+            char c, List<RobotToken> tokens, RobotToken lastRobotToken) {
+        RobotToken doubleSpaces = new RobotToken(
+                lastRobotToken.getStartPosition(), lastRobotToken.getText()
+                        .append(c));
+        tokenOutput.setCurrentMarker(doubleSpaces.getEndPosition());
+        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+                .getTokensPosition();
+        List<Integer> listSingleSpace = tokensPosition
+                .get(RobotTokenType.SINGLE_SPACE);
+        listSingleSpace.remove(listSingleSpace.size() - 1);
+        tokensPosition.put(RobotWordType.DOUBLE_SPACE, tokens.size() - 1);
+        tokens.set(tokens.size() - 1, doubleSpaces);
     }
 
 }
