@@ -22,6 +22,16 @@ public class RobotWordTypeTest {
 
 
     @Test
+    public void test_typeDOUBLE_SPACE() {
+        String text = "  ";
+        RobotWordType type = RobotWordType.DOUBLE_SPACE;
+
+        assertThat(type.toWrite()).isEqualTo(text);
+        assertThat(RobotWordType.getToken(text)).isEqualTo(type);
+    }
+
+
+    @Test
     public void test_typeRANGE_WORD() {
         String text = "RANGE";
         RobotWordType type = RobotWordType.RANGE_WORD;
@@ -362,7 +372,7 @@ public class RobotWordTypeTest {
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes).hasSize(32);
+        assertThat(tokenTypes).hasSize(33);
 
         for (RobotWordType type : tokenTypes) {
             String thisTokenText = type.toWrite();
