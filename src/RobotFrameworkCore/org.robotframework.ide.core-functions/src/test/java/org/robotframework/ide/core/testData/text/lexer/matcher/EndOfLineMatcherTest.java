@@ -3,6 +3,8 @@ package org.robotframework.ide.core.testData.text.lexer.matcher;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.CharBuffer;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.After;
@@ -32,6 +34,153 @@ public class EndOfLineMatcherTest {
 
     @ForClean
     private ISingleCharTokenMatcher matcher;
+
+
+    @Test
+    public void test_match_forTokenStoreWithTwoAsterisksInside_and_lineFeedFollowingByCarriageReturn() {
+        // prepare
+        CharBuffer tempBuffer = CharBuffer.wrap("\n\r");
+        TokenOutput output = createTokenOutputWithTwoAsterisksInside();
+        RobotTokenType[] types = new RobotTokenType[] {
+                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+
+        // execute & verify
+        for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
+            assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
+            RobotTokenType[] crSequence;
+            if ((charIndex + 1) % 2 == 0) {
+                crSequence = new RobotTokenType[] { RobotTokenType.LINE_FEED,
+                        RobotTokenType.CARRIAGE_RETURN,
+                        RobotTokenType.END_OF_LINE };
+                assertThat(output.getTokens()).hasSize(5);
+            } else {
+                crSequence = new RobotTokenType[] { RobotTokenType.LINE_FEED,
+                        RobotTokenType.END_OF_LINE };
+                assertThat(output.getTokens()).hasSize(4);
+            }
+            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+                    types, crSequence, 1);
+            assertTokens(output, expectedSequenceOfTypes, 0, 1);
+            assertCurrentPosition(output);
+            assertPositionMarkers(output);
+        }
+    }
+
+
+    @Test
+    public void test_match_forTokenStoreWithTwoAsterisksInside_and_carriageReturnFollowingByLineFeed() {
+        // prepare
+        CharBuffer tempBuffer = CharBuffer.wrap("\r\n");
+        TokenOutput output = createTokenOutputWithTwoAsterisksInside();
+        RobotTokenType[] types = new RobotTokenType[] {
+                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+
+        // execute & verify
+        for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
+            assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
+            RobotTokenType[] crSequence;
+            if ((charIndex + 1) % 2 == 0) {
+                crSequence = new RobotTokenType[] {
+                        RobotTokenType.CARRIAGE_RETURN,
+                        RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+                assertThat(output.getTokens()).hasSize(5);
+            } else {
+                crSequence = new RobotTokenType[] {
+                        RobotTokenType.CARRIAGE_RETURN,
+                        RobotTokenType.END_OF_LINE };
+                assertThat(output.getTokens()).hasSize(4);
+            }
+            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+                    types, crSequence, 1);
+            assertTokens(output, expectedSequenceOfTypes, 0, 1);
+            assertCurrentPosition(output);
+            assertPositionMarkers(output);
+        }
+    }
+
+
+    @Test
+    public void test_match_forTokenStoreWithTwoAsterisksInside_and_weProcessingLineFeeds() {
+        // prepare
+        CharBuffer tempBuffer = CharBuffer.wrap("\n\n\n\n\n");
+        TokenOutput output = createTokenOutputWithTwoAsterisksInside();
+        RobotTokenType[] types = new RobotTokenType[] {
+                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+        RobotTokenType[] crSequence = new RobotTokenType[] {
+                RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+
+        // execute & verify
+        for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
+            assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
+            assertThat(output.getTokens()).hasSize((charIndex + 2) * 2);
+            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+                    types, crSequence, charIndex + 1);
+            assertTokens(output, expectedSequenceOfTypes, 0, 1);
+            assertCurrentPosition(output);
+            assertPositionMarkers(output);
+        }
+    }
+
+
+    @Test
+    public void test_match_forTokenStoreWithTwoAsterisksInside_and_weProccessingCarriageReturns() {
+        // prepare
+        CharBuffer tempBuffer = CharBuffer.wrap("\r\r\r\r\r");
+        TokenOutput output = createTokenOutputWithTwoAsterisksInside();
+        RobotTokenType[] types = new RobotTokenType[] {
+                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+        RobotTokenType[] crSequence = new RobotTokenType[] {
+                RobotTokenType.CARRIAGE_RETURN, RobotTokenType.END_OF_LINE };
+
+        // execute & verify
+        for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
+            assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
+            assertThat(output.getTokens()).hasSize((charIndex + 2) * 2);
+            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+                    types, crSequence, charIndex + 1);
+            assertTokens(output, expectedSequenceOfTypes, 0, 1);
+            assertCurrentPosition(output);
+            assertPositionMarkers(output);
+        }
+    }
+
+
+    private RobotTokenType[] extendByArrayNTimes(RobotTokenType[] types,
+            RobotTokenType[] sequenceToAddManyTimes, int i) {
+        List<RobotTokenType> tempTypes = new LinkedList<>();
+        tempTypes.addAll(Arrays.asList(types));
+        for (int j = 0; j < i; j++) {
+            for (int k = 0; k < sequenceToAddManyTimes.length; k++) {
+                tempTypes.add(sequenceToAddManyTimes[k]);
+            }
+        }
+        RobotTokenType[] buildTypes = tempTypes.toArray(new RobotTokenType[0]);
+        tempTypes.clear();
+
+        return buildTypes;
+    }
+
+
+    private TokenOutput createTokenOutputWithTwoAsterisksInside() {
+        TokenOutput output = new TokenOutput();
+        LinearPositionMarker beginMarker = output.getCurrentMarker();
+
+        RobotToken asteriskTokenOne = new RobotToken(beginMarker,
+                new StringBuilder("*"));
+        asteriskTokenOne.setType(RobotTokenType.SINGLE_ASTERISK);
+        output.getTokens().add(asteriskTokenOne);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 0);
+
+        RobotToken asteriskTokenTwo = new RobotToken(
+                asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
+        asteriskTokenTwo.setType(RobotTokenType.SINGLE_ASTERISK);
+        output.getTokens().add(asteriskTokenTwo);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 1);
+
+        output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
+
+        return output;
+    }
 
 
     @Test
