@@ -13,6 +13,7 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistKeywordContext;
 
 public class KeywordProposalsProvider implements IContentProposalProvider {
 
@@ -41,15 +42,15 @@ public class KeywordProposalsProvider implements IContentProposalProvider {
         return proposals.toArray(new IContentProposal[0]);
     }
 
-    public Map<String, KeywordSpecification> getKeywordsForCompletionProposals() {
+    public Map<String, TextEditorContentAssistKeywordContext> getKeywordsForCompletionProposals() {
         final List<LibrarySpecification> importedLibraries = suiteFile.getImportedLibraries();
 
-        final Map<String, KeywordSpecification> keywordMap = new HashMap<String, KeywordSpecification>();
+        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = new HashMap<String, TextEditorContentAssistKeywordContext>();
         for (final LibrarySpecification spec : importedLibraries) {
             for (final KeywordSpecification keyword : spec.getKeywords()) {
-                keywordMap.put(keyword.getName(), keyword);
+                keywordMap.put(keyword.getName(), new TextEditorContentAssistKeywordContext(spec.getName(), keyword));
             }
         }
-        return new TreeMap<String, KeywordSpecification>(keywordMap);
+        return new TreeMap<String, TextEditorContentAssistKeywordContext>(keywordMap);
     }
 }

@@ -13,11 +13,12 @@ public class RobotEventBroker {
         this.broker = broker;
     }
 
-    public void sendHighlightLineEventToTextEditor(String file, int line) {
+    public void sendHighlightLineEventToTextEditor(String file, int line, Map<String, Object> variables) {
 
-        Map<String, String> eventMap = new HashMap<>();
+        Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("file", file);
         eventMap.put("line", String.valueOf(line));
+        eventMap.put("vars", variables);
         broker.send("TextEditor/HighlightLine", eventMap);
     }
 
