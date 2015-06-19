@@ -20,6 +20,8 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.FatalProblemsReporter.ReportingInterruptedException;
@@ -132,26 +134,19 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             return;
         }
 
-        final List<String> stdLibs = runtimeEnvironment.getStandardLibrariesNames();
-        final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
-        final List<IFile> specsToRecreate = newArrayList();
-        try {
-            specsToRecreate.addAll(libspecsFolder.collectSpecsWithDifferentVersion(stdLibs,
-                    runtimeEnvironment.getVersion()));
-        } catch (final CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        subMonitor.setWorkRemaining(specsToRecreate.size());
+        final List<ILibdocGenerator> libdocGenerators = newArrayList();
 
-        for (final IFile spec : specsToRecreate) {
+        final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
+        libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
+        libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+
+        subMonitor.setWorkRemaining(libdocGenerators.size());
+        for (final ILibdocGenerator generator : libdocGenerators) {
             if (subMonitor.isCanceled()) {
                 return;
             }
-            final String libName = spec.getLocation().removeFileExtension().lastSegment();
-            subMonitor.subTask("generating libdoc for " + libName + " library");
-            runtimeEnvironment.createLibdocForStdLibrary(libName, spec.getLocation().toFile());
+            subMonitor.subTask(generator.getMessage());
+            generator.generateLibdoc(runtimeEnvironment);
             subMonitor.worked(1);
         }
     }
@@ -181,7 +176,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
                 final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT);
-                problem.fillFormattedMessageWith(configuration.getPythonLocation());
+                problem.fillFormattedMessageWith(configuration.providePythonLocation());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.isValidPythonInstallation()) {
                 final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION);
@@ -196,6 +191,40 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         } finally {
             monitor.done();
         }
+    }
+
+    private List<ILibdocGenerator> getStandardLibrariesToRecreate(
+            final RobotRuntimeEnvironment runtimeEnvironment,
+            final LibspecsFolder libspecsFolder) {
+        final List<ILibdocGenerator> generators = newArrayList();
+        final List<String> stdLibs = runtimeEnvironment.getStandardLibrariesNames();
+        try {
+            final List<IFile> toRecr = libspecsFolder.collectSpecsWithDifferentVersion(stdLibs, runtimeEnvironment.getVersion());
+            for (final IFile specToRecreate : toRecr) {
+                generators.add(new StandardLibraryLibdocGenerator(specToRecreate));
+            }
+        } catch (final CoreException e) {
+            // FIXME : handle this
+            e.printStackTrace();
+        }
+        return generators;
+    }
+
+    private List<ILibdocGenerator> getReferencedJavaLibrariesToRecreate(
+            final RobotProjectConfig configuration, final LibspecsFolder libspecsFolder) {
+        final List<ILibdocGenerator> generators = newArrayList();
+
+        for (final ReferencedLibrary lib : configuration.getLibraries()) {
+            if (lib.provideType() == LibraryType.JAVA) {
+                final String libName = lib.getName();
+                final IFile specFile = libspecsFolder.getSpecFile(libName);
+                if (!specFile.exists()) {
+                    final String jarPath = lib.getPath();
+                    generators.add(new JavaLibraryLibdocGenerator(libName, jarPath, specFile));
+                }
+            }
+        }
+        return generators;
     }
 
     @Override
