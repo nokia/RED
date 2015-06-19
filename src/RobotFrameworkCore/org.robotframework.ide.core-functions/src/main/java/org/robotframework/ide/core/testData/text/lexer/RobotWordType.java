@@ -141,7 +141,11 @@ public enum RobotWordType implements RobotType {
     /**
      * 
      */
-    RANGE_WORD("range", "RANGE");
+    RANGE_WORD("range", "RANGE"),
+    /**
+     * 
+     */
+    DOUBLE_SPACE("  ", "  ");
 
     private final String aliases;
     private final String toWriteText;
