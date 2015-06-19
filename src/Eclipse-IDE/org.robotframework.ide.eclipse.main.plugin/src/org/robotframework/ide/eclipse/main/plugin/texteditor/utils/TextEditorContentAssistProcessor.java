@@ -12,97 +12,97 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * @author mmarzec
- *
  */
 public class TextEditorContentAssistProcessor implements IContentAssistProcessor {
-	
-	private String lastError = null;
-	
-	private boolean showSections;
-	
-	private TextEditorContextValidator validator = new TextEditorContextValidator(this);
-	
-	private Map<String, KeywordSpecification> sections = new LinkedHashMap<>();
-	{
-		sections.put("*** Variables ***", null);
-		sections.put("*** Settings ***", null);
-		sections.put("*** Test Cases ***", null);
-		sections.put("*** Keywords ***", null);
-	}
-	
-	private Map<String, KeywordSpecification> keywordMap;
-	
-	public TextEditorContentAssistProcessor(Map<String, KeywordSpecification> keywordMap) {
-	    this.keywordMap = keywordMap;
-	}
 
-	@Override
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
-		
-		IDocument document = viewer.getDocument();
-	    int currOffset = offset - 1;
-	    
-	    try {
-	        String currWord = "";
-	        char currChar, prevChar;
-	        
-	        if(currOffset < 0 || document.getChar(currOffset) == '\n') {
-	            showSections = true;
-	        	return buildProposals(sections, "", currOffset+1);
-	        } else {
-	            showSections = false;
-	        }
-	        
-	        if(currOffset == 0) {
-	            return new ICompletionProposal[0];
-	        }
-	        
-	        while (currOffset > 0) {
-	        	currChar = document.getChar(currOffset);
-	        	prevChar = document.getChar(currOffset-1);
-	        	if (Character.isWhitespace(currChar)) {
-	        		if(Character.isWhitespace(prevChar) && prevChar != '\n' || currChar == '\t') {
-	        			break;
-	        		} else if(prevChar == '\n') {
-	        			return new ICompletionProposal[0];
-	        		}
-	        	}
-	        	currWord = currChar + currWord;
-	        	currOffset--;
-	        }
-	        
-	        Map<String, KeywordSpecification> keywordProposals = new LinkedHashMap<>();
-	        for (Iterator<String> i =  keywordMap.keySet().iterator(); i.hasNext();) {
-				String keyword = (String) i.next();
-				if(keyword.startsWith(currWord)) {
-				    keywordProposals.put(keyword, keywordMap.get(keyword));
-				}
-		    }
-	        
-	        ICompletionProposal[] proposals = null;
-	        if (keywordProposals.size() > 0) {
-	          proposals = buildProposals(keywordProposals, currWord, offset - currWord.length());
-	          lastError = null;
-	        }
-	        return proposals;
-	    } catch (BadLocationException e) {
-	        e.printStackTrace();
-	        lastError = e.getMessage();
-	    }
-	    
-		return null;
-	}
-	
-	private ICompletionProposal[] buildProposals(final Map<String, KeywordSpecification> proposals, final String replacedWord, final int offset) {
-		
-		if(proposals.size() == 0) {
-			return new ICompletionProposal[0];
-		}
-		    
+    private String lastError = null;
+
+    private boolean showSections;
+
+    private TextEditorContextValidator validator = new TextEditorContextValidator(this);
+
+    private Map<String, TextEditorContentAssistKeywordContext> sections = new LinkedHashMap<>();
+    {
+        sections.put("*** Variables ***", null);
+        sections.put("*** Settings ***", null);
+        sections.put("*** Test Cases ***", null);
+        sections.put("*** Keywords ***", null);
+    }
+
+    private Map<String, TextEditorContentAssistKeywordContext> keywordMap;
+
+    public TextEditorContentAssistProcessor(Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
+        this.keywordMap = keywordMap;
+    }
+
+    @Override
+    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
+
+        IDocument document = viewer.getDocument();
+        int currOffset = offset - 1;
+
+        try {
+            String currWord = "";
+            char currChar, prevChar;
+
+            if (currOffset < 0 || document.getChar(currOffset) == '\n') {
+                showSections = true;
+                return buildProposals(sections, "", currOffset + 1);
+            } else {
+                showSections = false;
+            }
+
+            if (currOffset == 0) {
+                return new ICompletionProposal[0];
+            }
+
+            while (currOffset > 0) {
+                currChar = document.getChar(currOffset);
+                prevChar = document.getChar(currOffset - 1);
+                if (Character.isWhitespace(currChar)) {
+                    if (Character.isWhitespace(prevChar) && prevChar != '\n' || currChar == '\t') {
+                        break;
+                    } else if (prevChar == '\n') {
+                        return new ICompletionProposal[0];
+                    }
+                }
+                currWord = currChar + currWord;
+                currOffset--;
+            }
+
+            Map<String, TextEditorContentAssistKeywordContext> keywordProposals = new LinkedHashMap<>();
+            for (Iterator<String> i = keywordMap.keySet().iterator(); i.hasNext();) {
+                String keyword = (String) i.next();
+                if (keyword.startsWith(currWord)) {
+                    keywordProposals.put(keyword, keywordMap.get(keyword));
+                }
+            }
+
+            ICompletionProposal[] proposals = null;
+            if (keywordProposals.size() > 0) {
+                proposals = buildProposals(keywordProposals, currWord, offset - currWord.length());
+                lastError = null;
+            }
+            return proposals;
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+            lastError = e.getMessage();
+        }
+
+        return null;
+    }
+
+    private ICompletionProposal[] buildProposals(final Map<String, TextEditorContentAssistKeywordContext> proposals,
+            final String replacedWord, final int offset) {
+
+        if (proposals.size() == 0) {
+            return new ICompletionProposal[0];
+        }
+
         ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
 
         int index = 0;
@@ -111,46 +111,49 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 
             ContextInformation contextInfo = null;
             String additionalInfo = null;
+            String sourceName = null;
+            Image image = null;
             if (!showSections) {
-                KeywordSpecification spec = proposals.get(proposal);
-                contextInfo = new ContextInformation(proposal, spec.getArguments().toString());
-                additionalInfo = "Arguments: " + spec.getArguments().toString() + System.lineSeparator() + System.lineSeparator() + spec.getDocumentation();
+                TextEditorContentAssistKeywordContext keywordContext = proposals.get(proposal);
+                contextInfo = new ContextInformation(proposal, keywordContext.getArguments());
+                additionalInfo = keywordContext.getDescription();
+                sourceName = keywordContext.getLibName();
+                image = keywordContext.getImage();
             }
 
-            completionProposals[index] = new TextEditorCompletionProposal(proposal, offset, replacedWord.length(), proposal.length(),
-                    null, proposal, contextInfo, additionalInfo);
+            completionProposals[index] = new TextEditorCompletionProposal(proposal, offset, replacedWord.length(),
+                    proposal.length(), image, proposal, contextInfo, additionalInfo, sourceName);
             index++;
 
         }
 
         return completionProposals;
-	}
-	
-	@Override
-	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
-		
-		return new IContextInformation[0];
-	}
+    }
 
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters() {
-	    return null;
-	}
+    @Override
+    public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
 
-	@Override
-	public char[] getContextInformationAutoActivationCharacters() {
-		return null;
-	}
+        return new IContextInformation[0];
+    }
 
-	@Override
-	public String getErrorMessage() {
-		return lastError;
-	}
+    @Override
+    public char[] getCompletionProposalAutoActivationCharacters() {
+        return null;
+    }
 
-	@Override
-	public IContextInformationValidator getContextInformationValidator() {
-		return validator;
-	}
+    @Override
+    public char[] getContextInformationAutoActivationCharacters() {
+        return null;
+    }
 
-	
+    @Override
+    public String getErrorMessage() {
+        return lastError;
+    }
+
+    @Override
+    public IContextInformationValidator getContextInformationValidator() {
+        return validator;
+    }
+
 }
