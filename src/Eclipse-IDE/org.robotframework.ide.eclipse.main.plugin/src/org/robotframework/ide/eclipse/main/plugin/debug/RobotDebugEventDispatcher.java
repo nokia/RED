@@ -252,7 +252,7 @@ public class RobotDebugEventDispatcher extends Job {
                             if (isStopping) {
                                 target.sendEventToAgent("stop");
                                 robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
-                                        currentKeywordContext.getLineNumber());
+                                        currentKeywordContext.getLineNumber(), currentKeywordContext.getVariables());
                             } else {
                                 target.sendEventToAgent("run");
                             }
@@ -277,7 +277,7 @@ public class RobotDebugEventDispatcher extends Job {
                         if (isStopping && isBreakpointConditionFulfilled) {
                             target.sendEventToAgent("stop");
                             robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
-                                    currentKeywordContext.getLineNumber());
+                                    currentKeywordContext.getLineNumber(), currentKeywordContext.getVariables());
                         } else {
                             target.sendEventToAgent("run");
                         }
