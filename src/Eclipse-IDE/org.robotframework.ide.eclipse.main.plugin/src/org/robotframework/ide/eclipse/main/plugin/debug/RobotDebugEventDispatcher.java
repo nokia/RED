@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Set;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -21,11 +23,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.UIJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
@@ -44,7 +47,9 @@ public class RobotDebugEventDispatcher extends Job {
     private RobotDebugTarget target;
 
     private IFile executedFile;
-
+    
+    private List<IResource> suiteResources;
+    
     private RobotEventBroker robotEventBroker;
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -71,12 +76,13 @@ public class RobotDebugEventDispatcher extends Job {
 
     private boolean isStopping;
     
-    public RobotDebugEventDispatcher(RobotDebugTarget target, IFile executedFile, RobotEventBroker robotEventBroker) {
+    public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteResources, final RobotEventBroker robotEventBroker) {
         super("Robot Event Dispatcher");
         setSystem(true);
 
         this.target = target;
-        this.executedFile = executedFile;
+        //this.executedFile = executedFile;
+        this.suiteResources = suiteResources;
         this.robotEventBroker = robotEventBroker;
 
         currentExecutionLinesInFile = new LinkedHashMap<>();
@@ -115,12 +121,22 @@ public class RobotDebugEventDispatcher extends Job {
                         List<Object> suiteList = (List<Object>) eventMap.get("start_suite");
                         Map<String, String> suiteElements = (Map<String, String>) suiteList.get(1);
                         currentSuite = new File(suiteElements.get("source")).getName();
+                        extractSuiteFile(currentSuite, suiteResources);
                         break;
                     case "start_keyword":
                         List<Object> startList = (List<Object>) eventMap.get("start_keyword");
                         currentKeyword = (String) startList.get(0);
                         Map<String, Object> startElements = (Map<String, Object>) startList.get(1);
                         List<String> args = (List<String>) startElements.get("args");
+                        
+                        if(executedFile == null) {
+                            try {
+                                target.terminate();
+                                return Status.OK_STATUS;
+                            } catch (DebugException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         String executedSuite = "";
                         IFile currentFile = null;
@@ -269,9 +285,7 @@ public class RobotDebugEventDispatcher extends Job {
                         isBreakpointConditionFulfilled = true;
                         List<Object> errorList = (List<Object>) eventMap.get("condition_error");
                         String error = (String) errorList.get(0);
-                        ShowDebugErrorJob showDebugErrorJob = new ShowDebugErrorJob("Conditional Breakpoint Error",
-                                "Reason:\n" + error);
-                        showDebugErrorJob.schedule();
+                        showDebugError("Conditional Breakpoint Error", "Reason:\n" + error);
                         break;
                     case "condition_checked":
                         if (isStopping && isBreakpointConditionFulfilled) {
@@ -303,6 +317,9 @@ public class RobotDebugEventDispatcher extends Job {
 
                             currentResourceFiles.remove(keyword);
                         }
+                        break;
+                    case "end_suite":
+                        target.clearStackFrames();
                         break;
                     case "close":
                         robotEventBroker.sendClearAllEventToTextEditor();
@@ -372,31 +389,36 @@ public class RobotDebugEventDispatcher extends Job {
 
         return conditionJson.toString();
     }
-
-    private class ShowDebugErrorJob extends UIJob {
-
-        private String title;
-
-        private String message;
-
-        public ShowDebugErrorJob(String title, String message) {
-            super("Show Debug Error");
-            setSystem(true);
-            setPriority(Job.INTERACTIVE);
-            this.message = message;
-            this.title = title;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-         */
-        @Override
-        public IStatus runInUIThread(IProgressMonitor monitor) {
-            MessageDialog.openError(PlatformUI.getWorkbench().getDisplay().getActiveShell(), title, message);
-            return Status.OK_STATUS;
+    
+    private void extractSuiteFile(String suiteName, List<IResource> resources) {
+        for (IResource iResource : resources) {
+            if(iResource.getName().equalsIgnoreCase(suiteName) && iResource instanceof IFile) {
+                executedFile = (IFile) iResource;
+                break;
+            } else if (iResource instanceof IFolder) {
+                try {
+                    extractSuiteFile(suiteName, Arrays.asList(((IFolder) iResource).members()));
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
+            } else if (iResource instanceof IProject) {
+                try {
+                    extractSuiteFile(suiteName, Arrays.asList(((IProject) iResource).members()));
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     
+    private void showDebugError(final String title, final String message) {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        workbench.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                MessageDialog.openError(PlatformUI.getWorkbench().getDisplay().getActiveShell(), title, message);
+            }
+        });
+    }
+
 }

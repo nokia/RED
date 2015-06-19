@@ -11,8 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -81,8 +81,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private final RobotDebugValueManager robotDebugValueManager;
 
-    public RobotDebugTarget(final ILaunch launch, final IProcess process, final int port, final IFile executedFile,
-            final RobotPartListener partListener, final RobotEventBroker robotEventBroker) throws CoreException {
+    public RobotDebugTarget(final ILaunch launch, final IProcess process, final int port,
+            final List<IResource> suiteResources, final RobotPartListener partListener,
+            final RobotEventBroker robotEventBroker) throws CoreException {
         super(null);
         target = this;
         this.launch = launch;
@@ -107,7 +108,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         thread = new RobotThread(this);
         threads = new IThread[] { thread };
 
-        final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, executedFile,
+        final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, suiteResources,
                 robotEventBroker);
         eventDispatcher.schedule();
 
@@ -468,6 +469,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public void setHasStackFramesCreated(final boolean hasCreated) {
         hasStackFramesCreated = hasCreated;
+    }
+    
+    public void clearStackFrames() {
+        stackFrames = null;
     }
 
     /**

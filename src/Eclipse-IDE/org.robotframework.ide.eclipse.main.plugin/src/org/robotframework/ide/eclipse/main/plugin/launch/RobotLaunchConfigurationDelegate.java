@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -181,9 +180,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (isDebugging) {
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
-
-            final IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, cmdLine.getPort(),
-                    (IFile) suiteResources.get(0), robotPartListener, robotEventBroker);
+            
+            final IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, cmdLine.getPort(), suiteResources,
+                    robotPartListener, robotEventBroker);
             launch.addDebugTarget(target);
         }
 
