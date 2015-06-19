@@ -11,18 +11,7 @@ import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -45,15 +34,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsContentProvider;
@@ -80,7 +68,7 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
     private IDirtyProviderService dirtyProviderService;
 
     @Inject
-    private Form form;
+    private IMessageManager messageManager;
 
     @Inject
     private RedProjectEditorInput editorInput;
@@ -94,8 +82,6 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        installResourceListener();
-
         final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
                 | Section.DESCRIPTION);
         section.setText("Robot framework");
@@ -112,38 +98,12 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         createSeparator(sectionInternal);
         createSourceButton(sectionInternal);
         createViewer(sectionInternal);
-
-        setInput();
-
     }
 
-    private void installResourceListener() {
-        final IProject project = editorInput.getRobotProject().getProject();
-        final IResourceChangeListener listener = new RedProjectConfigurationFileChangeListener(project, new Runnable() {
-            @Override
-            public void run() {
-                currentFramework.setText("", false, false);
-                sourceButton.setEnabled(false);
-                viewer.getTable().setEnabled(false);
-
-                setInput();
-            }
-        });
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
-        form.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
-            }
-        });
-    }
-
-    void reloadInput() {
+    void whenConfigurationFiledChanged() {
         currentFramework.setText("", false, false);
         sourceButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
-
-        setInput();
     }
 
     private void createCurrentFrameworkInfo(final Composite parent) {
@@ -202,12 +162,14 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
                 viewer.getTable().setEnabled(sourceButton.getSelection());
 
                 final Object[] elements = viewer.getCheckedElements();
+                File file;
                 if (elements.length == 1 && sourceButton.getSelection()) {
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) elements[0];
-                    configuration.setPythonLocation(env.getFile());
+                    file = env.getFile();
                 } else {
-                    configuration.setPythonLocation(null);
+                    file = null;
                 }
+                configuration.assignPythonLocation(file);
                 dirtyProviderService.setDirtyState(true);
             }
         });
@@ -220,6 +182,7 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
+        viewer.getTable().setEnabled(false);
 
         final ICheckStateListener checkListener = createCheckListener();
         viewer.addCheckStateListener(checkListener);
@@ -245,15 +208,17 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         final ICheckStateListener checkListener = new ICheckStateListener() {
             @Override
             public void checkStateChanged(final CheckStateChangedEvent event) {
+                File file;
                 if (event.getChecked()) {
                     viewer.setCheckedElements(new Object[] { event.getElement() });
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) event.getElement();
-                    configuration.setPythonLocation(env.getFile());
+                    file = env.getFile();
                 } else {
                     sourceButton.setSelection(false);
                     viewer.getTable().setEnabled(false);
-                    configuration.setPythonLocation(null);
+                    file = null;
                 }
+                configuration.assignPythonLocation(file);
                 dirtyProviderService.setDirtyState(true);
                 viewer.refresh();
             }
@@ -261,74 +226,37 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         return checkListener;
     }
 
-    private void setInput() {
+    void whenEnvironmentWasLoaded(final RobotRuntimeEnvironment env, final List<?> allEnvironments) {
         final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
         final boolean isEditable = editorInput.isEditable();
-        final RobotProject project = editorInput.getRobotProject();
 
-        final String activeEnv = "activeEnv";
-        final String allEnvs = "allEnvs";
+        if (viewer.getTable() == null || viewer.getTable().isDisposed()) {
+            return;
+        }
+        final boolean isUsingPrefs = configuration.usesPreferences();
 
-        final Job job = new Job("Reading available frameworks") {
-            @Override
-            protected IStatus run(final IProgressMonitor monitor) {
-                final RobotRuntimeEnvironment activeEnvironment = project == null ? null : project
-                        .getRuntimeEnvironment();
-                final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RobotFramework.getDefault()
-                        .getAllRuntimeEnvironments();
-                setProperty(createKey(activeEnv), activeEnvironment);
-                setProperty(createKey(allEnvs), allRuntimeEnvironments);
-                return Status.OK_STATUS;
+        sourceButton.setEnabled(isEditable);
+        sourceButton.setSelection(!isUsingPrefs);
+
+        viewer.setInput(allEnvironments);
+        if (env != null) {
+            viewer.setChecked(env, true);
+        }
+        viewer.getTable().setEnabled(isEditable && !isUsingPrefs);
+        viewer.refresh();
+
+        if (env == null) {
+            currentFramework.setText(createCurrentFrameworkText("unknown"), true, true);
+            int i = 0;
+            for (final String problem : getProblems()) {
+                messageManager.addMessage("problems_" + i, problem, null, IMessageProvider.ERROR, currentFramework);
+                i++;
             }
-        };
-        job.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(final IJobChangeEvent event) {
-                if (viewer.getTable() == null || viewer.getTable().isDisposed()) {
-                    return;
-                }
-                viewer.getTable().getDisplay().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean isUsingPrefs = configuration.getPythonLocation() == null;
-                        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) job
-                                .getProperty(createKey(activeEnv));
-                        final List<?> allEnvironments = (List<?>) job.getProperty(createKey(allEnvs));
-
-                        sourceButton.setEnabled(isEditable);
-                        sourceButton.setSelection(!isUsingPrefs);
-
-                        viewer.setInput(allEnvironments);
-                        if (env != null) {
-                            viewer.setChecked(env, true);
-                        }
-                        viewer.getTable().setEnabled(isEditable && !isUsingPrefs);
-                        viewer.refresh();
-
-                        if (env == null) {
-                            currentFramework.setText(createCurrentFrameworkText("unknown"), true, true);
-                            int i = 0;
-                            for (final String problem : getProblems()) {
-                                form.getMessageManager().addMessage("problems_" + i, problem, null,
-                                        IMessageProvider.ERROR, currentFramework);
-                                i++;
-                            }
-                        } else {
-                            final String activeText = createActiveFrameworkText(env, isUsingPrefs);
-                            currentFramework.setText(createCurrentFrameworkText(activeText), true, true);
-                        }
-                        currentFramework.getParent().layout();
-                        form.setBusy(false);
-                    }
-                });
-            }
-        });
-        form.setBusy(true);
-        job.schedule();
-    }
-
-    private QualifiedName createKey(final String localName) {
-        return new QualifiedName(RobotFramework.PLUGIN_ID, localName);
+        } else {
+            final String activeText = createActiveFrameworkText(env, isUsingPrefs);
+            currentFramework.setText(createCurrentFrameworkText(activeText), true, true);
+        }
+        currentFramework.getParent().layout();
     }
 
     private List<String> getProblems() {

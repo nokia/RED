@@ -155,8 +155,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         final List<String> suites = getSuitesToRun(suiteResources);
         final String userArguments = robotConfig.getExecutorArguments();
-        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, project.getLocation()
-                .toFile(), suites, userArguments, isDebugging);
+        final List<String> classpath = createClasspath(project);
+        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, project
+                .getLocation().toFile(), suites, userArguments, isDebugging);
         final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
@@ -197,6 +198,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 unregisterPartListener(robotPartListener);
             }
         }
+    }
+
+    private List<String> createClasspath(final IProject project) {
+        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        return robotProject.getClasspath();
     }
 
     protected final RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotLaunchConfiguration robotConfig)
