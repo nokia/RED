@@ -20,6 +20,10 @@ import com.google.common.collect.LinkedListMultimap;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see RobotTokenMatcher
+ * @see RobotTokenType#SINGLE_SPACE
+ * @see RobotTokenType#SINGLE_TABULATOR
+ * @see RobotWordType#DOUBLE_SPACE
  */
 public class WhitespaceMatcher implements ISingleCharTokenMatcher {
 

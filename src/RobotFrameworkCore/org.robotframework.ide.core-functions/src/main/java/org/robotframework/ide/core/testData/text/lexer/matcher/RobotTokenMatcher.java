@@ -32,6 +32,7 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new EndOfLineMatcher());
         oneCharTokenMatchers.add(new WhitespaceMatcher());
         oneCharTokenMatchers.add(new PipeMatcher());
+        oneCharTokenMatchers.add(new AsteriskMatcher());
     }
 
 
@@ -45,6 +46,9 @@ public class RobotTokenMatcher {
             }
         }
 
+        if (wasUsed) {
+
+        }
         // TODO: if not used maybe exception?
     }
 
