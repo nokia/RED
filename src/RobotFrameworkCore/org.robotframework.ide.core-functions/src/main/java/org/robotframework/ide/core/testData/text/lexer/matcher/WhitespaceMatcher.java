@@ -33,7 +33,6 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
         RobotTokenType type = RobotTokenType.getToken(c);
 
         if (type == RobotTokenType.SINGLE_SPACE) {
-
             List<RobotToken> tokens = tokenOutput.getTokens();
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
