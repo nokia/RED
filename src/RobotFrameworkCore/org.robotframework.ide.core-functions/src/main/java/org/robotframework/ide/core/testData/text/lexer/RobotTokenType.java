@@ -148,7 +148,7 @@ public enum RobotTokenType implements RobotType {
 
 
     public char getThisTokenChar() {
-        return thisTokenChar;
+        return this.thisTokenChar;
     }
 
 
