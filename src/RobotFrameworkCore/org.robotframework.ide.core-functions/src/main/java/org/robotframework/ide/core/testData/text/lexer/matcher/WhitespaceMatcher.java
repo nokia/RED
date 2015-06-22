@@ -70,11 +70,6 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
             wasUsed = true;
         }
 
-        if (wasUsed && shouldBeHandleAsSingleSpace) {
-            // TODO: sprawdz ostatni czy ma specjalne znaczenie [fix-1] jezeli
-            // zostal uzyty
-        }
-
         return wasUsed;
     }
 
