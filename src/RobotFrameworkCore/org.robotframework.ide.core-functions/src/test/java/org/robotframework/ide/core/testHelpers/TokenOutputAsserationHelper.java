@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
@@ -60,8 +61,16 @@ public class TokenOutputAsserationHelper {
                 line++;
                 column = LinearPositionMarker.THE_FIRST_COLUMN;
             } else {
-                assertThat(robotToken.getText().toString()).isEqualTo(
-                        type.toWrite());
+                if (robotToken.getType().getClass() != GroupedSameTokenType.class) {
+                    assertThat(robotToken.getText().toString()).isEqualTo(
+                            type.toWrite());
+                } else {
+                    assertThat(robotToken.getText().toString()).matches(
+                            "["
+                                    + ((GroupedSameTokenType) robotToken
+                                            .getType()).getWrappedType()
+                                            .toWrite() + "]+");
+                }
                 assertStartPosition(robotToken, line, column);
                 if (robotToken.getText() != null) {
                     column += robotToken.getText().length();
@@ -139,24 +148,46 @@ public class TokenOutputAsserationHelper {
     }
 
 
+    public static TokenOutput createTokenOutputWithTwoTabulatorsInside() {
+        TokenOutput output = new TokenOutput();
+        LinearPositionMarker beginMarker = output.getCurrentMarker();
+
+        RobotToken tabulatorTokenOne = new RobotToken(beginMarker,
+                new StringBuilder("\t"));
+        tabulatorTokenOne.setType(RobotTokenType.SINGLE_TABULATOR);
+        output.getTokens().add(tabulatorTokenOne);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_TABULATOR, 0);
+
+        RobotToken tabulatorTokenTwo = new RobotToken(
+                tabulatorTokenOne.getEndPosition(), new StringBuilder("\t"));
+        tabulatorTokenTwo.setType(RobotTokenType.SINGLE_TABULATOR);
+        output.getTokens().add(tabulatorTokenTwo);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_TABULATOR, 1);
+
+        output.setCurrentMarker(tabulatorTokenTwo.getEndPosition());
+
+        return output;
+    }
+
+
     public static TokenOutput createTokenOutputWithTwoAsterisksInside() {
         TokenOutput output = new TokenOutput();
         LinearPositionMarker beginMarker = output.getCurrentMarker();
-    
+
         RobotToken asteriskTokenOne = new RobotToken(beginMarker,
                 new StringBuilder("*"));
         asteriskTokenOne.setType(RobotTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenOne);
         output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 0);
-    
+
         RobotToken asteriskTokenTwo = new RobotToken(
                 asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
         asteriskTokenTwo.setType(RobotTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenTwo);
         output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 1);
-    
+
         output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
-    
+
         return output;
     }
 }
