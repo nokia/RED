@@ -26,18 +26,18 @@ import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see AsteriskMatcher
+ * @see HashCommentMatcher
  */
-public class AsteriskMatcherTest {
+public class HashCommentMatcherTest {
 
     @ForClean
     private ISingleCharTokenMatcher matcher;
 
 
     @Test
-    public void test_match_forTokenStoreWithTwoTabulators_andWithThreeAsterisksInTempBuffer_shouldReturn_MANY_ASTERISKS_TOKEN() {
+    public void test_match_forTokenStoreWithTwoTabulators_andWithThreeCommentHashInTempBuffer_shouldReturn_MANY_COMMENT_HASH_TOKEN() {
         // prepare
-        CharBuffer tempBuffer = CharBuffer.wrap("***");
+        CharBuffer tempBuffer = CharBuffer.wrap("###");
         TokenOutput output = createTokenOutputWithTwoTabulatorsInside();
 
         // execute & verify
@@ -48,13 +48,13 @@ public class AsteriskMatcherTest {
                 expectedSequenceOfTypes = new RobotType[] {
                         RobotTokenType.SINGLE_TABULATOR,
                         RobotTokenType.SINGLE_TABULATOR,
-                        GroupedSameTokenType.MANY_ASTERISKS };
+                        GroupedSameTokenType.MANY_COMMENT_HASHS };
                 assertThat(output.getTokens()).hasSize(3);
             } else {
                 expectedSequenceOfTypes = new RobotType[] {
                         RobotTokenType.SINGLE_TABULATOR,
                         RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_ASTERISK };
+                        RobotTokenType.SINGLE_COMMENT_HASH };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -65,9 +65,9 @@ public class AsteriskMatcherTest {
 
 
     @Test
-    public void test_match_forEmptyTokenStore_andWithTrippletAsterisksInTempBuffer_shouldReturn_MANY_ASTERISKS_TOKEN() {
+    public void test_match_forEmptyTokenStore_andWithTrippletCommentHashInTempBuffer_shouldReturn_MANY_COMMENT_HASH_TOKEN() {
         // prepare
-        CharBuffer tempBuffer = CharBuffer.wrap("***");
+        CharBuffer tempBuffer = CharBuffer.wrap("###");
         TokenOutput output = new TokenOutput();
 
         // execute & verify
@@ -75,10 +75,10 @@ public class AsteriskMatcherTest {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             RobotType[] expectedSequenceOfTypes;
             if (charIndex >= 1) {
-                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_ASTERISKS };
+                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_COMMENT_HASHS };
                 assertThat(output.getTokens()).hasSize(1);
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ASTERISK };
+                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_COMMENT_HASH };
                 assertThat(output.getTokens()).hasSize(1);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -89,9 +89,9 @@ public class AsteriskMatcherTest {
 
 
     @Test
-    public void test_match_forEmptyTokenStore_andWithTwoAsterisksInTempBuffer_shouldReturn_MANY_ASTERISKS_TOKEN() {
+    public void test_match_forEmptyTokenStore_andWithTwoCommentHashInTempBuffer_shouldReturn_MANY_COMMENT_HASH_TOKEN() {
         // prepare
-        CharBuffer tempBuffer = CharBuffer.wrap("**");
+        CharBuffer tempBuffer = CharBuffer.wrap("##");
         TokenOutput output = new TokenOutput();
 
         // execute & verify
@@ -99,10 +99,10 @@ public class AsteriskMatcherTest {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             RobotType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_ASTERISKS };
+                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_COMMENT_HASHS };
                 assertThat(output.getTokens()).hasSize(1);
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ASTERISK };
+                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_COMMENT_HASH };
                 assertThat(output.getTokens()).hasSize(1);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -113,9 +113,9 @@ public class AsteriskMatcherTest {
 
 
     @Test
-    public void test_match_forTokenStoreWithTwoTabulatorsInside_andWithOneSingleAsteriskInTempBuffer_shouldReturn_TRUE() {
+    public void test_match_forTokenStoreWithTwoTabulatorsInside_andWithOneSingleCommentHashInTempBuffer_shouldReturn_TRUE() {
         // prepare
-        CharBuffer tempBuffer = CharBuffer.wrap("*");
+        CharBuffer tempBuffer = CharBuffer.wrap("#");
         TokenOutput output = createTokenOutputWithTwoTabulatorsInside();
 
         // execute & verify
@@ -123,17 +123,17 @@ public class AsteriskMatcherTest {
         assertCurrentPosition(output);
         assertPositionMarkers(output);
 
-        assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_ASTERISK }, 0, 1);
+        assertTokens(output, new RobotTokenType[] {
+                RobotTokenType.SINGLE_TABULATOR,
+                RobotTokenType.SINGLE_TABULATOR,
+                RobotTokenType.SINGLE_COMMENT_HASH }, 0, 1);
     }
 
 
     @Test
-    public void test_match_forEmptyTokenStore_andWithOneSingleAsteriskInTempBuffer_shouldReturn_TRUE() {
+    public void test_match_forEmptyTokenStore_andWithOneSingleCommentHashInTempBuffer_shouldReturn_TRUE() {
         // prepare
-        CharBuffer tempBuffer = CharBuffer.wrap("*");
+        CharBuffer tempBuffer = CharBuffer.wrap("#");
         TokenOutput output = new TokenOutput();
 
         // execute & verify
@@ -142,7 +142,8 @@ public class AsteriskMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_ASTERISK }, 0, 1);
+                new RobotTokenType[] { RobotTokenType.SINGLE_COMMENT_HASH }, 0,
+                1);
     }
 
 
@@ -160,7 +161,7 @@ public class AsteriskMatcherTest {
 
     @Before
     public void setUp() {
-        matcher = new AsteriskMatcher();
+        matcher = new HashCommentMatcher();
     }
 
 

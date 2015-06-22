@@ -33,6 +33,7 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new WhitespaceMatcher());
         oneCharTokenMatchers.add(new PipeMatcher());
         oneCharTokenMatchers.add(new AsteriskMatcher());
+        oneCharTokenMatchers.add(new HashCommentMatcher());
     }
 
 
