@@ -35,11 +35,11 @@ public class TokenOutputAsserationHelper {
     }
 
 
-    public static void assertTokens(TokenOutput out, RobotTokenType[] types,
+    public static void assertTokens(TokenOutput out, RobotType[] types,
             int startTokenPos, int startLine) {
         List<RobotToken> tokens = out.getTokens();
         int typesLength = types.length;
-        CircullarArrayIterator<RobotTokenType> iter = new CircullarArrayIterator<>(
+        CircullarArrayIterator<RobotType> iter = new CircullarArrayIterator<>(
                 types);
 
         assertThat(tokens).isNotNull();
@@ -63,7 +63,11 @@ public class TokenOutputAsserationHelper {
                 assertThat(robotToken.getText().toString()).isEqualTo(
                         type.toWrite());
                 assertStartPosition(robotToken, line, column);
-                column++;
+                if (robotToken.getText() != null) {
+                    column += robotToken.getText().length();
+                } else {
+                    column++;
+                }
                 assertEndPosition(robotToken, line, column);
             }
         }
