@@ -8,9 +8,11 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+import org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper;
 
 
 /**
@@ -34,7 +36,12 @@ public class WhitespaceMatcherTest {
         TokenOutput output = new TokenOutput();
 
         // execute & verify
-        // assertThat(matcher.match(output, tempBuffer, 0)).isTrue();
+        assertThat(matcher.match(output, tempBuffer, 0)).isTrue();
+        TokenOutputAsserationHelper.assertCurrentPosition(output);
+        TokenOutputAsserationHelper.assertPositionMarkers(output);
+
+        TokenOutputAsserationHelper.assertTokens(output,
+                new RobotTokenType[] { RobotTokenType.SINGLE_SPACE }, 0, 1);
     }
 
 

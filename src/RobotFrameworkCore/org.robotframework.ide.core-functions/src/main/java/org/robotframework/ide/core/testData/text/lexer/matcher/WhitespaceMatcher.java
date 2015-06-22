@@ -42,15 +42,16 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
                     if (doubleSpacesType != null) {
                         shouldBeHandleAsSingleSpace = false;
                         replaceLastSingleSpaceByDoubleSpace(tokenOutput, c,
-                                tokens, lastRobotToken);
+                                tokens, lastRobotToken, doubleSpacesType);
                     }
                 }
             }
 
             if (shouldBeHandleAsSingleSpace) {
+                StringBuilder str = new StringBuilder(" ");
                 RobotToken spaceToken = new RobotToken(
-                        tokenOutput.getCurrentMarker(), new StringBuilder(
-                                type.getThisTokenChar()));
+                        tokenOutput.getCurrentMarker(), str);
+                spaceToken.setType(type);
                 tokenOutput.setCurrentMarker(spaceToken.getEndPosition());
                 tokenOutput.getTokensPosition().put(type, tokens.size());
                 tokens.add(spaceToken);
@@ -60,8 +61,9 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
         } else if (type == RobotTokenType.SINGLE_TABULATOR) {
             List<RobotToken> tokens = tokenOutput.getTokens();
             RobotToken tabulatorToken = new RobotToken(
-                    tokenOutput.getCurrentMarker(), new StringBuilder(
-                            type.getThisTokenChar()));
+                    tokenOutput.getCurrentMarker(),
+                    new StringBuilder().append(type.getThisTokenChar()));
+            tabulatorToken.setType(type);
             tokenOutput.setCurrentMarker(tabulatorToken.getEndPosition());
             tokenOutput.getTokensPosition().put(type, tokens.size());
             tokens.add(tabulatorToken);
@@ -79,10 +81,12 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
 
 
     private void replaceLastSingleSpaceByDoubleSpace(TokenOutput tokenOutput,
-            char c, List<RobotToken> tokens, RobotToken lastRobotToken) {
+            char c, List<RobotToken> tokens, RobotToken lastRobotToken,
+            RobotType doubleSpacesType) {
         RobotToken doubleSpaces = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
+        doubleSpaces.setType(doubleSpacesType);
         tokenOutput.setCurrentMarker(doubleSpaces.getEndPosition());
         LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
