@@ -19,6 +19,10 @@ import com.google.common.collect.LinkedListMultimap;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see RobotTokenMatcher
+ * @see RobotTokenType#CARRIAGE_RETURN
+ * @see RobotTokenType#LINE_FEED
+ * @see RobotTokenType#END_OF_LINE
  */
 public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
