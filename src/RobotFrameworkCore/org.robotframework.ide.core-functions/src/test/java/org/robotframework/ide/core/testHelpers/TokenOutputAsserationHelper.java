@@ -137,4 +137,26 @@ public class TokenOutputAsserationHelper {
         assertThat(currentMarker.getLine()).isEqualTo(line);
         assertThat(currentMarker.getColumn()).isEqualTo(column);
     }
+
+
+    public static TokenOutput createTokenOutputWithTwoAsterisksInside() {
+        TokenOutput output = new TokenOutput();
+        LinearPositionMarker beginMarker = output.getCurrentMarker();
+    
+        RobotToken asteriskTokenOne = new RobotToken(beginMarker,
+                new StringBuilder("*"));
+        asteriskTokenOne.setType(RobotTokenType.SINGLE_ASTERISK);
+        output.getTokens().add(asteriskTokenOne);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 0);
+    
+        RobotToken asteriskTokenTwo = new RobotToken(
+                asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
+        asteriskTokenTwo.setType(RobotTokenType.SINGLE_ASTERISK);
+        output.getTokens().add(asteriskTokenTwo);
+        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 1);
+    
+        output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
+    
+        return output;
+    }
 }

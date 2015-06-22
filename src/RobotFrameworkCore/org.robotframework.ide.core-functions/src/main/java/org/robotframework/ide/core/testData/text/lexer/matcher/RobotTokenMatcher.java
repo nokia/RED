@@ -31,6 +31,7 @@ public class RobotTokenMatcher {
     public RobotTokenMatcher() {
         oneCharTokenMatchers.add(new EndOfLineMatcher());
         oneCharTokenMatchers.add(new WhitespaceMatcher());
+        oneCharTokenMatchers.add(new PipeMatcher());
     }
 
 
