@@ -23,9 +23,13 @@ public enum GroupedSameTokenType implements RobotType {
      */
     UNKNOWN(RobotTokenType.UNKNOWN),
     /**
-     * 
+     * in example: '***'
      */
-    MANY_ASTERISKS(RobotTokenType.SINGLE_ASTERISK);
+    MANY_ASTERISKS(RobotTokenType.SINGLE_ASTERISK),
+    /**
+     * in example: '###'
+     */
+    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH);
 
     private final RobotTokenType wrappedType;
     private static final Map<RobotTokenType, GroupedSameTokenType> reservedWordTypes;
