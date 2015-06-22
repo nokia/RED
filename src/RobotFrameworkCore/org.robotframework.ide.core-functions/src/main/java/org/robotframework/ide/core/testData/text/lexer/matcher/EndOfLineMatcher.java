@@ -37,8 +37,6 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
             RobotType oppositeType = RobotTokenType.CARRIAGE_RETURN;
             wasUsed = handleLineSeparator(tokenOutput, type, oppositeType);
         }
-        // TODO: sprawdz ostatni czy ma specjalne znaczenie [fix-1] jezeli
-        // zostal uzyty
 
         return wasUsed;
     }
