@@ -80,12 +80,23 @@ public class TokenOutputAsserationHelper {
                 .get(RobotTokenType.CARRIAGE_RETURN);
         List<Integer> lfTokens = tokensPosition.get(RobotTokenType.LINE_FEED);
         int line = Math.max(crTokens.size(), lfTokens.size());
-        if (line == 0) {
-            line = 1;
-        }
         assertThat(currentMarker.getLine()).isEqualTo(line + 1);
-        assertThat(currentMarker.getColumn()).isEqualTo(
-                ((crTokens.size() + lfTokens.size()) % line) + 1);
+        assertThat(currentMarker.getColumn()).isEqualTo(currentColumn(output));
+    }
+
+
+    private static int currentColumn(TokenOutput output) {
+        List<RobotToken> tokens = output.getTokens();
+        int column = LinearPositionMarker.THE_FIRST_COLUMN;
+        if (!tokens.isEmpty()) {
+            RobotToken robotToken = tokens.get(tokens.size() - 1);
+            column = robotToken.getEndPosition().getColumn();
+            if (robotToken.getType() == RobotTokenType.END_OF_LINE) {
+                column = LinearPositionMarker.THE_FIRST_COLUMN;
+            }
+        }
+
+        return column;
     }
 
 
