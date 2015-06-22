@@ -5,6 +5,7 @@ import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelpe
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertIsTotalEmpty;
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertPositionMarkers;
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokens;
+import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.createTokenOutputWithTwoAsterisksInside;
 
 import java.nio.CharBuffer;
 import java.util.Arrays;
@@ -14,8 +15,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
-import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -158,28 +157,6 @@ public class EndOfLineMatcherTest {
         tempTypes.clear();
 
         return buildTypes;
-    }
-
-
-    private TokenOutput createTokenOutputWithTwoAsterisksInside() {
-        TokenOutput output = new TokenOutput();
-        LinearPositionMarker beginMarker = output.getCurrentMarker();
-
-        RobotToken asteriskTokenOne = new RobotToken(beginMarker,
-                new StringBuilder("*"));
-        asteriskTokenOne.setType(RobotTokenType.SINGLE_ASTERISK);
-        output.getTokens().add(asteriskTokenOne);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 0);
-
-        RobotToken asteriskTokenTwo = new RobotToken(
-                asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
-        asteriskTokenTwo.setType(RobotTokenType.SINGLE_ASTERISK);
-        output.getTokens().add(asteriskTokenTwo);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 1);
-
-        output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
-
-        return output;
     }
 
 
