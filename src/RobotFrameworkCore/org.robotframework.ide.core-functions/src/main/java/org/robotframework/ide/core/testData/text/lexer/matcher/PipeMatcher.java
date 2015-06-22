@@ -16,6 +16,8 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see RobotTokenMatcher
+ * @see RobotTokenType#SINGLE_PIPE
  */
 public class PipeMatcher implements ISingleCharTokenMatcher {
 
