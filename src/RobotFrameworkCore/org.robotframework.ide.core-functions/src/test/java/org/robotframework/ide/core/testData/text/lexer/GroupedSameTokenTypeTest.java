@@ -17,6 +17,32 @@ import org.junit.Test;
 public class GroupedSameTokenTypeTest {
 
     @Test
+    public void test_typeMANY_COMMENT_HASHS() {
+        GroupedSameTokenType type = GroupedSameTokenType.MANY_COMMENT_HASHS;
+
+        assertThat(type.getWrappedType()).isEqualTo(
+                RobotTokenType.SINGLE_COMMENT_HASH);
+        assertThat(type.isWriteable()).isFalse();
+        RobotToken token = new RobotToken(
+                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
+                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+        token.setType(GroupedSameTokenType.MANY_COMMENT_HASHS);
+        assertThat(type.isFromThisGroup(token));
+        token.setType(RobotTokenType.SINGLE_COMMENT_HASH);
+        assertThat(type.isFromThisGroup(token));
+
+        try {
+            type.toWrite();
+            fail("Exception should occurs");
+        } catch (UnsupportedOperationException uoe) {
+            assertThat(uoe.getMessage()).isEqualTo(
+                    "Write should be performed from " + RobotToken.class
+                            + "#getText(); method. Type: " + type);
+        }
+    }
+
+
+    @Test
     public void test_typeMANY_ASTERISKS() {
         GroupedSameTokenType type = GroupedSameTokenType.MANY_ASTERISKS;
 
@@ -71,7 +97,7 @@ public class GroupedSameTokenTypeTest {
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
-        assertThat(tokenTypes).hasSize(2);
+        assertThat(tokenTypes).hasSize(3);
         for (GroupedSameTokenType type : tokenTypes) {
             assertThat(GroupedSameTokenType.getToken(type.getWrappedType()))
                     .isEqualTo(type);
