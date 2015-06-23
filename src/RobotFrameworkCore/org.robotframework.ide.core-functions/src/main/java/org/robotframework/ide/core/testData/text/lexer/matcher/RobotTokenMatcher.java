@@ -34,6 +34,8 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new PipeMatcher());
         oneCharTokenMatchers.add(new AsteriskMatcher());
         oneCharTokenMatchers.add(new HashCommentMatcher());
+        oneCharTokenMatchers.add(new ScalarVariableBeginSignMatcher());
+        oneCharTokenMatchers.add(new ListVariableBeginSignMatcher());
     }
 
 
