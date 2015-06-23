@@ -14,7 +14,7 @@ public class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
     private final RobotType acceptedType;
 
 
-    public AOnlyMapCharToToken(final RobotType acceptedType) {
+    protected AOnlyMapCharToToken(final RobotType acceptedType) {
         this.acceptedType = acceptedType;
     }
 
