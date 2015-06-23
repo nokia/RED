@@ -2,13 +2,16 @@ package org.robotframework.ide.core.testHelpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -29,9 +32,71 @@ public class TokenOutputAsserationHelper {
                 .getTokensPosition();
         assertThat(tokensPosition).isNotNull();
         List<RobotToken> tokens = output.getTokens();
+        Set<RobotType> typeSetFound = new HashSet<>();
         for (int i = 0; i < tokens.size(); i++) {
             RobotToken cToken = tokens.get(i);
             assertThat(tokensPosition.get(cToken.getType())).contains(i);
+            typeSetFound.add(cToken.getType());
+        }
+
+        Set<RobotType> typeSet = tokensPosition.keySet();
+        assertThat(typeSet).hasSameSizeAs(typeSetFound);
+        assertThat(typeSet).hasSameElementsAs(typeSetFound);
+    }
+
+
+    public static void assertTokensForUnknownWords(TokenOutput out,
+            RobotType[] types, int startTokenPos, int startLine,
+            String[] textForCorrespondingUnknownWords) {
+        List<RobotToken> tokens = out.getTokens();
+        int typesLength = types.length;
+        CircullarArrayIterator<RobotType> iter = new CircullarArrayIterator<>(
+                types);
+
+        assertThat(tokens).isNotNull();
+        assertThat(tokens).isNotEmpty();
+        assertThat((tokens.size() - startTokenPos) % typesLength).isEqualTo(0);
+        int correspondingTextIndex = 0;
+        int line = startLine;
+        int column = LinearPositionMarker.THE_FIRST_COLUMN;
+        for (int tokId = startTokenPos; tokId < tokens.size(); tokId++) {
+            RobotToken robotToken = tokens.get(tokId);
+            assertThat(robotToken).isNotNull();
+            RobotType type = iter.next();
+            assertThat(robotToken.getType()).isEqualTo(type);
+
+            if (type == RobotTokenType.END_OF_LINE) {
+                assertThat(robotToken.getText()).isNull();
+                assertStartPosition(robotToken, line, column);
+                assertEndPosition(robotToken, line, column);
+                line++;
+                column = LinearPositionMarker.THE_FIRST_COLUMN;
+            } else {
+                if ((robotToken.getType() == RobotTokenType.UNKNOWN || robotToken
+                        .getType() == RobotWordType.UNKNOWN_WORD)
+                        && correspondingTextIndex < textForCorrespondingUnknownWords.length) {
+                    assertThat(robotToken.getText().toString())
+                            .isEqualTo(
+                                    textForCorrespondingUnknownWords[correspondingTextIndex]);
+                    correspondingTextIndex++;
+                } else if (robotToken.getType().getClass() != GroupedSameTokenType.class) {
+                    assertThat(robotToken.getText().toString()).isEqualTo(
+                            type.toWrite());
+                } else if (robotToken.getType().getClass() == GroupedSameTokenType.class) {
+                    assertThat(robotToken.getText().toString()).matches(
+                            "["
+                                    + ((GroupedSameTokenType) robotToken
+                                            .getType()).getWrappedType()
+                                            .toWrite() + "]+");
+                }
+                assertStartPosition(robotToken, line, column);
+                if (robotToken.getText() != null) {
+                    column += robotToken.getText().length();
+                } else {
+                    column++;
+                }
+                assertEndPosition(robotToken, line, column);
+            }
         }
     }
 
