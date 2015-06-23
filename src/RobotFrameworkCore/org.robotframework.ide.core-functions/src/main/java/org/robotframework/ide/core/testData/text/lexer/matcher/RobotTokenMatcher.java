@@ -36,6 +36,8 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new HashCommentMatcher());
         oneCharTokenMatchers.add(new ScalarVariableBeginSignMatcher());
         oneCharTokenMatchers.add(new ListVariableBeginSignMatcher());
+        oneCharTokenMatchers.add(new EnvironmentVariableBeginSignMatcher());
+        oneCharTokenMatchers.add(new DictionaryVariableBeginSignMatcher());
     }
 
 
