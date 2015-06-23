@@ -153,7 +153,11 @@ public enum RobotWordType implements RobotType {
     /**
      * 
      */
-    CONTINOUE_PREVIOUS_LINE_DOTS("...", "...");
+    CONTINOUE_PREVIOUS_LINE_DOTS("...", "..."),
+    /**
+     * 
+     */
+    DOUBLE_ESCAPE_BACKSLASH("\\\\", "\\\\");
 
     private final String aliases;
     private final String toWriteText;
