@@ -6,8 +6,12 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
+import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
+import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.LinkedListMultimap;
 
 
@@ -21,11 +25,24 @@ import com.google.common.collect.LinkedListMultimap;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see TxtRobotTestDataLexer
  */
 public class RobotTokenMatcher {
 
     private TokenOutput output = new TokenOutput();
     private List<ISingleCharTokenMatcher> oneCharTokenMatchers = new LinkedList<>();
+
+
+    /**
+     * Constructor to use only for testing propose
+     * 
+     * @param output
+     *            used in tests
+     */
+    @VisibleForTesting
+    protected RobotTokenMatcher(final TokenOutput output) {
+        this.output = output;
+    }
 
 
     public RobotTokenMatcher() {
@@ -60,18 +77,86 @@ public class RobotTokenMatcher {
             }
         }
 
-        if (wasUsed) {
-
+        if (!wasUsed) {
+            convertCharToUnknownToken(tempBuffer, charIndex);
+        } else {
+            tryToRecognizeUnknownTokens(output);
         }
-        // TODO: if not used maybe exception?
+    }
+
+
+    private void convertCharToUnknownToken(final CharBuffer tempBuffer,
+            final int charIndex) {
+        boolean useAsNewSingleUnknownToken = true;
+
+        char c = tempBuffer.get(charIndex);
+
+        List<RobotToken> tokens = output.getTokens();
+        if (!tokens.isEmpty()) {
+            int lastTokenIndex = tokens.size() - 1;
+            RobotToken lastToken = tokens.get(lastTokenIndex);
+            if (lastToken.getType() == RobotTokenType.UNKNOWN) {
+                RobotToken newUnknownToken = new RobotToken(
+                        lastToken.getStartPosition(), lastToken.getText()
+                                .append(c));
+                newUnknownToken.setType(RobotTokenType.UNKNOWN);
+                output.setCurrentMarker(newUnknownToken.getEndPosition());
+                tokens.set(lastTokenIndex, newUnknownToken);
+
+                useAsNewSingleUnknownToken = false;
+            }
+        }
+
+        if (useAsNewSingleUnknownToken) {
+            StringBuilder text = new StringBuilder().append(c);
+            RobotToken unknownToken = new RobotToken(output.getCurrentMarker(),
+                    text);
+            unknownToken.setType(RobotTokenType.UNKNOWN);
+            output.setCurrentMarker(unknownToken.getEndPosition());
+            output.getTokensPosition().put(RobotTokenType.UNKNOWN,
+                    tokens.size());
+            tokens.add(unknownToken);
+        }
     }
 
 
     public TokenOutput buildTokens() {
         TokenOutput old = output;
+        tryToRecognizeUnknownTokens(old);
         output = new TokenOutput();
 
         return old;
+    }
+
+
+    private void tryToRecognizeUnknownTokens(TokenOutput old) {
+        LinkedListMultimap<RobotType, Integer> tokensPosition = old
+                .getTokensPosition();
+        List<Integer> listOfUnknown = tokensPosition
+                .get(RobotTokenType.UNKNOWN);
+        if (listOfUnknown != null) {
+            List<RobotToken> tokens = old.getTokens();
+            for (int i = 0; i < listOfUnknown.size(); i++) {
+                Integer tokenPosition = listOfUnknown.get(i);
+                RobotToken unknownRobotToken = tokens.get(tokenPosition);
+                RobotToken wordToken = convertToWordType(unknownRobotToken);
+                tokensPosition.put(wordToken.getType(), tokenPosition);
+                tokens.set(tokenPosition, wordToken);
+            }
+
+        }
+
+        tokensPosition.removeAll(RobotTokenType.UNKNOWN);
+    }
+
+
+    private RobotToken convertToWordType(RobotToken unknownRobotToken) {
+        StringBuilder text = unknownRobotToken.getText();
+        RobotToken token = new RobotToken(unknownRobotToken.getStartPosition(),
+                text);
+        token.setType(RobotWordType.getToken(text));
+
+        return token;
     }
 
     public static class TokenOutput {
