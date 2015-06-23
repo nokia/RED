@@ -43,6 +43,7 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new VariableEndCurlySignMatcher());
         oneCharTokenMatchers.add(new IndexBeginSquareSignMatcher());
         oneCharTokenMatchers.add(new IndexEndSquareSignMatcher());
+        oneCharTokenMatchers.add(new ColonSignMatcher());
     }
 
 
