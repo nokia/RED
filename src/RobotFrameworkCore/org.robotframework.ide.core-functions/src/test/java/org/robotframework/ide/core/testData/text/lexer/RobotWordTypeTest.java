@@ -372,7 +372,7 @@ public class RobotWordTypeTest {
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes).hasSize(33);
+        assertThat(tokenTypes).hasSize(36);
 
         for (RobotWordType type : tokenTypes) {
             String thisTokenText = type.toWrite();
