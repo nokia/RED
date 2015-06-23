@@ -97,7 +97,7 @@ public class GroupedSameTokenTypeTest {
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
-        assertThat(tokenTypes).hasSize(3);
+        assertThat(tokenTypes).hasSize(4);
         for (GroupedSameTokenType type : tokenTypes) {
             assertThat(GroupedSameTokenType.getToken(type.getWrappedType()))
                     .isEqualTo(type);
