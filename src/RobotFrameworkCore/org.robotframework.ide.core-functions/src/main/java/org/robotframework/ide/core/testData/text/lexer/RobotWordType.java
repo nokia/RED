@@ -145,7 +145,15 @@ public enum RobotWordType implements RobotType {
     /**
      * 
      */
-    DOUBLE_SPACE("  ", "  ");
+    DOUBLE_SPACE("  ", "  "),
+    /**
+     * 
+     */
+    EMPTY_CELL_DOTS("..", ".."),
+    /**
+     * 
+     */
+    CONTINOUE_PREVIOUS_LINE_DOTS("...", "...");
 
     private final String aliases;
     private final String toWriteText;

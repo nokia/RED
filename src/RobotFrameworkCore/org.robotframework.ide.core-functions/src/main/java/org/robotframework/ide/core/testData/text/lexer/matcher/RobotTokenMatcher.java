@@ -44,6 +44,7 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new IndexBeginSquareSignMatcher());
         oneCharTokenMatchers.add(new IndexEndSquareSignMatcher());
         oneCharTokenMatchers.add(new ColonSignMatcher());
+        oneCharTokenMatchers.add(new DotSignMatcher());
     }
 
 

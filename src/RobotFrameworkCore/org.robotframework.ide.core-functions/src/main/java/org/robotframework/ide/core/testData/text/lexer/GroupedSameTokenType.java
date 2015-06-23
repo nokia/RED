@@ -9,7 +9,8 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.AsteriskMatcher;
 
 /**
  * Concatenation of the same special tokens like asterisk '*', which appears
- * together.
+ * together. The common information from this token type is that join them
+ * together doesn't bring for them new meaning.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -29,7 +30,11 @@ public enum GroupedSameTokenType implements RobotType {
     /**
      * in example: '###'
      */
-    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH);
+    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH),
+    /**
+     * more than 3 dot signs, in example: '....'
+     */
+    MORE_THAN_THREE_DOTS(RobotTokenType.SINGLE_DOT);
 
     private final RobotTokenType wrappedType;
     private static final Map<RobotTokenType, GroupedSameTokenType> reservedWordTypes;
