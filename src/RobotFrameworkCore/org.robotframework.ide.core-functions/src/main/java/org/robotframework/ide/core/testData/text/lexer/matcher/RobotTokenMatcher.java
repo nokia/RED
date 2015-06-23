@@ -38,6 +38,9 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new ListVariableBeginSignMatcher());
         oneCharTokenMatchers.add(new EnvironmentVariableBeginSignMatcher());
         oneCharTokenMatchers.add(new DictionaryVariableBeginSignMatcher());
+        oneCharTokenMatchers.add(new EqualSignMatcher());
+        oneCharTokenMatchers.add(new VariableBeginCurlySignMatcher());
+        oneCharTokenMatchers.add(new VariableEndCurlySignMatcher());
     }
 
 
