@@ -203,4 +203,14 @@ public enum RobotWordType implements RobotType {
     public boolean isWriteable() {
         return (this.toWriteText != null);
     }
+
+
+    public static RobotType getToken(StringBuilder text) {
+        RobotWordType type = RobotWordType.UNKNOWN_WORD;
+        if (text != null) {
+            type = getToken(text.toString());
+        }
+
+        return type;
+    }
 }
