@@ -167,4 +167,16 @@ public enum RobotTokenType implements RobotType {
     public boolean isWriteable() {
         return (HELPER.UNWRITABLE_CHARS != thisTokenChar);
     }
+
+
+    @Override
+    public RobotType getTokenType(StringBuilder text) {
+        return RobotTokenType.UNKNOWN;
+    }
+
+
+    @Override
+    public RobotType getTokenType(String text) {
+        return RobotTokenType.UNKNOWN;
+    }
 }
