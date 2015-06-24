@@ -9,11 +9,38 @@ import org.robotframework.ide.core.testData.text.lexer.RobotType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
-public class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
+/**
+ * Extracted functionality related to mapping directly char to type, without any
+ * extra logic related to duplication of the same char or coexistence with
+ * others.
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ * 
+ * @see ColonSignMatcher
+ * @see DictionaryVariableBeginSignMatcher
+ * @see EnvironmentVariableBeginSignMatcher
+ * @see EqualSignMatcher
+ * @see IndexBeginSquareSignMatcher
+ * @see IndexEndSquareSignMatcher
+ * @see ListVariableBeginSignMatcher
+ * @see PipeMatcher
+ * @see QuoteMarkSignMatcher
+ * @see ScalarVariableBeginSignMatcher
+ * @see VariableBeginCurlySignMatcher
+ * @see VariableEndCurlySignMatcher
+ */
+public abstract class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
 
     private final RobotType acceptedType;
 
 
+    /**
+     * 
+     * @param acceptedType
+     *            type which should be mapped to token directly
+     */
     protected AOnlyMapCharToToken(final RobotType acceptedType) {
         this.acceptedType = acceptedType;
     }
