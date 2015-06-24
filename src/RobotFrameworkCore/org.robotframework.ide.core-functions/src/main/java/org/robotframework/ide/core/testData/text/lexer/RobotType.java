@@ -22,4 +22,24 @@ public interface RobotType {
      *         usefull for tokens like 'Test', asterisks '*'
      */
     String toWrite();
+
+
+    /**
+     * trying to get token in other case it should return something like unknown
+     * token
+     * 
+     * @param text
+     * @return
+     */
+    RobotType getTokenType(StringBuilder text);
+
+
+    /**
+     * trying to get token in other case it should return something like unknown
+     * token
+     * 
+     * @param text
+     * @return
+     */
+    RobotType getTokenType(String text);
 }

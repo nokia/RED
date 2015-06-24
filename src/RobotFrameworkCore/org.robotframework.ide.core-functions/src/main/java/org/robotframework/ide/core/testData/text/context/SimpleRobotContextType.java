@@ -1,6 +1,12 @@
 package org.robotframework.ide.core.testData.text.context;
 
-public enum SimpleRobotContextType {
+/**
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ */
+public enum SimpleRobotContextType implements IContextElementType {
     /**
      * 
      */
@@ -144,5 +150,69 @@ public enum SimpleRobotContextType {
     /**
      * 
      */
-    TABLE_KEYWORD_SETTINGS_TIMEOUT;
+    TABLE_KEYWORD_SETTINGS_TIMEOUT,
+    /**
+     * 
+     */
+    FOR_LOOP_DECLARATION,
+    /**
+     * 
+     */
+    CONTINOUE_LOOP_DECLARATION,
+    /**
+     * 
+     */
+    CONTINOUE_PREVIOUS_LINE_DECLARATION,
+    /**
+     * 
+     */
+    ESCAPED_SCALAR_VARIABLE,
+    /**
+     * 
+     */
+    ESCAPED_LIST_VARIABLE,
+    /**
+     * 
+     */
+    ESCAPED_ENVIRONMENT_VARIABLE,
+    /**
+     * 
+     */
+    ESCAPED_HASH_COMMENT,
+    /**
+     * 
+     */
+    ESCAPED_EQUALS_SIGN,
+    /**
+     * 
+     */
+    ESCAPED_PIPE,
+    /**
+     * \xhh char with hex value
+     */
+    CHAR_WITH_BYTE_HEX_VALUE,
+    /**
+     * \\uhhhh
+     */
+    CHAR_WITH_SHORT_HEX_VALUE,
+    /**
+     * \\Uhhhhhhhh
+     */
+    CHAR_WITH_INT_HEX_VALUE,
+    /**
+     * \n
+     */
+    LINE_FEED_TEXT,
+    /**
+     * \t
+     */
+    TABULATOR_TEXT,
+    /**
+     * 
+     */
+    TIME,
+    /**
+     * 
+     */
+    EMPTY_LINE;
 }

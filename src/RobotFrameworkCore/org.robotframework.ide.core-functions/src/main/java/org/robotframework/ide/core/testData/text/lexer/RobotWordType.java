@@ -234,4 +234,16 @@ public enum RobotWordType implements RobotType {
 
         return type;
     }
+
+
+    @Override
+    public RobotType getTokenType(StringBuilder text) {
+        return getToken(text);
+    }
+
+
+    @Override
+    public RobotType getTokenType(String text) {
+        return getToken(text);
+    }
 }
