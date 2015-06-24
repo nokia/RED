@@ -1027,6 +1027,10 @@
 			super="org.eclipse.debug.core.breakpoint"
 			name="org.eclipse.debug.core.robot.breakpoint">
 		</type>
+	  <type
+         markerType="org.robotframework.ide.texteditor.occurrencesMark"
+         name="org.robotframework.ide.texteditor.occurrencesMark">
+	  </type>
 	</extension>	
  	<extension
          point="org.eclipse.debug.core.breakpoints">
@@ -1121,6 +1125,33 @@
       <persistent
             value="true">
       </persistent>
+   </extension>
+   <extension
+         id="org.robotframework.ide.texteditor.occurrencesMark"
+         name="Robot TextEditor Occurrences Mark"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.robotframework.ide.texteditor.occurrencesMark"
+            colorPreferenceKey="org.robotframework.ide.texteditor.color"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="org.robotframework.ide.texteditor.highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            overviewRulerPreferenceKey="org.robotframework.ide.texteditor.overview"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="6"
+            textPreferenceKey="org.robotframework.ide.texteditor.text"
+            textPreferenceValue="true"
+            verticalRulerPreferenceKey="org.robotframework.ide.texteditor.ruler"
+            verticalRulerPreferenceValue="false">
+      </specification>
    </extension>
 
 </plugin>
