@@ -82,7 +82,7 @@ public class KeywordRule implements IRule {
 					return true;
 				}
 			} else {
-			    this.clearScanner(scanner, readCount);
+			    this.clearScanner(scanner, readCount+1);
 				return false;
 			}
 			
@@ -94,7 +94,7 @@ public class KeywordRule implements IRule {
 		    return true;
 		} 
 		
-		this.clearScanner(scanner, readCount);
+		this.clearScanner(scanner, readCount+1);
 		return false;
 	}
 	
