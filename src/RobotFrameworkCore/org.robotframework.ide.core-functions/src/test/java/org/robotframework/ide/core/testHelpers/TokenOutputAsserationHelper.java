@@ -126,7 +126,8 @@ public class TokenOutputAsserationHelper {
                 line++;
                 column = LinearPositionMarker.THE_FIRST_COLUMN;
             } else {
-                if (robotToken.getType().getClass() != GroupedSameTokenType.class) {
+                if (robotToken.getType().getClass() != GroupedSameTokenType.class
+                        && robotToken.getType().isWriteable()) {
                     assertThat(robotToken.getText().toString()).isEqualTo(
                             type.toWrite());
                 } else {
