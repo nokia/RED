@@ -41,6 +41,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.TextViewerUndoManager;
+import org.eclipse.jface.text.WhitespaceCharacterPainter;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -60,6 +61,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -86,6 +88,7 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHand
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TxtScanner;
@@ -119,7 +122,11 @@ public class TextEditor {
     private TxtScanner txtScanner;
     
     private TextEditorTextHover textHover;
-	
+    
+    private WhitespaceCharacterPainter whitespacePainter;
+    
+    private TextEditorOccurrenceMarksManager occurrenceMarksManager;
+    
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
         highlightingColor = new Color(parent.getDisplay(), 198, 219, 174);
@@ -159,6 +166,7 @@ public class TextEditor {
         
 		final AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
 		final AnnotationType breakpointAnnotationType = new AnnotationType("org.eclipse.debug.core.breakpoint", null);
+		final AnnotationType occurrencesMarkAnnotationType = new AnnotationType("org.robotframework.ide.texteditor.occurrencesMark", null);
 		
 		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
 		final ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
@@ -169,7 +177,8 @@ public class TextEditor {
 		final OverviewRuler overviewRuler = new OverviewRuler(markerAnnotationAccess, 15, new SharedTextColors());
 		overviewRuler.addAnnotationType(errorAnnotationType.getType());
 		overviewRuler.addHeaderAnnotationType(errorAnnotationType.getType());
-		overviewRuler.setModel(markerAnnotationModel);
+		overviewRuler.addAnnotationType(occurrencesMarkAnnotationType.getType());
+        overviewRuler.setModel(markerAnnotationModel);
 		
 		//TODO move SourceViewer initialization to other class
 		viewer = new SourceViewer(parent, compositeRuler, overviewRuler, true, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -179,6 +188,7 @@ public class TextEditor {
 		final AnnotationRulerColumn annotationColumn = new AnnotationRulerColumn(15,markerAnnotationAccess);
 		annotationColumn.addAnnotationType(errorAnnotationType.getType());
 		annotationColumn.addAnnotationType(breakpointAnnotationType.getType());
+		annotationColumn.addAnnotationType(occurrencesMarkAnnotationType.getType());
 		
 		final LineNumberRulerColumn lineNumberColumn = new LineNumberRulerColumn();
         lineNumberColumn.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -190,7 +200,9 @@ public class TextEditor {
 		
 		final SourceViewerDecorationSupport decorationSupport = new SourceViewerDecorationSupport(viewer, overviewRuler, markerAnnotationAccess, new SharedTextColors());
 		final IPreferenceStore editorsPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.ui.editors");
-		final AnnotationPreference errorAnnotationPreference = this.createAnnotationPreference(errorAnnotationType);
+		final AnnotationPreference occurrencesMarkAnnotationPreference = this.createOccurrencesMarkAnnotationPreference(occurrencesMarkAnnotationType);
+		decorationSupport.setAnnotationPreference(occurrencesMarkAnnotationPreference);
+		final AnnotationPreference errorAnnotationPreference = this.createErrorAnnotationPreference(errorAnnotationType);
 		decorationSupport.setAnnotationPreference(errorAnnotationPreference);
 		decorationSupport.install(editorsPreferenceStore);
 		
@@ -219,11 +231,14 @@ public class TextEditor {
 		final PresentationReconciler reconciler = this.createPresentationReconciler(keywordList);
 		reconciler.install(viewer);
 		
+		occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer, editedFile);
+		
 		//TODO Add Listener classes
 		viewer.getTextWidget().addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
 				dirtyProviderService.setDirtyState(true);
+				occurrenceMarksManager.removeOldOccurrenceMarks();
 			}
 		});
 		
@@ -255,18 +270,27 @@ public class TextEditor {
 			}
 		});
 		
-		viewer.getTextWidget().addMouseListener(new MouseListener() {
-			@Override
-			public void mouseUp(final MouseEvent e) {}
-			@Override
-			public void mouseDown(final MouseEvent e) {
-				if(e.button == 3) {
-					contextMenu.setVisible(true);
-				}
-			}
-			@Override
-			public void mouseDoubleClick(final MouseEvent e) {}
-		});
+        viewer.getTextWidget().addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseUp(final MouseEvent e) {
+                if (e.button != 3 && e.count == 1) {
+                    Point point = viewer.getTextWidget().getSelection();
+                    occurrenceMarksManager.showOccurrenceMarks(point.x);
+                }
+            }
+
+            @Override
+            public void mouseDown(final MouseEvent e) {
+                if (e.button == 3) {
+                    contextMenu.setVisible(true);
+                }
+            }
+
+            @Override
+            public void mouseDoubleClick(final MouseEvent e) {
+            }
+        });
 		
         compositeRuler.getControl().addMouseListener(new MouseAdapter() {
             @Override
@@ -406,7 +430,7 @@ public class TextEditor {
 		}
 	}
 	
-	private AnnotationPreference createAnnotationPreference(final AnnotationType type) {
+	private AnnotationPreference createErrorAnnotationPreference(final AnnotationType type) {
 		final AnnotationPreference annotationPreference = new AnnotationPreference();
 		annotationPreference.setAnnotationType(type.getType());
 		annotationPreference.setTextStylePreferenceKey("errorTextStyle");
@@ -421,10 +445,28 @@ public class TextEditor {
 		return annotationPreference;
 	}
 	
+	private AnnotationPreference createOccurrencesMarkAnnotationPreference(final AnnotationType type) {
+        final AnnotationPreference annotationPreference = new AnnotationPreference();
+        annotationPreference.setAnnotationType(type.getType());
+        annotationPreference.setOverviewRulerPreferenceKey("org.robotframework.ide.texteditor.overview");
+        annotationPreference.setOverviewRulerPreferenceValue(true);
+        annotationPreference.setTextPreferenceKey("org.robotframework.ide.texteditor.text");
+        annotationPreference.setTextPreferenceValue(true);
+        annotationPreference.setColorPreferenceKey("org.robotframework.ide.texteditor.color");
+        annotationPreference.setColorPreferenceValue(new RGB(212, 212, 212));
+        annotationPreference.setHighlightPreferenceKey("org.robotframework.ide.texteditor.highlight");
+        annotationPreference.setHighlightPreferenceValue(true);
+        annotationPreference.setVerticalRulerPreferenceKey("org.robotframework.ide.texteditor.ruler");
+        annotationPreference.setVerticalRulerPreferenceValue(false);
+        annotationPreference.setPresentationLayer(6);
+        annotationPreference.setContributesToHeader(false);
+        return annotationPreference;
+    }
+	
 	private Menu createContextMenu(final LineNumberRulerColumn lineNumberColumn, final ParameterizedCommand saveAsCommand) {
 		final Menu menu = new Menu(viewer.getControl());
 		final MenuItem saveAsItem = new MenuItem(menu, SWT.PUSH);
-		saveAsItem.setText("Save As");
+		saveAsItem.setText("Save as...");
 		saveAsItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -451,7 +493,7 @@ public class TextEditor {
 		
 		final MenuItem toggleLineNumberColumnItem = new MenuItem(menu, SWT.CHECK);
 		toggleLineNumberColumnItem.setSelection(true);
-		toggleLineNumberColumnItem.setText("Show Line Numbers");
+		toggleLineNumberColumnItem.setText("Show line numbers");
         toggleLineNumberColumnItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -462,6 +504,24 @@ public class TextEditor {
 				}
 			}
 		});
+        final MenuItem showWhitespacesItem = new MenuItem(menu, SWT.CHECK);
+        showWhitespacesItem.setSelection(false);
+        showWhitespacesItem.setText("Show whitespace characters");
+        showWhitespacesItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (showWhitespacesItem.getSelection()) {
+                    if (whitespacePainter == null) {
+                        whitespacePainter = new WhitespaceCharacterPainter(viewer);
+                        viewer.addPainter(whitespacePainter);
+                    }
+                } else {
+                    viewer.removePainter(whitespacePainter);
+                    whitespacePainter = null;
+                }
+            }
+        });
 		return menu;
 	}
 	
@@ -512,6 +572,7 @@ public class TextEditor {
         if (txtScanner != null) {
             txtScanner.disposeResources();
         }
+        occurrenceMarksManager.removeOldOccurrenceMarks();
     }
 
     public class TextEditorInitializationException extends RuntimeException {

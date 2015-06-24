@@ -9,9 +9,11 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Resource;
@@ -34,19 +36,40 @@ public class TxtScanner extends RuleBasedScanner {
         final Color graySystemColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
         final Color userColor = new Color(display, 0, 128, 192);
         resources.add(userColor);
+        final Color userSettingsColor = new Color(display, 149, 0, 85);
+        resources.add(userSettingsColor);
 
         final IToken sectionToken = new Token(new TextAttribute(redSystemColor));
         final IToken variableToken = new Token(new TextAttribute(greenSystemColor));
         final IToken commentToken = new Token(new TextAttribute(graySystemColor));
         final IToken keywordToken = new Token(new TextAttribute(userColor, null, SWT.BOLD));
-		
+        final IToken settingsToken = new Token(new TextAttribute(userSettingsColor));
+        
+        WordRule settingsWordRule = new WordRule(new IWordDetector() {
+            
+            @Override
+            public boolean isWordStart(char c) {
+                return !Character.isWhitespace(c);
+            }
+            
+            @Override
+            public boolean isWordPart(char c) {
+                return !Character.isWhitespace(c);
+            }
+        }); 
+        settingsWordRule.addWord("Library", settingsToken);
+        settingsWordRule.addWord("Resource", settingsToken);
+        
+        
+        
         setRules(new IRule[] { 
                 new SingleLineRule("***", "***", sectionToken),
                 new SingleLineRule("${", "}", variableToken),
                 new SingleLineRule("@{", "}", variableToken), 
                 new SingleLineRule("&{", "}", variableToken),
                 new EndOfLineRule("#", commentToken),
-                new KeywordRule(keywordToken, keywordList) 
+                new KeywordRule(keywordToken, keywordList),
+                settingsWordRule
         });
 	}
 
