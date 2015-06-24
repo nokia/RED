@@ -17,6 +17,142 @@ import org.junit.Test;
 public class GroupedSameTokenTypeTest {
 
     @Test
+    public void test_getTokenType_fourhDotsAndSpaceInside_shouldReturn_UNKNOWN() {
+        String text = "... .";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_fourDots_shouldReturn_MORE_THAN_THREE_DOTS() {
+        String text = "....";
+        RobotType expectedType = GroupedSameTokenType.MORE_THAN_THREE_DOTS;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_oneDot_shouldReturn_UNKNOWN() {
+        String text = ".";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_threeHashAndSpaceInside_shouldReturn_UNKNOWN() {
+        String text = "## #";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_twoHash_shouldReturn_MANY_COMMENT_HASHS() {
+        String text = "##";
+        RobotType expectedType = GroupedSameTokenType.MANY_COMMENT_HASHS;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_oneHash_shouldReturn_UNKNOWN() {
+        String text = "#";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_threeAsteriskAndSpaceInside_shouldReturn_UNKNOWN() {
+        String text = "** *";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_threeAsterisk_shouldReturn_MANY_ASTERISKS() {
+        String text = "***";
+        RobotType expectedType = GroupedSameTokenType.MANY_ASTERISKS;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_twoAsterisk_shouldReturn_MANY_ASTERISKS() {
+        String text = "**";
+        RobotType expectedType = GroupedSameTokenType.MANY_ASTERISKS;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_oneAsterisk_shouldReturn_UNKNOWN() {
+        String text = "*";
+        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        assertGetTokenType(text, expectedType);
+    }
+
+
+    private void assertGetTokenType(String text, RobotType expectedType) {
+        // prepare
+        StringBuilder str = new StringBuilder(text);
+
+        // execute
+        RobotType tokenType = GroupedSameTokenType.UNKNOWN.getTokenType(str);
+        RobotType tokenTypeViaText = GroupedSameTokenType.UNKNOWN
+                .getTokenType(text);
+
+        // verify
+        assertThat(tokenType).isNotNull();
+        assertThat(tokenType).isEqualTo(expectedType);
+        assertThat(tokenTypeViaText).isNotNull();
+        assertThat(tokenTypeViaText).isEqualTo(expectedType);
+    }
+
+
+    @Test
+    public void test_getTokenType_viaStringBuilder_NULL() {
+        // prepare
+        StringBuilder str = null;
+
+        // execute
+        RobotType tokenType = GroupedSameTokenType.UNKNOWN.getTokenType(str);
+
+        // verify
+        assertThat(tokenType).isNotNull();
+        assertThat(tokenType).isEqualTo(GroupedSameTokenType.UNKNOWN);
+    }
+
+
+    @Test
+    public void test_typeMORE_THAN_THREE_DOTS() {
+        GroupedSameTokenType type = GroupedSameTokenType.MORE_THAN_THREE_DOTS;
+
+        assertThat(type.getWrappedType()).isEqualTo(RobotTokenType.SINGLE_DOT);
+        assertThat(type.isWriteable()).isFalse();
+        RobotToken token = new RobotToken(
+                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
+                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+        token.setType(GroupedSameTokenType.MORE_THAN_THREE_DOTS);
+        assertThat(type.isFromThisGroup(token));
+        token.setType(RobotTokenType.SINGLE_DOT);
+        assertThat(type.isFromThisGroup(token));
+
+        try {
+            type.toWrite();
+            fail("Exception should occurs");
+        } catch (UnsupportedOperationException uoe) {
+            assertThat(uoe.getMessage()).isEqualTo(
+                    "Write should be performed from " + RobotToken.class
+                            + "#getText(); method. Type: " + type);
+        }
+    }
+
+
+    @Test
     public void test_typeMANY_COMMENT_HASHS() {
         GroupedSameTokenType type = GroupedSameTokenType.MANY_COMMENT_HASHS;
 

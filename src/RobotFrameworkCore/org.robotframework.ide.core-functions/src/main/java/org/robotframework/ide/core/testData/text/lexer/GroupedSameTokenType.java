@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.robotframework.ide.core.testData.text.lexer.matcher.AsteriskMatcher;
+import org.robotframework.ide.core.testData.text.lexer.matcher.DotSignMatcher;
+import org.robotframework.ide.core.testData.text.lexer.matcher.HashCommentMatcher;
 
 
 /**
@@ -17,24 +19,92 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.AsteriskMatcher;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see AsteriskMatcher
+ * @see HashCommentMatcher
+ * @see DotSignMatcher
  */
 public enum GroupedSameTokenType implements RobotType {
     /**
      * just for not return null in {@link #getToken(RobotToken)} method
      */
-    UNKNOWN(RobotTokenType.UNKNOWN),
+    UNKNOWN(RobotTokenType.UNKNOWN) {
+
+        @Override
+        protected boolean isMine(String text) {
+            return false;
+        }
+    },
     /**
      * in example: '***'
      */
-    MANY_ASTERISKS(RobotTokenType.SINGLE_ASTERISK),
+    MANY_ASTERISKS(RobotTokenType.SINGLE_ASTERISK) {
+
+        @Override
+        protected boolean isMine(String text) {
+            boolean result = false;
+
+            char required = getWrappedType().getThisTokenChar();
+            if (text != null && text.length() >= 2) {
+                char[] chars = text.toCharArray();
+                result = true;
+                for (char c : chars) {
+                    if (c != required) {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+    },
     /**
      * in example: '###'
      */
-    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH),
+    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH) {
+
+        @Override
+        protected boolean isMine(String text) {
+            boolean result = false;
+
+            char required = getWrappedType().getThisTokenChar();
+            if (text != null && text.length() >= 2) {
+                char[] chars = text.toCharArray();
+                result = true;
+                for (char c : chars) {
+                    if (c != required) {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+    },
     /**
      * more than 3 dot signs, in example: '....'
      */
-    MORE_THAN_THREE_DOTS(RobotTokenType.SINGLE_DOT);
+    MORE_THAN_THREE_DOTS(RobotTokenType.SINGLE_DOT) {
+
+        @Override
+        protected boolean isMine(String text) {
+            boolean result = false;
+
+            char required = getWrappedType().getThisTokenChar();
+            if (text != null && text.length() > 3) {
+                char[] chars = text.toCharArray();
+                result = true;
+                for (char c : chars) {
+                    if (c != required) {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+    };
 
     private final RobotTokenType wrappedType;
     private static final Map<RobotTokenType, GroupedSameTokenType> reservedWordTypes;
@@ -90,4 +160,37 @@ public enum GroupedSameTokenType implements RobotType {
     public RobotTokenType getWrappedType() {
         return this.wrappedType;
     }
+
+
+    @Override
+    public RobotType getTokenType(StringBuilder text) {
+        RobotType type = UNKNOWN;
+        if (text != null) {
+            type = getTokenType(text.toString());
+        }
+
+        return type;
+    }
+
+
+    @Override
+    public RobotType getTokenType(String text) {
+        RobotType type = UNKNOWN;
+        GroupedSameTokenType[] values = GroupedSameTokenType.values();
+        for (GroupedSameTokenType tType : values) {
+            if (tType == UNKNOWN) {
+                continue;
+            }
+
+            if (tType.isMine(text)) {
+                type = tType;
+                break;
+            }
+        }
+
+        return type;
+    }
+
+
+    protected abstract boolean isMine(String text);
 }
