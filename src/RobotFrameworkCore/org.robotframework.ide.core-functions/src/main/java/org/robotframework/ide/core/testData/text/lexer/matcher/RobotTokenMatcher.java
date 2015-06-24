@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.LowLevelTypesProvider;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotType;
@@ -154,7 +155,12 @@ public class RobotTokenMatcher {
         StringBuilder text = unknownRobotToken.getText();
         RobotToken token = new RobotToken(unknownRobotToken.getStartPosition(),
                 text);
-        token.setType(RobotWordType.getToken(text));
+        RobotType type = RobotWordType.getToken(text);
+        if (type == RobotWordType.UNKNOWN_WORD) {
+            type = LowLevelTypesProvider.getTokenType(text);
+        }
+
+        token.setType(type);
 
         return token;
     }

@@ -6,10 +6,16 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 
-public class OneLineRobotContext {
+/**
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ */
+public class OneLineRobotContext implements IContextElement {
 
     private List<RobotToken> contextTokens = new LinkedList<>();
-    private SimpleRobotContextType type = SimpleRobotContextType.UNDECLARED_COMMENT;
+    private IContextElementType type = SimpleRobotContextType.UNDECLARED_COMMENT;
     private ManyLinesRobotContext parentContext = null;
     private int lineNumber = -1;
 
@@ -29,7 +35,8 @@ public class OneLineRobotContext {
     }
 
 
-    public SimpleRobotContextType getType() {
+    @Override
+    public IContextElementType getType() {
         return type;
     }
 

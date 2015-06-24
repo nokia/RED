@@ -11,23 +11,24 @@ import java.util.List;
  * @version Robot Framework 2.9 alpha 2
  * 
  */
-public class ManyLinesRobotContext {
+public class ManyLinesRobotContext implements IContextElement {
 
-    private List<OneLineRobotContext> childContexts = new LinkedList<>();
-    private ComplexRobotContextType type = ComplexRobotContextType.UNDECLARED_COMMENT;
+    private List<IContextElement> childContexts = new LinkedList<>();
+    private IContextElementType type = ComplexRobotContextType.UNDECLARED_COMMENT;
 
 
-    public void addNextLineContext(OneLineRobotContext newLine) {
-        this.childContexts.add(newLine);
+    public void addNextLineContext(IContextElement newElement) {
+        this.childContexts.add(newElement);
     }
 
 
-    public List<OneLineRobotContext> getChildContexts() {
+    public List<IContextElement> getChildContexts() {
         return childContexts;
     }
 
 
-    public ComplexRobotContextType getType() {
+    @Override
+    public IContextElementType getType() {
         return type;
     }
 
