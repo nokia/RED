@@ -12,6 +12,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 
 
 /**
+ * Responsible for parse file to understandable tokens.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
