@@ -1,8 +1,9 @@
 package org.robotframework.ide.core.testData.text.lexer;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -13,99 +14,37 @@ import java.util.Map;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see LowLevelTypesProvider
  */
 public enum RobotTimeType implements RobotType {
     /**
-     * 
+     * add for do not return null value
      */
     UNKNOWN(null, null),
     /**
-     * 
+     * represents all possible combinations of word day
      */
-    DAYS("days", "days"),
+    DAY("day", Arrays.asList("d", "day", "days")),
     /**
-     * 
+     * represents all possible combinations of word hour
      */
-    DAY("day", "day"),
+    HOUR("hour", Arrays.asList("h", "hour", "hours")),
     /**
-     * 
+     * represents all possible combinations of word minute
      */
-    D_AS_DAY("d", "d"),
+    MINUTE("minute", Arrays.asList("m", "minute", "minutes")),
     /**
-     * 
+     * represents all possible combinations of word second
      */
-    HOURS("hours", "hours"),
+    SECOND("second", Arrays.asList("s", "sec", "secs", "second", "seconds")),
     /**
-     * 
+     * represents all possible combinations of word millisecond
      */
-    HOUR("hour", "hour"),
-    /**
-     * 
-     */
-    H_AS_HOUR("h", "h"),
-    /**
-     * 
-     */
-    MINUTES("minutes", "minutes"),
-    /**
-     * 
-     */
-    MINUTE("minute", "minute"),
-    /**
-     * 
-     */
-    M_AS_MINUTE("m", "m"),
-    /**
-     * 
-     */
-    SECONDS("seconds", "seconds"),
-    /**
-     * 
-     */
-    SECOND("second", "second"),
-    /**
-     * 
-     */
-    SECS("secs", "secs"),
-    /**
-     * 
-     */
-    SEC("sec", "sec"),
-    /**
-     * 
-     */
-    S_AS_SECOND("s", "s"),
-    /**
-     * 
-     */
-    MILLISECONDS("milliseconds", "milliseconds"),
-    /**
-     * 
-     */
-    MILLISECOND("millisecond", "millisecond"),
-    /**
-     * 
-     */
-    MILLIS("millis", "millis"),
-    /**
-     * 
-     */
-    MS_AS_MILLISECOND("ms", "ms");
+    MILLISECOND("millisecond", Arrays.asList("ms", "millis", "millisecond",
+            "milliseconds"));
 
-    private final String aliases;
     private final String toWriteText;
-
-    private static final Map<String, RobotTimeType> reservedWordTypes;
-
-    static {
-        Map<String, RobotTimeType> temp = new HashMap<>();
-        RobotTimeType[] values = RobotTimeType.values();
-        for (RobotTimeType type : values) {
-            temp.put(type.aliases, type);
-        }
-
-        reservedWordTypes = Collections.unmodifiableMap(temp);
-    }
+    private final List<String> types;
 
 
     @Override
@@ -114,21 +53,29 @@ public enum RobotTimeType implements RobotType {
     }
 
 
-    public static RobotType getToken(String text) {
-        RobotType type = RobotWordType.UNKNOWN_WORD;
-        if (text != null) {
-            RobotType foundType = reservedWordTypes.get(text.toLowerCase());
-            if (foundType != null) {
-                type = foundType;
-            }
+    private RobotTimeType(final String toWriteText, final List<String> types) {
+        this.toWriteText = toWriteText;
+        if (types == null) {
+            this.types = Collections.unmodifiableList(new LinkedList<String>());
+        } else {
+            this.types = Collections.unmodifiableList(types);
         }
-        return type;
     }
 
 
-    private RobotTimeType(final String aliases, final String toWriteText) {
-        this.aliases = aliases;
-        this.toWriteText = toWriteText;
+    public static RobotType getToken(String text) {
+        RobotType type = RobotTimeType.UNKNOWN;
+        if (text != null) {
+            final RobotTimeType[] types = RobotTimeType.values();
+            for (RobotTimeType cType : types) {
+                if (cType.isMine(text)) {
+                    type = cType;
+                    break;
+                }
+            }
+        }
+
+        return type;
     }
 
 
@@ -139,7 +86,7 @@ public enum RobotTimeType implements RobotType {
 
 
     public static RobotType getToken(StringBuilder text) {
-        RobotType type = RobotWordType.UNKNOWN_WORD;
+        RobotType type = RobotTimeType.UNKNOWN;
         if (text != null) {
             type = getToken(text.toString());
         }
@@ -157,5 +104,26 @@ public enum RobotTimeType implements RobotType {
     @Override
     public RobotType getTokenType(String text) {
         return getToken(text);
+    }
+
+
+    public boolean isMine(String text) {
+        boolean result = false;
+        if (text != null) {
+            String lowerCase = text.toLowerCase();
+            result = this.getPossibleRepresentations().contains(lowerCase);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * 
+     * @return all possible representation of current time type, i.e. for DAY it
+     *         will be: [d, day, days]
+     */
+    public List<String> getPossibleRepresentations() {
+        return types;
     }
 }
