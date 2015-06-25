@@ -7,6 +7,7 @@ import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelpe
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokensForUnknownWords;
 
 import java.nio.CharBuffer;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+import org.robotframework.ide.core.testHelpers.ExactlyTheSameClassComperator;
 
 
 /**
@@ -31,6 +33,31 @@ public class RobotTokenMatcherTest {
 
     @ForClean
     private RobotTokenMatcher matcher;
+
+
+    @Test
+    public void test_if_declaredSingleCharMatchers_areCorrect() {
+        assertThat(matcher.getDeclaredSingleCharMatchers())
+                .usingElementComparator(new ExactlyTheSameClassComperator())
+                .containsExactlyElementsOf(
+                        Arrays.asList(new EndOfLineMatcher(),
+                                new WhitespaceMatcher(), new PipeMatcher(),
+                                new AsteriskMatcher(),
+                                new HashCommentMatcher(),
+                                new ScalarVariableBeginSignMatcher(),
+                                new ListVariableBeginSignMatcher(),
+                                new EnvironmentVariableBeginSignMatcher(),
+                                new DictionaryVariableBeginSignMatcher(),
+                                new EqualSignMatcher(),
+                                new VariableBeginCurlySignMatcher(),
+                                new VariableEndCurlySignMatcher(),
+                                new IndexBeginSquareSignMatcher(),
+                                new IndexEndSquareSignMatcher(),
+                                new ColonSignMatcher(),
+                                new QuoteMarkSignMatcher(),
+                                new DotSignMatcher(),
+                                new EscapeBackslashSignMatcher()));
+    }
 
 
     @Test
