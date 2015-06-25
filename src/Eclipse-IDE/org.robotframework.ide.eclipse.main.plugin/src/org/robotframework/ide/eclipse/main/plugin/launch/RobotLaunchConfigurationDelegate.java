@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.viewers.Selections;
 
 import com.google.common.base.CaseFormat;
@@ -163,6 +165,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             throw newCoreException("Unable to find free port", null);
         }
 
+        DebugSocketManager socketManager = null;
+        
         if (!isDebugging) {
             runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), new ILineHandler() {
                 @Override
@@ -170,8 +174,12 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                     robotEventBroker.sendAppendLineEventToMessageLogView(line);
                 }
             });
+        } else {
+            socketManager = new DebugSocketManager(cmdLine.getPort());
+            new Thread(socketManager).start();
+            waitForDebugServerSocket(cmdLine.getPort());
         }
-
+        
         final Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
@@ -182,8 +190,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
             
-            final IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, cmdLine.getPort(), suiteResources,
-                    robotPartListener, robotEventBroker);
+            final IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
+                    robotEventBroker, socketManager);
             launch.addDebugTarget(target);
         }
 
@@ -312,5 +320,22 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 workbench.getActiveWorkbenchWindow().getActivePage().removePartListener(listener);
             }
         });
+    }
+    
+    private void waitForDebugServerSocket(int port) {
+        boolean isListening = false;
+        int retryCounter = 0;
+        while (!isListening && retryCounter < 20) {
+            try (Socket temporarySocket = new Socket("localhost", port)) {
+                isListening = true;
+            } catch (IOException e) {
+                try {
+                    Thread.sleep(100);
+                    retryCounter++;
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
     }
 }
