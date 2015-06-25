@@ -12,6 +12,8 @@ import java.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.robotframework.ide.core.testData.text.lexer.NumberType;
+import org.robotframework.ide.core.testData.text.lexer.RobotTimeType;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
@@ -33,6 +35,22 @@ public class RobotTokenMatcherTest {
 
     @ForClean
     private RobotTokenMatcher matcher;
+
+
+    @Test
+    public void test_if_numberTokenWillBeRecognizedCorrectly() {
+        String text = "-1";
+        RobotType[] expectedSequenceOfTypes = new RobotType[] { NumberType.NUMBER_WITH_SIGN };
+        assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
+    }
+
+
+    @Test
+    public void test_if_timeTokenWillBeRecognizedCorrectly() {
+        String text = "hour";
+        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTimeType.HOUR };
+        assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
+    }
 
 
     @Test
