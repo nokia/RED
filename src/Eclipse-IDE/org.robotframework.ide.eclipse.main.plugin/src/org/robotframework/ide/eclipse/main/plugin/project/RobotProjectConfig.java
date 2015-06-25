@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,7 +66,7 @@ public class RobotProjectConfig {
     }
 
     public List<ReferencedLibrary> getLibraries() {
-        return libraries;
+        return libraries == null ? new ArrayList<ReferencedLibrary>() : libraries;
     }
 
     public void addReferencedLibrarySpecification(final IPath workspaceRelativePath) {
