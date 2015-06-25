@@ -1,9 +1,12 @@
 package org.robotframework.ide.core.testData.text.lexer;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -60,5 +63,11 @@ public class LowLevelTypesProvider {
         }
 
         return type;
+    }
+
+
+    @VisibleForTesting
+    public static List<RobotType> getDeclaredRobotTypes() {
+        return Collections.unmodifiableList(lowLevelTypes);
     }
 }
