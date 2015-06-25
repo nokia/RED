@@ -368,6 +368,7 @@ public class RobotWordTypeTest {
     public void test_getToken_checkIfMapOfRobotTokenTypesIsCoherent() {
         // prepare
         RobotWordType[] tokenTypes = RobotWordType.values();
+        RobotType unknownType = RobotWordType.UNKNOWN_WORD;
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
@@ -377,6 +378,13 @@ public class RobotWordTypeTest {
         for (RobotWordType type : tokenTypes) {
             String thisTokenText = type.toWrite();
             assertThat(RobotWordType.getToken(thisTokenText)).isEqualTo(type);
+
+            assertThat(unknownType.getTokenType(thisTokenText)).isEqualTo(type);
+            StringBuilder str = null;
+            if (thisTokenText != null) {
+                str = new StringBuilder(thisTokenText);
+            }
+            assertThat(unknownType.getTokenType(str)).isEqualTo(type);
         }
     }
 }
