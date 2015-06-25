@@ -130,6 +130,12 @@ public class RobotTokenMatcher {
     }
 
 
+    @VisibleForTesting
+    protected List<ISingleCharTokenMatcher> getDeclaredSingleCharMatchers() {
+        return oneCharTokenMatchers;
+    }
+
+
     private void tryToRecognizeUnknownTokens(TokenOutput old) {
         LinkedListMultimap<RobotType, Integer> tokensPosition = old
                 .getTokensPosition();
