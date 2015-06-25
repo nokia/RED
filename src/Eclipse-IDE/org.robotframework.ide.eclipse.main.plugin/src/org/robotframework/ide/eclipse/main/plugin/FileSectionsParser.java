@@ -47,8 +47,11 @@ class FileSectionsParser {
             markers = file == null ? new IMarker[0] : file.findMarkers(
                     RobotProblem.TYPE_ID, true, 1);
         } catch (final CoreException e) {
-            throw new IOException("Unable to get content of file: "
-                    + file.getLocation().toString(), e);
+            if (file != null) {
+                throw new IOException("Unable to get content of file: " + file.getLocation().toString(), e);
+            } else {
+                throw new IOException("Unable to read content from stream", e);
+            }
         }
         final Multimap<Integer, IMarker> groupedMarkers = groupMarkersByLine(markers);
 
@@ -165,7 +168,7 @@ class FileSectionsParser {
 
     private String extractVarValue(final String line) {
         String varValue = null;
-        int index = line.indexOf('}');
+        final int index = line.indexOf('}');
         if (index > -1) {
             varValue = line.substring(index + 1).trim();
         }
@@ -176,7 +179,7 @@ class FileSectionsParser {
 
     private String extractVarName(final String line) {
         String varName = null;
-        int index = line.indexOf('}');
+        final int index = line.indexOf('}');
 
         if (index > -1) {
             varName = line.substring(2, index).trim();
