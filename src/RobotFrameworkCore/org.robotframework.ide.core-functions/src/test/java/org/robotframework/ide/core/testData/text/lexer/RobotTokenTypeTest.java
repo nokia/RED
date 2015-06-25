@@ -17,6 +17,36 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType.HELPER;
 public class RobotTokenTypeTest {
 
     @Test
+    public void test_getTokenType_zeroCharacters_shouldReturn_UNKNOWN() {
+        assertThat(RobotTokenType.UNKNOWN.getTokenType("")).isEqualTo(
+                RobotTokenType.UNKNOWN);
+        assertThat(RobotTokenType.UNKNOWN.getTokenType(new StringBuilder("")))
+                .isEqualTo(RobotTokenType.UNKNOWN);
+    }
+
+
+    @Test
+    public void test_getTokenType_nullAsParam_shouldReturn_UNKNOWN() {
+        String text = null;
+        assertThat(RobotTokenType.UNKNOWN.getTokenType(text)).isEqualTo(
+                RobotTokenType.UNKNOWN);
+        StringBuilder text2 = null;
+        assertThat(RobotTokenType.UNKNOWN.getTokenType(text2)).isEqualTo(
+                RobotTokenType.UNKNOWN);
+    }
+
+
+    @Test
+    public void test_getTokenType_moreThanOneChar_shouldReturn_UNKNOWN() {
+        assertThat(RobotTokenType.UNKNOWN.getTokenType("...")).isEqualTo(
+                RobotTokenType.UNKNOWN);
+        assertThat(
+                RobotTokenType.UNKNOWN.getTokenType(new StringBuilder("...")))
+                .isEqualTo(RobotTokenType.UNKNOWN);
+    }
+
+
+    @Test
     public void test_typeSINGLE_QUOTE_MARK() {
         char tokenChar = '"';
         RobotTokenType type = RobotTokenType.SINGLE_QUOTE_MARK;
@@ -258,10 +288,20 @@ public class RobotTokenTypeTest {
                 assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
                         RobotTokenType.UNKNOWN);
                 assertThat(((RobotType) type).isWriteable()).isFalse();
+                assertThat(type.getTokenType("" + thisTokenChar)).isEqualTo(
+                        RobotTokenType.UNKNOWN);
+                assertThat(
+                        type.getTokenType(new StringBuilder("" + thisTokenChar)))
+                        .isEqualTo(RobotTokenType.UNKNOWN);
             } else {
                 assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
                         type);
                 assertThat(((RobotType) type).isWriteable()).isTrue();
+                assertThat(type.getTokenType("" + thisTokenChar)).isEqualTo(
+                        type);
+                assertThat(
+                        type.getTokenType(new StringBuilder("" + thisTokenChar)))
+                        .isEqualTo(type);
             }
         }
     }
