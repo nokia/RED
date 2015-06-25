@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -81,9 +82,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private final RobotDebugValueManager robotDebugValueManager;
 
-    public RobotDebugTarget(final ILaunch launch, final IProcess process, final int port,
-            final List<IResource> suiteResources, final RobotPartListener partListener,
-            final RobotEventBroker robotEventBroker) throws CoreException {
+    public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
+            final RobotPartListener partListener, final RobotEventBroker robotEventBroker,
+            final DebugSocketManager socketManager) throws CoreException {
         super(null);
         target = this;
         this.launch = launch;
@@ -93,15 +94,20 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         currentFrames = new LinkedHashMap<>();
         robotVariablesManager = new RobotDebugVariablesManager(this);
         robotDebugValueManager = new RobotDebugValueManager();
-
+        
         try {
-            serverSocket = new ServerSocket(port);
-            serverSocket.setReuseAddress(true);
-            serverSocket.setSoTimeout(10000);
-            eventSocket = serverSocket.accept();
-            eventReader = new BufferedReader(new InputStreamReader(eventSocket.getInputStream()));
-            eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
-        } catch (final IOException e) {
+            while ((eventReader = new BufferedReader(new InputStreamReader(socketManager.getEventSocket()
+                    .getInputStream()))).readLine() == null) {
+                try {
+                    Thread.sleep(500);  //wait for TestRunnerAgent
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            serverSocket = socketManager.getServerSocket();
+        	eventSocket = socketManager.getEventSocket();
+        	eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
