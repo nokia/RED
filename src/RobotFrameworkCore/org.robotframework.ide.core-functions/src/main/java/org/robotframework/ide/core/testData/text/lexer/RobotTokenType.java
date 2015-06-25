@@ -171,12 +171,23 @@ public enum RobotTokenType implements RobotType {
 
     @Override
     public RobotType getTokenType(StringBuilder text) {
-        return RobotTokenType.UNKNOWN;
+        RobotType type = RobotTokenType.UNKNOWN;
+        if (text != null) {
+            type = getTokenType(text.toString());
+        }
+
+        return type;
     }
 
 
     @Override
     public RobotType getTokenType(String text) {
-        return RobotTokenType.UNKNOWN;
+        RobotType type = RobotTokenType.UNKNOWN;
+
+        if (text != null && text.length() == 1) {
+            type = getToken(text.charAt(0));
+        }
+
+        return type;
     }
 }
