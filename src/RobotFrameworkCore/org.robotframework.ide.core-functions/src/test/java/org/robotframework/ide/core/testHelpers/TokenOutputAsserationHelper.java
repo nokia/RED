@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.NumberType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotType;
@@ -130,12 +131,22 @@ public class TokenOutputAsserationHelper {
                         && robotToken.getType().isWriteable()) {
                     assertThat(robotToken.getText().toString()).isEqualTo(
                             type.toWrite());
-                } else {
+                } else if (GroupedSameTokenType.class
+                        .isAssignableFrom(robotToken.getType().getClass())) {
                     assertThat(robotToken.getText().toString()).matches(
                             "["
                                     + ((GroupedSameTokenType) robotToken
                                             .getType()).getWrappedType()
                                             .toWrite() + "]+");
+                } else if (robotToken.getType() == NumberType.NUMBER_WITH_SIGN) {
+                    assertThat(robotToken.getText().toString()
+                            .matches("^[-][0-9]+$"));
+                } else if (robotToken.getType() == NumberType.NUMBER_WITHOUT_SIGN) {
+                    assertThat(robotToken.getText().toString()
+                            .matches("^[0-9]+$"));
+                } else {
+                    throw new UnsupportedOperationException(
+                            "Not implemented yet!");
                 }
                 assertStartPosition(robotToken, line, column);
                 if (robotToken.getText() != null) {
