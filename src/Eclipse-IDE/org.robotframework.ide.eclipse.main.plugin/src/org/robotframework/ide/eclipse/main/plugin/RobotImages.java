@@ -83,6 +83,14 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/library.png");
     }
 
+    public static ImageDescriptor getJavaLibraryImage() {
+        return RobotFramework.getImageDescriptor("resources/java_jar.png");
+    }
+
+    public static ImageDescriptor getJavaClassImage() {
+        return RobotFramework.getImageDescriptor("resources/java_class.png");
+    }
+
     public static ImageDescriptor getBookImage() {
         return RobotFramework.getImageDescriptor("resources/book.png");
     }

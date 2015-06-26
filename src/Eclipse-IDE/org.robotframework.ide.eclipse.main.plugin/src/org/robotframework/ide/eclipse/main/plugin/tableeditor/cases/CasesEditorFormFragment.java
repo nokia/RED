@@ -12,16 +12,15 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.RedColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
@@ -96,12 +95,12 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
-        viewer.getTable().setLinesVisible(true);
+        // viewer.getTable().setLinesVisible(true);
         viewer.setUseHashlookup(true);
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
             @Override
             public void handleEvent(final Event event) {
-                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 2).intValue();
             }
         });
         final ISelectionChangedListener selectionListener = createSelectionListener();
@@ -200,7 +199,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         caseSection.setClient(caseViewer.getTable());
         caseViewer.setUseHashlookup(true);
         TableCellsAcivationStrategy.addActivationStrategy(caseViewer, RowTabbingStrategy.MOVE_TO_NEXT);
-        ColumnViewerToolTipSupport.enableFor(caseViewer, ToolTip.NO_RECREATE);
+        RedColumnViewerToolTipSupport.enableFor(caseViewer);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(caseViewer.getTable());
         caseViewer.getTable().setLinesVisible(true);

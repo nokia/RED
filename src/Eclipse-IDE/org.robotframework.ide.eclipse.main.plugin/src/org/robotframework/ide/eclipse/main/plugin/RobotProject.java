@@ -82,6 +82,8 @@ public class RobotProject extends RobotContainer {
         readProjectConfigurationIfNeeded();
         if (refLibsSpecs != null) {
             return refLibsSpecs;
+        } else if (configuration == null) {
+            return newArrayList();
         }
 
         refLibsSpecs = newArrayList(Iterables.filter(
