@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "libraries" })
@@ -197,6 +199,15 @@ public class RobotProjectConfig {
 
         public LibraryType provideType() {
             return LibraryType.valueOf(type);
+        }
+
+        public ImageDescriptor getImage() {
+            switch (provideType()) {
+                case JAVA:
+                    return RobotImages.getJavaLibraryImage();
+                default:
+                    return RobotImages.getLibraryImage();
+            }
         }
     }
 

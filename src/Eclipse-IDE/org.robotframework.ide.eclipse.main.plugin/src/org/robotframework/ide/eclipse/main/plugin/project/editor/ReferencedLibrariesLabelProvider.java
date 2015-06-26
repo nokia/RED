@@ -5,7 +5,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -32,7 +31,7 @@ public class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvi
 
     @Override
     public Image getImage(final Object element) {
-        return RobotImages.getLibraryImage().createImage();
+        final ReferencedLibrary library = (ReferencedLibrary) element;
+        return library.getImage().createImage();
     }
-
 }
