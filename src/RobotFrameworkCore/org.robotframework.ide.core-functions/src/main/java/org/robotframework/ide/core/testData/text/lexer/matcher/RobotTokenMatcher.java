@@ -1,6 +1,7 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
 import java.nio.CharBuffer;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,7 +36,10 @@ public class RobotTokenMatcher {
 
 
     /**
-     * Constructor to use only for testing propose
+     * Constructor to use only for testing propose.
+     * <p/>
+     * Note: do not use this constructor to merge two or more method
+     * {@link #buildTokens()} invocations.
      * 
      * @param output
      *            used in tests
@@ -65,9 +69,19 @@ public class RobotTokenMatcher {
         oneCharTokenMatchers.add(new QuoteMarkSignMatcher());
         oneCharTokenMatchers.add(new DotSignMatcher());
         oneCharTokenMatchers.add(new EscapeBackslashSignMatcher());
+
+        oneCharTokenMatchers = Collections
+                .unmodifiableList(oneCharTokenMatchers);
     }
 
 
+    /**
+     * 
+     * @param tempBuffer
+     *            bytes to consume
+     * @param charIndex
+     *            current byte index to consume
+     */
     public void offerChar(final CharBuffer tempBuffer, final int charIndex) {
         boolean wasUsed = false;
 
@@ -121,6 +135,12 @@ public class RobotTokenMatcher {
     }
 
 
+    /**
+     * Note: After invoke this method next output will not include tokens
+     * previously matched
+     * 
+     * @return all matched tokens
+     */
     public TokenOutput buildTokens() {
         TokenOutput old = output;
         tryToRecognizeUnknownTokens(old);
@@ -171,6 +191,14 @@ public class RobotTokenMatcher {
         return token;
     }
 
+    /**
+     * Output of token matching process.
+     * 
+     * @author wypych
+     * @since JDK 1.7 update 74
+     * @version Robot Framework 2.9 alpha 2
+     * 
+     */
     public static class TokenOutput {
 
         private LinkedListMultimap<RobotType, Integer> tokenTypeToPositionOfOcurrancy = LinkedListMultimap
@@ -180,11 +208,20 @@ public class RobotTokenMatcher {
         private List<RobotToken> tokens = new LinkedList<>();
 
 
+        /**
+         * 
+         * @return mapping between type of token and it position in
+         *         {@link #tokens} list.
+         */
         public LinkedListMultimap<RobotType, Integer> getTokensPosition() {
             return tokenTypeToPositionOfOcurrancy;
         }
 
 
+        /**
+         * 
+         * @return current position in file
+         */
         public LinearPositionMarker getCurrentMarker() {
             return currentMarker;
         }
@@ -195,6 +232,10 @@ public class RobotTokenMatcher {
         }
 
 
+        /**
+         * 
+         * @return sequence of tokens matched currently
+         */
         public List<RobotToken> getTokens() {
             return tokens;
         }
