@@ -29,7 +29,7 @@ public class DebugSocketManager implements Runnable {
         } catch (final IOException e) {
             // TODO: check if socket exception was caused by close during accept, then some info log
             // should be printed without stack trace
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

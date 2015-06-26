@@ -190,8 +190,15 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
             
-            final IDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
-                    robotEventBroker, socketManager);
+            IDebugTarget target = null;
+            try {
+                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
+                        robotEventBroker, socketManager);
+            } catch (CoreException e) {
+                if (socketManager.getServerSocket() != null) {
+                    socketManager.getServerSocket().close();
+                }
+            }
             launch.addDebugTarget(target);
         }
 

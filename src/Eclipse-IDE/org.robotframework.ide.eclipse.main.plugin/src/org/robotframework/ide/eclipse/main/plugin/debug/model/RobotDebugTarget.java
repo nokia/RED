@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -95,6 +96,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         robotVariablesManager = new RobotDebugVariablesManager(this);
         robotDebugValueManager = new RobotDebugValueManager();
         
+        int retryCounter = 0;
         try {
             while ((eventReader = new BufferedReader(new InputStreamReader(socketManager.getEventSocket()
                     .getInputStream()))).readLine() == null) {
@@ -102,6 +104,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     Thread.sleep(500);  //wait for TestRunnerAgent
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                }
+                retryCounter++;
+                if(retryCounter > 20 || process.isTerminated()) {
+                    throw new CoreException(Status.CANCEL_STATUS);
                 }
             }
             serverSocket = socketManager.getServerSocket();
