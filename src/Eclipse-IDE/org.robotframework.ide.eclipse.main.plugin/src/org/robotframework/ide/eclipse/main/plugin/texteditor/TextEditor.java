@@ -448,15 +448,15 @@ public class TextEditor {
 	private AnnotationPreference createOccurrencesMarkAnnotationPreference(final AnnotationType type) {
         final AnnotationPreference annotationPreference = new AnnotationPreference();
         annotationPreference.setAnnotationType(type.getType());
-        annotationPreference.setOverviewRulerPreferenceKey("org.robotframework.ide.texteditor.overview");
+        annotationPreference.setOverviewRulerPreferenceKey("org.robotframework.ide.texteditor.occurrencesMark.overview");
         annotationPreference.setOverviewRulerPreferenceValue(true);
-        annotationPreference.setTextPreferenceKey("org.robotframework.ide.texteditor.text");
+        annotationPreference.setTextPreferenceKey("org.robotframework.ide.texteditor.occurrencesMark.text");
         annotationPreference.setTextPreferenceValue(true);
-        annotationPreference.setColorPreferenceKey("org.robotframework.ide.texteditor.color");
+        annotationPreference.setColorPreferenceKey("org.robotframework.ide.texteditor.occurrencesMark.color");
         annotationPreference.setColorPreferenceValue(new RGB(212, 212, 212));
-        annotationPreference.setHighlightPreferenceKey("org.robotframework.ide.texteditor.highlight");
+        annotationPreference.setHighlightPreferenceKey("org.robotframework.ide.texteditor.occurrencesMark.highlight");
         annotationPreference.setHighlightPreferenceValue(true);
-        annotationPreference.setVerticalRulerPreferenceKey("org.robotframework.ide.texteditor.ruler");
+        annotationPreference.setVerticalRulerPreferenceKey("org.robotframework.ide.texteditor.occurrencesMark.ruler");
         annotationPreference.setVerticalRulerPreferenceValue(false);
         annotationPreference.setPresentationLayer(6);
         annotationPreference.setContributesToHeader(false);
