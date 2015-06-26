@@ -7,27 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "libraries" })
+@XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
     public static final String FILENAME = "red.xml";
 
     private static final String CURRENT_VERSION = "1.0";
 
+    @XmlElement(name = "configVersion", required = true)
     private String version;
 
+    @XmlElement(name = "robotExecEnvironment", required = false)
     private ExecutionEnvironment executionEnvironment;
 
-    private List<ReferencedLibrary> libraries;
+    @XmlElement(name = "referencedLibrary", required = false)
+    private List<ReferencedLibrary> libraries = new ArrayList<>();
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -42,7 +47,6 @@ public class RobotProjectConfig {
         return configuration;
     }
 
-    @XmlElement(name = "configVersion", required = true)
     public void setVersion(final String version) {
         this.version = version;
     }
@@ -51,7 +55,6 @@ public class RobotProjectConfig {
         return version;
     }
 
-    @XmlElement(name = "robotExecEnvironment", required = false)
     public void setExecutionEnvironment(final ExecutionEnvironment executionEnvironment) {
         this.executionEnvironment = executionEnvironment;
     }
@@ -60,13 +63,12 @@ public class RobotProjectConfig {
         return executionEnvironment;
     }
 
-    @XmlElement(name = "referencedLibrary")
     public void setLibraries(final List<ReferencedLibrary> libraries) {
         this.libraries = libraries;
     }
 
     public List<ReferencedLibrary> getLibraries() {
-        return libraries == null ? new ArrayList<ReferencedLibrary>() : libraries;
+        return libraries;
     }
 
     public void addReferencedLibrarySpecification(final IPath workspaceRelativePath) {
@@ -140,12 +142,13 @@ public class RobotProjectConfig {
                 && Objects.equals(version, other.version);
     }
 
-    @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig")
+    @XmlRootElement(name = "robotExecEnvironment")
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class ExecutionEnvironment {
 
+        @XmlAttribute
         private String path;
 
-        @XmlAttribute
         public void setPath(final String path) {
             this.path = path;
         }
@@ -155,26 +158,27 @@ public class RobotProjectConfig {
         }
     }
 
-    @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig")
+    @XmlRootElement(name = "referencedLibrary")
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class ReferencedLibrary {
 
-        private LibraryType type;
-
-        private String name;
-
-        private IPath path;
-
+        @XmlAttribute
+        private String type;
 
         @XmlAttribute
+        private String name;
+
+        @XmlAttribute
+        private String path;
+
         public void setType(final String type) {
-            this.type = LibraryType.valueOf(type);
+            this.type = type;
         }
 
         public String getType() {
-            return type.toString();
+            return type;
         }
 
-        @XmlAttribute
         public void setName(final String name) {
             this.name = name;
         }
@@ -183,17 +187,16 @@ public class RobotProjectConfig {
             return name;
         }
 
-        @XmlAttribute
         public void setPath(final String path) {
-            this.path = new Path(path);
+            this.path = path;
         }
 
         public String getPath() {
-            return path.toPortableString();
+            return path;
         }
 
         public LibraryType provideType() {
-            return type;
+            return LibraryType.valueOf(type);
         }
     }
 
