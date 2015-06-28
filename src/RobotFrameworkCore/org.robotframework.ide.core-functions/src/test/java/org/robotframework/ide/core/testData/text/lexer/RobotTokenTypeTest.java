@@ -247,15 +247,6 @@ public class RobotTokenTypeTest {
 
 
     @Test
-    public void test_typeEND_OF_FILE() {
-        RobotTokenType type = RobotTokenType.END_OF_FILE;
-
-        assertThat(type.getThisTokenChar()).isEqualTo(HELPER.UNWRITABLE_CHARS);
-        assertThat(type.toWrite()).isEmpty();
-    }
-
-
-    @Test
     public void test_typeEND_OF_LINE() {
         RobotTokenType type = RobotTokenType.END_OF_LINE;
 
@@ -280,7 +271,7 @@ public class RobotTokenTypeTest {
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
-        assertThat(tokenTypes).hasSize(23);
+        assertThat(tokenTypes).hasSize(22);
 
         for (RobotTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
