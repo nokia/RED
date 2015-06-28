@@ -19,7 +19,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.invocation.InvocationOnMock;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
-import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.AnswerRecorder;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
@@ -70,50 +69,6 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         assertThat(o).isInstanceOf(CharBuffer.class);
         CharBuffer c = (CharBuffer) o;
         assertThat(c.limit()).isGreaterThan(0);
-    }
-
-
-    @Test
-    public void test_extractTokens_emptyFile_shouldReturn_onlyTwoTokensStartLineAndEndOfFileTokens()
-            throws IOException {
-        // prepare
-        when(readersProvider.create(any(File.class))).thenReturn(reader);
-        when(reader.read(any(CharBuffer.class))).thenReturn(-1);
-        TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer(readersProvider);
-
-        // execute
-        TokenOutput out = lexer.extractTokens(file);
-
-        // verify
-    }
-
-
-    private void assertThatTokenIsAsExpected(RobotToken tokenToExaminate,
-            RobotTokenType type, int startLine, int startColumn, int endLine,
-            int endColumn, String text) {
-        assertThat(tokenToExaminate).isNotNull();
-        assertThat(tokenToExaminate.getType()).isEqualTo(type);
-
-        LinearPositionMarker startPosition = tokenToExaminate
-                .getStartPosition();
-        assertLinearPositionMarker(startPosition, startLine, startColumn);
-        LinearPositionMarker endPosition = tokenToExaminate.getEndPosition();
-        assertLinearPositionMarker(endPosition, endLine, endColumn);
-
-        if (text == null) {
-            assertThat(tokenToExaminate.getText()).isEqualTo(null);
-        } else {
-            assertThat(tokenToExaminate.getText()).isNotNull();
-            assertThat(tokenToExaminate.getText().toString()).isEqualTo(text);
-        }
-    }
-
-
-    private void assertLinearPositionMarker(LinearPositionMarker marker,
-            int line, int column) {
-        assertThat(marker).isNotNull();
-        assertThat(marker.getLine()).isEqualTo(line);
-        assertThat(marker.getColumn()).isEqualTo(column);
     }
 
 
