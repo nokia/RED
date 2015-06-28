@@ -15,6 +15,7 @@ public class ManyLinesRobotContext implements IContextElement {
 
     private List<IContextElement> childContexts = new LinkedList<>();
     private IContextElementType type = ComplexRobotContextType.UNDECLARED_COMMENT;
+    private IContextElement parentContext = null;
 
 
     public void addNextLineContext(IContextElement newElement) {
@@ -35,5 +36,17 @@ public class ManyLinesRobotContext implements IContextElement {
 
     public void setType(ComplexRobotContextType type) {
         this.type = type;
+    }
+
+
+    @Override
+    public void setParent(IContextElement context) {
+        this.parentContext = context;
+    }
+
+
+    @Override
+    public IContextElement getParent() {
+        return this.parentContext;
     }
 }

@@ -59,4 +59,21 @@ public class OneLineRobotContext implements IContextElement {
     public void setParentContext(ManyLinesRobotContext parentContext) {
         this.parentContext = parentContext;
     }
+
+
+    @Override
+    public void setParent(IContextElement context) {
+        setParent((ManyLinesRobotContext) context);
+    }
+
+
+    public void setParent(ManyLinesRobotContext context) {
+        this.parentContext = context;
+    }
+
+
+    @Override
+    public IContextElement getParent() {
+        return parentContext;
+    }
 }
