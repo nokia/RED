@@ -2,12 +2,14 @@ package org.robotframework.ide.core.testData.text.lexer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.List;
 
@@ -19,9 +21,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.invocation.InvocationOnMock;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
+import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.AnswerRecorder;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+import org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper;
 
 
 /**
@@ -69,6 +73,22 @@ public class TxtRobotTestDataLexerEmptyFileTest {
         assertThat(o).isInstanceOf(CharBuffer.class);
         CharBuffer c = (CharBuffer) o;
         assertThat(c.limit()).isGreaterThan(0);
+    }
+
+
+    @Test
+    public void test_forEmptyFile_shouldReturn_emptyTokenOutput()
+            throws IOException {
+        // prepare
+        when(readersProvider.create(file)).thenReturn(new StringReader(""));
+        doCallRealMethod().when(readersProvider).newCharBuffer(anyInt());
+        TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer(readersProvider);
+
+        // execute
+        TokenOutput tokenOutput = lexer.extractTokens(file);
+
+        // verify
+        TokenOutputAsserationHelper.assertIsTotalEmpty(tokenOutput);
     }
 
 
