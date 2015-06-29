@@ -1,35 +1,39 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 
+import java.util.Arrays;
+
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+
+import com.google.common.base.Joiner;
 
 public class TextEditorContentAssistKeywordContext {
 
     private static final Image IMAGE = RobotImages.getKeywordImage().createImage();
 
-    private String libName;
+    private final RedKeywordProposal proposal;
 
-    private KeywordSpecification keywordSpec;
-
-    public TextEditorContentAssistKeywordContext(String libName, KeywordSpecification keywordSpec) {
-        this.libName = libName;
-        this.keywordSpec = keywordSpec;
+    public TextEditorContentAssistKeywordContext(final RedKeywordProposal proposal) {
+        this.proposal = proposal;
     }
 
     public String getLibName() {
-        return libName;
+        return proposal.getSourceName();
     }
     
     public String getArguments() {
-        return keywordSpec.getArguments().toString();
+        return proposal.getArgumentsLabel();
     }
 
     public String getDescription() {
-        return "Name: " + keywordSpec.getName() + System.lineSeparator() + System.lineSeparator() + "Source: "
-                + libName + System.lineSeparator() + System.lineSeparator() + "Arguments: "
-                + keywordSpec.getArguments().toString() + System.lineSeparator() + System.lineSeparator()
-                + System.lineSeparator() + keywordSpec.getDocumentation();
+        final String separator = System.lineSeparator();
+
+        final String name = "Name: " + proposal.getLabel();
+        final String source = "Source: " + proposal.getSourceName();
+        final String args = "Arguments: " + proposal.getArgumentsLabel();
+        final String doc = System.lineSeparator() + proposal.getDocumentation();
+        return Joiner.on(separator).join(Arrays.asList(name, source, args, doc));
     }
 
     

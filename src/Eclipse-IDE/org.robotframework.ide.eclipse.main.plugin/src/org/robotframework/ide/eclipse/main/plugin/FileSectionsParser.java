@@ -59,10 +59,12 @@ class FileSectionsParser {
                 new InputStreamReader(inputStream, "UTF-8"))) {
             String line = bufferedReader.readLine();
 
-            RobotVariablesSection varSection = null;
             RobotCasesSection casesSection = null;
             RobotCase testCase = null;
+            RobotKeywordsSection keywordsSection = null;
+            RobotKeywordDefinition keywordDef = null;
             RobotSuiteSettingsSection settingSection = null;
+            RobotVariablesSection varSection = null;
             int lineNumber = 1;
             while(line != null) {
                 if (line.trim().isEmpty()) {
@@ -70,10 +72,12 @@ class FileSectionsParser {
                     lineNumber++;
                     continue;
                 } else if (line.startsWith("*")) {
-                    varSection = null;
                     casesSection = null;
                     testCase = null;
+                    keywordsSection = null;
+                    keywordDef = null;
                     settingSection = null;
+                    varSection = null;
                     final String sectionName = extractSectionName(line);
                     if (RobotVariablesSection.SECTION_NAME.equals(sectionName)) {
                         varSection = new RobotVariablesSection(parent, readOnly);
@@ -82,6 +86,9 @@ class FileSectionsParser {
                             .equals(sectionName)) {
                         casesSection = new RobotCasesSection(parent, readOnly);
                         sections.add(casesSection);
+                    } else if (RobotKeywordsSection.SECTION_NAME.equals(sectionName)) {
+                        keywordsSection = new RobotKeywordsSection(parent, readOnly);
+                        sections.add(keywordsSection);
                     } else if (RobotSuiteSettingsSection.SECTION_NAME
                             .equals(sectionName)) {
                         settingSection = new RobotSuiteSettingsSection(parent,
@@ -128,6 +135,20 @@ class FileSectionsParser {
                         }
                     } else {
                         testCase = casesSection.createTestCase(line);
+                    }
+                } else if (keywordsSection != null) {
+                    if (line.startsWith("  ") && keywordDef != null) {
+                        final String comment = extractComment(line);
+                        final String lineWithoutComment = removeComment(line);
+
+                        final String[] split = lineWithoutComment.split("  +");
+                        final String name = split[0];
+                        final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
+                                split.length);
+
+                        keywordDef.createKeywordCall(name, args, comment);
+                    } else {
+                        keywordDef = keywordsSection.createKeywordDefinition(line);
                     }
                 } else if (settingSection != null) {
                     final String comment = extractComment(line);

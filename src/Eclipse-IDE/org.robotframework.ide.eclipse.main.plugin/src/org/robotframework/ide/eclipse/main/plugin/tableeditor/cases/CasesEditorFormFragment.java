@@ -19,17 +19,25 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -80,22 +88,87 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     private boolean isSaving;
 
+    private Text filter;
+
     TableViewer getViewer() {
         return viewer;
     }
 
     @Override
     public void initialize(final Composite parent) {
+        final SashForm mainSash = createSash(parent);
+
+        final Composite casesComposite = createCasesComposite(mainSash);
+        createFilter(casesComposite);
+        createSectionViewer(casesComposite);
+
+        final Composite casesDetailComposite = createCasesDetailComposite(mainSash);
+        createCaseSection(casesDetailComposite);
+        createCaseSettingsSection(casesDetailComposite);
+
+        mainSash.setWeights(new int[] { 20, 80 });
+
+        createContextMenu();
+
+        setInput();
+    }
+
+    private SashForm createSash(final Composite parent) {
         final SashForm mainSash = new SashForm(parent, SWT.SMOOTH | SWT.HORIZONTAL);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(mainSash);
         toolkit.adapt(mainSash);
         toolkit.paintBordersFor(mainSash);
+        return mainSash;
+    }
 
-        viewer = new RowExposingTableViewer(mainSash, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+    private Composite createCasesComposite(final Composite parent) {
+        final Composite casesComposite = toolkit.createComposite(parent);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(casesComposite);
+        GridLayoutFactory.fillDefaults().applyTo(casesComposite);
+        return casesComposite;
+    }
+
+    private void createFilter(final Composite parent) {
+        filter = toolkit.createText(parent, "");
+        GridDataFactory.fillDefaults().grab(true, false).indent(3, 5).applyTo(filter);
+        filter.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(final PaintEvent e) {
+                if (filter.getText().isEmpty() && !filter.isFocusControl()) {
+                    final Color current = e.gc.getForeground();
+                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
+                    e.gc.drawText("filter cases", 3, 1);
+                    e.gc.setForeground(current);
+                }
+            }
+        });
+        filter.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                final String currentFilter = filter.getText();
+                if (currentFilter.isEmpty()) {
+                    viewer.setFilters(new ViewerFilter[0]);
+                } else {
+                    viewer.setFilters(new ViewerFilter[] { new ViewerFilter() {
+                        @Override
+                        public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+                            if (element instanceof RobotCase) {
+                                return ((RobotCase) element).getName().contains(currentFilter);
+                            }
+                            return true;
+                        }
+                    } });
+                }
+                viewer.refresh();
+            }
+        });
+    }
+
+    private void createSectionViewer(final Composite parent) {
+        viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
-        // viewer.getTable().setLinesVisible(true);
+        GridDataFactory.fillDefaults().grab(true, true).indent(10, 0).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
             @Override
@@ -113,27 +186,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         });
         viewer.setContentProvider(new CasesContentProvider());
 
-        final NewElementsCreator creator = newCasesCreator();
-
-        ViewerColumnsFactory.newColumn("").withWidth(250)
-            .labelsProvidedBy(new CasesNameLabelProvider())
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .shouldShowLastVerticalSeparator(true)
-            .editingSupportedBy(new CasesNameEditingSupport(viewer, commandsStack, creator))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
-
-        final Composite casesDetailComposite = createCasesDetailComposite(mainSash);
-
-        createCaseSection(casesDetailComposite);
-        createCaseSettingsSection(casesDetailComposite);
-        mainSash.setWeights(new int[] { 20, 80 });
+        createColumns();
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
-        createContextMenu();
-
-        setInput();
     }
 
     private ISelectionChangedListener createSelectionListener() {
@@ -151,6 +207,18 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 }
             }
         };
+    }
+
+    private void createColumns() {
+        final NewElementsCreator creator = newCasesCreator();
+
+        ViewerColumnsFactory.newColumn("").withWidth(250)
+            .labelsProvidedBy(new CasesNameLabelProvider(filter))
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .shouldShowLastVerticalSeparator(true)
+            .editingSupportedBy(new CasesNameEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
     }
 
     private NewElementsCreator newCasesCreator() {
