@@ -10,10 +10,10 @@ import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
@@ -53,8 +53,9 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
 
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
-        boolean wasBeginAsterisksPresent = false;
+        boolean wasPrefixAsterisksPresent = false;
         boolean wasSettingNamePresent = false;
+        boolean wasSuffixAsterisksPresent = false;
 
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
             RobotToken token = tokens.get(tokId);
@@ -63,11 +64,11 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
             if (type == RobotSingleCharTokenType.SINGLE_ASTERISK
                     || type == MultipleCharTokenType.MANY_ASTERISKS) {
 
-                if (!wasBeginAsterisksPresent && !wasSettingNamePresent) {
+                if (!wasPrefixAsterisksPresent && !wasSettingNamePresent) {
                     // begin asterisks
                     context.addNextToken(token);
-                    wasBeginAsterisksPresent = true;
-                } else if (wasBeginAsterisksPresent && wasSettingNamePresent) {
+                    wasPrefixAsterisksPresent = true;
+                } else if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
                     // trailing asterisks
                     context.addNextToken(token);
                     context.setType(BUILD_TYPE);
@@ -75,23 +76,26 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
 
                     context = new OneLineRobotContext(
                             lineInterval.getLineNumber());
+                    context.addNextToken(token);
 
-                    wasBeginAsterisksPresent = false;
+                    wasPrefixAsterisksPresent = false;
                     wasSettingNamePresent = false;
+                    wasSuffixAsterisksPresent = true;
                 } else {
                     // i.e. case *** *** - asteriks after asterisks or other
                     // word
                     context.removeAllContextTokens();
                     context.addNextToken(token);
 
-                    wasBeginAsterisksPresent = true;
+                    wasPrefixAsterisksPresent = true;
                     wasSettingNamePresent = false;
+                    wasSuffixAsterisksPresent = false;
                 }
-            } else if (type == RobotSingleCharTokenType.SINGLE_SPACE) {
-                // add here: type == RobotWordType.DOUBLE_SPACE and type ==
-                // RobotSingleCharTokenType.SINGLE_TABULATOR to build not so strict
-                // recognizer
-                if (wasBeginAsterisksPresent || wasSettingNamePresent) {
+            } else if (type == RobotSingleCharTokenType.SINGLE_SPACE
+                    || type == RobotWordType.DOUBLE_SPACE
+                    || type == RobotSingleCharTokenType.SINGLE_TABULATOR) {
+                if (wasPrefixAsterisksPresent || wasSettingNamePresent
+                        || wasSuffixAsterisksPresent) {
                     // space are allowed after the first asterisks or after
                     // table name
                     context.addNextToken(token);
@@ -99,13 +103,17 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
             } else if (type == RobotWordType.SETTING_WORD
                     || type == RobotWordType.SETTINGS_WORD
                     || type == RobotWordType.METADATA_WORD) {
-                if (wasBeginAsterisksPresent) {
+                if (wasPrefixAsterisksPresent || wasSuffixAsterisksPresent) {
                     // table name after begin asterisks
                     context.addNextToken(token);
                     wasSettingNamePresent = true;
+                    if (wasSuffixAsterisksPresent) {
+                        wasPrefixAsterisksPresent = true;
+                        wasSuffixAsterisksPresent = false;
+                    }
                 }
             } else {
-                if (wasBeginAsterisksPresent && wasSettingNamePresent) {
+                if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
                     context.setType(BUILD_TYPE);
                     foundContexts.add(context);
 
@@ -113,12 +121,12 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                             lineInterval.getLineNumber());
                 }
 
-                wasBeginAsterisksPresent = false;
+                wasPrefixAsterisksPresent = false;
                 wasSettingNamePresent = false;
             }
         }
 
-        if (wasBeginAsterisksPresent && wasSettingNamePresent) {
+        if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
             // case when is not END OF LINE on header name
             context.setType(BUILD_TYPE);
             foundContexts.add(context);
