@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/29/15 4:29 PM
+Save-Time: 6/29/15 4:41 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -18,9 +18,10 @@ Entry-Name: .content
 get-menu "Window/Show View/Other..." | click
 get-window "Show View" | get-tree | select "General/Problems" | double-click
 
-get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
-    | select "For200Project/For200TestSuite.robot" | get-menu "Open With/Robot Text Editor" | click
-get-editor "Robot Text Editor" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 8
+get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" | double-click
+
+get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 8
+
 get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
     | get-menu "Debug As/1 Robot Test" | click
     
