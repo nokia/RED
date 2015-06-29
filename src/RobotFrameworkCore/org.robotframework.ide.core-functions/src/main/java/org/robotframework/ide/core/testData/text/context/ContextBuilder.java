@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -28,6 +29,7 @@ import com.google.common.collect.LinkedListMultimap;
  * @see DeclaredCommentRecognizer
  * @see SettingTableHeaderRecognizer
  * @see VariableTableHeaderRecognizer
+ * @see TestCaseTableHeaderRecognizer
  */
 public class ContextBuilder {
 
@@ -38,6 +40,7 @@ public class ContextBuilder {
         recognizers.add(new DeclaredCommentRecognizer());
         recognizers.add(new SettingTableHeaderRecognizer());
         recognizers.add(new VariableTableHeaderRecognizer());
+        recognizers.add(new TestCaseTableHeaderRecognizer());
         recognizers = Collections.unmodifiableList(recognizers);
     }
 

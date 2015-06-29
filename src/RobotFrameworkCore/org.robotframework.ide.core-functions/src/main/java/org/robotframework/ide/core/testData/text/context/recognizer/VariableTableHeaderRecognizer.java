@@ -101,12 +101,24 @@ public class VariableTableHeaderRecognizer implements IContextRecognizer {
             } else if (type == RobotWordType.VARIABLE_WORD
                     || type == RobotWordType.VARIABLES_WORD) {
                 if (wasPrefixAsterisksPresent || wasSuffixAsterisksPresent) {
-                    // table name after begin asterisks
-                    context.addNextToken(token);
-                    wasVariableNamePresent = true;
-                    if (wasSuffixAsterisksPresent) {
-                        wasPrefixAsterisksPresent = true;
+                    if (wasVariableNamePresent) {
+                        context.setType(BUILD_TYPE);
+                        foundContexts.add(context);
+
+                        context = new OneLineRobotContext(
+                                lineInterval.getLineNumber());
+
+                        wasPrefixAsterisksPresent = false;
+                        wasVariableNamePresent = false;
                         wasSuffixAsterisksPresent = false;
+                    } else {
+                        // table name after begin asterisks
+                        context.addNextToken(token);
+                        wasVariableNamePresent = true;
+                        if (wasSuffixAsterisksPresent) {
+                            wasPrefixAsterisksPresent = true;
+                            wasSuffixAsterisksPresent = false;
+                        }
                     }
                 }
             } else {

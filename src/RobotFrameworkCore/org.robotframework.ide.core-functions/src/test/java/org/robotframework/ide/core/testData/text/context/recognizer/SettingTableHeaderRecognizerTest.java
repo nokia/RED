@@ -90,6 +90,48 @@ public class SettingTableHeaderRecognizerTest extends ARecognizerTest {
 
 
     @Test
+    public void test_pipe_beginAsteriskMetadataWordSpaceSettingWord_pipe_shouldReturn_oneContextOfSettingTableHeaderName()
+            throws FileNotFoundException, IOException {
+        String prefix = "|";
+        String text = "*Metadata";
+        String suffix = " Setting";
+        assertThatIsExepectedContext(prefix, text, suffix,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.METADATA_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE });
+    }
+
+
+    @Test
+    public void test_pipe_beginAsteriskSettingWordSpaceSettingWord_pipe_shouldReturn_oneContextOfSettingTableHeaderName()
+            throws FileNotFoundException, IOException {
+        String prefix = "|";
+        String text = "*Setting";
+        String suffix = " Setting";
+        assertThatIsExepectedContext(prefix, text, suffix,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.SETTING_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE });
+    }
+
+
+    @Test
+    public void test_pipe_beginAsteriskSettingsWordSpaceSettingsWord_pipe_shouldReturn_oneContextOfSettingTableHeaderName()
+            throws FileNotFoundException, IOException {
+        String prefix = "|";
+        String text = "*Settings";
+        String suffix = " Settings";
+        assertThatIsExepectedContext(prefix, text, suffix,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.SETTINGS_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE });
+    }
+
+
+    @Test
     public void test_pipe_beginAsteriskSettingsWordAsterisk_pipe_shouldReturn_oneContextOfSettingTableHeaderName()
             throws FileNotFoundException, IOException {
         String prefix = "|";
@@ -625,54 +667,4 @@ public class SettingTableHeaderRecognizerTest extends ARecognizerTest {
         assertForIncorrectData(text);
     }
 
-
-    private void assertThatIsExepectedContext(final String prefix,
-            final String text, final String suffix,
-            final IRobotTokenType[] types) throws FileNotFoundException,
-            IOException {
-        // prepare
-        String toTest = "";
-        if (prefix != null) {
-            toTest += prefix;
-        }
-        int column = toTest.length() + 1;
-        toTest += text;
-        if (suffix != null) {
-            toTest += suffix;
-        }
-
-        TokenOutput tokenOutput = createTokenOutput(toTest);
-
-        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
-        LineTokenPosition line = iter.next();
-        ContextOutput out = new ContextOutput(tokenOutput);
-
-        // execute
-        List<IContextElement> recognize = context.recognize(out, line);
-
-        // verify
-        assertThat(out.getContexts()).isEmpty();
-        OneLineRobotContext header = assertAndGetOneLineContext(recognize);
-
-        assertTokensForUnknownWords(header.getContextTokens(), types, 0,
-                new LinearPositionMarker(1, column), new String[] {});
-    }
-
-
-    private void assertForIncorrectData(String text)
-            throws FileNotFoundException, IOException {
-        // prepare
-        TokenOutput tokenOutput = createTokenOutput(text);
-
-        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
-        LineTokenPosition line = iter.next();
-        ContextOutput out = new ContextOutput(tokenOutput);
-
-        // execute
-        List<IContextElement> recognize = context.recognize(out, line);
-
-        // verify
-        assertThat(out.getContexts()).isEmpty();
-        assertThat(recognize).isEmpty();
-    }
 }

@@ -104,6 +104,34 @@ public class VariableTableHeaderRecognizerTest extends ARecognizerTest {
 
 
     @Test
+    public void test_foobar_beginAsteriskVariablsWordAsterisk_spaceVariables_shouldReturn_oneContextOfVariableTableHeaderName()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar";
+        String text = "*Variables";
+        String suffix = " Variables";
+        assertThatIsExepectedContext(prefix, text, suffix,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.VARIABLES_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE });
+    }
+
+
+    @Test
+    public void test_foobar_beginAsteriskVariableWordAsterisk_spaceVariable_shouldReturn_oneContextOfVariableTableHeaderName()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar";
+        String text = "*Variable";
+        String suffix = " Variable";
+        assertThatIsExepectedContext(prefix, text, suffix,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.VARIABLE_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE });
+    }
+
+
+    @Test
     public void test_foobar_beginAsteriskVariableWordAsterisk_barfoo_shouldReturn_oneContextOfVariableTableHeaderName()
             throws FileNotFoundException, IOException {
         String prefix = "foobar";
@@ -459,56 +487,5 @@ public class VariableTableHeaderRecognizerTest extends ARecognizerTest {
             throws IOException {
         String text = "foobar foobar";
         assertForIncorrectData(text);
-    }
-
-
-    private void assertThatIsExepectedContext(final String prefix,
-            final String text, final String suffix,
-            final IRobotTokenType[] types) throws FileNotFoundException,
-            IOException {
-        // prepare
-        String toTest = "";
-        if (prefix != null) {
-            toTest += prefix;
-        }
-        int column = toTest.length() + 1;
-        toTest += text;
-        if (suffix != null) {
-            toTest += suffix;
-        }
-
-        TokenOutput tokenOutput = createTokenOutput(toTest);
-
-        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
-        LineTokenPosition line = iter.next();
-        ContextOutput out = new ContextOutput(tokenOutput);
-
-        // execute
-        List<IContextElement> recognize = context.recognize(out, line);
-
-        // verify
-        assertThat(out.getContexts()).isEmpty();
-        OneLineRobotContext header = assertAndGetOneLineContext(recognize);
-
-        assertTokensForUnknownWords(header.getContextTokens(), types, 0,
-                new LinearPositionMarker(1, column), new String[] {});
-    }
-
-
-    private void assertForIncorrectData(String text)
-            throws FileNotFoundException, IOException {
-        // prepare
-        TokenOutput tokenOutput = createTokenOutput(text);
-
-        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
-        LineTokenPosition line = iter.next();
-        ContextOutput out = new ContextOutput(tokenOutput);
-
-        // execute
-        List<IContextElement> recognize = context.recognize(out, line);
-
-        // verify
-        assertThat(out.getContexts()).isEmpty();
-        assertThat(recognize).isEmpty();
     }
 }
