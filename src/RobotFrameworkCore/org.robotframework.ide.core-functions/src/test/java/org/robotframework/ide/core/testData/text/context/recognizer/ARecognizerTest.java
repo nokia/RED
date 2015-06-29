@@ -61,18 +61,35 @@ public abstract class ARecognizerTest {
     }
 
 
+    protected void assertTheSameLinesContext(
+            final List<IContextElement> recognize,
+            Class<? extends IContextElement> aClass, int expectedSize) {
+        assertThat(recognize).hasSize(expectedSize);
+
+        for (int i = 0; i < expectedSize; i++) {
+            IContextElement iContextElement = recognize.get(i);
+            assertThat(iContextElement).isInstanceOf(aClass);
+            OneLineRobotContext line = (OneLineRobotContext) iContextElement;
+            assertThat(line.getLineNumber()).isEqualTo(1);
+            assertThat(line.getParent()).isNull();
+            assertThat(line.getParentContext()).isNull();
+            assertThat(line.getType()).isEqualTo(context.getContextType());
+        }
+    }
+
+
     protected OneLineRobotContext assertAndGetOneLineContext(
             final List<IContextElement> recognize) {
         assertThat(recognize).hasSize(1);
         IContextElement iContextElement = recognize.get(0);
         assertThat(iContextElement).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext comment = (OneLineRobotContext) iContextElement;
-        assertThat(comment.getLineNumber()).isEqualTo(1);
-        assertThat(comment.getParent()).isNull();
-        assertThat(comment.getParentContext()).isNull();
-        assertThat(comment.getType()).isEqualTo(context.getContextType());
+        OneLineRobotContext line = (OneLineRobotContext) iContextElement;
+        assertThat(line.getLineNumber()).isEqualTo(1);
+        assertThat(line.getParent()).isNull();
+        assertThat(line.getParentContext()).isNull();
+        assertThat(line.getType()).isEqualTo(context.getContextType());
 
-        return comment;
+        return line;
     }
 
 
