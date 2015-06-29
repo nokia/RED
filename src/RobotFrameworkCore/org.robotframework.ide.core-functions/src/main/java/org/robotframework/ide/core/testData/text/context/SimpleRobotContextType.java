@@ -32,4 +32,12 @@ public enum SimpleRobotContextType implements IContextElementType {
      * variable table declaration
      */
     VARIABLE_TABLE_HEADER,
+    /**
+     * <pre>
+     * *** Test Case ***
+     * </pre>
+     * 
+     * variable table declaration
+     */
+    TEST_CASE_TABLE_HEADER;
 }
