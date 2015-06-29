@@ -46,10 +46,9 @@ public class TokenOutputAsserationHelper {
     }
 
 
-    public static void assertTokensForUnknownWords(TokenOutput out,
-            RobotType[] types, int startTokenPos, int startLine,
+    public static void assertTokensForUnknownWords(List<RobotToken> tokens,
+            RobotType[] types, int startTokenPos, LinearPositionMarker linePos,
             String[] textForCorrespondingUnknownWords) {
-        List<RobotToken> tokens = out.getTokens();
         int typesLength = types.length;
         CircullarArrayIterator<RobotType> iter = new CircullarArrayIterator<>(
                 types);
@@ -58,8 +57,8 @@ public class TokenOutputAsserationHelper {
         assertThat(tokens).isNotEmpty();
         assertThat((tokens.size() - startTokenPos) % typesLength).isEqualTo(0);
         int correspondingTextIndex = 0;
-        int line = startLine;
-        int column = LinearPositionMarker.THE_FIRST_COLUMN;
+        int line = linePos.getLine();
+        int column = linePos.getColumn();
         for (int tokId = startTokenPos; tokId < tokens.size(); tokId++) {
             RobotToken robotToken = tokens.get(tokId);
             assertThat(robotToken).isNotNull();
@@ -99,6 +98,17 @@ public class TokenOutputAsserationHelper {
                 assertEndPosition(robotToken, line, column);
             }
         }
+    }
+
+
+    public static void assertTokensForUnknownWords(TokenOutput out,
+            RobotType[] types, int startTokenPos, int startLine,
+            String[] textForCorrespondingUnknownWords) {
+        List<RobotToken> tokens = out.getTokens();
+        assertTokensForUnknownWords(tokens, types, startTokenPos,
+                new LinearPositionMarker(startLine,
+                        LinearPositionMarker.THE_FIRST_COLUMN),
+                textForCorrespondingUnknownWords);
     }
 
 
