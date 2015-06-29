@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7EzTMPfVEeSx2Y7ZMEilqw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/25/15 11:30 AM
+Save-Time: 6/29/15 3:52 PM
 Tags: Bugs
 Testcase-Type: ecl
 
@@ -14,7 +14,7 @@ Testcase-Type: ecl
 Content-Type: text/plain
 Entry-Name: .description
 
-RED-82 , if fixed this test will fail
+RED-82 , if fixed this test will pass
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -55,6 +55,8 @@ with [get-editor "newFile.robot" | get-table] {
     }
     apply-cell-edit -deactivate
 }
+
+
 //move folder
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/NewFolder"
@@ -68,22 +70,32 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/TestSuiteFolder" | drop 26 7 -detail move
     drag-end -detail move
 }
+
+
 //Save file
 get-window "Save Resource" | get-button Yes | click
+
 // Open moved file
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder/NewFolder/newFile.robot" | double-click
-get-editor "newFile.robot" -index 1 | get-tab-folder | get-tab-item Variables | click
-// 2 editors for one file are opened, old one dirty, moved one clean
-with [get-tab-folder -index 1] {
-    get-property "pages[0]" | equals "*newFile.robot" | verify-true
-    get-property "pages[1]" | equals "newFile.robot" | verify-true
-}
 
-//check if file is moved
-with [get-view "Project Explorer" | get-tree] {
-    get-property "selection[0].path[0]" | equals RobotProject | verify-true
-    get-property "selection[0].path[1]" | equals TestSuiteFolder | verify-true
-    get-property "selection[0].path[2]" | equals NewFolder | verify-true
-    get-property "selection[0].path[3]" | equals "newFile.robot" | verify-true
+
+// double click on file in Project Explorer - editor is still open therefore already opened editor should be focused
+get-tab-folder -index 1 | get-property tabCount | equals 1 | verify-true 
+
+// close editor and reopen to check if file was saved before move
+
+get-editor "newFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder/NewFolder/newFile.robot" | double-click
+get-editor "newFile.robot" | get-tab-folder | get-tab-item Variables | click
+
+// check if opened file consists changes made in the beggining of the test
+
+get-view "Project Explorer" | get-tree | select "RobotProject/NewFolder/newFile.robot" | double-click
+get-editor "newFile.robot" | get-tab-folder | get-tab-item Variables | click
+with [get-editor "newFile.robot" | get-table] {
+    get-item "${var}" | get-property "columns[0]" | equals "${var}" | verify-true
+    get-item "${var}" | get-property "columns[1]" | equals test | verify-true
+    get-item "${var1}" | get-property "columns[0]" | equals "${var1}" | verify-true
+    get-item "${var1}" | get-property "columns[1]" | equals "" | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
