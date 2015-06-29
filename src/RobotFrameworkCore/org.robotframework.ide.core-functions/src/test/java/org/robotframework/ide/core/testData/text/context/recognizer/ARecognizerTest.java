@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokensForUnknownWords;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,8 +17,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
+import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -78,6 +84,39 @@ public abstract class ARecognizerTest {
     }
 
 
+    protected void assertThatIsExepectedContext(final String prefix,
+            final String text, final String suffix,
+            final IRobotTokenType[] types) throws FileNotFoundException,
+            IOException {
+        // prepare
+        String toTest = "";
+        if (prefix != null) {
+            toTest += prefix;
+        }
+        int column = toTest.length() + 1;
+        toTest += text;
+        if (suffix != null) {
+            toTest += suffix;
+        }
+
+        TokenOutput tokenOutput = createTokenOutput(toTest);
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        OneLineRobotContext header = assertAndGetOneLineContext(recognize);
+
+        assertTokensForUnknownWords(header.getContextTokens(), types, 0,
+                new LinearPositionMarker(1, column), new String[] {});
+    }
+
+
     protected OneLineRobotContext assertAndGetOneLineContext(
             final List<IContextElement> recognize) {
         assertThat(recognize).hasSize(1);
@@ -90,6 +129,24 @@ public abstract class ARecognizerTest {
         assertThat(line.getType()).isEqualTo(context.getContextType());
 
         return line;
+    }
+
+
+    protected void assertForIncorrectData(String text)
+            throws FileNotFoundException, IOException {
+        // prepare
+        TokenOutput tokenOutput = createTokenOutput(text);
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        assertThat(recognize).isEmpty();
     }
 
 
