@@ -5,11 +5,15 @@ import java.util.List;
 
 
 /**
+ * Designed for context, which took place only in multiple lines i.e. settings
+ * table.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
+ * @see OneLineRobotContext
+ * @see ContextBuilder
  */
 public class ManyLinesRobotContext implements IContextElement {
 

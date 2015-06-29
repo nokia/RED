@@ -13,7 +13,7 @@ import java.util.Map;
  * @version Robot Framework 2.9 alpha 2
  * 
  */
-public enum RobotWordType implements RobotType {
+public enum RobotWordType implements IRobotTokenType {
     /**
      * It value, which do not have any special meaning, text to put should be
      * taken from token not from this type
@@ -230,7 +230,7 @@ public enum RobotWordType implements RobotType {
     }
 
 
-    public static RobotType getToken(StringBuilder text) {
+    public static IRobotTokenType getToken(StringBuilder text) {
         RobotWordType type = RobotWordType.UNKNOWN_WORD;
         if (text != null) {
             type = getToken(text.toString());
@@ -241,13 +241,13 @@ public enum RobotWordType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(StringBuilder text) {
+    public IRobotTokenType getTokenType(StringBuilder text) {
         return getToken(text);
     }
 
 
     @Override
-    public RobotType getTokenType(String text) {
+    public IRobotTokenType getTokenType(String text) {
         return getToken(text);
     }
 }

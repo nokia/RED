@@ -12,8 +12,8 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
@@ -42,18 +42,18 @@ public class PipeMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_PIPE, RobotTokenType.SINGLE_PIPE };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_PIPE, RobotSingleCharTokenType.SINGLE_PIPE };
                 assertThat(output.getTokens()).hasSize(4);
             } else {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_PIPE };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_PIPE };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -75,7 +75,7 @@ public class PipeMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_PIPE }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE }, 0, 1);
     }
 
 

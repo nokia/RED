@@ -14,8 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.text.lexer.NumberType;
 import org.robotframework.ide.core.testData.text.lexer.RobotTimeType;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -40,7 +40,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_numberTokenWillBeRecognizedCorrectly() {
         String text = "-1";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { NumberType.NUMBER_WITH_SIGN };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { NumberType.NUMBER_WITH_SIGN };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -48,7 +48,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_timeTokenWillBeRecognizedCorrectly() {
         String text = "hour";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTimeType.HOUR };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotTimeType.HOUR };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -81,7 +81,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_RANGE_willBeRecognizedAsCorrectWordType() {
         String text = "RANGE";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.RANGE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.RANGE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -89,7 +89,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_IN_willBeRecognizedAsCorrectWordType() {
         String text = "IN";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.IN_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.IN_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -97,7 +97,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_FOR_willBeRecognizedAsCorrectWordType() {
         String text = "FOR";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.FOR_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.FOR_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -105,7 +105,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Return_willBeRecognizedAsCorrectWordType() {
         String text = "Return";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.RETURN_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.RETURN_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -113,7 +113,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Arguments_willBeRecognizedAsCorrectWordType() {
         String text = "Arguments";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.ARGUMENTS_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.ARGUMENTS_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -121,7 +121,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Timeout_willBeRecognizedAsCorrectWordType() {
         String text = "Timeout";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.TIMEOUT_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.TIMEOUT_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -129,7 +129,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Template_willBeRecognizedAsCorrectWordType() {
         String text = "Template";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.TEMPLATE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.TEMPLATE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -137,7 +137,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Tags_willBeRecognizedAsCorrectWordType() {
         String text = "Tags";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.TAGS_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.TAGS_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -145,7 +145,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Default_willBeRecognizedAsCorrectWordType() {
         String text = "Default";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.DEFAULT_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DEFAULT_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -153,7 +153,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Force_willBeRecognizedAsCorrectWordType() {
         String text = "Force";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.FORCE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.FORCE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -161,7 +161,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Postcondition_willBeRecognizedAsCorrectWordType() {
         String text = "Postcondition";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.POSTCONDITION_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.POSTCONDITION_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -169,7 +169,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Precondition_willBeRecognizedAsCorrectWordType() {
         String text = "Precondition";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.PRECONDITION_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.PRECONDITION_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -177,7 +177,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Teardown_willBeRecognizedAsCorrectWordType() {
         String text = "Teardown";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.TEARDOWN_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.TEARDOWN_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -185,7 +185,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Setup_willBeRecognizedAsCorrectWordType() {
         String text = "Setup";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.SETUP_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.SETUP_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -193,7 +193,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Suite_willBeRecognizedAsCorrectWordType() {
         String text = "Suite";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.SUITE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.SUITE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -201,7 +201,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Documentation_willBeRecognizedAsCorrectWordType() {
         String text = "Documentation";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.DOCUMENTATION_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DOCUMENTATION_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -209,7 +209,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Resource_willBeRecognizedAsCorrectWordType() {
         String text = "Resource";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.RESOURCE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.RESOURCE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -217,7 +217,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_NAME_willBeRecognizedAsCorrectWordType() {
         String text = "NAME";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.NAME_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.NAME_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -225,7 +225,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_WITH_willBeRecognizedAsCorrectWordType() {
         String text = "WITH";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.WITH_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.WITH_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -233,7 +233,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Library_willBeRecognizedAsCorrectWordType() {
         String text = "Library";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.LIBRARY_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.LIBRARY_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -241,7 +241,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_User_willBeRecognizedAsCorrectWordType() {
         String text = "User";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.USER_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.USER_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -249,7 +249,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Keywords_willBeRecognizedAsCorrectWordType() {
         String text = "Keywords";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.KEYWORDS_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.KEYWORDS_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -257,7 +257,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Keyword_willBeRecognizedAsCorrectWordType() {
         String text = "Keyword";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.KEYWORD_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.KEYWORD_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -265,7 +265,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Cases_willBeRecognizedAsCorrectWordType() {
         String text = "Cases";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.CASES_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.CASES_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -273,7 +273,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Case_willBeRecognizedAsCorrectWordType() {
         String text = "Case";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.CASE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.CASE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -281,7 +281,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Test_willBeRecognizedAsCorrectWordType() {
         String text = "Test";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.TEST_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.TEST_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -289,7 +289,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Variables_willBeRecognizedAsCorrectWordType() {
         String text = "Variables";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.VARIABLES_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.VARIABLES_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -297,7 +297,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Variable_willBeRecognizedAsCorrectWordType() {
         String text = "Variable";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.VARIABLE_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.VARIABLE_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -305,7 +305,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Metadata_willBeRecognizedAsCorrectWordType() {
         String text = "Metadata";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.METADATA_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.METADATA_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -313,7 +313,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Settings_willBeRecognizedAsCorrectWordType() {
         String text = "Settings";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.SETTINGS_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.SETTINGS_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -321,7 +321,7 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_if_Setting_willBeRecognizedAsCorrectWordType() {
         String text = "Setting";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotWordType.SETTING_WORD };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.SETTING_WORD };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
@@ -333,7 +333,7 @@ public class RobotTokenMatcherTest {
         CharBuffer tempBuffer = CharBuffer.wrap(text);
 
         matcher = new RobotTokenMatcher(tokenOutput);
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.UNKNOWN };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.UNKNOWN };
         for (int i = 0; i < tempBuffer.length(); i++) {
             matcher.offerChar(tempBuffer, i);
             assertThat(tokenOutput).isNotNull();
@@ -346,7 +346,7 @@ public class RobotTokenMatcherTest {
         TokenOutput finalBuildTokens = matcher.buildTokens();
         assertThat(finalBuildTokens).isNotNull();
         assertTokensForUnknownWords(tokenOutput,
-                new RobotType[] { RobotWordType.UNKNOWN_WORD }, 0, 1,
+                new IRobotTokenType[] { RobotWordType.UNKNOWN_WORD }, 0, 1,
                 new String[] { text });
         assertCurrentPosition(tokenOutput);
         assertPositionMarkers(tokenOutput);
@@ -360,7 +360,7 @@ public class RobotTokenMatcherTest {
         CharBuffer tempBuffer = CharBuffer.wrap(text);
 
         matcher = new RobotTokenMatcher(tokenOutput);
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.UNKNOWN };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.UNKNOWN };
         for (int i = 0; i < tempBuffer.length(); i++) {
             matcher.offerChar(tempBuffer, i);
             assertThat(tokenOutput).isNotNull();
@@ -374,9 +374,9 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifEscapeBackslashCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
                 RobotWordType.DOUBLE_ESCAPE_BACKSLASH,
-                RobotTokenType.SINGLE_ESCAPE_BACKSLASH };
+                RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH };
         String text = "\\\\\\";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -384,10 +384,10 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifDotSignCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
-                RobotTokenType.SINGLE_DOT, RobotTokenType.LINE_FEED,
-                RobotTokenType.END_OF_LINE, RobotWordType.EMPTY_CELL_DOTS,
-                RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE,
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_DOT, RobotSingleCharTokenType.LINE_FEED,
+                RobotSingleCharTokenType.END_OF_LINE, RobotWordType.EMPTY_CELL_DOTS,
+                RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE,
                 RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
         String text = ".\n..\n...";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
@@ -396,7 +396,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifQuoteMarkSignCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_QUOTE_MARK };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_QUOTE_MARK };
         String text = "\"";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -404,7 +404,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifColonCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_COLON };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_COLON };
         String text = ":";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -412,9 +412,9 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifIndexSquareStartAndStopCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
-                RobotTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET,
-                RobotTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET,
+                RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET };
         String text = "[]";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -422,9 +422,9 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifVariableCurlyStartAndStopCanBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
-                RobotTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
-                RobotTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
+                RobotSingleCharTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET };
         String text = "{}";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -432,7 +432,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifEqualCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_EQUAL };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_EQUAL };
         String text = "=";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -440,7 +440,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifDictionaryVariableBeginCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND };
         String text = "&";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -448,7 +448,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifEnvironmentVariableBeginCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT };
         String text = "%";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -456,7 +456,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifListVariableBeginCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_LIST_BEGIN_AT };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_LIST_BEGIN_AT };
         String text = "@";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -464,7 +464,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifScalarVariableBeginCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_SCALAR_BEGIN_DOLLAR };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR };
         String text = "$";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -472,7 +472,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifHashCommentCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_COMMENT_HASH };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_COMMENT_HASH };
         String text = "#";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -480,7 +480,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifAsteriskCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ASTERISK };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ASTERISK };
         String text = "*";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -488,7 +488,7 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifPipeCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_PIPE };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE };
         String text = "|";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -496,8 +496,8 @@ public class RobotTokenMatcherTest {
 
     @Test
     public void test_ifWhitespaceCouldBeMatch() {
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
-                RobotTokenType.SINGLE_SPACE, RobotTokenType.SINGLE_TABULATOR };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_SPACE, RobotSingleCharTokenType.SINGLE_TABULATOR };
         String text = " \t";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
@@ -506,14 +506,14 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_ifEndOfLineCouldBeMatch() {
         String text = "\n";
-        RobotType[] expectedSequenceOfTypes = new RobotType[] {
-                RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+        IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
+                RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE };
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }
 
 
     private void assertThatCorrespondingMatcherWillBeUsed(String text,
-            RobotType[] expectedSequenceOfTypes) {
+            IRobotTokenType[] expectedSequenceOfTypes) {
         CharBuffer tempBuffer = CharBuffer.wrap(text);
         for (int i = 0; i < tempBuffer.length(); i++) {
             matcher.offerChar(tempBuffer, i);

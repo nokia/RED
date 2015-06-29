@@ -12,7 +12,8 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 
 
 /**
- * Responsible for parse file to understandable tokens.
+ * Responsible for parse file to understandable tokens in method
+ * {@link #extractTokens(File)}
  * 
  * @author wypych
  * @since JDK 1.7 update 74

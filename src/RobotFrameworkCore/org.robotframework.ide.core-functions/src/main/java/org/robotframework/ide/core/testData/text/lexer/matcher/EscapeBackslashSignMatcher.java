@@ -4,8 +4,8 @@ import java.nio.CharBuffer;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -22,7 +22,7 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_ESCAPE_BACKSLASH
+ * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
  * @see RobotWordType#DOUBLE_ESCAPE_BACKSLASH
  */
 public class EscapeBackslashSignMatcher implements ISingleCharTokenMatcher {
@@ -34,13 +34,13 @@ public class EscapeBackslashSignMatcher implements ISingleCharTokenMatcher {
         boolean shouldBeHandleAsSingleBackslash = true;
 
         char c = tempBuffer.get(charIndex);
-        RobotType type = RobotTokenType.getToken(c);
-        if (type == RobotTokenType.SINGLE_ESCAPE_BACKSLASH) {
+        IRobotTokenType type = RobotSingleCharTokenType.getToken(c);
+        if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
             List<RobotToken> tokens = tokenOutput.getTokens();
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
-                if (lastRobotToken.getType() == RobotTokenType.SINGLE_ESCAPE_BACKSLASH) {
-                    RobotType doubleBackslashTokenType = RobotWordType
+                if (lastRobotToken.getType() == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
+                    IRobotTokenType doubleBackslashTokenType = RobotWordType
                             .getToken("" + c + c);
                     if (doubleBackslashTokenType != null) {
                         replaceLastSingleBackslashByEscapedBackslash(
@@ -68,7 +68,7 @@ public class EscapeBackslashSignMatcher implements ISingleCharTokenMatcher {
 
 
     private void replaceLastSingleBackslashByEscapedBackslash(
-            TokenOutput tokenOutput, char c, RobotType doubleBackslashTokenType) {
+            TokenOutput tokenOutput, char c, IRobotTokenType doubleBackslashTokenType) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         int lastTokenIndex = tokens.size() - 1;
         RobotToken lastRobotToken = tokens.get(lastTokenIndex);
@@ -77,7 +77,7 @@ public class EscapeBackslashSignMatcher implements ISingleCharTokenMatcher {
                         .append(c));
         doubleBackslash.setType(doubleBackslashTokenType);
         tokenOutput.setCurrentMarker(doubleBackslash.getEndPosition());
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<Integer> listSingleBackslashes = tokensPosition.get(lastRobotToken
                 .getType());

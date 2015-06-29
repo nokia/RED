@@ -4,8 +4,8 @@ import java.nio.CharBuffer;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
@@ -33,7 +33,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  */
 public abstract class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
 
-    private final RobotType acceptedType;
+    private final IRobotTokenType acceptedType;
 
 
     /**
@@ -41,7 +41,7 @@ public abstract class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
      * @param acceptedType
      *            type which should be mapped to token directly
      */
-    protected AOnlyMapCharToToken(final RobotType acceptedType) {
+    protected AOnlyMapCharToToken(final IRobotTokenType acceptedType) {
         this.acceptedType = acceptedType;
     }
 
@@ -52,7 +52,7 @@ public abstract class AOnlyMapCharToToken implements ISingleCharTokenMatcher {
         boolean wasUsed = false;
 
         char c = tempBuffer.get(charIndex);
-        RobotType type = RobotTokenType.getToken(c);
+        IRobotTokenType type = RobotSingleCharTokenType.getToken(c);
 
         if (type == this.acceptedType) {
             StringBuilder str = new StringBuilder().append(c);

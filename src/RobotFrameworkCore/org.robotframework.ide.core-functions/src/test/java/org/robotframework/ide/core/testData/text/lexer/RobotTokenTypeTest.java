@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.text.lexer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType.HELPER;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType.HELPER;
 
 
 /**
@@ -12,44 +12,44 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType.HELPER;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see RobotTokenType
+ * @see RobotSingleCharTokenType
  */
 public class RobotTokenTypeTest {
 
     @Test
     public void test_getTokenType_zeroCharacters_shouldReturn_UNKNOWN() {
-        assertThat(RobotTokenType.UNKNOWN.getTokenType("")).isEqualTo(
-                RobotTokenType.UNKNOWN);
-        assertThat(RobotTokenType.UNKNOWN.getTokenType(new StringBuilder("")))
-                .isEqualTo(RobotTokenType.UNKNOWN);
+        assertThat(RobotSingleCharTokenType.UNKNOWN.getTokenType("")).isEqualTo(
+                RobotSingleCharTokenType.UNKNOWN);
+        assertThat(RobotSingleCharTokenType.UNKNOWN.getTokenType(new StringBuilder("")))
+                .isEqualTo(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
     @Test
     public void test_getTokenType_nullAsParam_shouldReturn_UNKNOWN() {
         String text = null;
-        assertThat(RobotTokenType.UNKNOWN.getTokenType(text)).isEqualTo(
-                RobotTokenType.UNKNOWN);
+        assertThat(RobotSingleCharTokenType.UNKNOWN.getTokenType(text)).isEqualTo(
+                RobotSingleCharTokenType.UNKNOWN);
         StringBuilder text2 = null;
-        assertThat(RobotTokenType.UNKNOWN.getTokenType(text2)).isEqualTo(
-                RobotTokenType.UNKNOWN);
+        assertThat(RobotSingleCharTokenType.UNKNOWN.getTokenType(text2)).isEqualTo(
+                RobotSingleCharTokenType.UNKNOWN);
     }
 
 
     @Test
     public void test_getTokenType_moreThanOneChar_shouldReturn_UNKNOWN() {
-        assertThat(RobotTokenType.UNKNOWN.getTokenType("...")).isEqualTo(
-                RobotTokenType.UNKNOWN);
+        assertThat(RobotSingleCharTokenType.UNKNOWN.getTokenType("...")).isEqualTo(
+                RobotSingleCharTokenType.UNKNOWN);
         assertThat(
-                RobotTokenType.UNKNOWN.getTokenType(new StringBuilder("...")))
-                .isEqualTo(RobotTokenType.UNKNOWN);
+                RobotSingleCharTokenType.UNKNOWN.getTokenType(new StringBuilder("...")))
+                .isEqualTo(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
     @Test
     public void test_typeSINGLE_QUOTE_MARK() {
         char tokenChar = '"';
-        RobotTokenType type = RobotTokenType.SINGLE_QUOTE_MARK;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_QUOTE_MARK;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -59,7 +59,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_DOT() {
         char tokenChar = '.';
-        RobotTokenType type = RobotTokenType.SINGLE_DOT;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_DOT;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -69,7 +69,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_COLON() {
         char tokenChar = ':';
-        RobotTokenType type = RobotTokenType.SINGLE_COLON;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_COLON;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -79,7 +79,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_POSSITION_INDEX_END_SQUARE_BRACKET() {
         char tokenChar = ']';
-        RobotTokenType type = RobotTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -89,7 +89,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET() {
         char tokenChar = '[';
-        RobotTokenType type = RobotTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -99,7 +99,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_VARIABLE_END_CURLY_BRACKET() {
         char tokenChar = '}';
-        RobotTokenType type = RobotTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -109,7 +109,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_VARIABLE_BEGIN_CURLY_BRACKET() {
         char tokenChar = '{';
-        RobotTokenType type = RobotTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -119,7 +119,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_EQUAL() {
         char tokenChar = '=';
-        RobotTokenType type = RobotTokenType.SINGLE_EQUAL;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_EQUAL;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -129,7 +129,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_DICTIONARY_BEGIN_AMPERSAND() {
         char tokenChar = '&';
-        RobotTokenType type = RobotTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -139,7 +139,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_ENVIRONMENT_BEGIN_PROCENT() {
         char tokenChar = '%';
-        RobotTokenType type = RobotTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -149,7 +149,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_LIST_BEGIN_AT() {
         char tokenChar = '@';
-        RobotTokenType type = RobotTokenType.SINGLE_LIST_BEGIN_AT;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_LIST_BEGIN_AT;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -159,7 +159,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_SCALAR_BEGIN_DOLLAR() {
         char tokenChar = '$';
-        RobotTokenType type = RobotTokenType.SINGLE_SCALAR_BEGIN_DOLLAR;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -169,7 +169,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_ESCAPE_BACKSLASH() {
         char tokenChar = '\\';
-        RobotTokenType type = RobotTokenType.SINGLE_ESCAPE_BACKSLASH;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -179,7 +179,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_COMMENT_HASH() {
         char tokenChar = '#';
-        RobotTokenType type = RobotTokenType.SINGLE_COMMENT_HASH;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_COMMENT_HASH;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -189,7 +189,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_ASTERISK() {
         char tokenChar = '*';
-        RobotTokenType type = RobotTokenType.SINGLE_ASTERISK;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_ASTERISK;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -199,7 +199,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_PIPE() {
         char tokenChar = '|';
-        RobotTokenType type = RobotTokenType.SINGLE_PIPE;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_PIPE;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -209,7 +209,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_SPACE() {
         char tokenChar = ' ';
-        RobotTokenType type = RobotTokenType.SINGLE_SPACE;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_SPACE;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -219,7 +219,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_TABULATOR() {
         char tokenChar = '\t';
-        RobotTokenType type = RobotTokenType.SINGLE_TABULATOR;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_TABULATOR;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -229,7 +229,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeLINE_FEED() {
         char tokenChar = '\n';
-        RobotTokenType type = RobotTokenType.LINE_FEED;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.LINE_FEED;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -239,7 +239,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeCARRIAGE_RETURN() {
         char tokenChar = '\r';
-        RobotTokenType type = RobotTokenType.CARRIAGE_RETURN;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.CARRIAGE_RETURN;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -248,7 +248,7 @@ public class RobotTokenTypeTest {
 
     @Test
     public void test_typeEND_OF_LINE() {
-        RobotTokenType type = RobotTokenType.END_OF_LINE;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.END_OF_LINE;
 
         assertThat(type.getThisTokenChar()).isEqualTo(HELPER.UNWRITABLE_CHARS);
         assertThat(type.toWrite()).isEmpty();
@@ -257,7 +257,7 @@ public class RobotTokenTypeTest {
 
     @Test
     public void test_typeUNKNOWN() {
-        RobotTokenType type = RobotTokenType.UNKNOWN;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.UNKNOWN;
 
         assertThat(type.getThisTokenChar()).isEqualTo(HELPER.UNWRITABLE_CHARS);
         assertThat(type.toWrite()).isEmpty();
@@ -267,27 +267,27 @@ public class RobotTokenTypeTest {
     @Test
     public void test_getToken_checkIfMapOfRobotWordTypesIsCoherent() {
         // prepare
-        RobotTokenType[] tokenTypes = RobotTokenType.values();
+        RobotSingleCharTokenType[] tokenTypes = RobotSingleCharTokenType.values();
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).hasSize(22);
 
-        for (RobotTokenType type : tokenTypes) {
+        for (RobotSingleCharTokenType type : tokenTypes) {
             char thisTokenChar = type.getThisTokenChar();
             if (thisTokenChar == HELPER.UNWRITABLE_CHARS) {
-                assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
-                        RobotTokenType.UNKNOWN);
-                assertThat(((RobotType) type).isWriteable()).isFalse();
+                assertThat(RobotSingleCharTokenType.getToken(thisTokenChar)).isEqualTo(
+                        RobotSingleCharTokenType.UNKNOWN);
+                assertThat(((IRobotTokenType) type).isWriteable()).isFalse();
                 assertThat(type.getTokenType("" + thisTokenChar)).isEqualTo(
-                        RobotTokenType.UNKNOWN);
+                        RobotSingleCharTokenType.UNKNOWN);
                 assertThat(
                         type.getTokenType(new StringBuilder("" + thisTokenChar)))
-                        .isEqualTo(RobotTokenType.UNKNOWN);
+                        .isEqualTo(RobotSingleCharTokenType.UNKNOWN);
             } else {
-                assertThat(RobotTokenType.getToken(thisTokenChar)).isEqualTo(
+                assertThat(RobotSingleCharTokenType.getToken(thisTokenChar)).isEqualTo(
                         type);
-                assertThat(((RobotType) type).isWriteable()).isTrue();
+                assertThat(((IRobotTokenType) type).isWriteable()).isTrue();
                 assertThat(type.getTokenType("" + thisTokenChar)).isEqualTo(
                         type);
                 assertThat(

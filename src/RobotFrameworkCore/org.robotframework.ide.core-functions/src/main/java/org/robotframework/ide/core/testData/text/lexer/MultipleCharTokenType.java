@@ -22,11 +22,11 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.HashCommentMatche
  * @see HashCommentMatcher
  * @see DotSignMatcher
  */
-public enum GroupedSameTokenType implements RobotType {
+public enum MultipleCharTokenType implements IRobotTokenType {
     /**
      * just for not return null in {@link #getToken(RobotToken)} method
      */
-    UNKNOWN(RobotTokenType.UNKNOWN) {
+    UNKNOWN(RobotSingleCharTokenType.UNKNOWN) {
 
         @Override
         protected boolean isMine(String text) {
@@ -36,7 +36,7 @@ public enum GroupedSameTokenType implements RobotType {
     /**
      * in example: '***'
      */
-    MANY_ASTERISKS(RobotTokenType.SINGLE_ASTERISK) {
+    MANY_ASTERISKS(RobotSingleCharTokenType.SINGLE_ASTERISK) {
 
         @Override
         protected boolean isMine(String text) {
@@ -60,7 +60,7 @@ public enum GroupedSameTokenType implements RobotType {
     /**
      * in example: '###'
      */
-    MANY_COMMENT_HASHS(RobotTokenType.SINGLE_COMMENT_HASH) {
+    MANY_COMMENT_HASHS(RobotSingleCharTokenType.SINGLE_COMMENT_HASH) {
 
         @Override
         protected boolean isMine(String text) {
@@ -84,7 +84,7 @@ public enum GroupedSameTokenType implements RobotType {
     /**
      * more than 3 dot signs, in example: '....'
      */
-    MORE_THAN_THREE_DOTS(RobotTokenType.SINGLE_DOT) {
+    MORE_THAN_THREE_DOTS(RobotSingleCharTokenType.SINGLE_DOT) {
 
         @Override
         protected boolean isMine(String text) {
@@ -106,13 +106,13 @@ public enum GroupedSameTokenType implements RobotType {
         }
     };
 
-    private final RobotTokenType wrappedType;
-    private static final Map<RobotTokenType, GroupedSameTokenType> reservedWordTypes;
+    private final RobotSingleCharTokenType wrappedType;
+    private static final Map<RobotSingleCharTokenType, MultipleCharTokenType> reservedWordTypes;
 
     static {
-        Map<RobotTokenType, GroupedSameTokenType> temp = new HashMap<>();
-        GroupedSameTokenType[] values = GroupedSameTokenType.values();
-        for (GroupedSameTokenType type : values) {
+        Map<RobotSingleCharTokenType, MultipleCharTokenType> temp = new HashMap<>();
+        MultipleCharTokenType[] values = MultipleCharTokenType.values();
+        for (MultipleCharTokenType type : values) {
             temp.put(type.wrappedType, type);
         }
 
@@ -120,12 +120,12 @@ public enum GroupedSameTokenType implements RobotType {
     }
 
 
-    public static GroupedSameTokenType getToken(final RobotType previousType) {
-        GroupedSameTokenType groupedSameTokenType = reservedWordTypes
+    public static MultipleCharTokenType getToken(final IRobotTokenType previousType) {
+        MultipleCharTokenType groupedSameTokenType = reservedWordTypes
                 .get(previousType);
 
         if (groupedSameTokenType == null) {
-            groupedSameTokenType = GroupedSameTokenType.UNKNOWN;
+            groupedSameTokenType = MultipleCharTokenType.UNKNOWN;
         }
 
         return groupedSameTokenType;
@@ -133,12 +133,12 @@ public enum GroupedSameTokenType implements RobotType {
 
 
     public boolean isFromThisGroup(RobotToken token) {
-        RobotType tokenType = token.getType();
+        IRobotTokenType tokenType = token.getType();
         return (tokenType == this) || (tokenType == this.wrappedType);
     }
 
 
-    private GroupedSameTokenType(final RobotTokenType wrappedType) {
+    private MultipleCharTokenType(final RobotSingleCharTokenType wrappedType) {
         this.wrappedType = wrappedType;
     }
 
@@ -157,14 +157,14 @@ public enum GroupedSameTokenType implements RobotType {
     }
 
 
-    public RobotTokenType getWrappedType() {
+    public RobotSingleCharTokenType getWrappedType() {
         return this.wrappedType;
     }
 
 
     @Override
-    public RobotType getTokenType(StringBuilder text) {
-        RobotType type = UNKNOWN;
+    public IRobotTokenType getTokenType(StringBuilder text) {
+        IRobotTokenType type = UNKNOWN;
         if (text != null) {
             type = getTokenType(text.toString());
         }
@@ -174,10 +174,10 @@ public enum GroupedSameTokenType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(String text) {
-        RobotType type = UNKNOWN;
-        GroupedSameTokenType[] values = GroupedSameTokenType.values();
-        for (GroupedSameTokenType tType : values) {
+    public IRobotTokenType getTokenType(String text) {
+        IRobotTokenType type = UNKNOWN;
+        MultipleCharTokenType[] values = MultipleCharTokenType.values();
+        for (MultipleCharTokenType tType : values) {
             if (tType == UNKNOWN) {
                 continue;
             }

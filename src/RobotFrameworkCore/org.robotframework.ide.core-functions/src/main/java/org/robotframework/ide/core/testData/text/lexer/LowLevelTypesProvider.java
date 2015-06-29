@@ -24,7 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class LowLevelTypesProvider {
 
-    private volatile static List<RobotType> lowLevelTypes = new LinkedList<>();
+    private volatile static List<IRobotTokenType> lowLevelTypes = new LinkedList<>();
 
     static {
         lowLevelTypes.add(RobotTimeType.UNKNOWN);
@@ -37,10 +37,10 @@ public class LowLevelTypesProvider {
      * @return in case can not be recognized, its return
      *         {@link RobotWordType#UNKNOWN_WORD}
      */
-    public static RobotType getTokenType(String text) {
-        RobotType type = RobotWordType.UNKNOWN_WORD;
-        for (RobotType rType : lowLevelTypes) {
-            RobotType returnedType = rType.getTokenType(text);
+    public static IRobotTokenType getTokenType(String text) {
+        IRobotTokenType type = RobotWordType.UNKNOWN_WORD;
+        for (IRobotTokenType rType : lowLevelTypes) {
+            IRobotTokenType returnedType = rType.getTokenType(text);
             if (returnedType != rType) {
                 type = returnedType;
                 break;
@@ -56,8 +56,8 @@ public class LowLevelTypesProvider {
      * @return in case can not be recognized or text is {@code null}, its return
      *         {@link RobotWordType#UNKNOWN_WORD}
      */
-    public static RobotType getTokenType(StringBuilder text) {
-        RobotType type = RobotWordType.UNKNOWN_WORD;
+    public static IRobotTokenType getTokenType(StringBuilder text) {
+        IRobotTokenType type = RobotWordType.UNKNOWN_WORD;
         if (text != null) {
             type = getTokenType(text.toString());
         }
@@ -67,7 +67,7 @@ public class LowLevelTypesProvider {
 
 
     @VisibleForTesting
-    public static List<RobotType> getDeclaredRobotTypes() {
+    public static List<IRobotTokenType> getDeclaredRobotTypes() {
         return Collections.unmodifiableList(lowLevelTypes);
     }
 }
