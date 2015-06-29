@@ -8,17 +8,17 @@ class KeywordProposalsLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
-        return ((KeywordProposal) element).getImage();
+        return ((KeywordContentProposal) element).getImage();
     }
 
     @Override
     public String getText(final Object element) {
-        return ((KeywordProposal) element).getLabel();
+        return ((KeywordContentProposal) element).getLabel();
     }
 
     @Override
     public StyledString getStyledText(final Object element) {
-        return new StyledString(((KeywordProposal) element).getLabel());
+        return new StyledString(((KeywordContentProposal) element).getLabel());
     }
 
 }

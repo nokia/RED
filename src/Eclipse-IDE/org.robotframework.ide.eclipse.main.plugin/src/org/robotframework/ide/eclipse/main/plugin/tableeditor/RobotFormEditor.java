@@ -36,6 +36,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
@@ -101,11 +102,12 @@ public class RobotFormEditor extends FormEditor {
             prepareCommandsContext();
 
             addEditorPart(new CasesEditorPart(), "Test Cases");
+            addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new TextEditorWrapper(), "Source", null);
 
-            setActivePage(3);
+            setActivePage(4);
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
         }

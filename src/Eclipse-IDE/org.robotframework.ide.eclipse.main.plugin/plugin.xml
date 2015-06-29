@@ -486,6 +486,12 @@
           name="Settings Editor Context"
           parentId="org.robotframework.ide.eclipse.tableeditor.context">
     </context>
+    <context
+          description="Context for Keywords section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.keywords.context"
+          name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
