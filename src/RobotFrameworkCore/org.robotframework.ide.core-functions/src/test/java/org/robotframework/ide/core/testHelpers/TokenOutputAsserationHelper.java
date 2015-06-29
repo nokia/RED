@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
-import org.robotframework.ide.core.testData.text.lexer.NumberType;
-import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.NumberType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -47,7 +47,8 @@ public class TokenOutputAsserationHelper {
 
 
     public static void assertTokensForUnknownWords(List<RobotToken> tokens,
-            IRobotTokenType[] types, int startTokenPos, LinearPositionMarker linePos,
+            IRobotTokenType[] types, int startTokenPos,
+            LinearPositionMarker linePos,
             String[] textForCorrespondingUnknownWords) {
         int typesLength = types.length;
         CircullarArrayIterator<IRobotTokenType> iter = new CircullarArrayIterator<>(
@@ -88,8 +89,8 @@ public class TokenOutputAsserationHelper {
                                             .toWrite() + "]+");
 
                 } else if (robotToken.getType().getClass() != MultipleCharTokenType.class) {
-                    assertThat(robotToken.getText().toString()).isEqualTo(
-                            type.toWrite());
+                    assertThat(robotToken.getText().toString())
+                            .isEqualToIgnoringCase(type.toWrite());
                 } else {
                     throw new UnsupportedOperationException(
                             "Not implemented yet!");
@@ -183,7 +184,8 @@ public class TokenOutputAsserationHelper {
         assertThat(tokensPosition).isNotNull();
         List<Integer> crTokens = tokensPosition
                 .get(RobotSingleCharTokenType.CARRIAGE_RETURN);
-        List<Integer> lfTokens = tokensPosition.get(RobotSingleCharTokenType.LINE_FEED);
+        List<Integer> lfTokens = tokensPosition
+                .get(RobotSingleCharTokenType.LINE_FEED);
         int line = Math.max(crTokens.size(), lfTokens.size());
         assertThat(currentMarker.getLine()).isEqualTo(line + 1);
         assertThat(currentMarker.getColumn()).isEqualTo(currentColumn(output));
@@ -248,13 +250,15 @@ public class TokenOutputAsserationHelper {
                 new StringBuilder("\t"));
         tabulatorTokenOne.setType(RobotSingleCharTokenType.SINGLE_TABULATOR);
         output.getTokens().add(tabulatorTokenOne);
-        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_TABULATOR, 0);
+        output.getTokensPosition().put(
+                RobotSingleCharTokenType.SINGLE_TABULATOR, 0);
 
         RobotToken tabulatorTokenTwo = new RobotToken(
                 tabulatorTokenOne.getEndPosition(), new StringBuilder("\t"));
         tabulatorTokenTwo.setType(RobotSingleCharTokenType.SINGLE_TABULATOR);
         output.getTokens().add(tabulatorTokenTwo);
-        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_TABULATOR, 1);
+        output.getTokensPosition().put(
+                RobotSingleCharTokenType.SINGLE_TABULATOR, 1);
 
         output.setCurrentMarker(tabulatorTokenTwo.getEndPosition());
 
@@ -270,13 +274,15 @@ public class TokenOutputAsserationHelper {
                 new StringBuilder("*"));
         asteriskTokenOne.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenOne);
-        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_ASTERISK, 0);
+        output.getTokensPosition().put(
+                RobotSingleCharTokenType.SINGLE_ASTERISK, 0);
 
         RobotToken asteriskTokenTwo = new RobotToken(
                 asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
         asteriskTokenTwo.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenTwo);
-        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_ASTERISK, 1);
+        output.getTokensPosition().put(
+                RobotSingleCharTokenType.SINGLE_ASTERISK, 1);
 
         output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
 

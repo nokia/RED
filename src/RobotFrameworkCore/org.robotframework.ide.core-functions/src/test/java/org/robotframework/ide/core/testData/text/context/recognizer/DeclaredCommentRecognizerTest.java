@@ -12,10 +12,10 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -54,11 +54,11 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         assertThat(out.getContexts()).isEmpty();
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
 
-        assertTokensForUnknownWords(
-                comment.getContextTokens(),
+        assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
-                        RobotSingleCharTokenType.SINGLE_SPACE, RobotWordType.UNKNOWN_WORD },
-                0, new LinearPositionMarker(1, 2), new String[] { commentText });
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.UNKNOWN_WORD }, 0,
+                new LinearPositionMarker(1, 2), new String[] { commentText });
     }
 
 
@@ -82,7 +82,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
-                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
                         RobotWordType.UNKNOWN_WORD }, 0,
                 new LinearPositionMarker(1,
                         LinearPositionMarker.THE_FIRST_COLUMN),
@@ -172,11 +173,11 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         assertThat(out.getContexts()).isEmpty();
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
 
-        assertTokensForUnknownWords(
-                comment.getContextTokens(),
+        assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
-                        RobotSingleCharTokenType.SINGLE_SPACE, RobotWordType.UNKNOWN_WORD },
-                9, new LinearPositionMarker(1,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.UNKNOWN_WORD }, 9,
+                new LinearPositionMarker(1,
                         LinearPositionMarker.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
@@ -202,11 +203,12 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         assertThat(out.getContexts()).isEmpty();
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
 
-        assertTokensForUnknownWords(
-                comment.getContextTokens(),
-                new IRobotTokenType[] { MultipleCharTokenType.MANY_COMMENT_HASHS,
-                        RobotSingleCharTokenType.SINGLE_SPACE, RobotWordType.UNKNOWN_WORD },
-                9, new LinearPositionMarker(1,
+        assertTokensForUnknownWords(comment.getContextTokens(),
+                new IRobotTokenType[] {
+                        MultipleCharTokenType.MANY_COMMENT_HASHS,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.UNKNOWN_WORD }, 9,
+                new LinearPositionMarker(1,
                         LinearPositionMarker.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
@@ -232,11 +234,12 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         assertThat(out.getContexts()).isEmpty();
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
 
-        assertTokensForUnknownWords(
-                comment.getContextTokens(),
-                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
-                        RobotSingleCharTokenType.SINGLE_SPACE, RobotWordType.UNKNOWN_WORD },
-                9, new LinearPositionMarker(1,
+        assertTokensForUnknownWords(comment.getContextTokens(),
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.UNKNOWN_WORD }, 9,
+                new LinearPositionMarker(1,
                         LinearPositionMarker.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
