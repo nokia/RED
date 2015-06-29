@@ -99,6 +99,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/keyword.png");
     }
 
+    public static ImageDescriptor getUserKeywordImage() {
+        return RobotFramework.getImageDescriptor("resources/keyword_user.png");
+    }
+
     public static ImageDescriptor getRobotProjectConfigFile() {
         return RobotFramework.getImageDescriptor("resources/config.png");
     }

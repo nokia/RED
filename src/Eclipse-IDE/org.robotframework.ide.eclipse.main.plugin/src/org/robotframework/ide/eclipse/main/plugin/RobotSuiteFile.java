@@ -49,6 +49,8 @@ public class RobotSuiteFile implements RobotElement {
             section = new RobotSuiteSettingsSection(this, readOnly);
         } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
             section = new RobotCasesSection(this, readOnly);
+        } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
+            section = new RobotKeywordsSection(this, readOnly);
         } else {
             section = new RobotSuiteFileSection(this, name, readOnly);
         }
@@ -202,10 +204,16 @@ public class RobotSuiteFile implements RobotElement {
                 imported.add(spec);
             }
         }
-
-        // TODO : go through keyword defined in the file itself and other
-        // imported resources
-
         return imported;
+    }
+
+    public List<RobotKeywordDefinition> getUserDefinedKeywords() {
+        final List<RobotKeywordDefinition> userKeywords = newArrayList();
+        final Optional<RobotElement> sectionOptional = findSection(RobotKeywordsSection.class);
+        if (sectionOptional.isPresent()) {
+            final RobotKeywordsSection section = (RobotKeywordsSection) sectionOptional.get();
+            return section.getUserDefinedKeywords();
+        }
+        return userKeywords;
     }
 }

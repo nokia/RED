@@ -84,7 +84,10 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
         if (parentElement instanceof IProject) {
             final IProject project = (IProject) parentElement;
             final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
-            final List<RobotProjectDependencies> dependencies = newArrayList(new RobotProjectDependencies(robotProject));
+            final List<RobotProjectDependencies> dependencies = newArrayList();
+            if (robotProject.hasStandardLibraries()) {
+                dependencies.add(new RobotProjectDependencies(robotProject));
+            }
             if (robotProject.hasReferencedLibraries()) {
                 dependencies.add(new RobotProjectExternalDependencies(robotProject));
             }
