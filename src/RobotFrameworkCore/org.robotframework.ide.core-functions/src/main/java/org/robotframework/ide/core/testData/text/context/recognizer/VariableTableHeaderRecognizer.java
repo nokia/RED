@@ -18,10 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
 /**
- * Search and builds the context for Setting table header - i.e.
+ * Search and builds the context for Variable table header - i.e.
  * 
  * <pre>
- * *** Settings ***
+ * *** Variables ***
  * </pre>
  * 
  * @author wypych
@@ -32,15 +32,14 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotSingleCharTokenType#SINGLE_ASTERISK
  * @see RobotSingleCharTokenType#SINGLE_TABULATOR
  * @see RobotSingleCharTokenType#SINGLE_SPACE
- * @see RobotWordType#SETTING_WORD
- * @see RobotWordType#SETTINGS_WORD
- * @see RobotWordType#METADATA_WORD
+ * @see RobotWordType#VARIABLE_WORD
+ * @see RobotWordType#VARIABLES_WORDD
  * @see RobotWordType#DOUBLE_SPACE
  * 
  */
-public class SettingTableHeaderRecognizer implements IContextRecognizer {
+public class VariableTableHeaderRecognizer implements IContextRecognizer {
 
-    private final static SimpleRobotContextType BUILD_TYPE = SimpleRobotContextType.SETTING_TABLE_HEADER;
+    private final static SimpleRobotContextType BUILD_TYPE = SimpleRobotContextType.VARIABLE_TABLE_HEADER;
 
 
     @Override
@@ -53,7 +52,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         boolean wasPrefixAsterisksPresent = false;
-        boolean wasSettingNamePresent = false;
+        boolean wasVariableNamePresent = false;
         boolean wasSuffixAsterisksPresent = false;
 
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
@@ -63,11 +62,11 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
             if (type == RobotSingleCharTokenType.SINGLE_ASTERISK
                     || type == MultipleCharTokenType.MANY_ASTERISKS) {
 
-                if (!wasPrefixAsterisksPresent && !wasSettingNamePresent) {
+                if (!wasPrefixAsterisksPresent && !wasVariableNamePresent) {
                     // begin asterisks
                     context.addNextToken(token);
                     wasPrefixAsterisksPresent = true;
-                } else if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
+                } else if (wasPrefixAsterisksPresent && wasVariableNamePresent) {
                     // trailing asterisks
                     context.addNextToken(token);
                     context.setType(BUILD_TYPE);
@@ -78,7 +77,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                     context.addNextToken(token);
 
                     wasPrefixAsterisksPresent = false;
-                    wasSettingNamePresent = false;
+                    wasVariableNamePresent = false;
                     wasSuffixAsterisksPresent = true;
                 } else {
                     // i.e. case *** *** - asteriks after asterisks or other
@@ -87,32 +86,31 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                     context.addNextToken(token);
 
                     wasPrefixAsterisksPresent = true;
-                    wasSettingNamePresent = false;
+                    wasVariableNamePresent = false;
                     wasSuffixAsterisksPresent = false;
                 }
             } else if (type == RobotSingleCharTokenType.SINGLE_SPACE
                     || type == RobotWordType.DOUBLE_SPACE
                     || type == RobotSingleCharTokenType.SINGLE_TABULATOR) {
-                if (wasPrefixAsterisksPresent || wasSettingNamePresent
+                if (wasPrefixAsterisksPresent || wasVariableNamePresent
                         || wasSuffixAsterisksPresent) {
                     // space are allowed after the first asterisks or after
                     // table name
                     context.addNextToken(token);
                 }
-            } else if (type == RobotWordType.SETTING_WORD
-                    || type == RobotWordType.SETTINGS_WORD
-                    || type == RobotWordType.METADATA_WORD) {
+            } else if (type == RobotWordType.VARIABLE_WORD
+                    || type == RobotWordType.VARIABLES_WORD) {
                 if (wasPrefixAsterisksPresent || wasSuffixAsterisksPresent) {
                     // table name after begin asterisks
                     context.addNextToken(token);
-                    wasSettingNamePresent = true;
+                    wasVariableNamePresent = true;
                     if (wasSuffixAsterisksPresent) {
                         wasPrefixAsterisksPresent = true;
                         wasSuffixAsterisksPresent = false;
                     }
                 }
             } else {
-                if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
+                if (wasPrefixAsterisksPresent && wasVariableNamePresent) {
                     context.setType(BUILD_TYPE);
                     foundContexts.add(context);
 
@@ -121,12 +119,12 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                 }
 
                 wasPrefixAsterisksPresent = false;
-                wasSettingNamePresent = false;
+                wasVariableNamePresent = false;
                 wasSuffixAsterisksPresent = false;
             }
         }
 
-        if (wasPrefixAsterisksPresent && wasSettingNamePresent) {
+        if (wasPrefixAsterisksPresent && wasVariableNamePresent) {
             // case when is not END OF LINE on header name
             context.setType(BUILD_TYPE);
             foundContexts.add(context);
