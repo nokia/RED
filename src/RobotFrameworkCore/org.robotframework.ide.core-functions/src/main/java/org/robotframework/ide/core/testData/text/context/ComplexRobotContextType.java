@@ -14,41 +14,5 @@ public enum ComplexRobotContextType implements IContextElementType {
     /**
      * 
      */
-    DECLARED_COMMENT,
-    /**
-     * 
-     */
-    SETTINGS_TABLE,
-    /**
-     * 
-     */
-    VARIABLES_TABLE,
-    /**
-     * 
-     */
-    TEST_CASES_TABLE,
-    /**
-     * 
-     */
-    KEYWORDS_TABLE,
-    /**
-     * 
-     */
-    TEST_CASES_SETTING_TABLE,
-    /**
-     * 
-     */
-    TEST_CASE_STEPS,
-    /**
-     * 
-     */
-    KEYWORDS_SETTING_TABLE,
-    /**
-     * 
-     */
-    KEYWORD_CONTENTS,
-    /**
-     * 
-     */
-    FOR_LOOP;
+    DECLARED_COMMENT;
 }
