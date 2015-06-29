@@ -12,9 +12,9 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -44,29 +44,29 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
 
             assertThat(output.getTokens()).hasSize(3);
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_DOT };
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.EMPTY_CELL_DOTS };
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
             } else if (charIndex >= 3) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        GroupedSameTokenType.MORE_THAN_THREE_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        MultipleCharTokenType.MORE_THAN_THREE_DOTS };
             }
 
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -85,23 +85,23 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
 
             assertThat(output.getTokens()).hasSize(3);
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_DOT };
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.EMPTY_CELL_DOTS };
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
             }
 
@@ -121,19 +121,19 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             assertThat(output.getTokens()).hasSize(3);
 
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.EMPTY_CELL_DOTS };
             } else {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_DOT };
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -151,17 +151,17 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
             assertThat(output.getTokens()).hasSize(1);
 
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_DOT };
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.EMPTY_CELL_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.EMPTY_CELL_DOTS };
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
             } else if (charIndex >= 3) {
-                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MORE_THAN_THREE_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { MultipleCharTokenType.MORE_THAN_THREE_DOTS };
             }
 
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -180,15 +180,15 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
             assertThat(output.getTokens()).hasSize(1);
 
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_DOT };
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.EMPTY_CELL_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.EMPTY_CELL_DOTS };
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS };
             }
 
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -207,13 +207,13 @@ public class DotSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             assertThat(output.getTokens()).hasSize(1);
 
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.EMPTY_CELL_DOTS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.EMPTY_CELL_DOTS };
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_DOT };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_DOT };
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -233,9 +233,9 @@ public class DotSignMatcherTest {
         assertCurrentPosition(output);
         assertPositionMarkers(output);
 
-        assertTokens(output, new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK,
-                RobotTokenType.SINGLE_DOT }, 0, 1);
+        assertTokens(output, new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotSingleCharTokenType.SINGLE_DOT }, 0, 1);
     }
 
 
@@ -251,7 +251,7 @@ public class DotSignMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_DOT }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_DOT }, 0, 1);
     }
 
 

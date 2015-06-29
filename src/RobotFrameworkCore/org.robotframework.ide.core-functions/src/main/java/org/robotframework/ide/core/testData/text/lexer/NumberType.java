@@ -9,7 +9,7 @@ package org.robotframework.ide.core.testData.text.lexer;
  * 
  * @see LowLevelTypesProvider
  */
-public enum NumberType implements RobotType {
+public enum NumberType implements IRobotTokenType {
     /**
      * default answer in case text is not number token
      */
@@ -88,8 +88,8 @@ public enum NumberType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(StringBuilder text) {
-        RobotType type = NumberType.UNKNOWN;
+    public IRobotTokenType getTokenType(StringBuilder text) {
+        IRobotTokenType type = NumberType.UNKNOWN;
         if (text != null) {
             type = getTokenType(text.toString());
         }
@@ -99,8 +99,8 @@ public enum NumberType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(String text) {
-        RobotType type = NumberType.UNKNOWN;
+    public IRobotTokenType getTokenType(String text) {
+        IRobotTokenType type = NumberType.UNKNOWN;
         NumberType[] values = NumberType.values();
         for (NumberType nType : values) {
             if (nType == NumberType.UNKNOWN) {

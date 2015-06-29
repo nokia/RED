@@ -11,7 +11,7 @@ package org.robotframework.ide.core.testData.text.lexer;
  */
 public class RobotToken {
 
-    private RobotType type = RobotTokenType.UNKNOWN;
+    private IRobotTokenType type = RobotSingleCharTokenType.UNKNOWN;
     private final LinearPositionMarker startPosition;
     private final StringBuilder text;
     private final LinearPositionMarker endPosition;
@@ -20,7 +20,7 @@ public class RobotToken {
     /**
      * Constructor, which set end position marker base on text length in
      * parameter {@code text}. Note: the begin type of token is set to
-     * {@link RobotTokenType#UNKNOWN}
+     * {@link RobotSingleCharTokenType#UNKNOWN}
      * 
      * @param start
      *            where token was found
@@ -36,7 +36,7 @@ public class RobotToken {
 
 
     /**
-     * Note: the begin type of token is set to {@link RobotTokenType#UNKNOWN}
+     * Note: the begin type of token is set to {@link RobotSingleCharTokenType#UNKNOWN}
      * 
      * @param start
      *            where token was found
@@ -53,12 +53,12 @@ public class RobotToken {
     }
 
 
-    public RobotType getType() {
+    public IRobotTokenType getType() {
         return type;
     }
 
 
-    public void setType(RobotType type) {
+    public void setType(IRobotTokenType type) {
         this.type = type;
     }
 

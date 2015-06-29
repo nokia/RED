@@ -3,10 +3,10 @@ package org.robotframework.ide.core.testData.text.lexer.matcher;
 import java.nio.CharBuffer;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -25,10 +25,10 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_DOT
+ * @see RobotSingleCharTokenType#SINGLE_DOT
  * @see RobotWordType#EMPTY_CELL_DOTS
  * @see RobotWordType#CONTINOUE_PREVIOUS_LINE_DOTS
- * @see GroupedSameTokenType#MORE_THAN_THREE_DOTS
+ * @see MultipleCharTokenType#MORE_THAN_THREE_DOTS
  */
 public class DotSignMatcher implements ISingleCharTokenMatcher {
 
@@ -39,15 +39,15 @@ public class DotSignMatcher implements ISingleCharTokenMatcher {
         boolean shouldBeHandleAsSingleDot = true;
 
         char c = tempBuffer.get(charIndex);
-        RobotType type = RobotTokenType.getToken(c);
+        IRobotTokenType type = RobotSingleCharTokenType.getToken(c);
 
-        if (type == RobotTokenType.SINGLE_DOT) {
+        if (type == RobotSingleCharTokenType.SINGLE_DOT) {
             List<RobotToken> tokens = tokenOutput.getTokens();
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
-                RobotType lastRobotTokenType = lastRobotToken.getType();
+                IRobotTokenType lastRobotTokenType = lastRobotToken.getType();
 
-                if (lastRobotTokenType == RobotTokenType.SINGLE_DOT) {
+                if (lastRobotTokenType == RobotSingleCharTokenType.SINGLE_DOT) {
                     mergeLastDotTokenTypeToNewType(tokenOutput, c,
                             lastRobotToken, RobotWordType.EMPTY_CELL_DOTS);
                     shouldBeHandleAsSingleDot = false;
@@ -59,9 +59,9 @@ public class DotSignMatcher implements ISingleCharTokenMatcher {
                 } else if (lastRobotTokenType == RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS) {
                     mergeLastDotTokenTypeToNewType(tokenOutput, c,
                             lastRobotToken,
-                            GroupedSameTokenType.MORE_THAN_THREE_DOTS);
+                            MultipleCharTokenType.MORE_THAN_THREE_DOTS);
                     shouldBeHandleAsSingleDot = false;
-                } else if (lastRobotTokenType == GroupedSameTokenType.MORE_THAN_THREE_DOTS) {
+                } else if (lastRobotTokenType == MultipleCharTokenType.MORE_THAN_THREE_DOTS) {
                     addNewDotToGroupedSameTokenType(tokenOutput, c);
                     shouldBeHandleAsSingleDot = false;
                 }
@@ -85,13 +85,13 @@ public class DotSignMatcher implements ISingleCharTokenMatcher {
 
 
     private void mergeLastDotTokenTypeToNewType(TokenOutput tokenOutput,
-            char c, RobotToken lastRobotToken, RobotType newType) {
+            char c, RobotToken lastRobotToken, IRobotTokenType newType) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         RobotToken manyDots = new RobotToken(lastRobotToken.getStartPosition(),
                 lastRobotToken.getText().append(c));
         manyDots.setType(newType);
         tokenOutput.setCurrentMarker(manyDots.getEndPosition());
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<Integer> previousTokenTypeList = tokensPosition.get(lastRobotToken
                 .getType());
@@ -107,7 +107,7 @@ public class DotSignMatcher implements ISingleCharTokenMatcher {
         RobotToken groupedDots = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
-        groupedDots.setType(GroupedSameTokenType.MORE_THAN_THREE_DOTS);
+        groupedDots.setType(MultipleCharTokenType.MORE_THAN_THREE_DOTS);
         tokenOutput.setCurrentMarker(groupedDots.getEndPosition());
         tokens.set(tokens.size() - 1, groupedDots);
     }

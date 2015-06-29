@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -20,9 +20,9 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#CARRIAGE_RETURN
- * @see RobotTokenType#LINE_FEED
- * @see RobotTokenType#END_OF_LINE
+ * @see RobotSingleCharTokenType#CARRIAGE_RETURN
+ * @see RobotSingleCharTokenType#LINE_FEED
+ * @see RobotSingleCharTokenType#END_OF_LINE
  */
 public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
@@ -32,13 +32,13 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
         boolean wasUsed = false;
 
         char c = tempBuffer.get(charIndex);
-        RobotTokenType type = RobotTokenType.getToken(c);
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.getToken(c);
 
-        if (type == RobotTokenType.CARRIAGE_RETURN) {
-            RobotType oppositeType = RobotTokenType.LINE_FEED;
+        if (type == RobotSingleCharTokenType.CARRIAGE_RETURN) {
+            IRobotTokenType oppositeType = RobotSingleCharTokenType.LINE_FEED;
             wasUsed = handleLineSeparator(tokenOutput, type, oppositeType);
-        } else if (type == RobotTokenType.LINE_FEED) {
-            RobotType oppositeType = RobotTokenType.CARRIAGE_RETURN;
+        } else if (type == RobotSingleCharTokenType.LINE_FEED) {
+            IRobotTokenType oppositeType = RobotSingleCharTokenType.CARRIAGE_RETURN;
             wasUsed = handleLineSeparator(tokenOutput, type, oppositeType);
         }
 
@@ -47,15 +47,15 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
 
     private boolean handleLineSeparator(TokenOutput tokenOutput,
-            RobotTokenType type, RobotType oppositeType) {
+            RobotSingleCharTokenType type, IRobotTokenType oppositeType) {
         boolean wasUsed = false;
 
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<RobotToken> tokens = tokenOutput.getTokens();
         if (!tokens.isEmpty()) {
             int nrOfTokens = tokens.size();
-            if (tokens.get(nrOfTokens - 1).getType() == RobotTokenType.END_OF_LINE) {
+            if (tokens.get(nrOfTokens - 1).getType() == RobotSingleCharTokenType.END_OF_LINE) {
                 List<Integer> currentTypeIndexes = tokensPosition.get(type);
                 int numberOfCurrentTypeTokens = currentTypeIndexes.size();
                 List<Integer> oppositeTypeIndexes = tokensPosition
@@ -67,7 +67,7 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
                     if (tokens.get(nrOfTokens - 2).getType() == oppositeType) {
                         tokens.remove(nrOfTokens - 1);
                         List<Integer> eolIndexes = tokensPosition
-                                .get(RobotTokenType.END_OF_LINE);
+                                .get(RobotSingleCharTokenType.END_OF_LINE);
                         eolIndexes.remove(eolIndexes.size() - 1);
                         RobotToken oppositeTypeTokenLast = tokens
                                 .get(nrOfTokens - 2);
@@ -94,10 +94,10 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
     }
 
 
-    private void addLineEnd(TokenOutput tokenOutput, RobotTokenType type) {
+    private void addLineEnd(TokenOutput tokenOutput, RobotSingleCharTokenType type) {
         LinearPositionMarker pos = tokenOutput.getCurrentMarker();
         List<RobotToken> tokens = tokenOutput.getTokens();
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         int column = pos.getColumn();
         if (column > LinearPositionMarker.THE_FIRST_COLUMN) {
@@ -113,10 +113,10 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
         RobotToken eolToken = new RobotToken(endToken.getEndPosition(), null,
                 endToken.getEndPosition());
-        eolToken.setType(RobotTokenType.END_OF_LINE);
+        eolToken.setType(RobotSingleCharTokenType.END_OF_LINE);
 
         tokens.add(eolToken);
-        tokensPosition.put(RobotTokenType.END_OF_LINE, tokens.size() - 1);
+        tokensPosition.put(RobotSingleCharTokenType.END_OF_LINE, tokens.size() - 1);
 
         tokenOutput.setCurrentMarker(LinearPositionMarker
                 .createMarkerForFirstColumn(pos.getLine() + 1));

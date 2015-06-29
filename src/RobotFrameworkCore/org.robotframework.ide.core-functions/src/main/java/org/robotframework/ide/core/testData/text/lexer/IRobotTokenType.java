@@ -9,7 +9,7 @@ package org.robotframework.ide.core.testData.text.lexer;
  * @version Robot Framework 2.9 alpha 2
  * 
  */
-public interface RobotType {
+public interface IRobotTokenType {
 
     /**
      * @return an information if token can be directly write to output stream
@@ -31,7 +31,7 @@ public interface RobotType {
      * @param text
      * @return
      */
-    RobotType getTokenType(StringBuilder text);
+    IRobotTokenType getTokenType(StringBuilder text);
 
 
     /**
@@ -41,5 +41,5 @@ public interface RobotType {
      * @param text
      * @return
      */
-    RobotType getTokenType(String text);
+    IRobotTokenType getTokenType(String text);
 }

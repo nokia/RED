@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
 /**
+ * Separator of tokens, base on line view. This iterator, just gives view on
+ * which token line is starting and where is it end.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -26,7 +28,7 @@ public class TokensLineIterator implements Iterator<LineTokenPosition> {
     public TokensLineIterator(final TokenOutput tokenOutput) {
         this.tokenOutput = tokenOutput;
         listOfLineEnds = tokenOutput.getTokensPosition().get(
-                RobotTokenType.END_OF_LINE);
+                RobotSingleCharTokenType.END_OF_LINE);
         numberOfLineEnds = listOfLineEnds.size();
         checkNextLineIndex();
     }
@@ -97,6 +99,13 @@ public class TokensLineIterator implements Iterator<LineTokenPosition> {
         }
     }
 
+    /**
+     * Next line start and end token index holder.
+     * 
+     * @author wypych
+     * @since JDK 1.7 update 74
+     * @version Robot Framework 2.9 alpha 2
+     */
     public static class LineTokenPosition {
 
         private final int start;

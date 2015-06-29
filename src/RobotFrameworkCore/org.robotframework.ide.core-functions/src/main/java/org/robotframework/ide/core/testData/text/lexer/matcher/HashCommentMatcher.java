@@ -3,10 +3,10 @@ package org.robotframework.ide.core.testData.text.lexer.matcher;
 import java.nio.CharBuffer;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -21,8 +21,8 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_COMMENT_HASH
- * @see GroupedSameTokenType#MANY_COMMENT_HASHS
+ * @see RobotSingleCharTokenType#SINGLE_COMMENT_HASH
+ * @see MultipleCharTokenType#MANY_COMMENT_HASHS
  */
 public class HashCommentMatcher implements ISingleCharTokenMatcher {
 
@@ -33,13 +33,13 @@ public class HashCommentMatcher implements ISingleCharTokenMatcher {
         boolean shouldBeHandleAsSingleHash = true;
 
         char c = tempBuffer.get(charIndex);
-        RobotType type = RobotTokenType.getToken(c);
-        if (type == RobotTokenType.SINGLE_COMMENT_HASH) {
+        IRobotTokenType type = RobotSingleCharTokenType.getToken(c);
+        if (type == RobotSingleCharTokenType.SINGLE_COMMENT_HASH) {
             List<RobotToken> tokens = tokenOutput.getTokens();
 
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
-                if (GroupedSameTokenType.MANY_COMMENT_HASHS
+                if (MultipleCharTokenType.MANY_COMMENT_HASHS
                         .isFromThisGroup(lastRobotToken)) {
                     mergeLastHashsTokenWithCurrent(tokenOutput, c,
                             lastRobotToken);
@@ -66,42 +66,42 @@ public class HashCommentMatcher implements ISingleCharTokenMatcher {
 
     private void mergeLastHashsTokenWithCurrent(TokenOutput tokenOutput,
             char c, RobotToken lastRobotToken) {
-        RobotType lastRobotTokenType = lastRobotToken.getType();
-        if (lastRobotTokenType == GroupedSameTokenType.MANY_COMMENT_HASHS) {
+        IRobotTokenType lastRobotTokenType = lastRobotToken.getType();
+        if (lastRobotTokenType == MultipleCharTokenType.MANY_COMMENT_HASHS) {
             mergeLastHashsTokenWithCurrent(tokenOutput, c, lastRobotToken,
-                    GroupedSameTokenType.MANY_COMMENT_HASHS);
-        } else if (lastRobotTokenType == RobotTokenType.SINGLE_COMMENT_HASH) {
+                    MultipleCharTokenType.MANY_COMMENT_HASHS);
+        } else if (lastRobotTokenType == RobotSingleCharTokenType.SINGLE_COMMENT_HASH) {
             mergeLastHashsTokenWithCurrent(tokenOutput, c, lastRobotToken,
-                    RobotTokenType.SINGLE_COMMENT_HASH);
+                    RobotSingleCharTokenType.SINGLE_COMMENT_HASH);
         }
     }
 
 
     private void mergeLastHashsTokenWithCurrent(TokenOutput tokenOutput,
-            char c, RobotToken lastRobotToken, GroupedSameTokenType type) {
+            char c, RobotToken lastRobotToken, MultipleCharTokenType type) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         RobotToken groupedHash = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
-        groupedHash.setType(GroupedSameTokenType.MANY_COMMENT_HASHS);
+        groupedHash.setType(MultipleCharTokenType.MANY_COMMENT_HASHS);
         tokenOutput.setCurrentMarker(groupedHash.getEndPosition());
         tokens.set(tokens.size() - 1, groupedHash);
     }
 
 
     private void mergeLastHashsTokenWithCurrent(TokenOutput tokenOutput,
-            char c, RobotToken lastRobotToken, RobotTokenType type) {
+            char c, RobotToken lastRobotToken, RobotSingleCharTokenType type) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         RobotToken groupedHash = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
-        groupedHash.setType(GroupedSameTokenType.MANY_COMMENT_HASHS);
+        groupedHash.setType(MultipleCharTokenType.MANY_COMMENT_HASHS);
         tokenOutput.setCurrentMarker(groupedHash.getEndPosition());
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<Integer> listSingleHashs = tokensPosition.get(type);
         listSingleHashs.remove(listSingleHashs.size() - 1);
-        tokensPosition.put(GroupedSameTokenType.MANY_COMMENT_HASHS,
+        tokensPosition.put(MultipleCharTokenType.MANY_COMMENT_HASHS,
                 tokens.size() - 1);
         tokens.set(tokens.size() - 1, groupedHash);
     }

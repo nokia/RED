@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
@@ -40,24 +40,24 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\n\r");
         TokenOutput output = createTokenOutputWithTwoAsterisksInside();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotTokenType[] crSequence;
+            RobotSingleCharTokenType[] crSequence;
             if ((charIndex + 1) % 2 == 0) {
-                crSequence = new RobotTokenType[] { RobotTokenType.LINE_FEED,
-                        RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.END_OF_LINE };
+                crSequence = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.LINE_FEED,
+                        RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.END_OF_LINE };
                 assertThat(output.getTokens()).hasSize(5);
             } else {
-                crSequence = new RobotTokenType[] { RobotTokenType.LINE_FEED,
-                        RobotTokenType.END_OF_LINE };
+                crSequence = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.LINE_FEED,
+                        RobotSingleCharTokenType.END_OF_LINE };
                 assertThat(output.getTokens()).hasSize(4);
             }
-            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+            RobotSingleCharTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
                     types, crSequence, 1);
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -71,25 +71,25 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\r\n");
         TokenOutput output = createTokenOutputWithTwoAsterisksInside();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotTokenType[] crSequence;
+            RobotSingleCharTokenType[] crSequence;
             if ((charIndex + 1) % 2 == 0) {
-                crSequence = new RobotTokenType[] {
-                        RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+                crSequence = new RobotSingleCharTokenType[] {
+                        RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE };
                 assertThat(output.getTokens()).hasSize(5);
             } else {
-                crSequence = new RobotTokenType[] {
-                        RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.END_OF_LINE };
+                crSequence = new RobotSingleCharTokenType[] {
+                        RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.END_OF_LINE };
                 assertThat(output.getTokens()).hasSize(4);
             }
-            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+            RobotSingleCharTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
                     types, crSequence, 1);
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -103,16 +103,16 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\n\n\n\n\n");
         TokenOutput output = createTokenOutputWithTwoAsterisksInside();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
-        RobotTokenType[] crSequence = new RobotTokenType[] {
-                RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK };
+        RobotSingleCharTokenType[] crSequence = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             assertThat(output.getTokens()).hasSize((charIndex + 2) * 2);
-            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+            RobotSingleCharTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
                     types, crSequence, charIndex + 1);
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -126,16 +126,16 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\r\r\r\r\r");
         TokenOutput output = createTokenOutputWithTwoAsterisksInside();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK };
-        RobotTokenType[] crSequence = new RobotTokenType[] {
-                RobotTokenType.CARRIAGE_RETURN, RobotTokenType.END_OF_LINE };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK };
+        RobotSingleCharTokenType[] crSequence = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.CARRIAGE_RETURN, RobotSingleCharTokenType.END_OF_LINE };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             assertThat(output.getTokens()).hasSize((charIndex + 2) * 2);
-            RobotTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
+            RobotSingleCharTokenType[] expectedSequenceOfTypes = extendByArrayNTimes(
                     types, crSequence, charIndex + 1);
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -144,16 +144,16 @@ public class EndOfLineMatcherTest {
     }
 
 
-    private RobotTokenType[] extendByArrayNTimes(RobotTokenType[] types,
-            RobotTokenType[] sequenceToAddManyTimes, int i) {
-        List<RobotTokenType> tempTypes = new LinkedList<>();
+    private RobotSingleCharTokenType[] extendByArrayNTimes(RobotSingleCharTokenType[] types,
+            RobotSingleCharTokenType[] sequenceToAddManyTimes, int i) {
+        List<RobotSingleCharTokenType> tempTypes = new LinkedList<>();
         tempTypes.addAll(Arrays.asList(types));
         for (int j = 0; j < i; j++) {
             for (int k = 0; k < sequenceToAddManyTimes.length; k++) {
                 tempTypes.add(sequenceToAddManyTimes[k]);
             }
         }
-        RobotTokenType[] buildTypes = tempTypes.toArray(new RobotTokenType[0]);
+        RobotSingleCharTokenType[] buildTypes = tempTypes.toArray(new RobotSingleCharTokenType[0]);
         tempTypes.clear();
 
         return buildTypes;
@@ -171,14 +171,14 @@ public class EndOfLineMatcherTest {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             // plus one because we have also End-Of-Line token
             assertThat(output.getTokens()).hasSize(charIndex + 2);
-            RobotTokenType[] types;
+            RobotSingleCharTokenType[] types;
             if ((charIndex + 1) % 2 == 0) {
-                types = new RobotTokenType[] { RobotTokenType.LINE_FEED,
-                        RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.END_OF_LINE };
+                types = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.LINE_FEED,
+                        RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.END_OF_LINE };
             } else {
-                types = new RobotTokenType[] { RobotTokenType.LINE_FEED,
-                        RobotTokenType.END_OF_LINE };
+                types = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.LINE_FEED,
+                        RobotSingleCharTokenType.END_OF_LINE };
             }
             assertTokens(output, types, 0, 1);
             assertCurrentPosition(output);
@@ -198,13 +198,13 @@ public class EndOfLineMatcherTest {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
             // plus one because we have also End-Of-Line token
             assertThat(output.getTokens()).hasSize(charIndex + 2);
-            RobotTokenType[] types;
+            RobotSingleCharTokenType[] types;
             if ((charIndex + 1) % 2 == 0) {
-                types = new RobotTokenType[] { RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+                types = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE };
             } else {
-                types = new RobotTokenType[] { RobotTokenType.CARRIAGE_RETURN,
-                        RobotTokenType.END_OF_LINE };
+                types = new RobotSingleCharTokenType[] { RobotSingleCharTokenType.CARRIAGE_RETURN,
+                        RobotSingleCharTokenType.END_OF_LINE };
             }
             assertTokens(output, types, 0, 1);
             assertCurrentPosition(output);
@@ -218,8 +218,8 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\n\n\n\n\n");
         TokenOutput output = new TokenOutput();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.LINE_FEED, RobotTokenType.END_OF_LINE };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.LINE_FEED, RobotSingleCharTokenType.END_OF_LINE };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
@@ -238,8 +238,8 @@ public class EndOfLineMatcherTest {
         // prepare
         CharBuffer tempBuffer = CharBuffer.wrap("\r\r\r\r\r");
         TokenOutput output = new TokenOutput();
-        RobotTokenType[] types = new RobotTokenType[] {
-                RobotTokenType.CARRIAGE_RETURN, RobotTokenType.END_OF_LINE };
+        RobotSingleCharTokenType[] types = new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.CARRIAGE_RETURN, RobotSingleCharTokenType.END_OF_LINE };
 
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
