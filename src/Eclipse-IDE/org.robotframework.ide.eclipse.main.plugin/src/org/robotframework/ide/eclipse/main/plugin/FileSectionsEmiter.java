@@ -71,6 +71,14 @@ class FileSectionsEmiter {
                     emitKeywordCall(builder, getCellsSeparator(), (RobotKeywordCall) el);
                 }
                 builder.append('\n');
+            } else if (element instanceof RobotKeywordDefinition) {
+                builder.append(element.getName());
+                builder.append('\n');
+
+                for (final RobotElement el : element.getChildren()) {
+                    emitKeywordCall(builder, getCellsSeparator(), (RobotKeywordCall) el);
+                }
+                builder.append('\n');
             }
         }
     }

@@ -738,7 +738,7 @@ public class RedContentProposalAdapter {
             final int index = proposalTable.indexOf(item);
 
             if (0 <= index && index < proposals.length) {
-                final IRedContentProposal current = (IRedContentProposal) proposals[index];
+                final IDecoratedContentProposal current = (IDecoratedContentProposal) proposals[index];
                 item.setText(getString(current));
                 item.setImage(getImage(current));
                 item.setData(current);
@@ -773,7 +773,7 @@ public class RedContentProposalAdapter {
                     final TableItem[] items = proposalTable.getItems();
                     for (int i = 0; i < items.length; i++) {
                         final TableItem item = items[i];
-                        final IRedContentProposal proposal = (IRedContentProposal) newProposals[i];
+                        final IDecoratedContentProposal proposal = (IDecoratedContentProposal) newProposals[i];
                         item.setText(getString(proposal));
                         item.setImage(getImage(proposal));
                         item.setData(proposal);
@@ -855,13 +855,13 @@ public class RedContentProposalAdapter {
         /*
          * Return the current selected proposal.
          */
-        private IContentProposal getSelectedProposal() {
+        private IDecoratedContentProposal getSelectedProposal() {
             if (isValid()) {
                 final int i = proposalTable.getSelectionIndex();
                 if (proposals == null || i < 0 || i >= proposals.length) {
                     return null;
                 }
-                return proposals[i];
+                return (IDecoratedContentProposal) proposals[i];
             }
             return null;
         }
@@ -947,7 +947,7 @@ public class RedContentProposalAdapter {
                             public void run() {
                                 // Query the current selection since we have
                                 // been delayed
-                                final IRedContentProposal p = (IRedContentProposal) getSelectedProposal();
+                                final IDecoratedContentProposal p = getSelectedProposal();
                                 if (p == null) {
                                     return;
                                 }

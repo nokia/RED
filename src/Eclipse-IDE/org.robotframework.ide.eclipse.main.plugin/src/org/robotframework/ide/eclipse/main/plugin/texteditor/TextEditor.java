@@ -1,9 +1,12 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor;
 
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -81,7 +84,8 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.assist.KeywordProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
@@ -144,12 +148,12 @@ public class TextEditor {
         	fileEditorInput = (FileEditorInput) input;
         	editedFile = fileEditorInput.getFile();
         } else if (input instanceof FileRevisionEditorInput) {
-        	FileRevisionEditorInput historyEditor = (FileRevisionEditorInput) input;
+        	final FileRevisionEditorInput historyEditor = (FileRevisionEditorInput) input;
         	
-        	IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
+        	final IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
         	try {
         		editedFile = workspace.getRoot().getFile(historyEditor.getStorage().getFullPath());
-			} catch (CoreException e1) {
+			} catch (final CoreException e1) {
 				e1.printStackTrace();
 				return;
 			}
@@ -217,8 +221,7 @@ public class TextEditor {
 		undoManager.connect(viewer);
 		
 		final RobotSuiteFile suiteFile = RobotFramework.getModelManager().createSuiteFile(editedFile);
-        final KeywordProposalsProvider proposalProvider = new KeywordProposalsProvider(suiteFile);
-        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = proposalProvider.getKeywordsForCompletionProposals();
+        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
         
         textHover = new TextEditorTextHover(keywordMap);
         final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover);
@@ -275,7 +278,7 @@ public class TextEditor {
             @Override
             public void mouseUp(final MouseEvent e) {
                 if (e.button != 3 && e.count == 1) {
-                    Point point = viewer.getTextWidget().getSelection();
+                    final Point point = viewer.getTextWidget().getSelection();
                     occurrenceMarksManager.showOccurrenceMarks(point.x);
                 }
             }
@@ -318,6 +321,18 @@ public class TextEditor {
             }
         });
 	}
+
+    private Map<String, TextEditorContentAssistKeywordContext> provideContentAssistantKeywordsMapping(
+            final RobotSuiteFile suiteFile) {
+        final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
+        final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
+        
+        final Map<String, TextEditorContentAssistKeywordContext> mapping = new LinkedHashMap<>();
+        for (final RedKeywordProposal proposal : keywordProposals) {
+            mapping.put(proposal.getLabel(), new TextEditorContentAssistKeywordContext(proposal));
+        }
+        return mapping;
+    }
 	
 	@Persist
 	public void save(final IProgressMonitor monitor) {

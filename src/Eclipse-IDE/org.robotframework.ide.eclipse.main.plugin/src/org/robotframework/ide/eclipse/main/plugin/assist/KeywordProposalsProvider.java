@@ -1,56 +1,32 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedBySourcesAndNames;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistKeywordContext;
 
-public class KeywordProposalsProvider implements IContentProposalProvider {
+class KeywordProposalsProvider implements IContentProposalProvider {
 
     private final RobotSuiteFile suiteFile;
 
-    public KeywordProposalsProvider(final RobotSuiteFile suiteFile) {
+    KeywordProposalsProvider(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
     }
 
     @Override
     public IContentProposal[] getProposals(final String contents, final int position) {
-        final List<LibrarySpecification> importedLibraries = suiteFile.getImportedLibraries();
+        final String prefix = contents.substring(0, position);
+        final List<RedKeywordProposal> keywordsProposals = new RedKeywordProposals(suiteFile).getKeywordProposals(
+                prefix, sortedBySourcesAndNames());
 
-        final KeywordProposalsFactory proposalsFactory = new KeywordProposalsFactory();
-        final List<KeywordProposal> proposals = newArrayList();
-        for (final LibrarySpecification spec : importedLibraries) {
-            for (final KeywordSpecification keyword : spec.getKeywords()) {
-                if (keyword.getName().startsWith(contents.substring(0, position))) {
-                    final KeywordProposal proposal = proposalsFactory.create(spec, keyword);
-                    proposals.add(proposal);
-                }
-            }
+        final List<KeywordContentProposal> proposals = newArrayList();
+        for (final RedKeywordProposal proposedKeyword : keywordsProposals) {
+            proposals.add(new KeywordContentProposal(proposedKeyword));
         }
-
-        Collections.sort(proposals);
         return proposals.toArray(new IContentProposal[0]);
-    }
-
-    public Map<String, TextEditorContentAssistKeywordContext> getKeywordsForCompletionProposals() {
-        final List<LibrarySpecification> importedLibraries = suiteFile.getImportedLibraries();
-
-        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = new HashMap<String, TextEditorContentAssistKeywordContext>();
-        for (final LibrarySpecification spec : importedLibraries) {
-            for (final KeywordSpecification keyword : spec.getKeywords()) {
-                keywordMap.put(keyword.getName(), new TextEditorContentAssistKeywordContext(spec.getName(), keyword));
-            }
-        }
-        return new TreeMap<String, TextEditorContentAssistKeywordContext>(keywordMap);
     }
 }
