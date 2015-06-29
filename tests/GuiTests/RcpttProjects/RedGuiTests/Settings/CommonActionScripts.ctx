@@ -6,44 +6,44 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/18/15 5:10 PM
+Save-Time: 6/26/15 12:30 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
 proc CreateVariablesInTableEditor [val EditorTitle] {
-// input - Editor title - filename
-// editor must be opened beforehand , section need to be created
-
-//focus on editor file
-with [get-editor $EditorTitle] {
-    get-tab-folder | get-tab-item Variables | click}
-
-//create 2 variables
-with [get-editor $EditorTitle | get-table] {
-    get-cell 0 0 | double-click
-    get-cell 0 0 | mouse down -count 2
-    double-click
-    select "${var}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 6
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
-}
-
-with [get-editor $EditorTitle | get-table] {
-    get-cell 1 0 | double-click
-    get-cell 1 0 | mouse down -count 2
-    double-click
-    select "${var1}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 6
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
-}
+	// input - Editor title - filename
+	// editor must be opened beforehand , section need to be created
+	
+	//focus on editor file
+	with [get-editor $EditorTitle] {
+	    get-tab-folder | get-tab-item Variables | click}
+	
+	//create 2 variables
+	with [get-editor $EditorTitle | get-table] {
+	    get-cell 0 0 | double-click
+	    get-cell 0 0 | mouse down -count 2
+	    double-click
+	    select "${var}" | activate-cell-edit
+	    with [get-editbox] {
+	        click-text 3 6
+	        key-type "NUMPAD_ENTER" "\\u000D"
+	    }
+	    apply-cell-edit -deactivate
+	}
+	
+	with [get-editor $EditorTitle | get-table] {
+	    get-cell 1 0 | double-click
+	    get-cell 1 0 | mouse down -count 2
+	    double-click
+	    select "${var1}" | activate-cell-edit
+	    with [get-editbox] {
+	        click-text 3 6
+	        key-type "NUMPAD_ENTER" "\\u000D"
+	    }
+	    apply-cell-edit -deactivate
+	}
 }
 
 proc Create2MetadataInTableEditor [val EditorTitle]{
@@ -111,13 +111,23 @@ proc Create2MetadataInTableEditor [val EditorTitle]{
 	}
 }
 
-//set python path
-if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{
-	global [val python_exe_path [	exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout]]
+//get python path
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	global [val python_exe_path [exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout]]
 
 }-else{
-	global [val python_exe_path [	exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
+	global [val python_exe_path [exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
 }	
+
+
+//get robot version
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	global [val robot_version [exec-process "\"pybot.bat\"" "\"--version\"" -ignoreStderr -ignoreExitCode | get stdout  |split -sep "!"   -trimResults]]
+
+}-else{
+	global [val robot_version [exec-process  "pybot" "--version"  -ignoreStderr -ignoreExitCode  | get stdout |split -sep "!"   -trimResults]]
+}	
+
 
 //concatenate strings in list with regex to check MEssage Log view (for short log)
 proc concat_str_with_regex [val log_list]
@@ -130,9 +140,9 @@ proc concat_str_with_regex [val log_list]
 }
 
 //select path depends to operating system
-proc "os-specific" [val windowsPath] [val linuxPath] 
+proc "os-specific" [val windowsValue] [val linuxValue] 
 {
-	echo [get-by-os -linux $linuxPath -win $windowsPath]
+	echo [get-by-os -win $windowsValue -linux $linuxValue]
 }
 
 
@@ -146,6 +156,18 @@ proc "check_if_line_is_highlighted" [val line] [val script_name]{
 	  	}
 	  	
 	}
+}
+
+
+proc replace [val input] [val old] [val new]{
+
+	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+		exec-process  "\"python.exe\"" "-c"  "\"import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])\"" $input $old $new | get stdout 
+
+	}-else{
+		exec-process  "python.exe" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout 
+	}	
+
 }
 
 
