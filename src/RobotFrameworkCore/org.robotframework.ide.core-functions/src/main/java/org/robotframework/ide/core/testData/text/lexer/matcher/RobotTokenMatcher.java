@@ -8,8 +8,8 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.LowLevelTypesProvider;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
 
@@ -110,11 +110,11 @@ public class RobotTokenMatcher {
         if (!tokens.isEmpty()) {
             int lastTokenIndex = tokens.size() - 1;
             RobotToken lastToken = tokens.get(lastTokenIndex);
-            if (lastToken.getType() == RobotTokenType.UNKNOWN) {
+            if (lastToken.getType() == RobotSingleCharTokenType.UNKNOWN) {
                 RobotToken newUnknownToken = new RobotToken(
                         lastToken.getStartPosition(), lastToken.getText()
                                 .append(c));
-                newUnknownToken.setType(RobotTokenType.UNKNOWN);
+                newUnknownToken.setType(RobotSingleCharTokenType.UNKNOWN);
                 output.setCurrentMarker(newUnknownToken.getEndPosition());
                 tokens.set(lastTokenIndex, newUnknownToken);
 
@@ -126,9 +126,9 @@ public class RobotTokenMatcher {
             StringBuilder text = new StringBuilder().append(c);
             RobotToken unknownToken = new RobotToken(output.getCurrentMarker(),
                     text);
-            unknownToken.setType(RobotTokenType.UNKNOWN);
+            unknownToken.setType(RobotSingleCharTokenType.UNKNOWN);
             output.setCurrentMarker(unknownToken.getEndPosition());
-            output.getTokensPosition().put(RobotTokenType.UNKNOWN,
+            output.getTokensPosition().put(RobotSingleCharTokenType.UNKNOWN,
                     tokens.size());
             tokens.add(unknownToken);
         }
@@ -157,10 +157,10 @@ public class RobotTokenMatcher {
 
 
     private void tryToRecognizeUnknownTokens(TokenOutput old) {
-        LinkedListMultimap<RobotType, Integer> tokensPosition = old
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = old
                 .getTokensPosition();
         List<Integer> listOfUnknown = tokensPosition
-                .get(RobotTokenType.UNKNOWN);
+                .get(RobotSingleCharTokenType.UNKNOWN);
         if (listOfUnknown != null) {
             List<RobotToken> tokens = old.getTokens();
             for (int i = 0; i < listOfUnknown.size(); i++) {
@@ -173,7 +173,7 @@ public class RobotTokenMatcher {
 
         }
 
-        tokensPosition.removeAll(RobotTokenType.UNKNOWN);
+        tokensPosition.removeAll(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
@@ -181,7 +181,7 @@ public class RobotTokenMatcher {
         StringBuilder text = unknownRobotToken.getText();
         RobotToken token = new RobotToken(unknownRobotToken.getStartPosition(),
                 text);
-        RobotType type = RobotWordType.getToken(text);
+        IRobotTokenType type = RobotWordType.getToken(text);
         if (type == RobotWordType.UNKNOWN_WORD) {
             type = LowLevelTypesProvider.getTokenType(text);
         }
@@ -201,7 +201,7 @@ public class RobotTokenMatcher {
      */
     public static class TokenOutput {
 
-        private LinkedListMultimap<RobotType, Integer> tokenTypeToPositionOfOcurrancy = LinkedListMultimap
+        private LinkedListMultimap<IRobotTokenType, Integer> tokenTypeToPositionOfOcurrancy = LinkedListMultimap
                 .create();
         private LinearPositionMarker currentMarker = LinearPositionMarker
                 .createMarkerForFirstLineAndColumn();
@@ -213,7 +213,7 @@ public class RobotTokenMatcher {
          * @return mapping between type of token and it position in
          *         {@link #tokens} list.
          */
-        public LinkedListMultimap<RobotType, Integer> getTokensPosition() {
+        public LinkedListMultimap<IRobotTokenType, Integer> getTokensPosition() {
             return tokenTypeToPositionOfOcurrancy;
         }
 

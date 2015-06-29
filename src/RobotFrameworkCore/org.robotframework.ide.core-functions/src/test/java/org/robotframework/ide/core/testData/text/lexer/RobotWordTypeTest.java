@@ -408,7 +408,7 @@ public class RobotWordTypeTest {
     public void test_getToken_checkIfMapOfRobotTokenTypesIsCoherent() {
         // prepare
         RobotWordType[] tokenTypes = RobotWordType.values();
-        RobotType unknownType = RobotWordType.UNKNOWN_WORD;
+        IRobotTokenType unknownType = RobotWordType.UNKNOWN_WORD;
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();

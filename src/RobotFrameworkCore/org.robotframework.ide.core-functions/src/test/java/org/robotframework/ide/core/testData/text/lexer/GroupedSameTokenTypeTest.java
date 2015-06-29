@@ -12,14 +12,14 @@ import org.junit.Test;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see GroupedSameTokenType
+ * @see MultipleCharTokenType
  */
 public class GroupedSameTokenTypeTest {
 
     @Test
     public void test_getTokenType_fourhDotsAndSpaceInside_shouldReturn_UNKNOWN() {
         String text = "... .";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
@@ -27,7 +27,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_fourDots_shouldReturn_MORE_THAN_THREE_DOTS() {
         String text = "....";
-        RobotType expectedType = GroupedSameTokenType.MORE_THAN_THREE_DOTS;
+        IRobotTokenType expectedType = MultipleCharTokenType.MORE_THAN_THREE_DOTS;
         assertGetTokenType(text, expectedType);
     }
 
@@ -35,7 +35,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_oneDot_shouldReturn_UNKNOWN() {
         String text = ".";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
@@ -43,7 +43,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_threeHashAndSpaceInside_shouldReturn_UNKNOWN() {
         String text = "## #";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
@@ -51,7 +51,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_twoHash_shouldReturn_MANY_COMMENT_HASHS() {
         String text = "##";
-        RobotType expectedType = GroupedSameTokenType.MANY_COMMENT_HASHS;
+        IRobotTokenType expectedType = MultipleCharTokenType.MANY_COMMENT_HASHS;
         assertGetTokenType(text, expectedType);
     }
 
@@ -59,7 +59,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_oneHash_shouldReturn_UNKNOWN() {
         String text = "#";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
@@ -67,7 +67,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_threeAsteriskAndSpaceInside_shouldReturn_UNKNOWN() {
         String text = "** *";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
@@ -75,7 +75,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_threeAsterisk_shouldReturn_MANY_ASTERISKS() {
         String text = "***";
-        RobotType expectedType = GroupedSameTokenType.MANY_ASTERISKS;
+        IRobotTokenType expectedType = MultipleCharTokenType.MANY_ASTERISKS;
         assertGetTokenType(text, expectedType);
     }
 
@@ -83,7 +83,7 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_twoAsterisk_shouldReturn_MANY_ASTERISKS() {
         String text = "**";
-        RobotType expectedType = GroupedSameTokenType.MANY_ASTERISKS;
+        IRobotTokenType expectedType = MultipleCharTokenType.MANY_ASTERISKS;
         assertGetTokenType(text, expectedType);
     }
 
@@ -91,18 +91,18 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getTokenType_oneAsterisk_shouldReturn_UNKNOWN() {
         String text = "*";
-        RobotType expectedType = GroupedSameTokenType.UNKNOWN;
+        IRobotTokenType expectedType = MultipleCharTokenType.UNKNOWN;
         assertGetTokenType(text, expectedType);
     }
 
 
-    private void assertGetTokenType(String text, RobotType expectedType) {
+    private void assertGetTokenType(String text, IRobotTokenType expectedType) {
         // prepare
         StringBuilder str = new StringBuilder(text);
 
         // execute
-        RobotType tokenType = GroupedSameTokenType.UNKNOWN.getTokenType(str);
-        RobotType tokenTypeViaText = GroupedSameTokenType.UNKNOWN
+        IRobotTokenType tokenType = MultipleCharTokenType.UNKNOWN.getTokenType(str);
+        IRobotTokenType tokenTypeViaText = MultipleCharTokenType.UNKNOWN
                 .getTokenType(text);
 
         // verify
@@ -119,26 +119,26 @@ public class GroupedSameTokenTypeTest {
         StringBuilder str = null;
 
         // execute
-        RobotType tokenType = GroupedSameTokenType.UNKNOWN.getTokenType(str);
+        IRobotTokenType tokenType = MultipleCharTokenType.UNKNOWN.getTokenType(str);
 
         // verify
         assertThat(tokenType).isNotNull();
-        assertThat(tokenType).isEqualTo(GroupedSameTokenType.UNKNOWN);
+        assertThat(tokenType).isEqualTo(MultipleCharTokenType.UNKNOWN);
     }
 
 
     @Test
     public void test_typeMORE_THAN_THREE_DOTS() {
-        GroupedSameTokenType type = GroupedSameTokenType.MORE_THAN_THREE_DOTS;
+        MultipleCharTokenType type = MultipleCharTokenType.MORE_THAN_THREE_DOTS;
 
-        assertThat(type.getWrappedType()).isEqualTo(RobotTokenType.SINGLE_DOT);
+        assertThat(type.getWrappedType()).isEqualTo(RobotSingleCharTokenType.SINGLE_DOT);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
                 LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
                 LinearPositionMarker.createMarkerForFirstLineAndColumn());
-        token.setType(GroupedSameTokenType.MORE_THAN_THREE_DOTS);
+        token.setType(MultipleCharTokenType.MORE_THAN_THREE_DOTS);
         assertThat(type.isFromThisGroup(token));
-        token.setType(RobotTokenType.SINGLE_DOT);
+        token.setType(RobotSingleCharTokenType.SINGLE_DOT);
         assertThat(type.isFromThisGroup(token));
 
         try {
@@ -154,17 +154,17 @@ public class GroupedSameTokenTypeTest {
 
     @Test
     public void test_typeMANY_COMMENT_HASHS() {
-        GroupedSameTokenType type = GroupedSameTokenType.MANY_COMMENT_HASHS;
+        MultipleCharTokenType type = MultipleCharTokenType.MANY_COMMENT_HASHS;
 
         assertThat(type.getWrappedType()).isEqualTo(
-                RobotTokenType.SINGLE_COMMENT_HASH);
+                RobotSingleCharTokenType.SINGLE_COMMENT_HASH);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
                 LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
                 LinearPositionMarker.createMarkerForFirstLineAndColumn());
-        token.setType(GroupedSameTokenType.MANY_COMMENT_HASHS);
+        token.setType(MultipleCharTokenType.MANY_COMMENT_HASHS);
         assertThat(type.isFromThisGroup(token));
-        token.setType(RobotTokenType.SINGLE_COMMENT_HASH);
+        token.setType(RobotSingleCharTokenType.SINGLE_COMMENT_HASH);
         assertThat(type.isFromThisGroup(token));
 
         try {
@@ -180,17 +180,17 @@ public class GroupedSameTokenTypeTest {
 
     @Test
     public void test_typeMANY_ASTERISKS() {
-        GroupedSameTokenType type = GroupedSameTokenType.MANY_ASTERISKS;
+        MultipleCharTokenType type = MultipleCharTokenType.MANY_ASTERISKS;
 
         assertThat(type.getWrappedType()).isEqualTo(
-                RobotTokenType.SINGLE_ASTERISK);
+                RobotSingleCharTokenType.SINGLE_ASTERISK);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
                 LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
                 LinearPositionMarker.createMarkerForFirstLineAndColumn());
-        token.setType(GroupedSameTokenType.MANY_ASTERISKS);
+        token.setType(MultipleCharTokenType.MANY_ASTERISKS);
         assertThat(type.isFromThisGroup(token));
-        token.setType(RobotTokenType.SINGLE_ASTERISK);
+        token.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
         assertThat(type.isFromThisGroup(token));
 
         try {
@@ -206,14 +206,14 @@ public class GroupedSameTokenTypeTest {
 
     @Test
     public void test_typeUNKNOWN() {
-        GroupedSameTokenType type = GroupedSameTokenType.UNKNOWN;
+        MultipleCharTokenType type = MultipleCharTokenType.UNKNOWN;
 
-        assertThat(type.getWrappedType()).isEqualTo(RobotTokenType.UNKNOWN);
+        assertThat(type.getWrappedType()).isEqualTo(RobotSingleCharTokenType.UNKNOWN);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
                 LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
                 LinearPositionMarker.createMarkerForFirstLineAndColumn());
-        token.setType(GroupedSameTokenType.UNKNOWN);
+        token.setType(MultipleCharTokenType.UNKNOWN);
         assertThat(type.isFromThisGroup(token));
         try {
             type.toWrite();
@@ -229,13 +229,13 @@ public class GroupedSameTokenTypeTest {
     @Test
     public void test_getToken_checkIfMapOfRobotWordTypesIsCoherent() {
         // prepare
-        GroupedSameTokenType[] tokenTypes = GroupedSameTokenType.values();
+        MultipleCharTokenType[] tokenTypes = MultipleCharTokenType.values();
 
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).hasSize(4);
-        for (GroupedSameTokenType type : tokenTypes) {
-            assertThat(GroupedSameTokenType.getToken(type.getWrappedType()))
+        for (MultipleCharTokenType type : tokenTypes) {
+            assertThat(MultipleCharTokenType.getToken(type.getWrappedType()))
                     .isEqualTo(type);
         }
     }

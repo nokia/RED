@@ -32,7 +32,7 @@ public class RobotTokenTest {
         assertThat(endPosition).isNotNull();
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(start.getColumn());
-        assertThat(token.getType()).isEqualTo(RobotTokenType.UNKNOWN);
+        assertThat(token.getType()).isEqualTo(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
@@ -54,7 +54,7 @@ public class RobotTokenTest {
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(
                 start.getColumn() + text.length());
-        assertThat(token.getType()).isEqualTo(RobotTokenType.UNKNOWN);
+        assertThat(token.getType()).isEqualTo(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
@@ -74,7 +74,7 @@ public class RobotTokenTest {
         assertThat(token.getStartPosition()).isEqualTo(start);
         assertThat(token.getText()).isEqualTo(text);
         assertThat(token.getEndPosition()).isEqualTo(end);
-        assertThat(token.getType()).isEqualTo(RobotTokenType.UNKNOWN);
+        assertThat(token.getType()).isEqualTo(RobotSingleCharTokenType.UNKNOWN);
     }
 
 
@@ -87,7 +87,7 @@ public class RobotTokenTest {
 
         // execute
         RobotToken token = new RobotToken(start, text);
-        token.setType(RobotTokenType.END_OF_LINE);
+        token.setType(RobotSingleCharTokenType.END_OF_LINE);
 
         // verify
         assertThat(token.getStartPosition()).isEqualTo(start);
@@ -97,6 +97,6 @@ public class RobotTokenTest {
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(
                 start.getColumn() + text.length());
-        assertThat(token.getType()).isEqualTo(RobotTokenType.END_OF_LINE);
+        assertThat(token.getType()).isEqualTo(RobotSingleCharTokenType.END_OF_LINE);
     }
 }

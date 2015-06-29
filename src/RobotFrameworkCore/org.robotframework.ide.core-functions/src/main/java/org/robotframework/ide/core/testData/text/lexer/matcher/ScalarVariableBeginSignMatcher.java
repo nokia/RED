@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 
 
 /**
@@ -11,11 +11,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_SCALAR_BEGIN_DOLLAR
+ * @see RobotSingleCharTokenType#SINGLE_SCALAR_BEGIN_DOLLAR
  */
 public class ScalarVariableBeginSignMatcher extends AOnlyMapCharToToken {
 
     public ScalarVariableBeginSignMatcher() {
-        super(RobotTokenType.SINGLE_SCALAR_BEGIN_DOLLAR);
+        super(RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR);
     }
 }

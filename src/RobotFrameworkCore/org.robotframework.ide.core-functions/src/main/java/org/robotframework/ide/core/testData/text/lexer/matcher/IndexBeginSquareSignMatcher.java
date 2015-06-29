@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 
 
 /**
@@ -11,11 +11,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET
+ * @see RobotSingleCharTokenType#SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET
  */
 public class IndexBeginSquareSignMatcher extends AOnlyMapCharToToken {
 
     public IndexBeginSquareSignMatcher() {
-        super(RobotTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET);
+        super(RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET);
     }
 }

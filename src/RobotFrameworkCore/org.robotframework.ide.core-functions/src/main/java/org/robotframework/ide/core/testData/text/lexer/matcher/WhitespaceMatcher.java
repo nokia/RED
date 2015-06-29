@@ -4,8 +4,8 @@ import java.nio.CharBuffer;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -21,8 +21,8 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_SPACE
- * @see RobotTokenType#SINGLE_TABULATOR
+ * @see RobotSingleCharTokenType#SINGLE_SPACE
+ * @see RobotSingleCharTokenType#SINGLE_TABULATOR
  * @see RobotWordType#DOUBLE_SPACE
  */
 public class WhitespaceMatcher implements ISingleCharTokenMatcher {
@@ -34,14 +34,14 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
         boolean shouldBeHandleAsSingleSpace = true;
 
         char c = tempBuffer.get(charIndex);
-        RobotTokenType type = RobotTokenType.getToken(c);
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.getToken(c);
 
-        if (type == RobotTokenType.SINGLE_SPACE) {
+        if (type == RobotSingleCharTokenType.SINGLE_SPACE) {
             List<RobotToken> tokens = tokenOutput.getTokens();
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
-                if (lastRobotToken.getType() == RobotTokenType.SINGLE_SPACE) {
-                    RobotType doubleSpacesType = RobotWordType.getToken("  ");
+                if (lastRobotToken.getType() == RobotSingleCharTokenType.SINGLE_SPACE) {
+                    IRobotTokenType doubleSpacesType = RobotWordType.getToken("  ");
                     if (doubleSpacesType != null) {
                         shouldBeHandleAsSingleSpace = false;
                         replaceLastSingleSpaceByDoubleSpace(tokenOutput, c,
@@ -61,7 +61,7 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
             }
 
             wasUsed = true;
-        } else if (type == RobotTokenType.SINGLE_TABULATOR) {
+        } else if (type == RobotSingleCharTokenType.SINGLE_TABULATOR) {
             List<RobotToken> tokens = tokenOutput.getTokens();
             RobotToken tabulatorToken = new RobotToken(
                     tokenOutput.getCurrentMarker(),
@@ -80,16 +80,16 @@ public class WhitespaceMatcher implements ISingleCharTokenMatcher {
 
     private void replaceLastSingleSpaceByDoubleSpace(TokenOutput tokenOutput,
             char c, List<RobotToken> tokens, RobotToken lastRobotToken,
-            RobotType doubleSpacesType) {
+            IRobotTokenType doubleSpacesType) {
         RobotToken doubleSpaces = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
         doubleSpaces.setType(doubleSpacesType);
         tokenOutput.setCurrentMarker(doubleSpaces.getEndPosition());
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<Integer> listSingleSpace = tokensPosition
-                .get(RobotTokenType.SINGLE_SPACE);
+                .get(RobotSingleCharTokenType.SINGLE_SPACE);
         listSingleSpace.remove(listSingleSpace.size() - 1);
         tokensPosition.put(RobotWordType.DOUBLE_SPACE, tokens.size() - 1);
         tokens.set(tokens.size() - 1, doubleSpaces);
