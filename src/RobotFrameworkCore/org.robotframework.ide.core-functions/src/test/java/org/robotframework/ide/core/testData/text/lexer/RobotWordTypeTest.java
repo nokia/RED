@@ -22,6 +22,46 @@ public class RobotWordTypeTest {
 
 
     @Test
+    public void test_typeCOMMENT_FROM_BUILTIN() {
+        String text = "Comment";
+        RobotWordType type = RobotWordType.COMMENT_FROM_BUILTIN;
+
+        assertThat(type.toWrite()).isEqualTo(text);
+        assertForAllCombinationsOfWord(type, text);
+    }
+
+
+    @Test
+    public void test_typeDOUBLE_ESCAPE_BACKSLASH() {
+        String text = "\\\\";
+        RobotWordType type = RobotWordType.DOUBLE_ESCAPE_BACKSLASH;
+
+        assertThat(type.toWrite()).isEqualTo(text);
+        assertThat(RobotWordType.getToken(text)).isEqualTo(type);
+    }
+
+
+    @Test
+    public void test_typeCONTINOUE_PREVIOUS_LINE_DOTS() {
+        String text = "...";
+        RobotWordType type = RobotWordType.CONTINOUE_PREVIOUS_LINE_DOTS;
+
+        assertThat(type.toWrite()).isEqualTo(text);
+        assertThat(RobotWordType.getToken(text)).isEqualTo(type);
+    }
+
+
+    @Test
+    public void test_typeEMPTY_CELL_DOTS() {
+        String text = "..";
+        RobotWordType type = RobotWordType.EMPTY_CELL_DOTS;
+
+        assertThat(type.toWrite()).isEqualTo(text);
+        assertThat(RobotWordType.getToken(text)).isEqualTo(type);
+    }
+
+
+    @Test
     public void test_typeDOUBLE_SPACE() {
         String text = "  ";
         RobotWordType type = RobotWordType.DOUBLE_SPACE;
@@ -373,7 +413,7 @@ public class RobotWordTypeTest {
         // execute & verify
         assertThat(tokenTypes).isNotNull();
         assertThat(tokenTypes).isNotEmpty();
-        assertThat(tokenTypes).hasSize(36);
+        assertThat(tokenTypes).hasSize(37);
 
         for (RobotWordType type : tokenTypes) {
             String thisTokenText = type.toWrite();
