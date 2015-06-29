@@ -12,8 +12,8 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -43,20 +43,20 @@ public class EscapeBackslashSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ESCAPE_BACKSLASH };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH };
                 assertThat(output.getTokens()).hasSize(1);
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
                 assertThat(output.getTokens()).hasSize(1);
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] {
+                expectedSequenceOfTypes = new IRobotTokenType[] {
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH,
-                        RobotTokenType.SINGLE_ESCAPE_BACKSLASH };
+                        RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH };
                 assertThat(output.getTokens()).hasSize(2);
             } else if (charIndex == 3) {
-                expectedSequenceOfTypes = new RobotType[] {
+                expectedSequenceOfTypes = new IRobotTokenType[] {
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH,
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
                 assertThat(output.getTokens()).hasSize(2);
@@ -78,18 +78,18 @@ public class EscapeBackslashSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             assertThat(output.getTokens()).hasSize(3);
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
             } else {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ESCAPE_BACKSLASH };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH };
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -107,12 +107,12 @@ public class EscapeBackslashSignMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             assertThat(output.getTokens()).hasSize(1);
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DOUBLE_ESCAPE_BACKSLASH };
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ESCAPE_BACKSLASH };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH };
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
             assertCurrentPosition(output);
@@ -132,9 +132,9 @@ public class EscapeBackslashSignMatcherTest {
         assertCurrentPosition(output);
         assertPositionMarkers(output);
 
-        assertTokens(output, new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK,
-                RobotTokenType.SINGLE_ESCAPE_BACKSLASH }, 0, 1);
+        assertTokens(output, new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH }, 0, 1);
     }
 
 
@@ -151,7 +151,7 @@ public class EscapeBackslashSignMatcherTest {
 
         assertTokens(
                 output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_ESCAPE_BACKSLASH },
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH },
                 0, 1);
     }
 

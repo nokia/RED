@@ -12,9 +12,9 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
@@ -43,18 +43,18 @@ public class AsteriskMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if (charIndex > 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_TABULATOR,
-                        GroupedSameTokenType.MANY_ASTERISKS };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        MultipleCharTokenType.MANY_ASTERISKS };
                 assertThat(output.getTokens()).hasSize(3);
             } else {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_ASTERISK };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -73,12 +73,12 @@ public class AsteriskMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if (charIndex >= 1) {
-                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_ASTERISKS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { MultipleCharTokenType.MANY_ASTERISKS };
                 assertThat(output.getTokens()).hasSize(1);
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ASTERISK };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ASTERISK };
                 assertThat(output.getTokens()).hasSize(1);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -97,12 +97,12 @@ public class AsteriskMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] { GroupedSameTokenType.MANY_ASTERISKS };
+                expectedSequenceOfTypes = new IRobotTokenType[] { MultipleCharTokenType.MANY_ASTERISKS };
                 assertThat(output.getTokens()).hasSize(1);
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_ASTERISK };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_ASTERISK };
                 assertThat(output.getTokens()).hasSize(1);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -124,9 +124,9 @@ public class AsteriskMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_TABULATOR,
-                        RobotTokenType.SINGLE_ASTERISK }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK }, 0, 1);
     }
 
 
@@ -142,7 +142,7 @@ public class AsteriskMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_ASTERISK }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_ASTERISK }, 0, 1);
     }
 
 

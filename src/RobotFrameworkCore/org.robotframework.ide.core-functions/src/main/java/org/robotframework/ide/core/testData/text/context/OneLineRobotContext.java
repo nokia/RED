@@ -7,10 +7,14 @@ import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 
 /**
+ * Designed for context, which took place only in one line i.e. comments.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
+ * 
+ * @see ManyLinesRobotContext
+ * @see ContextBuilder
  */
 public class OneLineRobotContext implements IContextElement {
 
@@ -27,6 +31,11 @@ public class OneLineRobotContext implements IContextElement {
 
     public void addNextToken(RobotToken newToken) {
         this.contextTokens.add(newToken);
+    }
+
+
+    public void removeAllContextTokens() {
+        contextTokens.clear();
     }
 
 

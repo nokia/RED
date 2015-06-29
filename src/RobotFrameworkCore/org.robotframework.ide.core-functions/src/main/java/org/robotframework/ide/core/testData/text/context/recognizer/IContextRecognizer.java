@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
+import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 
 
@@ -17,4 +18,7 @@ public interface IContextRecognizer {
 
     List<IContextElement> recognize(final ContextOutput currentContext,
             final LineTokenPosition lineInterval);
+
+
+    IContextElementType getContextType();
 }

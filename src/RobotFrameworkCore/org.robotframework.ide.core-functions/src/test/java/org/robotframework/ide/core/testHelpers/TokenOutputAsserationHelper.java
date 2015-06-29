@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.NumberType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -29,28 +29,28 @@ import com.google.common.collect.LinkedListMultimap;
 public class TokenOutputAsserationHelper {
 
     public static void assertPositionMarkers(TokenOutput output) {
-        LinkedListMultimap<RobotType, Integer> tokensPosition = output
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = output
                 .getTokensPosition();
         assertThat(tokensPosition).isNotNull();
         List<RobotToken> tokens = output.getTokens();
-        Set<RobotType> typeSetFound = new HashSet<>();
+        Set<IRobotTokenType> typeSetFound = new HashSet<>();
         for (int i = 0; i < tokens.size(); i++) {
             RobotToken cToken = tokens.get(i);
             assertThat(tokensPosition.get(cToken.getType())).contains(i);
             typeSetFound.add(cToken.getType());
         }
 
-        Set<RobotType> typeSet = tokensPosition.keySet();
+        Set<IRobotTokenType> typeSet = tokensPosition.keySet();
         assertThat(typeSet).hasSameSizeAs(typeSetFound);
         assertThat(typeSet).hasSameElementsAs(typeSetFound);
     }
 
 
     public static void assertTokensForUnknownWords(List<RobotToken> tokens,
-            RobotType[] types, int startTokenPos, LinearPositionMarker linePos,
+            IRobotTokenType[] types, int startTokenPos, LinearPositionMarker linePos,
             String[] textForCorrespondingUnknownWords) {
         int typesLength = types.length;
-        CircullarArrayIterator<RobotType> iter = new CircullarArrayIterator<>(
+        CircullarArrayIterator<IRobotTokenType> iter = new CircullarArrayIterator<>(
                 types);
 
         assertThat(tokens).isNotNull();
@@ -62,32 +62,37 @@ public class TokenOutputAsserationHelper {
         for (int tokId = startTokenPos; tokId < tokens.size(); tokId++) {
             RobotToken robotToken = tokens.get(tokId);
             assertThat(robotToken).isNotNull();
-            RobotType type = iter.next();
+            IRobotTokenType type = iter.next();
             assertThat(robotToken.getType()).isEqualTo(type);
 
-            if (type == RobotTokenType.END_OF_LINE) {
+            if (type == RobotSingleCharTokenType.END_OF_LINE) {
                 assertThat(robotToken.getText()).isNull();
                 assertStartPosition(robotToken, line, column);
                 assertEndPosition(robotToken, line, column);
                 line++;
                 column = LinearPositionMarker.THE_FIRST_COLUMN;
             } else {
-                if ((robotToken.getType() == RobotTokenType.UNKNOWN || robotToken
+                if ((robotToken.getType() == RobotSingleCharTokenType.UNKNOWN || robotToken
                         .getType() == RobotWordType.UNKNOWN_WORD)
                         && correspondingTextIndex < textForCorrespondingUnknownWords.length) {
                     assertThat(robotToken.getText().toString())
                             .isEqualTo(
                                     textForCorrespondingUnknownWords[correspondingTextIndex]);
                     correspondingTextIndex++;
-                } else if (robotToken.getType().getClass() != GroupedSameTokenType.class) {
-                    assertThat(robotToken.getText().toString()).isEqualTo(
-                            type.toWrite());
-                } else if (robotToken.getType().getClass() == GroupedSameTokenType.class) {
+                } else if (MultipleCharTokenType.class
+                        .isAssignableFrom(robotToken.getType().getClass())) {
                     assertThat(robotToken.getText().toString()).matches(
                             "["
-                                    + ((GroupedSameTokenType) robotToken
+                                    + ((MultipleCharTokenType) robotToken
                                             .getType()).getWrappedType()
                                             .toWrite() + "]+");
+
+                } else if (robotToken.getType().getClass() != MultipleCharTokenType.class) {
+                    assertThat(robotToken.getText().toString()).isEqualTo(
+                            type.toWrite());
+                } else {
+                    throw new UnsupportedOperationException(
+                            "Not implemented yet!");
                 }
                 assertStartPosition(robotToken, line, column);
                 if (robotToken.getText() != null) {
@@ -102,7 +107,7 @@ public class TokenOutputAsserationHelper {
 
 
     public static void assertTokensForUnknownWords(TokenOutput out,
-            RobotType[] types, int startTokenPos, int startLine,
+            IRobotTokenType[] types, int startTokenPos, int startLine,
             String[] textForCorrespondingUnknownWords) {
         List<RobotToken> tokens = out.getTokens();
         assertTokensForUnknownWords(tokens, types, startTokenPos,
@@ -112,11 +117,11 @@ public class TokenOutputAsserationHelper {
     }
 
 
-    public static void assertTokens(TokenOutput out, RobotType[] types,
+    public static void assertTokens(TokenOutput out, IRobotTokenType[] types,
             int startTokenPos, int startLine) {
         List<RobotToken> tokens = out.getTokens();
         int typesLength = types.length;
-        CircullarArrayIterator<RobotType> iter = new CircullarArrayIterator<>(
+        CircullarArrayIterator<IRobotTokenType> iter = new CircullarArrayIterator<>(
                 types);
 
         assertThat(tokens).isNotNull();
@@ -127,25 +132,25 @@ public class TokenOutputAsserationHelper {
         for (int tokId = startTokenPos; tokId < tokens.size(); tokId++) {
             RobotToken robotToken = tokens.get(tokId);
             assertThat(robotToken).isNotNull();
-            RobotType type = iter.next();
+            IRobotTokenType type = iter.next();
             assertThat(robotToken.getType()).isEqualTo(type);
 
-            if (type == RobotTokenType.END_OF_LINE) {
+            if (type == RobotSingleCharTokenType.END_OF_LINE) {
                 assertThat(robotToken.getText()).isNull();
                 assertStartPosition(robotToken, line, column);
                 assertEndPosition(robotToken, line, column);
                 line++;
                 column = LinearPositionMarker.THE_FIRST_COLUMN;
             } else {
-                if (robotToken.getType().getClass() != GroupedSameTokenType.class
+                if (robotToken.getType().getClass() != MultipleCharTokenType.class
                         && robotToken.getType().isWriteable()) {
                     assertThat(robotToken.getText().toString()).isEqualTo(
                             type.toWrite());
-                } else if (GroupedSameTokenType.class
+                } else if (MultipleCharTokenType.class
                         .isAssignableFrom(robotToken.getType().getClass())) {
                     assertThat(robotToken.getText().toString()).matches(
                             "["
-                                    + ((GroupedSameTokenType) robotToken
+                                    + ((MultipleCharTokenType) robotToken
                                             .getType()).getWrappedType()
                                             .toWrite() + "]+");
                 } else if (robotToken.getType() == NumberType.NUMBER_WITH_SIGN) {
@@ -173,12 +178,12 @@ public class TokenOutputAsserationHelper {
     public static void assertCurrentPosition(TokenOutput output) {
         LinearPositionMarker currentMarker = output.getCurrentMarker();
         assertThat(currentMarker).isNotNull();
-        LinkedListMultimap<RobotType, Integer> tokensPosition = output
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = output
                 .getTokensPosition();
         assertThat(tokensPosition).isNotNull();
         List<Integer> crTokens = tokensPosition
-                .get(RobotTokenType.CARRIAGE_RETURN);
-        List<Integer> lfTokens = tokensPosition.get(RobotTokenType.LINE_FEED);
+                .get(RobotSingleCharTokenType.CARRIAGE_RETURN);
+        List<Integer> lfTokens = tokensPosition.get(RobotSingleCharTokenType.LINE_FEED);
         int line = Math.max(crTokens.size(), lfTokens.size());
         assertThat(currentMarker.getLine()).isEqualTo(line + 1);
         assertThat(currentMarker.getColumn()).isEqualTo(currentColumn(output));
@@ -191,7 +196,7 @@ public class TokenOutputAsserationHelper {
         if (!tokens.isEmpty()) {
             RobotToken robotToken = tokens.get(tokens.size() - 1);
             column = robotToken.getEndPosition().getColumn();
-            if (robotToken.getType() == RobotTokenType.END_OF_LINE) {
+            if (robotToken.getType() == RobotSingleCharTokenType.END_OF_LINE) {
                 column = LinearPositionMarker.THE_FIRST_COLUMN;
             }
         }
@@ -241,15 +246,15 @@ public class TokenOutputAsserationHelper {
 
         RobotToken tabulatorTokenOne = new RobotToken(beginMarker,
                 new StringBuilder("\t"));
-        tabulatorTokenOne.setType(RobotTokenType.SINGLE_TABULATOR);
+        tabulatorTokenOne.setType(RobotSingleCharTokenType.SINGLE_TABULATOR);
         output.getTokens().add(tabulatorTokenOne);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_TABULATOR, 0);
+        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_TABULATOR, 0);
 
         RobotToken tabulatorTokenTwo = new RobotToken(
                 tabulatorTokenOne.getEndPosition(), new StringBuilder("\t"));
-        tabulatorTokenTwo.setType(RobotTokenType.SINGLE_TABULATOR);
+        tabulatorTokenTwo.setType(RobotSingleCharTokenType.SINGLE_TABULATOR);
         output.getTokens().add(tabulatorTokenTwo);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_TABULATOR, 1);
+        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_TABULATOR, 1);
 
         output.setCurrentMarker(tabulatorTokenTwo.getEndPosition());
 
@@ -263,15 +268,15 @@ public class TokenOutputAsserationHelper {
 
         RobotToken asteriskTokenOne = new RobotToken(beginMarker,
                 new StringBuilder("*"));
-        asteriskTokenOne.setType(RobotTokenType.SINGLE_ASTERISK);
+        asteriskTokenOne.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenOne);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 0);
+        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_ASTERISK, 0);
 
         RobotToken asteriskTokenTwo = new RobotToken(
                 asteriskTokenOne.getEndPosition(), new StringBuilder("*"));
-        asteriskTokenTwo.setType(RobotTokenType.SINGLE_ASTERISK);
+        asteriskTokenTwo.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
         output.getTokens().add(asteriskTokenTwo);
-        output.getTokensPosition().put(RobotTokenType.SINGLE_ASTERISK, 1);
+        output.getTokensPosition().put(RobotSingleCharTokenType.SINGLE_ASTERISK, 1);
 
         output.setCurrentMarker(asteriskTokenTwo.getEndPosition());
 

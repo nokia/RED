@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 
 
 /**
@@ -11,11 +11,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_ENVIRONMENT_BEGIN_PROCENT
+ * @see RobotSingleCharTokenType#SINGLE_ENVIRONMENT_BEGIN_PROCENT
  */
 public class EnvironmentVariableBeginSignMatcher extends AOnlyMapCharToToken {
 
     public EnvironmentVariableBeginSignMatcher() {
-        super(RobotTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT);
+        super(RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT);
     }
 }

@@ -3,10 +3,10 @@ package org.robotframework.ide.core.testData.text.lexer.matcher;
 import java.nio.CharBuffer;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.lexer.GroupedSameTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -21,8 +21,8 @@ import com.google.common.collect.LinkedListMultimap;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_ASTERISK
- * @see GroupedSameTokenType#MANY_ASTERISKS
+ * @see RobotSingleCharTokenType#SINGLE_ASTERISK
+ * @see MultipleCharTokenType#MANY_ASTERISKS
  */
 public class AsteriskMatcher implements ISingleCharTokenMatcher {
 
@@ -33,13 +33,13 @@ public class AsteriskMatcher implements ISingleCharTokenMatcher {
         boolean shouldBeHandleAsSingleAsterisk = true;
 
         char c = tempBuffer.get(charIndex);
-        RobotType type = RobotTokenType.getToken(c);
-        if (type == RobotTokenType.SINGLE_ASTERISK) {
+        IRobotTokenType type = RobotSingleCharTokenType.getToken(c);
+        if (type == RobotSingleCharTokenType.SINGLE_ASTERISK) {
             List<RobotToken> tokens = tokenOutput.getTokens();
 
             if (!tokens.isEmpty()) {
                 RobotToken lastRobotToken = tokens.get(tokens.size() - 1);
-                if (GroupedSameTokenType.MANY_ASTERISKS
+                if (MultipleCharTokenType.MANY_ASTERISKS
                         .isFromThisGroup(lastRobotToken)) {
                     shouldBeHandleAsSingleAsterisk = false;
                     mergeLastAsterisksTokenWithCurrent(tokenOutput, c,
@@ -66,42 +66,42 @@ public class AsteriskMatcher implements ISingleCharTokenMatcher {
 
     private void mergeLastAsterisksTokenWithCurrent(TokenOutput tokenOutput,
             char c, RobotToken lastRobotToken) {
-        RobotType lastRobotTokenType = lastRobotToken.getType();
-        if (lastRobotTokenType == GroupedSameTokenType.MANY_ASTERISKS) {
+        IRobotTokenType lastRobotTokenType = lastRobotToken.getType();
+        if (lastRobotTokenType == MultipleCharTokenType.MANY_ASTERISKS) {
             mergeLastAsterisksTokenWithCurrent(tokenOutput, c, lastRobotToken,
-                    GroupedSameTokenType.MANY_ASTERISKS);
-        } else if (lastRobotTokenType == RobotTokenType.SINGLE_ASTERISK) {
+                    MultipleCharTokenType.MANY_ASTERISKS);
+        } else if (lastRobotTokenType == RobotSingleCharTokenType.SINGLE_ASTERISK) {
             mergeLastAsterisksTokenWithCurrent(tokenOutput, c, lastRobotToken,
-                    RobotTokenType.SINGLE_ASTERISK);
+                    RobotSingleCharTokenType.SINGLE_ASTERISK);
         }
     }
 
 
     private void mergeLastAsterisksTokenWithCurrent(TokenOutput tokenOutput,
-            char c, RobotToken lastRobotToken, GroupedSameTokenType type) {
+            char c, RobotToken lastRobotToken, MultipleCharTokenType type) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         RobotToken groupedAsterisks = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
-        groupedAsterisks.setType(GroupedSameTokenType.MANY_ASTERISKS);
+        groupedAsterisks.setType(MultipleCharTokenType.MANY_ASTERISKS);
         tokenOutput.setCurrentMarker(groupedAsterisks.getEndPosition());
         tokens.set(tokens.size() - 1, groupedAsterisks);
     }
 
 
     private void mergeLastAsterisksTokenWithCurrent(TokenOutput tokenOutput,
-            char c, RobotToken lastRobotToken, RobotTokenType type) {
+            char c, RobotToken lastRobotToken, RobotSingleCharTokenType type) {
         List<RobotToken> tokens = tokenOutput.getTokens();
         RobotToken groupedAsterisks = new RobotToken(
                 lastRobotToken.getStartPosition(), lastRobotToken.getText()
                         .append(c));
-        groupedAsterisks.setType(GroupedSameTokenType.MANY_ASTERISKS);
+        groupedAsterisks.setType(MultipleCharTokenType.MANY_ASTERISKS);
         tokenOutput.setCurrentMarker(groupedAsterisks.getEndPosition());
-        LinkedListMultimap<RobotType, Integer> tokensPosition = tokenOutput
+        LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         List<Integer> listSingleAsterisks = tokensPosition.get(type);
         listSingleAsterisks.remove(listSingleAsterisks.size() - 1);
-        tokensPosition.put(GroupedSameTokenType.MANY_ASTERISKS,
+        tokensPosition.put(MultipleCharTokenType.MANY_ASTERISKS,
                 tokens.size() - 1);
         tokens.set(tokens.size() - 1, groupedAsterisks);
     }

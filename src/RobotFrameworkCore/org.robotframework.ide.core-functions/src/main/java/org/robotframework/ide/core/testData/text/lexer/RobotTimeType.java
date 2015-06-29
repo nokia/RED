@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @see LowLevelTypesProvider
  */
-public enum RobotTimeType implements RobotType {
+public enum RobotTimeType implements IRobotTokenType {
     /**
      * add for do not return null value
      */
@@ -63,8 +63,8 @@ public enum RobotTimeType implements RobotType {
     }
 
 
-    public static RobotType getToken(String text) {
-        RobotType type = RobotTimeType.UNKNOWN;
+    public static IRobotTokenType getToken(String text) {
+        IRobotTokenType type = RobotTimeType.UNKNOWN;
         if (text != null) {
             final RobotTimeType[] types = RobotTimeType.values();
             for (RobotTimeType cType : types) {
@@ -85,8 +85,8 @@ public enum RobotTimeType implements RobotType {
     }
 
 
-    public static RobotType getToken(StringBuilder text) {
-        RobotType type = RobotTimeType.UNKNOWN;
+    public static IRobotTokenType getToken(StringBuilder text) {
+        IRobotTokenType type = RobotTimeType.UNKNOWN;
         if (text != null) {
             type = getToken(text.toString());
         }
@@ -96,13 +96,13 @@ public enum RobotTimeType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(StringBuilder text) {
+    public IRobotTokenType getTokenType(StringBuilder text) {
         return getToken(text);
     }
 
 
     @Override
-    public RobotType getTokenType(String text) {
+    public IRobotTokenType getTokenType(String text) {
         return getToken(text);
     }
 

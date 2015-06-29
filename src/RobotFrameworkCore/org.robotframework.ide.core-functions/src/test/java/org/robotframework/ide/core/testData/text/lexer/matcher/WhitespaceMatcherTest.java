@@ -12,8 +12,8 @@ import java.nio.CharBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -43,19 +43,19 @@ public class WhitespaceMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes = null;
+            IRobotTokenType[] expectedSequenceOfTypes = null;
             if (charIndex == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE };
                 assertThat(output.getTokens()).hasSize(1);
             } else if (charIndex == 1) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.DOUBLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE };
                 assertThat(output.getTokens()).hasSize(1);
             } else if (charIndex == 2) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotWordType.DOUBLE_SPACE, RobotTokenType.SINGLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotWordType.DOUBLE_SPACE, RobotSingleCharTokenType.SINGLE_SPACE };
                 assertThat(output.getTokens()).hasSize(2);
             } else if (charIndex == 3) {
-                expectedSequenceOfTypes = new RobotType[] {
+                expectedSequenceOfTypes = new IRobotTokenType[] {
                         RobotWordType.DOUBLE_SPACE, RobotWordType.DOUBLE_SPACE };
                 assertThat(output.getTokens()).hasSize(2);
             }
@@ -76,18 +76,18 @@ public class WhitespaceMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.DOUBLE_SPACE };
                 assertThat(output.getTokens()).hasSize(3);
             } else {
-                expectedSequenceOfTypes = new RobotType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_SPACE };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -106,12 +106,12 @@ public class WhitespaceMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotType[] expectedSequenceOfTypes;
+            IRobotTokenType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotType[] { RobotWordType.DOUBLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE };
                 assertThat(output.getTokens()).hasSize(1);
             } else {
-                expectedSequenceOfTypes = new RobotType[] { RobotTokenType.SINGLE_SPACE };
+                expectedSequenceOfTypes = new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE };
                 assertThat(output.getTokens()).hasSize(1);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -130,19 +130,19 @@ public class WhitespaceMatcherTest {
         // execute & verify
         for (int charIndex = 0; charIndex < tempBuffer.length(); charIndex++) {
             assertThat(matcher.match(output, tempBuffer, charIndex)).isTrue();
-            RobotTokenType[] expectedSequenceOfTypes;
+            RobotSingleCharTokenType[] expectedSequenceOfTypes;
             if ((charIndex + 1) % 2 == 0) {
-                expectedSequenceOfTypes = new RobotTokenType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_SPACE,
-                        RobotTokenType.SINGLE_TABULATOR };
+                expectedSequenceOfTypes = new RobotSingleCharTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_TABULATOR };
                 assertThat(output.getTokens()).hasSize(4);
             } else {
-                expectedSequenceOfTypes = new RobotTokenType[] {
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_ASTERISK,
-                        RobotTokenType.SINGLE_SPACE };
+                expectedSequenceOfTypes = new RobotSingleCharTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotSingleCharTokenType.SINGLE_SPACE };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -163,9 +163,9 @@ public class WhitespaceMatcherTest {
         assertCurrentPosition(output);
         assertPositionMarkers(output);
 
-        assertTokens(output, new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK,
-                RobotTokenType.SINGLE_TABULATOR }, 0, 1);
+        assertTokens(output, new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotSingleCharTokenType.SINGLE_TABULATOR }, 0, 1);
     }
 
 
@@ -181,7 +181,7 @@ public class WhitespaceMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_TABULATOR }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR }, 0, 1);
     }
 
 
@@ -196,9 +196,9 @@ public class WhitespaceMatcherTest {
         assertCurrentPosition(output);
         assertPositionMarkers(output);
 
-        assertTokens(output, new RobotTokenType[] {
-                RobotTokenType.SINGLE_ASTERISK, RobotTokenType.SINGLE_ASTERISK,
-                RobotTokenType.SINGLE_SPACE }, 0, 1);
+        assertTokens(output, new RobotSingleCharTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK, RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotSingleCharTokenType.SINGLE_SPACE }, 0, 1);
     }
 
 
@@ -214,7 +214,7 @@ public class WhitespaceMatcherTest {
         assertPositionMarkers(output);
 
         assertTokens(output,
-                new RobotTokenType[] { RobotTokenType.SINGLE_SPACE }, 0, 1);
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE }, 0, 1);
     }
 
 

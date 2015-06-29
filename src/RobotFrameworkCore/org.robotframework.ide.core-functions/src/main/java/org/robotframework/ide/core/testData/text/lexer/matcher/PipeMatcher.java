@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.text.lexer.matcher;
 
-import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 
 
 /**
@@ -11,11 +11,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotTokenType;
  * @version Robot Framework 2.9 alpha 2
  * 
  * @see RobotTokenMatcher
- * @see RobotTokenType#SINGLE_PIPE
+ * @see RobotSingleCharTokenType#SINGLE_PIPE
  */
 public class PipeMatcher extends AOnlyMapCharToToken {
 
     public PipeMatcher() {
-        super(RobotTokenType.SINGLE_PIPE);
+        super(RobotSingleCharTokenType.SINGLE_PIPE);
     }
 }

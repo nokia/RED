@@ -15,7 +15,7 @@ import java.util.Map;
  * @see RobotToken
  * @see TxtRobotTestDataLexer
  */
-public enum RobotTokenType implements RobotType {
+public enum RobotSingleCharTokenType implements IRobotTokenType {
     /**
      * the type of token can't be recognized
      */
@@ -107,12 +107,12 @@ public enum RobotTokenType implements RobotType {
 
     private final char thisTokenChar;
     private final String toWriteText;
-    private static final Map<Character, RobotTokenType> writeableTypes;
+    private static final Map<Character, RobotSingleCharTokenType> writeableTypes;
 
     static {
-        Map<Character, RobotTokenType> temp = new HashMap<>();
-        RobotTokenType[] values = RobotTokenType.values();
-        for (RobotTokenType type : values) {
+        Map<Character, RobotSingleCharTokenType> temp = new HashMap<>();
+        RobotSingleCharTokenType[] values = RobotSingleCharTokenType.values();
+        for (RobotSingleCharTokenType type : values) {
             if (type.thisTokenChar != HELPER.UNWRITABLE_CHARS) {
                 temp.put(type.thisTokenChar, type);
             }
@@ -122,7 +122,7 @@ public enum RobotTokenType implements RobotType {
     }
 
 
-    private RobotTokenType(final char thisTokenChar) {
+    private RobotSingleCharTokenType(final char thisTokenChar) {
         this.thisTokenChar = thisTokenChar;
         if (this.thisTokenChar == HELPER.UNWRITABLE_CHARS) {
             this.toWriteText = "";
@@ -132,11 +132,11 @@ public enum RobotTokenType implements RobotType {
     }
 
 
-    public static RobotTokenType getToken(char c) {
-        RobotTokenType type = writeableTypes.get(c);
+    public static RobotSingleCharTokenType getToken(char c) {
+        RobotSingleCharTokenType type = writeableTypes.get(c);
 
         if (type == null) {
-            type = RobotTokenType.UNKNOWN;
+            type = RobotSingleCharTokenType.UNKNOWN;
         }
 
         return type;
@@ -166,8 +166,8 @@ public enum RobotTokenType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(StringBuilder text) {
-        RobotType type = RobotTokenType.UNKNOWN;
+    public IRobotTokenType getTokenType(StringBuilder text) {
+        IRobotTokenType type = RobotSingleCharTokenType.UNKNOWN;
         if (text != null) {
             type = getTokenType(text.toString());
         }
@@ -177,8 +177,8 @@ public enum RobotTokenType implements RobotType {
 
 
     @Override
-    public RobotType getTokenType(String text) {
-        RobotType type = RobotTokenType.UNKNOWN;
+    public IRobotTokenType getTokenType(String text) {
+        IRobotTokenType type = RobotSingleCharTokenType.UNKNOWN;
 
         if (text != null && text.length() == 1) {
             type = getToken(text.charAt(0));
