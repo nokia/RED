@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
@@ -43,6 +44,8 @@ public class ContextBuilder {
         recognizers.add(new VariableTableHeaderRecognizer());
         recognizers.add(new TestCaseTableHeaderRecognizer());
         recognizers.add(new KeywordsTableHeaderRecognizer());
+        recognizers.add(new QuotesSentenceRecognizer());
+
         recognizers = Collections.unmodifiableList(recognizers);
     }
 
@@ -61,6 +64,7 @@ public class ContextBuilder {
                         lineInterval);
                 foundPerLine.putAll(recognizer, foundContexts);
             }
+
         }
 
         return out;
