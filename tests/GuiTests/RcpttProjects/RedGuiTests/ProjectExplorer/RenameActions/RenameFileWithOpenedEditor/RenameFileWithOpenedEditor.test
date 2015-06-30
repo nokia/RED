@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TPd0oPPqEeSRSqmeMHfJYA
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/25/15 11:30 AM
+Save-Time: 6/30/15 11:12 AM
 Tags: Bugs
 Testcase-Type: ecl
 
@@ -35,12 +35,13 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 with [get-window "Rename Resource"] {
     with [get-editbox -after [get-label "New name:"]] {
         key-type Left -times 6
-        set-text "TestFile1.robot"
+        set-text "TestFile-edited.robot"
     }
     get-button OK | click
 }
 // save file from rename prompt
 get-window "Save Resource" | get-button Yes | click
-// editor is still dirty, name is not refreshed
-get-tab-folder -index 1 | get-property activePage | equals "*TestFile.robot" | verify-true
+
+// editor should be refreshed with new file name 
+get-tab-folder -index 1 | get-property activePage | equals "TestFile-edited.robot" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
