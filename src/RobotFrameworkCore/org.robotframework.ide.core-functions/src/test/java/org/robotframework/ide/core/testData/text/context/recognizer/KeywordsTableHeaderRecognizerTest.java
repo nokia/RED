@@ -1,13 +1,24 @@
 package org.robotframework.ide.core.testData.text.context.recognizer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokensForUnknownWords;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
+import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
+import org.robotframework.ide.core.testData.text.context.IContextElement;
+import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
+import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
+import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
 /**
@@ -22,6 +33,189 @@ public class KeywordsTableHeaderRecognizerTest extends ARecognizerTest {
 
     public KeywordsTableHeaderRecognizerTest() {
         super(KeywordsTableHeaderRecognizer.class);
+    }
+
+
+    @Test
+    public void test_pipe_beginAsteriskKeywordsWordAsteriskUser_KeywordsWord_pipe_shouldReturn_twoWrongContexts()
+            throws FileNotFoundException, IOException {
+        // prepare
+        String prefix = "|";
+        String text = "*Keywords";
+        String text2 = "*User Keywords";
+        String suffix = "|";
+        String p = prefix + text;
+        TokenOutput tokenOutput = createTokenOutput(p + text2 + suffix);
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        assertTheSameLinesContext(recognize, OneLineRobotContext.class, 2);
+
+        assertTokensForUnknownWords(
+                ((OneLineRobotContext) recognize.get(0)).getContextTokens(),
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.KEYWORDS_WORD,
+                        RobotSingleCharTokenType.SINGLE_ASTERISK }, 0,
+                new LinearPositionMarker(1, prefix.length() + 1),
+                new String[] {});
+        assertTokensForUnknownWords(
+                ((OneLineRobotContext) recognize.get(1)).getContextTokens(),
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_ASTERISK,
+                        RobotWordType.USER_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.KEYWORDS_WORD }, 0,
+                new LinearPositionMarker(1, p.length() + 1), new String[] {});
+    }
+
+
+    @Test
+    public void test_prefix_asterisk_user_keywords_asterisk_shouldReturn_incorrectContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*User Keywords*";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORDS_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_prefix_asterisk_user_keyword_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*User Keyword*";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORD_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_prefix_asterisk_keywords_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*Keywords*";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORDS_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_prefix_asterisk_keyword_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*Keyword*";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORD_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK, });
+    }
+
+
+    @Test
+    public void test_asterisk_user_keywords_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String text = "*User Keywords*";
+        assertThatIsExepectedContext(null, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORDS_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK, });
+    }
+
+
+    @Test
+    public void test_asterisk_user_keyword_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String text = "*User Keyword*";
+        assertThatIsExepectedContext(null, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORD_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_asterisk_keywords_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String text = "*Keywords*";
+        assertThatIsExepectedContext(null, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORDS_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_asterisk_keyword_asterisk_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String text = "*Keyword*";
+        assertThatIsExepectedContext(null, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORD_WORD,
+                RobotSingleCharTokenType.SINGLE_ASTERISK });
+    }
+
+
+    @Test
+    public void test_trashBeginAsterisk_user_keywords_word_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*User Keywords";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORDS_WORD });
+    }
+
+
+    @Test
+    public void test_trashBeginAsterisk_and_user_keyword_word_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*User Keyword";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.USER_WORD, RobotSingleCharTokenType.SINGLE_SPACE,
+                RobotWordType.KEYWORD_WORD });
+    }
+
+
+    @Test
+    public void test_trashBeginAsterisk_and_keywords_word_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*Keywords";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORDS_WORD });
+    }
+
+
+    @Test
+    public void test_trashBeginAsterisk_and_keyword_word_shouldReturn_correctContext()
+            throws FileNotFoundException, IOException {
+        String prefix = "foobar ";
+        String text = "*Keyword";
+        assertThatIsExepectedContext(prefix, text, null, new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotWordType.KEYWORD_WORD });
     }
 
 
@@ -530,9 +724,25 @@ public class KeywordsTableHeaderRecognizerTest extends ARecognizerTest {
 
 
     @Test
+    public void test_asterisks_user_asterisk_userWordOnly_suffix_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "***  user ***  user keywor";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
     public void test_asterisk_userWordOnly_suffix_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
         String text = "***  user keywor";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_asterisk_userWordOnly_asterisk_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "***  user ***";
         assertForIncorrectData(text);
     }
 
