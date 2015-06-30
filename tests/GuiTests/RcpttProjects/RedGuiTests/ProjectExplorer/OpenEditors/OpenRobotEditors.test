@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _a-5zUB8dEeWYlfCPyvfohw
+Element-Name: OpenRobotEditors
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JuIiAB8QEeWYlfCPyvfohw
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 6/30/15 2:37 PM
+Testcase-Type: ecl
+Verifications: _KKSfQB8gEeWYlfCPyvfohw
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+start-time-measure MyCounter   
+//open editor by double click
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+with [get-tab-folder -index 1] {
+    get-property activePage | equals "BigScript.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+//check if all tabs are shown
+with [get-editor "BigScript.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+get-editor "BigScript.robot" | close
+
+//open editor by right clicking of mouse
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
+    | get-menu "Open With/Robot Table Editor" | click
+    
+ //check if all tabs are shown     
+with [get-tab-folder -index 1] {
+    get-property activePage | equals "BigScript.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+with [get-editor "BigScript.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}    
+get-editor "BigScript.robot" | close
+
+//open in Robot text editor
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
+    | select "ScriptWithResource/BigScript.robot" | get-menu "Open With/Robot Text Editor" | click
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "Robot Text Editor" | verify-true
+    get-property activePage | equals "Robot Text Editor" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+get-editor "Robot Text Editor" | close
+
+//open in Text editor
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Open With/Text Editor" 
+    | click
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "BigScript.robot" | verify-true
+    get-property activePage | equals "BigScript.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+
+get-editor "BigScript.robot" | close
+
+//open in default Table editor
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
+    | get-menu "Open With/Robot Table Editor" | click
+    
+//go to Keywords tab    
+get-editor "BigScript.robot" | get-tab-folder | get-tab-item Keywords | click
+
+//double clik on the same editor (nothing should change)
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+
+//close editor and check which tab is open
+get-editor "BigScript.robot" | close
+
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+with [get-editor "BigScript.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+get-editor "BigScript.robot" | close
+
+
+ stop-time-measure MyCounter | get duration |write-lines  -uri "file:/c:/aaa/aa.txt"
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
