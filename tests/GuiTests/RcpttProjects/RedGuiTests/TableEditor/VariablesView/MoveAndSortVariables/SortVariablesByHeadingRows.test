@@ -6,8 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zyxbUP1MEeSShP_1X3jgkw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 5/25/15 11:31 AM
-Tags: Bugs
+Save-Time: 6/30/15 11:53 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -15,7 +14,7 @@ Content-Type: text/plain
 Entry-Name: .description
 
 Sort Variables by clicking heading rows ( Variable Nam, Value).
-Test for enhencment RED-86 , if issue solved this test will fail.
+Test for enhencment RED-86 , if issue solved this test will pass.
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -40,7 +39,32 @@ with [get-editor "TestFile.robot" | get-table] {
 get-editor "TestFile.robot" | get-table | get-property "getItems().TableItem[1].getText()" | equals "${var2}" 
     | verify-true
 
-// try to sort variable names
+// save file, sorting should not change a file
+get-eclipse-window | key-type "M1+s"
+
+
+// sort variable names descending
+get-editor "TestFile.robot" | get-table | get-column-header Variable | click
+
+// check if sorted
+with [get-editor "TestFile.robot" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${var2}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${var1}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${var}" | verify-true
+}
+
+// sort variable names ascending
+get-editor "TestFile.robot" | get-table | get-column-header Variable | click
+
+// check if sorted
+with [get-editor "TestFile.robot" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${var1}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${var2}" | verify-true
+}
+
+
+// click Variable header to go back to orginal set
 get-editor "TestFile.robot" | get-table | get-column-header Variable | click
 
 // check if sorted
@@ -49,6 +73,9 @@ with [get-editor "TestFile.robot" | get-table] {
     get-property "getItems().TableItem[1].getText()" | equals "${var2}" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "${var1}" | verify-true
 }
+// check if file is still clean, sorting should not change a data
+get-tab-folder -index 1 | get-property activePage | equals "TestFile.robot" | verify-true
+
 
 // add values to variables
 with [get-editor "TestFile.robot" | get-table] {
@@ -81,8 +108,31 @@ with [get-editor "TestFile.robot" | get-table] {
     apply-cell-edit -deactivate
 
 }
+// save file, sorting should not change a file
+get-eclipse-window | key-type "M1+s"
 
-//try to sort variable by values column
+
+//sort variable by values column - descending
+get-editor "TestFile.robot" | get-table | get-column-header Value | click
+
+//check if sorted
+with [get-editor "TestFile.robot" | get-table] {
+    get-property "getItems().TableItem[0].getData().getValue()" | equals 2 | verify-true
+    get-property "getItems().TableItem[1].getData().getValue()" | equals 1 | verify-true
+    get-property "getItems().TableItem[2].getData().getValue()" | equals 0 | verify-true
+}
+
+//sort variable by values column - ascending
+get-editor "TestFile.robot" | get-table | get-column-header Value | click
+
+//check if sorted
+with [get-editor "TestFile.robot" | get-table] {
+    get-property "getItems().TableItem[0].getData().getValue()" | equals 0 | verify-true
+    get-property "getItems().TableItem[1].getData().getValue()" | equals 1 | verify-true
+    get-property "getItems().TableItem[2].getData().getValue()" | equals 2 | verify-true
+}
+
+//sort variable by values column - original order
 get-editor "TestFile.robot" | get-table | get-column-header Value | click
 
 //check if sorted
@@ -91,4 +141,12 @@ with [get-editor "TestFile.robot" | get-table] {
     get-property "getItems().TableItem[1].getData().getValue()" | equals 2 | verify-true
     get-property "getItems().TableItem[2].getData().getValue()" | equals 1 | verify-true
 }
+
+// check if file is still clean, sorting should not change a data
+get-tab-folder -index 1 | get-property activePage | equals "TestFile.robot" | verify-true
+
+
+
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
