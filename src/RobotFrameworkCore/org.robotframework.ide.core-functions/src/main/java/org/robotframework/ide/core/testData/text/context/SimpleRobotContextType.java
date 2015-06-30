@@ -47,5 +47,9 @@ public enum SimpleRobotContextType implements IContextElementType {
      * 
      * keyword table declaration
      */
-    KEYWORD_TABLE_HEADER;
+    KEYWORD_TABLE_HEADER,
+    /**
+     * is i.e. "water is liquid"
+     */
+    QUOTES_SENTENCE;
 }
