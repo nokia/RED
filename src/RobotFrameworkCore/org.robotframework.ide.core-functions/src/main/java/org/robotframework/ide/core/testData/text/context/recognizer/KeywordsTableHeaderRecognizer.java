@@ -18,10 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
 /**
- * Search and builds the context for Test Case table header - i.e.
+ * Search and builds the context for User keyword table header - i.e.
  * 
  * <pre>
- * *** Test Cases ***
+ * *** Keywords ***
  * </pre>
  * 
  * @author wypych
@@ -32,15 +32,15 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotSingleCharTokenType#SINGLE_ASTERISK
  * @see RobotSingleCharTokenType#SINGLE_TABULATOR
  * @see RobotSingleCharTokenType#SINGLE_SPACE
- * @see RobotWordType#TEST_WORD
- * @see RobotWordType#CASE_WORD
- * @see RobotWordType#CASES_WORD
+ * @see RobotWordType#USER_WORD
+ * @see RobotWordType#KEYWORD_WORD
+ * @see RobotWordType#KEYWORDS_WORD
  * @see RobotWordType#DOUBLE_SPACE
  * 
  */
-public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
+public class KeywordsTableHeaderRecognizer implements IContextRecognizer {
 
-    private final static SimpleRobotContextType BUILD_TYPE = SimpleRobotContextType.TEST_CASE_TABLE_HEADER;
+    private final static SimpleRobotContextType BUILD_TYPE = SimpleRobotContextType.KEYWORD_TABLE_HEADER;
 
 
     @Override
@@ -53,8 +53,8 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         boolean wasPrefixAsterisksPresent = false;
-        boolean wasTestWordPresent = false;
-        boolean wasCaseWordPresent = false;
+        boolean wasUserWordPresent = false;
+        boolean wasKeywordWordPresent = false;
         boolean wasSuffixAsterisksPresent = false;
 
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
@@ -63,13 +63,12 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
 
             if (type == RobotSingleCharTokenType.SINGLE_ASTERISK
                     || type == MultipleCharTokenType.MANY_ASTERISKS) {
-                if (!wasPrefixAsterisksPresent && !wasTestWordPresent
-                        && !wasCaseWordPresent && !wasSuffixAsterisksPresent) {
-                    // begin asterisks
+                if (!wasPrefixAsterisksPresent && !wasUserWordPresent
+                        && !wasKeywordWordPresent && !wasSuffixAsterisksPresent) {
+                    // begin asterisk
                     context.addNextToken(token);
                     wasPrefixAsterisksPresent = true;
-                } else if (wasPrefixAsterisksPresent && wasTestWordPresent
-                        && wasCaseWordPresent) {
+                } else if (wasPrefixAsterisksPresent && wasKeywordWordPresent) {
                     // trailing asterisks
                     context.addNextToken(token);
                     context.setType(BUILD_TYPE);
@@ -80,8 +79,8 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
                     context.addNextToken(token);
 
                     wasPrefixAsterisksPresent = false;
-                    wasTestWordPresent = false;
-                    wasCaseWordPresent = false;
+                    wasUserWordPresent = false;
+                    wasKeywordWordPresent = false;
                     wasSuffixAsterisksPresent = true;
                 } else {
                     // i.e. case *** *** - asteriks after asterisks or other
@@ -90,23 +89,23 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
                     context.addNextToken(token);
 
                     wasPrefixAsterisksPresent = true;
-                    wasTestWordPresent = false;
-                    wasCaseWordPresent = false;
+                    wasUserWordPresent = false;
+                    wasKeywordWordPresent = false;
                     wasSuffixAsterisksPresent = false;
                 }
             } else if (type == RobotSingleCharTokenType.SINGLE_SPACE
                     || type == RobotWordType.DOUBLE_SPACE
                     || type == RobotSingleCharTokenType.SINGLE_TABULATOR) {
-                if (wasPrefixAsterisksPresent || wasTestWordPresent
-                        || wasCaseWordPresent || wasSuffixAsterisksPresent) {
+                if (wasPrefixAsterisksPresent || wasUserWordPresent
+                        || wasKeywordWordPresent || wasSuffixAsterisksPresent) {
                     // space are allowed after the first asterisks or after
                     // table name
                     context.addNextToken(token);
                 }
-            } else if (type == RobotWordType.TEST_WORD) {
+            } else if (type == RobotWordType.USER_WORD) {
                 if (wasPrefixAsterisksPresent || wasSuffixAsterisksPresent) {
-                    // *Test Test - case protection
-                    if (wasTestWordPresent && wasCaseWordPresent) {
+                    // *Keyword User - case protection
+                    if (wasKeywordWordPresent) {
                         context.setType(BUILD_TYPE);
                         foundContexts.add(context);
 
@@ -114,13 +113,13 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
                                 lineInterval.getLineNumber());
 
                         wasPrefixAsterisksPresent = false;
-                        wasTestWordPresent = false;
-                        wasCaseWordPresent = false;
+                        wasUserWordPresent = false;
+                        wasKeywordWordPresent = false;
                         wasSuffixAsterisksPresent = false;
-                    } else if (!wasTestWordPresent && !wasCaseWordPresent) {
+                    } else if (!wasKeywordWordPresent && !wasUserWordPresent) {
                         // table name after begin asterisks
                         context.addNextToken(token);
-                        wasTestWordPresent = true;
+                        wasUserWordPresent = true;
                         if (wasSuffixAsterisksPresent) {
                             wasPrefixAsterisksPresent = true;
                             wasSuffixAsterisksPresent = false;
@@ -130,45 +129,46 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
                         context.removeAllContextTokens();
 
                         wasPrefixAsterisksPresent = false;
-                        wasTestWordPresent = false;
-                        wasCaseWordPresent = false;
+                        wasUserWordPresent = false;
+                        wasKeywordWordPresent = false;
                         wasSuffixAsterisksPresent = false;
                     }
                 }
-            } else if (type == RobotWordType.CASE_WORD
-                    || type == RobotWordType.CASES_WORD) {
-                // *Test Case Case - case protection
-                if (wasTestWordPresent && wasCaseWordPresent) {
-                    context.setType(BUILD_TYPE);
-                    foundContexts.add(context);
+            } else if (type == RobotWordType.KEYWORD_WORD
+                    || type == RobotWordType.KEYWORDS_WORD) {
+                if (wasPrefixAsterisksPresent || wasSuffixAsterisksPresent) {
+                    // *Keyword Keyword - case protection
+                    if (wasKeywordWordPresent) {
+                        context.setType(BUILD_TYPE);
+                        foundContexts.add(context);
 
-                    context = new OneLineRobotContext(
-                            lineInterval.getLineNumber());
+                        context = new OneLineRobotContext(
+                                lineInterval.getLineNumber());
 
-                    wasPrefixAsterisksPresent = false;
-                    wasTestWordPresent = false;
-                    wasCaseWordPresent = false;
-                    wasSuffixAsterisksPresent = false;
-                } else if (wasTestWordPresent && !wasCaseWordPresent) {
-                    // table name after begin asterisks
-                    context.addNextToken(token);
-                    wasCaseWordPresent = true;
-                    if (wasSuffixAsterisksPresent) {
-                        wasPrefixAsterisksPresent = true;
+                        wasPrefixAsterisksPresent = false;
+                        wasUserWordPresent = false;
+                        wasKeywordWordPresent = false;
+                        wasSuffixAsterisksPresent = false;
+                    } else if (!wasKeywordWordPresent) {
+                        // table name after begin asterisks
+                        context.addNextToken(token);
+                        wasKeywordWordPresent = true;
+                        if (wasSuffixAsterisksPresent) {
+                            wasPrefixAsterisksPresent = true;
+                            wasSuffixAsterisksPresent = false;
+                        }
+                    } else {
+                        // keyword appears after keyword or case
+                        context.removeAllContextTokens();
+
+                        wasPrefixAsterisksPresent = false;
+                        wasUserWordPresent = false;
+                        wasKeywordWordPresent = false;
                         wasSuffixAsterisksPresent = false;
                     }
-                } else {
-                    // test appears after test or case
-                    context.removeAllContextTokens();
-
-                    wasPrefixAsterisksPresent = false;
-                    wasTestWordPresent = false;
-                    wasCaseWordPresent = false;
-                    wasSuffixAsterisksPresent = false;
                 }
             } else {
-                if (wasPrefixAsterisksPresent && wasTestWordPresent
-                        && wasCaseWordPresent) {
+                if (wasPrefixAsterisksPresent && wasKeywordWordPresent) {
                     context.setType(BUILD_TYPE);
                     foundContexts.add(context);
 
@@ -177,14 +177,13 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
                 }
 
                 wasPrefixAsterisksPresent = false;
-                wasTestWordPresent = false;
-                wasCaseWordPresent = false;
+                wasUserWordPresent = false;
+                wasKeywordWordPresent = false;
                 wasSuffixAsterisksPresent = false;
             }
         }
 
-        if (wasPrefixAsterisksPresent && wasTestWordPresent
-                && wasCaseWordPresent) {
+        if (wasPrefixAsterisksPresent && wasKeywordWordPresent) {
             // case when is not END OF LINE on header name
             context.setType(BUILD_TYPE);
             foundContexts.add(context);
