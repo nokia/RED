@@ -228,9 +228,11 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
     }
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+        private final Image bookImage = RobotImages.getBookImage().createImage();
+
         @Override
         public Image getImage(final Object element) {
-            return RobotImages.getBookImage().createImage();
+            return bookImage;
         }
 
         @Override
@@ -252,6 +254,12 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 });
             }
             return text;
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            bookImage.dispose();
         }
     }
 }
