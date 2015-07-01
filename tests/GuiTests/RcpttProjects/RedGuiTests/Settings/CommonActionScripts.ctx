@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/30/15 6:06 PM
+Save-Time: 7/1/15 12:48 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -149,12 +149,15 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 proc "check_if_line_is_highlighted" [val line] [val script_name]{
 	repeat [val index] -times  [get-editor $script_name | get-text-viewer | get-property "getLineCount()" -raw | int] -command
 	{
-		if [$index | eq [minus $line 1]] {
-	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground [minus $line 1 | int] | invoke toString  | str | equals "Color {198, 219, 174}"
-		}
+		if [$index | not-eq [minus $line 1]] {
+	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index  | assert-empty
+	  		
+		}-else{
+			get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index | invoke toString  | str | equals "Color {198, 219, 174}" 
+			| assert-true -message [format "Background color in line %s is not green!"  [plus $index 1]]
+			}	
 	}
 }
-
 
 proc replace [val input] [val old] [val new]{
 
