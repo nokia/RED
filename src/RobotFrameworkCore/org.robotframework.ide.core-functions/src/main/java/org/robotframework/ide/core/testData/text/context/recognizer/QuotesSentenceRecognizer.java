@@ -35,6 +35,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
  * @see RobotWordType#DOUBLE_SPACE
  * 
+ * @see SimpleRobotContextType#QUOTES_SENTENCE
  */
 public class QuotesSentenceRecognizer implements IContextRecognizer {
 

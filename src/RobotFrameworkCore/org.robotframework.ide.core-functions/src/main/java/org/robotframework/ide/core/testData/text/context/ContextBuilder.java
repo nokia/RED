@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
@@ -45,6 +46,7 @@ public class ContextBuilder {
         recognizers.add(new TestCaseTableHeaderRecognizer());
         recognizers.add(new KeywordsTableHeaderRecognizer());
         recognizers.add(new QuotesSentenceRecognizer());
+        recognizers.add(new DoubleSpaceOrTabulatorSeparatorRecognizer());
 
         recognizers = Collections.unmodifiableList(recognizers);
     }
