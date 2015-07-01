@@ -13,11 +13,17 @@
 	      <url>http://download.eclipse.org/releases/luna/</url>
 	      <layout>p2</layout>
 	    </repository>
+	    <repository>
+	      <id>eclipse-mars</id>
+	      <url>http://download.eclipse.org/releases/mars/</url>
+	      <layout>p2</layout>
+	    </repository>		
 	</repositories>
 	  
 	<properties>
 		<tycho-version>0.21.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eclipse.version>luna</eclipse.version>
 	</properties>
 
 	<modules>
@@ -37,7 +43,7 @@
 							<groupId>org.robotframework.ide.eclipse</groupId>
 							<artifactId>org.robotframework.ide.eclipse.target-platform</artifactId>
 							<version>1.0.0-SNAPSHOT</version>
-							<classifier>luna</classifier>
+							<classifier>${eclipse.version}</classifier>
 						</artifact>
 					</target>
 					<ignoreTychoRepositories>true</ignoreTychoRepositories>
