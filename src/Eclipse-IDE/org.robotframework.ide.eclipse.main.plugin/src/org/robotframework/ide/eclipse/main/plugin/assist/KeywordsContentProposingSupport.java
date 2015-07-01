@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 public class KeywordsContentProposingSupport implements IContentProposingSupport {
 
     private final RobotSuiteFile suiteFile;
+    private final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
 
     public KeywordsContentProposingSupport(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
@@ -34,7 +35,7 @@ public class KeywordsContentProposingSupport implements IContentProposingSupport
 
     @Override
     public ILabelProvider getLabelProvider() {
-        return new KeywordProposalsLabelProvider();
+        return labelProvider;
     }
 
     @Override

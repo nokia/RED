@@ -15,6 +15,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 
 public class KeywordCallNameEditingSupport extends RobotElementEditingSupport {
 
+    private KeywordsContentProposingSupport contentAssistSupport;
+
     public KeywordCallNameEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack,
             final NewElementsCreator creator) {
         super(viewer, 0, commandsStack, creator);
@@ -27,7 +29,10 @@ public class KeywordCallNameEditingSupport extends RobotElementEditingSupport {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) element;
             final ActivationCharPreservingTextCellEditor editor = new ActivationCharPreservingTextCellEditor(
                     getViewer().getColumnViewerEditor(), parent, DETAILS_EDITING_CONTEXT_ID);
-            editor.addContentProposalsSupport(new KeywordsContentProposingSupport(keywordCall.getSuiteFile()));
+            if (contentAssistSupport == null) {
+                contentAssistSupport = new KeywordsContentProposingSupport(keywordCall.getSuiteFile());
+            }
+            editor.addContentProposalsSupport(contentAssistSupport);
             final ControlDecoration decoration = new ControlDecoration(editor.getControl(), SWT.RIGHT | SWT.TOP);
             decoration.setDescriptionText("Press Ctrl+Space for content assist");
             decoration.setImage(FieldDecorationRegistry.getDefault()
