@@ -5,6 +5,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -21,7 +22,14 @@ public class Sections {
         final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
         final ToolItem item = new ToolItem(bar, SWT.PUSH);
         item.setToolTipText("Maximize section");
-        item.setImage(RobotImages.getFocusSectionImage().createImage());
+        final Image icon = RobotImages.getFocusSectionImage().createImage();
+        item.setImage(icon);
+        item.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                icon.dispose();
+            }
+        });
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {

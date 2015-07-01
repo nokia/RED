@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import org.eclipse.jface.assist.IDecoratedContentProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 
 import com.google.common.base.Strings;
 
@@ -24,9 +23,8 @@ class KeywordContentProposal implements IDecoratedContentProposal {
         return getContent().length();
     }
 
-    Image getImage() {
-        final ImageDescriptor descriptor = wrappedProposal.getImage();
-        return descriptor != null ? descriptor.createImage() : null;
+    ImageDescriptor getImage() {
+        return wrappedProposal.getImage();
     }
 
     @Override
