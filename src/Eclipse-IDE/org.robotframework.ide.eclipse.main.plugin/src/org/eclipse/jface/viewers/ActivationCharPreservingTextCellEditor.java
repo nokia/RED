@@ -116,12 +116,19 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     }
 
     public void addContentProposalsSupport(final IContentProposingSupport support) {
+        final ILabelProvider labelProvider = support.getLabelProvider();
         contentProposalAdapter = new RedContentProposalAdapter(text, support.getControlAdapter(text),
                 support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
-        contentProposalAdapter.setLabelProvider(support.getLabelProvider());
+        contentProposalAdapter.setLabelProvider(labelProvider);
         contentProposalAdapter.setAutoActivationDelay(200);
         contentProposalAdapter.setAutoActivationCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray());
         contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_REPLACE);
+        text.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                labelProvider.dispose();
+            }
+        });
     }
 
     @Override
