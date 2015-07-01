@@ -65,12 +65,15 @@ public class QuotesSentenceRecognizer implements IContextRecognizer {
                         context.addNextToken(token);
                         wasEscapeChar = false;
                     } else {
+                        // closing quote mark
                         context.addNextToken(token);
                         context.setType(BUILD_TYPE);
                         foundContexts.add(context);
 
                         context = new OneLineRobotContext(
                                 lineInterval.getLineNumber());
+                        // for catch all possible quote marks, we adding it as
+                        // begin quote mark
                         wasEscapeChar = false;
                         context.addNextToken(token);
                     }
@@ -85,6 +88,9 @@ public class QuotesSentenceRecognizer implements IContextRecognizer {
                     context.addNextToken(token);
                 }
             } else {
+                // this false is set to handle: "abcd \h" case
+                // this prevents to think that last quote mark was after escape
+                // backslash
                 wasEscapeChar = false;
                 if (wasQuoteMark) {
                     context.addNextToken(token);
