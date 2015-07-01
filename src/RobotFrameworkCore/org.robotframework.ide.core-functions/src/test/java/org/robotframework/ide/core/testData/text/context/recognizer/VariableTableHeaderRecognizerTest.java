@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -487,5 +488,12 @@ public class VariableTableHeaderRecognizerTest extends ARecognizerTest {
             throws IOException {
         String text = "foobar foobar";
         assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_getContextType() {
+        assertThat(context.getContextType()).isEqualTo(
+                SimpleRobotContextType.VARIABLE_TABLE_HEADER);
     }
 }

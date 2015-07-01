@@ -410,4 +410,11 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         String text = "temp";
         assertForIncorrectData(text);
     }
+
+
+    @Test
+    public void test_getContextType() {
+        assertThat(context.getContextType()).isEqualTo(
+                SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
+    }
 }
