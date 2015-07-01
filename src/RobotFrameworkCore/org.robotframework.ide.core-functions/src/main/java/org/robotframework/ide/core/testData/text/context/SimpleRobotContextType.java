@@ -51,5 +51,18 @@ public enum SimpleRobotContextType implements IContextElementType {
     /**
      * is i.e. "water is liquid"
      */
-    QUOTES_SENTENCE;
+    QUOTES_SENTENCE,
+    /**
+     * separator without pipe
+     */
+    DOUBLE_SPACE_OR_TABULATOR_SEPARATED,
+    /**
+     * 
+     */
+    PIPE_SEPARATED,
+    /**
+     * this contexts belongs to additional spaces or tabulators made by user for
+     * readability increase
+     */
+    PRETTY_ALIGN;
 }
