@@ -37,6 +37,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotWordType#CASES_WORD
  * @see RobotWordType#DOUBLE_SPACE
  * 
+ * @see SimpleRobotContextType#TEST_CASE_TABLE_HEADER
  */
 public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
 

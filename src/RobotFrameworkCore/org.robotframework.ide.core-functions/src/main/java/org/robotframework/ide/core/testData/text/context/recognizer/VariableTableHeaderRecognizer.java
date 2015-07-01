@@ -33,9 +33,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotSingleCharTokenType#SINGLE_TABULATOR
  * @see RobotSingleCharTokenType#SINGLE_SPACE
  * @see RobotWordType#VARIABLE_WORD
- * @see RobotWordType#VARIABLES_WORDD
+ * @see RobotWordType#VARIABLES_WORD
  * @see RobotWordType#DOUBLE_SPACE
  * 
+ * @see SimpleRobotContextType#VARIABLE_TABLE_HEADER
  */
 public class VariableTableHeaderRecognizer implements IContextRecognizer {
 

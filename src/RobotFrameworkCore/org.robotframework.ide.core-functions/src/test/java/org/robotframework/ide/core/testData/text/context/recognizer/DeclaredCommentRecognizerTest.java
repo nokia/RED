@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -53,6 +54,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineRobotContext comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,

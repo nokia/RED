@@ -37,6 +37,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotWordType#KEYWORDS_WORD
  * @see RobotWordType#DOUBLE_SPACE
  * 
+ * @see SimpleRobotContextType#KEYWORD_TABLE_HEADER
  */
 public class KeywordsTableHeaderRecognizer implements IContextRecognizer {
 
