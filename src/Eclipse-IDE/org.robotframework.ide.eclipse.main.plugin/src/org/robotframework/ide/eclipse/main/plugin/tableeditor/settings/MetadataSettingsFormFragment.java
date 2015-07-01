@@ -43,8 +43,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
@@ -94,7 +94,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
             }
         });
         viewer.setContentProvider(new MetadataSettingsContentProvider(fileModel.isEditable()));
-        TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         final NewElementsCreator creator = newElementsCreator();

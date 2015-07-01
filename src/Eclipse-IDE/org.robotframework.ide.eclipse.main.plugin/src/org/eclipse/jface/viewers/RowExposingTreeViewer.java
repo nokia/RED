@@ -3,12 +3,12 @@ package org.eclipse.jface.viewers;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Widget;
 
-public class RowExposingTableViewer extends TableViewer {
+public class RowExposingTreeViewer extends TreeViewer {
 
-    public RowExposingTableViewer(final Composite parent, final int style) {
+    public RowExposingTreeViewer(final Composite parent, final int style) {
         super(parent, style);
     }
 
@@ -28,7 +28,7 @@ public class RowExposingTableViewer extends TableViewer {
      */
     public void removeColumns(final int beginIndex) {
         int i = 0;
-        for (final TableColumn column : getTable().getColumns()) {
+        for (final TreeColumn column : getTree().getColumns()) {
             if (i >= beginIndex) {
                 column.dispose();
             }
@@ -44,10 +44,10 @@ public class RowExposingTableViewer extends TableViewer {
     }
 
     public void packFirstColumn() {
-        getTable().getColumn(0).pack();
+        getTree().getColumn(0).pack();
     }
 
     public boolean hasAtLeastOneColumn() {
-        return getTable().getColumnCount() > 0;
+        return getTree().getColumnCount() > 0;
     }
 }

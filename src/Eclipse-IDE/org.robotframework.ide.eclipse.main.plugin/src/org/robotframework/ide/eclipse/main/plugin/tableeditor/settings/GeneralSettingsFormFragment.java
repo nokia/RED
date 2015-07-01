@@ -57,8 +57,8 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgum
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
@@ -161,7 +161,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         });
         viewer.setContentProvider(new GeneralSettingsContentProvider());
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
-        TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
+        CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         createColumns(true);

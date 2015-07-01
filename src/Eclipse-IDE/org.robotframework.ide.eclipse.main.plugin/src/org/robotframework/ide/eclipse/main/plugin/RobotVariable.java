@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,6 +48,15 @@ public class RobotVariable implements RobotElement {
         public abstract String getMark();
 
         public abstract ImageDescriptor getImage();
+    }
+
+    public static boolean isVariable(final String expression) {
+        for (final Type type : EnumSet.allOf(Type.class)) {
+            if (expression.startsWith(type.getMark() + "{") && expression.endsWith("}") ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private RobotSuiteFileSection section;
