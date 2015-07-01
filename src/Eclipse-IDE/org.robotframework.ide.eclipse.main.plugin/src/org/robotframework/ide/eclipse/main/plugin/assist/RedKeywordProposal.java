@@ -104,20 +104,6 @@ public class RedKeywordProposal {
         return type.getImage();
     }
 
-    public enum KeywordType {
-        RESERVED(null), STD_LIBRARY(RobotImages.getKeywordImage()), USER_DEFINED(RobotImages.getUserKeywordImage());
-
-        private ImageDescriptor image;
-
-        private KeywordType(final ImageDescriptor image) {
-            this.image = image;
-        }
-
-        public ImageDescriptor getImage() {
-            return image;
-        }
-    }
-
     public String getHtmlDocumentation() {
         return htmlDocumentationProvider.provide();
     }
@@ -132,5 +118,19 @@ public class RedKeywordProposal {
 
     public String getDocumentation() {
         return documentation;
+    }
+
+    public enum KeywordType {
+        RESERVED(null), STD_LIBRARY(RobotImages.getKeywordImage()), USER_DEFINED(RobotImages.getUserKeywordImage());
+
+        private ImageDescriptor image;
+
+        private KeywordType(final ImageDescriptor image) {
+            this.image = image;
+        }
+
+        private ImageDescriptor getImage() {
+            return image;
+        }
     }
 }
