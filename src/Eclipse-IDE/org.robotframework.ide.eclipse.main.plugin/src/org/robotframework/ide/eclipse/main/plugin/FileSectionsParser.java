@@ -13,9 +13,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-
 
 class FileSectionsParser {
 
@@ -53,7 +50,8 @@ class FileSectionsParser {
                 throw new IOException("Unable to read content from stream", e);
             }
         }
-        final Multimap<Integer, IMarker> groupedMarkers = groupMarkersByLine(markers);
+        // final Multimap<Integer, IMarker> groupedMarkers =
+        // groupMarkersByLine(markers);
 
         try (final BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(inputStream, "UTF-8"))) {
@@ -65,11 +63,11 @@ class FileSectionsParser {
             RobotKeywordDefinition keywordDef = null;
             RobotSuiteSettingsSection settingSection = null;
             RobotVariablesSection varSection = null;
-            int lineNumber = 1;
+            // int lineNumber = 1;
             while(line != null) {
                 if (line.trim().isEmpty()) {
                     line = bufferedReader.readLine();
-                    lineNumber++;
+                    // lineNumber++;
                     continue;
                 } else if (line.startsWith("*")) {
                     casesSection = null;
@@ -130,8 +128,7 @@ class FileSectionsParser {
                         if (name.startsWith("[") && name.endsWith("]")) {
                             testCase.createSettting(name, args, comment);
                         } else {
-                            testCase.createKeywordCall(name, args, comment,
-                                    groupedMarkers.get(lineNumber));
+                            testCase.createKeywordCall(name, args, comment);
                         }
                     } else {
                         testCase = casesSection.createTestCase(line);
@@ -148,7 +145,15 @@ class FileSectionsParser {
 
                         keywordDef.createKeywordCall(name, args, comment);
                     } else {
-                        keywordDef = keywordsSection.createKeywordDefinition(line);
+                        final String comment = extractComment(line);
+                        final String lineWithoutComment = removeComment(line);
+
+                        final String[] split = lineWithoutComment.split("  +");
+                        final String name = split[0];
+                        final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
+                                split.length);
+
+                        keywordDef = keywordsSection.createKeywordDefinition(name, args, comment);
                     }
                 } else if (settingSection != null) {
                     final String comment = extractComment(line);
@@ -162,7 +167,7 @@ class FileSectionsParser {
                     settingSection.createSetting(name, comment, args);
                 }
                 line = bufferedReader.readLine();
-                lineNumber++;
+                // lineNumber++;
             }
         }
         return sections;
@@ -214,16 +219,14 @@ class FileSectionsParser {
         return line.replaceAll("\\*", " ").trim();
     }
 
-
-    private static Multimap<Integer, IMarker> groupMarkersByLine(
-            final IMarker[] markers) {
-        final Multimap<Integer, IMarker> groupedMarkers = LinkedListMultimap
-                .create();
-        for (final IMarker marker : markers) {
-            final int line = marker.getAttribute(IMarker.LINE_NUMBER, 0);
-            groupedMarkers.put(line, marker);
-        }
-        return groupedMarkers;
-    }
-
+    // private static Multimap<Integer, IMarker> groupMarkersByLine(
+    // final IMarker[] markers) {
+    // final Multimap<Integer, IMarker> groupedMarkers = LinkedListMultimap
+    // .create();
+    // for (final IMarker marker : markers) {
+    // final int line = marker.getAttribute(IMarker.LINE_NUMBER, 0);
+    // groupedMarkers.put(line, marker);
+    // }
+    // return groupedMarkers;
+    // }
 }

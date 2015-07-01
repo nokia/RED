@@ -10,6 +10,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TreeColumn;
 
 public class ViewerColumnsFactory {
 
@@ -94,7 +95,7 @@ public class ViewerColumnsFactory {
         return this;
     }
 
-    public TableViewerColumn createFor(final TableViewer viewer) {
+    public void createFor(final TableViewer viewer) {
         final TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
         column.getColumn().setWidth(Math.max(width, minimumWidth));
         column.getColumn().setText(name);
@@ -128,15 +129,13 @@ public class ViewerColumnsFactory {
         if(selectionListener != null) {
             column.getColumn().addSelectionListener(selectionListener);
         }
-        
-        return column;
     }
 
     private ControlAdapter createResizeListener(final TableViewer viewer, final TableColumn column) {
         return new ControlAdapter() {
             @Override
             public void controlResized(final ControlEvent e) {
-                final int totalTableWidth = viewer.getTable().getSize().x;
+                final int totalTableWidth = viewer.getControl().getSize().x;
 
                 int otherColumnsTotalWidth = 0;
                 for (final TableColumn currentColumn : viewer.getTable().getColumns()) {
@@ -160,7 +159,7 @@ public class ViewerColumnsFactory {
 
     public TreeViewerColumn createFor(final TreeViewer viewer) {
         final TreeViewerColumn column = new TreeViewerColumn(viewer, SWT.NONE);
-        column.getColumn().setWidth(width);
+        column.getColumn().setWidth(Math.max(width, minimumWidth));
         column.getColumn().setText(name);
         column.getColumn().setImage(image);
         column.getColumn().addDisposeListener(new DisposeListener() {
@@ -173,10 +172,52 @@ public class ViewerColumnsFactory {
         });
         column.getColumn().setToolTipText(tooltip);
         column.getColumn().setResizable(resizable);
+
+        if (shouldExtend) {
+            final ControlAdapter resizeListener = createResizeListener(viewer, column.getColumn());
+            column.getColumn().addDisposeListener(new DisposeListener() {
+                @Override
+                public void widgetDisposed(final DisposeEvent e) {
+                    viewer.getTree().removeControlListener(resizeListener);
+                }
+            });
+            viewer.getTree().addControlListener(resizeListener);
+        }
+
         column.setLabelProvider(labelProvider);
         if (shouldAddEditingSupport) {
             column.setEditingSupport(editingSupport);
         }
+
+        if (selectionListener != null) {
+            column.getColumn().addSelectionListener(selectionListener);
+        }
         return column;
+    }
+
+    private ControlAdapter createResizeListener(final TreeViewer viewer, final TreeColumn column) {
+        return new ControlAdapter() {
+            @Override
+            public void controlResized(final ControlEvent e) {
+                final int totalTableWidth = viewer.getControl().getSize().x;
+
+                int otherColumnsTotalWidth = 0;
+                for (final TreeColumn currentColumn : viewer.getTree().getColumns()) {
+                    if (currentColumn != column) {
+                        otherColumnsTotalWidth += currentColumn.getWidth();
+                    }
+                }
+                final int scrollbarWidth = getScrollBarWidth(viewer);
+
+                final int additional = shouldShowLastSep ? 1 : 0;
+                final int widthToOccupy = totalTableWidth - (otherColumnsTotalWidth + scrollbarWidth + additional);
+                column.setWidth(Math.max(minimumWidth, widthToOccupy));
+            }
+
+            private int getScrollBarWidth(final TreeViewer viewer) {
+                final ScrollBar verticalBar = viewer.getTree().getVerticalBar();
+                return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
+            }
+        };
     }
 }

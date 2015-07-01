@@ -61,8 +61,16 @@ public class RobotKeywordCall implements RobotElement {
         this.comment = comment;
     }
 
+    protected RobotSuiteFileSection getSection() {
+        RobotElement current = this;
+        while (current != null && !(current instanceof RobotSuiteFileSection)) {
+            current = current.getParent();
+        }
+        return (RobotSuiteFileSection) current;
+    }
+
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new OpenStrategy();
+        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getSection(), this);
     }
 }

@@ -26,10 +26,16 @@ public class ElementAddingToken {
 
     private final String newElementTypeName;
     private final boolean enabled;
+    private final int rank;
 
     public ElementAddingToken(final String newElementTypeName, final boolean isEnabled) {
+        this(newElementTypeName, isEnabled, 0);
+    }
+
+    public ElementAddingToken(final String newElementTypeName, final boolean isEnabled, final int rank) {
         this.newElementTypeName = newElementTypeName;
         this.enabled = isEnabled;
+        this.rank = rank;
     }
 
     /**
@@ -37,6 +43,9 @@ public class ElementAddingToken {
      * by framework.
      */
     public Image getImage() {
+        if (rank > 0) {
+            return null;
+        }
         final ImageDescriptor descriptor = RobotImages.getAddImage();
         if (enabled) {
             return descriptor.createImage();
@@ -46,11 +55,13 @@ public class ElementAddingToken {
     }
 
     public StyledString getStyledText() {
-        return new StyledString("...add new " + newElementTypeName, new Styler() {
+        final String msg = rank == 0 ? "...add new" + newElementTypeName : "...";
+        return new StyledString(msg, new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = getColor();
-                textStyle.font = getFont(textStyle.font);
+                final int style = rank == 0 ? SWT.ITALIC : SWT.ITALIC | SWT.BOLD;
+                textStyle.font = getFont(textStyle.font, style);
             }
         });
     }
@@ -70,12 +81,12 @@ public class ElementAddingToken {
         return null;
     }
 
-    private Font getFont(final Font fontToReuse) {
+    private Font getFont(final Font fontToReuse, final int style) {
         if (font != null) {
             return font;
         }
         final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
-        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(SWT.ITALIC);
+        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
         font = fontDescriptor.createFont(currentFont.getDevice());
         return font;
     }

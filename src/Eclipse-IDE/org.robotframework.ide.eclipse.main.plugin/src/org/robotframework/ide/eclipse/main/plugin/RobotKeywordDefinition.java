@@ -12,13 +12,18 @@ public class RobotKeywordDefinition implements RobotElement {
     private final RobotKeywordsSection parent;
     private String name;
     protected final List<RobotElement> elements = new ArrayList<>();
+    private String comment;
+    private final List<String> arguments;
 
-    public RobotKeywordDefinition(final RobotKeywordsSection parent, final String name) {
+    RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final List<String> arguments,
+            final String comment) {
         this.parent = parent;
         this.name = name;
+        this.arguments = arguments;
+        this.comment = comment;
     }
 
-    public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
+    RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
         final RobotKeywordCall call = new RobotKeywordCall(this, name, Arrays.asList(args), comment);
         elements.add(call);
         return call;
@@ -31,6 +36,18 @@ public class RobotKeywordDefinition implements RobotElement {
 
     public void setName(final String newName) {
         this.name = newName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
+    }
+
+    public List<String> getArguments() {
+        return arguments;
     }
 
     @Override
