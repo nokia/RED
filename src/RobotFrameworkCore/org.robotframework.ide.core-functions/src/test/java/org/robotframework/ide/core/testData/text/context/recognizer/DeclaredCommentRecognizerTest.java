@@ -286,4 +286,11 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         assertThat(out.getContexts()).isEmpty();
         assertThat(recognize).isEmpty();
     }
+
+
+    @Test
+    public void test_getContextType() {
+        assertThat(context.getContextType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
+    }
 }
