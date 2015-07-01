@@ -9,6 +9,7 @@ import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredComm
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
@@ -33,6 +34,8 @@ import com.google.common.collect.LinkedListMultimap;
  * @see SettingTableHeaderRecognizer
  * @see VariableTableHeaderRecognizer
  * @see TestCaseTableHeaderRecognizer
+ * @see DoubleSpaceOrTabulatorSeparatorRecognizer
+ * @see PipeSeparatorRecognizer
  */
 public class ContextBuilder {
 
@@ -47,6 +50,7 @@ public class ContextBuilder {
         recognizers.add(new KeywordsTableHeaderRecognizer());
         recognizers.add(new QuotesSentenceRecognizer());
         recognizers.add(new DoubleSpaceOrTabulatorSeparatorRecognizer());
+        recognizers.add(new PipeSeparatorRecognizer());
 
         recognizers = Collections.unmodifiableList(recognizers);
     }
