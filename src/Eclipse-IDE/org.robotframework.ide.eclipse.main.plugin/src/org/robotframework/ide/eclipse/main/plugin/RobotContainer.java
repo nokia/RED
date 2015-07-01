@@ -119,7 +119,7 @@ public abstract class RobotContainer implements RobotElement {
                     toRemove.add(file);
                 } else if (isChanged(elementDelta)) {
                     changes.add(RobotElementChange.createChangedElement(file));
-                    changes.addAll(file.synchronizeChanges());
+                    changes.addAll(file.synchronizeChanges(elementDelta));
                 }
             }
         }
@@ -128,7 +128,8 @@ public abstract class RobotContainer implements RobotElement {
     }
 
     private boolean isChanged(final IResourceDelta elementDelta) {
-        return elementDelta != null && elementDelta.getKind() == IResourceDelta.CHANGED;
+        final boolean onlyMarkerWasAdded = (elementDelta.getFlags() & IResourceDelta.MARKERS) == IResourceDelta.MARKERS;
+        return elementDelta != null && elementDelta.getKind() == IResourceDelta.CHANGED && !onlyMarkerWasAdded;
     }
 
     private boolean isRemoved(final IResourceDelta elementDelta) {

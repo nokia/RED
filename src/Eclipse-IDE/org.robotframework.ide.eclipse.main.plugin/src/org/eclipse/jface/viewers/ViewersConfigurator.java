@@ -23,9 +23,9 @@ public class ViewersConfigurator {
      * @param viewer
      *            Table viewer for which header context menu should be disabled
      */
-    public static void disableContextMenuOnHeader(final TableViewer viewer) {
+    public static void disableContextMenuOnHeader(final ColumnViewer viewer) {
         // no need to dispose
-        viewer.getTable().addMenuDetectListener(new MenuDetectListener() {
+        viewer.getControl().addMenuDetectListener(new MenuDetectListener() {
 
             @Override
             public void menuDetected(final MenuDetectEvent e) {
@@ -33,9 +33,29 @@ public class ViewersConfigurator {
             }
 
             private boolean isClickedOnHeader(final MenuDetectEvent e) {
-                final Rectangle clientArea = viewer.getTable().getClientArea();
-                final Point point = viewer.getTable().toControl(e.x, e.y);
-                return clientArea.y <= point.y && point.y <= clientArea.y + viewer.getTable().getHeaderHeight();
+                final Rectangle clientArea = getClientArea(viewer);
+                final Point point = viewer.getControl().toControl(e.x, e.y);
+                return clientArea.y <= point.y && point.y <= clientArea.y + getHeaderHeight(viewer);
+            }
+
+            private int getHeaderHeight(final ColumnViewer viewer) {
+                if (viewer instanceof TableViewer) {
+                    return ((TableViewer) viewer).getTable().getHeaderHeight();
+                } else if (viewer instanceof TreeViewer) {
+                    return ((TreeViewer) viewer).getTree().getHeaderHeight();
+                }
+                throw new IllegalStateException("Unknown viewer type: "
+                        + (viewer == null ? "null" : viewer.getClass().getSimpleName()));
+            }
+
+            private Rectangle getClientArea(final ColumnViewer viewer) {
+                if (viewer instanceof TableViewer) {
+                    return ((TableViewer) viewer).getTable().getClientArea();
+                } else if (viewer instanceof TreeViewer) {
+                    return ((TreeViewer) viewer).getTree().getClientArea();
+                }
+                throw new IllegalStateException("Unknown viewer type: "
+                        + (viewer == null ? "null" : viewer.getClass().getSimpleName()));
             }
         });
     }
@@ -47,10 +67,10 @@ public class ViewersConfigurator {
      * @param viewer
      *            Table viewer which should have deselection enabled
      */
-    public static void enableDeselectionPossibility(final TableViewer viewer) {
+    public static void enableDeselectionPossibility(final ColumnViewer viewer) {
         // sets empty selection when user clicked outside the table items
         // section
-        viewer.getTable().addMouseListener(new MouseAdapter() {
+        viewer.getControl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseUp(final MouseEvent e) {
                 if (leftClickOutsideTable(e)) {
@@ -59,7 +79,13 @@ public class ViewersConfigurator {
             }
 
             private boolean leftClickOutsideTable(final MouseEvent e) {
-                return e.button == 1 && viewer.getTable().getItem(new Point(e.x, e.y)) == null;
+                if (viewer instanceof TableViewer) {
+                    return e.button == 1 && ((TableViewer) viewer).getTable().getItem(new Point(e.x, e.y)) == null;
+                } else if (viewer instanceof TreeViewer) {
+                    return e.button == 1 && ((TreeViewer) viewer).getTree().getItem(new Point(e.x, e.y)) == null;
+                }
+                throw new IllegalStateException("Unknown viewer type: "
+                        + (viewer == null ? "null" : viewer.getClass().getSimpleName()));
             }
         });
     }

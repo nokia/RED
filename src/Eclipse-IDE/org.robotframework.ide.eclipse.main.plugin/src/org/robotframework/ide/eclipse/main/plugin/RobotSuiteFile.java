@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -69,12 +71,16 @@ public class RobotSuiteFile implements RobotElement {
             try {
                 sections.addAll(createParser().parseRobotFileSections(this));
 
-                final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
-
-                listener = new RobotEditorClosedListener();
-                ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
-                service.addPartListener(listener);
-
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getPartService();
+                        listener = new RobotEditorClosedListener();
+                        ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
+                        service.addPartListener(listener);
+                    }
+                });
             } catch (final IOException e) {
                 throw new RuntimeException("Unable to read sections");
             }
@@ -101,8 +107,10 @@ public class RobotSuiteFile implements RobotElement {
         getSections();
     }
 
-    List<RobotElementChange> synchronizeChanges() {
-        refreshOnFileChange();
+    List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
+        if ((delta.getFlags() & IResourceDelta.MARKERS) != IResourceDelta.MARKERS) {
+            refreshOnFileChange();
+        }
         return new ArrayList<>();
     }
 

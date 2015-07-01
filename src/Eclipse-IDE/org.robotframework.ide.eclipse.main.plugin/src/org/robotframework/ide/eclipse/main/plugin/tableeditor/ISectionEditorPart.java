@@ -6,6 +6,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 
 public interface ISectionEditorPart {
 
+    String SECTION_FILTERING_TOPIC = "red/suite_editor/section/filter/changed";
+
     void updateOnActivation();
 
     com.google.common.base.Optional<RobotElement> provideSection(RobotSuiteFile suiteModel);
