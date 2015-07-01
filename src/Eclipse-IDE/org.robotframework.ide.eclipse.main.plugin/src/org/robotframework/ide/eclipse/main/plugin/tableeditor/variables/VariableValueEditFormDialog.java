@@ -40,8 +40,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 
 /**
  * @author mmarzec
@@ -127,7 +127,7 @@ public class VariableValueEditFormDialog extends FormDialog {
 
     private void createTable(final Composite parent) {
         tableViewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        TableCellsAcivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsAcivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(tableViewer.getTable());
 

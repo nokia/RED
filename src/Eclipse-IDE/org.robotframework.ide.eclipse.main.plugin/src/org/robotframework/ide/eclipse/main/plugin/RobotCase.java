@@ -2,10 +2,8 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -20,8 +18,7 @@ public class RobotCase implements RobotElement {
         this.name = name;
     }
 
-    public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment,
-            final Collection<IMarker> markers) {
+    public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
         final RobotKeywordCall call = new RobotKeywordCall(this, name, Arrays.asList(args), comment);
         elements.add(call);
         return call;

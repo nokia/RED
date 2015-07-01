@@ -12,12 +12,28 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
+    private Image libraryImage = RobotImages.getLibraryImage().createImage();
+    private Image bookImage = RobotImages.getBookImage().createImage();
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (libraryImage != null) {
+            libraryImage.dispose();
+            libraryImage = null;
+        }
+        if (bookImage != null) {
+            bookImage.dispose();
+            bookImage = null;
+        }
+    }
+
     @Override
     public Image getImage(final Object element) {
         if (element instanceof RobotProjectDependencies) {
-            return RobotImages.getLibraryImage().createImage();
+            return libraryImage;
         } else if (element instanceof LibrarySpecification) {
-            return RobotImages.getBookImage().createImage();
+            return bookImage;
         }
         return null;
     }

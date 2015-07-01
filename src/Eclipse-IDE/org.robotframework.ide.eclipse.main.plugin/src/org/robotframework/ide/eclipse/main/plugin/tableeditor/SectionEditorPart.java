@@ -8,8 +8,13 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
@@ -17,11 +22,18 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -30,6 +42,7 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
@@ -43,6 +56,9 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     private final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
 
     protected RedFormToolkit toolkit;
+
+    @Inject
+    protected IEventBroker eventBroker;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -107,8 +123,52 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         form.setText(getTitle());
         toolkit.decorateFormHeading(form);
 
+        createFilter();
+
         GridLayoutFactory.fillDefaults().applyTo(form.getBody());
         return form;
+    }
+
+    private void createFilter() {
+        final Text filter = toolkit.createText(form.getHead(), "");
+        filter.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
+        form.setHeadClient(filter);
+
+        filter.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(final PaintEvent e) {
+                if (filter.getText().isEmpty() && !filter.isFocusControl()) {
+                    final Color current = e.gc.getForeground();
+                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
+                    e.gc.drawText("filter elements", 3, 1);
+                    e.gc.setForeground(current);
+                }
+            }
+        });
+        filter.addModifyListener(new ModifyListener() {
+            private Job notifyingJob = null;
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                if (notifyingJob != null && notifyingJob.getState() == Job.SLEEPING) {
+                    notifyingJob.cancel();
+                }
+                notifyingJob = new Job("filtering section") {
+                    @Override
+                    protected IStatus run(final IProgressMonitor monitor) {
+                        filter.getDisplay().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                eventBroker.send(ISectionEditorPart.SECTION_FILTERING_TOPIC + "/" + getSectionName(),
+                                        filter.getText());
+                            }
+                        });
+                        return Status.OK_STATUS;
+                    }
+                };
+                notifyingJob.schedule(200);
+            }
+        });
     }
 
     private void injectToFormParts(final IEclipseContext context, final List<? extends ISectionFormFragment> sectionForms) {
@@ -149,8 +209,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         }
 
         final com.google.common.base.Optional<RobotElement> section = provideSection(fileModel);
+        form.removeMessageHyperlinkListener(createSectionLinkListener);
         if (section.isPresent()) {
-            form.removeMessageHyperlinkListener(createSectionLinkListener);
             form.setMessage(null, 0);
         } else {
             createSectionLinkListener = createHyperlinkListener();

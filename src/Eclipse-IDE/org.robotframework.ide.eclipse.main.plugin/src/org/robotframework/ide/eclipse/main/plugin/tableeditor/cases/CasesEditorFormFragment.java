@@ -58,8 +58,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.viewers.Selections;
 
 public class CasesEditorFormFragment implements ISectionFormFragment {
@@ -166,7 +166,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     private void createSectionViewer(final Composite parent) {
         viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(10, 0).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
@@ -266,7 +266,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 | SWT.V_SCROLL);
         caseSection.setClient(caseViewer.getTable());
         caseViewer.setUseHashlookup(true);
-        TableCellsAcivationStrategy.addActivationStrategy(caseViewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsAcivationStrategy.addActivationStrategy(caseViewer, RowTabbingStrategy.MOVE_TO_NEXT);
         RedColumnViewerToolTipSupport.enableFor(caseViewer);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(caseViewer.getTable());

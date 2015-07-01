@@ -27,6 +27,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
     public static class KeywordsEditor extends SectionEditorPart {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.keywords.context";
+        private KeywordsEditorFormFragment keywordsFragment;
 
         @Override
         protected String getContextId() {
@@ -50,7 +51,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-
+            keywordsFragment.revealElement(robotElement);
         }
 
         @Override
@@ -60,12 +61,13 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            return newArrayList();
+            keywordsFragment = new KeywordsEditorFormFragment();
+            return newArrayList(keywordsFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return null;
+            return keywordsFragment.getViewer();
         }
     }
 }

@@ -48,6 +48,11 @@ public class RobotModelEvents {
     public static final String ROBOT_SETTING_COMMENT_CHANGED = "robot/model/editor/file/detail/setting/changed/comment";
 
 
+    public static final String ROBOT_KEYWORD_DEFINITION_CHANGE_ALL = "robot/model/editor/file/detail/userkeyword/changed/*";
+
+    public static final String ROBOT_KEYWORD_DEFINITION_COMMENT_CHANGE = "robot/model/editor/file/detail/userkeyword/changed/comment";
+
+
     public static final String ROBOT_CASE_STRUCTURAL_ALL = "robot/model/editor/file/structural/cases/*";
     
     public static final String ROBOT_CASE_ADDED = "robot/model/editor/file/structural/cases/added";

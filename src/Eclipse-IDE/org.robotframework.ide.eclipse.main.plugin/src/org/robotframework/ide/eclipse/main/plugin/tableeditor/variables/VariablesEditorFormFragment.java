@@ -31,12 +31,12 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableCellsAcivationStrategy.RowTabbingStrategy;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
 
@@ -62,7 +62,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void initialize(final Composite parent) {
         viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        TableCellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         viewer.setContentProvider(new VariablesContentProvider());
@@ -136,12 +136,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void setInput() {
         final com.google.common.base.Optional<RobotElement> variablesSection = fileModel
                 .findSection(RobotVariablesSection.class);
-        if (variablesSection.isPresent()) {
-            viewer.setInput(variablesSection.get());
-        } else {
-            viewer.setInput(null);
-            viewer.refresh();
-        }
+        viewer.setInput(variablesSection.orNull());
+        viewer.refresh();
     }
 
     void revealVariable(final RobotVariable robotVariable) {

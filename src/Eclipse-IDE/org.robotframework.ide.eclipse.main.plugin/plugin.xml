@@ -453,6 +453,16 @@
           Color used for comments in RED table editor
        </description>
     </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.table.theme"
+          id="org.robotframework.ide.eclipse.variable"
+          isEditable="true"
+          label="Variables"
+          value="COLOR_DARK_GREEN">
+       <description>
+          Color used for variables in RED table editor
+       </description>
+    </colorDefinition>
  </extension>
  <extension
        point="org.eclipse.ui.contexts">
@@ -525,6 +535,16 @@
           name="Delete section">
        <commandParameter
              id="org.robotframework.ide.eclipse.deleteSection.sectionName"
+             name="name"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.findElementUsages"
+          name="Find keyword usages in workspace">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.findElementUsages.place"
              name="name"
              optional="false">
        </commandParameter>
@@ -675,6 +695,48 @@
           </reference>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.FindElementUsagesHandler"
+          commandId="org.robotframework.ide.eclipse.findElementUsages">
+       <enabledWhen>
+          <with
+                variable="selection">
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.RobotElement">
+                   </instanceof>
+                </iterate>
+                <count
+                      value="1">
+                </count>
+             </and>
+          </with></enabledWhen>
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.editorContextIsActive">
+             </reference>
+             <with
+                   variable="selection">
+                <and>
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <instanceof
+                            value="org.robotframework.ide.eclipse.main.plugin.RobotElement">
+                      </instanceof>
+                   </iterate>
+                   <count
+                         value="1">
+                   </count>
+                </and>
+             </with>
+          </and>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -695,6 +757,16 @@
           contextId="org.eclipse.ui.contexts.window"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+ARROW_DOWN">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.findElementUsages"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+G">
+       <parameter
+             id="org.robotframework.ide.eclipse.findElementUsages.place"
+             value="workspace">
+       </parameter>
     </key>
  </extension>
  <extension
@@ -730,6 +802,90 @@
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
              style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.keywords.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNew"
+             icon="resources/add.png"
+             label="Add new keyword"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="true"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
+                   </instanceof>
+                </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+       <separator
+             name="navigation"
+             visible="true">
+       </separator>
+       <menu
+             label="References">
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementUsages"
+                label="Workspace"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="workspace">
+             </parameter>
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementUsages"
+                label="Project"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="project">
+             </parameter>
+          </command>
+       </menu>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementUp"
+             label="Move keyword up"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="true"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
+                   </instanceof>
+                </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementDown"
+             label="Move test case down"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="true"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
+                   </instanceof>
+                </iterate>
+             </with>
+          </visibleWhen>
        </command>
     </menuContribution>
     <menuContribution
