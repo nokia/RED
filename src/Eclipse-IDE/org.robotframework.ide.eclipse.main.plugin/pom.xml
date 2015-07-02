@@ -26,9 +26,14 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<outputDirectory>${project.basedir}/lib</outputDirectory>
-							<markersDirectory>${project.basedir}/lib</markersDirectory>
+						   <!--includeScope>compile</includeScope-->
+						   <includeTypes>jar</includeTypes>
+						   <outputDirectory>lib</outputDirectory>
+						   <markersDirectory>lib</markersDirectory>
+						   <overWriteIfNewer>true</overWriteIfNewer>
+						   <overWriteReleases>true</overWriteReleases>
+						   <overWriteSnapshots>true</overWriteSnapshots>
+						   <stripVersion>true</stripVersion>						
 						</configuration>
 					</execution>
 				</executions>
@@ -71,6 +76,7 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
+			<type>jar</type>	
 		</dependency>
 	</dependencies>
 </project>
