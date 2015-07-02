@@ -364,9 +364,8 @@ public class TextEditor {
             textHover.setDebugVariables((Map<String, Object>) event.getProperty("vars"));
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
-                final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
-
-                viewer.getTextWidget().setLineBackground(breakpointLine, 1, whiteColor);
+                
+                viewer.getTextWidget().setLineBackground(breakpointLine, 1, null);
                 viewer.getTextWidget().setLineBackground(line - 1, 1, highlightingColor);
                 showHighlightedLine(line);
                 compositeRuler.immediateUpdate();
@@ -398,10 +397,8 @@ public class TextEditor {
         if ("".equals(file) || editedFile.getName().equals(file)) {
             textHover.setDebugVariables(null);
             
-            final Color whiteColor = viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE);
-
             editor.activateSourcePage();
-            viewer.getTextWidget().setLineBackground(breakpointLine, 1, whiteColor);
+            viewer.getTextWidget().setLineBackground(breakpointLine, 1, null);
 	        breakpointLine = 0;
 	    }
     }
