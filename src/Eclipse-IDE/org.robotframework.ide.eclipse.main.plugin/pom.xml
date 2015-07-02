@@ -18,22 +18,21 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>				
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-						   <!--includeScope>compile</includeScope-->
+						   <includeScope>compile</includeScope>
 						   <includeTypes>jar</includeTypes>
 						   <outputDirectory>lib</outputDirectory>
-						   <markersDirectory>lib</markersDirectory>
 						   <overWriteIfNewer>true</overWriteIfNewer>
 						   <overWriteReleases>true</overWriteReleases>
 						   <overWriteSnapshots>true</overWriteSnapshots>
-						   <!--stripVersion>true</stripVersion removes i.e. guava-0.18.jar and converts it to guava.jar-->						
 						</configuration>
 					</execution>
 				</executions>
@@ -41,11 +40,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
+				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>clean-dependencies</id>
-						<phase>clean</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
