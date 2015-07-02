@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -19,7 +20,8 @@ class VariableValueEditingSupport extends RobotElementEditingSupport {
     protected CellEditor getCellEditor(final Object element) {
         final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotVariable) {
-            return new VariableValueDialogCellEditor(parent, (RobotVariable) element);
+            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
+                    DETAILS_EDITING_CONTEXT_ID);
         }
         return super.getCellEditor(element);
     }

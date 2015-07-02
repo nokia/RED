@@ -4,12 +4,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -22,6 +25,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.forms.RedFormToolkit;
+import org.robotframework.forms.Sections;
+import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -37,8 +45,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
+import org.robotframework.viewers.Selections;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
+    
+    @Inject
+    protected IEventBroker eventBroker;
+    @Inject
+    private RedFormToolkit toolkit;
 
     @Inject
     private IEditorSite site;
@@ -54,6 +68,12 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private IDirtyProviderService dirtyProviderService;
 
     private RowExposingTableViewer viewer;
+    
+    private RowExposingTableViewer valueEditViewer;
+    
+    private Composite valueEditFormPanel;
+    
+    private VariableValueEditForm valueEditForm;
 
     TableViewer getViewer() {
         return viewer;
@@ -81,7 +101,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final NewElementsCreator creator = newElementsCreator();
         
         final VariablesViewerComparator comparator = new VariablesViewerComparator();
-
+        
         ViewerColumnsFactory.newColumn("Variable").withWidth(270)
                 .labelsProvidedBy(new VariableNameLabelProvider())
                 .editingSupportedBy(new VariableNameEditingSupport(viewer, commandsStack, creator))
@@ -109,6 +129,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         createContextMenu();
 
         setInput();
+        
+        final Section section = createValueEditSection(parent);
+        valueEditForm = new VariableValueEditForm(toolkit, section, eventBroker);
+        addSelectionListenerForValueEditing(section);
     }
 
     private NewElementsCreator newElementsCreator() {
@@ -147,6 +171,58 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
+    }
+    
+    private Section createValueEditSection(final Composite parent) {
+        final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        section.setText("Edit Variable");
+        section.setExpanded(false);
+        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
+        Sections.switchGridCellGrabbingOnExpansion(section);
+        Sections.installMaximazingPossibility(section);
+        
+        return section;
+    }
+    
+    private void addSelectionListenerForValueEditing(final Section section) {
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+
+                if (event != null && event.getSelection() instanceof StructuredSelection
+                        && ((StructuredSelection) event.getSelection()).size() == 1
+                        && ((StructuredSelection) event.getSelection()).getFirstElement() instanceof RobotVariable) {
+
+                    final RobotVariable selectedVariable = Selections.getSingleElement(
+                            (StructuredSelection) event.getSelection(), RobotVariable.class);
+
+                    if (valueEditFormPanel != null) {
+                        valueEditFormPanel.dispose();
+                    }
+                    valueEditFormPanel = valueEditForm.createVariableValueEditForm(selectedVariable);
+                    valueEditViewer = valueEditForm.getTableViewer();
+
+                    if (valueEditViewer != null) {
+                        final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.collection.elements.contextMenu";
+                        final MenuManager manager = new MenuManager(
+                                "Robot suite editor variable value page context menu", menuId);
+                        final Table control = valueEditViewer.getTable();
+                        final Menu menu = manager.createContextMenu(control);
+                        control.setMenu(menu);
+                        site.registerContextMenu(menuId, manager, valueEditViewer, false);
+                        site.setSelectionProvider(new VariablesEditorPageSelectionProvider(viewer, valueEditViewer));
+                    } else {
+
+                        site.setSelectionProvider(viewer);
+                    }
+                    section.setClient(valueEditFormPanel);
+                    section.layout();
+                } else {
+                    site.setSelectionProvider(viewer);
+                }
+            }
+        });
     }
 
     @Inject
@@ -197,4 +273,47 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             setInput();
         }
     }
+    
+    
+    @Inject
+    @Optional
+    private void moveCollectionElementUp(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_COLLECTION_ELEMENT_MOVE_UP) final RobotCollectionElement element) {
+        valueEditForm.moveSelectedElementUp();
+    }
+
+    @Inject
+    @Optional
+    private void moveCollectionElementDown(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_COLLECTION_ELEMENT_MOVE_DOWN) final RobotCollectionElement element) {
+        valueEditForm.moveSelectedElementDown();
+    }
+
+    @Inject
+    @Optional
+    private void addNewCollectionElement(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_COLLECTION_ELEMENT_INSERT) final RobotCollectionElement element) {
+        valueEditForm.addNewElement();
+    }
+
+    @Inject
+    @Optional
+    private void deleteCollectionElement(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_COLLECTION_ELEMENT_DELETE) final RobotCollectionElement element) {
+        valueEditForm.deleteElement();
+    }
+    
+    
+    @Inject
+    @Optional
+    private void variableValueChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE) final RobotVariable variable) {
+        valueEditForm.changeInput(variable);
+    }
+    
+    @Inject
+    @Optional
+    private void variableNameChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE) final RobotVariable variable) {
+        valueEditForm.changeVariableName(variable.getName());
+    }
+
 }
