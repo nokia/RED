@@ -296,6 +296,14 @@
              </instanceof>
           </parentExpression>
        </commonSorter>
+       <commonSorter
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.KeywordsSectionSorter">
+          <parentExpression>
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection">
+             </instanceof>
+          </parentExpression>
+       </commonSorter>
     </navigatorContent>
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLibrariesContentProvider"
@@ -594,11 +602,11 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.InsertNewKeywordHandler"
           commandId="org.robotframework.ide.eclipse.insertNew">
        <activeWhen>
           <reference
-                definitionId="org.robotframework.activeVariablesPartIsEditable">
+                definitionId="org.robotframework.activeKeywordsPartIsEditable">
           </reference>
        </activeWhen>
        <enabledWhen>
@@ -613,6 +621,20 @@
        <activeWhen>
           <reference
                 definitionId="org.robotframework.activeCasesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
           </reference>
        </activeWhen>
        <enabledWhen>
@@ -812,19 +834,6 @@
              icon="resources/add.png"
              label="Add new keyword"
              style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="selection">
-                <iterate
-                      ifEmpty="true"
-                      operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
        </command>
        <separator
              name="navigation"
@@ -994,6 +1003,39 @@
              </test>
           </and>
        </with>
+    </definition>
+    <definition
+          id="org.robotframework.activeKeywordsPartIsEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
+                </equals>
+             </iterate>
+             <and>
+                <not>
+                   <iterate
+                         ifEmpty="false"
+                         operator="or">
+                      <equals
+                            value="org.robotframework.ide.eclipse.details.context">
+                      </equals>
+                   </iterate>
+                </not>
+             </and>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
     </definition>
     <definition
           id="org.robotframework.activeVariablesPartIsEditable">
