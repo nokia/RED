@@ -33,7 +33,7 @@
 						   <overWriteIfNewer>true</overWriteIfNewer>
 						   <overWriteReleases>true</overWriteReleases>
 						   <overWriteSnapshots>true</overWriteSnapshots>
-						   <stripVersion>true</stripVersion>						
+						   <!--stripVersion>true</stripVersion removes i.e. guava-0.18.jar and converts it to guava.jar-->						
 						</configuration>
 					</execution>
 				</executions>
