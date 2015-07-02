@@ -54,13 +54,13 @@ public class VariablesViewerComparator extends ViewerComparator {
             int result = 0;
             switch (columnIndex) {
                 case 0:
-                    result = variable1.getName().compareToIgnoreCase(variable2.getName());
+                    result = variable1.getName().compareTo(variable2.getName());
                     break;
                 case 1:
-                    result = variable1.getValue().compareToIgnoreCase(variable2.getValue());
+                    result = variable1.getValue().compareTo(variable2.getValue());
                     break;
                 case 2:
-                    result = variable1.getComment().compareToIgnoreCase(variable2.getComment());
+                    result = variable1.getComment().compareTo(variable2.getComment());
                     break;
                 default:
                     result = 0;
