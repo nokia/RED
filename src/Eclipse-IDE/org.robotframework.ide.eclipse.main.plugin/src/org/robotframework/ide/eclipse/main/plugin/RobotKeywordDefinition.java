@@ -15,7 +15,7 @@ public class RobotKeywordDefinition implements RobotElement {
     private String comment;
     private final List<String> arguments;
 
-    RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final List<String> arguments,
+    public RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final List<String> arguments,
             final String comment) {
         this.parent = parent;
         this.name = name;

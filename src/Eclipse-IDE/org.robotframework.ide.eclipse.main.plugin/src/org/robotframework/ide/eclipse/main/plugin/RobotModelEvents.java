@@ -48,6 +48,13 @@ public class RobotModelEvents {
     public static final String ROBOT_SETTING_COMMENT_CHANGED = "robot/model/editor/file/detail/setting/changed/comment";
 
 
+    public static final String ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL = "robot/model/editor/file/structural/keyword/*";
+
+    public static final String ROBOT_KEYWORD_DEFINITION_ADDED = "robot/model/editor/file/structural/keyword/added";
+
+    public static final String ROBOT_KEYWORD_DEFINITION_REMOVED = "robot/model/editor/file/structural/keyword/removed";
+
+
     public static final String ROBOT_KEYWORD_DEFINITION_CHANGE_ALL = "robot/model/editor/file/detail/userkeyword/changed/*";
 
     public static final String ROBOT_KEYWORD_DEFINITION_COMMENT_CHANGE = "robot/model/editor/file/detail/userkeyword/changed/comment";
