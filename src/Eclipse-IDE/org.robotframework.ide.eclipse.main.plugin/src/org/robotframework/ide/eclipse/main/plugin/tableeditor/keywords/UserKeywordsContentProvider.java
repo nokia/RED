@@ -26,7 +26,7 @@ public class UserKeywordsContentProvider implements ITreeContentProvider {
         if (inputElement instanceof RobotKeywordsSection) {
             final RobotKeywordsSection section = (RobotKeywordsSection) inputElement;
             final boolean isEditable = section.getSuiteFile().isEditable();
-            return extendWithAddingToken(section.getChildren().toArray(), "case", 0, isEditable);
+            return extendWithAddingToken(section.getChildren().toArray(), "keyword", 0, isEditable);
         }
         return new Object[0];
     }

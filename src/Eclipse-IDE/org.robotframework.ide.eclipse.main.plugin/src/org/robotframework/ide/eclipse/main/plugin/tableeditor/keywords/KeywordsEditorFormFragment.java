@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
@@ -187,6 +188,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && viewer.getInput() != null) {
             setInput();
+            dirtyProviderService.setDirtyState(true);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            viewer.refresh();
             dirtyProviderService.setDirtyState(true);
         }
     }

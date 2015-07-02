@@ -139,7 +139,6 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotSuiteFile affectedFile) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh();
-            viewer.expandAll();
         }
     }
 
@@ -150,7 +149,6 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null
                 && !viewer.getTree().isDisposed()) {
             viewer.refresh();
-            viewer.expandAll();
         }
     }
 
@@ -177,6 +175,15 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
     private void whenCasesSectionChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_CASE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (viewer != null) {
+            viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordsSectionChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(section);
         }
     }

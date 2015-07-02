@@ -26,7 +26,7 @@ class RobotOutlinePage extends ContentOutlinePage {
 
         getTreeViewer().setInput(new Object[] { suiteModel });
 
-        getTreeViewer().expandAll();
+        getTreeViewer().expandToLevel(3);
     }
 
 }

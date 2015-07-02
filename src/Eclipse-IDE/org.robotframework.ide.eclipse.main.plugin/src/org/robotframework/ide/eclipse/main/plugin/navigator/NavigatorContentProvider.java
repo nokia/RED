@@ -197,6 +197,15 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 
     @Inject
     @Optional
+    private void whenKeywordsSectionChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (viewer != null) {
+            viewer.refresh(section);
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(testCase.getParent());
