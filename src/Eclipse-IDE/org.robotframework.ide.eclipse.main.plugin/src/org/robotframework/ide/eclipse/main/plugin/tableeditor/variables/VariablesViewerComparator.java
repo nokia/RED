@@ -13,19 +13,19 @@ public class VariablesViewerComparator extends ViewerComparator {
 
     private int columnIndex = -1;
 
-    private static final int DESC = -1;
+    private static final int DESC = 1;
 
-    private static final int ASC = 1;
+    private static final int ASC = -1;
 
-    private int direction = DESC;
+    private int direction = ASC;
 
     private int clickCounter = 0;
 
     public int getDirection() {
         if (direction == DESC) {
-            clickCounter = 0;
             return SWT.DOWN;
         } else if (direction == ASC) {
+            clickCounter = 0;
             return SWT.UP;
         } else {
             return SWT.NONE;
@@ -39,9 +39,9 @@ public class VariablesViewerComparator extends ViewerComparator {
             direction = 1 - clickCounter;
             clickCounter++;
         } else {
-            // New column; set descending sort
+            // New column; set ascending sort
             this.columnIndex = column;
-            direction = DESC;
+            direction = ASC;
             clickCounter = 0;
         }
     }
