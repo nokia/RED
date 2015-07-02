@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/2/15 11:55 AM
+Save-Time: 7/2/15 12:07 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -24,7 +24,7 @@ get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.r
     
 
 try -times 10 -delay 300 -command{
-	get-view Debug | get-tree] |get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
+	get-view Debug | get-tree |get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
 }
 
    
