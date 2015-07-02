@@ -130,31 +130,7 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
             int pipeIndex = findPipeIndex(contextTokens);
             int lineNumber = context.getLineNumber();
 
-            if (force) {
-                if (pipeIndex == -1) {
-                    context.setType(SimpleRobotContextType.PRETTY_ALIGN);
-                    foundContexts.add(context);
-
-                    newContext = new OneLineRobotContext(
-                            context.getLineNumber());
-                } else {
-                    OneLineRobotContext beginPrettyAlign = extractPrettyAlignContext(
-                            contextTokens, 0, pipeIndex - 2, lineNumber);
-                    if (!beginPrettyAlign.getContextTokens().isEmpty()) {
-                        foundContexts.add(beginPrettyAlign);
-                    }
-
-                    OneLineRobotContext separator = buildPipeSeparatedContext(
-                            contextTokens, pipeIndex, lineNumber);
-                    foundContexts.add(separator);
-                    OneLineRobotContext endPrettyAlign = extractPrettyAlignContext(
-                            contextTokens, pipeIndex + 2, contextTokens.size(),
-                            lineNumber);
-                    if (!endPrettyAlign.getContextTokens().isEmpty()) {
-                        foundContexts.add(endPrettyAlign);
-                    }
-                }
-            } else if (isNotSingleSpace(contextTokens)) {
+            if (force || isNotSingleSpace(contextTokens)) {
                 if (pipeIndex == -1) {
                     context.setType(SimpleRobotContextType.PRETTY_ALIGN);
                     foundContexts.add(context);
@@ -214,7 +190,7 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
             separator.addNextToken(tokens.get(pipeIndex + 1));
         }
 
-        separator.setType(SimpleRobotContextType.PIPE_SEPARATED);
+        separator.setType(BUILD_TYPE);
         return separator;
     }
 
