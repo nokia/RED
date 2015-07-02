@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/2/15 12:07 PM
+Save-Time: 7/2/15 2:34 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -28,21 +28,22 @@ try -times 10 -delay 300 -command{
 }
 
    
-loop [val i [int 0]] {
-	if [$i | lt 20] {
-		exec-with-options -disableJobWaiting -command {
+repeat [val index]-times 20 -command{
+	exec-with-options -disableJobWaiting -command {
 			get-button "Step Over (F6)" | click
-		}
-		wait 200
-		//next line could verify if ${i} is changing correctly, but step get-item "${i}" fails randomly
-		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $i | verify-true
-		recur [$i | plus 1]
-   	}
+	}
+	wait 200
+	//next line could verify if ${i} is changing correctly, but step get-item "${i}" fails randomly
+	get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
+	check_if_line_is_highlighted -line 8 -script_name "For200TestSuite.robot"	
+
+   	
 }
 
 get-button "Terminate (M1+F2)" | click
 
 //check Mesage log
+get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 21 | verify-true
 get-view "Message Log" | get-editbox | get-property text -raw | split -sep "\n" |to-list |each [val item]  [val index]{
 	$item | matches [concat $msg_log_regex_INFO  $index]
 }
