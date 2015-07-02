@@ -55,7 +55,7 @@ public class ElementAddingToken {
     }
 
     public StyledString getStyledText() {
-        final String msg = rank == 0 ? "...add new" + newElementTypeName : "...";
+        final String msg = rank == 0 ? "...add new " + newElementTypeName : "...";
         return new StyledString(msg, new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
