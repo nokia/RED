@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/1/15 12:48 PM
+Save-Time: 7/2/15 11:10 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -150,7 +150,7 @@ proc "check_if_line_is_highlighted" [val line] [val script_name]{
 	repeat [val index] -times  [get-editor $script_name | get-text-viewer | get-property "getLineCount()" -raw | int] -command
 	{
 		if [$index | not-eq [minus $line 1]] {
-	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index  | assert-empty
+	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index  |  assert-empty -message [format "Expected no line highlighting in line: %s!" [plus $index 1 ]]
 	  		
 		}-else{
 			get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index | invoke toString  | str | equals "Color {198, 219, 174}" 
