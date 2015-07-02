@@ -61,7 +61,7 @@ public class RobotKeywordCall implements RobotElement {
         this.comment = comment;
     }
 
-    protected RobotSuiteFileSection getSection() {
+    public RobotSuiteFileSection getSection() {
         RobotElement current = this;
         while (current != null && !(current instanceof RobotSuiteFileSection)) {
             current = current.getParent();
