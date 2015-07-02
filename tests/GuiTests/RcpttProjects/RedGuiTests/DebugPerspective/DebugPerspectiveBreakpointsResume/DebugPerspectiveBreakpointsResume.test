@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xf9_cPS5EeSLOvIIpQkwfQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/30/15 5:35 PM
+Save-Time: 7/2/15 12:13 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -40,7 +40,11 @@ with [get-editor "SimpleLoggingTestCase.robot" | get-left-ruler | get-ruler-colu
 get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Debug As/1 Robot Test" | click
 
 
-wait 200
+try -times 10 -delay 300 -command{
+	get-view Debug | get-tree |get-item "SimpleLoggingTestCase.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
+}
+
+
 check_if_line_is_highlighted -line 9 -script_name "SimpleLoggingTestCase.robot"
 get-view "Message Log" | get-editbox | get-property text | matches [concat $msg_log_regex_INFO "1" ] | verify-true
 
