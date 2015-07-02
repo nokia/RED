@@ -28,7 +28,6 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-						   <includeScope>compile, test</includeScope>
 						   <includeTypes>jar</includeTypes>
 						   <outputDirectory>lib</outputDirectory>
 						   <overWriteIfNewer>true</overWriteIfNewer>
