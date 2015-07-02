@@ -23,14 +23,17 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<outputDirectory>${project.basedir}/lib</outputDirectory>
-							<markersDirectory>${project.basedir}/lib</markersDirectory>
+						   <includeScope>compile</includeScope>
+						   <includeTypes>jar</includeTypes>
+						   <outputDirectory>lib</outputDirectory>
+						   <overWriteIfNewer>true</overWriteIfNewer>
+						   <overWriteReleases>true</overWriteReleases>
+						   <overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
 				</executions>
@@ -42,7 +45,6 @@
 				<executions>
 					<execution>
 						<id>clean-dependencies</id>
-						<phase>clean</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
