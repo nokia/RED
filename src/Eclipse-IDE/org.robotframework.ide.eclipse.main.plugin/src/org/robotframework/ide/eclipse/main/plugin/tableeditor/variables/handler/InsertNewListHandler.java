@@ -11,12 +11,12 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler.E4InsertNewHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewListHandler.E4InsertNewHandler;
 import org.robotframework.viewers.Selections;
 
-public class InsertNewVariableHandler extends DIHandler<E4InsertNewHandler> {
+public class InsertNewListHandler extends DIHandler<E4InsertNewHandler> {
 
-    public InsertNewVariableHandler() {
+    public InsertNewListHandler() {
         super(E4InsertNewHandler.class);
     }
 
@@ -31,7 +31,7 @@ public class InsertNewVariableHandler extends DIHandler<E4InsertNewHandler> {
             final RobotSuiteFileSection variablesSection = (RobotSuiteFileSection) selectedVariable.getParent();
             final int index = variablesSection.getChildren().indexOf(selectedVariable);
             
-            stack.execute(new CreateFreshVariableCommand(variablesSection, index, Type.SCALAR));
+            stack.execute(new CreateFreshVariableCommand(variablesSection, index, Type.LIST));
             return null;
         }
     }

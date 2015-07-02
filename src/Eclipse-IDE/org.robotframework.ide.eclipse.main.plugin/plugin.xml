@@ -524,6 +524,16 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNewList"
+          name="Add new list">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNewDictionary"
+          name="Add new dictionary">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.moveElementUp"
           name="Move up">
     </command>
@@ -644,8 +654,8 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementUp">
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewListHandler"
+          commandId="org.robotframework.ide.eclipse.insertNewList">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.activeVariablesPartIsEditable">
@@ -656,6 +666,34 @@
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewDictionaryHandler"
+          commandId="org.robotframework.ide.eclipse.insertNewDictionary">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.activeVariablesPartIsEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+	<handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.activeVariablesPartIsEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler"
@@ -758,6 +796,62 @@
              </with>
           </and>
        </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.activeVariablesPartIsEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.activeVariablesPartIsEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewCollectionElementHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.activeVariablesPartIsEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteCollectionElementHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+	      <and>
+	         <reference
+	               definitionId="org.robotframework.activeVariablesPartIsEditable">
+	         </reference>
+	         <reference
+	               definitionId="org.robotframework.atLeastOneCollectionElementIsSelected">
+	         </reference>
+	      </and>
+		</activeWhen>
     </handler>
  </extension>
  <extension
@@ -902,8 +996,20 @@
           locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.contextMenu?before=additions">
        <command
              commandId="org.robotframework.ide.eclipse.insertNew"
-             icon="resources/add.png"
-             label="Add new variable"
+             icon="resources/variable_scalar.png"
+             label="Add new scalar"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNewList"
+             icon="resources/variable_list.png"
+             label="Add new list"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNewDictionary"
+             icon="resources/variable_dict.png"
+             label="Add new dictionary"
              style="push">
        </command>
        <separator
@@ -923,6 +1029,39 @@
        <command
              commandId="org.robotframework.ide.eclipse.sortElements"
              label="Sort variables"
+             style="push">
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.collection.elements.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNew"
+             icon="resources/add.png"
+             label="Add new element"
+             style="push">
+       </command>
+       <separator
+             name="navigation"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementUp"
+             label="Move element up"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementDown"
+             label="Move element down"
              style="push">
        </command>
        <separator
@@ -1206,7 +1345,7 @@
     <definition
           id="org.robotframework.exactlyOneCollectionElementIsSelected">
        <with
-             variable="activeMenuSelection">
+             variable="selection">
           <and>
              <iterate
                    ifEmpty="false"
@@ -1221,7 +1360,19 @@
           </and>
        </with>
     </definition>
-    
+    <definition
+          id="org.robotframework.atLeastOneCollectionElementIsSelected">
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="and">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement">
+             </instanceof>
+          </iterate>
+       </with>
+    </definition>
  </extension>
  
   	<extension
