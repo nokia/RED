@@ -247,6 +247,13 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         if (file == fileModel && viewer.getInput() != null) {
             setInput();
             dirtyProviderService.setDirtyState(true);
+            
+            if (valueEditFormPanel != null) {
+                valueEditFormPanel.dispose();
+            }
+            valueEditFormPanel = toolkit.createComposite(editSection);
+            editSection.setClient(valueEditFormPanel);
+            editSection.layout();
         }
     }
 
