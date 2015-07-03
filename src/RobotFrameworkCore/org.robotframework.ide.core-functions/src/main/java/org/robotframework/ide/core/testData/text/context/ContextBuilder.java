@@ -1,22 +1,16 @@
 package org.robotframework.ide.core.testData.text.context;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
-
-import com.google.common.collect.LinkedListMultimap;
 
 
 /**
@@ -39,47 +33,17 @@ import com.google.common.collect.LinkedListMultimap;
  */
 public class ContextBuilder {
 
-    private List<IContextRecognizer> recognizers = new LinkedList<>();
-
-
-    public ContextBuilder() {
-        recognizers.add(new DeclaredCommentRecognizer());
-        recognizers.add(new SettingTableHeaderRecognizer());
-        recognizers.add(new VariableTableHeaderRecognizer());
-        recognizers.add(new TestCaseTableHeaderRecognizer());
-        recognizers.add(new KeywordsTableHeaderRecognizer());
-        recognizers.add(new QuotesSentenceRecognizer());
-        recognizers.add(new DoubleSpaceOrTabulatorSeparatorRecognizer());
-        recognizers.add(new PipeSeparatorRecognizer());
-
-        recognizers = Collections.unmodifiableList(recognizers);
-    }
-
-
     public ContextOutput buildContexts(final TokenOutput tokenOutput) {
         ContextOutput out = new ContextOutput(tokenOutput);
-
         TokensLineIterator lineIter = new TokensLineIterator(tokenOutput);
-        while(lineIter.hasNext()) {
-            LineTokenPosition lineInterval = lineIter.next();
-
-            LinkedListMultimap<IContextRecognizer, IContextElement> foundPerLine = LinkedListMultimap
-                    .create();
-            for (IContextRecognizer recognizer : recognizers) {
-                List<IContextElement> foundContexts = recognizer.recognize(out,
-                        lineInterval);
-                foundPerLine.putAll(recognizer, foundContexts);
-            }
-
-        }
 
         return out;
     }
 
     public static class ContextOutput {
 
+        private final List<AggregatedOneLineRobotContexts> contexts = new LinkedList<>();
         private final TokenOutput tokenOutput;
-        private List<IContextElement> contexts = new LinkedList<>();
 
 
         public ContextOutput(final TokenOutput tokenOutput) {
@@ -92,7 +56,7 @@ public class ContextBuilder {
         }
 
 
-        public List<IContextElement> getContexts() {
+        public List<AggregatedOneLineRobotContexts> getContexts() {
             return contexts;
         }
     }

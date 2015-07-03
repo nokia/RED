@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -75,7 +75,7 @@ public abstract class ARecognizerTest {
         for (int i = 0; i < expectedSize; i++) {
             IContextElement iContextElement = recognize.get(i);
             assertThat(iContextElement).isInstanceOf(aClass);
-            OneLineRobotContext line = (OneLineRobotContext) iContextElement;
+            OneLineSingleRobotContextPart line = (OneLineSingleRobotContextPart) iContextElement;
             assertThat(line.getLineNumber()).isEqualTo(1);
             assertThat(line.getParent()).isNull();
             assertThat(line.getParentContext()).isNull();
@@ -110,19 +110,19 @@ public abstract class ARecognizerTest {
 
         // verify
         assertThat(out.getContexts()).isEmpty();
-        OneLineRobotContext header = assertAndGetOneLineContext(recognize);
+        OneLineSingleRobotContextPart header = assertAndGetOneLineContext(recognize);
 
         assertTokensForUnknownWords(header.getContextTokens(), types, 0,
                 new LinearPositionMarker(1, column), new String[] {});
     }
 
 
-    protected OneLineRobotContext assertAndGetOneLineContext(
+    protected OneLineSingleRobotContextPart assertAndGetOneLineContext(
             final List<IContextElement> recognize) {
         assertThat(recognize).hasSize(1);
         IContextElement iContextElement = recognize.get(0);
-        assertThat(iContextElement).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext line = (OneLineRobotContext) iContextElement;
+        assertThat(iContextElement).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart line = (OneLineSingleRobotContextPart) iContextElement;
         assertThat(line.getLineNumber()).isEqualTo(1);
         assertThat(line.getParent()).isNull();
         assertThat(line.getParentContext()).isNull();
