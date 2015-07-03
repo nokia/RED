@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
@@ -57,8 +57,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(
@@ -67,8 +67,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 0, new LinearPositionMarker(1, 1), new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -99,8 +99,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(
@@ -109,8 +109,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 0, new LinearPositionMarker(1, 1), new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(
@@ -141,8 +141,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -150,8 +150,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new LinearPositionMarker(1, 1), new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -181,8 +181,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -190,8 +190,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new LinearPositionMarker(1, 1), new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -222,8 +222,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -232,8 +232,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -265,8 +265,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
@@ -275,8 +275,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(
@@ -308,8 +308,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(
@@ -319,8 +319,8 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new String[] {});
 
         element = recognize.get(1);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        separator = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        separator = (OneLineSingleRobotContextPart) element;
         assertThat(separator.getType()).isEqualTo(
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),

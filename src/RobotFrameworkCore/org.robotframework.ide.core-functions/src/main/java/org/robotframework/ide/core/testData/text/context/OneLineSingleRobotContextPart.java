@@ -7,24 +7,26 @@ import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 
 /**
- * Designed for context, which took place only in one line i.e. comments.
+ * Designed for context, which took place only in one line i.e. comments, it is
+ * also i.e. single element like it could be many variables in one line and it
+ * will represent only single one.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see ManyLinesRobotContext
+ * @see AggregatedOneLineRobotContexts
  * @see ContextBuilder
  */
-public class OneLineRobotContext implements IContextElement {
+public class OneLineSingleRobotContextPart implements IContextElement {
 
     private List<RobotToken> contextTokens = new LinkedList<>();
     private IContextElementType type = SimpleRobotContextType.UNDECLARED_COMMENT;
-    private ManyLinesRobotContext parentContext = null;
+    private AggregatedOneLineRobotContexts parentContext = null;
     private int lineNumber = -1;
 
 
-    public OneLineRobotContext(final int lineNumber) {
+    public OneLineSingleRobotContextPart(final int lineNumber) {
         this.lineNumber = lineNumber;
     }
 
@@ -60,23 +62,23 @@ public class OneLineRobotContext implements IContextElement {
     }
 
 
-    public ManyLinesRobotContext getParentContext() {
+    public AggregatedOneLineRobotContexts getParentContext() {
         return parentContext;
     }
 
 
-    public void setParentContext(ManyLinesRobotContext parentContext) {
+    public void setParentContext(AggregatedOneLineRobotContexts parentContext) {
         this.parentContext = parentContext;
     }
 
 
     @Override
     public void setParent(IContextElement context) {
-        setParent((ManyLinesRobotContext) context);
+        setParent((AggregatedOneLineRobotContexts) context);
     }
 
 
-    public void setParent(ManyLinesRobotContext context) {
+    public void setParent(AggregatedOneLineRobotContexts context) {
         this.parentContext = context;
     }
 
