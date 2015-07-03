@@ -17,6 +17,6 @@ ${aA},B,# defined
 ${99},f,# defined here
 ${+8},ghjuk,# glob
 ${},notpad,# red comment
-${ },,# text
+${ },258+9652,# text
 ${A},                     space2,# zorro 1
 ...add new scalar,,

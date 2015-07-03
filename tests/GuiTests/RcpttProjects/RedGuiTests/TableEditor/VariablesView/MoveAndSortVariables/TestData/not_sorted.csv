@@ -15,7 +15,7 @@ ${aA},B,# defined
 ${99},f,# defined here
 ${_temp},GHJUK,# _UNDERSCORE
 ${+8},ghjuk,# glob
-${ },,# text
+${ },258+9652,# text
 ${global},,# Glob
 ${global_name},,# 500
 ${text},3,# abba
