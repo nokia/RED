@@ -74,7 +74,7 @@ public class VariableValueEditForm {
 
         @Override
         public void modifyText(ModifyEvent e) {
-            variableChanged();
+            variableChangedInSection();
         }
     };
 
@@ -273,7 +273,7 @@ public class VariableValueEditForm {
             if (selectionIndex >= 0 && table.getSelectionCount() == 1) {
                 collectionElements.add(selectionIndex, createNewCollectionElement(selectionIndex, "", ""));
                 updateIndexesAboveNewElement(selectionIndex);
-                variableChanged();
+                variableChangedInSection();
                 tableViewer.refresh();
             }
         }
@@ -289,7 +289,7 @@ public class VariableValueEditForm {
                 elementBelow.setIndex(elementAbove.getIndex() - 1);
                 collectionElements.set(selectionIndex - 1, elementBelow);
                 collectionElements.set(selectionIndex, elementAbove);
-                variableChanged();
+                variableChangedInSection();
                 tableViewer.refresh();
             }
         }
@@ -305,7 +305,7 @@ public class VariableValueEditForm {
                 elementBelow.setIndex(elementAbove.getIndex() - 1);
                 collectionElements.set(selectionIndex, elementBelow);
                 collectionElements.set(selectionIndex + 1, elementAbove);
-                variableChanged();
+                variableChangedInSection();
                 tableViewer.refresh();
             }
         }
@@ -322,7 +322,7 @@ public class VariableValueEditForm {
             }
             if (selectedItems.length > 0) {
                 updateIndexes();
-                variableChanged();
+                variableChangedInSection();
                 tableViewer.refresh();
             }
         }
@@ -340,7 +340,7 @@ public class VariableValueEditForm {
         }
     }
     
-    private void variableChanged() {
+    private void variableChangedInSection() {
 
         String resultValue = "";
         if (isList) {
@@ -357,7 +357,7 @@ public class VariableValueEditForm {
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);   //notify main variables table that value is changed in section
     }
     
-    public void changeInput(final RobotVariable variable) {
+    public void variableChangedInMainTable(final RobotVariable variable) {
         if (!isEditedInForm) {  //change input only when event is from main variables table
             final String[] values = variable.getValue().split(COLLECTION_SEPARATOR_REGEX);
 
@@ -368,7 +368,7 @@ public class VariableValueEditForm {
             } else if (variable.getType() == RobotVariable.Type.LIST && tableViewer != null) {
                 createInputForList(collectionElements, values);
                 tableViewer.setInput(collectionElements);
-            } else if(variable.getType() == RobotVariable.Type.SCALAR && valueTxt != null) { //type must be checked because tableviewer can be null 
+            } else if(variable.getType() == RobotVariable.Type.SCALAR && valueTxt != null) { 
                     valueTxt.removeModifyListener(valueTxtModifyListener);
                     valueTxt.setText(variable.getValue());
                     valueTxt.addModifyListener(valueTxtModifyListener);
@@ -377,7 +377,7 @@ public class VariableValueEditForm {
         isEditedInForm = false;
     }
     
-    public void changeVariableName(String name) {
+    public void variableNameChanged(String name) {
         if (nameTxt != null) {
             nameTxt.setText(name);
         }
@@ -435,13 +435,13 @@ public class VariableValueEditForm {
                         collectionElements.get(ind).setValue(userInputValue.toString());
                         if (collectionElements.get(ind).getValue() != null
                                 && collectionElements.get(ind).getValue() != "") {
-                            variableChanged();
+                            variableChangedInSection();
                         }
                     } else {
                         collectionElements.get(ind).setKey(userInputValue.toString());
                         if (collectionElements.get(ind).getValue() != null
                                 && collectionElements.get(ind).getValue() != "") {
-                            variableChanged();
+                            variableChangedInSection();
                         }
                     }
 
