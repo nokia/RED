@@ -74,6 +74,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private Composite valueEditFormPanel;
     
     private VariableValueEditForm valueEditForm;
+    
+    private Section editSection;
 
     TableViewer getViewer() {
         return viewer;
@@ -130,9 +132,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         setInput();
         
-        final Section section = createValueEditSection(parent);
-        valueEditForm = new VariableValueEditForm(toolkit, section, eventBroker);
-        addSelectionListenerForValueEditing(section);
+        editSection = createValueEditSection(parent);
+        valueEditForm = new VariableValueEditForm(toolkit, editSection, eventBroker);
+        addSelectionListenerForValueEditing();
     }
 
     private NewElementsCreator newElementsCreator() {
@@ -184,7 +186,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         return section;
     }
     
-    private void addSelectionListenerForValueEditing(final Section section) {
+    private void addSelectionListenerForValueEditing() {
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
             @Override
@@ -197,32 +199,35 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                     final RobotVariable selectedVariable = Selections.getSingleElement(
                             (StructuredSelection) event.getSelection(), RobotVariable.class);
 
-                    if (valueEditFormPanel != null) {
-                        valueEditFormPanel.dispose();
-                    }
-                    valueEditFormPanel = valueEditForm.createVariableValueEditForm(selectedVariable);
-                    valueEditViewer = valueEditForm.getTableViewer();
-
-                    if (valueEditViewer != null) {
-                        final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.collection.elements.contextMenu";
-                        final MenuManager manager = new MenuManager(
-                                "Robot suite editor variable value page context menu", menuId);
-                        final Table control = valueEditViewer.getTable();
-                        final Menu menu = manager.createContextMenu(control);
-                        control.setMenu(menu);
-                        site.registerContextMenu(menuId, manager, valueEditViewer, false);
-                        site.setSelectionProvider(new VariablesEditorPageSelectionProvider(viewer, valueEditViewer));
-                    } else {
-
-                        site.setSelectionProvider(viewer);
-                    }
-                    section.setClient(valueEditFormPanel);
-                    section.layout();
+                    setupValueEditFormPanel(selectedVariable);
                 } else {
                     site.setSelectionProvider(viewer);
                 }
             }
         });
+    }
+    
+    private void setupValueEditFormPanel(final RobotVariable selectedVariable) {
+        if (valueEditFormPanel != null) {
+            valueEditFormPanel.dispose();
+        }
+        valueEditFormPanel = valueEditForm.createVariableValueEditForm(selectedVariable);
+        valueEditViewer = valueEditForm.getTableViewer();
+
+        if (valueEditViewer != null) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.collection.elements.contextMenu";
+            final MenuManager manager = new MenuManager(
+                    "Robot suite editor variable value page context menu", menuId);
+            final Table control = valueEditViewer.getTable();
+            final Menu menu = manager.createContextMenu(control);
+            control.setMenu(menu);
+            site.registerContextMenu(menuId, manager, valueEditViewer, false);
+            site.setSelectionProvider(new VariablesEditorPageSelectionProvider(viewer, valueEditViewer));
+        } else {
+            site.setSelectionProvider(viewer);
+        }
+        editSection.setClient(valueEditFormPanel);
+        editSection.layout();
     }
 
     @Inject
@@ -307,13 +312,18 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void variableValueChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE) final RobotVariable variable) {
-        valueEditForm.changeInput(variable);
+        valueEditForm.variableChangedInMainTable(variable);
     }
     
     @Inject
     @Optional
     private void variableNameChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE) final RobotVariable variable) {
-        valueEditForm.changeVariableName(variable.getName());
+        valueEditForm.variableNameChanged(variable.getName());
     }
 
+    @Inject
+    @Optional
+    private void variableTypeChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE) final RobotVariable variable) {
+        setupValueEditFormPanel(variable);
+    }
 }
