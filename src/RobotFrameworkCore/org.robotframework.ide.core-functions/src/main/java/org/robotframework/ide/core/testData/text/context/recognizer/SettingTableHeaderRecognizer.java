@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -48,7 +48,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineRobotContext context = new OneLineRobotContext(
+        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
                 lineInterval.getLineNumber());
 
         List<RobotToken> tokens = currentContext.getTokenizedContent()
@@ -74,7 +74,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                     context.setType(BUILD_TYPE);
                     foundContexts.add(context);
 
-                    context = new OneLineRobotContext(
+                    context = new OneLineSingleRobotContextPart(
                             lineInterval.getLineNumber());
                     context.addNextToken(token);
 
@@ -109,7 +109,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                         context.setType(BUILD_TYPE);
                         foundContexts.add(context);
 
-                        context = new OneLineRobotContext(
+                        context = new OneLineSingleRobotContextPart(
                                 lineInterval.getLineNumber());
 
                         wasPrefixAsterisksPresent = false;
@@ -130,7 +130,7 @@ public class SettingTableHeaderRecognizer implements IContextRecognizer {
                     context.setType(BUILD_TYPE);
                     foundContexts.add(context);
 
-                    context = new OneLineRobotContext(
+                    context = new OneLineSingleRobotContextPart(
                             lineInterval.getLineNumber());
                 }
 

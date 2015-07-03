@@ -9,6 +9,8 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
 
 
 /**
+ * Extract functionality need for recognize if in given line expected tokens are
+ * present.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -16,9 +18,23 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
  */
 public interface IContextRecognizer {
 
+    /**
+     * 
+     * @param currentContext
+     *            current context builded
+     * @param lineInterval
+     *            boundaries for line in token list
+     * @return
+     */
     List<IContextElement> recognize(final ContextOutput currentContext,
             final LineTokenPosition lineInterval);
 
 
+    /**
+     * 
+     * @return main type of context build up by this recognizer, it could be
+     *         situation where one recognizer are build few contexts in example
+     *         escaped variable
+     */
     IContextElementType getContextType();
 }

@@ -7,13 +7,13 @@ import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
@@ -41,32 +41,66 @@ public class DeclaredCommentRecognizer implements IContextRecognizer {
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineRobotContext context = new OneLineRobotContext(
+        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
                 lineInterval.getLineNumber());
 
-        boolean isComment = false;
-        boolean escape = false;
+        boolean wasCommentHash = false;
+        boolean wasCommentWord = false;
+        boolean wasEscape = false;
+
+        RobotToken lastEscape = null;
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
             RobotToken token = tokens.get(tokId);
             IRobotTokenType type = token.getType();
-            if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH && !isComment) {
-                escape = !escape;
-            } else if (type == RobotSingleCharTokenType.SINGLE_COMMENT_HASH
-                    || type == MultipleCharTokenType.MANY_COMMENT_HASHS) {
-                if (!escape) {
-                    isComment = true;
+
+            if (type == RobotSingleCharTokenType.SINGLE_COMMENT_HASH) {
+                if (!wasCommentHash && !wasCommentWord) {
+                    if (wasEscape) {
+                        wasEscape = false;
+                    } else {
+                        wasCommentHash = true;
+                    }
+                }
+
+                if (wasCommentHash || wasCommentWord) {
                     context.addNextToken(token);
                 }
-            } else if (type == RobotWordType.COMMENT_FROM_BUILTIN) {
-                isComment = true;
-                context.addNextToken(token);
-            } else {
-                if (isComment) {
+            } else if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
+                if (wasCommentHash || wasCommentWord) {
                     context.addNextToken(token);
                 } else {
-                    escape = false;
+                    lastEscape = token;
+                    wasEscape = true;
+                }
+            } else if (type == RobotWordType.COMMENT_FROM_BUILTIN) {
+                wasEscape = false;
+                lastEscape = null;
+                wasCommentWord = true;
+                context.addNextToken(token);
+            } else if (type == MultipleCharTokenType.MANY_COMMENT_HASHS) {
+                if (!wasCommentHash && !wasCommentWord) {
+                    if (wasEscape) {
+                        context.addNextToken(lastEscape);
+                    }
+
+                    context.addNextToken(token);
+                    wasCommentHash = true;
+                } else {
+                    wasCommentHash = true;
+                }
+
+                lastEscape = null;
+                wasEscape = false;
+                if (wasCommentHash || wasCommentWord) {
+                    context.addNextToken(token);
+                }
+            } else {
+                wasEscape = false;
+                lastEscape = null;
+                if (wasCommentWord || wasCommentHash) {
+                    context.addNextToken(token);
                 }
             }
         }

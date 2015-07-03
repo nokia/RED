@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
@@ -56,8 +56,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertThat(recognize).hasSize(2);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextOne = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
         assertThat(contextOne.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
@@ -66,8 +66,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextTwo = (OneLineRobotContext) elementTwo;
+        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(
@@ -97,8 +97,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertThat(recognize).hasSize(1);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextOne = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
         assertThat(contextOne.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
@@ -131,8 +131,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertThat(recognize).hasSize(3);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextOne = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
         assertThat(contextOne.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
@@ -140,8 +140,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new LinearPositionMarker(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextTwo = (OneLineRobotContext) elementTwo;
+        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PIPE_SEPARATED);
         assertTokensForUnknownWords(contextTwo.getContextTokens(),
@@ -152,8 +152,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new String[] {});
 
         IContextElement elementThree = recognize.get(2);
-        assertThat(elementThree).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextThree = (OneLineRobotContext) elementThree;
+        assertThat(elementThree).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
         assertThat(contextThree.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(
@@ -185,8 +185,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertThat(recognize).hasSize(3);
 
         IContextElement element = recognize.get(0);
-        assertThat(element).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextOne = (OneLineRobotContext) element;
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
         assertThat(contextOne.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
@@ -194,8 +194,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new LinearPositionMarker(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextTwo = (OneLineRobotContext) elementTwo;
+        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PIPE_SEPARATED);
         assertTokensForUnknownWords(contextTwo.getContextTokens(),
@@ -206,8 +206,8 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new String[] {});
 
         IContextElement elementThree = recognize.get(2);
-        assertThat(elementThree).isInstanceOf(OneLineRobotContext.class);
-        OneLineRobotContext contextThree = (OneLineRobotContext) elementThree;
+        assertThat(elementThree).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
         assertThat(contextThree.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(
