@@ -1,0 +1,417 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SortVariablesByAllColumn
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _bHv3IB_qEeWIFM1C_X1kYg
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 7/2/15 5:25 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Variables | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+    //set focus
+    get-tab-folder | get-tab-item Variables | click
+    
+    with [get-table] {
+    	select "...add new scalar" | key-type Enter
+        select "${var}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${}"
+             key-type Enter
+        }
+        apply-cell-edit -deactivate
+        
+        
+        select "...add new scalar" | key-type Enter
+        select "${var}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${var100}"
+             key-type Enter
+        }
+        apply-cell-edit -deactivate
+        
+        
+        
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${var1}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${var11}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${11}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${Text}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${text}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${TEXT}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${varaible with space }"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${a}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${G}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${A}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${aA}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${99}"
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${_temp}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${+8}"
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${ }"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${global}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${global_name}"
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        apply-cell-edit -deactivate
+        
+        select "...add new scalar" | key-type Enter
+        select "${var101}" | activate-cell-edit
+        with [get-editbox] {
+            set-text "${text}"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+    }
+}
+
+with [get-editor "TestFile.robot" | get-table] {
+    select "${}" | double-click
+    select "${}" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text notpad
+        key-type Enter
+    }
+    select "${var100}" | double-click
+    apply-cell-edit -deactivate
+    select "${var100}" | activate-cell-edit -column 1
+    get-editbox | set-text 1
+    select "${var1}" | double-click
+    apply-cell-edit -deactivate
+    select "${var1}" | activate-cell-edit -column 1
+    get-editbox | set-text " space "
+    select "${var11}" | double-click
+    apply-cell-edit -deactivate
+    select "${var11}" | activate-cell-edit -column 1
+    get-editbox | set-text "Z main"
+    select "${11}" | double-click
+    apply-cell-edit -deactivate
+    select "${11}" | activate-cell-edit -column 1
+    get-editbox | set-text 1
+    select "${Text}" | double-click
+    apply-cell-edit -deactivate
+    select "${Text}" | activate-cell-edit -column 1
+    get-editbox | set-text 6
+    select "${text}" | double-click
+    apply-cell-edit -deactivate
+    select "${text}" | activate-cell-edit -column 1
+    get-editbox | set-text 2
+    select "${TEXT}" | double-click
+    apply-cell-edit -deactivate
+    select "${TEXT}" | activate-cell-edit -column 1
+    get-editbox | set-text 02
+    select "${varaible with space }" | double-click
+    apply-cell-edit -deactivate
+    select "${varaible with space }" | activate-cell-edit -column 1
+    get-editbox | set-text 101
+    select "${a}" | double-click
+    apply-cell-edit -deactivate
+    select "${a}" | activate-cell-edit -column 1
+    get-editbox | set-text "!@#"
+    select "${G}" | double-click
+    apply-cell-edit -deactivate
+    select "${G}" | activate-cell-edit -column 1
+    get-editbox | set-text "${text}"
+    select "${A}" | double-click
+    apply-cell-edit -deactivate
+    select "${A}" | activate-cell-edit -column 1
+    get-editbox | set-text "                     space2"
+    select "${aA}" | double-click
+    apply-cell-edit -deactivate
+    select "${aA}" | activate-cell-edit -column 1
+    get-editbox | set-text B
+    select "${99}" | double-click
+    apply-cell-edit -deactivate
+    select "${99}" | activate-cell-edit -column 1
+    get-editbox | set-text f
+    select "${_temp}" | double-click
+    apply-cell-edit -deactivate
+    select "${_temp}" | activate-cell-edit -column 1
+    get-editbox | set-text GHJUK
+    select "${\\+8}" | double-click
+    apply-cell-edit -deactivate
+    select "${\\+8}" | activate-cell-edit -column 1
+    get-editbox | set-text ghjuk
+    select "${ }" | double-click
+    apply-cell-edit -deactivate
+    select "${ }" | activate-cell-edit -column 1
+    get-editbox | set-text "258+9652"
+    select [get-item "${text}" -index 1] | double-click
+    select [get-item "${text}" -index 1] | activate-cell-edit -column 1
+    get-editbox | set-text 3
+	apply-cell-edit -deactivate
+} 
+
+
+with [get-editor "TestFile.robot" | get-table] {
+    select "${}" | double-click
+    select "${}" | activate-cell-edit -column 2
+    get-editbox | set-text "red comment"
+   
+    select "${var100}" | apply-cell-edit -deactivate
+    select "${var100}" | double-click
+    select "${var100}" | activate-cell-edit -column 2
+    get-editbox | set-text 1
+    select "${var1}" | apply-cell-edit -deactivate
+    select "${var1}" | double-click
+    select "${var1}" | activate-cell-edit -column 2
+    get-editbox | set-text 6
+    select "${var11}" | apply-cell-edit -deactivate
+    select "${var11}" | double-click
+    select "${var11}" | activate-cell-edit -column 2
+    get-editbox | set-text 12
+    select "${11}" | apply-cell-edit -deactivate
+    select "${11}" | double-click
+    select "${11}" | activate-cell-edit -column 2
+    get-editbox | set-text " space here "
+    select "${Text}" | apply-cell-edit -deactivate
+    select "${Text}" | double-click
+    select "${Text}" | activate-cell-edit -column 2
+    with [get-editbox] {
+        set-text "${var}"
+        key-type Left
+        set-text "${var99}"
+    }
+    select "${text}" | apply-cell-edit -deactivate
+    select "${text}" | double-click
+    select "${text}" | activate-cell-edit -column 2
+    get-editbox | set-text "_undecrscore"
+    select "${TEXT}" | apply-cell-edit -deactivate
+    select "${TEXT}" | double-click
+    select "${TEXT}" | activate-cell-edit -column 2
+    get-editbox | set-text "()"
+    select "${varaible with space }" | apply-cell-edit -deactivate
+    select "${varaible with space }" | double-click
+    select "${varaible with space }" | activate-cell-edit -column 2
+    get-editbox | set-text "<commnet>"
+    select "${a}" | apply-cell-edit -deactivate
+    select "${a}" | double-click
+    select "${a}" | activate-cell-edit -column 2
+    get-editbox | set-text DEFINED
+    select "${G}" | apply-cell-edit -deactivate
+    select "${G}" | double-click
+    select "${G}" | activate-cell-edit -column 2
+    get-editbox | set-text "ZZ top"
+    select "${A}" | apply-cell-edit -deactivate
+    select "${A}" | double-click
+    select "${A}" | activate-cell-edit -column 2
+    with [get-editbox] {
+        set-text "zorro 1"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    select "${aA}" | double-click
+    select "${aA}" | activate-cell-edit -column 2
+    get-editbox | set-text defined
+    select "${99}" | apply-cell-edit -deactivate
+    select "${99}" | double-click
+    select "${99}" | activate-cell-edit -column 2
+    get-editbox | set-text "defined here"
+    select "${_temp}" | apply-cell-edit -deactivate
+    select "${_temp}" | double-click
+    select "${_temp}" | activate-cell-edit -column 2
+    get-editbox | set-text "_UNDERSCORE"
+    select "${+8}" | apply-cell-edit -deactivate
+    select "${\\+8}" | double-click
+    select "${\\+8}" | activate-cell-edit -column 2
+    get-editbox | set-text glob
+    select "${ }" | apply-cell-edit -deactivate
+    select "${ }" | double-click
+    select "${ }" | activate-cell-edit -column 2
+    get-editbox | set-text text
+    select "${global}" | apply-cell-edit -deactivate
+    select "${global}" | double-click
+    select "${global}" | activate-cell-edit -column 2
+    get-editbox | set-text Glob
+    select "${global_name}" | apply-cell-edit -deactivate
+    select "${global_name}" | double-click
+    select "${global_name}" | activate-cell-edit -column 2
+    get-editbox | set-text 500
+    select [get-item "${text}" -index 1] | apply-cell-edit -deactivate
+    select [get-item "${text}" -index 1] | double-click
+    select [get-item "${text}" -index 1] | activate-cell-edit -column 2
+    get-editbox | set-text abba
+    select "...add new scalar" | apply-cell-edit -deactivate
+}
+
+//----------------------------------------  sort by name ----------------------------------------------------
+//not sorted
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/not_sorted.csv" $RCPTT_project_path]]]
+
+
+//sort asc
+with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_asc_by_name.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
+
+//sort dec by name
+with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_dec_by_name.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
+
+//not sorted
+with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/not_sorted.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 0 | verify-true
+//-----------------------------------      sort by value  ----------------------------------
+
+
+//sort asc by value
+with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_asc_by_value.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
+
+//sort dec by name
+with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_dec_by_value.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
+
+//not sorted
+with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/not_sorted.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 0 | verify-true
+
+//-----------------------------------      sort by comment  ----------------------------------
+
+
+//sort asc by name
+with [get-editor "TestFile.robot" | get-table | get-column-header Comment] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_asc_by_comment.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
+
+//sort dec by name
+with [get-editor "TestFile.robot" | get-table | get-column-header Comment] {
+    click
+}
+assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
+[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/sorted_dec_by_comment.csv" $RCPTT_project_path]]]
+get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
