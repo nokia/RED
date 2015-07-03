@@ -7,6 +7,7 @@ ${_temp},GHJUK,# _UNDERSCORE
 ${aA},B,# defined
 ${Text},6,# ${var99}
 ${text},3,# abba
+${ },258+9652,# text
 ${text},2,# _undecrscore
 ${varaible with space },101,# <commnet>
 ${var100},1,# 1
@@ -16,7 +17,6 @@ ${G},${text},# ZZ top
 ${a},!@#,# DEFINED
 ${var1}, space ,# 6
 ${A},                     space2,# zorro 1
-${ },,# text
 ${global},,# Glob
 ${global_name},,# 500
 ...add new scalar,,
