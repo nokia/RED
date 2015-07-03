@@ -17,6 +17,6 @@ ${A},                     space2,# zorro 1
 ${99},f,# defined here
 ${11},1,#  space here 
 ${+8},ghjuk,# glob
-${ },,# text
+${ },258+9652,# text
 ${},notpad,# red comment
 ...add new scalar,,

@@ -1,6 +1,6 @@
 Variable,Value,Comment
 ${},notpad,# red comment
-${ },,# text
+${ },258+9652,# text
 ${+8},ghjuk,# glob
 ${11},1,#  space here 
 ${99},f,# defined here

@@ -1,6 +1,6 @@
 Variable,Value,Comment
 ${A},                     space2,# zorro 1
-${ },,# text
+${ },258+9652,# text
 ${},notpad,# red comment
 ${+8},ghjuk,# glob
 ${99},f,# defined here
