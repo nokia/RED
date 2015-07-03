@@ -69,6 +69,14 @@ public class VariableValueEditForm {
     private RobotVariable variable;
     
     private boolean isEditedInForm;
+    
+    ModifyListener valueTxtModifyListener = new ModifyListener() {
+
+        @Override
+        public void modifyText(ModifyEvent e) {
+            variableChanged();
+        }
+    };
 
     public VariableValueEditForm(final RedFormToolkit toolkit, final Section section, final IEventBroker eventBroker) {
         this.toolkit = toolkit;
@@ -94,7 +102,7 @@ public class VariableValueEditForm {
     private void createEditControls(final Composite composite) {
         toolkit.createLabel(composite, "Name: ");
         nameTxt = toolkit.createText(composite, variable.getName(), SWT.NONE);
-        nameTxt.setEditable(false);
+        nameTxt.setEnabled(false);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(nameTxt);
 
         Label valueLbl = toolkit.createLabel(composite, "");
@@ -110,13 +118,7 @@ public class VariableValueEditForm {
         if (isScalar) {
             valueTxt = toolkit.createText(composite, "", SWT.BORDER);
             valueTxt.setText(variable.getValue());
-            valueTxt.addModifyListener(new ModifyListener() {
-                
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    variableChanged();
-                }
-            });
+            valueTxt.addModifyListener(valueTxtModifyListener);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(valueTxt);
             tableViewer = null;
             
@@ -193,7 +195,7 @@ public class VariableValueEditForm {
             }
         }).createFor(tableViewer);
         ViewerColumnsFactory.newColumn("Value")
-                .withWidth(200)
+                .withWidth(300)
                 .labelsProvidedBy(new CollectionLabelProvider(true))
                 .editingSupportedBy(new CollectionEditingSupport(tableViewer, true))
                 .editingEnabledOnlyWhen(true)
@@ -212,13 +214,13 @@ public class VariableValueEditForm {
             }
         }).createFor(tableViewer);
         ViewerColumnsFactory.newColumn("Key")
-                .withWidth(120)
+                .withWidth(150)
                 .labelsProvidedBy(new CollectionLabelProvider(false))
                 .editingSupportedBy(new CollectionEditingSupport(tableViewer, false))
                 .editingEnabledOnlyWhen(true)
                 .createFor(tableViewer);
         ViewerColumnsFactory.newColumn("Value")
-                .withWidth(100)
+                .withWidth(150)
                 .labelsProvidedBy(new CollectionLabelProvider(true))
                 .editingSupportedBy(new CollectionEditingSupport(tableViewer, true))
                 .editingEnabledOnlyWhen(true)
@@ -366,15 +368,19 @@ public class VariableValueEditForm {
             } else if (variable.getType() == RobotVariable.Type.LIST && tableViewer != null) {
                 createInputForList(collectionElements, values);
                 tableViewer.setInput(collectionElements);
-            } else {
-                valueTxt.setText(variable.getValue());
+            } else if(variable.getType() == RobotVariable.Type.SCALAR && valueTxt != null) { //type must be checked because tableviewer can be null 
+                    valueTxt.removeModifyListener(valueTxtModifyListener);
+                    valueTxt.setText(variable.getValue());
+                    valueTxt.addModifyListener(valueTxtModifyListener);
             }
         }
         isEditedInForm = false;
     }
     
     public void changeVariableName(String name) {
-        nameTxt.setText(name);
+        if (nameTxt != null) {
+            nameTxt.setText(name);
+        }
     }
 
     public RowExposingTableViewer getTableViewer() {
