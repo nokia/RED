@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -47,7 +47,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizer implements
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineRobotContext context = new OneLineRobotContext(
+        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
                 lineInterval.getLineNumber());
 
         List<RobotToken> tokens = currentContext.getTokenizedContent()
@@ -77,10 +77,10 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizer implements
     }
 
 
-    private OneLineRobotContext merge(
+    private OneLineSingleRobotContextPart merge(
             final List<IContextElement> foundContexts,
-            final OneLineRobotContext context, final List<RobotToken> temp) {
-        OneLineRobotContext newContext = context;
+            final OneLineSingleRobotContextPart context, final List<RobotToken> temp) {
+        OneLineSingleRobotContextPart newContext = context;
 
         int numberOfPossibleSeparators = temp.size();
         if (numberOfPossibleSeparators > 0) {
@@ -89,7 +89,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizer implements
             context.setType(BUILD_TYPE);
             foundContexts.add(context);
 
-            OneLineRobotContext prettyAlignContext = new OneLineRobotContext(
+            OneLineSingleRobotContextPart prettyAlignContext = new OneLineSingleRobotContextPart(
                     context.getLineNumber());
             for (int i = 1; i < numberOfPossibleSeparators; i++) {
                 prettyAlignContext.addNextToken(temp.get(i));
@@ -100,7 +100,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizer implements
                 foundContexts.add(prettyAlignContext);
             }
 
-            newContext = new OneLineRobotContext(context.getLineNumber());
+            newContext = new OneLineSingleRobotContextPart(context.getLineNumber());
         }
 
         temp.clear(); // clean up after merge

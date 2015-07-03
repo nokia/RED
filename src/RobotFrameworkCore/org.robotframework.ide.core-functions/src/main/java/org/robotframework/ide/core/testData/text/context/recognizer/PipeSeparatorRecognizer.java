@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -48,7 +48,7 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineRobotContext context = new OneLineRobotContext(
+        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
                 lineInterval.getLineNumber());
 
         List<RobotToken> tokens = currentContext.getTokenizedContent()
@@ -119,10 +119,10 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
     }
 
 
-    private OneLineRobotContext tryToExtractContexts(
+    private OneLineSingleRobotContextPart tryToExtractContexts(
             final List<IContextElement> foundContexts,
-            final OneLineRobotContext context, boolean force) {
-        OneLineRobotContext newContext = context;
+            final OneLineSingleRobotContextPart context, boolean force) {
+        OneLineSingleRobotContextPart newContext = context;
 
         List<RobotToken> contextTokens = context.getContextTokens();
 
@@ -135,19 +135,19 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
                     context.setType(SimpleRobotContextType.PRETTY_ALIGN);
                     foundContexts.add(context);
 
-                    newContext = new OneLineRobotContext(
+                    newContext = new OneLineSingleRobotContextPart(
                             context.getLineNumber());
                 } else {
-                    OneLineRobotContext beginPrettyAlign = extractPrettyAlignContext(
+                    OneLineSingleRobotContextPart beginPrettyAlign = extractPrettyAlignContext(
                             contextTokens, 0, pipeIndex - 2, lineNumber);
                     if (!beginPrettyAlign.getContextTokens().isEmpty()) {
                         foundContexts.add(beginPrettyAlign);
                     }
 
-                    OneLineRobotContext separator = buildPipeSeparatedContext(
+                    OneLineSingleRobotContextPart separator = buildPipeSeparatedContext(
                             contextTokens, pipeIndex, lineNumber);
                     foundContexts.add(separator);
-                    OneLineRobotContext endPrettyAlign = extractPrettyAlignContext(
+                    OneLineSingleRobotContextPart endPrettyAlign = extractPrettyAlignContext(
                             contextTokens, pipeIndex + 2, contextTokens.size(),
                             lineNumber);
                     if (!endPrettyAlign.getContextTokens().isEmpty()) {
@@ -156,7 +156,7 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
                 }
             }
 
-            newContext = new OneLineRobotContext(context.getLineNumber());
+            newContext = new OneLineSingleRobotContextPart(context.getLineNumber());
         }
 
         return newContext;
@@ -178,9 +178,9 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
     }
 
 
-    private OneLineRobotContext buildPipeSeparatedContext(
+    private OneLineSingleRobotContextPart buildPipeSeparatedContext(
             final List<RobotToken> tokens, int pipeIndex, int lineNumber) {
-        OneLineRobotContext separator = new OneLineRobotContext(lineNumber);
+        OneLineSingleRobotContextPart separator = new OneLineSingleRobotContextPart(lineNumber);
         if (pipeIndex - 1 >= 0) {
             separator.addNextToken(tokens.get(pipeIndex - 1));
         }
@@ -195,9 +195,9 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
     }
 
 
-    private OneLineRobotContext extractPrettyAlignContext(
+    private OneLineSingleRobotContextPart extractPrettyAlignContext(
             final List<RobotToken> tokens, int from, int to, int lineNumber) {
-        OneLineRobotContext pretty = new OneLineRobotContext(lineNumber);
+        OneLineSingleRobotContextPart pretty = new OneLineSingleRobotContextPart(lineNumber);
 
         if (from <= to && from > -1 && to < tokens.size()) {
             for (int i = from; i <= to; i++) {

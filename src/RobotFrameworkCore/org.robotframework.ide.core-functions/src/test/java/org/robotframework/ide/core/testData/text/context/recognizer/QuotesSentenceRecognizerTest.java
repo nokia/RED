@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
-import org.robotframework.ide.core.testData.text.context.OneLineRobotContext;
+import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
@@ -58,10 +58,10 @@ public class QuotesSentenceRecognizerTest extends ARecognizerTest {
 
         // verify
         assertThat(out.getContexts()).isEmpty();
-        assertTheSameLinesContext(recognize, OneLineRobotContext.class, 2);
+        assertTheSameLinesContext(recognize, OneLineSingleRobotContextPart.class, 2);
 
         assertTokensForUnknownWords(
-                ((OneLineRobotContext) recognize.get(0)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(0)).getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_QUOTE_MARK,
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH,
@@ -69,7 +69,7 @@ public class QuotesSentenceRecognizerTest extends ARecognizerTest {
                 new LinearPositionMarker(1, prefix.length() + 1),
                 new String[] {});
         assertTokensForUnknownWords(
-                ((OneLineRobotContext) recognize.get(1)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(1)).getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_QUOTE_MARK,
                         RobotSingleCharTokenType.SINGLE_QUOTE_MARK }, 0,

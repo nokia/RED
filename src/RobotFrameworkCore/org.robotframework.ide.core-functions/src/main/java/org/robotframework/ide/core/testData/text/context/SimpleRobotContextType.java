@@ -57,7 +57,7 @@ public enum SimpleRobotContextType implements IContextElementType {
      */
     DOUBLE_SPACE_OR_TABULATOR_SEPARATED,
     /**
-     * 
+     * separator following by pipe and whitespace inside
      */
     PIPE_SEPARATED,
     /**
