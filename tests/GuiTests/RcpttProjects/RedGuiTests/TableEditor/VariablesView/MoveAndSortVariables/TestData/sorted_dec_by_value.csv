@@ -1,0 +1,22 @@
+Variable,Value,Comment
+${},notpad,# red comment
+${+8},ghjuk,# glob
+${99},f,# defined here
+${var11},Z main,# 12
+${_temp},GHJUK,# _UNDERSCORE
+${aA},B,# defined
+${Text},6,# ${var99}
+${text},3,# abba
+${text},2,# _undecrscore
+${varaible with space },101,# <commnet>
+${var100},1,# 1
+${11},1,#  space here 
+${TEXT},02,# ()
+${G},${text},# ZZ top
+${a},!@#,# DEFINED
+${var1}, space ,# 6
+${A},                     space2,# zorro 1
+${ },,# text
+${global},,# Glob
+${global_name},,# 500
+...add new scalar,,
