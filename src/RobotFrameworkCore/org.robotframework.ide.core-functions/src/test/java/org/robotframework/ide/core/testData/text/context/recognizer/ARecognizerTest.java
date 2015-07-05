@@ -78,7 +78,6 @@ public abstract class ARecognizerTest {
             OneLineSingleRobotContextPart line = (OneLineSingleRobotContextPart) iContextElement;
             assertThat(line.getLineNumber()).isEqualTo(1);
             assertThat(line.getParent()).isNull();
-            assertThat(line.getParentContext()).isNull();
             assertThat(line.getType()).isEqualTo(context.getContextType());
         }
     }
@@ -121,11 +120,11 @@ public abstract class ARecognizerTest {
             final List<IContextElement> recognize) {
         assertThat(recognize).hasSize(1);
         IContextElement iContextElement = recognize.get(0);
-        assertThat(iContextElement).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(iContextElement).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart line = (OneLineSingleRobotContextPart) iContextElement;
         assertThat(line.getLineNumber()).isEqualTo(1);
         assertThat(line.getParent()).isNull();
-        assertThat(line.getParentContext()).isNull();
         assertThat(line.getType()).isEqualTo(context.getContextType());
 
         return line;
