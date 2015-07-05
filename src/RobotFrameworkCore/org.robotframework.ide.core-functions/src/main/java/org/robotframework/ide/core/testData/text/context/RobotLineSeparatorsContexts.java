@@ -24,7 +24,7 @@ public class RobotLineSeparatorsContexts implements IContextElement {
 
 
     public void addNextSeparators(final List<IContextElement> separators) {
-        if (!separators.isEmpty()) {
+        if (separators != null && !separators.isEmpty()) {
             handledElements.putAll(separators.get(0).getType(), separators);
         }
     }
@@ -49,11 +49,6 @@ public class RobotLineSeparatorsContexts implements IContextElement {
     @Override
     public IContextElementType getType() {
         return type;
-    }
-
-
-    public void setType(ComplexRobotContextType type) {
-        this.type = type;
     }
 
 

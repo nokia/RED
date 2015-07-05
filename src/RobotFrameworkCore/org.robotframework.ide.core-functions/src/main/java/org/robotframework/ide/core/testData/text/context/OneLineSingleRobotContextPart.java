@@ -23,7 +23,7 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     private List<RobotToken> contextTokens = new LinkedList<>();
     private IContextElementType type = SimpleRobotContextType.UNDECLARED_COMMENT;
     private AggregatedOneLineRobotContexts parentContext = null;
-    private int lineNumber = -1;
+    private final int lineNumber;
 
 
     public OneLineSingleRobotContextPart(final int lineNumber) {
@@ -62,22 +62,6 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     }
 
 
-    public AggregatedOneLineRobotContexts getParentContext() {
-        return parentContext;
-    }
-
-
-    public void setParentContext(AggregatedOneLineRobotContexts parentContext) {
-        this.parentContext = parentContext;
-    }
-
-
-    @Override
-    public void setParent(IContextElement context) {
-        setParent((AggregatedOneLineRobotContexts) context);
-    }
-
-
     public void setParent(AggregatedOneLineRobotContexts context) {
         this.parentContext = context;
     }
@@ -86,5 +70,11 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     @Override
     public IContextElement getParent() {
         return parentContext;
+    }
+
+
+    @Override
+    public void setParent(IContextElement context) {
+        setParent((AggregatedOneLineRobotContexts) context);
     }
 }
