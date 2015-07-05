@@ -64,5 +64,9 @@ public enum SimpleRobotContextType implements IContextElementType {
      * this contexts belongs to additional spaces or tabulators made by user for
      * readability increase
      */
-    PRETTY_ALIGN;
+    PRETTY_ALIGN,
+    /**
+     * in textual format new line \n
+     */
+    LINE_FEED_TEXT;
 }
