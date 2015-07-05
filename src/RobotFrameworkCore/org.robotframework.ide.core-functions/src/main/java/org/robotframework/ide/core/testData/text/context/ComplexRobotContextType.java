@@ -16,5 +16,9 @@ public enum ComplexRobotContextType implements IContextElementType {
     /**
      * few lines of type {@link SimpleRobotContextType#DECLARED_COMMENT}
      */
-    DECLARED_COMMENT;
+    DECLARED_COMMENT,
+    /**
+     * it handle all found separators in line
+     */
+    SEPARATORS;
 }

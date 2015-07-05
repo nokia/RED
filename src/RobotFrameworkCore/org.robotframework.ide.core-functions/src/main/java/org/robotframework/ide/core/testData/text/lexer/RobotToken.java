@@ -36,7 +36,8 @@ public class RobotToken {
 
 
     /**
-     * Note: the begin type of token is set to {@link RobotSingleCharTokenType#UNKNOWN}
+     * Note: the begin type of token is set to
+     * {@link RobotSingleCharTokenType#UNKNOWN}
      * 
      * @param start
      *            where token was found
