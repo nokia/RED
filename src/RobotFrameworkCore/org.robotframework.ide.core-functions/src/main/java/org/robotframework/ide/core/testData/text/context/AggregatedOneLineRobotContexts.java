@@ -18,7 +18,7 @@ import com.google.common.collect.LinkedListMultimap;
  */
 public class AggregatedOneLineRobotContexts implements IContextElement {
 
-    private List<IContextElement> separators = new LinkedList<>();
+    private RobotLineSeparatorsContexts separators = new RobotLineSeparatorsContexts();
     private List<IContextElement> childContexts = new LinkedList<>();
     private LinkedListMultimap<IContextElementType, IContextElement> handledElements = LinkedListMultimap
             .create();
@@ -32,19 +32,8 @@ public class AggregatedOneLineRobotContexts implements IContextElement {
     }
 
 
-    public void addNextTypeOfSeparators(final IContextElement separator) {
-        this.separators.add(separator);
-        this.handledElements.put(separator.getType(), separator);
-    }
-
-
     public List<IContextElement> getChildContexts() {
         return childContexts;
-    }
-
-
-    public List<IContextElement> getSeparatorsForLine() {
-        return separators;
     }
 
 
@@ -68,5 +57,15 @@ public class AggregatedOneLineRobotContexts implements IContextElement {
     @Override
     public IContextElement getParent() {
         return this.parentContext;
+    }
+
+
+    public RobotLineSeparatorsContexts getSeparators() {
+        return separators;
+    }
+
+
+    public void setSeparators(RobotLineSeparatorsContexts separators) {
+        this.separators = separators;
     }
 }
