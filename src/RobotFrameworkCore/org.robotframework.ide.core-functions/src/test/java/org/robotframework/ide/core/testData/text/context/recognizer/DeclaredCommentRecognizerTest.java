@@ -83,6 +83,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] {
@@ -113,6 +115,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
@@ -144,6 +148,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
@@ -175,6 +181,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
@@ -205,6 +213,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] {
@@ -236,6 +246,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
         // verify
         assertThat(out.getContexts()).isEmpty();
         OneLineSingleRobotContextPart comment = assertAndGetOneLineContext(recognize);
+        assertThat(comment.getType()).isEqualTo(
+                SimpleRobotContextType.DECLARED_COMMENT);
 
         assertTokensForUnknownWords(comment.getContextTokens(),
                 new IRobotTokenType[] {

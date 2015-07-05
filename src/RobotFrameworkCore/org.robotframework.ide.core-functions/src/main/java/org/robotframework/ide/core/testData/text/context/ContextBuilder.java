@@ -1,12 +1,17 @@
 package org.robotframework.ide.core.testData.text.context;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.LineFeedTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
@@ -33,11 +38,74 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  */
 public class ContextBuilder {
 
+    private List<IContextRecognizer> separatorRecognizers = new LinkedList<>();
+    private List<IContextRecognizer> normalRecognizers = new LinkedList<>();
+
+
+    public ContextBuilder() {
+        separatorRecognizers
+                .add(new DoubleSpaceOrTabulatorSeparatorRecognizer());
+        separatorRecognizers.add(new PipeSeparatorRecognizer());
+        separatorRecognizers = Collections
+                .unmodifiableList(separatorRecognizers);
+
+        normalRecognizers.add(new DeclaredCommentRecognizer());
+        normalRecognizers.add(new QuotesSentenceRecognizer());
+        normalRecognizers.add(new SettingTableHeaderRecognizer());
+        normalRecognizers.add(new VariableTableHeaderRecognizer());
+        normalRecognizers.add(new TestCaseTableHeaderRecognizer());
+        normalRecognizers.add(new KeywordsTableHeaderRecognizer());
+
+        normalRecognizers.add(new LineFeedTextualRecognizer());
+
+        normalRecognizers = Collections.unmodifiableList(normalRecognizers);
+    }
+
+
     public ContextOutput buildContexts(final TokenOutput tokenOutput) {
         ContextOutput out = new ContextOutput(tokenOutput);
         TokensLineIterator lineIter = new TokensLineIterator(tokenOutput);
 
+        while(lineIter.hasNext()) {
+            LineTokenPosition lineBoundaries = lineIter.next();
+            RobotLineSeparatorsContexts sepCtx = extractSeperators(out,
+                    lineBoundaries);
+            AggregatedOneLineRobotContexts ctx = new AggregatedOneLineRobotContexts();
+            // adding in case some of context will need to see separators
+            ctx.setSeparators(sepCtx);
+            out.getContexts().add(ctx);
+
+            for (IContextRecognizer recognizer : normalRecognizers) {
+                List<IContextElement> recognize = recognizer.recognize(out,
+                        lineBoundaries);
+                addFoundContexts(ctx, recognize);
+            }
+        }
+
         return out;
+    }
+
+
+    private void addFoundContexts(
+            final AggregatedOneLineRobotContexts aggregated,
+            final List<IContextElement> simpleContexts) {
+        if (simpleContexts != null && !simpleContexts.isEmpty()) {
+            for (IContextElement ctx : simpleContexts) {
+                aggregated.addNextLineContext(ctx);
+            }
+        }
+    }
+
+
+    private RobotLineSeparatorsContexts extractSeperators(
+            final ContextOutput contexts, LineTokenPosition lineBoundaries) {
+        RobotLineSeparatorsContexts sep = new RobotLineSeparatorsContexts();
+        for (IContextRecognizer sepRecognizer : separatorRecognizers) {
+            sep.addNextSeparators(sepRecognizer.recognize(contexts,
+                    lineBoundaries));
+        }
+
+        return sep;
     }
 
     public static class ContextOutput {
