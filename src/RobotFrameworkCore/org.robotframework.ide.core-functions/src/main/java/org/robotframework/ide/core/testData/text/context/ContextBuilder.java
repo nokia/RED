@@ -9,6 +9,7 @@ import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWit
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.LineFeedTextualRecognizer;
@@ -63,6 +64,7 @@ public class ContextBuilder {
 
         normalRecognizers.add(new LineFeedTextualRecognizer());
         normalRecognizers.add(new TabulatorTextualRecognizer());
+        normalRecognizers.add(new EmptyLineRecognizer());
 
         normalRecognizers.add(new CharacterWithByteHexValue());
         normalRecognizers.add(new CharacterWithShortHexValue());
