@@ -3,7 +3,6 @@ package org.robotframework.ide.core.testData.text.context.recognizer;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.assertj.core.util.VisibleForTesting;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
@@ -15,6 +14,8 @@ import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
