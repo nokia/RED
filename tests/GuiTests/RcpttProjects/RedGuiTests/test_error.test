@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dHhysCO9EeW4dIpDC7GSRQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/6/15 11:02 AM
+Save-Time: 7/6/15 12:55 PM
 Tags: test
 Testcase-Type: ecl
 
@@ -14,5 +14,5 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | get-property itemCount | equals 666 | verify-true
+get-view "Project Explorer" | get-tree | get-property itemCount | equals 1 | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
