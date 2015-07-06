@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 
 import com.google.common.base.Predicate;
@@ -35,23 +36,42 @@ public class RobotSuiteSettingsSection extends RobotSuiteFileSection {
     }
     
     public List<RobotElement> getMetadataSettings() {
-        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
-            @Override
-            public boolean apply(final RobotElement element) {
-                return element instanceof RobotSetting
-                        && (((RobotSetting) element).getGroup() == SettingsGroup.METADATA);
-            }
-        }));
+        return getSettingsFromGroup(SettingsGroup.METADATA);
+    }
+
+    public List<RobotElement> getResourcesSettings() {
+        return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }
 
     public List<RobotElement> getImportSettings() {
         return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
             @Override
             public boolean apply(final RobotElement element) {
-                return element instanceof RobotSetting
-                        && SettingsGroup.getImportsGroupsSet()
+                return SettingsGroup.getImportsGroupsSet()
                                 .contains((((RobotSetting) element).getGroup()));
             }
         }));
+    }
+
+    private List<RobotElement> getSettingsFromGroup(final SettingsGroup group) {
+        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
+            @Override
+            public boolean apply(final RobotElement element) {
+                return (((RobotSetting) element).getGroup() == group);
+            }
+        }));
+    }
+
+    public List<IPath> getResourcesPaths() {
+        final List<RobotElement> resources = getResourcesSettings();
+        final List<IPath> paths = newArrayList();
+        for (final RobotElement element : resources) {
+            final RobotSetting setting = (RobotSetting) element;
+            final List<String> args = setting.getArguments();
+            if (!args.isEmpty()) {
+                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+            }
+        }
+        return paths;
     }
 }

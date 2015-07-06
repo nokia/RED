@@ -63,6 +63,8 @@ public class RobotModelEvents {
 
     public static final String ROBOT_KEYWORD_DEFINITION_REMOVED = "robot/model/editor/file/structural/keyword/removed";
 
+    public static final String ROBOT_KEYWORD_DEFINITION_MOVED = "robot/model/editor/file/structural/keyword/moved";
+
 
     public static final String ROBOT_KEYWORD_DEFINITION_CHANGE_ALL = "robot/model/editor/file/detail/userkeyword/changed/*";
 
@@ -83,11 +85,13 @@ public class RobotModelEvents {
     public static final String ROBOT_CASE_NAME_CHANGE = "robot/model/editor/file/detail/cases/changed/argument";
     
 
-    public static final String ROBOT_KEYWORD_STRUCTURAL_ALL = "robot/model/editor/file/structural/cases/keywords/*";
+    public static final String ROBOT_KEYWORD_CALL_STRUCTURAL_ALL = "robot/model/editor/file/structural/cases/keywords/*";
 
     public static final String ROBOT_KEYWORD_CALL_ADDED = "robot/model/editor/file/structural/cases/keywords/added";
 
     public static final String ROBOT_KEYWORD_CALL_REMOVED = "robot/model/editor/file/structural/cases/keywords/removed";
+
+    public static final String ROBOT_KEYWORD_CALL_MOVED = "robot/model/editor/file/structural/cases/keywords/moved";
     
     
     public static final String ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/cases/keywords/changed/*";

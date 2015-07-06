@@ -5,7 +5,11 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 public class Selections {
@@ -23,5 +27,28 @@ public class Selections {
         }
         throw new IllegalArgumentException("Given selection should contain only one element of class "
                 + elementsClass.getName() + ", but have " + elements.size() + " instead");
+    }
+
+    public static Object getFirstElement(final IStructuredSelection selection) {
+        return selection.getFirstElement();
+    }
+
+    public static TreePath getFirstElementPath(final ITreeSelection selection) {
+        final Object firstElement = selection.getFirstElement();
+        final TreePath[] paths = firstElement == null ? new TreePath[0] : selection.getPathsFor(firstElement);
+        return paths.length == 0 ? TreePath.EMPTY : paths[0];
+    }
+
+    public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,
+            final Class<T> elementsClass) {
+        final List<T> elements = getElements(selection, elementsClass);
+        if (elements.size() == 1) {
+            return Optional.of(elements.get(0));
+        }
+        return Optional.absent();
+    }
+
+    public static IStructuredSelection createStructuredSelection(final Object... elements) {
+        return new StructuredSelection(elements);
     }
 }
