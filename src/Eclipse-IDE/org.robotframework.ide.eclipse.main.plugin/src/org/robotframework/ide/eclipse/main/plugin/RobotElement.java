@@ -11,6 +11,8 @@ public interface RobotElement {
 
     RobotElement getParent();
 
+    void fixParents(RobotElement parent);
+
     RobotSuiteFile getSuiteFile();
 
     List<RobotElement> getChildren();

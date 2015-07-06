@@ -15,6 +15,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -47,15 +48,22 @@ public class RobotFormEditor extends FormEditor {
 
     public static final String ID = "org.robotframework.ide.tableditor";
 
+    private Clipboard clipboard;
+
     private RobotSuiteFile suiteModel;
 
     private boolean isEditable;
+
+    public Clipboard getClipboard() {
+        return clipboard;
+    }
 
     @Override
     public void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
         try {
             super.init(site, input);
 
+            clipboard = new Clipboard(site.getShell().getDisplay());
             prepareEclipseContext();
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
@@ -71,6 +79,7 @@ public class RobotFormEditor extends FormEditor {
                 return provideSuiteModel();
             }
         });
+        eclipseContext.set(Clipboard.class, clipboard);
         ContextInjectionFactory.inject(this, eclipseContext);
     }
 
@@ -170,6 +179,8 @@ public class RobotFormEditor extends FormEditor {
     @Override
     public void dispose() {
         super.dispose();
+
+        clipboard.dispose();
 
         final IEclipseContext context = ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
