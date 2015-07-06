@@ -36,6 +36,11 @@ public class ArtificialGroupingRobotElement implements RobotElement {
     }
 
     @Override
+    public void fixParents(final RobotElement parent) {
+        // this method will never be called for artificial element objects
+    }
+
+    @Override
     public RobotSuiteFile getSuiteFile() {
         return groupedElements.get(0).getSuiteFile();
     }

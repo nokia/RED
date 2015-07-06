@@ -58,7 +58,7 @@ public class RobotVariable implements RobotElement {
         return false;
     }
 
-    private RobotSuiteFileSection section;
+    private RobotSuiteFileSection parent;
     private String name;
     private Type type;
     private String value;
@@ -66,7 +66,7 @@ public class RobotVariable implements RobotElement {
 
     public RobotVariable(final RobotSuiteFileSection section, final Type type, final String name,
             final String value, final String comment) {
-        this.section = section;
+        this.parent = section;
         this.type = type;
         this.name = name;
         this.value = value;
@@ -90,12 +90,17 @@ public class RobotVariable implements RobotElement {
 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), section, this);
+        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), parent, this);
     }
 
     @Override
     public RobotElement getParent() {
-        return section;
+        return parent;
+    }
+
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = (RobotSuiteFileSection) parent;
     }
 
     @Override
@@ -132,12 +137,12 @@ public class RobotVariable implements RobotElement {
     }
 
     public void setParent(final RobotSuiteFileSection variablesSection) {
-        this.section = variablesSection;
+        this.parent = variablesSection;
     }
 
     @Override
     public RobotSuiteFile getSuiteFile() {
-        return section.getSuiteFile();
+        return parent.getSuiteFile();
     }
 
     public Type getType() {

@@ -1,0 +1,42 @@
+package org.robotframework.ide.eclipse.main.plugin.propertytester;
+
+import java.util.List;
+
+import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.viewers.Selections;
+
+import com.google.common.base.Preconditions;
+
+public class SelectionsPropertyTester extends PropertyTester {
+
+    @Override
+    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
+        Preconditions.checkArgument(receiver instanceof IStructuredSelection,
+                "Property tester is unable to test properties of " + receiver.getClass().getName()
+                        + ". It should be used with " + IStructuredSelection.class.getName());
+
+        if (expectedValue instanceof Boolean) {
+            return testProperty((IStructuredSelection) receiver, property, ((Boolean) expectedValue).booleanValue());
+        }
+        return false;
+    }
+
+    private boolean testProperty(final IStructuredSelection selection, final String property, final boolean expectedValue) {
+        if ("allElementsHaveSameType".equals(property)) {
+            final List<Object> elements = Selections.getElements(selection, Object.class);
+            if (elements.isEmpty()) {
+                return expectedValue;
+            }
+            final Class<? extends Object> classOfFirst = elements.get(0).getClass();
+            for (final Object element : elements) {
+                if (!classOfFirst.isInstance(element)) {
+                    return !expectedValue;
+                }
+            }
+            return expectedValue;
+        }
+        return false;
+    }
+
+}

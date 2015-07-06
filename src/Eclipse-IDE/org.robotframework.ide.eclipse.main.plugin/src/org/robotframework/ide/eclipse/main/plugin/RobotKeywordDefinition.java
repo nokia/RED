@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class RobotKeywordDefinition implements RobotElement {
+public class RobotKeywordDefinition implements RobotElement, Serializable {
 
-    private final RobotKeywordsSection parent;
+    private transient RobotKeywordsSection parent;
     private String name;
     protected final List<RobotElement> elements = new ArrayList<>();
     private String comment;
@@ -53,6 +54,19 @@ public class RobotKeywordDefinition implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
+    }
+
+    public void setParent(final RobotKeywordsSection parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = (RobotKeywordsSection) parent;
+
+        for (final RobotElement element : elements) {
+            element.fixParents(this);
+        }
     }
 
     @Override

@@ -1,10 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.ui.IEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
 
 import com.google.common.base.Preconditions;
 
@@ -17,14 +20,14 @@ public class RobotEditorPropertyTester extends PropertyTester {
                         + ". It should be used with " + RobotFormEditor.class.getName());
 
         if (expectedValue instanceof Boolean) {
-            return testProperty((RobotFormEditor) receiver, property, (Boolean) expectedValue);
+            return testProperty((RobotFormEditor) receiver, property, ((Boolean) expectedValue).booleanValue());
         }
         return testProperty((RobotFormEditor) receiver, property, (String) expectedValue);
     }
 
-    private boolean testProperty(final RobotFormEditor editor, final String property, final Boolean expectedValue) {
+    private boolean testProperty(final RobotFormEditor editor, final String property, final boolean expectedValue) {
         if (property.equals("editorModelIsEditable")) {
-            return editor.provideSuiteModel().isEditable() == expectedValue.booleanValue();
+            return editor.provideSuiteModel().isEditable() == expectedValue;
         } else if (property.equals("activeSectionEditorHasSection")) {
             final IEditorPart activeEditor = editor.getActiveEditor();
             final ISectionEditorPart activePage = activeEditor instanceof ISectionEditorPart ? (ISectionEditorPart) activeEditor
@@ -32,8 +35,14 @@ public class RobotEditorPropertyTester extends PropertyTester {
             if (activePage != null) {
                 return activePage.provideSection(editor.provideSuiteModel()).isPresent() == expectedValue;
             } else {
-                return !expectedValue.booleanValue();
+                return !expectedValue;
             }
+        } else if (property.equals("thereAreKeywordDefinitionElementsInClipboard")) {
+            final Clipboard clipboard = editor.getClipboard();
+            return KeywordDefinitionsTransfer.hasKeywordDefinitions(clipboard) == expectedValue;
+        } else if (property.equals("thereAreKeywordCallElementsInClipboard")) {
+            final Clipboard clipboard = editor.getClipboard();
+            return KeywordCallsTransfer.hasKeywordCalls(clipboard) == expectedValue;
         }
         return false;
     }

@@ -65,6 +65,13 @@ public class RobotModel implements RobotElement {
     }
 
     @Override
+    public void fixParents(final RobotElement parent) {
+        for (final RobotElement element : projects) {
+            element.fixParents(this);
+        }
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return null;
     }

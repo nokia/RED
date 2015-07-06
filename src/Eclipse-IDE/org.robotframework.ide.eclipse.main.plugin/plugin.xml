@@ -567,6 +567,25 @@
              optional="false">
        </commandParameter>
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.extractKeyword"
+          name="Extract to new keyword">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.renameKeyword"
+          name="Rename">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.assignToVariable"
+          name="Assign to variable">
+    </command>
+    <command
+          id="org.robotframework.ide.eclipse.openDeclaration"
+          name="Open declaration">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -608,20 +627,6 @@
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.atLeastOneSettingIsSelected">
-          </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.InsertNewKeywordHandler"
-          commandId="org.robotframework.ide.eclipse.insertNew">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.activeKeywordsPartIsEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -855,6 +860,148 @@
     </handler>
  </extension>
  <extension
+       name="Keywords part handlers"
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.InsertNewKeywordHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler"
+          commandId="org.eclipse.ui.edit.cut">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler"
+          commandId="org.eclipse.ui.edit.copy">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActive">
+          </reference></activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler"
+          commandId="org.eclipse.ui.edit.paste">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.canPasteToSectionEditorTable">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.ExtractKeywordHandler"
+          commandId="org.robotframework.ide.eclipse.extractKeyword">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.AssignToVariableHandler"
+          commandId="org.robotframework.ide.eclipse.assignToVariable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.RenameKeywordsHandler"
+          commandId="org.robotframework.ide.eclipse.renameKeyword">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.OpenDeclarationHandler"
+          commandId="org.robotframework.ide.eclipse.openDeclaration">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActive">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+ </extension>
+ <extension
        point="org.eclipse.ui.bindings">
     <key
           commandId="org.robotframework.ide.eclipse.insertNew"
@@ -933,6 +1080,80 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementUp"
+             label="Move up"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.moveElementDown"
+             label="Move down"
+             style="push">
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.eclipse.ui.edit.cut"
+             label="Cut"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.copy"
+             label="Copy"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.paste"
+             label="Paste"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+       <separator
+             name="actions"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.openDeclaration"
+             label="Open Declaration"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall">
+                   </instanceof>
+                </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+       <menu
+             label="Refactor">
+          <command
+                commandId="org.robotframework.ide.eclipse.renameKeyword"
+                label="Rename"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.extractKeyword"
+                label="Extract to new keyword"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.assignToVariable"
+                label="Assign to variable"
+                style="push">
+          </command>
+       </menu>
        <menu
              label="References">
           <command
@@ -954,42 +1175,6 @@
              </parameter>
           </command>
        </menu>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementUp"
-             label="Move keyword up"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="selection">
-                <iterate
-                      ifEmpty="true"
-                      operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementDown"
-             label="Move test case down"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="selection">
-                <iterate
-                      ifEmpty="true"
-                      operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
     </menuContribution>
     <menuContribution
           allPopups="false"
@@ -1108,8 +1293,15 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable,editorModelHasSection,activeSectionEditorHasSection"
+          properties="editorModelIsEditable,editorModelHasSection,activeSectionEditorHasSection,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+    </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester"
+          id="org.robotframework.selectionsPropertyTester"
+          namespace="org.robotframework.selection"
+          properties="allElementsHaveSameType"
+          type="org.eclipse.jface.viewers.IStructuredSelection">
     </propertyTester>
  </extension>
  <extension
@@ -1144,7 +1336,31 @@
        </with>
     </definition>
     <definition
-          id="org.robotframework.activeKeywordsPartIsEditable">
+          id="org.robotframework.keywordsPartIsActive">
+      <with
+            variable="activeContexts">
+         <iterate
+               ifEmpty="false"
+               operator="or">
+            <equals
+                  value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
+            </equals>
+         </iterate>
+         <and>
+            <not>
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <equals
+                        value="org.robotframework.ide.eclipse.details.context">
+                  </equals>
+               </iterate>
+            </not>
+         </and>
+      </with>
+    </definition>
+    <definition
+          id="org.robotframework.keywordsPartIsActiveAndEditable">
        <and>
           <with
                 variable="activeContexts">
@@ -1237,6 +1453,25 @@
              <count
                    value="1">
              </count>
+          </and>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.selectedElementsHaveSameType">
+       <with
+             variable="selection">
+          <and>
+             <test
+                   property="org.robotframework.selection.allElementsHaveSameType"
+                   value="true">
+             </test>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.RobotElement">
+                </instanceof>
+             </iterate>
           </and>
        </with>
     </definition>
@@ -1358,6 +1593,30 @@
                    value="1">
              </count>
           </and>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.canPasteToSectionEditorTable">
+       <with
+         variable="activeEditor">
+         <or>
+            <test
+                  property="org.robotframework.thereAreKeywordDefinitionElementsInClipboard"
+                  value="true">
+            </test>
+            <and>
+               <test
+                     property="org.robotframework.thereAreKeywordCallElementsInClipboard"
+                     value="true">
+               </test>
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+               </with>
+            </and>
+         </or>
        </with>
     </definition>
     <definition

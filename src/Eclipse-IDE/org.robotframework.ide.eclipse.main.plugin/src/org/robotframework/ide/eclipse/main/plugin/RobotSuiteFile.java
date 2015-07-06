@@ -10,6 +10,7 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -28,7 +29,7 @@ import com.google.common.collect.Lists;
 
 public class RobotSuiteFile implements RobotElement {
 
-    private final RobotElement parent;
+    private RobotElement parent;
 
     private final IFile file;
 
@@ -150,6 +151,15 @@ public class RobotSuiteFile implements RobotElement {
         return parent;
     }
 
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = parent;
+
+        for (final RobotElement element : sections) {
+            element.fixParents(this);
+        }
+    }
+
     public IFile getFile() {
         return file;
     }
@@ -216,12 +226,20 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
-        final List<RobotKeywordDefinition> userKeywords = newArrayList();
-        final Optional<RobotElement> sectionOptional = findSection(RobotKeywordsSection.class);
-        if (sectionOptional.isPresent()) {
-            final RobotKeywordsSection section = (RobotKeywordsSection) sectionOptional.get();
-            return section.getUserDefinedKeywords();
+        final Optional<RobotElement> optionalKeywords = findSection(RobotKeywordsSection.class);
+        if (optionalKeywords.isPresent()) {
+            final RobotKeywordsSection keywords = (RobotKeywordsSection) optionalKeywords.get();
+            return keywords.getUserDefinedKeywords();
         }
-        return userKeywords;
+        return newArrayList();
+    }
+
+    public List<IPath> getResourcesPaths() {
+        final Optional<RobotElement> optionalSettings = findSection(RobotSuiteSettingsSection.class);
+        if (optionalSettings.isPresent()) {
+            final RobotSuiteSettingsSection settings = (RobotSuiteSettingsSection) optionalSettings.get();
+            return settings.getResourcesPaths();
+        }
+        return newArrayList();
     }
 }

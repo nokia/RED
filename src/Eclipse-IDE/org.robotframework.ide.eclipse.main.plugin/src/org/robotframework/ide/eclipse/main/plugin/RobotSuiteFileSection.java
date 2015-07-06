@@ -14,13 +14,13 @@ public class RobotSuiteFileSection implements RobotElement {
     private final String name;
     private final boolean readOnly;
 
-    private final RobotElement parent;
+    private RobotElement parent;
     protected final List<RobotElement> elements = new ArrayList<>();
 
     public RobotSuiteFileSection(final RobotSuiteFile parent, final String name,
             final boolean readOnly) {
         this.parent = parent;
-        this.file = parent.getFile();
+        this.file = parent == null ? null : parent.getFile();
         this.name = name;
         this.readOnly = readOnly;
     }
@@ -63,6 +63,15 @@ public class RobotSuiteFileSection implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
+    }
+
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = parent;
+
+        for (final RobotElement element : elements) {
+            element.fixParents(this);
+        }
     }
 
     @Override

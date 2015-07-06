@@ -14,14 +14,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 
-class FileSectionsParser {
+public class FileSectionsParser {
 
     private final boolean readOnly;
     private IFile file;
     private InputStream stream;
 
 
-    FileSectionsParser(final IFile file) {
+    public FileSectionsParser(final IFile file) {
         this.file = file;
         this.readOnly = file.isReadOnly();
     }
@@ -33,7 +33,7 @@ class FileSectionsParser {
     }
 
 
-    List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent)
+    public List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent)
             throws IOException {
         final List<RobotElement> sections = new ArrayList<>();
 
