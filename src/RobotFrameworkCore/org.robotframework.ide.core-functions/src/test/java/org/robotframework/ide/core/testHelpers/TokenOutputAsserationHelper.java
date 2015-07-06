@@ -55,6 +55,7 @@ public class TokenOutputAsserationHelper {
                 types);
 
         assertThat(tokens).isNotNull();
+
         assertThat(tokens).isNotEmpty();
         assertThat((tokens.size() - startTokenPos) % typesLength).isEqualTo(0);
         int correspondingTextIndex = 0;
@@ -104,6 +105,7 @@ public class TokenOutputAsserationHelper {
                 assertEndPosition(robotToken, line, column);
             }
         }
+
     }
 
 
