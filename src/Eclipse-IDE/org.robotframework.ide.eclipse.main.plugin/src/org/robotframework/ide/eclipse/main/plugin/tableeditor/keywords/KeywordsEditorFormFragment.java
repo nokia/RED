@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
@@ -198,6 +199,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             viewer.refresh();
+            dirtyProviderService.setDirtyState(true);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordCallIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_STRUCTURAL_ALL) final RobotKeywordDefinition definition) {
+        if (definition.getSuiteFile() == fileModel) {
+            viewer.refresh(definition);
             dirtyProviderService.setDirtyState(true);
         }
     }

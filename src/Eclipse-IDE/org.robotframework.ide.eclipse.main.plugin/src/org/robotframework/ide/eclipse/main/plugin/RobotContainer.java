@@ -12,7 +12,7 @@ import org.eclipse.ui.IWorkbenchPage;
 
 public abstract class RobotContainer implements RobotElement {
 
-    private final RobotElement parent;
+    private RobotElement parent;
     protected final IContainer container;
     private final List<RobotElement> elements;
 
@@ -72,6 +72,15 @@ public abstract class RobotContainer implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
+    }
+
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = parent;
+
+        for (final RobotElement element : elements) {
+            element.fixParents(this);
+        }
     }
 
     @Override

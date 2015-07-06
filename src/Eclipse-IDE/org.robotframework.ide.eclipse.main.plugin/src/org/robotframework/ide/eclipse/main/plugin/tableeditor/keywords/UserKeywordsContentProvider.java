@@ -41,8 +41,8 @@ public class UserKeywordsContentProvider implements ITreeContentProvider {
         return new Object[0];
     }
 
-    private Object[] extendWithAddingToken(final Object[] elements, final String name, final int rank,
-            final boolean isEditable) {
+    private Object[] extendWithAddingToken(final Object[] elements, final String name,
+            final int rank, final boolean isEditable) {
         final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
         newElements[elements.length] = new ElementAddingToken(name, isEditable, rank);
         return newElements;

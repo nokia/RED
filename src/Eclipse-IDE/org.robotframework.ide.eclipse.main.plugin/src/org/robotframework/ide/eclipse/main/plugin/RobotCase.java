@@ -9,7 +9,7 @@ import org.eclipse.ui.IWorkbenchPage;
 
 public class RobotCase implements RobotElement {
 
-    private final RobotCasesSection parent;
+    private RobotCasesSection parent;
     private String name;
     protected final List<RobotElement> elements = new ArrayList<>();
 
@@ -42,6 +42,15 @@ public class RobotCase implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
+    }
+
+    @Override
+    public void fixParents(final RobotElement parent) {
+        this.parent = (RobotCasesSection) parent;
+
+        for (final RobotElement element : elements) {
+            element.fixParents(this);
+        }
     }
 
     @Override
