@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/3/15 10:08 AM
+Save-Time: 7/3/15 5:44 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -46,6 +46,65 @@ proc CreateVariablesInTableEditor [val EditorTitle] {
 	}
 }
 
+proc "add-variable" [val list_of_variables] [val script_name]{
+
+	with [get-editor $script_name] {
+	    get-tab-folder | get-tab-item Variables | click
+	   
+	   $list_of_variables| each [val variable_name] [val index]{
+		    with [get-table] {
+		        select "...add new scalar" | key-type Enter
+		        get-item ".*" -index $index | activate-cell-edit
+		        with [get-editbox] {
+		            set-text $variable_name
+		            key-type Enter
+		        }
+		        apply-cell-edit -deactivate
+			}
+			
+		}
+		
+	}
+}
+
+proc "add-value-to-variable" [val list_of_variables] [val script_name]{
+
+	with [get-editor $script_name] {
+	    get-tab-folder | get-tab-item Variables | click
+	 
+	   	$list_of_variables| each [val variable_value] [val index]{
+		   	with [get-table] {
+		        get-item ".*" -index $index | double-click
+		      	get-item ".*"  -index $index | activate-cell-edit -column 1
+		        with [get-editbox] {
+		            set-text $variable_value
+		            key-type Enter
+		        }
+		        apply-cell-edit -deactivate
+	    	}
+		}	
+	}
+}
+
+
+proc "add-commeny-to-variable" [val list_of_variables] [val script_name]{
+
+	with [get-editor $script_name] {
+	    get-tab-folder | get-tab-item Variables | click
+	 
+	   	$list_of_variables| each [val comment_text] [val index]{
+		   	with [get-table] {
+		        get-item ".*" -index $index| double-click
+		      	get-item ".*" -index $index| activate-cell-edit -column 02
+		        with [get-editbox] {
+        			set-text $comment_text
+        			key-type "NUMPAD_ENTER" "\\u000D"
+    			}
+		        apply-cell-edit -deactivate
+	    	}
+		}	
+	}
+}
 proc Create2MetadataInTableEditor [val EditorTitle]{
 // create 2 variables in table editor Vriables tab
 // input - Editor title - filename
