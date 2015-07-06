@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithByteHexValue;
-import org.robotframework.ide.core.testData.text.context.recognizer.UnicodeCharacterWithHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
@@ -16,7 +15,9 @@ import org.robotframework.ide.core.testData.text.context.recognizer.LineFeedText
 import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.UnicodeCharacterWithHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -61,6 +62,8 @@ public class ContextBuilder {
         normalRecognizers.add(new KeywordsTableHeaderRecognizer());
 
         normalRecognizers.add(new LineFeedTextualRecognizer());
+        normalRecognizers.add(new TabulatorTextualRecognizer());
+
         normalRecognizers.add(new CharacterWithByteHexValue());
         normalRecognizers.add(new CharacterWithShortHexValue());
         normalRecognizers.add(new UnicodeCharacterWithHexValue());
