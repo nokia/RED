@@ -62,6 +62,12 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     }
 
 
+    /**
+     * 
+     * @param context
+     *            the parent context for this class is
+     *            {@link AggregatedOneLineRobotContexts}
+     */
     public void setParent(AggregatedOneLineRobotContexts context) {
         this.parentContext = context;
     }
@@ -75,6 +81,13 @@ public class OneLineSingleRobotContextPart implements IContextElement {
 
     @Override
     public void setParent(IContextElement context) {
-        setParent((AggregatedOneLineRobotContexts) context);
+        if (context == null
+                || context instanceof AggregatedOneLineRobotContexts) {
+            setParent((AggregatedOneLineRobotContexts) context);
+        } else {
+            throw new IllegalArgumentException("Context should be instance of "
+                    + AggregatedOneLineRobotContexts.class + ", but was "
+                    + context.getClass());
+        }
     }
 }
