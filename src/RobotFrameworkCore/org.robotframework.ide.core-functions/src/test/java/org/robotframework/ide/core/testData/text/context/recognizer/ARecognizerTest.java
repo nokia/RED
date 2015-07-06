@@ -102,6 +102,10 @@ public abstract class ARecognizerTest {
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
         LineTokenPosition line = iter.next();
+        if (line == null) {
+            line = new LineTokenPosition(0, 0,
+                    LinearPositionMarker.THE_FIRST_LINE);
+        }
         ContextOutput out = new ContextOutput(tokenOutput);
 
         // execute

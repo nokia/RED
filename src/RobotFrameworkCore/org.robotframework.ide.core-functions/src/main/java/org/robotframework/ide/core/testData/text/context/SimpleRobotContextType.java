@@ -84,5 +84,9 @@ public enum SimpleRobotContextType implements IContextElementType {
     /**
      * \\Uhhhhhhhh
      */
-    UNICODE_CHAR_WITH_HEX_VALUE;
+    UNICODE_CHAR_WITH_HEX_VALUE,
+    /**
+     * contains only space or tabulators or just nothing
+     */
+    EMPTY_LINE;
 }
