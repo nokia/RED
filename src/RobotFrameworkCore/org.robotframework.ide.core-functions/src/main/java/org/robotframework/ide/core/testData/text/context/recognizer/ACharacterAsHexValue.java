@@ -48,42 +48,45 @@ public abstract class ACharacterAsHexValue implements IContextRecognizer {
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineSingleRobotContextPart context = createContext(lineInterval);
+        if (lineInterval != null) {
+            OneLineSingleRobotContextPart context = createContext(lineInterval);
 
-        boolean wasEscape = false;
-        boolean wasUsed = false;
-        List<RobotToken> tokens = currentContext.getTokenizedContent()
-                .getTokens();
-        for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
-            RobotToken token = tokens.get(tokId);
-            IRobotTokenType type = token.getType();
+            boolean wasEscape = false;
+            boolean wasUsed = false;
+            List<RobotToken> tokens = currentContext.getTokenizedContent()
+                    .getTokens();
+            for (int tokId = lineInterval.getStart(); tokId < lineInterval
+                    .getEnd(); tokId++) {
+                RobotToken token = tokens.get(tokId);
+                IRobotTokenType type = token.getType();
 
-            if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
-                if (!wasEscape) {
-                    context.addNextToken(token);
-                    wasEscape = true;
-                    wasUsed = true;
+                if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
+                    if (!wasEscape) {
+                        context.addNextToken(token);
+                        wasEscape = true;
+                        wasUsed = true;
+                    } else {
+                        wasUsed = false;
+                    }
+                } else if (RobotWordType.class.isInstance(type)) {
+                    if (wasEscape && isStartingFromLetterAndHexNumber(token)) {
+                        context.addNextToken(token);
+                        context.setType(BUILD_TYPE);
+
+                        foundContexts.add(context);
+                        context = createContext(lineInterval);
+                        wasUsed = true;
+                    } else {
+                        wasUsed = false;
+                    }
                 } else {
                     wasUsed = false;
                 }
-            } else if (RobotWordType.class.isInstance(type)) {
-                if (wasEscape && isStartingFromLetterAndHexNumber(token)) {
-                    context.addNextToken(token);
-                    context.setType(BUILD_TYPE);
 
-                    foundContexts.add(context);
-                    context = createContext(lineInterval);
-                    wasUsed = true;
-                } else {
-                    wasUsed = false;
+                if (!wasUsed) {
+                    wasEscape = false;
+                    context.removeAllContextTokens();
                 }
-            } else {
-                wasUsed = false;
-            }
-
-            if (!wasUsed) {
-                wasEscape = false;
-                context.removeAllContextTokens();
             }
         }
 
