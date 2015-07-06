@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithByteHexValue;
-import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithIntHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.UnicodeCharacterWithHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
@@ -63,7 +63,7 @@ public class ContextBuilder {
         normalRecognizers.add(new LineFeedTextualRecognizer());
         normalRecognizers.add(new CharacterWithByteHexValue());
         normalRecognizers.add(new CharacterWithShortHexValue());
-        normalRecognizers.add(new CharacterWithIntHexValue());
+        normalRecognizers.add(new UnicodeCharacterWithHexValue());
 
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
