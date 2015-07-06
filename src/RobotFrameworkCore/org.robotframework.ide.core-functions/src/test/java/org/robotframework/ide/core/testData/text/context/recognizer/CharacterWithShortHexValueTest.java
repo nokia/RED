@@ -22,57 +22,47 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 
 
 /**
- * 
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see LineFeedTextualRecognizer
+ * @see CharacterWithShortHexValue
  */
-public class LineFeedTextualRecognizerTest extends ARecognizerTest {
+public class CharacterWithShortHexValueTest extends ARecognizerTest {
 
-    public LineFeedTextualRecognizerTest() {
-        super(LineFeedTextualRecognizer.class);
+    public CharacterWithShortHexValueTest() {
+        super(CharacterWithShortHexValue.class);
     }
 
 
     @Test
-    public void test_backslashFollowingWord_New_shouldReturn_oneElement()
+    public void testCorrectHexShortValue_lettersA9A8()
             throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterN = "New";
-        assertForSingleTextWithLetterN_atTheBeginning(additionalTextStartsWithLetterN);
+        String additionalTextStartsWithLetterX = "uA9A8";
+        assertForSingleTextWithLetterU_atTheBeginning(additionalTextStartsWithLetterX);
     }
 
 
     @Test
-    public void test_backslashFollowingWord_new_shouldReturn_oneElement()
+    public void testCorrectHexShortValue_lettersAAAA()
             throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterN = "new";
-        assertForSingleTextWithLetterN_atTheBeginning(additionalTextStartsWithLetterN);
+        String additionalTextStartsWithLetterX = "uAAAA";
+        assertForSingleTextWithLetterU_atTheBeginning(additionalTextStartsWithLetterX);
     }
 
 
     @Test
-    public void test_backslashFollowingLetter_N_shouldReturn_oneElement()
+    public void testCorrectHexShortValue_numberFrom_1234()
             throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterN = "N";
-        assertForSingleTextWithLetterN_atTheBeginning(additionalTextStartsWithLetterN);
+        assertForSingleTextWithLetterU_atTheBeginning("u1234");
     }
 
 
-    @Test
-    public void test_backslashFollowingLetter_n_shouldReturn_oneElement()
-            throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterN = "n";
-        assertForSingleTextWithLetterN_atTheBeginning(additionalTextStartsWithLetterN);
-    }
-
-
-    private void assertForSingleTextWithLetterN_atTheBeginning(
-            String additionalTextStartsWithLetterN)
+    private void assertForSingleTextWithLetterU_atTheBeginning(
+            String additionalTextStartsWithLetterU)
             throws FileNotFoundException, IOException {
         // prepare
-        String text = "\\" + additionalTextStartsWithLetterN;
+        String text = "\\" + additionalTextStartsWithLetterU;
         TokenOutput tokenOutput = createTokenOutput(text);
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
@@ -96,22 +86,62 @@ public class LineFeedTextualRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
                         RobotWordType.UNKNOWN_WORD }, 0,
                 new LinearPositionMarker(1, 1),
-                new String[] { additionalTextStartsWithLetterN });
+                new String[] { additionalTextStartsWithLetterU });
     }
 
 
     @Test
-    public void test_escapedBackslashAndThen_newWord_shouldReturn_anEmptyList()
+    public void test_onlyEscapeSmallU_letterG_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
-        String text = "\\\\new";
+        String text = "\\ug";
         assertForIncorrectData(text);
     }
 
 
     @Test
-    public void test_escapedAsterisks_shouldReturn_anEmptyList()
+    public void test_onlyEscapeSmallU_letterA_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
-        String text = "\\*";
+        String text = "\\ua";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_onlyEscapeUpperCaseUnumberZeroTwice_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "\\U00";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_onlyEscapeSmallUnumberZero_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "\\u0";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_onlyEscapeSmallU_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "\\u";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_onlyEscapeBiggerU_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "\\U";
+        assertForIncorrectData(text);
+    }
+
+
+    @Test
+    public void test_onlyEscapeAndTrashText_shouldReturn_anEmptyList()
+            throws FileNotFoundException, IOException {
+        String text = "\\d";
         assertForIncorrectData(text);
     }
 
@@ -127,6 +157,6 @@ public class LineFeedTextualRecognizerTest extends ARecognizerTest {
     @Test
     public void test_getContextType() {
         assertThat(context.getContextType()).isEqualTo(
-                SimpleRobotContextType.LINE_FEED_TEXT);
+                SimpleRobotContextType.CHAR_WITH_SHORT_HEX_VALUE);
     }
 }

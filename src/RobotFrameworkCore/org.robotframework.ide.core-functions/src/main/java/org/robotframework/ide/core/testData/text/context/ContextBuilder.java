@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithByteHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithIntHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
@@ -35,6 +38,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see TestCaseTableHeaderRecognizer
  * @see DoubleSpaceOrTabulatorSeparatorRecognizer
  * @see PipeSeparatorRecognizer
+ * @see CharacterWithByteHexValue
  */
 public class ContextBuilder {
 
@@ -57,6 +61,9 @@ public class ContextBuilder {
         normalRecognizers.add(new KeywordsTableHeaderRecognizer());
 
         normalRecognizers.add(new LineFeedTextualRecognizer());
+        normalRecognizers.add(new CharacterWithByteHexValue());
+        normalRecognizers.add(new CharacterWithShortHexValue());
+        normalRecognizers.add(new CharacterWithIntHexValue());
 
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }

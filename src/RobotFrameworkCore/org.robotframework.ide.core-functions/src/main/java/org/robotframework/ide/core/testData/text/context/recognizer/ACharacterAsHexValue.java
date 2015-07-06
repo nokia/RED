@@ -15,10 +15,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 
 /**
- * Check if current line contains literal (word) comment or comment by hash
- * sign.
+ * Extracted class for all hex base printable characters.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -27,20 +28,27 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see ContextBuilder
  * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
  * @see RobotWordType
- * 
- * @see SimpleRobotContextType#LINE_FEED_TEXT
  */
-public class LineFeedTextualRecognizer implements IContextRecognizer {
+public abstract class ACharacterAsHexValue implements IContextRecognizer {
 
-    private final static SimpleRobotContextType BUILD_TYPE = SimpleRobotContextType.LINE_FEED_TEXT;
+    private final SimpleRobotContextType BUILD_TYPE;
+    private final char startChar;
+    private final int numberOfHexChars;
+
+
+    protected ACharacterAsHexValue(final SimpleRobotContextType buildType,
+            char startChar, int numberOfHexChars) {
+        this.BUILD_TYPE = buildType;
+        this.startChar = startChar;
+        this.numberOfHexChars = numberOfHexChars;
+    }
 
 
     @Override
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
-                lineInterval.getLineNumber());
+        OneLineSingleRobotContextPart context = createContext(lineInterval);
 
         boolean wasEscape = false;
         boolean wasUsed = false;
@@ -59,13 +67,12 @@ public class LineFeedTextualRecognizer implements IContextRecognizer {
                     wasUsed = false;
                 }
             } else if (RobotWordType.class.isInstance(type)) {
-                if (wasEscape && isStartingFromN(token)) {
+                if (wasEscape && isStartingFromLetterAndHexNumber(token)) {
                     context.addNextToken(token);
                     context.setType(BUILD_TYPE);
 
                     foundContexts.add(context);
-                    context = new OneLineSingleRobotContextPart(
-                            lineInterval.getLineNumber());
+                    context = createContext(lineInterval);
                     wasUsed = true;
                 } else {
                     wasUsed = false;
@@ -84,22 +91,55 @@ public class LineFeedTextualRecognizer implements IContextRecognizer {
     }
 
 
-    private boolean isStartingFromN(final RobotToken token) {
-        return isStartingFromN(extractText(token));
+    @VisibleForTesting
+    protected OneLineSingleRobotContextPart createContext(
+            final LineTokenPosition lineInterval) {
+        return new OneLineSingleRobotContextPart(lineInterval.getLineNumber());
     }
 
 
-    private boolean isStartingFromN(String text) {
+    @VisibleForTesting
+    protected boolean isStartingFromLetterAndHexNumber(final RobotToken token) {
+        return isStartingFromLetterAndThenHex(extractText(token));
+    }
+
+
+    @VisibleForTesting
+    protected boolean isStartingFromLetterAndThenHex(String text) {
         boolean result = false;
-        if (text != null && text.length() > 0) {
+        if (text != null && text.length() >= numberOfHexChars + 1) {
             char c = text.charAt(0);
-            result = (c == 'n' || c == 'N');
+            result = (c == startChar && isHex(text, numberOfHexChars));
         }
         return result;
     }
 
 
-    private String extractText(final RobotToken token) {
+    @VisibleForTesting
+    protected boolean isHex(String text, int numberOfChars) {
+        boolean result = false;
+        for (int i = 1; i <= numberOfChars; i++) {
+            if (isHex(text.charAt(i))) {
+                result = true;
+            } else {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isHex(char c) {
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')
+                || (c >= 'A' && c <= 'F');
+    }
+
+
+    @VisibleForTesting
+    protected String extractText(final RobotToken token) {
         String value = null;
         StringBuilder text = token.getText();
         if (text != null) {

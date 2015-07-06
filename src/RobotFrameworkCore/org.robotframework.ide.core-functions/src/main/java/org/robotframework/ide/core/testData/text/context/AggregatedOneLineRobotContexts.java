@@ -32,6 +32,11 @@ public class AggregatedOneLineRobotContexts implements IContextElement {
     }
 
 
+    public LinkedListMultimap<IContextElementType, IContextElement> getChildContextTypes() {
+        return handledElements;
+    }
+
+
     public List<IContextElement> getChildContexts() {
         return childContexts;
     }
