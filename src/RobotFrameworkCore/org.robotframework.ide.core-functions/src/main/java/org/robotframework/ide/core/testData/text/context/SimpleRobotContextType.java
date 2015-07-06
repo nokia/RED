@@ -68,5 +68,17 @@ public enum SimpleRobotContextType implements IContextElementType {
     /**
      * in textual format new line \n
      */
-    LINE_FEED_TEXT;
+    LINE_FEED_TEXT,
+    /**
+     * \xhh char with hex value
+     */
+    CHAR_WITH_BYTE_HEX_VALUE,
+    /**
+     * \\uhhhh
+     */
+    CHAR_WITH_SHORT_HEX_VALUE,
+    /**
+     * \\Uhhhhhhhh
+     */
+    CHAR_WITH_INT_HEX_VALUE;
 }
