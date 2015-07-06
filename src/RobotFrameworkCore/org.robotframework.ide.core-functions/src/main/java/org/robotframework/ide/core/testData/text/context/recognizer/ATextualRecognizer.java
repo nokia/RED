@@ -3,6 +3,7 @@ package org.robotframework.ide.core.testData.text.context.recognizer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.assertj.core.util.VisibleForTesting;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
@@ -47,8 +48,7 @@ public abstract class ATextualRecognizer implements IContextRecognizer {
     public List<IContextElement> recognize(ContextOutput currentContext,
             LineTokenPosition lineInterval) {
         List<IContextElement> foundContexts = new LinkedList<>();
-        OneLineSingleRobotContextPart context = new OneLineSingleRobotContextPart(
-                lineInterval.getLineNumber());
+        OneLineSingleRobotContextPart context = createContext(lineInterval);
 
         boolean wasEscape = false;
         boolean wasUsed = false;
@@ -72,8 +72,7 @@ public abstract class ATextualRecognizer implements IContextRecognizer {
                     context.setType(BUILD_TYPE);
 
                     foundContexts.add(context);
-                    context = new OneLineSingleRobotContextPart(
-                            lineInterval.getLineNumber());
+                    context = createContext(lineInterval);
                     wasUsed = true;
                 } else {
                     wasUsed = false;
@@ -92,12 +91,21 @@ public abstract class ATextualRecognizer implements IContextRecognizer {
     }
 
 
-    private boolean isStartingFromLetter(final RobotToken token) {
+    @VisibleForTesting
+    protected OneLineSingleRobotContextPart createContext(
+            final LineTokenPosition lineInterval) {
+        return new OneLineSingleRobotContextPart(lineInterval.getLineNumber());
+    }
+
+
+    @VisibleForTesting
+    protected boolean isStartingFromLetter(final RobotToken token) {
         return isStartingFromLetter(extractText(token));
     }
 
 
-    private boolean isStartingFromLetter(String text) {
+    @VisibleForTesting
+    protected boolean isStartingFromLetter(String text) {
         boolean result = false;
         if (text != null && text.length() > 0) {
             char c = text.charAt(0);
@@ -107,7 +115,8 @@ public abstract class ATextualRecognizer implements IContextRecognizer {
     }
 
 
-    private String extractText(final RobotToken token) {
+    @VisibleForTesting
+    protected String extractText(final RobotToken token) {
         String value = null;
         StringBuilder text = token.getText();
         if (text != null) {
