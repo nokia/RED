@@ -70,6 +70,10 @@ public enum SimpleRobotContextType implements IContextElementType {
      */
     LINE_FEED_TEXT,
     /**
+     * \t
+     */
+    TABULATOR_TEXT,
+    /**
      * \xhh char with hex value
      */
     CHAR_WITH_BYTE_HEX_VALUE,
