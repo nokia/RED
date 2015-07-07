@@ -91,13 +91,6 @@ public class RedContentProposalAdapter {
                                         || (infoPopup != null && infoPopup.getShell() == activeShell)) {
                                     return;
                                 }
-                                /*
-                                 * System.out.println(e);
-                                 * System.out.println(e.display
-                                 * .getFocusControl());
-                                 * System.out.println(e.display
-                                 * .getActiveShell());
-                                 */
                                 close();
                             }
                         }

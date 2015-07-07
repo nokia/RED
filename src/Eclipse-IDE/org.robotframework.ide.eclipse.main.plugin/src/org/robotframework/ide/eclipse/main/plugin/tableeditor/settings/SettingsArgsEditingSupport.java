@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
@@ -44,7 +44,7 @@ class SettingsArgsEditingSupport extends RobotElementEditingSupport {
             final RobotSetting setting = (RobotSetting) element;
             final String arg = (String) value;
 
-            commandsStack.execute(new SetSettingKeywordCallArgument(setting, index, arg));
+            commandsStack.execute(new SetKeywordCallArgumentCommand(setting, index, arg));
         } else {
             super.setValue(element, value);
         }

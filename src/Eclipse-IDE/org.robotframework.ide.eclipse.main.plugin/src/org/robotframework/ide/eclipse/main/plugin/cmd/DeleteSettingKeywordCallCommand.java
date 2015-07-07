@@ -7,11 +7,11 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class DeleteSettingKeywordCall extends EditorCommand {
+public class DeleteSettingKeywordCallCommand extends EditorCommand {
 
     private final List<RobotSetting> settingsToRemove;
 
-    public DeleteSettingKeywordCall(final List<RobotSetting> settingsToRemove) {
+    public DeleteSettingKeywordCallCommand(final List<RobotSetting> settingsToRemove) {
         this.settingsToRemove = settingsToRemove;
     }
 

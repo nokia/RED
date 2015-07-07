@@ -20,11 +20,8 @@ class KeywordProposalsLabelProvider extends StylersDisposingLabelProvider {
         }
         Image image = images.get(imageDescriptor);
         if (image == null) {
-            System.out.println("not found: " + imageDescriptor.toString());
             image = imageDescriptor.createImage();
             images.put(imageDescriptor, image);
-        } else {
-            System.out.println("found in map!: " + imageDescriptor.toString());
         }
         return image;
     }

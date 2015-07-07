@@ -121,7 +121,6 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
                 support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
         contentProposalAdapter.setLabelProvider(labelProvider);
         contentProposalAdapter.setAutoActivationDelay(200);
-        contentProposalAdapter.setAutoActivationCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray());
         contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_REPLACE);
         text.addDisposeListener(new DisposeListener() {
             @Override

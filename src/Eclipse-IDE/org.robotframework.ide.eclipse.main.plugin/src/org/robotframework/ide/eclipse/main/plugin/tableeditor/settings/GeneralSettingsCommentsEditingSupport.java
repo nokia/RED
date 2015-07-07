@@ -9,8 +9,8 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallComment;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 class GeneralSettingsCommentsEditingSupport extends EditingSupport {
@@ -46,10 +46,10 @@ class GeneralSettingsCommentsEditingSupport extends EditingSupport {
         if (setting == null && !comment.isEmpty()) {
             final String keywordName = getSettingName(element);
             final GeneralSettingsModel model = (GeneralSettingsModel) getViewer().getInput();
-            commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), keywordName,
+            commandsStack.execute(new CreateSettingKeywordCallCommand(model.getSection(), keywordName,
                     new ArrayList<String>(), comment));
         } else if (setting != null) {
-            commandsStack.execute(new SetSettingKeywordCallComment(setting, comment));
+            commandsStack.execute(new SetKeywordCallCommentCommand(setting, comment));
         }
     }
 

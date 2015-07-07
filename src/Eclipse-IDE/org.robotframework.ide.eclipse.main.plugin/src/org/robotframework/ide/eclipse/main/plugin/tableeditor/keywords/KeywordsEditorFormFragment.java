@@ -24,17 +24,21 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 
 public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
@@ -110,37 +114,59 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        createNameColumn();
+        final NewElementsCreator creator = provideNewElementsCreator();
+
+        createNameColumn(creator);
         if (keywordsSectionIsDefined()) {
-            for (int i = 0; i < calculateLongestArgumentsList(); i++) {
-                createArgumentColumn(i);
+            final int maxLength = calculateLongestArgumentsList();
+            for (int i = 1; i <= maxLength; i++) {
+                createArgumentColumn(i, creator);
             }
-            createCommentColumn();
+            createCommentColumn(maxLength + 1, creator);
         }
     }
 
-    private void createNameColumn() {
+    private NewElementsCreator provideNewElementsCreator() {
+        return new NewElementsCreator() {
+
+            @Override
+            public RobotElement createNew(final Object parent) {
+                if (parent instanceof RobotKeywordsSection) {
+                    final RobotKeywordsSection section = (RobotKeywordsSection) parent;
+                    commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
+                    return section.getChildren().get(section.getChildren().size() - 1);
+                } else if (parent instanceof RobotKeywordDefinition) {
+                    final RobotKeywordDefinition definition = (RobotKeywordDefinition) parent;
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(definition, true));
+                    return definition.getChildren().get(definition.getChildren().size() - 1);
+                }
+                return null;
+            }
+        };
+    }
+
+    private void createNameColumn(final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(150)
             .shouldGrabAllTheSpaceLeft(!keywordsSectionIsDefined()).withMinWidth(50)
             .labelsProvidedBy(new UserKeywordNamesLabelProvider())            
-//            .editingSupportedBy(new CasesNameEditingSupport(viewer, commandsStack, creator))
+            .editingSupportedBy(new UserKeywordNamesEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
     }
 
-    private void createArgumentColumn(final int index) {
+    private void createArgumentColumn(final int index, final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(100)
             .labelsProvidedBy(new UserKeywordArgumentLabelProvider(index))
-    //        .editingSupportedBy(new KeywordCommentEditingSupport(viewer, commandsStack, null))
+            .editingSupportedBy(new UserKeywordArgumentEditingSupport(viewer, index, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
     }
 
-    private void createCommentColumn() {
+    private void createCommentColumn(final int index, final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
             .labelsProvidedBy(new UserKeywordCommentLabelProvider())
-            .editingSupportedBy(new UserKeywordCommentEditingSupport(viewer, commandsStack, null))
+            .editingSupportedBy(new UserKeywordCommentEditingSupport(viewer, index, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
     }
@@ -168,9 +194,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenFileChangedExternally(@UIEventTopic(ISectionEditorPart.SECTION_FILTERING_TOPIC + "/"
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotKeywordsSection.SECTION_NAME) final String filter) {
-        System.out.println("Requested filtering of keywords section with '" + filter + "'");
+        // nothing to do yet
     }
 
     @Inject
@@ -209,6 +235,26 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_STRUCTURAL_ALL) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
             viewer.refresh(definition);
+            dirtyProviderService.setDirtyState(true);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordDetailIsChanged(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_CHANGE_ALL) final RobotKeywordDefinition definition) {
+        if (definition.getSuiteFile() == fileModel) {
+            viewer.update(definition, null);
+            dirtyProviderService.setDirtyState(true);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordCallDetailIsChanged(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
+        if (keywordCall.getSuiteFile() == fileModel) {
+            viewer.update(keywordCall, null);
             dirtyProviderService.setDirtyState(true);
         }
     }

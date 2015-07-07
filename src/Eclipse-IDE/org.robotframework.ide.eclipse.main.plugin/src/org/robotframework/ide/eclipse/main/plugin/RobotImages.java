@@ -55,6 +55,10 @@ public class RobotImages {
         return RobotFramework.getImageDescriptor("resources/add.png");
     }
 
+    public static ImageDescriptor getMagnifierImage() {
+        return RobotFramework.getImageDescriptor("resources/magnifier.png");
+    }
+
     public static ImageDescriptor getTooltipImage() {
         return RobotFramework.getImageDescriptor("resources/tooltip.png");
     }

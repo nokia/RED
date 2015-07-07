@@ -94,6 +94,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             part.initialize(form.getBody());
         }
 
+        context.set(FocusedViewerAccessor.class, getActiveCellAccessor());
+
         site.setSelectionProvider(getSelectionProvider());
         prepareCommandsContext(site);
         createToolbarActions(site, form);
@@ -159,7 +161,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                         filter.getDisplay().syncExec(new Runnable() {
                             @Override
                             public void run() {
-                                eventBroker.send(ISectionEditorPart.SECTION_FILTERING_TOPIC + "/" + getSectionName(),
+                                eventBroker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + getSectionName(),
                                         filter.getText());
                             }
                         });
@@ -184,6 +186,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract List<? extends ISectionFormFragment> createFormFragments();
 
     protected abstract ISelectionProvider getSelectionProvider();
+
+    protected abstract FocusedViewerAccessor getActiveCellAccessor();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
         final IContextService service = (IContextService) site.getService(IContextService.class);
