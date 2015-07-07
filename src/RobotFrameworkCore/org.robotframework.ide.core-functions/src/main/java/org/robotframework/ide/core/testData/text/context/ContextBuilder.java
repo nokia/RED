@@ -8,13 +8,17 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithByteHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.DictionaryVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.EnvironmentVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.LineFeedTextualRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.ListVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.ScalarVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
@@ -35,12 +39,25 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * 
  * @see IContextRecognizer
  * @see DeclaredCommentRecognizer
+ * @see QuotesSentenceRecognizer
  * @see SettingTableHeaderRecognizer
  * @see VariableTableHeaderRecognizer
  * @see TestCaseTableHeaderRecognizer
+ * @see KeywordsTableHeaderRecognizer
+ * @see LineFeedTextualRecognizer
+ * @see TabulatorTextualRecognizer
+ * @see EmptyLineRecognizer
+ * @see CharacterWithByteHexValue
+ * @see CharacterWithShortHexValue
+ * @see UnicodeCharacterWithHexValue
+ * @see ScalarVariableRecognizer
+ * @see EnvironmentVariableRecognizer
+ * @see ListVariableRecognizer
+ * @see DictionaryVariableRecognizer
+ * 
  * @see DoubleSpaceOrTabulatorSeparatorRecognizer
  * @see PipeSeparatorRecognizer
- * @see CharacterWithByteHexValue
+ * 
  */
 public class ContextBuilder {
 
@@ -69,6 +86,11 @@ public class ContextBuilder {
         normalRecognizers.add(new CharacterWithByteHexValue());
         normalRecognizers.add(new CharacterWithShortHexValue());
         normalRecognizers.add(new UnicodeCharacterWithHexValue());
+
+        normalRecognizers.add(new ScalarVariableRecognizer());
+        normalRecognizers.add(new EnvironmentVariableRecognizer());
+        normalRecognizers.add(new ListVariableRecognizer());
+        normalRecognizers.add(new DictionaryVariableRecognizer());
 
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
