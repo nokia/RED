@@ -87,11 +87,11 @@ public enum RobotSingleCharTokenType implements IRobotTokenType {
     /**
      * '['
      */
-    SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET('['),
+    SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET('['),
     /**
      * ']'
      */
-    SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET(']'),
+    SINGLE_POSITION_INDEX_END_SQUARE_BRACKET(']'),
     /**
      * ':'
      */

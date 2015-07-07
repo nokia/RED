@@ -47,14 +47,14 @@ public class IndexBeginSquareSignMatcherTest {
                 expectedSequenceOfTypes = new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
-                        RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET,
-                        RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET };
+                        RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET,
+                        RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET };
                 assertThat(output.getTokens()).hasSize(4);
             } else {
                 expectedSequenceOfTypes = new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
-                        RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET };
+                        RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET };
                 assertThat(output.getTokens()).hasSize(3);
             }
             assertTokens(output, expectedSequenceOfTypes, 0, 1);
@@ -77,7 +77,7 @@ public class IndexBeginSquareSignMatcherTest {
 
         assertTokens(
                 output,
-                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET },
+                new RobotSingleCharTokenType[] { RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET },
                 0, 1);
     }
 
