@@ -12,9 +12,9 @@ package org.robotframework.ide.core.testData.text.lexer;
 public class RobotToken {
 
     private IRobotTokenType type = RobotSingleCharTokenType.UNKNOWN;
-    private final LinearPositionMarker startPosition;
+    private final FilePosition startPosition;
     private final StringBuilder text;
-    private final LinearPositionMarker endPosition;
+    private final FilePosition endPosition;
 
 
     /**
@@ -27,10 +27,10 @@ public class RobotToken {
      * @param text
      *            token text
      */
-    public RobotToken(final LinearPositionMarker start, final StringBuilder text) {
+    public RobotToken(final FilePosition start, final StringBuilder text) {
         this.startPosition = start;
         this.text = text;
-        this.endPosition = new LinearPositionMarker(start.getLine(),
+        this.endPosition = new FilePosition(start.getLine(),
                 start.getColumn() + text.length());
     }
 
@@ -46,8 +46,8 @@ public class RobotToken {
      * @param end
      *            where token end ups
      */
-    public RobotToken(final LinearPositionMarker start,
-            final StringBuilder text, final LinearPositionMarker end) {
+    public RobotToken(final FilePosition start,
+            final StringBuilder text, final FilePosition end) {
         this.startPosition = start;
         this.text = text;
         this.endPosition = end;
@@ -64,7 +64,7 @@ public class RobotToken {
     }
 
 
-    public LinearPositionMarker getStartPosition() {
+    public FilePosition getStartPosition() {
         return startPosition;
     }
 
@@ -74,7 +74,7 @@ public class RobotToken {
     }
 
 
-    public LinearPositionMarker getEndPosition() {
+    public FilePosition getEndPosition() {
         return endPosition;
     }
 

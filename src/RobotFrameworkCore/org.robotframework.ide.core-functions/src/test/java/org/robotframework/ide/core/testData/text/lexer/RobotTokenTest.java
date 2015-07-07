@@ -18,7 +18,7 @@ public class RobotTokenTest {
     @Test
     public void test_construction_withEndsComputeConstructor_startPositionIsFirstColumnAndLine_textIsEmpty() {
         // prepare
-        LinearPositionMarker start = LinearPositionMarker
+        FilePosition start = FilePosition
                 .createMarkerForFirstLineAndColumn();
         StringBuilder text = new StringBuilder();
 
@@ -28,7 +28,7 @@ public class RobotTokenTest {
         // verify
         assertThat(token.getStartPosition()).isEqualTo(start);
         assertThat(token.getText()).isEqualTo(text);
-        LinearPositionMarker endPosition = token.getEndPosition();
+        FilePosition endPosition = token.getEndPosition();
         assertThat(endPosition).isNotNull();
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(start.getColumn());
@@ -39,7 +39,7 @@ public class RobotTokenTest {
     @Test
     public void test_construction_withEndsComputeConstructor_startPositionIsFirstColumnAndLine_textIsFOOBAR() {
         // prepare
-        LinearPositionMarker start = LinearPositionMarker
+        FilePosition start = FilePosition
                 .createMarkerForFirstLineAndColumn();
         StringBuilder text = new StringBuilder("foobar");
 
@@ -49,7 +49,7 @@ public class RobotTokenTest {
         // verify
         assertThat(token.getStartPosition()).isEqualTo(start);
         assertThat(token.getText()).isEqualTo(text);
-        LinearPositionMarker endPosition = token.getEndPosition();
+        FilePosition endPosition = token.getEndPosition();
         assertThat(endPosition).isNotNull();
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(
@@ -61,10 +61,10 @@ public class RobotTokenTest {
     @Test
     public void test_construction_withSetEndsOfToken_startPositionIsFirstColumnAndLine_textIsEmpty() {
         // prepare
-        LinearPositionMarker start = LinearPositionMarker
+        FilePosition start = FilePosition
                 .createMarkerForFirstLineAndColumn();
         StringBuilder text = new StringBuilder();
-        LinearPositionMarker end = LinearPositionMarker
+        FilePosition end = FilePosition
                 .createMarkerForFirstLine(6);
 
         // execute
@@ -81,7 +81,7 @@ public class RobotTokenTest {
     @Test
     public void test_setTypeOfToken_textIsCarriageReturn() {
         // prepare
-        LinearPositionMarker start = LinearPositionMarker
+        FilePosition start = FilePosition
                 .createMarkerForFirstLineAndColumn();
         StringBuilder text = new StringBuilder('\r');
 
@@ -92,7 +92,7 @@ public class RobotTokenTest {
         // verify
         assertThat(token.getStartPosition()).isEqualTo(start);
         assertThat(token.getText()).isEqualTo(text);
-        LinearPositionMarker endPosition = token.getEndPosition();
+        FilePosition endPosition = token.getEndPosition();
         assertThat(endPosition).isNotNull();
         assertThat(endPosition.getLine()).isEqualTo(start.getLine());
         assertThat(endPosition.getColumn()).isEqualTo(

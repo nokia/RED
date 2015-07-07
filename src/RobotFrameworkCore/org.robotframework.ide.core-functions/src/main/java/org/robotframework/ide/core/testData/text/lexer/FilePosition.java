@@ -9,7 +9,7 @@ package org.robotframework.ide.core.testData.text.lexer;
  * @version Robot Framework 2.9 alpha 2
  * 
  */
-public class LinearPositionMarker {
+public class FilePosition {
 
     /**
      * Represents the first line number
@@ -23,7 +23,7 @@ public class LinearPositionMarker {
     private final int column;
 
 
-    public LinearPositionMarker(final int line, final int column) {
+    public FilePosition(final int line, final int column) {
         this.line = line;
         this.column = column;
     }
@@ -39,18 +39,18 @@ public class LinearPositionMarker {
     }
 
 
-    public static LinearPositionMarker createMarkerForFirstLineAndColumn() {
-        return new LinearPositionMarker(THE_FIRST_LINE, THE_FIRST_COLUMN);
+    public static FilePosition createMarkerForFirstLineAndColumn() {
+        return new FilePosition(THE_FIRST_LINE, THE_FIRST_COLUMN);
     }
 
 
-    public static LinearPositionMarker createMarkerForFirstLine(final int column) {
-        return new LinearPositionMarker(THE_FIRST_LINE, column);
+    public static FilePosition createMarkerForFirstLine(final int column) {
+        return new FilePosition(THE_FIRST_LINE, column);
     }
 
 
-    public static LinearPositionMarker createMarkerForFirstColumn(final int line) {
-        return new LinearPositionMarker(line, THE_FIRST_COLUMN);
+    public static FilePosition createMarkerForFirstColumn(final int line) {
+        return new FilePosition(line, THE_FIRST_COLUMN);
     }
 
 

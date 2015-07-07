@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.NumberType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -48,7 +48,7 @@ public class TokenOutputAsserationHelper {
 
     public static void assertTokensForUnknownWords(List<RobotToken> tokens,
             IRobotTokenType[] types, int startTokenPos,
-            LinearPositionMarker linePos,
+            FilePosition linePos,
             String[] textForCorrespondingUnknownWords) {
         int typesLength = types.length;
         CircullarArrayIterator<IRobotTokenType> iter = new CircullarArrayIterator<>(
@@ -72,7 +72,7 @@ public class TokenOutputAsserationHelper {
                 assertStartPosition(robotToken, line, column);
                 assertEndPosition(robotToken, line, column);
                 line++;
-                column = LinearPositionMarker.THE_FIRST_COLUMN;
+                column = FilePosition.THE_FIRST_COLUMN;
             } else {
                 if ((robotToken.getType() == RobotSingleCharTokenType.UNKNOWN || robotToken
                         .getType() == RobotWordType.UNKNOWN_WORD)
@@ -114,8 +114,8 @@ public class TokenOutputAsserationHelper {
             String[] textForCorrespondingUnknownWords) {
         List<RobotToken> tokens = out.getTokens();
         assertTokensForUnknownWords(tokens, types, startTokenPos,
-                new LinearPositionMarker(startLine,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(startLine,
+                        FilePosition.THE_FIRST_COLUMN),
                 textForCorrespondingUnknownWords);
     }
 
@@ -131,7 +131,7 @@ public class TokenOutputAsserationHelper {
         assertThat(tokens).isNotEmpty();
         assertThat((tokens.size() - startTokenPos) % typesLength).isEqualTo(0);
         int line = startLine;
-        int column = LinearPositionMarker.THE_FIRST_COLUMN;
+        int column = FilePosition.THE_FIRST_COLUMN;
         for (int tokId = startTokenPos; tokId < tokens.size(); tokId++) {
             RobotToken robotToken = tokens.get(tokId);
             assertThat(robotToken).isNotNull();
@@ -143,7 +143,7 @@ public class TokenOutputAsserationHelper {
                 assertStartPosition(robotToken, line, column);
                 assertEndPosition(robotToken, line, column);
                 line++;
-                column = LinearPositionMarker.THE_FIRST_COLUMN;
+                column = FilePosition.THE_FIRST_COLUMN;
             } else {
                 if (robotToken.getType().getClass() != MultipleCharTokenType.class
                         && robotToken.getType().isWriteable()) {
@@ -179,7 +179,7 @@ public class TokenOutputAsserationHelper {
 
 
     public static void assertCurrentPosition(TokenOutput output) {
-        LinearPositionMarker currentMarker = output.getCurrentMarker();
+        FilePosition currentMarker = output.getCurrentMarker();
         assertThat(currentMarker).isNotNull();
         LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = output
                 .getTokensPosition();
@@ -196,12 +196,12 @@ public class TokenOutputAsserationHelper {
 
     private static int currentColumn(TokenOutput output) {
         List<RobotToken> tokens = output.getTokens();
-        int column = LinearPositionMarker.THE_FIRST_COLUMN;
+        int column = FilePosition.THE_FIRST_COLUMN;
         if (!tokens.isEmpty()) {
             RobotToken robotToken = tokens.get(tokens.size() - 1);
             column = robotToken.getEndPosition().getColumn();
             if (robotToken.getType() == RobotSingleCharTokenType.END_OF_LINE) {
-                column = LinearPositionMarker.THE_FIRST_COLUMN;
+                column = FilePosition.THE_FIRST_COLUMN;
             }
         }
 
@@ -211,7 +211,7 @@ public class TokenOutputAsserationHelper {
 
     public static void assertStartPosition(RobotToken token, int line,
             int column) {
-        LinearPositionMarker startPosition = token.getStartPosition();
+        FilePosition startPosition = token.getStartPosition();
         assertThat(startPosition).isNotNull();
         assertThat(startPosition.getLine()).isEqualTo(line);
         assertThat(startPosition.getColumn()).isEqualTo(column);
@@ -219,7 +219,7 @@ public class TokenOutputAsserationHelper {
 
 
     public static void assertEndPosition(RobotToken token, int line, int column) {
-        LinearPositionMarker endPosition = token.getEndPosition();
+        FilePosition endPosition = token.getEndPosition();
         assertThat(endPosition).isNotNull();
         assertThat(endPosition.getLine()).isEqualTo(line);
         assertThat(endPosition.getColumn()).isEqualTo(column);
@@ -230,14 +230,14 @@ public class TokenOutputAsserationHelper {
         assertThat(output.getTokens()).isEmpty();
         assertThat(output.getTokensPosition().asMap()).isEmpty();
         assertCurrentMarkerPosition(output,
-                LinearPositionMarker.THE_FIRST_LINE,
-                LinearPositionMarker.THE_FIRST_COLUMN);
+                FilePosition.THE_FIRST_LINE,
+                FilePosition.THE_FIRST_COLUMN);
     }
 
 
     public static void assertCurrentMarkerPosition(final TokenOutput out,
             int line, int column) {
-        LinearPositionMarker currentMarker = out.getCurrentMarker();
+        FilePosition currentMarker = out.getCurrentMarker();
         assertThat(currentMarker).isNotNull();
         assertThat(currentMarker.getLine()).isEqualTo(line);
         assertThat(currentMarker.getColumn()).isEqualTo(column);
@@ -246,7 +246,7 @@ public class TokenOutputAsserationHelper {
 
     public static TokenOutput createTokenOutputWithTwoTabulatorsInside() {
         TokenOutput output = new TokenOutput();
-        LinearPositionMarker beginMarker = output.getCurrentMarker();
+        FilePosition beginMarker = output.getCurrentMarker();
 
         RobotToken tabulatorTokenOne = new RobotToken(beginMarker,
                 new StringBuilder("\t"));
@@ -270,7 +270,7 @@ public class TokenOutputAsserationHelper {
 
     public static TokenOutput createTokenOutputWithTwoAsterisksInside() {
         TokenOutput output = new TokenOutput();
-        LinearPositionMarker beginMarker = output.getCurrentMarker();
+        FilePosition beginMarker = output.getCurrentMarker();
 
         RobotToken asteriskTokenOne = new RobotToken(beginMarker,
                 new StringBuilder("*"));
