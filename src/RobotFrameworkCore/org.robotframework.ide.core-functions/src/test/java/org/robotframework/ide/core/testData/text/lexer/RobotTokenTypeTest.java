@@ -79,7 +79,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_POSSITION_INDEX_END_SQUARE_BRACKET() {
         char tokenChar = ']';
-        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSITION_INDEX_END_SQUARE_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
@@ -89,7 +89,7 @@ public class RobotTokenTypeTest {
     @Test
     public void test_typeSINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET() {
         char tokenChar = '[';
-        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET;
+        RobotSingleCharTokenType type = RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET;
 
         assertThat(type.getThisTokenChar()).isEqualTo(tokenChar);
         assertThat(type.toWrite()).isEqualTo("" + tokenChar);
