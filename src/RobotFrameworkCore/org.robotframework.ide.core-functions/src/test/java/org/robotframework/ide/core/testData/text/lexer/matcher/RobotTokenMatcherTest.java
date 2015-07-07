@@ -413,8 +413,8 @@ public class RobotTokenMatcherTest {
     @Test
     public void test_ifIndexSquareStartAndStopCanBeMatch() {
         IRobotTokenType[] expectedSequenceOfTypes = new IRobotTokenType[] {
-                RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_BEGIN_SQUARE_BRACKET,
-                RobotSingleCharTokenType.SINGLE_POSSITION_INDEX_END_SQUARE_BRACKET };
+                RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET,
+                RobotSingleCharTokenType.SINGLE_POSITION_INDEX_END_SQUARE_BRACKET };
         String text = "[]";
         assertThatCorrespondingMatcherWillBeUsed(text, expectedSequenceOfTypes);
     }

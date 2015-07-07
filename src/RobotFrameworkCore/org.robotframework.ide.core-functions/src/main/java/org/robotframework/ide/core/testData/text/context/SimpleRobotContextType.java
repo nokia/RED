@@ -88,5 +88,25 @@ public enum SimpleRobotContextType implements IContextElementType {
     /**
      * contains only space or tabulators or just nothing
      */
-    EMPTY_LINE;
+    EMPTY_LINE,
+    /**
+     * it could be usage of scalar ('$') or just declaration of them
+     */
+    SCALAR_VARIABLE,
+    /**
+     * it could be usage of list ('@') or just declaration of them
+     */
+    LIST_VARIABLE,
+    /**
+     * it could be usage of dictionary ('&') or just declaration of them
+     */
+    DICTIONARY_VARIABLE,
+    /**
+     * it could be usage of environment ('%') or just declaration of them
+     */
+    ENVIRONMENT_VARIABLE,
+    /**
+     * applies currently for list and dictionaries ( '[' ']' )
+     */
+    COLLECTION_TYPE_VARIABLE_POSITION;
 }
