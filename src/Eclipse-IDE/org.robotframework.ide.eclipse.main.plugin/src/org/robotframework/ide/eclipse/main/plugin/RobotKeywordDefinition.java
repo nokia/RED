@@ -90,4 +90,5 @@ public class RobotKeywordDefinition implements RobotElement, Serializable {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), (RobotSuiteFileSection) getParent(),
                 this);
     }
+
 }

@@ -583,16 +583,39 @@
           name="Assign to variable">
     </command>
     <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.openDeclaration"
           name="Open declaration">
     </command>
     <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.expandAll"
           name="Expand All">
     </command>
     <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.collapseAll"
           name="Collapse All">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.copyCellContent"
+          name="Copy cell content">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.cutCellContent"
+          name="Cut cell content">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.pasteCellContent"
+          name="Paste cell content">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.clearCellContent"
+          name="Clear cell content">
     </command>
  </extension>
  <extension
@@ -884,6 +907,20 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CopyCellContentHandler"
+          commandId="org.robotframework.ide.eclipse.copyCellContent">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.singleElementHasFocusedCell">
+          </reference>
+       </enabledWhen>
+    </handler>
  </extension>
  <extension
        name="Keywords part handlers"
@@ -1026,6 +1063,70 @@
           </reference>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutCellContentHandler"
+          commandId="org.robotframework.ide.eclipse.cutCellContent">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.singleElementHasFocusedCell">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+          </and>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteCellContentHandler"
+          commandId="org.robotframework.ide.eclipse.pasteCellContent">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="activeEditor">
+             <and>
+                <reference
+                      definitionId="org.robotframework.exactlyOneElementIsSelected">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.singleElementHasFocusedCell">
+                </reference>
+                <test
+                      property="org.robotframework.thereIsTextInClipboard"
+                      value="true">
+                </test>
+             </and>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteCellContentHandler"
+          commandId="org.robotframework.ide.eclipse.clearCellContent">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.singleElementHasFocusedCell">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+          </and>
+       </enabledWhen>
+    </handler>
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -1056,6 +1157,30 @@
              id="org.robotframework.ide.eclipse.findElementUsages.place"
              value="workspace">
        </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.cutCellContent"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+X">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.copyCellContent"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+C">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.pasteCellContent"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+V">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.clearCellContent"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+DEL">
     </key>
  </extension>
  <extension
@@ -1162,20 +1287,34 @@
        <menu
              label="Cell">
           <command
-                commandId="org.robotframework.ide.eclipse.expandAll"
-                icon="resources/expandall.png"
-                label="Expand All"
+                commandId="org.robotframework.ide.eclipse.cutCellContent"
+                icon="resources/cut_cell.png"
+                label="Cut cell content"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.copyCellContent"
+                icon="resources/copy_cell.png"
+                label="Copy cell content"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.pasteCellContent"
+                icon="resources/paste_cell.png"
+                label="Paste to cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.clearCellContent"
+                icon="resources/clear_cell.png"
+                label="Clear cell content"
                 style="push">
           </command>
           <visibleWhen
                 checkEnabled="false">
-             <with
-                   variable="activeEditor">
-                <test
-                      property="org.robotframework.table.cell.thereIsAFocusedCell"
-                      value="true">
-                </test>
-             </with>
+             <reference
+                   definitionId="org.robotframework.singleElementHasFocusedCell">
+             </reference>
           </visibleWhen>
        </menu>
        <separator
@@ -1357,7 +1496,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable,activeSectionEditorHasSection,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard"
+          properties="editorModelIsEditable,activeSectionEditorHasSection,thereIsTextInClipboard,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -1702,6 +1841,24 @@
              </instanceof>
           </iterate>
        </with>
+    </definition>
+    <definition
+          id="org.robotframework.singleElementHasFocusedCell">
+       <and>
+          <with
+                variable="selection">
+             <count
+                   value="1">
+             </count>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.table.cell.thereIsAFocusedCell"
+                   value="true">
+             </test>
+          </with>
+       </and>
     </definition>
  </extension>
  
