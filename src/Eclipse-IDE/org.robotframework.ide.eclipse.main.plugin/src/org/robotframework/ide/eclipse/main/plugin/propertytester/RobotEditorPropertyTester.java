@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import javax.inject.Named;
 
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.ui.IEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester.E4RobotEditorPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIPropertyTester;
@@ -45,6 +46,9 @@ public class RobotEditorPropertyTester extends DIPropertyTester<E4RobotEditorPro
             } else if ("thereAreKeywordCallElementsInClipboard".equals(propertyName)) {
                 final Clipboard clipboard = robotEditor.getClipboard();
                 return KeywordCallsTransfer.hasKeywordCalls(clipboard) == expected.booleanValue();
+            } else if ("thereIsTextInClipboard".equals(propertyName)) {
+                final Clipboard clipborad = robotEditor.getClipboard();
+                return (clipborad.getContents(TextTransfer.getInstance()) != null) == expected.booleanValue();
             }
             return false;
         }
