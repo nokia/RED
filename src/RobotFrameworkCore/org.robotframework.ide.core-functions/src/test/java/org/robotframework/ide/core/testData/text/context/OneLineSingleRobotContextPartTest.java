@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
@@ -110,14 +110,14 @@ public class OneLineSingleRobotContextPartTest {
     @Test
     public void test_getLineNumber_shouldReturn_THE_FIRST_LINE() {
         assertThat(context.getLineNumber()).isEqualTo(
-                LinearPositionMarker.THE_FIRST_LINE);
+                FilePosition.THE_FIRST_LINE);
     }
 
 
     @Before
     public void setUp() {
         context = new OneLineSingleRobotContextPart(
-                LinearPositionMarker.THE_FIRST_LINE);
+                FilePosition.THE_FIRST_LINE);
     }
 
 

@@ -16,7 +16,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -56,7 +56,7 @@ public class EmptyLineRecognizerTest extends ARecognizerTest {
         LineTokenPosition line = iter.next();
         if (line == null) {
             line = new LineTokenPosition(0, 0,
-                    LinearPositionMarker.THE_FIRST_LINE);
+                    FilePosition.THE_FIRST_LINE);
         }
         ContextOutput out = new ContextOutput(tokenOutput);
 

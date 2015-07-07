@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -64,7 +64,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(
                 separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR },
-                0, new LinearPositionMarker(1, 1), new String[] {});
+                0, new FilePosition(1, 1), new String[] {});
 
         element = recognize.get(1);
         assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -75,7 +75,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_TABULATOR,
                         RobotSingleCharTokenType.SINGLE_TABULATOR }, 0,
-                new LinearPositionMarker(1, text.length() + 1), new String[] {});
+                new FilePosition(1, text.length() + 1), new String[] {});
     }
 
 
@@ -106,7 +106,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(
                 separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR },
-                0, new LinearPositionMarker(1, 1), new String[] {});
+                0, new FilePosition(1, 1), new String[] {});
 
         element = recognize.get(1);
         assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -116,7 +116,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(
                 separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR },
-                0, new LinearPositionMarker(1, text.length() + 1),
+                0, new FilePosition(1, text.length() + 1),
                 new String[] {});
     }
 
@@ -147,7 +147,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, 1), new String[] {});
+                new FilePosition(1, 1), new String[] {});
 
         element = recognize.get(1);
         assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -157,7 +157,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE,
                         RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, text.length() + 1), new String[] {});
+                new FilePosition(1, text.length() + 1), new String[] {});
     }
 
 
@@ -187,7 +187,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, 1), new String[] {});
+                new FilePosition(1, 1), new String[] {});
 
         element = recognize.get(1);
         assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -196,7 +196,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, text.length() + 1), new String[] {});
+                new FilePosition(1, text.length() + 1), new String[] {});
     }
 
 
@@ -228,7 +228,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         element = recognize.get(1);
@@ -239,7 +239,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_TABULATOR }, 0,
-                new LinearPositionMarker(1, p.length() + 1), new String[] {});
+                new FilePosition(1, p.length() + 1), new String[] {});
     }
 
 
@@ -271,7 +271,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         element = recognize.get(1);
@@ -282,7 +282,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(
                 separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR },
-                0, new LinearPositionMarker(1, p.length() + 1), new String[] {});
+                0, new FilePosition(1, p.length() + 1), new String[] {});
     }
 
 
@@ -315,7 +315,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
         assertTokensForUnknownWords(
                 separator.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_TABULATOR },
-                0, new LinearPositionMarker(1, prefix.length() + 1),
+                0, new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         element = recognize.get(1);
@@ -325,7 +325,7 @@ public class DoubleSpaceOrTabulatorSeparatorRecognizerTest extends
                 SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
         assertTokensForUnknownWords(separator.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, p.length() + 1), new String[] {});
+                new FilePosition(1, p.length() + 1), new String[] {});
     }
 
 

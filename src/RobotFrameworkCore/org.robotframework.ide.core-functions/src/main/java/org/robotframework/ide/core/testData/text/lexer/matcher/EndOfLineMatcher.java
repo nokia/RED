@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.text.lexer.matcher;
 import java.nio.CharBuffer;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -95,12 +95,12 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
 
 
     private void addLineEnd(TokenOutput tokenOutput, RobotSingleCharTokenType type) {
-        LinearPositionMarker pos = tokenOutput.getCurrentMarker();
+        FilePosition pos = tokenOutput.getCurrentMarker();
         List<RobotToken> tokens = tokenOutput.getTokens();
         LinkedListMultimap<IRobotTokenType, Integer> tokensPosition = tokenOutput
                 .getTokensPosition();
         int column = pos.getColumn();
-        if (column > LinearPositionMarker.THE_FIRST_COLUMN) {
+        if (column > FilePosition.THE_FIRST_COLUMN) {
             column += 1;
         }
 
@@ -118,7 +118,7 @@ public class EndOfLineMatcher implements ISingleCharTokenMatcher {
         tokens.add(eolToken);
         tokensPosition.put(RobotSingleCharTokenType.END_OF_LINE, tokens.size() - 1);
 
-        tokenOutput.setCurrentMarker(LinearPositionMarker
+        tokenOutput.setCurrentMarker(FilePosition
                 .createMarkerForFirstColumn(pos.getLine() + 1));
     }
 }

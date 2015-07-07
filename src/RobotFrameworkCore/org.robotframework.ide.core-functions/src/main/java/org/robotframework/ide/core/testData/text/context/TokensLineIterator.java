@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
@@ -62,7 +62,7 @@ public class TokensLineIterator implements Iterator<LineTokenPosition> {
                 if (numberOfLineEnds > 0) {
                     currentPosition = new LineTokenPosition(0,
                             listOfLineEnds.get(0),
-                            LinearPositionMarker.THE_FIRST_LINE);
+                            FilePosition.THE_FIRST_LINE);
                 } else {
                     // case when only one line exits in file, but the first we
                     // ensure that file is not empty
@@ -70,7 +70,7 @@ public class TokensLineIterator implements Iterator<LineTokenPosition> {
                     if (numberOfTokens > 0) {
                         currentPosition = new LineTokenPosition(0,
                                 numberOfTokens,
-                                LinearPositionMarker.THE_FIRST_LINE);
+                                FilePosition.THE_FIRST_LINE);
                     } else {
                         currentPosition = null;
                     }

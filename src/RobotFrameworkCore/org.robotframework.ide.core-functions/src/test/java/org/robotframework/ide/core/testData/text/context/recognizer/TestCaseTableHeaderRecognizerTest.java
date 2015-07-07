@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
@@ -66,7 +66,7 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
                         RobotWordType.TEST_WORD, RobotWordType.DOUBLE_SPACE,
                         RobotWordType.CASE_WORD,
                         RobotSingleCharTokenType.SINGLE_ASTERISK }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
         assertTokensForUnknownWords(
                 ((OneLineSingleRobotContextPart) recognize.get(1)).getContextTokens(),
@@ -74,7 +74,7 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.TEST_WORD, RobotWordType.DOUBLE_SPACE,
                         RobotWordType.CASES_WORD }, 0,
-                new LinearPositionMarker(1, p.length() + 1), new String[] {});
+                new FilePosition(1, p.length() + 1), new String[] {});
     }
 
 
@@ -108,7 +108,7 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.CASE_WORD,
                         RobotSingleCharTokenType.SINGLE_ASTERISK }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
         assertTokensForUnknownWords(
                 ((OneLineSingleRobotContextPart) recognize.get(1)).getContextTokens(),
@@ -117,7 +117,7 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
                         RobotWordType.TEST_WORD,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.CASES_WORD }, 0,
-                new LinearPositionMarker(1, p.length() + 1), new String[] {});
+                new FilePosition(1, p.length() + 1), new String[] {});
     }
 
 

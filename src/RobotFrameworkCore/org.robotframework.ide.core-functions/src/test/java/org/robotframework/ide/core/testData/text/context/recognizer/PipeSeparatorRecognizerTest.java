@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -62,7 +62,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
@@ -73,7 +73,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertTokensForUnknownWords(
                 contextTwo.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE },
-                0, new LinearPositionMarker(1, 11), new String[] {});
+                0, new FilePosition(1, 11), new String[] {});
     }
 
 
@@ -103,7 +103,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
     }
@@ -137,7 +137,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, 1), new String[] {});
+                new FilePosition(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
         assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -148,7 +148,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_PIPE,
                         RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         IContextElement elementThree = recognize.get(2);
@@ -159,7 +159,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertTokensForUnknownWords(
                 contextThree.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE },
-                0, new LinearPositionMarker(1, 7), new String[] {});
+                0, new FilePosition(1, 7), new String[] {});
     }
 
 
@@ -191,7 +191,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, 1), new String[] {});
+                new FilePosition(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
         assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
@@ -202,7 +202,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_PIPE,
                         RobotWordType.DOUBLE_SPACE }, 0,
-                new LinearPositionMarker(1, prefix.length() + 1),
+                new FilePosition(1, prefix.length() + 1),
                 new String[] {});
 
         IContextElement elementThree = recognize.get(2);
@@ -213,7 +213,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
         assertTokensForUnknownWords(
                 contextThree.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE },
-                0, new LinearPositionMarker(1, 7), new String[] {});
+                0, new FilePosition(1, 7), new String[] {});
     }
 
 
