@@ -48,7 +48,8 @@ public class ContextElementComparatorTest {
         AggregatedOneLineRobotContexts contextTwo = mock(AggregatedOneLineRobotContexts.class);
         AggregatedOneLineRobotContexts contextOne = mock(AggregatedOneLineRobotContexts.class);
 
-        AnswerRecorder recorder = new AnswerRecorder<>(new Returns(0));
+        @SuppressWarnings("rawtypes")
+        AnswerRecorder recorder = new AnswerRecorder(new Returns(0));
 
         // execute
         dummy = spy(new ContextElementComparator());
@@ -93,11 +94,11 @@ public class ContextElementComparatorTest {
         FilePosition posTokenFromContextOne = mock(FilePosition.class);
         when(tokenFromContextOne.getStartPosition()).thenReturn(
                 posTokenFromContextOne);
-        @SuppressWarnings("unchecked")
         List<RobotToken> toksOne = mock(List.class);
         when(toksOne.get(0)).thenReturn(tokenFromContextOne);
         when(contextOne.getContextTokens()).thenReturn(toksOne);
-        AnswerRecorder recorder = new AnswerRecorder<>(new Returns(0));
+        @SuppressWarnings("rawtypes")
+        AnswerRecorder recorder = new AnswerRecorder(new Returns(0));
 
         // execute
         dummy = spy(new ContextElementComparator());
@@ -144,11 +145,11 @@ public class ContextElementComparatorTest {
         FilePosition posTokenFromContextTwo = mock(FilePosition.class);
         when(tokenFromContextTwo.getStartPosition()).thenReturn(
                 posTokenFromContextTwo);
-        @SuppressWarnings("unchecked")
         List<RobotToken> toksTwo = mock(List.class);
         when(toksTwo.get(0)).thenReturn(tokenFromContextTwo);
         when(contextTwo.getContextTokens()).thenReturn(toksTwo);
-        AnswerRecorder recorder = new AnswerRecorder<>(new Returns(0));
+        @SuppressWarnings("rawtypes")
+        AnswerRecorder recorder = new AnswerRecorder(new Returns(0));
 
         // execute
         dummy = spy(new ContextElementComparator());
