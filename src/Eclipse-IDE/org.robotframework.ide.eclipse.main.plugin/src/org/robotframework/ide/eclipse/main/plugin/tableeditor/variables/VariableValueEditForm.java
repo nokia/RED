@@ -156,21 +156,29 @@ public class VariableValueEditForm {
     }
 
     private void createInputForList(final List<RobotCollectionElement> elements, final String[] values) {
+        int j = 0;
         for (int i = 0; i < values.length; i++) {
             if (!values[i].equals("")) {
-                elements.add(createNewCollectionElement(i, values[i]));
+                elements.add(createNewCollectionElement(j, values[i]));
+                j++;
             }
         }
     }
 
     private void createInputForDictionary(final List<RobotCollectionElement> elements, final String[] values) {
         String[] keyValuePair;
+        int j = 0;
         for (int i = 0; i < values.length; i++) {
-            if (!values[i].equals("")) {
+            if (!values[i].equals("") && values[i].contains("=")) {
                 keyValuePair = values[i].split("=");
                 if (keyValuePair.length == 2) {
-                    elements.add(createNewCollectionElement(i, keyValuePair[0], keyValuePair[1]));
+                    elements.add(createNewCollectionElement(j, keyValuePair[0], keyValuePair[1]));
+                } else if (keyValuePair.length == 1) {
+                    elements.add(createNewCollectionElement(j, keyValuePair[0], ""));
+                } else {
+                    elements.add(createNewCollectionElement(j, "", ""));
                 }
+                j++;
             }
         }
     }
@@ -358,7 +366,7 @@ public class VariableValueEditForm {
     }
     
     public void variableChangedInMainTable(final RobotVariable variable) {
-        if (!isEditedInForm) {  //change input only when event is from main variables table
+        if (!isEditedInForm && variable == this.variable) {  //change input only when event is from main variables table and selected variable is the same as edited
             final String[] values = variable.getValue().split(COLLECTION_SEPARATOR_REGEX);
 
             collectionElements = new ArrayList<RobotCollectionElement>();
