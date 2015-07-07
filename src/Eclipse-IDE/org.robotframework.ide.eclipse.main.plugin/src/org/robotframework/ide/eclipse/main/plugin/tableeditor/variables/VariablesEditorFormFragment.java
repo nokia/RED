@@ -248,12 +248,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             setInput();
             dirtyProviderService.setDirtyState(true);
             
-            if (valueEditFormPanel != null) {
-                valueEditFormPanel.dispose();
-            }
-            valueEditFormPanel = toolkit.createComposite(editSection);
-            editSection.setClient(valueEditFormPanel);
-            editSection.layout();
+            clearValueEditFormPanel();
         }
     }
 
@@ -332,5 +327,27 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void variableTypeChange(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE) final RobotVariable variable) {
         setupValueEditFormPanel(variable);
+    }
+    
+    @Inject
+    @Optional
+    private void variableAdded(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection variablesSection) {
+        viewer.getTable().setSortColumn(null);
+        viewer.setComparator(null);
+    }
+    
+    @Inject
+    @Optional
+    private void variableRemoved(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection variablesSection) {
+        clearValueEditFormPanel();
+    }
+    
+    private void clearValueEditFormPanel() {
+        if (valueEditFormPanel != null) {
+            valueEditFormPanel.dispose();
+        }
+        valueEditFormPanel = toolkit.createComposite(editSection);
+        editSection.setClient(valueEditFormPanel);
+        editSection.layout();
     }
 }
