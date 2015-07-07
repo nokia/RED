@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +17,11 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -75,11 +80,14 @@ import org.eclipse.team.internal.ui.history.FileRevisionEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.texteditor.AnnotationType;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
+import org.eclipse.ui.texteditor.FindReplaceAction;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
@@ -134,7 +142,7 @@ public class TextEditor {
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
         highlightingColor = new Color(parent.getDisplay(), 198, 219, 174);
-
+        
 	    this.input = input;
 
 		final FillLayout layout = new FillLayout();
@@ -142,7 +150,7 @@ public class TextEditor {
         parent.setLayout(layout);
         
         final ParameterizedCommand saveAsCommand = this.createSaveAsCommand();
-		
+        
         FileEditorInput fileEditorInput = null;
         if(input instanceof FileEditorInput) {
         	fileEditorInput = (FileEditorInput) input;
@@ -235,6 +243,8 @@ public class TextEditor {
 		reconciler.install(viewer);
 		
 		occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer, editedFile);
+		
+		activateFindReplaceAction(parent, editorPart);
 		
 		//TODO Add Listener classes
 		viewer.getTextWidget().addModifyListener(new ModifyListener() {
@@ -405,14 +415,31 @@ public class TextEditor {
 	
 	private ParameterizedCommand createSaveAsCommand() {
 		ParameterizedCommand cmd = null;
-		final Command saveAsCommand = commandService.getCommand("org.eclipse.ui.file.saveAs");
+		final Command saveAsCommand = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_AS);
 		if (saveAsCommand.isDefined()) {
-			handlerService.activateHandler("org.eclipse.ui.file.saveAs",new SaveAsHandler());
-			cmd = commandService.createCommand("org.eclipse.ui.file.saveAs", null);
+			handlerService.activateHandler(IWorkbenchCommandConstants.FILE_SAVE_AS,new SaveAsHandler());
+			cmd = commandService.createCommand(IWorkbenchCommandConstants.FILE_SAVE_AS, null);
 			handlerService.canExecute(cmd);
 		}
 		return cmd;
 	}
+	
+    private void activateFindReplaceAction(Composite parent, IEditorPart editorPart) {
+
+        final FindReplaceAction findAction = new FindReplaceAction(
+                ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedTextEditorMessages"), null,
+                parent.getShell(), viewer.getFindReplaceTarget());
+        IHandlerService hs = (IHandlerService) editorPart.getSite().getService(IHandlerService.class);
+        IHandler findReplaceHandler = new AbstractHandler() {
+
+            public Object execute(ExecutionEvent event) throws ExecutionException {
+                if (viewer != null && viewer.getDocument() != null)
+                    findAction.run();
+                return null;
+            }
+        };
+        hs.activateHandler(IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE, findReplaceHandler);
+    }
 	
 	private String extractTextFromFile() {
 		Scanner scanner = null;
