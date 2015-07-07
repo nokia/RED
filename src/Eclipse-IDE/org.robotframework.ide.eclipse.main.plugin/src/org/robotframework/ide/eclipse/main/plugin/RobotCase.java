@@ -1,7 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -19,13 +20,13 @@ public class RobotCase implements RobotElement {
     }
 
     public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, name, Arrays.asList(args), comment);
+        final RobotKeywordCall call = new RobotKeywordCall(this, name, newArrayList(args), comment);
         elements.add(call);
         return call;
     }
 
     public RobotCaseSetting createSettting(final String name, final String[] args, final String comment) {
-        final RobotCaseSetting setting = new RobotCaseSetting(this, name, Arrays.asList(args), comment);
+        final RobotCaseSetting setting = new RobotCaseSetting(this, name, newArrayList(args), comment);
         elements.add(setting);
         return setting;
     }

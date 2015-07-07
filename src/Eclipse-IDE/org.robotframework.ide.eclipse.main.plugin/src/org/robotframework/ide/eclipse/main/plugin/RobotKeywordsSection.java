@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class RobotKeywordsSection extends RobotSuiteFileSection {
@@ -15,7 +14,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     RobotKeywordDefinition createKeywordDefinition(final String name, final String[] arguments, final String comment) {
         final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name,
-                Arrays.asList(arguments), comment);
+                newArrayList(arguments), comment);
         elements.add(keywordDefinition);
         return keywordDefinition;
     }

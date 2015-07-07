@@ -27,15 +27,22 @@ public class ElementAddingToken {
     private final String newElementTypeName;
     private final boolean enabled;
     private final int rank;
+    private final Object parent;
 
     public ElementAddingToken(final String newElementTypeName, final boolean isEnabled) {
-        this(newElementTypeName, isEnabled, 0);
+        this(null, newElementTypeName, isEnabled, 0);
     }
 
-    public ElementAddingToken(final String newElementTypeName, final boolean isEnabled, final int rank) {
+    public ElementAddingToken(final Object parent, final String newElementTypeName, final boolean isEnabled,
+            final int rank) {
+        this.parent = parent;
         this.newElementTypeName = newElementTypeName;
         this.enabled = isEnabled;
         this.rank = rank;
+    }
+
+    public Object getParent() {
+        return parent;
     }
 
     /**

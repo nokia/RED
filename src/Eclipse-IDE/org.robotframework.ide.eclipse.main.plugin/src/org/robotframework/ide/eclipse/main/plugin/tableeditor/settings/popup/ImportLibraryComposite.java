@@ -37,8 +37,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.viewers.Selections;
@@ -126,7 +126,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
                 final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
                 for (final LibrarySpecification spec : specs) {
-                    commandsStack.execute(new CreateSettingKeywordCall(settingsSection, "Library", newArrayList(spec
+                    commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Library", newArrayList(spec
                             .getName())));
                 }
 
@@ -150,7 +150,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
                 final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
                 final List<RobotSetting> settingsToRemove = getSettingsToRemove(settingsSection, specs);
-                commandsStack.execute(new DeleteSettingKeywordCall(settingsToRemove));
+                commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
 
                 leftViewer.refresh();
                 rightViewer.refresh();
