@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallComment;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
@@ -39,7 +39,7 @@ class SettingsCommentsEditingSupport extends RobotElementEditingSupport {
             final RobotSetting setting = (RobotSetting) element;
             final String comment = (String) value;
 
-            commandsStack.execute(new SetSettingKeywordCallComment(setting, comment));
+            commandsStack.execute(new SetKeywordCallCommentCommand(setting, comment));
         } else {
             super.setValue(element, value);
         }

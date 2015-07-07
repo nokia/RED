@@ -42,7 +42,8 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ElementAddingToken) {
-            scheduleViewerRefreshAndEditorActivation(creator.createNew(), index);
+            scheduleViewerRefreshAndEditorActivation(creator.createNew(((ElementAddingToken) element).getParent()),
+                    index);
         }
     }
 
@@ -60,8 +61,14 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
         });
     }
 
-    public interface NewElementsCreator {
+    public static class NewElementsCreator {
 
-        RobotElement createNew();
+        public RobotElement createNew() {
+            return null;
+        }
+
+        public RobotElement createNew(final Object parent) {
+            return createNew();
+        }
     }
 }

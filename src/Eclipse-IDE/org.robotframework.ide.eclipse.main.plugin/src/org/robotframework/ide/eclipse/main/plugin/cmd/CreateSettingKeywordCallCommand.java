@@ -6,19 +6,19 @@ import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class CreateSettingKeywordCall extends EditorCommand {
+public class CreateSettingKeywordCallCommand extends EditorCommand {
 
     private final RobotSuiteSettingsSection settingsSection;
     private final String keywordName;
     private final List<String> args;
     private final String comment;
 
-    public CreateSettingKeywordCall(final RobotSuiteSettingsSection settingsSection, final String keywordName,
+    public CreateSettingKeywordCallCommand(final RobotSuiteSettingsSection settingsSection, final String keywordName,
             final List<String> args) {
         this(settingsSection, keywordName, args, "");
     }
 
-    public CreateSettingKeywordCall(final RobotSuiteSettingsSection settingsSection, final String keywordName,
+    public CreateSettingKeywordCallCommand(final RobotSuiteSettingsSection settingsSection, final String keywordName,
             final List<String> args, final String comment) {
         this.settingsSection = settingsSection;
         this.keywordName = keywordName;

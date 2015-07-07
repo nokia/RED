@@ -51,14 +51,14 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetSettingKeywordCallArgument;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
@@ -297,12 +297,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         }
 
         if (currentSetting == null && !newDocumentation.isEmpty()) {
-            commandsStack.execute(new CreateSettingKeywordCall(model.getSection(), "Documentation",
+            commandsStack.execute(new CreateSettingKeywordCallCommand(model.getSection(), "Documentation",
                     newArrayList(newDocumentation)));
         } else if (currentSetting != null && newDocumentation.isEmpty()) {
-            commandsStack.execute(new DeleteSettingKeywordCall(newArrayList(currentSetting)));
+            commandsStack.execute(new DeleteSettingKeywordCallCommand(newArrayList(currentSetting)));
         } else if (currentSetting != null) {
-            commandsStack.execute(new SetSettingKeywordCallArgument(currentSetting, 0, newDocumentation));
+            commandsStack.execute(new SetKeywordCallArgumentCommand(currentSetting, 0, newDocumentation));
         }
     }
 
@@ -330,7 +330,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenSettingDetailsChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && model.contains(setting)) {
             setInput(false);
             dirtyProviderService.setDirtyState(true);

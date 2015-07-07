@@ -2,34 +2,40 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import java.util.ArrayList;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshKeywordCallCommand extends EditorCommand {
 
-    private final RobotCase testCase;
+    private final RobotElement parent;
     private final int index;
+    private final boolean notifySync;
 
-    public CreateFreshKeywordCallCommand(final RobotCase testCase) {
-        this(testCase, -1);
+    public CreateFreshKeywordCallCommand(final RobotElement parent, final boolean notifySync) {
+        this(parent, -1, notifySync);
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCase testCase, final int index) {
-        this.testCase = testCase;
+    public CreateFreshKeywordCallCommand(final RobotElement parent, final int index, final boolean notifySync) {
+        this.parent = parent;
         this.index = index;
+        this.notifySync = notifySync;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        final RobotKeywordCall keywordCall = new RobotKeywordCall(testCase, "", new ArrayList<String>(), "");
+        final RobotKeywordCall keywordCall = new RobotKeywordCall(parent, "", new ArrayList<String>(), "");
         if (index == -1) {
-            testCase.getChildren().add(keywordCall);
+            parent.getChildren().add(keywordCall);
         } else {
-            testCase.getChildren().add(index, keywordCall);
+            parent.getChildren().add(index, keywordCall);
         }
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        if (notifySync) {
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+        } else {
+            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+        }
     }
 }

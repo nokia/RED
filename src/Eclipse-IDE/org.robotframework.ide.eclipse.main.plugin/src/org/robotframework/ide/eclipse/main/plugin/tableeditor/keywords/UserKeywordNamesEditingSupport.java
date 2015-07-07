@@ -2,27 +2,26 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
-class UserKeywordCommentEditingSupport extends RobotElementEditingSupport {
+public class UserKeywordNamesEditingSupport extends RobotElementEditingSupport {
 
-    UserKeywordCommentEditingSupport(final ColumnViewer viewer, final int index,
-            final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
-        super(viewer, index, commandsStack, creator);
+    public UserKeywordNamesEditingSupport(final RowExposingTreeViewer viewer,
+            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
+        super(viewer, 0, commandsStack, creator);
     }
 
     @Override
     protected CellEditor getCellEditor(final Object element) {
-        final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotKeywordDefinition || element instanceof RobotKeywordCall) {
+            final Composite parent = (Composite) getViewer().getControl();
             return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
                     DETAILS_EDITING_CONTEXT_ID);
         }
@@ -43,10 +42,10 @@ class UserKeywordCommentEditingSupport extends RobotElementEditingSupport {
     protected void setValue(final Object element, final Object value) {
         if (element instanceof RobotKeywordDefinition) {
             final String comment = (String) value;
-            commandsStack.execute(new SetKeywordDefinitionCommentCommand((RobotKeywordDefinition) element, comment));
+            commandsStack.execute(new SetKeywordDefinitionNameCommand((RobotKeywordDefinition) element, comment));
         } else if (element instanceof RobotKeywordCall) {
             final String comment = (String) value;
-            commandsStack.execute(new SetKeywordCallCommentCommand((RobotKeywordCall) element, comment));
+            commandsStack.execute(new SetKeywordCallNameCommand((RobotKeywordCall) element, comment));
         } else {
             super.setValue(element, value);
         }

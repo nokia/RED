@@ -1,8 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,7 +26,7 @@ public class RobotKeywordDefinition implements RobotElement, Serializable {
     }
 
     RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, name, Arrays.asList(args), comment);
+        final RobotKeywordCall call = new RobotKeywordCall(this, name, newArrayList(args), comment);
         elements.add(call);
         return call;
     }
