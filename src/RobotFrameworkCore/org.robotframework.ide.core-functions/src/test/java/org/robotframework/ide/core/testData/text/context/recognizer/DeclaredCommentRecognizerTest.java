@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
@@ -61,7 +61,7 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.UNKNOWN_WORD }, 0,
-                new LinearPositionMarker(1, 2), new String[] { commentText });
+                new FilePosition(1, 2), new String[] { commentText });
     }
 
 
@@ -90,8 +90,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
                         RobotWordType.UNKNOWN_WORD }, 0,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 
@@ -123,8 +123,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         MultipleCharTokenType.MANY_COMMENT_HASHS,
                         RobotWordType.UNKNOWN_WORD }, 4,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 
@@ -156,8 +156,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
                         RobotWordType.UNKNOWN_WORD }, 4,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 
@@ -188,8 +188,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                 new IRobotTokenType[] { RobotWordType.COMMENT_FROM_BUILTIN,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.UNKNOWN_WORD }, 9,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 
@@ -221,8 +221,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                         MultipleCharTokenType.MANY_COMMENT_HASHS,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.UNKNOWN_WORD }, 4,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 
@@ -254,8 +254,8 @@ public class DeclaredCommentRecognizerTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.UNKNOWN_WORD }, 9,
-                new LinearPositionMarker(1,
-                        LinearPositionMarker.THE_FIRST_COLUMN),
+                new FilePosition(1,
+                        FilePosition.THE_FIRST_COLUMN),
                 new String[] { commentText });
     }
 

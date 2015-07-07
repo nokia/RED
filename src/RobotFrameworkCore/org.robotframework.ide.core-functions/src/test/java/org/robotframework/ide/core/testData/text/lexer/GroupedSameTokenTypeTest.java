@@ -134,8 +134,8 @@ public class GroupedSameTokenTypeTest {
         assertThat(type.getWrappedType()).isEqualTo(RobotSingleCharTokenType.SINGLE_DOT);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
-                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
-                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+                FilePosition.createMarkerForFirstLineAndColumn(), null,
+                FilePosition.createMarkerForFirstLineAndColumn());
         token.setType(MultipleCharTokenType.MORE_THAN_THREE_DOTS);
         assertThat(type.isFromThisGroup(token));
         token.setType(RobotSingleCharTokenType.SINGLE_DOT);
@@ -160,8 +160,8 @@ public class GroupedSameTokenTypeTest {
                 RobotSingleCharTokenType.SINGLE_COMMENT_HASH);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
-                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
-                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+                FilePosition.createMarkerForFirstLineAndColumn(), null,
+                FilePosition.createMarkerForFirstLineAndColumn());
         token.setType(MultipleCharTokenType.MANY_COMMENT_HASHS);
         assertThat(type.isFromThisGroup(token));
         token.setType(RobotSingleCharTokenType.SINGLE_COMMENT_HASH);
@@ -186,8 +186,8 @@ public class GroupedSameTokenTypeTest {
                 RobotSingleCharTokenType.SINGLE_ASTERISK);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
-                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
-                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+                FilePosition.createMarkerForFirstLineAndColumn(), null,
+                FilePosition.createMarkerForFirstLineAndColumn());
         token.setType(MultipleCharTokenType.MANY_ASTERISKS);
         assertThat(type.isFromThisGroup(token));
         token.setType(RobotSingleCharTokenType.SINGLE_ASTERISK);
@@ -211,8 +211,8 @@ public class GroupedSameTokenTypeTest {
         assertThat(type.getWrappedType()).isEqualTo(RobotSingleCharTokenType.UNKNOWN);
         assertThat(type.isWriteable()).isFalse();
         RobotToken token = new RobotToken(
-                LinearPositionMarker.createMarkerForFirstLineAndColumn(), null,
-                LinearPositionMarker.createMarkerForFirstLineAndColumn());
+                FilePosition.createMarkerForFirstLineAndColumn(), null,
+                FilePosition.createMarkerForFirstLineAndColumn());
         token.setType(MultipleCharTokenType.UNKNOWN);
         assertThat(type.isFromThisGroup(token));
         try {

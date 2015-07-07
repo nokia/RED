@@ -11,7 +11,7 @@ import org.junit.Test;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see LinearPositionMarker
+ * @see FilePosition
  */
 public class LinearPositionMarkerTest {
 
@@ -20,7 +20,7 @@ public class LinearPositionMarkerTest {
         // prepare & execute
         int line = 5;
         int column = 6;
-        LinearPositionMarker lineMarker = new LinearPositionMarker(line, column);
+        FilePosition lineMarker = new FilePosition(line, column);
 
         // verify
         assertThat(lineMarker.getLine()).isEqualTo(line);
@@ -31,16 +31,16 @@ public class LinearPositionMarkerTest {
     @Test
     public void test_createMarkerForFirstLineAndColumn_shouldReturn_lineNumberONE_columnNumberONE() {
         // prepare & execute
-        LinearPositionMarker lineMarker = LinearPositionMarker
+        FilePosition lineMarker = FilePosition
                 .createMarkerForFirstLineAndColumn();
 
         // verify
         int line = lineMarker.getLine();
         int column = lineMarker.getColumn();
         assertThat(line).isEqualTo(1);
-        assertThat(line).isEqualTo(LinearPositionMarker.THE_FIRST_LINE);
+        assertThat(line).isEqualTo(FilePosition.THE_FIRST_LINE);
         assertThat(column).isEqualTo(1);
-        assertThat(column).isEqualTo(LinearPositionMarker.THE_FIRST_COLUMN);
+        assertThat(column).isEqualTo(FilePosition.THE_FIRST_COLUMN);
     }
 
 
@@ -48,11 +48,11 @@ public class LinearPositionMarkerTest {
     public void test_createMarkerForFirstLine_shouldReturn_lineNumberONE() {
         // prepare & execute
         int column = 3;
-        LinearPositionMarker lineMarker = LinearPositionMarker
+        FilePosition lineMarker = FilePosition
                 .createMarkerForFirstLine(column);
 
         // verify
-        assertThat(lineMarker.getLine()).isEqualTo(LinearPositionMarker.THE_FIRST_LINE);
+        assertThat(lineMarker.getLine()).isEqualTo(FilePosition.THE_FIRST_LINE);
         assertThat(lineMarker.getColumn()).isEqualTo(column);
     }
 
@@ -61,11 +61,11 @@ public class LinearPositionMarkerTest {
     public void test_createMarkerForFirstColumn_shouldReturn_columnNumberONE() {
         // prepare & execute
         int line = 3;
-        LinearPositionMarker lineMarker = LinearPositionMarker
+        FilePosition lineMarker = FilePosition
                 .createMarkerForFirstColumn(line);
 
         // verify
         assertThat(lineMarker.getLine()).isEqualTo(line);
-        assertThat(lineMarker.getColumn()).isEqualTo(LinearPositionMarker.THE_FIRST_COLUMN);
+        assertThat(lineMarker.getColumn()).isEqualTo(FilePosition.THE_FIRST_COLUMN);
     }
 }

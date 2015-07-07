@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.LowLevelTypesProvider;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -20,7 +20,7 @@ import com.google.common.collect.LinkedListMultimap;
 /**
  * This class take responsibility for builds up expected tokens. It the first
  * take char by char in
- * {@link #offerChar(CharBuffer, int, LinearPositionMarker)} method and after in
+ * {@link #offerChar(CharBuffer, int, FilePosition)} method and after in
  * {@link #buildTokens()} it returns all matched elements.
  * 
  * @author wypych
@@ -203,7 +203,7 @@ public class RobotTokenMatcher {
 
         private LinkedListMultimap<IRobotTokenType, Integer> tokenTypeToPositionOfOcurrancy = LinkedListMultimap
                 .create();
-        private LinearPositionMarker currentMarker = LinearPositionMarker
+        private FilePosition currentMarker = FilePosition
                 .createMarkerForFirstLineAndColumn();
         private List<RobotToken> tokens = new LinkedList<>();
 
@@ -222,12 +222,12 @@ public class RobotTokenMatcher {
          * 
          * @return current position in file
          */
-        public LinearPositionMarker getCurrentMarker() {
+        public FilePosition getCurrentMarker() {
             return currentMarker;
         }
 
 
-        public void setCurrentMarker(final LinearPositionMarker newMarker) {
+        public void setCurrentMarker(final FilePosition newMarker) {
             this.currentMarker = newMarker;
         }
 
