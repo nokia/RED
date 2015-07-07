@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -90,7 +90,7 @@ public class UnicodeCharacterWithHexValueTest extends ARecognizerTest {
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
                         RobotWordType.UNKNOWN_WORD }, 0,
-                new LinearPositionMarker(1, 1),
+                new FilePosition(1, 1),
                 new String[] { additionalTextStartsWithLetterU });
     }
 

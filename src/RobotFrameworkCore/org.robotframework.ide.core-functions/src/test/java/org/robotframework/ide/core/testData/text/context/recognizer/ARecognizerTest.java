@@ -23,7 +23,7 @@ import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotConte
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.LinearPositionMarker;
+import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -104,7 +104,7 @@ public abstract class ARecognizerTest {
         LineTokenPosition line = iter.next();
         if (line == null) {
             line = new LineTokenPosition(0, 0,
-                    LinearPositionMarker.THE_FIRST_LINE);
+                    FilePosition.THE_FIRST_LINE);
         }
         ContextOutput out = new ContextOutput(tokenOutput);
 
@@ -116,7 +116,7 @@ public abstract class ARecognizerTest {
         OneLineSingleRobotContextPart header = assertAndGetOneLineContext(recognize);
 
         assertTokensForUnknownWords(header.getContextTokens(), types, 0,
-                new LinearPositionMarker(1, column), new String[] {});
+                new FilePosition(1, column), new String[] {});
     }
 
 
