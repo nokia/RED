@@ -12,8 +12,8 @@ import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
@@ -168,21 +168,27 @@ public abstract class AVariableRecognizer implements IContextRecognizer {
 
 
         @VisibleForTesting
-        protected int compareFilePosition(
-                final FilePosition o1, final FilePosition o2) {
+        protected int compareFilePosition(final FilePosition o1,
+                final FilePosition o2) {
             int result = 0;
 
             int o1Line = o1.getLine();
-            int o1Column = o1.getColumn();
             int o2Line = o2.getLine();
-            int o2Column = o2.getColumn();
+            result = compareInts(o1Line, o2Line);
 
-            result = Integer.compare(o1Line, o2Line);
             if (result == 0) {
-                result = Integer.compare(o1Column, o2Column);
+                int o1Column = o1.getColumn();
+                int o2Column = o2.getColumn();
+                result = compareInts(o1Column, o2Column);
             }
 
             return result;
+        }
+
+
+        @VisibleForTesting
+        protected int compareInts(int o1, int o2) {
+            return Integer.compare(o1, o2);
         }
     }
 
