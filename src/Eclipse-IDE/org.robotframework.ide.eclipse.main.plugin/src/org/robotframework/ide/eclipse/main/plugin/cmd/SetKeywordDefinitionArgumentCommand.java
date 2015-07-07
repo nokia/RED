@@ -2,26 +2,26 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-abstract class SetKeywordCallArgument extends EditorCommand {
+public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
-    private final RobotKeywordCall keywordCall;
+    private final RobotKeywordDefinition definition;
     private final int index;
     private final String value;
-    private final String topic;
 
-    SetKeywordCallArgument(final RobotKeywordCall keywordCall, final int index, final String value, final String topic) {
-        this.keywordCall = keywordCall;
+    public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
+            final String value) {
+        this.definition = definition;
         this.index = index;
         this.value = value;
-        this.topic = topic;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        final List<String> arguments = keywordCall.getArguments();
+        final List<String> arguments = definition.getArguments();
         boolean changed = false;
 
         for (int i = arguments.size(); i <= index; i++) {
@@ -38,7 +38,7 @@ abstract class SetKeywordCallArgument extends EditorCommand {
             // otherwise it is not possible to traverse between cells, because the cell
             // is traversed and then main thread has to handle incoming posted event which
             // closes currently active cell editor
-            eventBroker.send(topic, keywordCall);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
     }
 }

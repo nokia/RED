@@ -586,6 +586,14 @@
           id="org.robotframework.ide.eclipse.openDeclaration"
           name="Open declaration">
     </command>
+    <command
+          id="org.robotframework.ide.eclipse.expandAll"
+          name="Expand All">
+    </command>
+    <command
+          id="org.robotframework.ide.eclipse.collapseAll"
+          name="Collapse All">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -858,6 +866,24 @@
 	      </and>
 		</activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ExpandAllHandler"
+          commandId="org.robotframework.ide.eclipse.expandAll">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CollapseAllHandler"
+          commandId="org.robotframework.ide.eclipse.collapseAll">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Keywords part handlers"
@@ -1115,6 +1141,44 @@
              style="push">
        </command>
        <separator
+             name="table"
+             visible="true">
+       </separator>
+       <menu
+             label="Table">
+          <command
+                commandId="org.robotframework.ide.eclipse.expandAll"
+                icon="resources/expandall.png"
+                label="Expand All"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.collapseAll"
+                icon="resources/collapseall.png"
+                label="Collapse All"
+                style="push">
+          </command>
+       </menu>
+       <menu
+             label="Cell">
+          <command
+                commandId="org.robotframework.ide.eclipse.expandAll"
+                icon="resources/expandall.png"
+                label="Expand All"
+                style="push">
+          </command>
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="activeEditor">
+                <test
+                      property="org.robotframework.table.cell.thereIsAFocusedCell"
+                      value="true">
+                </test>
+             </with>
+          </visibleWhen>
+       </menu>
+       <separator
              name="actions"
              visible="true">
        </separator>
@@ -1293,7 +1357,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable,editorModelHasSection,activeSectionEditorHasSection,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard"
+          properties="editorModelIsEditable,activeSectionEditorHasSection,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -1302,6 +1366,13 @@
           namespace="org.robotframework.selection"
           properties="allElementsHaveSameType"
           type="org.eclipse.jface.viewers.IStructuredSelection">
+    </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
+          id="org.robotframework.focusedCellPropertyTester"
+          namespace="org.robotframework.table.cell"
+          properties="focusedCellHasIndex,thereIsAFocusedCell"
+          type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
  </extension>
  <extension

@@ -38,13 +38,13 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
@@ -124,7 +124,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
             @Override
             public RobotElement createNew() {
                 final RobotSuiteSettingsSection settingsSection = getSection();
-                commandsStack.execute(new CreateSettingKeywordCall(settingsSection, "Metadata", newArrayList("data")));
+                commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Metadata", newArrayList("data")));
                 return settingsSection.getChildren().get(settingsSection.getChildren().size() - 1);
             }
         };
@@ -193,7 +193,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenSettingDetailsChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_DETAIL_CHANGE_ALL) final RobotSetting setting) {
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         final List<?> input = (List<?>) viewer.getInput();
         if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
             setInput();

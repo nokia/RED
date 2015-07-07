@@ -26,7 +26,7 @@ public class UserKeywordsContentProvider implements ITreeContentProvider {
         if (inputElement instanceof RobotKeywordsSection) {
             final RobotKeywordsSection section = (RobotKeywordsSection) inputElement;
             final boolean isEditable = section.getSuiteFile().isEditable();
-            return extendWithAddingToken(section.getChildren().toArray(), "keyword", 0, isEditable);
+            return extendWithAddingToken(inputElement, section.getChildren().toArray(), "keyword", 0, isEditable);
         }
         return new Object[0];
     }
@@ -36,21 +36,24 @@ public class UserKeywordsContentProvider implements ITreeContentProvider {
         if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition def = (RobotKeywordDefinition) element;
             final boolean isEditable = def.getSuiteFile().isEditable();
-            return extendWithAddingToken(def.getChildren().toArray(), "", 1, isEditable);
+            return extendWithAddingToken(element, def.getChildren().toArray(), "", 1, isEditable);
         }
         return new Object[0];
     }
 
-    private Object[] extendWithAddingToken(final Object[] elements, final String name,
+    private Object[] extendWithAddingToken(final Object parent, final Object[] elements, final String name,
             final int rank, final boolean isEditable) {
         final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
-        newElements[elements.length] = new ElementAddingToken(name, isEditable, rank);
+        newElements[elements.length] = new ElementAddingToken(parent, name, isEditable, rank);
         return newElements;
     }
 
     @Override
     public Object getParent(final Object element) {
-        return ((RobotElement) element).getParent();
+        if (element instanceof RobotElement) {
+            return ((RobotElement) element).getParent();
+        }
+        return null;
     }
 
     @Override

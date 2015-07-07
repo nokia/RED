@@ -40,7 +40,7 @@ public class KeywordsContentProposingSupport implements IContentProposingSupport
 
     @Override
     public char[] getActivationKeys() {
-        return null;
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ@$&{".toCharArray();
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
@@ -17,9 +18,9 @@ public class UserKeywordNamesLabelProvider extends StylersDisposingLabelProvider
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotKeywordDefinition) {
             final DisposeNeededStyler styler = addDisposeNeededStyler(Stylers.withFontStyle(SWT.BOLD));
-            return new StyledString(((RobotElement) element).getName(), styler);
-        } else if (element instanceof RobotElement) {
-            return new StyledString(((RobotElement) element).getName());
+            return new StyledString(((RobotKeywordDefinition) element).getName(), styler);
+        } else if (element instanceof RobotKeywordCall) {
+            return new StyledString(((RobotKeywordCall) element).getName());
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getStyledText();
         }
@@ -32,6 +33,22 @@ public class UserKeywordNamesLabelProvider extends StylersDisposingLabelProvider
             return RobotImages.getUserKeywordImage().createImage();
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getImage();
+        }
+        return null;
+    }
+
+    @Override
+    public String getToolTipText(final Object element) {
+        if (element instanceof RobotElement) {
+            return ((RobotElement) element).getName();
+        }
+        return null;
+    }
+
+    @Override
+    public Image getToolTipImage(final Object element) {
+        if (element instanceof RobotKeywordDefinition || element instanceof RobotKeywordCall) {
+            return RobotImages.getTooltipImage().createImage();
         }
         return null;
     }

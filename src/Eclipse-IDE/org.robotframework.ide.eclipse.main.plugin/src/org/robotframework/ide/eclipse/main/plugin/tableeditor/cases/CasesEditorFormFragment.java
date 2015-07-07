@@ -54,12 +54,12 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.viewers.Selections;
 
 public class CasesEditorFormFragment implements ISectionFormFragment {
@@ -238,7 +238,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @Override
             public RobotElement createNew() {
                 final RobotCase testCase = (RobotCase) caseViewer.getInput();
-                commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
+                commandsStack.execute(new CreateFreshKeywordCallCommand(testCase, false));
 
                 return testCase.getChildren().get(testCase.getChildren().size() - 1);
             }
