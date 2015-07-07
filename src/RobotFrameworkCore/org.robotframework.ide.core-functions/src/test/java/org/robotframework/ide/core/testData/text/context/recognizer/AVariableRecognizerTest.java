@@ -39,7 +39,6 @@ public class AVariableRecognizerTest {
     private static IRobotTokenType recognizationChar = RobotSingleCharTokenType.SINGLE_DOT;
 
 
-    @SuppressWarnings("unchecked")
     @Test
     public void test_mergeAndAddInTail_emptyListToMerge() {
         // prepare
@@ -52,7 +51,6 @@ public class AVariableRecognizerTest {
         when(tokenTwo.getType()).thenReturn(
                 RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET);
 
-        @SuppressWarnings("rawtypes")
         List<RobotToken> tokens = Arrays.asList();
         when(context.getContextTokens()).thenReturn(tokens);
 
@@ -66,7 +64,6 @@ public class AVariableRecognizerTest {
     }
 
 
-    @SuppressWarnings("unchecked")
     @Test
     public void test_mergeAndAddInTail_twoElementListToMerge() {
         // prepare
@@ -79,7 +76,6 @@ public class AVariableRecognizerTest {
         when(tokenTwo.getType()).thenReturn(
                 RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET);
 
-        @SuppressWarnings("rawtypes")
         List<RobotToken> tokens = Arrays.asList(tokenOne, tokenTwo);
         when(context.getContextTokens()).thenReturn(tokens);
 
