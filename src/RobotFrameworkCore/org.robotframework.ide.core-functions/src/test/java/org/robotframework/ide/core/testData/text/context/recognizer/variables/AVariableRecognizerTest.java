@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
@@ -16,6 +16,7 @@ import org.mockito.InOrder;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.AVariableRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;

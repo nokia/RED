@@ -19,7 +19,7 @@ import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.invocation.InvocationOnMock;
 import org.robotframework.ide.core.testData.text.context.AggregatedOneLineRobotContexts;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
-import org.robotframework.ide.core.testData.text.context.recognizer.AVariableRecognizer.ContextElementComparator;
+import org.robotframework.ide.core.testData.text.context.recognizer.ContextElementComparator;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testHelpers.AnswerRecorder;

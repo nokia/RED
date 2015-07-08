@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.variables;
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
@@ -6,8 +6,8 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 
 
 /**
- * Check if current line contains literal environment with optional position
- * marker
+ * Check if current line contains literal dictionary (map) with optional
+ * position marker
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -20,13 +20,13 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * @see RobotSingleCharTokenType#SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET
  * @see RobotSingleCharTokenType#SINGLE_POSITION_INDEX_END_SQUARE_BRACKET
  * 
- * @see RobotSingleCharTokenType#SINGLE_ENVIRONMENT_BEGIN_PROCENT
- * @see SimpleRobotContextType#ENVIRONMENT_VARIABLE
+ * @see RobotSingleCharTokenType#SINGLE_DICTIONARY_BEGIN_AMPERSAND
+ * @see SimpleRobotContextType#DICTIONARY_VARIABLE
  */
-public class EnvironmentVariableRecognizer extends AVariableRecognizer {
+public class DictionaryVariableRecognizer extends AVariableRecognizer {
 
-    public EnvironmentVariableRecognizer() {
-        super(SimpleRobotContextType.ENVIRONMENT_VARIABLE,
-                RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT);
+    public DictionaryVariableRecognizer() {
+        super(SimpleRobotContextType.DICTIONARY_VARIABLE,
+                RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND);
     }
 }

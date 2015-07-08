@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences;
 
 import java.util.LinkedList;
 import java.util.List;
