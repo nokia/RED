@@ -18,9 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_DOLLAR_SIGN
  */
-public class EscapedDollarSign extends AEscapedRecognizer {
+public class EscapedDollarSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedDollarSign() {
-        super(SimpleRobotContextType.ESCAPED_DOLLAR_SIGN, '$', '$');
+        super(SimpleRobotContextType.ESCAPED_DOLLAR_SIGN, '$', '$',
+                RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR);
     }
 }
