@@ -94,7 +94,7 @@ public class AEscapedRecognizerTest {
         // iter for word
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(wordToken, times(1)).getType();
-        order.verify(dummy, times(1)).getCustomWordTypeHandler();
+        order.verify(dummy, times(2)).getCustomWordTypeHandler();
         order.verify(singleLineCtx, times(1)).removeAllContextTokens();
         order.verify(lineInterval, times(1)).getEnd();
         order.verifyNoMoreInteractions();
@@ -207,7 +207,7 @@ public class AEscapedRecognizerTest {
         // iter for word
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(wordToken, times(1)).getType();
-        order.verify(dummy, times(1)).getCustomWordTypeHandler();
+        order.verify(dummy, times(2)).getCustomWordTypeHandler();
         order.verify(lineInterval, times(1)).getEnd();
         order.verifyNoMoreInteractions();
 

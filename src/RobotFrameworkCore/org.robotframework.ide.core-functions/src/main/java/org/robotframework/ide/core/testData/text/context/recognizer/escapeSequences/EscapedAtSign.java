@@ -18,9 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_AT_SIGN
  */
-public class EscapedAtSign extends AEscapedRecognizer {
+public class EscapedAtSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedAtSign() {
-        super(SimpleRobotContextType.ESCAPED_AT_SIGN, '@', '@');
+        super(SimpleRobotContextType.ESCAPED_AT_SIGN, '@', '@',
+                RobotSingleCharTokenType.SINGLE_LIST_BEGIN_AT);
     }
 }
