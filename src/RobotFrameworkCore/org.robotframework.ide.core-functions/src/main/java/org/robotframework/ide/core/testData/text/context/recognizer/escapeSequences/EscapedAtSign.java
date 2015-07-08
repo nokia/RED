@@ -3,12 +3,10 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
 /**
- * Check if current line contains literal (word) with tabulator character
- * {@code \t}
+ * Check if current line contains escaped 'at' sign {@code '\@'}
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -16,13 +14,13 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * 
  * @see ContextBuilder
  * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
- * @see RobotWordType
+ * @see RobotSingleCharTokenType#SINGLE_LIST_BEGIN_AT
  * 
- * @see SimpleRobotContextType#TABULATOR_TEXT
+ * @see SimpleRobotContextType#ESCAPED_AT_SIGN
  */
-public class TabulatorTextualRecognizer extends AEscapedRecognizer {
+public class EscapedAtSign extends AEscapedRecognizer {
 
-    public TabulatorTextualRecognizer() {
-        super(SimpleRobotContextType.TABULATOR_TEXT, 't', 'T');
+    public EscapedAtSign() {
+        super(SimpleRobotContextType.ESCAPED_AT_SIGN, '@', '@');
     }
 }

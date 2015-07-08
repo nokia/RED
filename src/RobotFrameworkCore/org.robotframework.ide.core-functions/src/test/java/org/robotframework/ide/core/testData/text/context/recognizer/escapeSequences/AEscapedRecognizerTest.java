@@ -20,7 +20,6 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.ATextualRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
@@ -35,9 +34,9 @@ import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see ATextualRecognizer
+ * @see AEscapedRecognizer
  */
-public class ATextualRecognizerTest {
+public class AEscapedRecognizerTest {
 
     private final SimpleRobotContextType buildType = SimpleRobotContextType.DECLARED_COMMENT;
     private final char lowerCase = 'h';
@@ -55,6 +54,7 @@ public class ATextualRecognizerTest {
                 RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH);
 
         RobotToken wordToken = mock(RobotToken.class);
+        when(wordToken.getText()).thenReturn(new StringBuilder(lowerCase));
         when(wordToken.getType()).thenReturn(RobotWordType.UNKNOWN_WORD);
         List<RobotToken> tokens = Arrays.asList(tokenEscape, wordToken);
 
@@ -94,7 +94,7 @@ public class ATextualRecognizerTest {
         // iter for word
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(wordToken, times(1)).getType();
-        order.verify(dummy, times(1)).isStartingFromLetter(wordToken);
+        order.verify(dummy, times(1)).getCustomWordTypeHandler();
         order.verify(singleLineCtx, times(1)).removeAllContextTokens();
         order.verify(lineInterval, times(1)).getEnd();
         order.verifyNoMoreInteractions();
@@ -168,6 +168,8 @@ public class ATextualRecognizerTest {
 
         RobotToken wordToken = mock(RobotToken.class);
         when(wordToken.getType()).thenReturn(RobotWordType.UNKNOWN_WORD);
+        when(wordToken.getText()).thenReturn(
+                new StringBuilder().append(upperCase));
         List<RobotToken> tokens = Arrays.asList(tokenEscape, wordToken);
 
         LineTokenPosition lineInterval = mock(LineTokenPosition.class);
@@ -184,7 +186,6 @@ public class ATextualRecognizerTest {
 
         dummy = spy(new Dummy());
         doReturn(singleLineCtx).when(dummy).createContext(lineInterval);
-        when(dummy.isStartingFromLetter(wordToken)).thenReturn(true);
 
         // execute
         List<IContextElement> recognize = dummy.recognize(contextOutput,
@@ -206,9 +207,7 @@ public class ATextualRecognizerTest {
         // iter for word
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(wordToken, times(1)).getType();
-        order.verify(dummy, times(1)).isStartingFromLetter(wordToken);
-        order.verify(singleLineCtx, times(1)).addNextToken(wordToken);
-        order.verify(singleLineCtx, times(1)).setType(buildType);
+        order.verify(dummy, times(1)).getCustomWordTypeHandler();
         order.verify(lineInterval, times(1)).getEnd();
         order.verifyNoMoreInteractions();
 
@@ -358,12 +357,17 @@ public class ATextualRecognizerTest {
         assertThat(dummy.getContextType()).isEqualTo(buildType);
     }
 
-    private class Dummy extends ATextualRecognizer {
+    private class Dummy extends AEscapedRecognizer {
 
         public Dummy() {
             super(buildType, lowerCase, upperCase);
         }
 
+
+        @Override
+        public boolean isStartingFromLetter(final RobotToken token) {
+            return isStartingFromLetter(extractText(token));
+        }
     }
 
 
