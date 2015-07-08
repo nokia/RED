@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokensForUnknownWords;
@@ -14,6 +14,8 @@ import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotConte
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.ARecognizerTest;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -22,47 +24,57 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 
 
 /**
+ * 
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see CharacterWithShortHexValue
+ * @see TabulatorTextualRecognizer
  */
-public class CharacterWithShortHexValueTest extends ARecognizerTest {
+public class TabulatorTextualRecognizerTest extends ARecognizerTest {
 
-    public CharacterWithShortHexValueTest() {
-        super(CharacterWithShortHexValue.class);
+    public TabulatorTextualRecognizerTest() {
+        super(TabulatorTextualRecognizer.class);
     }
 
 
     @Test
-    public void testCorrectHexShortValue_lettersA9A8()
+    public void test_backslashFollowingWord_Tab_shouldReturn_oneElement()
             throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterX = "uA9A8";
-        assertForSingleTextWithLetterU_atTheBeginning(additionalTextStartsWithLetterX);
+        String additionalTextStartsWithLetterT = "Tab";
+        assertForSingleTextWithLetterT_atTheBeginning(additionalTextStartsWithLetterT);
     }
 
 
     @Test
-    public void testCorrectHexShortValue_lettersAAAA()
+    public void test_backslashFollowingWord_tab_shouldReturn_oneElement()
             throws FileNotFoundException, IOException {
-        String additionalTextStartsWithLetterX = "uAAAA";
-        assertForSingleTextWithLetterU_atTheBeginning(additionalTextStartsWithLetterX);
+        String additionalTextStartsWithLetterT = "tab";
+        assertForSingleTextWithLetterT_atTheBeginning(additionalTextStartsWithLetterT);
     }
 
 
     @Test
-    public void testCorrectHexShortValue_numberFrom_1234()
+    public void test_backslashFollowingLetter_T_shouldReturn_oneElement()
             throws FileNotFoundException, IOException {
-        assertForSingleTextWithLetterU_atTheBeginning("u1234");
+        String additionalTextStartsWithLetterT = "T";
+        assertForSingleTextWithLetterT_atTheBeginning(additionalTextStartsWithLetterT);
     }
 
 
-    private void assertForSingleTextWithLetterU_atTheBeginning(
-            String additionalTextStartsWithLetterU)
+    @Test
+    public void test_backslashFollowingLetter_t_shouldReturn_oneElement()
+            throws FileNotFoundException, IOException {
+        String additionalTextStartsWithLetterT = "t";
+        assertForSingleTextWithLetterT_atTheBeginning(additionalTextStartsWithLetterT);
+    }
+
+
+    private void assertForSingleTextWithLetterT_atTheBeginning(
+            String additionalTextStartsWithLetterT)
             throws FileNotFoundException, IOException {
         // prepare
-        String text = "\\" + additionalTextStartsWithLetterU;
+        String text = "\\" + additionalTextStartsWithLetterT;
         TokenOutput tokenOutput = createTokenOutput(text);
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
@@ -86,68 +98,28 @@ public class CharacterWithShortHexValueTest extends ARecognizerTest {
                         RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
                         RobotWordType.UNKNOWN_WORD }, 0,
                 new FilePosition(1, 1),
-                new String[] { additionalTextStartsWithLetterU });
+                new String[] { additionalTextStartsWithLetterT });
     }
 
 
     @Test
-    public void test_onlyEscapeSmallU_letterG_shouldReturn_anEmptyList()
+    public void test_escapedBackslashAndThen_tabulatorWord_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
-        String text = "\\ug";
+        String text = "\\\\tabulator";
         assertForIncorrectData(text);
     }
 
 
     @Test
-    public void test_onlyEscapeSmallU_letterA_shouldReturn_anEmptyList()
+    public void test_escapedAsterisks_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
-        String text = "\\ua";
+        String text = "\\*";
         assertForIncorrectData(text);
     }
 
 
     @Test
-    public void test_onlyEscapeUpperCaseUnumberZeroTwice_shouldReturn_anEmptyList()
-            throws FileNotFoundException, IOException {
-        String text = "\\U00";
-        assertForIncorrectData(text);
-    }
-
-
-    @Test
-    public void test_onlyEscapeSmallUnumberZero_shouldReturn_anEmptyList()
-            throws FileNotFoundException, IOException {
-        String text = "\\u0";
-        assertForIncorrectData(text);
-    }
-
-
-    @Test
-    public void test_onlyEscapeSmallU_shouldReturn_anEmptyList()
-            throws FileNotFoundException, IOException {
-        String text = "\\u";
-        assertForIncorrectData(text);
-    }
-
-
-    @Test
-    public void test_onlyEscapeBiggerU_shouldReturn_anEmptyList()
-            throws FileNotFoundException, IOException {
-        String text = "\\U";
-        assertForIncorrectData(text);
-    }
-
-
-    @Test
-    public void test_onlyEscapeAndTrashText_shouldReturn_anEmptyList()
-            throws FileNotFoundException, IOException {
-        String text = "\\d";
-        assertForIncorrectData(text);
-    }
-
-
-    @Test
-    public void test_noNLetterFollowingBackslashCharacter_shouldReturn_anEmptyList()
+    public void test_noTLetterFollowingBackslashCharacter_shouldReturn_anEmptyList()
             throws FileNotFoundException, IOException {
         String text = "foobar foobar";
         assertForIncorrectData(text);
@@ -157,6 +129,6 @@ public class CharacterWithShortHexValueTest extends ARecognizerTest {
     @Test
     public void test_getContextType() {
         assertThat(context.getContextType()).isEqualTo(
-                SimpleRobotContextType.CHAR_WITH_SHORT_HEX_VALUE);
+                SimpleRobotContextType.TABULATOR_TEXT);
     }
 }

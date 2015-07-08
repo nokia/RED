@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences;
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
@@ -7,8 +7,8 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
 /**
- * Check if current line contains literal character with hex value hh - null
- * byte: \x00, ä: \xE4
+ * Check if current line contains literal character with \\uhhhh hex value hhhh.
+ * snowman: \u2603
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -18,11 +18,11 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
  * @see RobotWordType
  * 
- * @see SimpleRobotContextType#CHAR_WITH_BYTE_HEX_VALUE
+ * @see SimpleRobotContextType#CHAR_WITH_SHORT_HEX_VALUE
  */
-public class CharacterWithByteHexValue extends ACharacterAsHexValue {
+public class CharacterWithShortHexValue extends ACharacterAsHexValue {
 
-    public CharacterWithByteHexValue() {
-        super(SimpleRobotContextType.CHAR_WITH_BYTE_HEX_VALUE, 'x', 2);
+    public CharacterWithShortHexValue() {
+        super(SimpleRobotContextType.CHAR_WITH_SHORT_HEX_VALUE, 'u', 4);
     }
 }
