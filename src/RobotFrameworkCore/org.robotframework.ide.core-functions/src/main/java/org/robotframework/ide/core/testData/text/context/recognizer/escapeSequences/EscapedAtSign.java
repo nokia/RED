@@ -2,7 +2,9 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.helpers.Collection;
 
 
 /**
@@ -21,7 +23,8 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 public class EscapedAtSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedAtSign() {
-        super(SimpleRobotContextType.ESCAPED_AT_SIGN, '@', '@',
-                RobotSingleCharTokenType.SINGLE_LIST_BEGIN_AT);
+        super(SimpleRobotContextType.ESCAPED_AT_SIGN, '@', '@', Collection
+                .createOfType(IRobotTokenType.class,
+                        RobotSingleCharTokenType.SINGLE_LIST_BEGIN_AT));
     }
 }

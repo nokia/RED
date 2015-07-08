@@ -2,7 +2,9 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.helpers.Collection;
 
 
 /**
@@ -21,7 +23,13 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 public class EscapedProcentSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedProcentSign() {
-        super(SimpleRobotContextType.ESCAPED_PROCENT_SIGN, '%', '%',
-                RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT);
+        super(
+                SimpleRobotContextType.ESCAPED_PROCENT_SIGN,
+                '%',
+                '%',
+                Collection
+                        .createOfType(
+                                IRobotTokenType.class,
+                                RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT));
     }
 }

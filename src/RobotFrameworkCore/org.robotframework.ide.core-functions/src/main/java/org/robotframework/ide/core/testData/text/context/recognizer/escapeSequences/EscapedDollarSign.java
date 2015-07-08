@@ -2,7 +2,9 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.helpers.Collection;
 
 
 /**
@@ -21,7 +23,8 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 public class EscapedDollarSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedDollarSign() {
-        super(SimpleRobotContextType.ESCAPED_DOLLAR_SIGN, '$', '$',
-                RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR);
+        super(SimpleRobotContextType.ESCAPED_DOLLAR_SIGN, '$', '$', Collection
+                .createOfType(IRobotTokenType.class,
+                        RobotSingleCharTokenType.SINGLE_SCALAR_BEGIN_DOLLAR));
     }
 }
