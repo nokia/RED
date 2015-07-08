@@ -2,7 +2,10 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
+import org.robotframework.ide.core.testData.text.lexer.helpers.Collection;
 
 
 /**
@@ -18,9 +21,12 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_HASH_SIGN
  */
-public class EscapedHashSign extends AEscapedRecognizer {
+public class EscapedHashSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedHashSign() {
-        super(SimpleRobotContextType.ESCAPED_HASH_SIGN, '#', '#');
+        super(SimpleRobotContextType.ESCAPED_HASH_SIGN, '#', '#', Collection
+                .createOfType(IRobotTokenType.class,
+                        RobotSingleCharTokenType.SINGLE_COMMENT_HASH,
+                        MultipleCharTokenType.MANY_COMMENT_HASHS));
     }
 }
