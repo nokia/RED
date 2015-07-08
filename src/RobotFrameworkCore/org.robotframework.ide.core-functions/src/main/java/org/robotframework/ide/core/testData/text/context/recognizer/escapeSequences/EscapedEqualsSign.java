@@ -18,9 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_EQUALS_SIGN
  */
-public class EscapedEqualsSign extends AEscapedRecognizer {
+public class EscapedEqualsSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedEqualsSign() {
-        super(SimpleRobotContextType.ESCAPED_EQUALS_SIGN, '=', '=');
+        super(SimpleRobotContextType.ESCAPED_EQUALS_SIGN, '=', '=',
+                RobotSingleCharTokenType.SINGLE_EQUAL);
     }
 }

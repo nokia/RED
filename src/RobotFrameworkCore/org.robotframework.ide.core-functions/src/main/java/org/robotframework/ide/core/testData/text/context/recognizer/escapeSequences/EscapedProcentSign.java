@@ -18,9 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_PROCENT_SIGN
  */
-public class EscapedProcentSign extends AEscapedRecognizer {
+public class EscapedProcentSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedProcentSign() {
-        super(SimpleRobotContextType.ESCAPED_PROCENT_SIGN, '%', '%');
+        super(SimpleRobotContextType.ESCAPED_PROCENT_SIGN, '%', '%',
+                RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT);
     }
 }
