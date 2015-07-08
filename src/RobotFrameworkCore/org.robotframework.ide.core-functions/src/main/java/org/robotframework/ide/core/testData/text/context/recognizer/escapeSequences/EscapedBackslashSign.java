@@ -27,7 +27,7 @@ public class EscapedBackslashSign extends AEscapedSpecialSingleCharTokens {
     public EscapedBackslashSign() {
         super(SimpleRobotContextType.ESCAPED_BACKSLASH_SIGN, '\\', '\\',
                 Collection.createOfType(IRobotTokenType.class,
-                        RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
                         RobotWordType.DOUBLE_ESCAPE_BACKSLASH));
+        setEscapeIncludedInToken(true);
     }
 }

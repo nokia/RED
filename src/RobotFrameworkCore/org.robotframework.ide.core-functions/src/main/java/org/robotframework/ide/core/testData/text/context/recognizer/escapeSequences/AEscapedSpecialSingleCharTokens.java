@@ -22,6 +22,9 @@ import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 public abstract class AEscapedSpecialSingleCharTokens extends
         AEscapedRecognizer {
 
+    private boolean isEscapeIncludedInToken = false;
+
+
     protected AEscapedSpecialSingleCharTokens(SimpleRobotContextType buildType,
             char lowerCaseCharRecognized, char upperCaseCharRecognized,
             List<IRobotTokenType> expectedType) {
@@ -55,7 +58,7 @@ public abstract class AEscapedSpecialSingleCharTokens extends
                 boolean wasEscape, LineTokenPosition lineInterval) {
             CustomHandlerOutput out = new CustomHandlerOutput(foundContexts,
                     context, token, wasEscape);
-            if (wasEscape) {
+            if (isEscapeIncludedInToken || wasEscape) {
                 context.addNextToken(token);
                 context.setType(buildType);
                 foundContexts.add(context);
@@ -70,4 +73,15 @@ public abstract class AEscapedSpecialSingleCharTokens extends
             return out;
         }
     }
+
+
+    public boolean isEscapeIncludedInToken() {
+        return isEscapeIncludedInToken;
+    }
+
+
+    protected void setEscapeIncludedInToken(boolean isEscapeIncludedInToken) {
+        this.isEscapeIncludedInToken = isEscapeIncludedInToken;
+    }
+
 }
