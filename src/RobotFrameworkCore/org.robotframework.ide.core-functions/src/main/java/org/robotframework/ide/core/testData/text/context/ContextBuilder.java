@@ -22,7 +22,6 @@ import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequen
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedEqualsSign;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedHashSign;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedPipeSign;
-import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedPipeSignTest;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedProcentSign;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedSpace;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.LineFeedTextualRecognizer;
@@ -70,7 +69,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see EscapedAtSign
  * @see EscapedProcentSign
  * @see EscapedHashSign
- * @see EscapedPipeSignTest
+ * @see EscapedPipeSign
  * @see EscapedBackslashSign
  * @see EscapedSpace
  * 
