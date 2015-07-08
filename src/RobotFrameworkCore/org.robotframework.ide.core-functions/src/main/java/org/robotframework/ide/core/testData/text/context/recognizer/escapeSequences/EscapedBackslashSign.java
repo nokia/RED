@@ -2,8 +2,10 @@ package org.robotframework.ide.core.testData.text.context.recognizer.escapeSeque
 
 import org.robotframework.ide.core.testData.text.context.ContextBuilder;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
+import org.robotframework.ide.core.testData.text.lexer.helpers.Collection;
 
 
 /**
@@ -20,9 +22,12 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * 
  * @see SimpleRobotContextType#ESCAPED_BACKSLASH_SIGN
  */
-public class EscapedBackslashSign extends AEscapedRecognizer {
+public class EscapedBackslashSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedBackslashSign() {
-        super(SimpleRobotContextType.ESCAPED_BACKSLASH_SIGN, '\\', '\\');
+        super(SimpleRobotContextType.ESCAPED_BACKSLASH_SIGN, '\\', '\\',
+                Collection.createOfType(IRobotTokenType.class,
+                        RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
+                        RobotWordType.DOUBLE_ESCAPE_BACKSLASH));
     }
 }
