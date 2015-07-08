@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer;
+package org.robotframework.ide.core.testData.text.context.recognizer.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.core.testHelpers.TokenOutputAsserationHelper.assertTokensForUnknownWords;
@@ -17,6 +17,8 @@ import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotConte
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.ARecognizerTest;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.DictionaryVariableRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -31,21 +33,22 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  * 
- * @see EnvironmentVariableRecognizer
+ * @see DictionaryVariableRecognizer
  */
-public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
+public class DictionaryVariableRecognizerTest extends ARecognizerTest {
 
-    public EnvironmentVariableRecognizerTest() {
-        super(EnvironmentVariableRecognizer.class);
+    public DictionaryVariableRecognizerTest() {
+        super(DictionaryVariableRecognizer.class);
     }
 
 
     @Test
-    public void test_envInEnv() throws FileNotFoundException, IOException {
+    public void test_dictionaryInDictionary() throws FileNotFoundException,
+            IOException {
         // prepare
         String text = "foobar";
         String text2 = "foobar2";
-        TokenOutput tokenOutput = createTokenOutput("%{" + text + "%{" + text2
+        TokenOutput tokenOutput = createTokenOutput("&{" + text + "&{" + text2
                 + "}}");
 
         List<RobotToken> toks = Collections.unmodifiableList(tokenOutput
@@ -68,13 +71,13 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
         OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) recognize
                 .get(0);
         assertThat(contextOne.getType()).isEqualTo(
-                SimpleRobotContextType.ENVIRONMENT_VARIABLE);
+                SimpleRobotContextType.DICTIONARY_VARIABLE);
         assertThatGetTokens(toks, contextOne, Arrays.asList(0, 1, 2, 7));
 
         OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) recognize
                 .get(1);
         assertThat(contextTwo.getType()).isEqualTo(
-                SimpleRobotContextType.ENVIRONMENT_VARIABLE);
+                SimpleRobotContextType.DICTIONARY_VARIABLE);
         assertThatGetTokens(toks, contextTwo, Arrays.asList(3, 4, 5, 6));
 
     }
@@ -93,11 +96,11 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
 
 
     @Test
-    public void test_envVariable_withoutAnyInsideTokens_withEscape()
+    public void test_dictionaryVariable_withoutAnyInsideTokens_withEscape()
             throws FileNotFoundException, IOException {
         // prepare
         String text = "foobar";
-        TokenOutput tokenOutput = createTokenOutput("%{" + text + "\\%{}");
+        TokenOutput tokenOutput = createTokenOutput("&{" + text + "\\&{}");
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
         LineTokenPosition line = iter.next();
@@ -117,11 +120,11 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
                 ((OneLineSingleRobotContextPart) recognize.get(0))
                         .getContextTokens(),
                 new IRobotTokenType[] {
-                        RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT,
+                        RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
                         RobotWordType.UNKNOWN_WORD,
                         RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH,
-                        RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT,
+                        RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET },
                 0, new FilePosition(1, 1), new String[] { text });
@@ -129,11 +132,11 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
 
 
     @Test
-    public void test_envVariableAfterListEnv_withoutAnyInsideTokens()
+    public void test_dictionaryVariableAfterDictionaryVariable_withoutAnyInsideTokens()
             throws FileNotFoundException, IOException {
         // prepare
         String text = "foobar";
-        TokenOutput tokenOutput = createTokenOutput("%%{" + text + "}");
+        TokenOutput tokenOutput = createTokenOutput("&&{" + text + "}");
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
         LineTokenPosition line = iter.next();
@@ -153,7 +156,7 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
                 ((OneLineSingleRobotContextPart) recognize.get(0))
                         .getContextTokens(),
                 new IRobotTokenType[] {
-                        RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT,
+                        RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
                         RobotWordType.UNKNOWN_WORD,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET },
@@ -162,11 +165,11 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
 
 
     @Test
-    public void test_envVariable_withoutAnyInsideTokens()
+    public void test_dictionaryVariable_withoutAnyInsideTokens()
             throws FileNotFoundException, IOException {
         // prepare
         String text = "foobar";
-        TokenOutput tokenOutput = createTokenOutput("%{" + text + "}");
+        TokenOutput tokenOutput = createTokenOutput("&{" + text + "}");
 
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
         LineTokenPosition line = iter.next();
@@ -186,7 +189,7 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
                 ((OneLineSingleRobotContextPart) recognize.get(0))
                         .getContextTokens(),
                 new IRobotTokenType[] {
-                        RobotSingleCharTokenType.SINGLE_ENVIRONMENT_BEGIN_PROCENT,
+                        RobotSingleCharTokenType.SINGLE_DICTIONARY_BEGIN_AMPERSAND,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_BEGIN_CURLY_BRACKET,
                         RobotWordType.UNKNOWN_WORD,
                         RobotSingleCharTokenType.SINGLE_VARIABLE_END_CURLY_BRACKET },
@@ -195,35 +198,36 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
 
 
     @Test
-    public void test_onlyEscapedProcentAndCurrlyBracketAndTextSign()
+    public void test_onlyEscapedAmpersandAndCurrlyBracketAndTextSign()
             throws FileNotFoundException, IOException {
-        assertForIncorrectData("\\%{foobar}");
+        assertForIncorrectData("\\&{foobar}");
     }
 
 
     @Test
-    public void test_onlyProcentAndCurrlyBracketAndTextSign()
+    public void test_onlyAmpersandAndCurrlyBracketAndTextSign()
             throws FileNotFoundException, IOException {
-        assertForIncorrectData("%{foobar");
+        assertForIncorrectData("&{foobar");
     }
 
 
     @Test
-    public void test_onlyProcentAndCurrlyBracketSign()
+    public void test_onlyAmpersandAndCurrlyBracketSign()
             throws FileNotFoundException, IOException {
-        assertForIncorrectData("%{");
+        assertForIncorrectData("&{");
     }
 
 
     @Test
-    public void test_onlyProcentSign() throws FileNotFoundException,
+    public void test_onlyAmpersandSign() throws FileNotFoundException,
             IOException {
-        assertForIncorrectData("%");
+        assertForIncorrectData("&");
     }
 
 
     @Test
-    public void test_noProcentSign() throws FileNotFoundException, IOException {
+    public void test_noAmpersandSign() throws FileNotFoundException,
+            IOException {
         assertForIncorrectData("foobar");
     }
 
@@ -231,6 +235,6 @@ public class EnvironmentVariableRecognizerTest extends ARecognizerTest {
     @Test
     public void test_getContextType() {
         assertThat(context.getContextType()).isEqualTo(
-                SimpleRobotContextType.ENVIRONMENT_VARIABLE);
+                SimpleRobotContextType.DICTIONARY_VARIABLE);
     }
 }

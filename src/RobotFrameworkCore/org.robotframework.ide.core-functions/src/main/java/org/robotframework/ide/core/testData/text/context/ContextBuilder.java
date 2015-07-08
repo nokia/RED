@@ -5,25 +5,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithByteHexValue;
-import org.robotframework.ide.core.testData.text.context.recognizer.CharacterWithShortHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.DictionaryVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.EnvironmentVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.LineFeedTextualRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.ListVariableRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.ScalarVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.UnicodeCharacterWithHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithByteHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithShortHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.LineFeedTextualRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.PipeSeparatorRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.TabulatorTextualRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.UnicodeCharacterWithHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.CollectionIndexPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.DictionaryVariableRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.EnvironmentVariableRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.ListVariableRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.variables.ScalarVariableRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
 
 
@@ -91,6 +92,7 @@ public class ContextBuilder {
         normalRecognizers.add(new EnvironmentVariableRecognizer());
         normalRecognizers.add(new ListVariableRecognizer());
         normalRecognizers.add(new DictionaryVariableRecognizer());
+        normalRecognizers.add(new CollectionIndexPosition());
 
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
