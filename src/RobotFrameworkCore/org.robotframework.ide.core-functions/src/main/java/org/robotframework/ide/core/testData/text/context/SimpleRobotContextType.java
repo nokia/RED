@@ -108,5 +108,39 @@ public enum SimpleRobotContextType implements IContextElementType {
     /**
      * applies currently for list and dictionaries ( '[' ']' )
      */
-    COLLECTION_TYPE_VARIABLE_POSITION;
+    COLLECTION_TYPE_VARIABLE_POSITION,
+    /**
+     * applies currently for possible scalar variable '\$'
+     */
+    ESCAPED_DOLLAR_SIGN,
+    /**
+     * applies currently for possible list variable '\@'
+     */
+    ESCAPED_AT_SIGN,
+    /**
+     * applies currently for possible environment variable '\%'
+     */
+    ESCAPED_PROCENT_SIGN,
+    /**
+     * applies currently for possible comment '\#'
+     */
+    ESCAPED_HASH_SIGN,
+    /**
+     * never part of named argument syntax '\='
+     */
+    ESCAPED_EQUALS_SIGN,
+    /**
+     * never a separator pipe '\|'
+     */
+    ESCAPED_PIPE_SIGN,
+    /**
+     * never escapes anything '\\'
+     */
+    ESCAPED_BACKSLASH_SIGN,
+    /**
+     * never a separator between two elements i.e. 'normal \ word', robot will
+     * understand it as 'normal word' and two spaces will be not taken as
+     * separator
+     */
+    ESCAPED_SPACE;
 }

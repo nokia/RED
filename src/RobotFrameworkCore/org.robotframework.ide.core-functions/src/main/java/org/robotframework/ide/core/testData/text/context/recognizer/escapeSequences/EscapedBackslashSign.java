@@ -7,8 +7,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
 
 /**
- * Check if current line contains literal (word) with tabulator character
- * {@code \t}
+ * Check if current line contains escaped backslash sign {@code '\\'}
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -16,13 +15,14 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * 
  * @see ContextBuilder
  * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
- * @see RobotWordType
+ * @see RobotSingleCharTokenType#SINGLE_ESCAPE_BACKSLASH
+ * @see RobotWordType#DOUBLE_ESCAPE_BACKSLASH
  * 
- * @see SimpleRobotContextType#TABULATOR_TEXT
+ * @see SimpleRobotContextType#ESCAPED_BACKSLASH_SIGN
  */
-public class TabulatorTextualRecognizer extends AEscapedRecognizer {
+public class EscapedBackslashSign extends AEscapedRecognizer {
 
-    public TabulatorTextualRecognizer() {
-        super(SimpleRobotContextType.TABULATOR_TEXT, 't', 'T');
+    public EscapedBackslashSign() {
+        super(SimpleRobotContextType.ESCAPED_BACKSLASH_SIGN, '\\', '\\');
     }
 }

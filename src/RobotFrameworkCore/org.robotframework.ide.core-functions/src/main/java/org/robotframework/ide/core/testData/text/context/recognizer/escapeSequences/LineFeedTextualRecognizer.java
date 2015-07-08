@@ -20,7 +20,7 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
  * 
  * @see SimpleRobotContextType#LINE_FEED_TEXT
  */
-public class LineFeedTextualRecognizer extends ATextualRecognizer {
+public class LineFeedTextualRecognizer extends AEscapedRecognizer {
 
     public LineFeedTextualRecognizer() {
         super(SimpleRobotContextType.LINE_FEED_TEXT, 'n', 'N');
