@@ -24,7 +24,7 @@ public abstract class AEscapedSpecialSingleCharTokens extends
 
     protected AEscapedSpecialSingleCharTokens(SimpleRobotContextType buildType,
             char lowerCaseCharRecognized, char upperCaseCharRecognized,
-            IRobotTokenType expectedType) {
+            List<IRobotTokenType> expectedType) {
         super(buildType, lowerCaseCharRecognized, upperCaseCharRecognized);
         setCustomWordTypeHandler(this.new OwnSignTypeHandler(expectedType,
                 buildType));
@@ -32,11 +32,11 @@ public abstract class AEscapedSpecialSingleCharTokens extends
 
     private class OwnSignTypeHandler implements IRobotTypeCustomHandler {
 
-        private final IRobotTokenType expectedType;
+        private final List<IRobotTokenType> expectedType;
         private final SimpleRobotContextType buildType;
 
 
-        public OwnSignTypeHandler(final IRobotTokenType expectedType,
+        public OwnSignTypeHandler(final List<IRobotTokenType> expectedType,
                 final SimpleRobotContextType buildType) {
             this.expectedType = expectedType;
             this.buildType = buildType;
@@ -45,7 +45,7 @@ public abstract class AEscapedSpecialSingleCharTokens extends
 
         @Override
         public boolean canAccept(IRobotTokenType o) {
-            return (expectedType == o);
+            return (expectedType.contains(o));
         }
 
 
