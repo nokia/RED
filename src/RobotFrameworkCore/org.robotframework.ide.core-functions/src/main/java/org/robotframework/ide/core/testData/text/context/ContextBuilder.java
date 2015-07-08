@@ -16,6 +16,14 @@ import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTabl
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithByteHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithShortHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedAtSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedBackslashSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedDollarSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedEqualsSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedHashSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedPipeSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedProcentSign;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.EscapedSpace;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.LineFeedTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.TabulatorTextualRecognizer;
@@ -55,6 +63,15 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see EnvironmentVariableRecognizer
  * @see ListVariableRecognizer
  * @see DictionaryVariableRecognizer
+ * @see CollectionIndexPosition
+ * 
+ * @see EscapedDollarSign
+ * @see EscapedAtSign
+ * @see EscapedProcentSign
+ * @see EscapedHashSign
+ * @see EscapedPipeSign
+ * @see EscapedBackslashSign
+ * @see EscapedSpace
  * 
  * @see DoubleSpaceOrTabulatorSeparatorRecognizer
  * @see PipeSeparatorRecognizer
@@ -87,6 +104,15 @@ public class ContextBuilder {
         normalRecognizers.add(new CharacterWithByteHexValue());
         normalRecognizers.add(new CharacterWithShortHexValue());
         normalRecognizers.add(new UnicodeCharacterWithHexValue());
+
+        normalRecognizers.add(new EscapedDollarSign());
+        normalRecognizers.add(new EscapedAtSign());
+        normalRecognizers.add(new EscapedProcentSign());
+        normalRecognizers.add(new EscapedHashSign());
+        normalRecognizers.add(new EscapedEqualsSign());
+        normalRecognizers.add(new EscapedPipeSign());
+        normalRecognizers.add(new EscapedBackslashSign());
+        normalRecognizers.add(new EscapedSpace());
 
         normalRecognizers.add(new ScalarVariableRecognizer());
         normalRecognizers.add(new EnvironmentVariableRecognizer());
