@@ -11,7 +11,7 @@ import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotConte
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.AEscapedRecognizer.IRobotWordTypeCustomHandler.CustomHandlerOutput;
+import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.AEscapedRecognizer.IRobotTypeCustomHandler.CustomHandlerOutput;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
@@ -36,21 +36,22 @@ public abstract class AEscapedRecognizer implements IContextRecognizer {
     private final SimpleRobotContextType BUILD_TYPE;
     private final char lowerCaseCharRecognized;
     private final char upperCaseCharRecognized;
-    private IRobotWordTypeCustomHandler customWordTypeHandler;
+    private IRobotTypeCustomHandler customWordTypeHandler;
 
 
     protected AEscapedRecognizer(final SimpleRobotContextType buildType,
             final char lowerCaseCharRecognized,
             final char upperCaseCharRecognized) {
         this(buildType, lowerCaseCharRecognized, upperCaseCharRecognized, null);
-        this.customWordTypeHandler = this.new DefaultRobotWordTypeCustomHandler();
+        this.customWordTypeHandler = this.new DefaultRobotWordTypeCustomHandler(
+                RobotWordType.class);
     }
 
 
     protected AEscapedRecognizer(final SimpleRobotContextType buildType,
             final char lowerCaseCharRecognized,
             final char upperCaseCharRecognized,
-            final IRobotWordTypeCustomHandler customWordTypeHandler) {
+            final IRobotTypeCustomHandler customWordTypeHandler) {
         this.BUILD_TYPE = buildType;
         this.lowerCaseCharRecognized = lowerCaseCharRecognized;
         this.upperCaseCharRecognized = upperCaseCharRecognized;
@@ -80,7 +81,7 @@ public abstract class AEscapedRecognizer implements IContextRecognizer {
                 } else {
                     wasUsed = false;
                 }
-            } else if (RobotWordType.class.isInstance(type)) {
+            } else if (getCustomWordTypeHandler().canAccept(type)) {
                 CustomHandlerOutput customHandlerOutput = getCustomWordTypeHandler()
                         .handle(foundContexts, context, token, wasEscape,
                                 lineInterval);
@@ -101,12 +102,32 @@ public abstract class AEscapedRecognizer implements IContextRecognizer {
     }
 
 
-    public IRobotWordTypeCustomHandler getCustomWordTypeHandler() {
+    protected void setCustomWordTypeHandler(
+            IRobotTypeCustomHandler customWordTypeHandler) {
+        this.customWordTypeHandler = customWordTypeHandler;
+    }
+
+
+    public IRobotTypeCustomHandler getCustomWordTypeHandler() {
         return customWordTypeHandler;
     }
 
     private class DefaultRobotWordTypeCustomHandler implements
-            IRobotWordTypeCustomHandler {
+            IRobotTypeCustomHandler {
+
+        private final Class<? extends IRobotTokenType> acceptedType;
+
+
+        public DefaultRobotWordTypeCustomHandler(
+                Class<? extends IRobotTokenType> acceptedType) {
+            this.acceptedType = acceptedType;
+        }
+
+
+        public boolean canAccept(IRobotTokenType o) {
+            return acceptedType.isInstance(o);
+        }
+
 
         @Override
         public CustomHandlerOutput handle(List<IContextElement> foundContexts,
@@ -131,8 +152,8 @@ public abstract class AEscapedRecognizer implements IContextRecognizer {
     }
 
     /**
-     * Custom logic related to handling {@link RobotWordType} inside
-     * {@link AEscapedRecognizer}.
+     * Custom logic related to handling {@link RobotWordType} or other
+     * {@link IRobotTokenType} inside {@link AEscapedRecognizer}.
      * 
      * @author wypych
      * @since JDK 1.7 update 74
@@ -140,7 +161,16 @@ public abstract class AEscapedRecognizer implements IContextRecognizer {
      * 
      * @see RobotWordType
      */
-    protected interface IRobotWordTypeCustomHandler {
+    protected interface IRobotTypeCustomHandler {
+
+        /**
+         * 
+         * @param o
+         *            current token type
+         * @return information if we can handle this type
+         */
+        boolean canAccept(IRobotTokenType o);
+
 
         CustomHandlerOutput handle(final List<IContextElement> foundContexts,
                 final OneLineSingleRobotContextPart context,

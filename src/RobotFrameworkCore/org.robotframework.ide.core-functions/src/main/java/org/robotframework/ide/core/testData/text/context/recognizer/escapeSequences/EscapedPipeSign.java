@@ -18,9 +18,10 @@ import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
  * 
  * @see SimpleRobotContextType#ESCAPED_PIPE_SIGN
  */
-public class EscapedPipeSign extends AEscapedRecognizer {
+public class EscapedPipeSign extends AEscapedSpecialSingleCharTokens {
 
     public EscapedPipeSign() {
-        super(SimpleRobotContextType.ESCAPED_PIPE_SIGN, '|', '|');
+        super(SimpleRobotContextType.ESCAPED_PIPE_SIGN, '|', '|',
+                RobotSingleCharTokenType.SINGLE_PIPE);
     }
 }
