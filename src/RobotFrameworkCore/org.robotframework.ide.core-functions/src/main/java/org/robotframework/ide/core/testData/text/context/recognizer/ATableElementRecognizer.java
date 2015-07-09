@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.context.recognizer.settingTable;
+package org.robotframework.ide.core.testData.text.context.recognizer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +8,8 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SettingTableRobotContextType;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement.PriorityType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
@@ -27,15 +28,14 @@ import com.google.common.annotations.VisibleForTesting;
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
  */
-public abstract class ASettingTableElementRecognizer implements
-        IContextRecognizer {
+public abstract class ATableElementRecognizer implements IContextRecognizer {
 
     private final SettingTableRobotContextType BUILD_TYPE;
     private final List<ExpectedSequenceElement> expectedSequence;
     private final int sequenceLength;
 
 
-    protected ASettingTableElementRecognizer(
+    protected ATableElementRecognizer(
             final SettingTableRobotContextType buildType,
             final List<ExpectedSequenceElement> expectedSequence) {
         this.BUILD_TYPE = buildType;
@@ -112,13 +112,36 @@ public abstract class ASettingTableElementRecognizer implements
     }
 
 
-    protected static List<ExpectedSequenceElement> createWithAllAsMandatory(
+    private static List<ExpectedSequenceElement> createExpectedAllMandatory(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = new LinkedList<>();
         for (IRobotTokenType t : types) {
             elems.add(ExpectedSequenceElement.buildMandatory(t));
         }
 
+        return elems;
+    }
+
+
+    protected static List<ExpectedSequenceElement> createExpectedInsideSquareBrackets(
+            IRobotTokenType... types) {
+        List<ExpectedSequenceElement> elems = createExpectedAllMandatory(types);
+        if (!elems.isEmpty()) {
+            elems.add(
+                    0,
+                    ExpectedSequenceElement
+                            .buildMandatory(RobotSingleCharTokenType.SINGLE_POSITION_INDEX_BEGIN_SQUARE_BRACKET));
+
+            elems.add(ExpectedSequenceElement
+                    .buildMandatory(RobotSingleCharTokenType.SINGLE_POSITION_INDEX_END_SQUARE_BRACKET));
+        }
+        return elems;
+    }
+
+
+    protected static List<ExpectedSequenceElement> createExpectedForSettingsTable(
+            IRobotTokenType... types) {
+        List<ExpectedSequenceElement> elems = createExpectedAllMandatory(types);
         if (!elems.isEmpty()) {
             elems.add(ExpectedSequenceElement
                     .buildOptional(RobotSingleCharTokenType.SINGLE_COLON));
