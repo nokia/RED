@@ -3,6 +3,9 @@ package org.robotframework.ide.core.testData.text.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordTableRobotContextType;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SettingTableRobotContextType;
+import org.robotframework.ide.core.testData.text.context.recognizer.testCaseTable.TestCaseTableRobotContextType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 
@@ -52,7 +55,54 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     }
 
 
+    /**
+     * 
+     * @param type
+     *            acceptable parameters are type from {@code @see}
+     * @throws UnsupportedOperationException
+     *             in case {@code type} is not supported
+     * 
+     * @see SimpleRobotContextType
+     * @see KeywordTableRobotContextType
+     * @see SettingTableRobotContextType
+     * @see TestCaseTableRobotContextType
+     */
+    public void setType(IContextElementType type) {
+        if (type != null) {
+            if (type instanceof SimpleRobotContextType) {
+                setType((SimpleRobotContextType) type);
+            } else if (type instanceof KeywordTableRobotContextType) {
+                setType((KeywordTableRobotContextType) type);
+            } else if (type instanceof SettingTableRobotContextType) {
+                setType((SettingTableRobotContextType) type);
+            } else if (type instanceof TestCaseTableRobotContextType) {
+                setType((TestCaseTableRobotContextType) type);
+            } else {
+                throw new UnsupportedOperationException("Type "
+                        + type.getClass() + " is not supported by this class.");
+            }
+        } else {
+            this.type = SimpleRobotContextType.UNDECLARED_COMMENT;
+        }
+    }
+
+
     public void setType(SimpleRobotContextType type) {
+        this.type = type;
+    }
+
+
+    public void setType(KeywordTableRobotContextType type) {
+        this.type = type;
+    }
+
+
+    public void setType(SettingTableRobotContextType type) {
+        this.type = type;
+    }
+
+
+    public void setType(TestCaseTableRobotContextType type) {
         this.type = type;
     }
 
@@ -90,4 +140,13 @@ public class OneLineSingleRobotContextPart implements IContextElement {
                     + context.getClass());
         }
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("OneLineSingleRobotContextPart [contextTokens=%s, type=%s, parentContext=%s, lineNumber=%s]",
+                        contextTokens, type, parentContext, lineNumber);
+    }
+
 }
