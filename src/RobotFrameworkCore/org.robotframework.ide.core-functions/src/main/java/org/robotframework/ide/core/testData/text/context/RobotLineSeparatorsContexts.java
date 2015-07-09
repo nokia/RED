@@ -62,4 +62,13 @@ public class RobotLineSeparatorsContexts implements IContextElement {
     public IContextElement getParent() {
         return this.parentContext;
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("RobotLineSeparatorsContexts [handledElements=%s, type=%s, parentContext=%s]",
+                        handledElements, type, parentContext);
+    }
+
 }
