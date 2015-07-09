@@ -8,6 +8,9 @@ import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.InsertNewCaseHandler.E4InsertNewCaseHandler;
@@ -26,11 +29,24 @@ public class InsertNewCaseHandler extends DIHandler<E4InsertNewCaseHandler> {
 
         @Execute
         public Object addNewTestCase(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            final RobotCase selectedCase = Selections.getSingleElement(selection, RobotCase.class);
-            final RobotCasesSection casesSection = (RobotCasesSection) selectedCase.getParent();
-            final int index = casesSection.getChildren().indexOf(selectedCase);
+            final RobotElement selectedElement = Selections.getSingleElement(selection, RobotElement.class);
 
-            stack.execute(new CreateFreshCaseCommand(casesSection, index));
+            RobotSuiteFileSection section = null;
+            RobotCase testCase = null;
+            if (selectedElement instanceof RobotKeywordCall) {
+                testCase = (RobotCase) selectedElement.getParent();
+                section = ((RobotKeywordCall) selectedElement).getSection();
+            } else if (selectedElement instanceof RobotCase) {
+                testCase = (RobotCase) selectedElement;
+                section = (RobotSuiteFileSection) testCase.getParent();
+            }
+
+            if (section == null || testCase == null) {
+                return null;
+            }
+
+            final int index = section.getChildren().indexOf(testCase);
+            stack.execute(new CreateFreshCaseCommand((RobotCasesSection) section, index));
             return null;
         }
     }

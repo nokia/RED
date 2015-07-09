@@ -7,11 +7,14 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.cmd.MoveCaseDownCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.MoveKeywordCallDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseDownHandler.E4MoveCaseDownHandler;
 import org.robotframework.viewers.Selections;
+
+import com.google.common.base.Optional;
 
 public class MoveCaseDownHandler extends DIHandler<E4MoveCaseDownHandler> {
 
@@ -22,15 +25,19 @@ public class MoveCaseDownHandler extends DIHandler<E4MoveCaseDownHandler> {
     public static class E4MoveCaseDownHandler {
 
         @Inject
-        private RobotEditorCommandsStack stack;
+        private RobotEditorCommandsStack commandsStack;
 
         @Execute
         public Object moveCaseDown(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            final RobotCase selectedCase = Selections.getSingleElement(selection, RobotCase.class);
-            final RobotCasesSection casesSection = (RobotCasesSection) selectedCase.getParent();
-            final int index = casesSection.getChildren().indexOf(selectedCase);
+            final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
+                    RobotKeywordCall.class);
+            final Optional<RobotCase> maybeTestCase = Selections.getOptionalFirstElement(selection, RobotCase.class);
 
-            stack.execute(new MoveCaseDownCommand(casesSection, index));
+            if (maybeKeywordCall.isPresent()) {
+                commandsStack.execute(new MoveKeywordCallDownCommand(maybeKeywordCall.get()));
+            } else if (maybeTestCase.isPresent()) {
+                commandsStack.execute(new MoveCaseDownCommand(maybeTestCase.get()));
+            }
             return null;
         }
     }
