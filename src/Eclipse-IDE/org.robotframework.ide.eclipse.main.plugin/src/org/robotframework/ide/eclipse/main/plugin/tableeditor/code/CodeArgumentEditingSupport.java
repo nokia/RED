@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import java.util.List;
 
@@ -19,11 +19,11 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionArgume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
-class UserKeywordArgumentEditingSupport extends RobotElementEditingSupport {
+class CodeArgumentEditingSupport extends RobotElementEditingSupport {
 
     private KeywordsContentProposingSupport contentAssistSupport;
 
-    UserKeywordArgumentEditingSupport(final RowExposingTreeViewer viewer, final int index,
+    CodeArgumentEditingSupport(final RowExposingTreeViewer viewer, final int index,
             final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
         super(viewer, index, commandsStack, creator);
     }

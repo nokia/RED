@@ -13,10 +13,12 @@ public class RobotCase implements RobotElement {
     private RobotCasesSection parent;
     private String name;
     protected final List<RobotElement> elements = new ArrayList<>();
+    private String comment;
 
-    public RobotCase(final RobotCasesSection parent, final String name) {
+    public RobotCase(final RobotCasesSection parent, final String name, final String comment) {
         this.parent = parent;
         this.name = name;
+        this.comment = comment;
     }
 
     public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
@@ -52,6 +54,14 @@ public class RobotCase implements RobotElement {
         for (final RobotElement element : elements) {
             element.fixParents(this);
         }
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     @Override

@@ -131,7 +131,7 @@ public class FileSectionsParser {
                             testCase.createKeywordCall(name, args, comment);
                         }
                     } else {
-                        testCase = casesSection.createTestCase(line);
+                        testCase = casesSection.createTestCase(line, extractComment(line));
                     }
                 } else if (keywordsSection != null) {
                     if (line.startsWith("  ") && keywordDef != null) {

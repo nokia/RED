@@ -47,6 +47,11 @@ public class RobotSuiteFileSection implements RobotElement {
     }
 
     @Override
+    public String getComment() {
+        return "";
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return RobotImages.getRobotCasesFileSectionImage();
     }

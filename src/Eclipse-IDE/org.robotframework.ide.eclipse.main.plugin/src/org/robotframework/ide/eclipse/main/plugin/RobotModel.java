@@ -60,6 +60,11 @@ public class RobotModel implements RobotElement {
     }
 
     @Override
+    public String getComment() {
+        return "";
+    }
+
+    @Override
     public RobotElement getParent() {
         return null;
     }

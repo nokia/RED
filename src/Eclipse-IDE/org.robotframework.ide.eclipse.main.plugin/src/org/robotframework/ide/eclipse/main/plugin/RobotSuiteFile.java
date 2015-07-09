@@ -137,6 +137,11 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     @Override
+    public String getComment() {
+        return "";
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return RobotImages.getRobotImage();
     }
