@@ -9,6 +9,7 @@ import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement.PriorityType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -18,20 +19,28 @@ import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import com.google.common.annotations.VisibleForTesting;
 
 
+/**
+ * Gives common functionality for search, which are not multiple lines - just
+ * one line and for Setting table.
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ */
 public abstract class ASettingTableElementRecognizer implements
         IContextRecognizer {
 
     private final SettingTableRobotContextType BUILD_TYPE;
-    private final List<IRobotTokenType> expectedTokensSequence;
+    private final List<ExpectedSequenceElement> expectedSequence;
     private final int sequenceLength;
 
 
     protected ASettingTableElementRecognizer(
-            final SettingTableRobotContextType type,
-            final List<IRobotTokenType> expectedTokensSequence) {
-        this.BUILD_TYPE = type;
-        this.expectedTokensSequence = expectedTokensSequence;
-        this.sequenceLength = expectedTokensSequence.size();
+            final SettingTableRobotContextType buildType,
+            final List<ExpectedSequenceElement> expectedSequence) {
+        this.BUILD_TYPE = buildType;
+        this.expectedSequence = expectedSequence;
+        this.sequenceLength = expectedSequence.size();
     }
 
 
@@ -44,20 +53,22 @@ public abstract class ASettingTableElementRecognizer implements
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         int expectedTokenId = 0;
-        IRobotTokenType currentType = expectedTokensSequence
+        ExpectedSequenceElement currentType = expectedSequence
                 .get(expectedTokenId);
+        int previousTokenId = -1;
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
             RobotToken token = tokens.get(tokId);
             IRobotTokenType type = token.getType();
 
-            if (type == currentType) {
+            if (type == currentType.getType()) {
                 context.addNextToken(token);
                 if (expectedTokenId + 1 >= sequenceLength) {
                     foundContexts.add(context);
                     context = createContext(lineInterval);
+                    expectedTokenId = 0;
                 } else {
                     expectedTokenId++;
-                    currentType = expectedTokensSequence.get(expectedTokenId);
+                    currentType = expectedSequence.get(expectedTokenId);
                 }
             } else if (type == RobotSingleCharTokenType.SINGLE_SPACE
                     || type == RobotSingleCharTokenType.SINGLE_TABULATOR
@@ -67,15 +78,53 @@ public abstract class ASettingTableElementRecognizer implements
                     || type == MultipleCharTokenType.MANY_COMMENT_HASHS) {
                 context.addNextToken(token);
             } else {
-                // this is for ensure not line which is interesting for use
-                context.removeAllContextTokens();
-                expectedTokenId = 0;
-                tokId = tokId - 1; // lets try to check if we do not have case
-                                   // like i.e. Suite Suite Setup
+                if (currentType.getPriority() == PriorityType.MANDATORY) {
+                    // this is for ensure not line which is interesting for use
+                    context.removeAllContextTokens();
+                    expectedTokenId = 0;
+                    if (previousTokenId != tokId) {
+                        previousTokenId = tokId;
+                        tokId = tokId - 1; // lets try to check if we do not
+                                           // have
+                                           // case
+                        // like i.e. Suite Suite Setup
+                    }
+                } else {
+                    // search for next mandatory
+                    if (expectedTokenId + 1 >= sequenceLength) {
+                        context.removeAllContextTokens();
+                        expectedTokenId = 0;
+                        if (previousTokenId != tokId) {
+                            previousTokenId = tokId;
+                            tokId = tokId - 1; // lets try to check if we do not
+                                               // have
+                                               // case
+                        }
+                    } else {
+                        expectedTokenId++;
+                        currentType = expectedSequence.get(expectedTokenId);
+                    }
+                }
             }
         }
 
         return foundContexts;
+    }
+
+
+    protected static List<ExpectedSequenceElement> createWithAllAsMandatory(
+            IRobotTokenType... types) {
+        List<ExpectedSequenceElement> elems = new LinkedList<>();
+        for (IRobotTokenType t : types) {
+            elems.add(ExpectedSequenceElement.buildMandatory(t));
+        }
+
+        if (!elems.isEmpty()) {
+            elems.add(ExpectedSequenceElement
+                    .buildOptional(RobotSingleCharTokenType.SINGLE_COLON));
+        }
+
+        return elems;
     }
 
 

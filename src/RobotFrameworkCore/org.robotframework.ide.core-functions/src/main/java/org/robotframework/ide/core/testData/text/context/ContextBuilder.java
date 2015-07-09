@@ -28,6 +28,24 @@ import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequen
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.UnicodeCharacterWithHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.DefaultTagsDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.DocumentationDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ForceTagsDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ImportLibraryAliasDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ImportLibraryDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ImportResourceDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ImportVariablesDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.MetadataDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SuitePostconditionDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SuitePreconditionDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SuiteSetupDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SuiteTeardownDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestPostconditionDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestPreconditionDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestSetupDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTeardownDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTemplateDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTimeoutDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.CollectionIndexPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.DictionaryVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.EnvironmentVariableRecognizer;
@@ -73,6 +91,25 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see EscapedBackslashSign
  * @see EscapedSpace
  * 
+ * @see ImportLibraryDeclaration
+ * @see ImportLibraryAliasDeclaration
+ * @see ImportResourceDeclaration
+ * @see ImportVariablesDeclaration
+ * @see DocumentationDeclaration
+ * @see MetadataDeclaration
+ * @see SuiteSetupDeclaration
+ * @see SuiteTeardownDeclaration
+ * @see SuitePreconditionDeclaration
+ * @see SuitePostconditionDeclaration
+ * @see ForceTagsDeclaration
+ * @see DefaultTagsDeclaration
+ * @see TestSetupDeclaration
+ * @see TestTeardownDeclaration
+ * @see TestPreconditionDeclaration
+ * @see TestPostconditionDeclaration
+ * @see TestTemplateDeclaration
+ * @see TestTimeoutDeclaration
+ * 
  * @see DoubleSpaceOrTabulatorSeparatorRecognizer
  * @see PipeSeparatorRecognizer
  * 
@@ -81,6 +118,7 @@ public class ContextBuilder {
 
     private List<IContextRecognizer> separatorRecognizers = new LinkedList<>();
     private List<IContextRecognizer> normalRecognizers = new LinkedList<>();
+    private List<IContextRecognizer> settingTableRecognizers = new LinkedList<>();
 
 
     public ContextBuilder() {
@@ -119,8 +157,28 @@ public class ContextBuilder {
         normalRecognizers.add(new ListVariableRecognizer());
         normalRecognizers.add(new DictionaryVariableRecognizer());
         normalRecognizers.add(new CollectionIndexPosition());
-
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
+
+        settingTableRecognizers.add(new ImportLibraryDeclaration());
+        settingTableRecognizers.add(new ImportLibraryAliasDeclaration());
+        settingTableRecognizers.add(new ImportResourceDeclaration());
+        settingTableRecognizers.add(new ImportVariablesDeclaration());
+        settingTableRecognizers.add(new DocumentationDeclaration());
+        settingTableRecognizers.add(new MetadataDeclaration());
+        settingTableRecognizers.add(new SuiteSetupDeclaration());
+        settingTableRecognizers.add(new SuiteTeardownDeclaration());
+        settingTableRecognizers.add(new SuitePreconditionDeclaration());
+        settingTableRecognizers.add(new SuitePostconditionDeclaration());
+        settingTableRecognizers.add(new ForceTagsDeclaration());
+        settingTableRecognizers.add(new DefaultTagsDeclaration());
+        settingTableRecognizers.add(new TestSetupDeclaration());
+        settingTableRecognizers.add(new TestTeardownDeclaration());
+        settingTableRecognizers.add(new TestPreconditionDeclaration());
+        settingTableRecognizers.add(new TestPostconditionDeclaration());
+        settingTableRecognizers.add(new TestTemplateDeclaration());
+        settingTableRecognizers.add(new TestTimeoutDeclaration());
+        settingTableRecognizers = Collections
+                .unmodifiableList(settingTableRecognizers);
     }
 
 
@@ -138,6 +196,12 @@ public class ContextBuilder {
             out.getContexts().add(ctx);
 
             for (IContextRecognizer recognizer : normalRecognizers) {
+                List<IContextElement> recognize = recognizer.recognize(out,
+                        lineBoundaries);
+                addFoundContexts(ctx, recognize);
+            }
+
+            for (IContextRecognizer recognizer : settingTableRecognizers) {
                 List<IContextElement> recognize = recognizer.recognize(out,
                         lineBoundaries);
                 addFoundContexts(ctx, recognize);
