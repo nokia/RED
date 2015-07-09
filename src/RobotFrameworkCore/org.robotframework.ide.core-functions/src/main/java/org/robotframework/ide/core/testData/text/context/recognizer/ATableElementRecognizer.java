@@ -61,6 +61,7 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
             if (type == currentType.getType()) {
                 context.addNextToken(token);
                 if (expectedTokenId + 1 >= sequenceLength) {
+                    context.setType(BUILD_TYPE);
                     foundContexts.add(context);
                     context = createContext(lineInterval);
                     expectedTokenId = 0;
@@ -88,19 +89,21 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
                         // like i.e. Suite Suite Setup
                     }
                 } else {
-                    // search for next mandatory
                     if (expectedTokenId + 1 >= sequenceLength) {
-                        context.removeAllContextTokens();
+                        // this last element is optional so can be skipped and
+                        // context can be close
+                        context.setType(BUILD_TYPE);
+                        foundContexts.add(context);
+                        context = createContext(lineInterval);
                         expectedTokenId = 0;
+                    } else {
                         if (previousTokenId != tokId) {
                             previousTokenId = tokId;
-                            tokId = tokId - 1; // lets try to check if we do not
-                                               // have
-                                               // case
+                            tokId = tokId - 1; // lets try with next element if
+                                               // it belongs to this token
+                            expectedTokenId++;
+                            currentType = expectedSequence.get(expectedTokenId);
                         }
-                    } else {
-                        expectedTokenId++;
-                        currentType = expectedSequence.get(expectedTokenId);
                     }
                 }
             }
