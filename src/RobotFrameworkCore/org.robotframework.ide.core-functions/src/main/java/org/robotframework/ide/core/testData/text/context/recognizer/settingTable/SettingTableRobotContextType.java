@@ -17,6 +17,10 @@ public enum SettingTableRobotContextType implements IContextElementType {
      */
     TABLE_SETTINGS_LIBRARY,
     /**
+     * Library alias WITH NAME
+     */
+    TABLE_SETTINGS_LIBRARY_ALIASES,
+    /**
      * Resource variables and keywords import begin declaration
      */
     TABLE_SETTINGS_RESOURCE,
