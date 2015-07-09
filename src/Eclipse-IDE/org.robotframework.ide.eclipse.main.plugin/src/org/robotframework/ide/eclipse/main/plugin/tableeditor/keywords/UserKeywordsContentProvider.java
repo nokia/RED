@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class UserKeywordsContentProvider implements ITreeContentProvider {
+class UserKeywordsContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {

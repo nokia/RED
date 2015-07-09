@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import static org.eclipse.jface.viewers.Stylers.mixStylers;
 import static org.eclipse.jface.viewers.Stylers.withFontStyle;
@@ -17,11 +17,11 @@ import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 
 import com.google.common.collect.Range;
 
-public class UserKeywordArgumentLabelProvider extends StylersDisposingLabelProvider {
+class CodeArgumentLabelProvider extends StylersDisposingLabelProvider {
 
     private final int index;
 
-    public UserKeywordArgumentLabelProvider(final int index) {
+    CodeArgumentLabelProvider(final int index) {
         this.index = index;
     }
 
