@@ -1,8 +1,16 @@
-package org.robotframework.ide.core.testData.text.context.recognizer.settingTable;
+package org.robotframework.ide.core.testData.text.context.recognizer;
 
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 
 
+/**
+ * Gives common functionality for search, which are not multiple lines - just
+ * one line and for Setting table.
+ * 
+ * @author wypych
+ * @since JDK 1.7 update 74
+ * @version Robot Framework 2.9 alpha 2
+ */
 public class ExpectedSequenceElement {
 
     private final IRobotTokenType type;
