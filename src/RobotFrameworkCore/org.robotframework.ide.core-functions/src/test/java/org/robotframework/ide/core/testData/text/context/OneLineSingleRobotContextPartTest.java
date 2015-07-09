@@ -9,6 +9,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordTableRobotContextType;
+import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SettingTableRobotContextType;
+import org.robotframework.ide.core.testData.text.context.recognizer.testCaseTable.TestCaseTableRobotContextType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
@@ -96,7 +99,104 @@ public class OneLineSingleRobotContextPartTest {
 
 
     @Test
-    public void test_getAndSetType() {
+    public void test_getAndSetType_unsupportedType_ComplexRobotContextType() {
+        try {
+            context.setType(ComplexRobotContextType.SEPARATORS);
+            fail("Expected excpetion");
+        } catch (UnsupportedOperationException e) {
+            assertThat(e.getMessage()).isEqualTo(
+                    "Type " + ComplexRobotContextType.SEPARATORS.getClass()
+                            + " is not supported by this class.");
+
+        }
+    }
+
+
+    @Test
+    public void test_getAndSetType_TestCaseTableType_asGenericContextElementType() {
+        // set-get test
+
+        context.setType((IContextElementType) TestCaseTableRobotContextType.TABLE_TEST_CASE_SETTINGS_TIMEOUT);
+        assertThat(context.getType()).isEqualTo(
+                TestCaseTableRobotContextType.TABLE_TEST_CASE_SETTINGS_TIMEOUT);
+    }
+
+
+    @Test
+    public void test_getAndSetType_SettingTableType_asGenericContextElementType() {
+        // set-get test
+
+        context.setType((IContextElementType) SettingTableRobotContextType.TABLE_SETTINGS_FORCE_TAGS);
+        assertThat(context.getType()).isEqualTo(
+                SettingTableRobotContextType.TABLE_SETTINGS_FORCE_TAGS);
+    }
+
+
+    @Test
+    public void test_getAndSetType_KeywordTableType_asGenericContextElementType() {
+        // set-get test
+
+        context.setType((IContextElementType) KeywordTableRobotContextType.TABLE_KEYWORD_SETTINGS_DOCUMENTATION);
+        assertThat(context.getType())
+                .isEqualTo(
+                        KeywordTableRobotContextType.TABLE_KEYWORD_SETTINGS_DOCUMENTATION);
+    }
+
+
+    @Test
+    public void test_getAndSetType_SimpleRobotContextType_asGenericContextElementType() {
+        assertThat(context.getType()).isEqualTo(
+                SimpleRobotContextType.UNDECLARED_COMMENT);
+
+        // set-get test
+        context.setType((IContextElementType) SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
+        assertThat(context.getType()).isEqualTo(
+                SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
+    }
+
+
+    @Test
+    public void test_getAndSetType_NULL_shouldSetDefault() {
+        // set-get test
+        context.setType((IContextElementType) null);
+        assertThat(context.getType()).isEqualTo(
+                SimpleRobotContextType.UNDECLARED_COMMENT);
+    }
+
+
+    @Test
+    public void test_getAndSetType_TestCaseTableType() {
+        // set-get test
+
+        context.setType(TestCaseTableRobotContextType.TABLE_TEST_CASE_SETTINGS_TIMEOUT);
+        assertThat(context.getType()).isEqualTo(
+                TestCaseTableRobotContextType.TABLE_TEST_CASE_SETTINGS_TIMEOUT);
+    }
+
+
+    @Test
+    public void test_getAndSetType_SettingTableType() {
+        // set-get test
+
+        context.setType(SettingTableRobotContextType.TABLE_SETTINGS_FORCE_TAGS);
+        assertThat(context.getType()).isEqualTo(
+                SettingTableRobotContextType.TABLE_SETTINGS_FORCE_TAGS);
+    }
+
+
+    @Test
+    public void test_getAndSetType_KeywordTableType() {
+        // set-get test
+
+        context.setType(KeywordTableRobotContextType.TABLE_KEYWORD_SETTINGS_DOCUMENTATION);
+        assertThat(context.getType())
+                .isEqualTo(
+                        KeywordTableRobotContextType.TABLE_KEYWORD_SETTINGS_DOCUMENTATION);
+    }
+
+
+    @Test
+    public void test_getAndSetType_SimpleRobotContextType() {
         assertThat(context.getType()).isEqualTo(
                 SimpleRobotContextType.UNDECLARED_COMMENT);
 
@@ -116,8 +216,7 @@ public class OneLineSingleRobotContextPartTest {
 
     @Before
     public void setUp() {
-        context = new OneLineSingleRobotContextPart(
-                FilePosition.THE_FIRST_LINE);
+        context = new OneLineSingleRobotContextPart(FilePosition.THE_FIRST_LINE);
     }
 
 
