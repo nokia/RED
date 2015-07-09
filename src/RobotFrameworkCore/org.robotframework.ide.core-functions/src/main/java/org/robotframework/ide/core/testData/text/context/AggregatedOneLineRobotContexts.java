@@ -73,4 +73,14 @@ public class AggregatedOneLineRobotContexts implements IContextElement {
     public void setSeparators(RobotLineSeparatorsContexts separators) {
         this.separators = separators;
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("AggregatedOneLineRobotContexts [separators=%s, childContexts=%s, handledElements=%s, type=%s, parentContext=%s]",
+                        separators, childContexts, handledElements, type,
+                        parentContext);
+    }
+
 }
