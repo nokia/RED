@@ -28,6 +28,11 @@ import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequen
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.PipeSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.TabulatorTextualRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.UnicodeCharacterWithHexValue;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordArgumentsDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordDocumentationDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordReturnDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordTeardownDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.keywordTable.KeywordTimeoutDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.DefaultTagsDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.DocumentationDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ForceTagsDeclaration;
@@ -46,6 +51,8 @@ import org.robotframework.ide.core.testData.text.context.recognizer.settingTable
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTeardownDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTemplateDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.TestTimeoutDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.testCaseTable.TestDocumentationDeclaration;
+import org.robotframework.ide.core.testData.text.context.recognizer.testCaseTable.TestTagsDeclaration;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.CollectionIndexPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.DictionaryVariableRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.EnvironmentVariableRecognizer;
@@ -110,6 +117,22 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see TestTemplateDeclaration
  * @see TestTimeoutDeclaration
  * 
+ * @see TestDocumentationDeclaration
+ * @see TestTagsDeclaration
+ * @see TestSetupDeclaration
+ * @see TestSetupDeclaration
+ * @see TestTeardownDeclaration
+ * @see TestPreconditionDeclaration
+ * @see TestPostconditionDeclaration
+ * @see TestTemplateDeclaration
+ * @see TestTimeoutDeclaration
+ * 
+ * @see KeywordDocumentationDeclaration
+ * @see KeywordArgumentsDeclaration
+ * @see KeywordReturnDeclaration
+ * @see KeywordTeardownDeclaration
+ * @see KeywordTimeoutDeclaration
+ * 
  * @see DoubleSpaceOrTabulatorSeparatorRecognizer
  * @see PipeSeparatorRecognizer
  * 
@@ -119,6 +142,8 @@ public class ContextBuilder {
     private List<IContextRecognizer> separatorRecognizers = new LinkedList<>();
     private List<IContextRecognizer> normalRecognizers = new LinkedList<>();
     private List<IContextRecognizer> settingTableRecognizers = new LinkedList<>();
+    private List<IContextRecognizer> testCaseTableRecognizers = new LinkedList<>();
+    private List<IContextRecognizer> keywordTableRecognizers = new LinkedList<>();
 
 
     public ContextBuilder() {
@@ -128,6 +153,63 @@ public class ContextBuilder {
         separatorRecognizers = Collections
                 .unmodifiableList(separatorRecognizers);
 
+        initIndependentFromContextRecognizers();
+        initSettingTableRecognizers();
+        initTestCaseTableRecognizers();
+        initKeywordTableRecognizers();
+    }
+
+
+    protected void initKeywordTableRecognizers() {
+        keywordTableRecognizers.add(new KeywordDocumentationDeclaration());
+        keywordTableRecognizers.add(new KeywordArgumentsDeclaration());
+        keywordTableRecognizers.add(new KeywordReturnDeclaration());
+        keywordTableRecognizers.add(new KeywordTeardownDeclaration());
+        keywordTableRecognizers.add(new KeywordTimeoutDeclaration());
+        keywordTableRecognizers = Collections
+                .unmodifiableList(keywordTableRecognizers);
+    }
+
+
+    protected void initTestCaseTableRecognizers() {
+        testCaseTableRecognizers.add(new TestDocumentationDeclaration());
+        testCaseTableRecognizers.add(new TestTagsDeclaration());
+        testCaseTableRecognizers.add(new TestSetupDeclaration());
+        testCaseTableRecognizers.add(new TestTeardownDeclaration());
+        testCaseTableRecognizers.add(new TestPreconditionDeclaration());
+        testCaseTableRecognizers.add(new TestPostconditionDeclaration());
+        testCaseTableRecognizers.add(new TestTemplateDeclaration());
+        testCaseTableRecognizers.add(new TestTimeoutDeclaration());
+        testCaseTableRecognizers = Collections
+                .unmodifiableList(testCaseTableRecognizers);
+    }
+
+
+    protected void initSettingTableRecognizers() {
+        settingTableRecognizers.add(new ImportLibraryDeclaration());
+        settingTableRecognizers.add(new ImportLibraryAliasDeclaration());
+        settingTableRecognizers.add(new ImportResourceDeclaration());
+        settingTableRecognizers.add(new ImportVariablesDeclaration());
+        settingTableRecognizers.add(new DocumentationDeclaration());
+        settingTableRecognizers.add(new MetadataDeclaration());
+        settingTableRecognizers.add(new SuiteSetupDeclaration());
+        settingTableRecognizers.add(new SuiteTeardownDeclaration());
+        settingTableRecognizers.add(new SuitePreconditionDeclaration());
+        settingTableRecognizers.add(new SuitePostconditionDeclaration());
+        settingTableRecognizers.add(new ForceTagsDeclaration());
+        settingTableRecognizers.add(new DefaultTagsDeclaration());
+        settingTableRecognizers.add(new TestSetupDeclaration());
+        settingTableRecognizers.add(new TestTeardownDeclaration());
+        settingTableRecognizers.add(new TestPreconditionDeclaration());
+        settingTableRecognizers.add(new TestPostconditionDeclaration());
+        settingTableRecognizers.add(new TestTemplateDeclaration());
+        settingTableRecognizers.add(new TestTimeoutDeclaration());
+        settingTableRecognizers = Collections
+                .unmodifiableList(settingTableRecognizers);
+    }
+
+
+    protected void initIndependentFromContextRecognizers() {
         normalRecognizers.add(new DeclaredCommentRecognizer());
         normalRecognizers.add(new QuotesSentenceRecognizer());
         normalRecognizers.add(new SettingTableHeaderRecognizer());
@@ -158,27 +240,6 @@ public class ContextBuilder {
         normalRecognizers.add(new DictionaryVariableRecognizer());
         normalRecognizers.add(new CollectionIndexPosition());
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
-
-        settingTableRecognizers.add(new ImportLibraryDeclaration());
-        settingTableRecognizers.add(new ImportLibraryAliasDeclaration());
-        settingTableRecognizers.add(new ImportResourceDeclaration());
-        settingTableRecognizers.add(new ImportVariablesDeclaration());
-        settingTableRecognizers.add(new DocumentationDeclaration());
-        settingTableRecognizers.add(new MetadataDeclaration());
-        settingTableRecognizers.add(new SuiteSetupDeclaration());
-        settingTableRecognizers.add(new SuiteTeardownDeclaration());
-        settingTableRecognizers.add(new SuitePreconditionDeclaration());
-        settingTableRecognizers.add(new SuitePostconditionDeclaration());
-        settingTableRecognizers.add(new ForceTagsDeclaration());
-        settingTableRecognizers.add(new DefaultTagsDeclaration());
-        settingTableRecognizers.add(new TestSetupDeclaration());
-        settingTableRecognizers.add(new TestTeardownDeclaration());
-        settingTableRecognizers.add(new TestPreconditionDeclaration());
-        settingTableRecognizers.add(new TestPostconditionDeclaration());
-        settingTableRecognizers.add(new TestTemplateDeclaration());
-        settingTableRecognizers.add(new TestTimeoutDeclaration());
-        settingTableRecognizers = Collections
-                .unmodifiableList(settingTableRecognizers);
     }
 
 
@@ -195,20 +256,38 @@ public class ContextBuilder {
             ctx.setSeparators(sepCtx);
             out.getContexts().add(ctx);
 
-            for (IContextRecognizer recognizer : normalRecognizers) {
-                List<IContextElement> recognize = recognizer.recognize(out,
-                        lineBoundaries);
-                addFoundContexts(ctx, recognize);
-            }
-
-            for (IContextRecognizer recognizer : settingTableRecognizers) {
-                List<IContextElement> recognize = recognizer.recognize(out,
-                        lineBoundaries);
-                addFoundContexts(ctx, recognize);
-            }
+            performRecognizationOfElementsInLine(out, lineBoundaries, ctx);
         }
 
         return out;
+    }
+
+
+    private void performRecognizationOfElementsInLine(ContextOutput out,
+            LineTokenPosition lineBoundaries, AggregatedOneLineRobotContexts ctx) {
+        for (IContextRecognizer recognizer : normalRecognizers) {
+            List<IContextElement> recognize = recognizer.recognize(out,
+                    lineBoundaries);
+            addFoundContexts(ctx, recognize);
+        }
+
+        for (IContextRecognizer recognizer : settingTableRecognizers) {
+            List<IContextElement> recognize = recognizer.recognize(out,
+                    lineBoundaries);
+            addFoundContexts(ctx, recognize);
+        }
+
+        for (IContextRecognizer recognizer : testCaseTableRecognizers) {
+            List<IContextElement> recognize = recognizer.recognize(out,
+                    lineBoundaries);
+            addFoundContexts(ctx, recognize);
+        }
+
+        for (IContextRecognizer recognizer : keywordTableRecognizers) {
+            List<IContextElement> recognize = recognizer.recognize(out,
+                    lineBoundaries);
+            addFoundContexts(ctx, recognize);
+        }
     }
 
 

@@ -9,7 +9,6 @@ import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement;
-import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.SettingTableRobotContextType;
 import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement.PriorityType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
@@ -30,13 +29,12 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public abstract class ATableElementRecognizer implements IContextRecognizer {
 
-    private final SettingTableRobotContextType BUILD_TYPE;
+    private final IContextElementType BUILD_TYPE;
     private final List<ExpectedSequenceElement> expectedSequence;
     private final int sequenceLength;
 
 
-    protected ATableElementRecognizer(
-            final SettingTableRobotContextType buildType,
+    protected ATableElementRecognizer(final IContextElementType buildType,
             final List<ExpectedSequenceElement> expectedSequence) {
         this.BUILD_TYPE = buildType;
         this.expectedSequence = expectedSequence;
