@@ -58,7 +58,9 @@ public class OneLineSingleRobotContextPart implements IContextElement {
     /**
      * 
      * @param type
-     *            acceptable parameters are type from {@code @see}
+     *            acceptable parameters are type from {@code @see}, in case
+     *            parameter is null default
+     *            {@link SimpleRobotContextType#UNDECLARED_COMMENT} will be set
      * @throws UnsupportedOperationException
      *             in case {@code type} is not supported
      * 
