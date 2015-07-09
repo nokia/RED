@@ -31,6 +31,11 @@ public class ArtificialGroupingRobotElement implements RobotElement {
     }
 
     @Override
+    public String getComment() {
+        return "";
+    }
+
+    @Override
     public RobotElement getParent() {
         return groupedElements.get(0);
     }

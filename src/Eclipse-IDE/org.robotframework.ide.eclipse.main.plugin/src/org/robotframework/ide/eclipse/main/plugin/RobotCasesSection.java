@@ -9,8 +9,8 @@ public class RobotCasesSection extends RobotSuiteFileSection {
         super(parent, SECTION_NAME, readOnly);
     }
 
-    public RobotCase createTestCase(final String name) {
-        final RobotCase testCase = new RobotCase(this, name);
+    public RobotCase createTestCase(final String name, final String comment) {
+        final RobotCase testCase = new RobotCase(this, name, comment);
         elements.add(testCase);
         return testCase;
     }
