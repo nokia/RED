@@ -9,6 +9,8 @@ public interface RobotElement {
 
     String getName();
 
+    String getComment();
+
     RobotElement getParent();
 
     void fixParents(RobotElement parent);

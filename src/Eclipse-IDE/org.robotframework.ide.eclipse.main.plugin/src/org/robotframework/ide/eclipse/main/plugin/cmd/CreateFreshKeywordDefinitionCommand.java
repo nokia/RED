@@ -32,9 +32,9 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
+
         final RobotKeywordDefinition definition = new RobotKeywordDefinition(keywordsSection, DEFAULT_NAME,
                 new ArrayList<String>(), "");
-
         if (index == -1) {
             keywordsSection.getChildren().add(definition);
         } else {

@@ -70,6 +70,11 @@ public abstract class RobotContainer implements RobotElement {
     }
 
     @Override
+    public String getComment() {
+        return "";
+    }
+
+    @Override
     public RobotElement getParent() {
         return parent;
     }
