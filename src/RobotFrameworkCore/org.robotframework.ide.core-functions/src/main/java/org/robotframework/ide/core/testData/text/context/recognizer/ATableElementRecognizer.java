@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.text.context.recognizer;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,8 +9,7 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement;
-import org.robotframework.ide.core.testData.text.context.recognizer.settingTable.ExpectedSequenceElement.PriorityType;
+import org.robotframework.ide.core.testData.text.context.recognizer.ExpectedSequenceElement.PriorityType;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
@@ -37,7 +37,7 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
     protected ATableElementRecognizer(final IContextElementType buildType,
             final List<ExpectedSequenceElement> expectedSequence) {
         this.BUILD_TYPE = buildType;
-        this.expectedSequence = expectedSequence;
+        this.expectedSequence = Collections.unmodifiableList(expectedSequence);
         this.sequenceLength = expectedSequence.size();
     }
 
@@ -48,6 +48,12 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
         List<IContextElement> foundContexts = new LinkedList<>();
         OneLineSingleRobotContextPart context = createContext(lineInterval);
 
+        /**
+         * Logic for this method base on {@link ExpectedSequenceElement} and
+         * idea, that some elements could be optional, so present of them are
+         * not crucial for parsing, therefore we can skip missing optional
+         * element until we will find mandatory, which can't be skipped
+         */
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         int expectedTokenId = 0;
@@ -83,7 +89,8 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
                     expectedTokenId = 0;
                     if (previousTokenId != tokId) {
                         previousTokenId = tokId;
-                        tokId = tokId - 1; // lets try to check if we do not
+                        tokId = tokId - 1; // lets try to check this token again
+                                           // if we do not
                                            // have
                                            // case
                         // like i.e. Suite Suite Setup
@@ -113,6 +120,12 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
     }
 
 
+    @VisibleForTesting
+    protected List<ExpectedSequenceElement> getExpectedElements() {
+        return expectedSequence;
+    }
+
+
     private static List<ExpectedSequenceElement> createExpectedAllMandatory(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = new LinkedList<>();
@@ -124,6 +137,14 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
     }
 
 
+    /**
+     * helper method for creation square wrapped elements
+     * 
+     * @param types
+     *            mandatory {@code tokens types} , which should exist inside
+     *            {@code '[' tokens types ']'}
+     * @return
+     */
     protected static List<ExpectedSequenceElement> createExpectedInsideSquareBrackets(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = createExpectedAllMandatory(types);
@@ -140,6 +161,13 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
     }
 
 
+    /**
+     * 
+     * @param types
+     *            mandatory {@code tokens types} , which should exist, the last
+     *            element is optional colon {@code ':'}
+     * @return
+     */
     protected static List<ExpectedSequenceElement> createExpectedForSettingsTable(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = createExpectedAllMandatory(types);
