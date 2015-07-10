@@ -98,7 +98,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                robotEventBroker.sendClearEventToMessageLogView();
 
                 ILaunchConfiguration config = findLaunchConfiguration(resources);
                 if (config == null) {
@@ -134,6 +133,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             return;
         }
         try {
+            robotEventBroker.sendClearEventToMessageLogView();
             doLaunch(configuration, mode, launch, monitor);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
@@ -194,7 +194,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             try {
                 target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
                         robotEventBroker, socketManager);
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
                 }
@@ -329,17 +329,17 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         });
     }
     
-    private void waitForDebugServerSocket(int port) {
+    private void waitForDebugServerSocket(final int port) {
         boolean isListening = false;
         int retryCounter = 0;
         while (!isListening && retryCounter < 20) {
             try (Socket temporarySocket = new Socket("localhost", port)) {
                 isListening = true;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 try {
                     Thread.sleep(100);
                     retryCounter++;
-                } catch (InterruptedException e1) {
+                } catch (final InterruptedException e1) {
                     e1.printStackTrace();
                 }
             }
