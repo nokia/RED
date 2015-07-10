@@ -304,7 +304,7 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     @Override
     public void setFocus() {
-        viewer.getTable().setFocus();
+        viewer.getTable().getParent().setFocus();
     }
 
     public TableViewer getViewer() {
