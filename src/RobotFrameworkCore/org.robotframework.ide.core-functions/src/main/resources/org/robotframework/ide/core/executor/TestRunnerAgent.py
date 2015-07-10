@@ -149,13 +149,15 @@ class TestRunnerAgent:
         self._send_socket("start agent", "")
         self._send_socket("pid", os.getpid())
         try:
-            from robot.version import get_version
-            robotVersion = str(get_version(naked=True))[:3]
-            robotVersion = float(robotVersion)
-            from robot.variables import GLOBAL_VARIABLES
-            variables = GLOBAL_VARIABLES
-            if robotVersion >= 2.9:
-                variables = variables.store.data
+            variables = {}
+            try:
+                from robot.variables import GLOBAL_VARIABLES
+                variables = GLOBAL_VARIABLES
+            except ImportError:  # for robot >2.9
+                from robot.conf.settings import RobotSettings
+                from robot.variables.scopes import GlobalVariables
+                variables = GlobalVariables(RobotSettings()).as_dict()
+            
             data = {}
             for k in variables.keys():
                 if not (k.startswith('${') or k.startswith('@{')):
