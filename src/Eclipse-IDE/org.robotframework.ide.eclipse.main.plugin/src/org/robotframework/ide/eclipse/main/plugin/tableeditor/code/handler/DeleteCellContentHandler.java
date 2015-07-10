@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -7,9 +7,13 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetCaseArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetCaseCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.cmd.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallNameCommand;
@@ -18,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionCommen
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
 import org.robotframework.viewers.Selections;
 
 public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandler> {
@@ -54,6 +58,15 @@ public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandl
                     commandsStack.execute(new SetKeywordDefinitionCommentCommand(definition, attribute));
                 } else {
                     commandsStack.execute(new SetKeywordDefinitionArgumentCommand(definition, index - 1, attribute));
+                }
+            } else if (element instanceof RobotCase) {
+                final RobotCase testCase = (RobotCase) element;
+                if (index == 0) {
+                    commandsStack.execute(new SetCaseNameCommand(testCase, attribute));
+                } else if (index == noOfColumns - 1) {
+                    commandsStack.execute(new SetCaseCommentCommand(testCase, attribute));
+                } else {
+                    commandsStack.execute(new SetCaseArgumentCommand(testCase, index - 1, attribute));
                 }
             } else if (element instanceof RobotKeywordCall) {
                 final RobotKeywordCall call = (RobotKeywordCall) element;

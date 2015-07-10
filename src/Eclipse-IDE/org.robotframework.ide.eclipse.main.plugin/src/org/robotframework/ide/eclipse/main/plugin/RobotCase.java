@@ -2,15 +2,16 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class RobotCase implements RobotElement {
+public class RobotCase implements RobotElement, Serializable {
 
-    private RobotCasesSection parent;
+    private transient RobotCasesSection parent;
     private String name;
     protected final List<RobotElement> elements = new ArrayList<>();
     private String comment;
@@ -42,9 +43,17 @@ public class RobotCase implements RobotElement {
         this.name = newName;
     }
 
+    public List<String> getArguments() {
+        return new ArrayList<String>();
+    }
+
     @Override
     public RobotElement getParent() {
         return parent;
+    }
+
+    public void setParent(final RobotCasesSection parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -56,6 +65,7 @@ public class RobotCase implements RobotElement {
         }
     }
 
+    @Override
     public String getComment() {
         return comment;
     }

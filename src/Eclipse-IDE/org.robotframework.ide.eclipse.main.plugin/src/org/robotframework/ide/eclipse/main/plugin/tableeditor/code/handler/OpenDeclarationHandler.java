@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
 import org.robotframework.viewers.Selections;
 
 public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> {
