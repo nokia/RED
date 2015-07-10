@@ -6,6 +6,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -76,6 +77,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private VariableValueEditForm valueEditForm;
     
     private Section editSection;
+    private boolean isSaving = false;
 
     TableViewer getViewer() {
         return viewer;
@@ -175,6 +177,11 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
     
+    @Persist
+    public void onSave() {
+        isSaving = true;
+    }
+
     private Section createValueEditSection(final Composite parent) {
         final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setText("Edit Variable");
@@ -190,7 +197,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
             @Override
-            public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(final SelectionChangedEvent event) {
 
                 if (event != null && event.getSelection() instanceof StructuredSelection
                         && ((StructuredSelection) event.getSelection()).size() == 1
@@ -276,11 +283,11 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED) {
+        if (change.getKind() == Kind.CHANGED && !isSaving) {
+            isSaving = false;
             setInput();
         }
     }
-    
     
     @Inject
     @Optional
