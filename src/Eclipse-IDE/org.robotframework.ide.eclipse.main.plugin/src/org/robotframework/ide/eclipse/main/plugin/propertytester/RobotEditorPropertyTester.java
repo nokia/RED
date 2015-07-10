@@ -9,6 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.CasesTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
 
@@ -46,9 +47,15 @@ public class RobotEditorPropertyTester extends DIPropertyTester<E4RobotEditorPro
             } else if ("thereAreKeywordCallElementsInClipboard".equals(propertyName)) {
                 final Clipboard clipboard = robotEditor.getClipboard();
                 return KeywordCallsTransfer.hasKeywordCalls(clipboard) == expected.booleanValue();
+
+            } else if ("thereAreCasesElementsInClipboard".equals(propertyName)) {
+                final Clipboard clipboard = robotEditor.getClipboard();
+                return CasesTransfer.hasCases(clipboard) == expected.booleanValue();
+
             } else if ("thereIsTextInClipboard".equals(propertyName)) {
                 final Clipboard clipborad = robotEditor.getClipboard();
                 return (clipborad.getContents(TextTransfer.getInstance()) != null) == expected.booleanValue();
+
             }
             return false;
         }

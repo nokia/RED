@@ -79,7 +79,9 @@ public class RobotModelEvents {
 
     public static final String ROBOT_CASE_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/cases/changed/*";
 
-    public static final String ROBOT_CASE_NAME_CHANGE = "robot/model/editor/file/detail/cases/changed/argument";
+    public static final String ROBOT_CASE_NAME_CHANGE = "robot/model/editor/file/detail/cases/changed/name";
+
+    public static final String ROBOT_CASE_ARGUMENT_CHANGE = "robot/model/editor/file/detail/cases/changed/argument";
 
     public static final String ROBOT_CASE_COMMENT_CHANGE = "robot/model/editor/file/detail/cases/changed/comment";
     
