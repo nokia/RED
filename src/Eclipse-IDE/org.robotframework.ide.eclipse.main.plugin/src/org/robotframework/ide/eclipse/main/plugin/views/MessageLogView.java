@@ -18,13 +18,12 @@ import org.eclipse.swt.widgets.Composite;
  *
  */
 public class MessageLogView {
-
     private StyledText styledText;
     
     @PostConstruct
-    public void postConstruct(Composite parent) {
+    public void postConstruct(final Composite parent) {
         
-        FillLayout layout = new FillLayout();
+        final FillLayout layout = new FillLayout();
         layout.marginHeight=2;
         layout.marginWidth=2;
         parent.setLayout(layout);
@@ -36,23 +35,23 @@ public class MessageLogView {
     
     @Focus
     public void onFocus() {
-        
+        styledText.setFocus();
     }
     
-    public void appendLine(String line) {
+    public void appendLine(final String line) {
         styledText.append(line);
         styledText.setTopIndex(styledText.getLineCount() - 1);
     }
     
     @Inject
     @Optional
-    private void lineEvent(@UIEventTopic("MessageLogView/AppendLine") String line) {
+    private void lineEvent(@UIEventTopic("MessageLogView/AppendLine") final String line) {
         appendLine(line);
     }
     
     @Inject
     @Optional
-    private void clearEvent(@UIEventTopic("MessageLogView/Clear") String s) {
+    private void clearEvent(@UIEventTopic("MessageLogView/Clear") final String s) {
         styledText.setText("");
     }
 }
