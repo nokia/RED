@@ -197,8 +197,10 @@ public class RobotRuntimeEnvironment {
     private static File copyResourceFile(final String filename) throws IOException {
         final Path tempDir = createTemporaryDirectory();
         final File scriptFile = new File(tempDir.toString() + File.separator + filename);
-        Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(filename), scriptFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING);
+        if (!scriptFile.exists()) {
+            Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(filename), scriptFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+        }
         return scriptFile;
     }
 
