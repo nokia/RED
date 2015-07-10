@@ -26,7 +26,7 @@ public class CasesContentProvider implements ITreeContentProvider {
         if (inputElement instanceof RobotCasesSection) {
             final RobotCasesSection section = (RobotCasesSection) inputElement;
             final boolean isEditable = section.getSuiteFile().isEditable();
-            return extendWithAddingToken(inputElement, section.getChildren().toArray(), " test case", 0, isEditable);
+            return extendWithAddingToken(inputElement, section.getChildren().toArray(), "test case", 0, isEditable);
         }
         return new Object[0];
     }
