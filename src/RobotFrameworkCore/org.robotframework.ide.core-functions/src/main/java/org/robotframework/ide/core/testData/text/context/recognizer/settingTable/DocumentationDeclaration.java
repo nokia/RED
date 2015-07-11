@@ -9,6 +9,6 @@ public class DocumentationDeclaration extends ATableElementRecognizer {
     public DocumentationDeclaration() {
         super(
                 SettingTableRobotContextType.TABLE_SETTINGS_DOCUMENTATION,
-                createExpectedForSettingsTable(RobotWordType.DOCUMENTATION_WORD));
+                createExpectedWithOptionalColonAsLast(RobotWordType.DOCUMENTATION_WORD));
     }
 }

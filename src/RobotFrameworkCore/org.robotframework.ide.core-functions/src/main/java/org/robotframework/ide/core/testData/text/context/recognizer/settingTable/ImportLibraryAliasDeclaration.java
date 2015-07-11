@@ -8,7 +8,7 @@ public class ImportLibraryAliasDeclaration extends ATableElementRecognizer {
 
     public ImportLibraryAliasDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_LIBRARY_ALIASES,
-                createExpectedForSettingsTable(RobotWordType.WITH_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.WITH_WORD,
                         RobotWordType.NAME_WORD));
     }
 }

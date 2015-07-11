@@ -21,7 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Gives common functionality for search, which are not multiple lines - just
- * one line and for Setting table.
+ * one line and in all tables.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
@@ -38,6 +38,25 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
             final List<ExpectedSequenceElement> expectedSequence) {
         this.BUILD_TYPE = buildType;
         this.expectedSequence = Collections.unmodifiableList(expectedSequence);
+        this.sequenceLength = expectedSequence.size();
+    }
+
+
+    /**
+     * 
+     * @param expectedSequence
+     *            sequence will be modifiable so we will able to test iteration
+     *            over this list
+     * @param buildType
+     */
+    @VisibleForTesting
+    protected ATableElementRecognizer(
+            final List<ExpectedSequenceElement> expectedSequence,
+            final IContextElementType buildType) {
+        // order change special just to have possibility to use the same amount
+        // of arguments
+        this.BUILD_TYPE = buildType;
+        this.expectedSequence = expectedSequence;
         this.sequenceLength = expectedSequence.size();
     }
 
@@ -116,7 +135,31 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
             }
         }
 
+        if (wasAllMandatoryFound(expectedSequence, expectedTokenId)) {
+            foundContexts.add(context);
+        }
+
         return foundContexts;
+    }
+
+
+    @VisibleForTesting
+    protected boolean wasAllMandatoryFound(
+            final List<ExpectedSequenceElement> expectedSequence,
+            final int currentPosition) {
+        boolean result = true;
+
+        int size = expectedSequence.size();
+        if (currentPosition >= 0 && currentPosition < size) {
+            for (int i = currentPosition; i < size; i++) {
+                if (expectedSequence.get(i).getPriority() == PriorityType.MANDATORY) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
 
@@ -168,7 +211,7 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
      *            element is optional colon {@code ':'}
      * @return
      */
-    protected static List<ExpectedSequenceElement> createExpectedForSettingsTable(
+    protected static List<ExpectedSequenceElement> createExpectedWithOptionalColonAsLast(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = createExpectedAllMandatory(types);
         if (!elems.isEmpty()) {
