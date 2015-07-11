@@ -8,7 +8,7 @@ public class SuiteSetupDeclaration extends ATableElementRecognizer {
 
     public SuiteSetupDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_SUITE_SETUP,
-                createExpectedForSettingsTable(RobotWordType.SUITE_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.SUITE_WORD,
                         RobotWordType.SETUP_WORD));
     }
 }

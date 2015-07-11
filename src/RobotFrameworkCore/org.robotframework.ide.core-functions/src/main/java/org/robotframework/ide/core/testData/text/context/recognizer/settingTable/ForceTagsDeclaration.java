@@ -8,7 +8,7 @@ public class ForceTagsDeclaration extends ATableElementRecognizer {
 
     public ForceTagsDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_FORCE_TAGS,
-                createExpectedForSettingsTable(RobotWordType.FORCE_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.FORCE_WORD,
                         RobotWordType.TAGS_WORD));
     }
 }

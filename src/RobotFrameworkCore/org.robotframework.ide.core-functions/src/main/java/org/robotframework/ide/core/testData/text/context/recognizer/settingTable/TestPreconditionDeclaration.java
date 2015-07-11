@@ -8,7 +8,7 @@ public class TestPreconditionDeclaration extends ATableElementRecognizer {
 
     public TestPreconditionDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_TEST_PRECONDITION,
-                createExpectedForSettingsTable(RobotWordType.TEST_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.TEST_WORD,
                         RobotWordType.PRECONDITION_WORD));
     }
 }
