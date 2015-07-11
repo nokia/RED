@@ -8,6 +8,6 @@ public class ImportLibraryDeclaration extends ATableElementRecognizer {
 
     public ImportLibraryDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_LIBRARY,
-                createExpectedForSettingsTable(RobotWordType.LIBRARY_WORD));
+                createExpectedWithOptionalColonAsLast(RobotWordType.LIBRARY_WORD));
     }
 }

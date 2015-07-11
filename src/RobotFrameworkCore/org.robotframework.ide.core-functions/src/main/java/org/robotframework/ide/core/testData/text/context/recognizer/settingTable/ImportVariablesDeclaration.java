@@ -8,6 +8,6 @@ public class ImportVariablesDeclaration extends ATableElementRecognizer {
 
     public ImportVariablesDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_VARIABLES,
-                createExpectedForSettingsTable(RobotWordType.VARIABLES_WORD));
+                createExpectedWithOptionalColonAsLast(RobotWordType.VARIABLES_WORD));
     }
 }

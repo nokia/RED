@@ -8,6 +8,6 @@ public class ImportResourceDeclaration extends ATableElementRecognizer {
 
     public ImportResourceDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_RESOURCE,
-                createExpectedForSettingsTable(RobotWordType.RESOURCE_WORD));
+                createExpectedWithOptionalColonAsLast(RobotWordType.RESOURCE_WORD));
     }
 }

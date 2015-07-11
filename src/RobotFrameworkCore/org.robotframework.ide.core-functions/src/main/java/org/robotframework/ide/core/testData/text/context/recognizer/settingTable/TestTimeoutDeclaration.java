@@ -8,7 +8,7 @@ public class TestTimeoutDeclaration extends ATableElementRecognizer {
 
     public TestTimeoutDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_TEST_TIMEOUT,
-                createExpectedForSettingsTable(RobotWordType.TEST_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.TEST_WORD,
                         RobotWordType.TIMEOUT_WORD));
     }
 }

@@ -8,6 +8,6 @@ public class MetadataDeclaration extends ATableElementRecognizer {
 
     public MetadataDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_METADATA,
-                createExpectedForSettingsTable(RobotWordType.METADATA_WORD));
+                createExpectedWithOptionalColonAsLast(RobotWordType.METADATA_WORD));
     }
 }
