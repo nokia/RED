@@ -8,7 +8,7 @@ public class TestPostconditionDeclaration extends ATableElementRecognizer {
 
     public TestPostconditionDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_TEST_POSTCONDITION,
-                createExpectedForSettingsTable(RobotWordType.TEST_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.TEST_WORD,
                         RobotWordType.POSTCONDITION_WORD));
     }
 }

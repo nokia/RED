@@ -8,7 +8,7 @@ public class SuiteTeardownDeclaration extends ATableElementRecognizer {
 
     public SuiteTeardownDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_SUITE_TEARDOWN,
-                createExpectedForSettingsTable(RobotWordType.SUITE_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.SUITE_WORD,
                         RobotWordType.TEARDOWN_WORD));
     }
 }

@@ -8,7 +8,7 @@ public class SuitePreconditionDeclaration extends ATableElementRecognizer {
 
     public SuitePreconditionDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_SUITE_PRECONDITION,
-                createExpectedForSettingsTable(RobotWordType.SUITE_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.SUITE_WORD,
                         RobotWordType.PRECONDITION_WORD));
     }
 }

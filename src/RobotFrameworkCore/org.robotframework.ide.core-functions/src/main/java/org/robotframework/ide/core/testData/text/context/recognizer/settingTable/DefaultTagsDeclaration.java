@@ -8,7 +8,7 @@ public class DefaultTagsDeclaration extends ATableElementRecognizer {
 
     public DefaultTagsDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_DEFAULT_TAGS,
-                createExpectedForSettingsTable(RobotWordType.DEFAULT_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.DEFAULT_WORD,
                         RobotWordType.TAGS_WORD));
     }
 }

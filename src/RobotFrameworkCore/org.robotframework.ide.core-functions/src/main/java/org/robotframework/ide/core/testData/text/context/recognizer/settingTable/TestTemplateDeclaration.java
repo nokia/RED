@@ -8,7 +8,7 @@ public class TestTemplateDeclaration extends ATableElementRecognizer {
 
     public TestTemplateDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_TEST_TEMPLATE,
-                createExpectedForSettingsTable(RobotWordType.TEST_WORD,
+                createExpectedWithOptionalColonAsLast(RobotWordType.TEST_WORD,
                         RobotWordType.TEMPLATE_WORD));
     }
 }
