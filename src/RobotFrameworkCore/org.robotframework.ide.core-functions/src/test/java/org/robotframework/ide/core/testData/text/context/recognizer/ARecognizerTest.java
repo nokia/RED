@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.After;
@@ -22,8 +23,8 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.TxtRobotTestDataLexer;
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -103,8 +104,7 @@ public abstract class ARecognizerTest {
         TokensLineIterator iter = new TokensLineIterator(tokenOutput);
         LineTokenPosition line = iter.next();
         if (line == null) {
-            line = new LineTokenPosition(0, 0,
-                    FilePosition.THE_FIRST_LINE);
+            line = new LineTokenPosition(0, 0, FilePosition.THE_FIRST_LINE);
         }
         ContextOutput out = new ContextOutput(tokenOutput);
 
@@ -160,6 +160,17 @@ public abstract class ARecognizerTest {
         TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer(readersProvider);
         TokenOutput tokenOutput = lexer.extractTokens(file);
         return tokenOutput;
+    }
+
+
+    protected void assertExpectedSequenceAllMandatory(IRobotTokenType... types) {
+        List<ExpectedSequenceElement> sequence = new LinkedList<>();
+        for (IRobotTokenType t : types) {
+            sequence.add(ExpectedSequenceElement.buildMandatory(t));
+        }
+
+        assertThat(((ATableElementRecognizer) context).getExpectedElements())
+                .containsExactlyElementsOf(sequence);
     }
 
 

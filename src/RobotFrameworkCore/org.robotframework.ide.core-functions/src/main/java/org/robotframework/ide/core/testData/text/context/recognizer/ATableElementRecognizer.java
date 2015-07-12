@@ -136,6 +136,7 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
         }
 
         if (wasAllMandatoryFound(expectedSequence, expectedTokenId)) {
+            context.setType(BUILD_TYPE);
             foundContexts.add(context);
         }
 
@@ -169,7 +170,7 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
     }
 
 
-    private static List<ExpectedSequenceElement> createExpectedAllMandatory(
+    protected static List<ExpectedSequenceElement> createExpectedAllMandatory(
             IRobotTokenType... types) {
         List<ExpectedSequenceElement> elems = new LinkedList<>();
         for (IRobotTokenType t : types) {
