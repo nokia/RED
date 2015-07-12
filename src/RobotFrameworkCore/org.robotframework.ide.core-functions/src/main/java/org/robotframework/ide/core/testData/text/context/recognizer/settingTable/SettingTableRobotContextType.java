@@ -51,7 +51,7 @@ public enum SettingTableRobotContextType implements IContextElementType {
     /**
      * the same as {@link #TABLE_SETTINGS_SUITE_TEARDOWN}
      */
-    TABLE_SETTINGS_SUITE_POSTCONDTION,
+    TABLE_SETTINGS_SUITE_POSTCONDITION,
     /**
      * Used for specifying forced values for tags when tagging test cases.
      */
