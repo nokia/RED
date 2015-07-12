@@ -142,5 +142,10 @@ public enum SimpleRobotContextType implements IContextElementType {
      * understand it as 'normal word' and two spaces will be not taken as
      * separator
      */
-    ESCAPED_SPACE;
+    ESCAPED_SPACE,
+    /**
+     * Continue of previous line - three dots {@code ...} - they should be at
+     * the first position
+     */
+    CONTINUE_PREVIOUS_LINE_DECLARATION;
 }
