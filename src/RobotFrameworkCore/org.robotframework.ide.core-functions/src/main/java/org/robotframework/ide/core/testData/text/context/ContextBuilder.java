@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizerTest;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
@@ -89,6 +91,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see ListVariableRecognizer
  * @see DictionaryVariableRecognizer
  * @see CollectionIndexPosition
+ * @see ContinuePreviousLineRecognizerTest
  * 
  * @see EscapedDollarSign
  * @see EscapedAtSign
@@ -239,6 +242,7 @@ public class ContextBuilder {
         normalRecognizers.add(new ListVariableRecognizer());
         normalRecognizers.add(new DictionaryVariableRecognizer());
         normalRecognizers.add(new CollectionIndexPosition());
+        normalRecognizers.add(new ContinuePreviousLineRecognizer());
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
 
@@ -331,6 +335,36 @@ public class ContextBuilder {
 
         public List<AggregatedOneLineRobotContexts> getContexts() {
             return contexts;
+        }
+
+
+        public static void prettyPrintContexts(ContextOutput out) {
+            List<AggregatedOneLineRobotContexts> contexts = out.getContexts();
+
+            int numberOfContextLines = contexts.size();
+            for (int line = 0; line < numberOfContextLines; line++) {
+                System.out.println(String.format("-- Context [%d] --",
+                        (line + 1)));
+                AggregatedOneLineRobotContexts c = contexts.get(line);
+                prettyPrintChildContexts("\t\t", "\n\t\t\t\t", c);
+            }
+        }
+
+
+        public static void prettyPrintChildContexts(String prefix,
+                String suffix, AggregatedOneLineRobotContexts lineAggregatedCtxs) {
+            List<IContextElement> childContexts = lineAggregatedCtxs
+                    .getChildContexts();
+            int size = childContexts.size();
+            for (int i = 0; i < size; i++) {
+                System.out.println(String.format(prefix
+                        + "Child context[%d]: %s%s", i, suffix,
+                        childContexts.get(i)));
+            }
+
+            if (childContexts.isEmpty()) {
+                System.out.println(prefix + "-- no child contexts found --");
+            }
         }
     }
 }
