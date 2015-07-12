@@ -676,6 +676,26 @@ public class ATableElementRecognizerTest {
 
 
     @Test
+    public void test_createExpected_withTwoElementsProvidedOnly() {
+        // prepare
+        IRobotTokenType[] types = new IRobotTokenType[] {
+                RobotSingleCharTokenType.SINGLE_ASTERISK,
+                RobotSingleCharTokenType.SINGLE_EQUAL };
+
+        // execute
+        List<ExpectedSequenceElement> elems = ATableElementRecognizer
+                .createExpectedAllMandatory(types);
+
+        // verify
+        assertThat(elems).hasSize(types.length);
+        assertExpectedSequenceElement(new ExpectedSequenceElement(types[0],
+                PriorityType.MANDATORY), elems.get(0));
+        assertExpectedSequenceElement(new ExpectedSequenceElement(types[1],
+                PriorityType.MANDATORY), elems.get(1));
+    }
+
+
+    @Test
     public void test_createExpectedInsideSquareBrackets_withThreeElements() {
         // prepare
         IRobotTokenType[] types = new IRobotTokenType[] {

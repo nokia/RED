@@ -21,7 +21,7 @@ public class ImportLibraryAliasDeclaration extends ATableElementRecognizer {
 
     public ImportLibraryAliasDeclaration() {
         super(SettingTableRobotContextType.TABLE_SETTINGS_LIBRARY_ALIASES,
-                createExpectedWithOptionalColonAsLast(RobotWordType.WITH_WORD,
+                createExpectedAllMandatory(RobotWordType.WITH_WORD,
                         RobotWordType.NAME_WORD));
     }
 }
