@@ -164,8 +164,8 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
 
 
     @VisibleForTesting
-    protected List<ExpectedSequenceElement> getExpectedElements() {
-        return expectedSequence;
+    public List<ExpectedSequenceElement> getExpectedElements() {
+        return Collections.unmodifiableList(expectedSequence);
     }
 
 
