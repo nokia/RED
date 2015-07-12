@@ -78,6 +78,168 @@ public class ATableElementRecognizerTest {
 
 
     @Test
+    public void test_recognizeWithOptionalTokenInTheEnd_andTrashDataAfterMandatory()
+            throws Exception {
+        // prepare
+        String text = ".default     *bold* foobar";
+        List<ExpectedSequenceElement> expectedSequence = createSpiedList(Arrays
+                .asList(elementExpectedOne, elementExpectedTwo,
+                        elementExpectedThreeOptional));
+        DummyWithList contextRecognizer = spy(new DummyWithList(
+                expectedSequence));
+
+        LineTokenPosition lineInterval = mock(LineTokenPosition.class);
+        when(lineInterval.getStart()).thenReturn(0);
+        when(lineInterval.getEnd()).thenReturn(10);
+        OneLineSingleRobotContextPart context = spy(new OneLineSingleRobotContextPart(
+                1));
+        OneLineSingleRobotContextPart contextClear = spy(new OneLineSingleRobotContextPart(
+                1));
+
+        TokenOutput tokenOutput = createInputForContext(text);
+        tokenOutput = spiedWithSpiesInside(tokenOutput);
+
+        List<RobotToken> tokens = tokenOutput.getTokens();
+        RobotToken theFirstToken = tokens.get(0);
+        RobotToken theSecondToken = tokens.get(1);
+        RobotToken theThirdToken = tokens.get(2);
+        RobotToken theFourthToken = tokens.get(3);
+        RobotToken theFiveToken = tokens.get(4);
+        RobotToken theSixToken = tokens.get(5);
+        RobotToken theSevenToken = tokens.get(6);
+        RobotToken theEightToken = tokens.get(7);
+        RobotToken theNineToken = tokens.get(8);
+        RobotToken theTenToken = tokens.get(9);
+
+        contextRecognizer.contextsToReturn.add(context);
+        contextRecognizer.contextsToReturn.add(contextClear);
+
+        ContextOutput currentContext = mock(ContextOutput.class);
+        when(currentContext.getTokenizedContent()).thenReturn(tokenOutput);
+
+        // execute
+        List<IContextElement> foundContexts = contextRecognizer.recognize(
+                currentContext, lineInterval);
+
+        // verify
+        assertThat(foundContexts).hasSize(1);
+        InOrder order = inOrder(contextRecognizer, currentContext, tokenOutput,
+                tokens, lineInterval, theFirstToken, theSecondToken,
+                theThirdToken, theFourthToken, theFiveToken, theSixToken,
+                theSevenToken, theEightToken, theNineToken, theTenToken,
+                elementExpectedOne, elementExpectedTwo,
+                elementExpectedThreeOptional, context, contextClear,
+                expectedSequence);
+
+        order.verify(contextRecognizer, times(1)).recognize(currentContext,
+                lineInterval);
+        order.verify(contextRecognizer, times(1)).createContext(lineInterval);
+        order.verify(currentContext, times(1)).getTokenizedContent();
+        order.verify(tokenOutput, times(1)).getTokens();
+
+        // for loop begin
+        order.verify(lineInterval, times(1)).getStart();
+        order.verify(lineInterval, times(1)).getEnd();
+
+        // // first iteration - dot
+        order.verify(tokens, times(1)).get(0);
+        order.verify(theFirstToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getType();
+        order.verify(context, times(1)).addNextToken(theFirstToken);
+
+        // // second iteration - word default
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(1);
+        order.verify(theSecondToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(1);
+        order.verify(elementExpectedTwo, times(1)).getType();
+        order.verify(context, times(1)).addNextToken(theSecondToken);
+
+        // // third iteration - double space
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(2);
+        order.verify(theThirdToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(2);
+        order.verify(elementExpectedThreeOptional, times(1)).getType();
+        order.verify(context, times(1)).addNextToken(theThirdToken);
+
+        // // fourth iteration - double space
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(3);
+        order.verify(theFourthToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(2);
+        order.verify(elementExpectedThreeOptional, times(1)).getType();
+        order.verify(context, times(1)).addNextToken(theFourthToken);
+
+        // // five iteration - space
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(4);
+        order.verify(theFiveToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(2);
+        order.verify(elementExpectedThreeOptional, times(1)).getType();
+        order.verify(context, times(1)).addNextToken(theFiveToken);
+
+        // // sixth iteration - asterisk
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(5);
+        order.verify(theSixToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(2);
+        order.verify(elementExpectedThreeOptional, times(1)).getType();
+        order.verify(elementExpectedThreeOptional, times(1)).getPriority();
+        // it is optional and next expected optional or mandatory doesn't exist
+        order.verify(context, times(1)).setType(buildType);
+        order.verify(contextRecognizer, times(1)).createContext(lineInterval);
+
+        // // seven iteration - asterisk
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(6);
+        order.verify(theSevenToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getType();
+        order.verify(elementExpectedOne, times(1)).getPriority();
+        order.verify(contextClear, times(1)).removeAllContextTokens();
+
+        // // eight iteration - space
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(7);
+        order.verify(theEightToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getType();
+        order.verify(elementExpectedOne, times(1)).getPriority();
+        order.verify(contextClear, times(1)).removeAllContextTokens();
+
+        // // nine iteration - space
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(8);
+        order.verify(theNineToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getType();
+        order.verify(elementExpectedOne, times(1)).getPriority();
+        order.verify(contextClear, times(1)).removeAllContextTokens();
+
+        // // ten iteration - foobar word
+        order.verify(lineInterval, times(1)).getEnd();
+        order.verify(tokens, times(1)).get(9);
+        order.verify(theTenToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getType();
+        order.verify(elementExpectedOne, times(1)).getPriority();
+        order.verify(contextClear, times(1)).removeAllContextTokens();
+
+        // last check for ends iteration
+        order.verify(lineInterval, times(1)).getEnd();
+        // was mandatory all found check
+        order.verify(contextRecognizer, times(1)).wasAllMandatoryFound(
+                expectedSequence, 0);
+        order.verify(expectedSequence, times(1)).size();
+        order.verify(expectedSequence, times(1)).get(0);
+        order.verify(elementExpectedOne, times(1)).getPriority();
+        order.verifyNoMoreInteractions();
+    }
+
+
+    @Test
     public void test_wasAllMandatoryFound_listWithTwoElement_positionIsOne_OptionalAndOptional_shouldReturn_TRUE() {
         // prepare
         List<ExpectedSequenceElement> elems = spy(new LinkedList<ExpectedSequenceElement>());
@@ -374,36 +536,36 @@ public class ATableElementRecognizerTest {
         order.verify(contextRecognizer, times(1)).createContext(lineInterval);
         order.verify(currentContext, times(1)).getTokenizedContent();
         order.verify(tokenOutput, times(1)).getTokens();
-        order.verify(expectedSequence, times(1)).get(0);
 
         // for loop begin
         order.verify(lineInterval, times(1)).getStart();
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(0);
         order.verify(theFirstToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
         order.verify(elementExpectedOne, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theFirstToken);
-        order.verify(expectedSequence, times(1)).get(1);
 
         // // second iteration
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(1);
         order.verify(theSecondToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(1);
         order.verify(elementExpectedTwo, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theSecondToken);
-        order.verify(expectedSequence, times(1)).get(2);
 
         // // third iteration optional is not present
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(2);
         order.verify(theThirdToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(2);
         order.verify(elementExpectedThreeOptional, times(1)).getType();
         order.verify(elementExpectedThreeOptional, times(1)).getPriority();
-        order.verify(expectedSequence, times(1)).get(3);
         // // re-check
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(2);
         order.verify(theThirdToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(3);
         order.verify(elementExpectedOne, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theThirdToken);
         order.verify(context, times(1)).setType(buildType);
@@ -461,28 +623,26 @@ public class ATableElementRecognizerTest {
         order.verify(contextRecognizer, times(1)).createContext(lineInterval);
         order.verify(currentContext, times(1)).getTokenizedContent();
         order.verify(tokenOutput, times(1)).getTokens();
-        order.verify(expectedSequence, times(1)).get(0);
 
         // for loop begin
         order.verify(lineInterval, times(1)).getStart();
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(0);
         order.verify(theFirstToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
         order.verify(elementExpectedOne, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theFirstToken);
-        order.verify(expectedSequence, times(1)).get(1);
 
         // // second iteration
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(1);
         order.verify(theSecondToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(1);
         order.verify(elementExpectedTwo, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theSecondToken);
-        order.verify(expectedSequence, times(1)).get(2);
 
         // last check for ends iteration
         order.verify(lineInterval, times(1)).getEnd();
-        // was mandatory all found check
         order.verify(contextRecognizer, times(1)).wasAllMandatoryFound(
                 expectedSequence, 2);
 
@@ -533,11 +693,11 @@ public class ATableElementRecognizerTest {
         order.verify(currentContext, times(1)).getTokenizedContent();
         order.verify(tokenOutput, times(1)).getTokens();
         // for content check
-        order.verify(expectedSequence, times(1)).get(0);
         order.verify(lineInterval, times(1)).getStart();
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(0);
         order.verify(theFirstToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
         order.verify(elementExpectedOne, times(1)).getType();
         order.verify(elementExpectedOne, times(1)).getPriority();
         order.verify(context, times(1)).removeAllContextTokens();
@@ -602,14 +762,13 @@ public class ATableElementRecognizerTest {
         order.verify(contextRecognizer, times(1)).createContext(lineInterval);
         order.verify(currentContext, times(1)).getTokenizedContent();
         order.verify(tokenOutput, times(1)).getTokens();
-        order.verify(expectedSequence, times(1)).get(0);
         order.verify(lineInterval, times(1)).getStart();
         order.verify(lineInterval, times(1)).getEnd();
         order.verify(tokens, times(1)).get(0);
         order.verify(theFirstToken, times(1)).getType();
+        order.verify(expectedSequence, times(1)).get(0);
         order.verify(elementExpectedOne, times(1)).getType();
         order.verify(context, times(1)).addNextToken(theFirstToken);
-        order.verify(expectedSequence, times(1)).get(1);
 
         // last check for ends iteration
         order.verify(lineInterval, times(1)).getEnd();
@@ -824,6 +983,24 @@ public class ATableElementRecognizerTest {
 
         public DummyWithModifiableList() {
             super(expectedSequence, buildType);
+        }
+    }
+
+    private class DummyWithList extends ATableElementRecognizer {
+
+        private int index = 0;
+        List<OneLineSingleRobotContextPart> contextsToReturn = new LinkedList<>();
+
+
+        public DummyWithList(List<ExpectedSequenceElement> expected) {
+            super(expected, buildType);
+        }
+
+
+        @Override
+        protected OneLineSingleRobotContextPart createContext(
+                final LineTokenPosition lineInterval) {
+            return contextsToReturn.get(index++);
         }
     }
 }
