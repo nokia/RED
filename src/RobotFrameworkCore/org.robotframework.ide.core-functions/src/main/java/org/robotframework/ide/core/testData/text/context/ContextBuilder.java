@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizer;
-import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizerTest;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
@@ -91,7 +90,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see ListVariableRecognizer
  * @see DictionaryVariableRecognizer
  * @see CollectionIndexPosition
- * @see ContinuePreviousLineRecognizerTest
+ * @see ContinuePreviousLineRecognizer
  * 
  * @see EscapedDollarSign
  * @see EscapedAtSign
