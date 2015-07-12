@@ -4,8 +4,8 @@ import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 
 
 /**
- * Gives common functionality for search, which are not multiple lines - just
- * one line and for Setting table.
+ * Represents single search for any word in line for
+ * {@link ATableElementRecognizer}.
  * 
  * @author wypych
  * @since JDK 1.7 update 74
