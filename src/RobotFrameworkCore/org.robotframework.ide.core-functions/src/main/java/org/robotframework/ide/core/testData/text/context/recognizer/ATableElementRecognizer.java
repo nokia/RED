@@ -76,13 +76,13 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
         List<RobotToken> tokens = currentContext.getTokenizedContent()
                 .getTokens();
         int expectedTokenId = 0;
-        ExpectedSequenceElement currentType = expectedSequence
-                .get(expectedTokenId);
         int previousTokenId = -1;
         for (int tokId = lineInterval.getStart(); tokId < lineInterval.getEnd(); tokId++) {
             RobotToken token = tokens.get(tokId);
             IRobotTokenType type = token.getType();
 
+            ExpectedSequenceElement currentType = expectedSequence
+                    .get(expectedTokenId);
             if (type == currentType.getType()) {
                 context.addNextToken(token);
                 if (expectedTokenId + 1 >= sequenceLength) {
@@ -92,7 +92,6 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
                     expectedTokenId = 0;
                 } else {
                     expectedTokenId++;
-                    currentType = expectedSequence.get(expectedTokenId);
                 }
             } else if (type == RobotSingleCharTokenType.SINGLE_SPACE
                     || type == RobotSingleCharTokenType.SINGLE_TABULATOR
@@ -128,7 +127,6 @@ public abstract class ATableElementRecognizer implements IContextRecognizer {
                             tokId = tokId - 1; // lets try with next element if
                                                // it belongs to this token
                             expectedTokenId++;
-                            currentType = expectedSequence.get(expectedTokenId);
                         }
                     }
                 }
