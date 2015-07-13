@@ -87,6 +87,7 @@ public class ForLoopRecognizer implements IContextRecognizer {
                         context.addNextToken(token);
                         context.setType(BUILD_TYPE);
                         foundContexts.add(context);
+
                         context = createContext(lineInterval);
                         wasColon = false;
                         wasForWord = false;
@@ -100,8 +101,6 @@ public class ForLoopRecognizer implements IContextRecognizer {
             context.setType(BUILD_TYPE);
             foundContexts.add(context);
         }
-
-        System.out.println(foundContexts);
 
         return foundContexts;
     }
