@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.recognizer.ContinoueLoopRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
@@ -95,6 +96,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see ContinuePreviousLineRecognizer
  * @see EmptyCellRecognizer
  * @see ForLoopRecognizer
+ * @see ContinoueLoopRecognizer
  * 
  * @see EscapedDollarSign
  * @see EscapedAtSign
@@ -248,6 +250,7 @@ public class ContextBuilder {
         normalRecognizers.add(new ContinuePreviousLineRecognizer());
         normalRecognizers.add(new EmptyCellRecognizer());
         normalRecognizers.add(new ForLoopRecognizer());
+        normalRecognizers.add(new ContinoueLoopRecognizer());
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
 
