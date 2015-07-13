@@ -152,5 +152,14 @@ public enum SimpleRobotContextType implements IContextElementType {
      * it could be just {@code ..} or @{code \ }, but it should be as the first
      * in the line with possible to exist spaces, tabulators or pipes
      */
-    EMPTY_CELL;
+    EMPTY_CELL,
+    /**
+     * starts from {@code :FOR} should contains {@code IN} and next just
+     * {@code RANGE} or list
+     */
+    FOR_LOOP_DECLARATION,
+    /**
+     * {@code #EMPTY_CELL}
+     */
+    CONTINOUE_LOOP_DECLARATION;
 }
