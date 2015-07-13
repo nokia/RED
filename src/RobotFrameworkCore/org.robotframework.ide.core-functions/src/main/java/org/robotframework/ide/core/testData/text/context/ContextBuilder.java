@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.context.TokensLineIterator.Line
 import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.EmptyCellRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
@@ -91,6 +92,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see DictionaryVariableRecognizer
  * @see CollectionIndexPosition
  * @see ContinuePreviousLineRecognizer
+ * @see EmptyCellRecognizer
  * 
  * @see EscapedDollarSign
  * @see EscapedAtSign
@@ -242,6 +244,7 @@ public class ContextBuilder {
         normalRecognizers.add(new DictionaryVariableRecognizer());
         normalRecognizers.add(new CollectionIndexPosition());
         normalRecognizers.add(new ContinuePreviousLineRecognizer());
+        normalRecognizers.add(new EmptyCellRecognizer());
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
 
