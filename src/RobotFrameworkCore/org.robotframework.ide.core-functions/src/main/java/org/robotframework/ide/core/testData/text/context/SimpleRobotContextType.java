@@ -147,5 +147,10 @@ public enum SimpleRobotContextType implements IContextElementType {
      * Continue of previous line - three dots {@code ...} - they should be at
      * the first position
      */
-    CONTINUE_PREVIOUS_LINE_DECLARATION;
+    CONTINUE_PREVIOUS_LINE_DECLARATION,
+    /**
+     * it could be just {@code ..} or @{code \ }, but it should be as the first
+     * in the line with possible to exist spaces, tabulators or pipes
+     */
+    EMPTY_CELL;
 }
