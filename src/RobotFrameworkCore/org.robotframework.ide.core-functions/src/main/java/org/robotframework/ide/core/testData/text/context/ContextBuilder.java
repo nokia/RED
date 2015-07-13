@@ -10,6 +10,7 @@ import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredComm
 import org.robotframework.ide.core.testData.text.context.recognizer.DoubleSpaceOrTabulatorSeparatorRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyCellRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.EmptyLineRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.ForLoopRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
@@ -93,6 +94,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see CollectionIndexPosition
  * @see ContinuePreviousLineRecognizer
  * @see EmptyCellRecognizer
+ * @see ForLoopRecognizer
  * 
  * @see EscapedDollarSign
  * @see EscapedAtSign
@@ -245,6 +247,7 @@ public class ContextBuilder {
         normalRecognizers.add(new CollectionIndexPosition());
         normalRecognizers.add(new ContinuePreviousLineRecognizer());
         normalRecognizers.add(new EmptyCellRecognizer());
+        normalRecognizers.add(new ForLoopRecognizer());
         normalRecognizers = Collections.unmodifiableList(normalRecognizers);
     }
 
