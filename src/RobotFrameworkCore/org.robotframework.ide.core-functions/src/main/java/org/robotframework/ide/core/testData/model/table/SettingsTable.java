@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.settings.AExternalImported;
-import org.robotframework.ide.core.testData.model.table.settings.DefaultTags;
-import org.robotframework.ide.core.testData.model.table.settings.ForceTags;
 import org.robotframework.ide.core.testData.model.table.settings.doc.Documentation;
 import org.robotframework.ide.core.testData.model.table.settings.metadata.Metadata;
 import org.robotframework.ide.core.testData.model.table.settings.suite.SuitePostcondition;
 import org.robotframework.ide.core.testData.model.table.settings.suite.SuitePrecondition;
 import org.robotframework.ide.core.testData.model.table.settings.suite.SuiteSetup;
 import org.robotframework.ide.core.testData.model.table.settings.suite.SuiteTeardown;
+import org.robotframework.ide.core.testData.model.table.settings.tags.DefaultTags;
+import org.robotframework.ide.core.testData.model.table.settings.tags.ForceTags;
 import org.robotframework.ide.core.testData.model.table.settings.test.TestPostcondition;
 import org.robotframework.ide.core.testData.model.table.settings.test.TestPrecondition;
 import org.robotframework.ide.core.testData.model.table.settings.test.TestSetup;
