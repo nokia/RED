@@ -17,7 +17,7 @@ public class RobotTestDataFile {
     private KeywordsTable keywordsTable = new KeywordsTable(null);
 
     private TestDataType type = TestDataType.UNKNOWN;
-    private List<RobotLine> linesInFile = new LinkedList<>();
+    private List<RobotLine> content = new LinkedList<>();
 
     public static enum TestDataType {
         /**
