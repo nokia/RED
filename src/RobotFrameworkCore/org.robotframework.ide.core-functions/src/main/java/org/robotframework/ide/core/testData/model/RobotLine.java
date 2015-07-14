@@ -1,26 +1,38 @@
-package org.robotframework.ide.core.testData.model.table;
+package org.robotframework.ide.core.testData.model;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 
-public class LineElement {
+public class RobotLine {
 
-    private List<ElementType> type = Arrays.asList(ElementType.VALUE);
-    private StringBuilder value = new StringBuilder();
+    private List<RobotLineType> types = Arrays
+            .asList(RobotLineType.UNDECLARED_COMMENT);
+    private List<LineElement> elements = new LinkedList<>();
 
-    public enum ElementType {
+
+    public List<RobotLineType> getTypes() {
+        return types;
+    }
+
+
+    public void setTypes(List<RobotLineType> types) {
+        this.types = types;
+    }
+
+    public static enum RobotLineType {
         /**
-         * just text without any special meaning
+         * unknown line content
          */
-        VALUE,
+        UNDECLARED_COMMENT,
         /**
-         * Comment word or hash sign not escaped
+         * line contains hash sign or comment word
          */
         DECLARED_COMMENT,
         /**
          * <pre>
-         * *** Settings *** or *** Metadata ***
+         * *** Settings ***
          * </pre>
          * 
          * setting table declaration
@@ -51,93 +63,17 @@ public class LineElement {
          */
         KEYWORD_TABLE_HEADER,
         /**
-         * own defined by user column name comes after table declaration i.e.
-         * 
-         * <pre>
-         * *** Test Case *** *** Action ***
-         * </pre>
-         */
-        TABLE_COLUMN_NAME,
-
-        /**
-         * its is usually defined before keyword and ends with dot single sign
-         */
-        LIBRARY_CONTAINS_KEYWORD,
-        /**
-         * declaration of keyword name
-         */
-        KEYWORD_NAME,
-        /**
-         * argument to pass to keyword
-         */
-        KEYWORD_ARGUMENT,
-
-        /**
-         * scalar variable in use
-         */
-        VARIABLE_SCALAR,
-        /**
-         * list variable in use
-         */
-        VARIABLE_LIST,
-        /**
-         * dictionary variable in use
-         */
-        VARIABLE_DICTIONARY,
-
-        /**
-         * appears after time setting
-         */
-        TIMEOUT_VALUE,
-        /**
-         * value used for tagging
-         */
-        TAG_VALUE,
-
-        /**
          * Library import begin declaration
          */
-        IMPORT_LIBRARY,
+        SETTINGS_IMPORT_LIBRARY,
         /**
-         * name of imported library or path to it
+         * Resource variables and keywords import begin declaration
          */
-        IMPORT_LIBRARY_NAME_OR_PATH,
+        SETTINGS_IMPORT_RESOURCE,
         /**
-         * argument pass to library during initialization
+         * Importing variables file declaration
          */
-        IMPORT_LIBRARY_INITAL_ARGUMENT,
-        /**
-         * 'with name' alias words
-         */
-        IMPORT_LIBRARY_ALIASES,
-        /**
-         * alias name of imported library comes after 'with name'
-         */
-        IMPORT_LIBRARY_ALIAS_NAME,
-
-        /**
-         * Resource import begin declaration
-         */
-        IMPORT_RESOURCE,
-        /**
-         * path to imported resource
-         */
-        IMPORT_RESOURCE_PATH,
-
-        /**
-         * Variables file import begin declaration
-         */
-        IMPORT_VARIABLES,
-        /**
-         * path to imported variables
-         */
-        IMPORT_VARIABLES_PATH,
-        /**
-         * argument pass to variable during initialization - mostly for python
-         * script
-         */
-        IMPORT_VARIABLES_INITAL_ARGUMENT,
-
+        SETTINGS_IMPORT_VARIABLES,
         /**
          * Documentation for suite declaration
          */
@@ -170,7 +106,6 @@ public class LineElement {
          * Used for specifying default values for tags when tagging test cases.
          */
         SETTINGS_DEFAULT_TAGS,
-
         /**
          * default setup for all test cases in suite
          */
@@ -195,7 +130,6 @@ public class LineElement {
          * default test case timeout
          */
         SETTINGS_TEST_TIMEOUT,
-
         /**
          * Used for specifying a user keyword documentation, appears as
          * {@code [Documentation]}
@@ -222,10 +156,9 @@ public class LineElement {
          */
         KEYWORD_TIMEOUT,
         /**
-         * name defined by user
+         * Single keyword line i.e. variable assignment or keyword execution
          */
-        USER_KEYWORD_NAME,
-
+        KEYWORD_STEP,
         /**
          * Used for specifying a test case documentation, appears as
          * {@code [Documentation]}
@@ -260,8 +193,20 @@ public class LineElement {
          */
         TEST_CASE_TIMEOUT,
         /**
-         * name defined by user
+         * Single test line i.e. variable assignment or keyword execution
          */
-        TEST_CASE_NAME;
+        TEST_STEP,
+        /**
+         * declaration of scalar variable in Variable table
+         */
+        VARIABLE_SCALAR_DECLARATION,
+        /**
+         * declaration of list variable in Variable table
+         */
+        VARIABLE_LIST_DECLARATION,
+        /**
+         * declaration of dictionary variable in Variable table
+         */
+        VARIABLE_DICTIONARY_DECLARATION;
     }
 }
