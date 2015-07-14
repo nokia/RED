@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.keywords.doc;
+package org.robotframework.ide.core.testData.model.table.keywords.settings;
 
 import org.robotframework.ide.core.testData.model.common.Text;
 import org.robotframework.ide.core.testData.model.table.settings.doc.DocumentationDeclaration;
