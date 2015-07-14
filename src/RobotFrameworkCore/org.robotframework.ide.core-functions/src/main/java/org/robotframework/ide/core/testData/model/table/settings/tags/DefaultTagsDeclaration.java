@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.settings;
+package org.robotframework.ide.core.testData.model.table.settings.tags;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.LineElement;
