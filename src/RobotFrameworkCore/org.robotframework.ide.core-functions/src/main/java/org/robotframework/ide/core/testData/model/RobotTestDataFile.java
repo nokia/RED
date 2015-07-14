@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class RobotTestDataFile {
 
     private TestDataType type = TestDataType.UNKNOWN;
     private List<RobotLine> content = new LinkedList<>();
+
+
+    public List<RobotLine> getContent() {
+        return Collections.unmodifiableList(content);
+    }
 
     public static enum TestDataType {
         /**
