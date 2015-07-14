@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 
 public class VariablesTable extends ATableModel {
 
+    @SuppressWarnings("rawtypes")
     public List<AVariable> variables = new LinkedList<>();
 
 
