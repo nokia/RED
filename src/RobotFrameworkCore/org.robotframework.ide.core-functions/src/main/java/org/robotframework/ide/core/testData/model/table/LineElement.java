@@ -1,36 +1,26 @@
 package org.robotframework.ide.core.testData.model.table;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 
-public class RobotLine {
+public class LineElement {
 
-    private RobotLineType type = RobotLineType.UNDECLARED_COMMENT;
-    private List<LineElement> elements = new LinkedList<>();
+    private List<ElementType> type = Arrays.asList(ElementType.VALUE);
+    private StringBuilder value = new StringBuilder();
 
-
-    public RobotLineType getType() {
-        return type;
-    }
-
-
-    public void setType(RobotLineType type) {
-        this.type = type;
-    }
-
-    public static enum RobotLineType {
+    public enum ElementType {
         /**
-         * unknown line content
+         * just text without any special meaning
          */
-        UNDECLARED_COMMENT,
+        VALUE,
         /**
-         * line contains hash sign or comment word
+         * Comment word or hash sign not escaped
          */
         DECLARED_COMMENT,
         /**
          * <pre>
-         * *** Settings ***
+         * *** Settings *** or *** Metadata ***
          * </pre>
          * 
          * setting table declaration
@@ -61,17 +51,93 @@ public class RobotLine {
          */
         KEYWORD_TABLE_HEADER,
         /**
+         * own defined by user column name comes after table declaration i.e.
+         * 
+         * <pre>
+         * *** Test Case *** *** Action ***
+         * </pre>
+         */
+        TABLE_COLUMN_NAME,
+
+        /**
+         * its is usually defined before keyword and ends with dot single sign
+         */
+        LIBRARY_CONTAINS_KEYWORD,
+        /**
+         * declaration of keyword name
+         */
+        KEYWORD_NAME,
+        /**
+         * argument to pass to keyword
+         */
+        KEYWORD_ARGUMENT,
+
+        /**
+         * scalar variable in use
+         */
+        VARIABLE_SCALAR,
+        /**
+         * list variable in use
+         */
+        VARIABLE_LIST,
+        /**
+         * dictionary variable in use
+         */
+        VARIABLE_DICTIONARY,
+
+        /**
+         * appears after time setting
+         */
+        TIMEOUT_VALUE,
+        /**
+         * value used for tagging
+         */
+        TAG_VALUE,
+
+        /**
          * Library import begin declaration
          */
-        SETTINGS_IMPORT_LIBRARY,
+        IMPORT_LIBRARY,
         /**
-         * Resource variables and keywords import begin declaration
+         * name of imported library or path to it
          */
-        SETTINGS_IMPORT_RESOURCE,
+        IMPORT_LIBRARY_NAME_OR_PATH,
         /**
-         * Importing variables file declaration
+         * argument pass to library during initialization
          */
-        SETTINGS_IMPORT_VARIABLES,
+        IMPORT_LIBRARY_INITAL_ARGUMENT,
+        /**
+         * 'with name' alias words
+         */
+        IMPORT_LIBRARY_ALIASES,
+        /**
+         * alias name of imported library comes after 'with name'
+         */
+        IMPORT_LIBRARY_ALIAS_NAME,
+
+        /**
+         * Resource import begin declaration
+         */
+        IMPORT_RESOURCE,
+        /**
+         * path to imported resource
+         */
+        IMPORT_RESOURCE_PATH,
+
+        /**
+         * Variables file import begin declaration
+         */
+        IMPORT_VARIABLES,
+        /**
+         * path to imported variables
+         */
+        IMPORT_VARIABLES_PATH,
+        /**
+         * argument pass to variable during initialization - mostly for python
+         * script
+         */
+        IMPORT_VARIABLES_INITAL_ARGUMENT,
+
         /**
          * Documentation for suite declaration
          */
@@ -104,6 +170,7 @@ public class RobotLine {
          * Used for specifying default values for tags when tagging test cases.
          */
         SETTINGS_DEFAULT_TAGS,
+
         /**
          * default setup for all test cases in suite
          */
@@ -128,6 +195,7 @@ public class RobotLine {
          * default test case timeout
          */
         SETTINGS_TEST_TIMEOUT,
+
         /**
          * Used for specifying a user keyword documentation, appears as
          * {@code [Documentation]}
@@ -154,9 +222,10 @@ public class RobotLine {
          */
         KEYWORD_TIMEOUT,
         /**
-         * Single keyword line i.e. variable assignment or keyword execution
+         * name defined by user
          */
-        KEYWORD_STEP,
+        USER_KEYWORD_NAME,
+
         /**
          * Used for specifying a test case documentation, appears as
          * {@code [Documentation]}
@@ -191,20 +260,8 @@ public class RobotLine {
          */
         TEST_CASE_TIMEOUT,
         /**
-         * Single test line i.e. variable assignment or keyword execution
+         * name defined by user
          */
-        TEST_STEP,
-        /**
-         * declaration of scalar variable in Variable table
-         */
-        VARIABLE_SCALAR_DECLARATION,
-        /**
-         * declaration of list variable in Variable table
-         */
-        VARIABLE_LIST_DECLARATION,
-        /**
-         * declaration of dictionary variable in Variable table
-         */
-        VARIABLE_DICTIONARY_DECLARATION;
+        TEST_CASE_NAME;
     }
 }
