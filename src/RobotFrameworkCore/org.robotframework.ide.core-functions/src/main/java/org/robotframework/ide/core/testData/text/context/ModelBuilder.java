@@ -11,8 +11,13 @@ import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutpu
 public class ModelBuilder {
 
     public ModelOutput build(final ContextOutput contexts) {
-        RobotTestDataFile fileModel = new RobotTestDataFile();
-        ModelOutput output = new ModelOutput(fileModel);
+        ModelOutput output = new ModelOutput();
+
+        List<AggregatedOneLineRobotContexts> lineContexts = contexts
+                .getContexts();
+        for (AggregatedOneLineRobotContexts ctx : lineContexts) {
+            System.out.println(ctx);
+        }
 
         return output;
     }
