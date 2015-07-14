@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table;
+package org.robotframework.ide.core.testData.model.common;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.LineElement;
@@ -6,10 +6,10 @@ import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotLine;
 
 
-public class NamedTableColumn extends AModelElement {
+public class Text extends AModelElement {
 
-    public NamedTableColumn(RobotLine containingLine,
+    public Text(RobotLine containingLine,
             LineElement originalElement) {
-        super(ElementType.TABLE_COLUMN_NAME, containingLine, originalElement);
+        super(ElementType.VALUE, containingLine, originalElement);
     }
 }

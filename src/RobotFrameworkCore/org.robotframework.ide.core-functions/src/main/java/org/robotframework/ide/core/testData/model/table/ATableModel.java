@@ -21,4 +21,24 @@ public abstract class ATableModel implements IOptionalModelElement {
     public boolean isPresent() {
         return (header != null);
     }
+
+
+    public TableHeader getHeader() {
+        return header;
+    }
+
+
+    public void setHeader(TableHeader header) {
+        this.header = header;
+    }
+
+
+    public List<NamedTableColumn> getColumns() {
+        return columns;
+    }
+
+
+    public void setColumns(List<NamedTableColumn> columns) {
+        this.columns = columns;
+    }
 }
