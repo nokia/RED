@@ -105,7 +105,7 @@ public class LineElement {
         /**
          * argument pass to library during initialization
          */
-        IMPORT_LIBRARY_INITAL_ARGUMENT,
+        ARGUMENT,
         /**
          * 'with name' alias words
          */
@@ -263,6 +263,10 @@ public class LineElement {
          * in context param1=${value} its represent param1
          */
         ARGUMENT_PARAMETER_NAME,
+        /**
+         * equals
+         */
+        ARGUMENT_EQUALS,
         /**
          * in context param1=${value} its represent ${value} - in case
          * {@link #ARGUMENT_PARAMETER_NAME} is not present it represents also

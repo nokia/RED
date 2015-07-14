@@ -7,6 +7,7 @@ public class TestTimeout {
 
     private final TestTimeoutDeclaration testTimeoutWord;
     private Text timeout;
+    private Text optionalMessage;
 
 
     public TestTimeout(final TestTimeoutDeclaration testTimeoutWord) {
