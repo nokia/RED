@@ -79,6 +79,10 @@ public class LineElement {
          * just {@code IN} mandatory and after optional {@code RANGE} and etc.
          */
         FOR_LOOP_ITERATOR_DECLARATION,
+        /**
+         * {@code \ action arguments..}
+         */
+        FOR_LOOP_CONTINUE,
 
         /**
          * scalar variable in use
