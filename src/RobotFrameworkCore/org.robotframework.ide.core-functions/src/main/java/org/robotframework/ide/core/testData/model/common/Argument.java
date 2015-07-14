@@ -9,11 +9,19 @@ import org.robotframework.ide.core.testData.model.RobotLine;
 public class Argument extends AModelElement {
 
     public ArgumentName name;
+    public OptionalEquals equals;
     public ArgumentValue value;
 
 
     public Argument(RobotLine containingLine, LineElement originalElement) {
-        super(ElementType.IMPORT_LIBRARY_INITAL_ARGUMENT, containingLine,
-                originalElement);
+        super(ElementType.ARGUMENT, containingLine, originalElement);
+    }
+
+    public static class OptionalEquals extends AModelElement {
+
+        public OptionalEquals(RobotLine containgLine,
+                LineElement originalElement) {
+            super(ElementType.ARGUMENT_EQUALS, containgLine, originalElement);
+        }
     }
 }
