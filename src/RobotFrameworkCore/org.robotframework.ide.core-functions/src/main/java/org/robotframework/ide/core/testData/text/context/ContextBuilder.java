@@ -135,7 +135,7 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
  * @see TestTemplateDeclaration
  * @see TestTimeoutDeclaration
  * 
- * @see KeywordDocumentationDeclaration
+ * @see DocumentationDeclaration
  * @see KeywordArgumentsDeclaration
  * @see KeywordReturnDeclaration
  * @see KeywordTeardownDeclaration
