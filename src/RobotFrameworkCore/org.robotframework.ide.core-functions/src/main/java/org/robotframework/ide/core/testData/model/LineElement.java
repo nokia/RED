@@ -58,7 +58,6 @@ public class LineElement {
          * </pre>
          */
         TABLE_COLUMN_NAME,
-
         /**
          * its is usually defined before keyword and ends with dot single sign
          */
@@ -67,10 +66,6 @@ public class LineElement {
          * declaration of keyword name
          */
         KEYWORD_NAME,
-        /**
-         * argument to pass to keyword
-         */
-        KEYWORD_ARGUMENT,
 
         /**
          * just {@code :for}
@@ -99,22 +94,14 @@ public class LineElement {
         VARIABLE_DICTIONARY,
 
         /**
-         * appears after time setting
-         */
-        TIMEOUT_VALUE,
-        /**
-         * value used for tagging
-         */
-        TAG_VALUE,
-
-        /**
          * Library import begin declaration
          */
         IMPORT_LIBRARY,
         /**
-         * name of imported library or path to it
+         * name of imported library or path to it, for resource and variables is
+         * path
          */
-        IMPORT_LIBRARY_NAME_OR_PATH,
+        IMPORT_LOCATION,
         /**
          * argument pass to library during initialization
          */
@@ -132,24 +119,11 @@ public class LineElement {
          * Resource import begin declaration
          */
         IMPORT_RESOURCE,
-        /**
-         * path to imported resource
-         */
-        IMPORT_RESOURCE_PATH,
 
         /**
          * Variables file import begin declaration
          */
         IMPORT_VARIABLES,
-        /**
-         * path to imported variables
-         */
-        IMPORT_VARIABLES_PATH,
-        /**
-         * argument pass to variable during initialization - mostly for python
-         * script
-         */
-        IMPORT_VARIABLES_INITAL_ARGUMENT,
 
         /**
          * Documentation for suite declaration
@@ -159,6 +133,14 @@ public class LineElement {
          * User key {separator} value additional information about suite
          */
         SETTINGS_METADATA,
+        /**
+         * 
+         */
+        METADATA_KEY,
+        /**
+         * 
+         */
+        METADATA_VALUE,
         /**
          * Suite Setup keyword
          */
@@ -275,6 +257,17 @@ public class LineElement {
         /**
          * name defined by user
          */
-        TEST_CASE_NAME;
+        TEST_CASE_NAME,
+
+        /**
+         * in context param1=${value} its represent param1
+         */
+        ARGUMENT_PARAMETER_NAME,
+        /**
+         * in context param1=${value} its represent ${value} - in case
+         * {@link #ARGUMENT_PARAMETER_NAME} is not present it represents also
+         * value
+         */
+        ARGUMENT_PARAMETER_VALUE;
     }
 }

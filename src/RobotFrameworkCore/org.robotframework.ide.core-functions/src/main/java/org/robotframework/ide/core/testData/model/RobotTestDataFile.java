@@ -12,9 +12,9 @@ import org.robotframework.ide.core.testData.model.table.VariablesTable;
 public class RobotTestDataFile {
 
     private SettingsTable settingsTable = new SettingsTable(null);
-    private VariablesTable variablesTable = new VariablesTable();
-    private TestCasesTable testCaseTable = new TestCasesTable();
-    private KeywordsTable keywordsTable = new KeywordsTable();
+    private VariablesTable variablesTable = new VariablesTable(null);
+    private TestCasesTable testCaseTable = new TestCasesTable(null);
+    private KeywordsTable keywordsTable = new KeywordsTable(null);
 
     private TestDataType type = TestDataType.UNKNOWN;
     private List<RobotLine> linesInFile = new LinkedList<>();

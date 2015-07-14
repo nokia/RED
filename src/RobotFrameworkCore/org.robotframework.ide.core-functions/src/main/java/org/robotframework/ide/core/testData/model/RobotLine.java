@@ -207,6 +207,10 @@ public class RobotLine {
         /**
          * declaration of dictionary variable in Variable table
          */
-        VARIABLE_DICTIONARY_DECLARATION;
+        VARIABLE_DICTIONARY_DECLARATION,
+        /**
+         * its starts from (...)
+         */
+        CONTINUE_PREVIOUS_LINE;
     }
 }
