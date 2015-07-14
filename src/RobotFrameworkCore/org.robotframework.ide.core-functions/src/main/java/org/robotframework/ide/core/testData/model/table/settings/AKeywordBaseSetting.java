@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.common.Argument;
 import org.robotframework.ide.core.testData.model.common.Comment;
-import org.robotframework.ide.core.testData.model.common.KeywordUsage;
 import org.robotframework.ide.core.testData.model.common.KeywordProvider;
+import org.robotframework.ide.core.testData.model.common.KeywordUsage;
 
 
 public abstract class AKeywordBaseSetting {
