@@ -3,7 +3,11 @@ package org.robotframework.ide.core.testData.model.table.keywords;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.table.keywords.doc.Documentation;
+import org.robotframework.ide.core.testData.model.table.keywords.settings.Arguments;
+import org.robotframework.ide.core.testData.model.table.keywords.settings.Documentation;
+import org.robotframework.ide.core.testData.model.table.keywords.settings.Return;
+import org.robotframework.ide.core.testData.model.table.keywords.settings.Teardown;
+import org.robotframework.ide.core.testData.model.table.keywords.settings.Timeout;
 
 
 public class UserKeyword {
