@@ -9,7 +9,25 @@ public class LineElement {
     private List<ElementType> type = Arrays.asList(ElementType.VALUE);
     private StringBuilder value = new StringBuilder();
 
+
+    public StringBuilder getValue() {
+        return value;
+    }
+
+
+    public void setValue(StringBuilder value) {
+        this.value = value;
+    }
+
     public enum ElementType {
+        /**
+         * nothing just CR or LF
+         */
+        EMPTY_LINE,
+        /**
+         * {@code ...} ellipse
+         */
+        LINE_CONTINUE,
         /**
          * just text without any special meaning
          */
@@ -107,7 +125,7 @@ public class LineElement {
          */
         IMPORT_LOCATION,
         /**
-         * argument pass to library during initialization
+         * argument pass during initialization
          */
         ARGUMENT,
         /**
