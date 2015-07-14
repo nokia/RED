@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.keywords;
+package org.robotframework.ide.core.testData.model.table.keywords.settings;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.LineElement;
@@ -6,10 +6,10 @@ import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotLine;
 
 
-public class ArgumentsDeclaration extends AModelElement {
+public class ReturnDeclaration extends AModelElement {
 
-    public ArgumentsDeclaration(RobotLine containingLine,
+    public ReturnDeclaration(RobotLine containingLine,
             LineElement originalElement) {
-        super(ElementType.KEYWORD_ARGUMENTS, containingLine, originalElement);
+        super(ElementType.KEYWORD_RETURN, containingLine, originalElement);
     }
 }
