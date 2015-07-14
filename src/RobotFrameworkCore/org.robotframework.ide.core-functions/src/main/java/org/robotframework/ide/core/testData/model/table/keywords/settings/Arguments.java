@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.keywords;
+package org.robotframework.ide.core.testData.model.table.keywords.settings;
 
 import java.util.LinkedList;
 import java.util.List;
