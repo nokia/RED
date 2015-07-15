@@ -271,10 +271,6 @@ public class ContextBuilder {
             out.getContexts().add(ctx);
 
             performRecognizationOfElementsInLine(out, lineBoundaries, ctx);
-
-            if (ctx.getChildContexts().isEmpty()) {
-
-            }
         }
 
         return out;
