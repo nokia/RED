@@ -204,7 +204,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
             locationLabel.setText("Location");
             
             locationText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
-            locationText.setText("http://127.0.0.1");
+            locationText.setText("127.0.0.1");
             GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(locationText);
 
             final Label portLabel = new Label(dialogComposite, SWT.NONE);
