@@ -6,6 +6,11 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 /**
  * Helper methods for common configuration operations on
@@ -88,5 +93,55 @@ public class ViewersConfigurator {
                         + (viewer == null ? "null" : viewer.getClass().getSimpleName()));
             }
         });
+    }
+
+    public static void enableContextMenuOnHeader(final RowExposingTreeViewer viewer,
+            final MenuProvider viewerMenuProvider, final MenuProvider headerMenuProvider) {
+        final Control control = viewer.getControl();
+        control.addMenuDetectListener(new MenuDetectListener() {
+            @Override
+            public void menuDetected(final MenuDetectEvent e) {
+                final Point pointRelativeToControl = Display.getCurrent().map(null, control,
+                        new Point(e.x, e.y));
+                final Menu currentMenu = control.getMenu();
+                if (currentMenu != null) {
+                    currentMenu.dispose();
+                }
+
+                if (headerWasClicked(control, pointRelativeToControl)) {
+                    control.setMenu(headerMenuProvider.provide());
+                } else {
+                    control.setMenu(viewerMenuProvider.provide());
+                }
+
+            }
+
+            private boolean headerWasClicked(final Control control, final Point pt) {
+                final Rectangle clientArea = getClientArea(control);
+                return clientArea.y <= pt.y && pt.y <= clientArea.y + getHeaderHeight(control);
+            }
+        });
+    }
+
+    private static int getHeaderHeight(final Control control) {
+        if (control instanceof Tree) {
+            return ((Tree) control).getHeaderHeight();
+        } else if (control instanceof Table) {
+            return ((Table) control).getHeaderHeight();
+        }
+        throw new IllegalStateException("Given control has to be Tree or Table");
+    }
+
+    private static Rectangle getClientArea(final Control control) {
+        if (control instanceof Tree) {
+            return ((Tree) control).getClientArea();
+        } else if (control instanceof Table) {
+            return ((Table) control).getClientArea();
+        }
+        throw new IllegalStateException("Given control has to be Tree or Table");
+    }
+    
+    public interface MenuProvider {
+        Menu provide();
     }
 }
