@@ -10,7 +10,7 @@ import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.IContextElementType;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContextElementComparator;
 import org.robotframework.ide.core.testData.text.context.recognizer.IContextRecognizer;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;

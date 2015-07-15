@@ -1,9 +1,9 @@
-package org.robotframework.ide.core.testData.text.context;
+package org.robotframework.ide.core.testData.text.context.iterator;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;

@@ -25,6 +25,17 @@ public class RobotLineSeparatorsContexts implements IContextElement {
             .create();
     private IContextElementType type = ComplexRobotContextType.SEPARATORS;
     private IContextElement parentContext = null;
+    private final int lineNumber;
+
+
+    public RobotLineSeparatorsContexts(final int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
 
 
     public void addNextSeparators(final List<IContextElement> separators) {

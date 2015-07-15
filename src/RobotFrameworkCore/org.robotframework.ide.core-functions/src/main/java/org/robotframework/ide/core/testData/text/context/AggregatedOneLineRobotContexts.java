@@ -18,7 +18,8 @@ import com.google.common.collect.LinkedListMultimap;
  */
 public class AggregatedOneLineRobotContexts implements IContextElement {
 
-    private RobotLineSeparatorsContexts separators = new RobotLineSeparatorsContexts();
+    private RobotLineSeparatorsContexts separators = new RobotLineSeparatorsContexts(
+            -1);
     private List<IContextElement> childContexts = new LinkedList<>();
     private LinkedListMultimap<IContextElementType, IContextElement> handledElements = LinkedListMultimap
             .create();

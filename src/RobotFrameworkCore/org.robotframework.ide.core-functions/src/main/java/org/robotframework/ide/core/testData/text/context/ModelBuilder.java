@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.testData.text.context;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,15 +7,23 @@ import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage.Level;
+import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator;
+import org.robotframework.ide.core.testData.text.context.iterator.RobotSeparatorIteratorOutput;
+import org.robotframework.ide.core.testData.text.context.iterator.SeparatorBaseIteratorBuilder;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 
 
 public class ModelBuilder {
+
+    private final SeparatorBaseIteratorBuilder separatorIterBuilder;
+
+
+    public ModelBuilder() {
+        this.separatorIterBuilder = new SeparatorBaseIteratorBuilder();
+    }
+
 
     public ModelOutput build(final ContextOutput contexts) {
         ModelOutput output = new ModelOutput();
@@ -36,76 +43,22 @@ public class ModelBuilder {
     @VisibleForTesting
     protected ElementType mapLine(final ModelOutput model,
             final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
-        final Iterator<? extends IContextElement> separatorBaseIterator = createSeparatorBaseIterator(ctx);
-        // while(separatorBaseIterator.hasNext()) {
-        IContextElement nextSeparator = separatorBaseIterator.next();
+        final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
+                .createSeparatorBaseIterator(ctx);
+        FilePosition fp = FilePosition.createMarkerForFirstColumn(ctx
+                .getSeparators().getLineNumber());
+        while(separatorBaseIterator.hasNext(fp)) {
+            RobotSeparatorIteratorOutput next = separatorBaseIterator.next();
+            if (next != null) {
 
-        // search for matching position
-        // find correct base on context
-        // perform actions
-        // }
+            }
+
+            // do merguje to co pasuje pretty align i separator potem wez
+            // pozycje i sobie z szamaja wszystko co pasuje do danego kontekstu
+
+        }
 
         return etLast;
-    }
-
-
-    @VisibleForTesting
-    protected Iterator<? extends IContextElement> createSeparatorBaseIterator(
-            final AggregatedOneLineRobotContexts ctx) {
-        Iterator<? extends IContextElement> iterator = null;
-
-        RobotLineSeparatorsContexts separators = ctx.getSeparators();
-        IContextElement theFirstPipeInLine = getFirstSeparatorContextFrom(
-                separators, RobotLineSeparatorsContexts.PIPE_SEPARATOR_TYPE);
-        if (isPipeSeparatedLine(theFirstPipeInLine)) {
-            iterator = new PipeSeparableIterator(ctx);
-        } else {
-            iterator = new WhitespaceSeparableIterator(ctx);
-        }
-
-        return iterator;
-    }
-
-
-    private boolean isPipeSeparatedLine(IContextElement theFirstPipeInLine) {
-        boolean result = false;
-        if (theFirstPipeInLine != null) {
-            if (theFirstPipeInLine instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart ctx = (OneLineSingleRobotContextPart) theFirstPipeInLine;
-                List<RobotToken> contextTokens = ctx.getContextTokens();
-                if (contextTokens != null && !contextTokens.isEmpty()) {
-                    RobotToken robotToken = contextTokens.get(0);
-                    IRobotTokenType type = robotToken.getType();
-                    if (type == RobotSingleCharTokenType.SINGLE_PIPE) {
-                        result = (FilePosition.THE_FIRST_COLUMN == robotToken
-                                .getStartPosition().getColumn());
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException(
-                        "Pipe separator element has incorrect type "
-                                + ((theFirstPipeInLine != null) ? theFirstPipeInLine
-                                        .getClass() : " null"));
-            }
-        }
-
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected IContextElement getFirstSeparatorContextFrom(
-            final RobotLineSeparatorsContexts separators,
-            final IContextElementType expectedContextType) {
-        IContextElement theFirstContext = null;
-
-        List<IContextElement> separatorContext = separators
-                .getFoundSeperatorsExcludeType().get(expectedContextType);
-        if (separatorContext != null && !separatorContext.isEmpty()) {
-            theFirstContext = separatorContext.get(0);
-        }
-
-        return theFirstContext;
     }
 
     public static class ModelOutput {
