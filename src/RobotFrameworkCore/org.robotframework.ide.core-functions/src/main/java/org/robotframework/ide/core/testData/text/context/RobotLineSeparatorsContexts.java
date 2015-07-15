@@ -17,6 +17,10 @@ import com.google.common.collect.LinkedListMultimap;
  */
 public class RobotLineSeparatorsContexts implements IContextElement {
 
+    public static final IContextElementType PIPE_SEPARATOR_TYPE = SimpleRobotContextType.PIPE_SEPARATED;
+    public static final IContextElementType WHITESPACE_SEPARATOR_TYPE = SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED;
+    public static final IContextElementType PRETTY_ALIGNMENT_TYPE = SimpleRobotContextType.PRETTY_ALIGN;
+
     private LinkedListMultimap<IContextElementType, IContextElement> handledElements = LinkedListMultimap
             .create();
     private IContextElementType type = ComplexRobotContextType.SEPARATORS;
@@ -26,8 +30,8 @@ public class RobotLineSeparatorsContexts implements IContextElement {
     public void addNextSeparators(final List<IContextElement> separators) {
         if (separators != null && !separators.isEmpty()) {
             IContextElementType type = separators.get(0).getType();
-            if (type == getPipeSeparatorType()
-                    || type == getWhitespaceSeparatorType()) {
+            if (type == PIPE_SEPARATOR_TYPE
+                    || type == WHITESPACE_SEPARATOR_TYPE) {
                 handledElements.putAll(type, separators);
             }
         }
@@ -40,22 +44,12 @@ public class RobotLineSeparatorsContexts implements IContextElement {
 
 
     public List<IContextElement> getPipeSeparators() {
-        return handledElements.get(getPipeSeparatorType());
+        return handledElements.get(PIPE_SEPARATOR_TYPE);
     }
 
 
     public List<IContextElement> getWhitespaceSeparators() {
-        return handledElements.get(getWhitespaceSeparatorType());
-    }
-
-
-    public IContextElementType getPipeSeparatorType() {
-        return SimpleRobotContextType.PIPE_SEPARATED;
-    }
-
-
-    public IContextElementType getWhitespaceSeparatorType() {
-        return SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED;
+        return handledElements.get(WHITESPACE_SEPARATOR_TYPE);
     }
 
 
