@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-class ReferencedLibrariesContentProvider implements IStructuredContentProvider {
+class RemoteLibraryLocationsContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
@@ -21,5 +21,4 @@ class ReferencedLibrariesContentProvider implements IStructuredContentProvider {
     public Object[] getElements(final Object inputElement) {
         return ((List<?>) inputElement).toArray();
     }
-
 }

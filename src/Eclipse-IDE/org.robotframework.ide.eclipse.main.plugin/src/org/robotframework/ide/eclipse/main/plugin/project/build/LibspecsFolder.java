@@ -117,4 +117,8 @@ public class LibspecsFolder {
     public IFile getFile(final String name) {
         return folder.getFile(name);
     }
+
+    public IResource[] members() throws CoreException {
+        return folder.members();
+    }
 }

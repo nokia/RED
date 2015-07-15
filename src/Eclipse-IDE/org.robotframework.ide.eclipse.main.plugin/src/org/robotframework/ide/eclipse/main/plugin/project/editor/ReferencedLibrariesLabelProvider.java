@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 
-public class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
+class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {

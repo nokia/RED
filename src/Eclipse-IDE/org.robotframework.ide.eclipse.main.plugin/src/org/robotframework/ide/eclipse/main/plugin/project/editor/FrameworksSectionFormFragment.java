@@ -55,7 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-public class FrameworksSectionFormFragment implements ISectionFormFragment {
+class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private static final String IMAGE_FOR_LINK = "image";
     private static final String PATH_LINK = "systemPath";
@@ -87,7 +87,7 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         section.setText("Robot framework");
         section.setDescription("In this section Robot framework location can be specified. The selected framework will"
                 + " be used by this project. Currently following framework is in use:");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
 
         final Composite sectionInternal = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(sectionInternal);
@@ -196,9 +196,10 @@ public class FrameworksSectionFormFragment implements ISectionFormFragment {
         ColumnViewerToolTipSupport.enableFor(viewer);
 
         viewer.setContentProvider(new InstalledRobotsContentProvider());
-        ViewerColumnsFactory.newColumn("Name").withWidth(300)
+        ViewerColumnsFactory.newColumn("Name").withWidth(200)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer)).createFor(viewer);
         ViewerColumnsFactory.newColumn("Path").withWidth(200)
+                .shouldGrabAllTheSpaceLeft(true).withMinWidth(30)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer)).createFor(viewer);
     }
 
