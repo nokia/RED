@@ -200,7 +200,7 @@ public class RobotLineSeparatorsContextsTest {
 
     @Before
     public void setUp() {
-        context = new RobotLineSeparatorsContexts();
+        context = new RobotLineSeparatorsContexts(-1);
     }
 
 
