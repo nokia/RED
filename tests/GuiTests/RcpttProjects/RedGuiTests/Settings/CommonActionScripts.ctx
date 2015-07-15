@@ -6,11 +6,43 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/6/15 3:28 PM
+Save-Time: 7/15/15 2:28 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
+
+//--------------------------- settings -----------------------------------------------------------------------------------------------------------------------
+//make full screen
+get-eclipse-window | maximize 
+
+//get python path
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	global [val python_exe_path [exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout]]
+
+}-else{
+	global [val python_exe_path [exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
+}	
+
+
+//get robot version
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	global [val robot_version [exec-process "\"pybot.bat\"" "\"--version\"" -ignoreStderr -ignoreExitCode | get stdout  |split -sep "!"   -trimResults]]
+
+}-else{
+	global [val robot_version [exec-process  "pybot" "--version"  -ignoreStderr -ignoreExitCode  | get stdout |split -sep "!"   -trimResults]]
+}	
+
+
+let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
+	if [$temp | equals ""] {
+		global [val RCPTT_project_path $user_RCPTT_project_path]
+	}-else{
+		global [val RCPTT_project_path $temp]
+	}
+}
+
+//----------------------------procedures -----------------------------------------------------
 
 proc CreateVariablesInTableEditor [val EditorTitle] {
 	// input - Editor title - filename
@@ -216,31 +248,7 @@ proc Create2MetadataInTableEditor [val EditorTitle]{
 	}
 }
 
-//get python path
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val python_exe_path [exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout]]
 
-}-else{
-	global [val python_exe_path [exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)"  | get stdout]]
-}	
-
-
-//get robot version
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val robot_version [exec-process "\"pybot.bat\"" "\"--version\"" -ignoreStderr -ignoreExitCode | get stdout  |split -sep "!"   -trimResults]]
-
-}-else{
-	global [val robot_version [exec-process  "pybot" "--version"  -ignoreStderr -ignoreExitCode  | get stdout |split -sep "!"   -trimResults]]
-}	
-
-
-let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
-	if [$temp | equals ""] {
-		global [val RCPTT_project_path $user_RCPTT_project_path]
-	}-else{
-		global [val RCPTT_project_path $temp]
-	}
-}
 
 //concatenate strings in list with regex to check MEssage Log view (for short log)
 proc concat_str_with_regex [val log_list]
