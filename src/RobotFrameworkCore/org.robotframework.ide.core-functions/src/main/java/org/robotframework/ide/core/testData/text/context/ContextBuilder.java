@@ -17,6 +17,7 @@ import org.robotframework.ide.core.testData.text.context.recognizer.KeywordsTabl
 import org.robotframework.ide.core.testData.text.context.recognizer.QuotesSentenceRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.SettingTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.TestCaseTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.context.recognizer.UndeclaredCommentRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.VariableTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithByteHexValue;
 import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.CharacterWithShortHexValue;
@@ -218,6 +219,7 @@ public class ContextBuilder {
 
 
     protected void initIndependentFromContextRecognizers() {
+        normalRecognizers.add(new UndeclaredCommentRecognizer());
         normalRecognizers.add(new DeclaredCommentRecognizer());
         normalRecognizers.add(new QuotesSentenceRecognizer());
         normalRecognizers.add(new SettingTableHeaderRecognizer());
@@ -269,6 +271,10 @@ public class ContextBuilder {
             out.getContexts().add(ctx);
 
             performRecognizationOfElementsInLine(out, lineBoundaries, ctx);
+
+            if (ctx.getChildContexts().isEmpty()) {
+
+            }
         }
 
         return out;
