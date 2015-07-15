@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContinoueLoopRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContinuePreviousLineRecognizer;
 import org.robotframework.ide.core.testData.text.context.recognizer.DeclaredCommentRecognizer;
@@ -318,7 +319,8 @@ public class ContextBuilder {
 
     private RobotLineSeparatorsContexts extractSeperators(
             final ContextOutput contexts, LineTokenPosition lineBoundaries) {
-        RobotLineSeparatorsContexts sep = new RobotLineSeparatorsContexts();
+        RobotLineSeparatorsContexts sep = new RobotLineSeparatorsContexts(
+                lineBoundaries.getLineNumber());
         for (IContextRecognizer sepRecognizer : separatorRecognizers) {
             sep.addNextSeparators(sepRecognizer.recognize(contexts,
                     lineBoundaries));

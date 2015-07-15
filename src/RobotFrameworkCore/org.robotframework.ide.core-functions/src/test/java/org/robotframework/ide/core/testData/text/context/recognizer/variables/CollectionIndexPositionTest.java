@@ -15,8 +15,8 @@ import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextO
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator;
-import org.robotframework.ide.core.testData.text.context.TokensLineIterator.LineTokenPosition;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator;
+import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.ARecognizerTest;
 import org.robotframework.ide.core.testData.text.context.recognizer.variables.CollectionIndexPosition;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
