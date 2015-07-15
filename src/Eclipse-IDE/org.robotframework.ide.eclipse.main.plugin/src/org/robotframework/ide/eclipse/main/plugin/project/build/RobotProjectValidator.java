@@ -1,73 +1,92 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 
 class RobotProjectValidator {
 
-    public Job createValidationJob(final IProject project) {
+    private final IProject project;
+
+    public RobotProjectValidator(final IProject project) {
+        this.project = project;
+    }
+
+    public Job createValidationJob(final IResourceDelta delta, final int kind) {
         return new Job("Validating") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 try {
-                    project.accept(new IResourceVisitor() {
-                        @Override
-                        public boolean visit(final IResource resource) throws CoreException {
-                            if (resource.getType() == IResource.FILE && resource.getFileExtension().equals("robot")) {
-                                try {
-                                    validateRobotFile((IFile) resource, monitor);
-                                } catch (final IOException e) {
-                                    throw new CoreException(Status.CANCEL_STATUS);
-                                }
-                            }
-                            return true;
-                        }
-
-                    });
+                    if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
+                        validateWholeProject(monitor);
+                    } else if (delta != null) {
+                        validateChangedFiles(delta, monitor);
+                    }
+                    return Status.OK_STATUS;
                 } catch (final CoreException e) {
-                    e.printStackTrace();
+                    RobotFramework.log(IStatus.ERROR, "Project validation was corrupted", e);
+                    return Status.CANCEL_STATUS;
+                } finally {
+                    monitor.done();
                 }
-                monitor.done();
-                return Status.OK_STATUS;
             }
         };
     }
 
-    private void validateRobotFile(final IFile file, final IProgressMonitor monitor) throws CoreException, IOException {
-        final List<RobotElement> sections = new FileSectionsParser(file).parseRobotFileSections(null);
-        for (final RobotElement section : sections) {
-            validateSection(file, (RobotSuiteFileSection) section);
-        }
+    private void validateWholeProject(final IProgressMonitor monitor) throws CoreException {
+        project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+
+        project.accept(new IResourceVisitor() {
+            @Override
+            public boolean visit(final IResource resource) throws CoreException {
+                validateResource(resource, monitor, false);
+                return true;
+            }
+        });
     }
 
-    private void validateSection(final IFile file, final RobotSuiteFileSection section) throws CoreException {
-        if (!Arrays.asList("Settings", "Variables", "Test Cases", "Keywords").contains(section.getName())) {
-            final int lineNumber = 1;
+    private void validateChangedFiles(final IResourceDelta delta, final IProgressMonitor monitor) throws CoreException {
+        delta.accept(new IResourceDeltaVisitor() {
 
-            final IMarker marker = file.createMarker(RobotProblem.TYPE_ID);
-
-            marker.setAttribute(IMarker.MESSAGE, "Unrecognized section name '" + section.getName() + "'");
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-            marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-        }
-
-        // duplicated section
+            @Override
+            public boolean visit(final IResourceDelta delta) throws CoreException {
+                if (delta.getKind() != IResourceDelta.REMOVED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+                    validateResource(delta.getResource(), monitor, true);
+                }
+                return true;
+            }
+        });
     }
 
+    private void validateResource(final IResource resource, final IProgressMonitor monitor, final boolean removeMarkers)
+            throws CoreException {
+        if (resource.getType() == IResource.FILE && resource.getFileExtension().equals("robot")) {
+            try {
+                if (removeMarkers) {
+                    resource.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+                }
+                new RobotSuiteFileValidator((IFile) resource).validate(monitor);
+            } catch (final IOException e) {
+                throw new CoreException(Status.CANCEL_STATUS);
+            }
+        } else if (resource.getType() == IResource.FILE && resource.getName().equals("red.xml")
+                && resource.getParent() == resource.getProject()) {
+            if (removeMarkers) {
+                resource.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+            }
+            new RobotProjectConfigFileValidator((IFile) resource).validate(monitor);
+        }
+    }
 }

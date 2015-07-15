@@ -1,12 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -14,19 +9,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
-import org.robotframework.ide.eclipse.main.plugin.project.build.FatalProblemsReporter.ReportingInterruptedException;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RuntimeEnvironmentProblem;
 
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
@@ -38,8 +22,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final LibspecsFolder libspecsFolder = LibspecsFolder.createIfNeeded(getProject());
             final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(getDelta(project), kind);
 
-            final Job buildJob = createBuildJob(rebuildNeeded);
-            final Job validationJob = new RobotProjectValidator().createValidationJob(project);
+            final Job buildJob = new RobotLibrariesBuilder(getProject()).createBuildJob(rebuildNeeded);
+            final Job validationJob = new RobotProjectValidator(getProject()).createValidationJob(getDelta(project),
+                    kind);
             final IProgressMonitor progressMonitor = Job.getJobManager().createProgressGroup();
             try {
                 final String projectPath = project.getFullPath().toString();
@@ -47,12 +32,10 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 progressMonitor.beginTask("Building and validating " + projectPath + " project", 200);
 
                 buildJob.setProgressGroup(progressMonitor, 100);
-                buildJob.schedule();
-
                 validationJob.setProgressGroup(progressMonitor, 100);
-                validationJob.schedule();
 
                 monitor.subTask("waiting for project " + projectPath + " build end");
+                buildJob.schedule();
                 buildJob.join();
 
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL) {
@@ -67,6 +50,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
                 if (!monitor.isCanceled()) {
                     monitor.subTask("waiting for project validation end");
+                    validationJob.schedule();
                     validationJob.join();
                 }
             } catch (final InterruptedException e) {
@@ -80,156 +64,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         }
     }
 
-    private Job createBuildJob(final boolean buildingIsNeeded) {
-        if (buildingIsNeeded) {
-            return new Job("Building") {
-                @Override
-                protected IStatus run(final IProgressMonitor monitor) {
-                    try {
-                        try {
-                            getProject().getFile(".project").deleteMarkers(IMarker.PROBLEM, true,
-                                    IResource.DEPTH_INFINITE);
-                            getProject().getFile(RobotProjectConfig.FILENAME).deleteMarkers(IMarker.PROBLEM, true,
-                                    IResource.DEPTH_INFINITE);
-                        } catch (final CoreException e) {
-                            // that's fine, lets try to build project
-                        }
-                        buildLibrariesSpecs(getProject(), monitor, new FatalProblemsReporter());
-                        monitor.done();
-                        return Status.OK_STATUS;
-                    } catch (final ReportingInterruptedException e) {
-                        return new Status(IStatus.CANCEL, RobotFramework.PLUGIN_ID, "Unable to build libraries", e);
-                    }
-                }
-            };
-        } else {
-            return new Job("Skipping build") {
-                @Override
-                protected IStatus run(final IProgressMonitor monitor) {
-                    monitor.done();
-                    return Status.OK_STATUS;
-                }
-            };
-        }
-    }
-
-    private void buildLibrariesSpecs(final IProject project, final IProgressMonitor monitor,
-            final IProblemsReporter reporter) {
-        if (monitor.isCanceled()) {
-            return;
-        }
-        final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-        subMonitor.beginTask("Building", 100);
-        subMonitor.subTask("checking Robot execution environment");
-
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
-        final RobotProjectConfig configuration = provideConfiguration(subMonitor.newChild(10), robotProject, reporter);
-        if (subMonitor.isCanceled()) {
-            return;
-        }
-
-        final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(subMonitor.newChild(10),
-                robotProject, configuration, reporter);
-        if (subMonitor.isCanceled()) {
-            return;
-        }
-
-        final List<ILibdocGenerator> libdocGenerators = newArrayList();
-
-        final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
-        libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
-        libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
-
-        subMonitor.setWorkRemaining(libdocGenerators.size());
-        for (final ILibdocGenerator generator : libdocGenerators) {
-            if (subMonitor.isCanceled()) {
-                return;
-            }
-            subMonitor.subTask(generator.getMessage());
-            generator.generateLibdoc(runtimeEnvironment);
-            subMonitor.worked(1);
-        }
-    }
-
-    private RobotProjectConfig provideConfiguration(final IProgressMonitor monitor,
-            final RobotProject robotProject, final IProblemsReporter reporter) {
-        try {
-            if (!robotProject.getConfigurationFile().exists()) {
-                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.DOES_NOT_EXIST);
-                reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
-            }
-            return new RobotProjectConfigReader().readConfiguration(robotProject);
-        } catch (final CannotReadProjectConfigurationException e) {
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.OTHER_PROBLEM);
-            problem.fillFormattedMessageWith(e.getMessage());
-            reporter.handleProblem(problem, robotProject.getConfigurationFile(), e.getLineNumber());
-            return null;
-        } finally {
-            monitor.done();
-        }
-    }
-
-    private RobotRuntimeEnvironment provideRuntimeEnvironment(final IProgressMonitor monitor,
-            final RobotProject robotProject, final RobotProjectConfig configuration,
-            final IProblemsReporter reporter) {
-        try {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment == null) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT);
-                problem.fillFormattedMessageWith(configuration.providePythonLocation());
-                reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
-            } else if (!runtimeEnvironment.isValidPythonInstallation()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION);
-                problem.fillFormattedMessageWith(runtimeEnvironment.getFile());
-                reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
-            } else if (!runtimeEnvironment.hasRobotInstalled()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ROBOT);
-                problem.fillFormattedMessageWith(runtimeEnvironment.getFile());
-                reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
-            }
-            return runtimeEnvironment;
-        } finally {
-            monitor.done();
-        }
-    }
-
-    private List<ILibdocGenerator> getStandardLibrariesToRecreate(
-            final RobotRuntimeEnvironment runtimeEnvironment,
-            final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
-        final List<String> stdLibs = runtimeEnvironment.getStandardLibrariesNames();
-        try {
-            final List<IFile> toRecr = libspecsFolder.collectSpecsWithDifferentVersion(stdLibs, runtimeEnvironment.getVersion());
-            for (final IFile specToRecreate : toRecr) {
-                generators.add(new StandardLibraryLibdocGenerator(specToRecreate));
-            }
-        } catch (final CoreException e) {
-            // FIXME : handle this
-            e.printStackTrace();
-        }
-        return generators;
-    }
-
-    private List<ILibdocGenerator> getReferencedJavaLibrariesToRecreate(
-            final RobotProjectConfig configuration, final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
-
-        for (final ReferencedLibrary lib : configuration.getLibraries()) {
-            if (lib.provideType() == LibraryType.JAVA) {
-                final String libName = lib.getName();
-                final IFile specFile = libspecsFolder.getSpecFile(libName);
-                if (!specFile.exists()) {
-                    final String jarPath = lib.getPath();
-                    generators.add(new JavaLibraryLibdocGenerator(libName, jarPath, specFile));
-                }
-            }
-        }
-        return generators;
-    }
-
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
-        getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+        getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
         RobotFramework.getModelManager().getModel().createRobotProject(getProject()).clear();
 
         LibspecsFolder.get(getProject()).removeNonSpecResources();

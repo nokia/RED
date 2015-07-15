@@ -3,7 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -53,6 +52,7 @@ import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
 import org.robotframework.viewers.Selections;
 
@@ -331,7 +331,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                         InterruptedException {
                     for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
                         try {
-                            project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+                            project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
                             project.build(IncrementalProjectBuilder.FULL_BUILD, null);
                         } catch (final CoreException e) {
                             MessageDialog.openError(getShell(), "Workspace rebuild",

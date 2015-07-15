@@ -39,7 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBui
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.viewers.Selections;
 
-public class ReferencedLibrariesFormFragment implements ISectionFormFragment {
+class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     private RedFormToolkit toolkit;

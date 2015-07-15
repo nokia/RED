@@ -64,6 +64,9 @@ public class RobotFramework extends AbstractUIPlugin {
 
     public static void log(final int severity, final String message) {
         getDefault().getLog().log(new Status(severity, PLUGIN_ID, message));
+    }
 
+    public static void log(final int severity, final String message, final Throwable cause) {
+        getDefault().getLog().log(new Status(severity, PLUGIN_ID, message, cause));
     }
 }
