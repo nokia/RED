@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -25,8 +27,13 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected String getContextMenuId() {
+    protected String getViewerMenuId() {
         return "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu";
+    }
+
+    @Override
+    protected String getHeaderMenuId() {
+        return "org.robotframework.ide.eclipse.editor.page.keywords.header.contextMenu";
     }
 
     @Override
@@ -57,6 +64,25 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
                 return null;
             }
         };
+    }
+
+    @Override
+    protected int calculateLongestArgumentsList() {
+        final RobotSuiteFileSection section = getSection();
+        int max = 5;
+        if (section != null) {
+            final List<RobotElement> children = section.getChildren();
+            for (final RobotElement element : children) {
+                final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
+                max = Math.max(max, keyword.getArguments().size());
+
+                for (final RobotElement nestedElement : element.getChildren()) {
+                    final RobotKeywordCall call = (RobotKeywordCall) nestedElement;
+                    max = Math.max(max, call.getArguments().size());
+                }
+            }
+        }
+        return max;
     }
 
     @Inject
