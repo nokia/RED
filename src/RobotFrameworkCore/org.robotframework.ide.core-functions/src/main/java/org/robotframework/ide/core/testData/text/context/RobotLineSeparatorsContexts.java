@@ -25,7 +25,11 @@ public class RobotLineSeparatorsContexts implements IContextElement {
 
     public void addNextSeparators(final List<IContextElement> separators) {
         if (separators != null && !separators.isEmpty()) {
-            handledElements.putAll(separators.get(0).getType(), separators);
+            IContextElementType type = separators.get(0).getType();
+            if (type == getPipeSeparatorType()
+                    || type == getWhitespaceSeparatorType()) {
+                handledElements.putAll(type, separators);
+            }
         }
     }
 
@@ -36,13 +40,22 @@ public class RobotLineSeparatorsContexts implements IContextElement {
 
 
     public List<IContextElement> getPipeSeparators() {
-        return handledElements.get(SimpleRobotContextType.PIPE_SEPARATED);
+        return handledElements.get(getPipeSeparatorType());
     }
 
 
     public List<IContextElement> getWhitespaceSeparators() {
-        return handledElements
-                .get(SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED);
+        return handledElements.get(getWhitespaceSeparatorType());
+    }
+
+
+    public IContextElementType getPipeSeparatorType() {
+        return SimpleRobotContextType.PIPE_SEPARATED;
+    }
+
+
+    public IContextElementType getWhitespaceSeparatorType() {
+        return SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED;
     }
 
 

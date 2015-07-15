@@ -3,9 +3,12 @@ package org.robotframework.ide.core.testData.text.context;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage.Level;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 public class ModelBuilder {
@@ -15,11 +18,32 @@ public class ModelBuilder {
 
         List<AggregatedOneLineRobotContexts> lineContexts = contexts
                 .getContexts();
+
+        ElementType etLast = null;
         for (AggregatedOneLineRobotContexts ctx : lineContexts) {
-            System.out.println(ctx);
+            etLast = mapLine(output, ctx, etLast);
         }
 
         return output;
+    }
+
+
+    @VisibleForTesting
+    protected ElementType mapLine(final ModelOutput model,
+            final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
+        RobotLineSeparatorsContexts separators = ctx.getSeparators();
+
+        List<IContextElement> childContexts = ctx.getChildContexts();
+
+        return etLast;
+    }
+
+
+    @VisibleForTesting
+    protected IContextElementType getSeparatorType(
+            final RobotLineSeparatorsContexts separators) {
+
+        return null;
     }
 
     public static class ModelOutput {
