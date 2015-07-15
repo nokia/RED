@@ -31,7 +31,6 @@ public class RobotProject extends RobotContainer {
 
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
-    private List<LibrarySpecification> remLibsSpecs;
     private RobotProjectConfig configuration;
 
     RobotProject(final IProject project) {
@@ -57,12 +56,13 @@ public class RobotProject extends RobotContainer {
     }
 
     public List<LibrarySpecification> getStandardLibraries() {
+        if (stdLibsSpecs != null) {
+            return stdLibsSpecs;
+        }
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        if (env == null) {
+        if (env == null || configuration == null) {
             return newArrayList();
-        } else if (stdLibsSpecs != null) {
-            return stdLibsSpecs;
         }
 
         stdLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getRemoteLocations(),
@@ -102,10 +102,11 @@ public class RobotProject extends RobotContainer {
     }
 
     public List<LibrarySpecification> getReferencedLibraries() {
-        readProjectConfigurationIfNeeded();
         if (refLibsSpecs != null) {
             return refLibsSpecs;
-        } else if (configuration == null) {
+        }
+        readProjectConfigurationIfNeeded();
+        if (configuration == null) {
             return newArrayList();
         }
 
@@ -134,37 +135,6 @@ public class RobotProject extends RobotContainer {
                     }
                 }), Predicates.<LibrarySpecification> notNull()));
         return refLibsSpecs;
-    }
-
-    public boolean hasRemoteLibraries() {
-        readProjectConfigurationIfNeeded();
-        if (remLibsSpecs != null && !remLibsSpecs.isEmpty()) {
-            return true;
-        }
-        return getRuntimeEnvironment() != null && configuration != null && configuration.hasRemoteLibraries();
-    }
-
-    public List<LibrarySpecification> getRemoteLibraries() {
-        readProjectConfigurationIfNeeded();
-        if (remLibsSpecs != null) {
-            return remLibsSpecs;
-        } else if (configuration == null) {
-            return newArrayList();
-        }
-
-        remLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getRemoteLocations(),
-                new Function<RemoteLocation, LibrarySpecification>() {
-                    @Override
-                    public LibrarySpecification apply(final RemoteLocation remoteLocation) {
-                        try {
-                            final IFile file = LibspecsFolder.get(getProject()).getSpecFile(remoteLocation.createLibspecFileName());
-                            return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
-                        } catch (final CannotReadlibrarySpecificationException e) {
-                            return null;
-                        }
-                    }
-                }), Predicates.<LibrarySpecification> notNull()));
-        return remLibsSpecs;
     }
 
     private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
