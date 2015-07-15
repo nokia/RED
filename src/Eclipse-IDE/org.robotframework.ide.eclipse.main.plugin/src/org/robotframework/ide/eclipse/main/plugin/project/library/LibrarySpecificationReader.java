@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 
 public class LibrarySpecificationReader {
 
@@ -21,6 +22,14 @@ public class LibrarySpecificationReader {
         } catch (final JAXBException e) {
             throw new CannotReadlibrarySpecificationException("Unable to read library specification file", e);
         }
+    }
+
+    public static LibrarySpecification readRemoteSpecification(final IFile libraryFile,
+            final RemoteLocation remoteLocation) {
+        final LibrarySpecification spec = readSpecification(libraryFile);
+        spec.setRemote();
+        spec.setAdditionalInformation(remoteLocation.getPath() + ":" + remoteLocation.getPort());
+        return spec;
     }
 
     public static class CannotReadlibrarySpecificationException extends RuntimeException {

@@ -15,6 +15,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
@@ -30,6 +31,7 @@ public class RobotProject extends RobotContainer {
 
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
+    private List<LibrarySpecification> remLibsSpecs;
     private RobotProjectConfig configuration;
 
     RobotProject(final IProject project) {
@@ -46,6 +48,14 @@ public class RobotProject extends RobotContainer {
         return env == null ? "???" : env.getVersion();
     }
 
+    public boolean hasStandardLibraries() {
+        readProjectConfigurationIfNeeded();
+        if (stdLibsSpecs != null && !stdLibsSpecs.isEmpty()) {
+            return true;
+        }
+        return configuration != null;
+    }
+
     public List<LibrarySpecification> getStandardLibraries() {
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
@@ -55,19 +65,32 @@ public class RobotProject extends RobotContainer {
             return stdLibsSpecs;
         }
 
-        try {
-            stdLibsSpecs = newArrayList(Iterables.transform(env.getStandardLibrariesNames(),
-                    new Function<String, LibrarySpecification>() {
-                        @Override
-                        public LibrarySpecification apply(final String libraryName) {
+        stdLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getRemoteLocations(),
+                new Function<RemoteLocation, LibrarySpecification>() {
+                    @Override
+                    public LibrarySpecification apply(final RemoteLocation remoteLocation) {
+                        try {
+                            final IFile file = LibspecsFolder.get(getProject()).getSpecFile(
+                                    remoteLocation.createLibspecFileName());
+                            return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
+                        } catch (final CannotReadlibrarySpecificationException e) {
+                            return null;
+                        }
+                    }
+                }), Predicates.<LibrarySpecification> notNull()));
+        stdLibsSpecs.addAll(newArrayList(Iterables.filter(
+                Iterables.transform(env.getStandardLibrariesNames(), new Function<String, LibrarySpecification>() {
+                    @Override
+                    public LibrarySpecification apply(final String libraryName) {
+                        try {
                             final IFile file = LibspecsFolder.get(getProject()).getSpecFile(libraryName);
                             return LibrarySpecificationReader.readSpecification(file);
+                        } catch (final CannotReadlibrarySpecificationException e) {
+                            return null;
                         }
-                    }));
-            return stdLibsSpecs;
-        } catch (final CannotReadlibrarySpecificationException e) {
-            return newArrayList();
-        }
+                    }
+                }), Predicates.<LibrarySpecification> notNull())));
+        return stdLibsSpecs;
     }
 
     public boolean hasReferencedLibraries() {
@@ -76,14 +99,6 @@ public class RobotProject extends RobotContainer {
             return true;
         }
         return configuration != null && configuration.hasReferencedLibraries();
-    }
-
-    public boolean hasStandardLibraries() {
-        readProjectConfigurationIfNeeded();
-        if (stdLibsSpecs != null && !stdLibsSpecs.isEmpty()) {
-            return true;
-        }
-        return configuration != null;
     }
 
     public List<LibrarySpecification> getReferencedLibraries() {
@@ -119,6 +134,37 @@ public class RobotProject extends RobotContainer {
                     }
                 }), Predicates.<LibrarySpecification> notNull()));
         return refLibsSpecs;
+    }
+
+    public boolean hasRemoteLibraries() {
+        readProjectConfigurationIfNeeded();
+        if (remLibsSpecs != null && !remLibsSpecs.isEmpty()) {
+            return true;
+        }
+        return getRuntimeEnvironment() != null && configuration != null && configuration.hasRemoteLibraries();
+    }
+
+    public List<LibrarySpecification> getRemoteLibraries() {
+        readProjectConfigurationIfNeeded();
+        if (remLibsSpecs != null) {
+            return remLibsSpecs;
+        } else if (configuration == null) {
+            return newArrayList();
+        }
+
+        remLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getRemoteLocations(),
+                new Function<RemoteLocation, LibrarySpecification>() {
+                    @Override
+                    public LibrarySpecification apply(final RemoteLocation remoteLocation) {
+                        try {
+                            final IFile file = LibspecsFolder.get(getProject()).getSpecFile(remoteLocation.createLibspecFileName());
+                            return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
+                        } catch (final CannotReadlibrarySpecificationException e) {
+                            return null;
+                        }
+                    }
+                }), Predicates.<LibrarySpecification> notNull()));
+        return remLibsSpecs;
     }
 
     private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {

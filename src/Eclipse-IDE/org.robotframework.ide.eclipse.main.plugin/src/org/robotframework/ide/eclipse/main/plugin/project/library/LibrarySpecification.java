@@ -17,6 +17,8 @@ public class LibrarySpecification {
     private String documentation;
 
     private List<KeywordSpecification> keywords;
+    private boolean isRemote;
+    private String additionalInfo = "";
 
     public String getName() {
         return name;
@@ -72,10 +74,26 @@ public class LibrarySpecification {
         this.keywords = keywords;
     }
 
+    public boolean isRemote() {
+        return isRemote;
+    }
+
+    public void setRemote() {
+        isRemote = true;
+    }
+
     public void propagateFormat() {
         for (final KeywordSpecification kwSpec : keywords) {
             kwSpec.setFormat(format);
         }
+    }
+
+    public String getAdditionalInformation() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInformation(final String info) {
+        this.additionalInfo = info;
     }
 
     public boolean isAccessibleWithoutImport() {

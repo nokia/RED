@@ -96,6 +96,10 @@
           </objectClass>
        </enablement>
     </decorator>
+    <decorator
+          id="org.robotframework.ide.eclipse.main.plugin.decorator1"
+          label="label">
+    </decorator>
  </extension>
 
 	<extension

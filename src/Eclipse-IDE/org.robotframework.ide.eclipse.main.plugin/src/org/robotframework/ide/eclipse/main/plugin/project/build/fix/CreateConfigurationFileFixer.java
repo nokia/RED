@@ -11,6 +11,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 
 public class CreateConfigurationFileFixer implements IMarkerResolution {
@@ -25,7 +26,7 @@ public class CreateConfigurationFileFixer implements IMarkerResolution {
         final IProject project = marker.getResource().getProject();
         try {
             new RobotProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
-            marker.getResource().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+            marker.getResource().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
         } catch (final CoreException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
                     StatusManager.SHOW);

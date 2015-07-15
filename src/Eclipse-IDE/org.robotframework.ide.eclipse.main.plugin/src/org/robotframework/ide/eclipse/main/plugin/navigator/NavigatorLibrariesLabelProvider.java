@@ -67,6 +67,16 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
         } else if (element instanceof LibrarySpecification) {
             final LibrarySpecification libSpec = (LibrarySpecification) element;
             final StyledString styled = new StyledString(libSpec.getName());
+            final String additonalInfo = libSpec.getAdditionalInformation();
+            if (!additonalInfo.isEmpty()) {
+                styled.append(" ");
+                styled.append(additonalInfo, new Styler() {
+                @Override
+                public void applyStyles(final TextStyle textStyle) {
+                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                }
+                });
+            }
             styled.append(" ");
             return styled.append("(" + libSpec.getKeywords().size() + ")", new Styler() {
                 @Override

@@ -19,7 +19,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 @XmlRootElement(name = "projectConfiguration")
-@XmlType(propOrder = { "version", "executionEnvironment", "libraries" })
+@XmlType(propOrder = { "version", "executionEnvironment", "libraries", "remoteLocations" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -35,6 +35,9 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "referencedLibrary", required = false)
     private List<ReferencedLibrary> libraries = new ArrayList<>();
+
+    @XmlElement(name = "remoteLocations", required = false)
+    private List<RemoteLocation> remoteLocations = new ArrayList<>();
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -73,6 +76,14 @@ public class RobotProjectConfig {
         return libraries;
     }
 
+    public void setRemoteLocations(final List<RemoteLocation> remoteLocations) {
+        this.remoteLocations = remoteLocations;
+    }
+
+    public List<RemoteLocation> getRemoteLocations() {
+        return remoteLocations;
+    }
+
     public void addReferencedLibrarySpecification(final IPath workspaceRelativePath) {
         if (libraries == null) {
             libraries = newArrayList();
@@ -96,8 +107,19 @@ public class RobotProjectConfig {
         libraries.add(referencedLibrary);
     }
 
+    public void addRemoteLocation(final RemoteLocation remoteLocation) {
+        if (remoteLocations == null) {
+            remoteLocations = newArrayList();
+        }
+        remoteLocations.add(remoteLocation);
+    }
+
     public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
         libraries.removeAll(selectedLibs);
+    }
+
+    public void removeRemoteLocations(final List<RemoteLocation> locations) {
+        remoteLocations.removeAll(locations);
     }
 
     public boolean usesPreferences() {
@@ -123,9 +145,13 @@ public class RobotProjectConfig {
         return libraries != null && !libraries.isEmpty();
     }
 
+    public boolean hasRemoteLibraries() {
+        return remoteLocations != null && !remoteLocations.isEmpty();
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(version, executionEnvironment.path);
+        return Objects.hash(version, executionEnvironment == null ? null : executionEnvironment.path);
     }
 
     @Override
@@ -208,6 +234,55 @@ public class RobotProjectConfig {
                 default:
                     return RobotImages.getLibraryImage();
             }
+        }
+    }
+
+    @XmlRootElement(name = "remoteLocation")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class RemoteLocation {
+
+        @XmlAttribute(required = true)
+        private String path;
+
+        @XmlAttribute(required = true)
+        private int port;
+
+        public void setPath(final String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPort(final int port) {
+            this.port = port;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof RemoteLocation) {
+                final RemoteLocation that = (RemoteLocation) obj;
+                return Objects.equals(path, that.path) && port == that.port;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path, port);
+        }
+
+        public String createLibspecFileName() {
+            return "Remote_" + pathWithoutSpecialCharacters(path) + "_" + port;
+        }
+
+        private static String pathWithoutSpecialCharacters(final String path) {
+            return path.replaceAll("[^A-Za-z0-9]", "_");
         }
     }
 
