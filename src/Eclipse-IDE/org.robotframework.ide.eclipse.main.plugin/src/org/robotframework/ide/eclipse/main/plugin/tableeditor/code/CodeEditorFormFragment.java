@@ -9,6 +9,7 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
@@ -16,6 +17,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.viewers.ViewersConfigurator.MenuProvider;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -24,6 +26,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
@@ -60,6 +64,9 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     private boolean isSaving;
 
+    private MenuManager viewerMenuManager;
+    private MenuManager headerMenuManager;
+
     public TreeViewer getViewer() {
         return viewer;
     }
@@ -67,9 +74,12 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     @Override
     public void initialize(final Composite parent) {
         createViewer(parent);
-        createContextMenu();
+        createDetailsPanel(parent);
+        createViewerMenuManager();
+        createHeaderMenuManager();
 
         setInput();
+        parent.layout();
     }
 
     private void createViewer(final Composite parent) {
@@ -90,22 +100,55 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         viewer.setContentProvider(createContentProvider());
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+        ViewersConfigurator.enableContextMenuOnHeader(viewer, 
+            new MenuProvider() {
+                @Override
+                public Menu provide() {
+                    return createMenu(viewerMenuManager);
+                }
+            }, 
+            new MenuProvider() {
+                @Override
+                public Menu provide() {
+                    return createMenu(headerMenuManager);
+                }
+            });
     }
 
     protected abstract ITreeContentProvider createContentProvider();
 
-    private void createContextMenu() {
-        final String menuId = getContextMenuId();
+    private void createDetailsPanel(final Composite parent) {
+        final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        section.setExpanded(false);
+        section.setText("Settings");
+        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
 
-        final MenuManager manager = new MenuManager("Robot suite editor code page context menu", menuId);
-        final Control control = viewer.getControl();
-        final Menu menu = manager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, viewer, false);
+        final Composite composite = toolkit.createComposite(section);
+        GridLayoutFactory.fillDefaults().applyTo(composite);
+        section.setClient(composite);
     }
 
-    protected abstract String getContextMenuId();
+    private void createViewerMenuManager() {
+        viewerMenuManager = new MenuManager("Robot suite editor code page context menu", getViewerMenuId());
+        viewerMenuManager.setRemoveAllWhenShown(true);
+    }
+
+    protected abstract String getViewerMenuId();
+
+    private void createHeaderMenuManager() {
+        headerMenuManager = new MenuManager("Robot suite editor code page header context menu", getHeaderMenuId());
+        headerMenuManager.setRemoveAllWhenShown(true);
+    }
+
+    protected abstract String getHeaderMenuId();
+
+    private Menu createMenu(final MenuManager menuManager) {
+        final Control control = viewer.getControl();
+        final Menu menu = menuManager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuManager.getId(), menuManager, viewer, false);
+        return menu;
+    }
 
     private void setInput() {
         viewer.setInput(getSection());
@@ -126,7 +169,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         if (sectionIsDefined()) {
             final int maxLength = calculateLongestArgumentsList();
             for (int i = 1; i <= maxLength; i++) {
-                createArgumentColumn(i, creator);
+                createArgumentColumn(i - 1, creator);
             }
             createCommentColumn(maxLength + 1, creator);
         }
@@ -160,7 +203,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    private int calculateLongestArgumentsList() {
+    protected int calculateLongestArgumentsList() {
         return 5;
     }
 

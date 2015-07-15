@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -26,8 +28,13 @@ public class CasesEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected String getContextMenuId() {
+    protected String getViewerMenuId() {
         return "org.robotframework.ide.eclipse.editor.page.cases.contextMenu";
+    }
+
+    @Override
+    protected String getHeaderMenuId() {
+        return "org.robotframework.ide.eclipse.editor.page.cases.header.contextMenu";
     }
 
     @Override
@@ -58,6 +65,22 @@ public class CasesEditorFormFragment extends CodeEditorFormFragment {
                 return null;
             }
         };
+    }
+
+    @Override
+    protected int calculateLongestArgumentsList() {
+        final RobotSuiteFileSection section = getSection();
+        int max = 5;
+        if (section != null) {
+            final List<RobotElement> children = section.getChildren();
+            for (final RobotElement testCase : children) {
+                for (final RobotElement nestedElement : testCase.getChildren()) {
+                    final RobotKeywordCall call = (RobotKeywordCall) nestedElement;
+                    max = Math.max(max, call.getArguments().size());
+                }
+            }
+        }
+        return max;
     }
 
     @Inject
