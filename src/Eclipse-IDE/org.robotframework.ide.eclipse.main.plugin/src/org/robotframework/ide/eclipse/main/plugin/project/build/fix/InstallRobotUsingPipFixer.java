@@ -23,6 +23,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 
 public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
@@ -40,7 +41,7 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
 
         try {
             updateRobotFramework(getActiveShell(), runtimeEnvironment);
-            project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+            project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
             project.build(IncrementalProjectBuilder.FULL_BUILD, null);
         } catch (final CoreException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),

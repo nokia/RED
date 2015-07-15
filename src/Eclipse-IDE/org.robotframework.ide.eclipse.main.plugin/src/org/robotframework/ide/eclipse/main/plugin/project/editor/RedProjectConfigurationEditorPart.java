@@ -43,23 +43,25 @@ import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationEditorPart.ProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 
-public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfigurationEditor> {
+class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfigurationEditor> {
 
     public RedProjectConfigurationEditorPart() {
         super(ProjectConfigurationEditor.class);
     }
 
-    public static class ProjectConfigurationEditor {
+    static class ProjectConfigurationEditor {
 
         private IEclipseContext context;
 
-        protected RedFormToolkit toolkit;
+        private RedFormToolkit toolkit;
 
         private List<? extends ISectionFormFragment> formFragments;
 
         private FrameworksSectionFormFragment frameworksFragment;
 
         private ReferencedLibrariesFormFragment referencedFragment;
+
+        private RemoteLibraryLocationsFormFragment remoteFragment;
 
         private Form form;
 
@@ -107,10 +109,11 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
             return toolkit;
         }
 
-        protected List<? extends ISectionFormFragment> createFormFragments() {
+        private List<? extends ISectionFormFragment> createFormFragments() {
             frameworksFragment = new FrameworksSectionFormFragment();
             referencedFragment = new ReferencedLibrariesFormFragment();
-            return newArrayList(frameworksFragment, referencedFragment);
+            remoteFragment = new RemoteLibraryLocationsFormFragment();
+            return newArrayList(frameworksFragment, referencedFragment, remoteFragment);
         }
 
         private void injectToFormParts(final IEclipseContext context,
@@ -195,6 +198,7 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
                 public void run() {
                     frameworksFragment.whenConfigurationFiledChanged();
                     referencedFragment.whenConfigurationFiledChanged();
+                    remoteFragment.whenConfigurationFiledChanged();
                 }
             });
         }
@@ -205,6 +209,7 @@ public class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfi
                 public void run() {
                     frameworksFragment.whenEnvironmentWasLoaded(env, allEnvironments);
                     referencedFragment.whenEnvironmentWasLoaded(env);
+                    remoteFragment.whenEnvironmentWasLoaded();
                 }
             });
         }

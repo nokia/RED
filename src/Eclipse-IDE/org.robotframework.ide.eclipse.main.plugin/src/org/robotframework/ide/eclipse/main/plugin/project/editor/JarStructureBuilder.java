@@ -37,7 +37,7 @@ class JarStructureBuilder {
             this.qualifiedName = qualifiedName;
         }
 
-        static JarClass create(final String name) {
+        private static JarClass create(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
             return new JarClass(qualifiedName);
