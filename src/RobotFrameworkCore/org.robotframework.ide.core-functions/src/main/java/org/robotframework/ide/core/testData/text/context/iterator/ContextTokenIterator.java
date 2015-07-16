@@ -8,5 +8,5 @@ public interface ContextTokenIterator {
     boolean hasNext(FilePosition currentPositionInLine);
 
 
-    RobotSeparatorIteratorOutput next();
+    RobotSeparatorIteratorOutput next(FilePosition currentPositionInLine);
 }

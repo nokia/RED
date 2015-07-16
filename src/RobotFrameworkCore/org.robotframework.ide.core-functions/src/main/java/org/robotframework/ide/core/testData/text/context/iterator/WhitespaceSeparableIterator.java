@@ -15,14 +15,15 @@ public class WhitespaceSeparableIterator implements ContextTokenIterator {
 
 
     @Override
-    public boolean hasNext(FilePosition currentPositionInLine) {
+    public boolean hasNext(final FilePosition currentPositionInLine) {
         // TODO Auto-generated method stub
         return false;
     }
 
 
     @Override
-    public RobotSeparatorIteratorOutput next() {
+    public RobotSeparatorIteratorOutput next(
+            final FilePosition currentPositionInLine) {
         // TODO Auto-generated method stub
         return null;
     }
