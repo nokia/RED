@@ -9,6 +9,19 @@ import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 public class ContextOperationHelper {
 
+    public int computeLastTokenColumnPosition(
+            final AggregatedOneLineRobotContexts ctx) {
+        int result = -1;
+        List<RobotToken> lineTokens = getWholeLineTokens(ctx);
+        if (!lineTokens.isEmpty()) {
+            RobotToken lastTokenInLine = lineTokens.get(lineTokens.size() - 1);
+            result = lastTokenInLine.getEndPosition().getColumn();
+        }
+
+        return result;
+    }
+
+
     public List<RobotToken> getWholeLineTokens(
             final AggregatedOneLineRobotContexts ctx) {
         List<RobotToken> tokens = new LinkedList<>();
