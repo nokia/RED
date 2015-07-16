@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.context.AggregatedOneLineRobotContexts;
+import org.robotframework.ide.core.testData.text.context.ContextOperationHelper;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.RobotLineSeparatorsContexts;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContextElementComparator;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 
@@ -25,6 +25,8 @@ public class PipeSeparableIterator implements ContextTokenIterator {
     private final List<IContextElement> separatorsAndPrettyAlign;
     private final int separatorsStoreSize;
     private final int lastTokenColumn;
+    private int lastFoundSeparatorIndex = 0;
+    private final ContextOperationHelper ctxHelper;
 
 
     public PipeSeparableIterator(final AggregatedOneLineRobotContexts ctx) {
@@ -34,6 +36,7 @@ public class PipeSeparableIterator implements ContextTokenIterator {
         Collections.sort(separatorsAndPrettyAlign,
                 new ContextElementComparator());
         this.separatorsStoreSize = separatorsAndPrettyAlign.size();
+        this.ctxHelper = new ContextOperationHelper();
         this.lastTokenColumn = computeLastTokenColumnPosition(ctx);
     }
 
@@ -42,19 +45,10 @@ public class PipeSeparableIterator implements ContextTokenIterator {
     protected int computeLastTokenColumnPosition(
             final AggregatedOneLineRobotContexts ctx) {
         int result = -1;
-        List<IContextElement> childContexts = ctx.getChildContexts();
-        if (childContexts != null && !childContexts.isEmpty()) {
-            IContextElement lastCtx = childContexts
-                    .get(childContexts.size() - 1);
-            if (lastCtx instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart last = (OneLineSingleRobotContextPart) lastCtx;
-                List<RobotToken> contextTokens = last.getContextTokens();
-                RobotToken lastToken = contextTokens
-                        .get(contextTokens.size() - 1);
-                result = lastToken.getEndPosition().getColumn();
-            } else {
-                reportProblemWithType(lastCtx);
-            }
+        List<RobotToken> lineTokens = ctxHelper.getWholeLineTokens(ctx);
+        if (!lineTokens.isEmpty()) {
+            RobotToken lastTokenInLine = lineTokens.get(lineTokens.size() - 1);
+            result = lastTokenInLine.getEndPosition().getColumn();
         }
 
         return result;
@@ -62,38 +56,10 @@ public class PipeSeparableIterator implements ContextTokenIterator {
 
 
     @VisibleForTesting
-    protected void reportProblemWithType(IContextElement lastCtx) {
+    protected void reportProblemWithType(IContextElement ctx) {
         throw new IllegalArgumentException(String.format(
-                "Type %s is not supported.",
-                ((lastCtx != null) ? lastCtx.getClass() : "null")));
-    }
-
-
-    @VisibleForTesting
-    protected int nextSeparator(final FilePosition currentPositionInLine) {
-        int result = -1;
-
-        int expectedColumn = currentPositionInLine.getColumn();
-        for (int i = 0; i < separatorsStoreSize; i++) {
-            IContextElement elem = separatorsAndPrettyAlign.get(i);
-            if (elem instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart ctx = (OneLineSingleRobotContextPart) elem;
-                if (ctx.getType() == RobotLineSeparatorsContexts.PIPE_SEPARATOR_TYPE) {
-                    if (!ctx.getContextTokens().isEmpty()) {
-                        int column = ctx.getContextTokens().get(0)
-                                .getStartPosition().getColumn();
-                        if (column == expectedColumn) {
-                            result = i;
-                            break;
-                        }
-                    }
-                }
-            } else {
-                reportProblemWithType(elem);
-            }
-        }
-
-        return result;
+                "Type %s is not supported.", ((ctx != null) ? ctx.getClass()
+                        : "null")));
     }
 
 
@@ -106,79 +72,86 @@ public class PipeSeparableIterator implements ContextTokenIterator {
     @Override
     public RobotSeparatorIteratorOutput next(
             final FilePosition currentPositionInLine) {
-        RobotSeparatorIteratorOutput result;
-
-        int nextSeparator = nextSeparator(currentPositionInLine);
+        RobotSeparatorIteratorOutput result = null;
         if (hasNext(currentPositionInLine)) {
             result = new RobotSeparatorIteratorOutput(
                     RobotLineSeparatorsContexts.PIPE_SEPARATOR_TYPE);
-            if (nextSeparator > -1) {
-                fill(result, nextSeparator);
+            int separatorIndex = nextSeparatorIndex(currentPositionInLine);
+            if (separatorIndex > -1) {
+                fillSeparatorData(result, separatorIndex);
             }
-        } else {
-            // null means no more token to map in this line
-            result = null;
         }
 
         return result;
     }
 
 
-    private void fill(RobotSeparatorIteratorOutput result, int nextSeparator) {
-        IContextElement currentSeparator = separatorsAndPrettyAlign
-                .get(nextSeparator);
-        if (currentSeparator instanceof OneLineSingleRobotContextPart) {
-            OneLineSingleRobotContextPart separatorPlusAlign = (OneLineSingleRobotContextPart) currentSeparator;
-            List<RobotToken> contextTokens = separatorPlusAlign
-                    .getContextTokens();
+    @VisibleForTesting
+    protected void fillSeparatorData(final RobotSeparatorIteratorOutput result,
+            int separatorIndex) {
+        OneLineSingleRobotContextPart separatorContext = (OneLineSingleRobotContextPart) separatorsAndPrettyAlign
+                .get(separatorIndex);
+        List<RobotToken> contextTokens = separatorContext.getContextTokens();
 
-            final StringBuilder leftPrettyAlign = new StringBuilder();
-            final StringBuilder separator = new StringBuilder();
-            final StringBuilder rightPrettyAlign = new StringBuilder();
+        StringBuilder leftAlign = new StringBuilder();
+        StringBuilder separator = new StringBuilder();
+        StringBuilder rightAlign = new StringBuilder();
 
-            RobotToken theFirst = contextTokens.get(0);
-            IRobotTokenType theFirstTokenType = theFirst.getType();
-            if (theFirstTokenType == RobotSingleCharTokenType.SINGLE_PIPE) {
-                if (theFirst.getStartPosition().getColumn() == FilePosition.THE_FIRST_COLUMN) {
-                    // check if is not case: ||${SPACE}
-                    separator.append(theFirst.getText());
-                    // it means we have case | ${WHITESPACE}
-                    RobotToken theSecond = contextTokens.get(1);
-                    IRobotTokenType theSecondTokenType = theSecond.getType();
-
-                    if (theSecondTokenType == RobotWordType.DOUBLE_SPACE) {
-                        separator.append(' ');
-                        rightPrettyAlign.append(' ');
-                    } else {
-                        separator.append(theSecond.getText());
-                    }
-                }
-            } else if (theFirstTokenType == RobotWordType.DOUBLE_SPACE) {
-                leftPrettyAlign.append(' ');
-                separator.append(" |");
-                // case ${WHITESPACE} |
-            } else {
-                // space case
-                separator.append(' ');
-            }
-
-            if (contextTokens.size() == 3) {
-                RobotToken theThird = contextTokens.get(2);
-                IRobotTokenType theThirdType = theThird.getType();
-
-                if (theThirdType == RobotWordType.DOUBLE_SPACE) {
-                    separator.append(' ');
-                    rightPrettyAlign.append(' ');
-                } else {
-                    rightPrettyAlign.append(theThird.getText());
-                }
-            }
-
-            result.setLeftPrettyAlign(leftPrettyAlign);
-            result.setSeparator(separator);
-            result.setRightPrettyAlign(rightPrettyAlign);
+        RobotToken theFirstToken = contextTokens.get(0);
+        IRobotTokenType theFirstTokenType = theFirstToken.getType();
+        if (theFirstTokenType == RobotWordType.DOUBLE_SPACE) {
+            leftAlign.append(' ');
+            separator.append(' ');
         } else {
-            reportProblemWithType(currentSeparator);
+            separator.append(theFirstToken.getText());
         }
+
+        RobotToken theSecondToken = contextTokens.get(1);
+        IRobotTokenType theSecondTokenType = theSecondToken.getType();
+        if (theSecondTokenType == RobotWordType.DOUBLE_SPACE) {
+            separator.append(' ');
+            rightAlign.append(' ');
+        } else {
+            separator.append(theSecondToken.getText());
+        }
+
+        if (contextTokens.size() == 3) {
+            RobotToken theThirdToken = contextTokens.get(2);
+            IRobotTokenType theThirdTokenType = theThirdToken.getType();
+            if (theThirdTokenType == RobotWordType.DOUBLE_SPACE) {
+                separator.append(' ');
+                rightAlign.append(' ');
+            } else {
+                separator.append(theThirdToken.getText());
+            }
+        }
+
+        result.setLeftPrettyAlign(leftAlign);
+        result.setSeparator(separator);
+        result.setRightPrettyAlign(rightAlign);
+    }
+
+
+    @VisibleForTesting
+    protected int nextSeparatorIndex(final FilePosition fp) {
+        int result = -1;
+        int column = fp.getColumn();
+        for (int i = lastFoundSeparatorIndex; i < separatorsStoreSize; i++) {
+            IContextElement context = separatorsAndPrettyAlign.get(i);
+            if (context instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart lineCtx = (OneLineSingleRobotContextPart) context;
+                RobotToken robotToken = lineCtx.getContextTokens().get(0);
+                int tokenStartColumn = robotToken.getStartPosition()
+                        .getColumn();
+                if (column == tokenStartColumn) {
+                    result = i;
+                    lastFoundSeparatorIndex = i;
+                }
+            } else {
+                reportProblemWithType(context);
+            }
+        }
+
+        return result;
     }
 }
