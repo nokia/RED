@@ -1,17 +1,28 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
 public class LineElement {
 
-    private List<ElementType> type = Arrays.asList(ElementType.VALUE);
+    private List<ElementType> types = Arrays.asList(ElementType.VALUE);
     private StringBuilder value = new StringBuilder();
 
 
     public StringBuilder getValue() {
         return value;
+    }
+
+
+    public List<ElementType> getElementTypes() {
+        return Collections.unmodifiableList(types);
+    }
+
+
+    public void setElemenTypes(final List<ElementType> types) {
+        this.types = types;
     }
 
 
@@ -24,6 +35,18 @@ public class LineElement {
          * nothing just CR or LF
          */
         EMPTY_LINE,
+        /**
+         * additional whitespace for visibility improvement
+         */
+        PRETTY_ALIGN,
+        /**
+         * 
+         */
+        PIPE_SEPARATOR,
+        /**
+         * 
+         */
+        WHITESPACE_SEPARATOR,
         /**
          * {@code ...} ellipse
          */
