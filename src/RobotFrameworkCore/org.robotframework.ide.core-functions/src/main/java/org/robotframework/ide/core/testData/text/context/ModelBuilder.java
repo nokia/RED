@@ -126,7 +126,7 @@ public class ModelBuilder {
 
         if (next.hasRightPrettyAlign()) {
             LineElement rightAlign = new LineElement();
-            rightAlign.setValue(next.getLeftPrettyAlign());
+            rightAlign.setValue(next.getRightPrettyAlign());
             rightAlign.setElemenTypes(Arrays.asList(ElementType.PRETTY_ALIGN));
             elems.add(rightAlign);
 

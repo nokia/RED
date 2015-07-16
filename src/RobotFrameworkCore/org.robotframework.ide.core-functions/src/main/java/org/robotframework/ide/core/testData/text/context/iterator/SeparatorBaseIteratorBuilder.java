@@ -34,11 +34,11 @@ public class SeparatorBaseIteratorBuilder {
     }
 
 
-    private boolean isPipeSeparatedLine(IContextElement theFirstPipeInLine) {
+    private boolean isPipeSeparatedLine(IContextElement context) {
         boolean result = false;
-        if (theFirstPipeInLine != null) {
-            if (theFirstPipeInLine instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart ctx = (OneLineSingleRobotContextPart) theFirstPipeInLine;
+        if (context != null) {
+            if (context instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart ctx = (OneLineSingleRobotContextPart) context;
                 List<RobotToken> contextTokens = ctx.getContextTokens();
                 if (contextTokens != null && !contextTokens.isEmpty()) {
                     RobotToken robotToken = contextTokens.get(0);
@@ -50,8 +50,8 @@ public class SeparatorBaseIteratorBuilder {
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "Pipe separator element has incorrect type "
-                                + ((theFirstPipeInLine != null) ? theFirstPipeInLine
+                        "Separator element has incorrect type "
+                                + ((context != null) ? context
                                         .getClass() : " null"));
             }
         }
