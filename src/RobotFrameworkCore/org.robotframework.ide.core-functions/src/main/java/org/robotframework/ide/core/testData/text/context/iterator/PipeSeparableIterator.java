@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.context.ContextOperationHelper;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotContextPart;
 import org.robotframework.ide.core.testData.text.context.RobotLineSeparatorsContexts;
+import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.recognizer.ContextElementComparator;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
@@ -37,29 +38,7 @@ public class PipeSeparableIterator implements ContextTokenIterator {
                 new ContextElementComparator());
         this.separatorsStoreSize = separatorsAndPrettyAlign.size();
         this.ctxHelper = new ContextOperationHelper();
-        this.lastTokenColumn = computeLastTokenColumnPosition(ctx);
-    }
-
-
-    @VisibleForTesting
-    protected int computeLastTokenColumnPosition(
-            final AggregatedOneLineRobotContexts ctx) {
-        int result = -1;
-        List<RobotToken> lineTokens = ctxHelper.getWholeLineTokens(ctx);
-        if (!lineTokens.isEmpty()) {
-            RobotToken lastTokenInLine = lineTokens.get(lineTokens.size() - 1);
-            result = lastTokenInLine.getEndPosition().getColumn();
-        }
-
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected void reportProblemWithType(IContextElement ctx) {
-        throw new IllegalArgumentException(String.format(
-                "Type %s is not supported.", ((ctx != null) ? ctx.getClass()
-                        : "null")));
+        this.lastTokenColumn = ctxHelper.computeLastTokenColumnPosition(ctx);
     }
 
 
@@ -138,17 +117,20 @@ public class PipeSeparableIterator implements ContextTokenIterator {
         int column = fp.getColumn();
         for (int i = lastFoundSeparatorIndex; i < separatorsStoreSize; i++) {
             IContextElement context = separatorsAndPrettyAlign.get(i);
-            if (context instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart lineCtx = (OneLineSingleRobotContextPart) context;
-                RobotToken robotToken = lineCtx.getContextTokens().get(0);
-                int tokenStartColumn = robotToken.getStartPosition()
-                        .getColumn();
-                if (column == tokenStartColumn) {
-                    result = i;
-                    lastFoundSeparatorIndex = i;
+            if (context.getType() == SimpleRobotContextType.PIPE_SEPARATED) {
+                if (context instanceof OneLineSingleRobotContextPart) {
+                    OneLineSingleRobotContextPart lineCtx = (OneLineSingleRobotContextPart) context;
+                    RobotToken robotToken = lineCtx.getContextTokens().get(0);
+                    int tokenStartColumn = robotToken.getStartPosition()
+                            .getColumn();
+                    if (column == tokenStartColumn) {
+                        result = i;
+                        lastFoundSeparatorIndex = i;
+                        break;
+                    }
+                } else {
+                    ctxHelper.reportProblemWithType(context);
                 }
-            } else {
-                reportProblemWithType(context);
             }
         }
 
