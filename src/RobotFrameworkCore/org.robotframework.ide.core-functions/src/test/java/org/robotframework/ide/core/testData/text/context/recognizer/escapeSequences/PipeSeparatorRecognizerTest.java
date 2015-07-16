@@ -15,9 +15,8 @@ import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
 import org.robotframework.ide.core.testData.text.context.recognizer.ARecognizerTest;
-import org.robotframework.ide.core.testData.text.context.recognizer.escapeSequences.PipeSeparatorRecognizer;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
 import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher.TokenOutput;
@@ -35,6 +34,203 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
 
     public PipeSeparatorRecognizerTest() {
         super(PipeSeparatorRecognizer.class);
+    }
+
+
+    @Test
+    public void test_lineFromTestCaseSection_withEscapedSpace()
+            throws FileNotFoundException, IOException {
+        // prepare
+        TokenOutput tokenOutput = createTokenOutput("| | Log | \\ | INFO |  |  \t|");
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        assertThat(recognize).hasSize(7);
+
+        IContextElement element = recognize.get(0);
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
+        assertThat(contextOne.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextOne.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 1), new String[] {});
+
+        IContextElement elementTwo = recognize.get(1);
+        assertThat(elementTwo)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextTwo.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 3), new String[] {});
+
+        IContextElement elementThree = recognize.get(2);
+        assertThat(elementThree).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextThree.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 8), new String[] {});
+
+        IContextElement elementFour = recognize.get(3);
+        assertThat(elementFour).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextFour = (OneLineSingleRobotContextPart) elementFour;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextFour.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 13), new String[] {});
+
+        IContextElement elementFive = recognize.get(4);
+        assertThat(elementFive).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextFive = (OneLineSingleRobotContextPart) elementFive;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextFive.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotWordType.DOUBLE_SPACE }, 0,
+                new FilePosition(1, 19), new String[] {});
+
+        IContextElement elementSix = recognize.get(5);
+        assertThat(elementSix)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextSix = (OneLineSingleRobotContextPart) elementSix;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextSix.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotWordType.DOUBLE_SPACE }, 0,
+                new FilePosition(1, 23), new String[] {});
+
+        IContextElement elementSeven = recognize.get(6);
+        assertThat(elementSeven).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextSeven = (OneLineSingleRobotContextPart) elementSeven;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextSeven.getContextTokens(),
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_PIPE }, 0,
+                new FilePosition(1, 26), new String[] {});
+    }
+
+
+    @Test
+    public void test_lineFromTestCaseSection_withEscapedPipe()
+            throws FileNotFoundException, IOException {
+        // prepare
+        TokenOutput tokenOutput = createTokenOutput("| | Log | \\|  | INFO |  |  \t|");
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        assertThat(recognize).hasSize(7);
+
+        IContextElement element = recognize.get(0);
+        assertThat(element).isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextOne = (OneLineSingleRobotContextPart) element;
+        assertThat(contextOne.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextOne.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 1), new String[] {});
+
+        IContextElement elementTwo = recognize.get(1);
+        assertThat(elementTwo)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextTwo.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 3), new String[] {});
+
+        IContextElement elementThree = recognize.get(2);
+        assertThat(elementThree).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextThree.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 8), new String[] {});
+
+        IContextElement elementFour = recognize.get(3);
+        assertThat(elementFour).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextFour = (OneLineSingleRobotContextPart) elementFour;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextFour.getContextTokens(),
+                new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotSingleCharTokenType.SINGLE_SPACE }, 0,
+                new FilePosition(1, 13), new String[] {});
+
+        IContextElement elementFive = recognize.get(4);
+        assertThat(elementFive).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextFive = (OneLineSingleRobotContextPart) elementFive;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextFive.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotWordType.DOUBLE_SPACE }, 0,
+                new FilePosition(1, 21), new String[] {});
+
+        IContextElement elementSix = recognize.get(5);
+        assertThat(elementSix)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextSix = (OneLineSingleRobotContextPart) elementSix;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextSix.getContextTokens(),
+                new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_PIPE,
+                        RobotWordType.DOUBLE_SPACE }, 0,
+                new FilePosition(1, 25), new String[] {});
+
+        IContextElement elementSeven = recognize.get(6);
+        assertThat(elementSeven).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
+        OneLineSingleRobotContextPart contextSeven = (OneLineSingleRobotContextPart) elementSeven;
+        assertThat(contextTwo.getType()).isEqualTo(
+                SimpleRobotContextType.PIPE_SEPARATED);
+        assertTokensForUnknownWords(contextSeven.getContextTokens(),
+                new IRobotTokenType[] {
+                        RobotSingleCharTokenType.SINGLE_TABULATOR,
+                        RobotSingleCharTokenType.SINGLE_PIPE }, 0,
+                new FilePosition(1, 28), new String[] {});
     }
 
 
@@ -64,11 +260,11 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                new FilePosition(1, prefix.length() + 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(elementTwo)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
@@ -105,8 +301,7 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 SimpleRobotContextType.PRETTY_ALIGN);
         assertTokensForUnknownWords(contextOne.getContextTokens(),
                 new IRobotTokenType[] { RobotWordType.DOUBLE_SPACE }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                new FilePosition(1, prefix.length() + 1), new String[] {});
 
     }
 
@@ -142,19 +337,20 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new FilePosition(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(elementTwo)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PIPE_SEPARATED);
         assertTokensForUnknownWords(contextTwo.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_PIPE,
-                        RobotWordType.DOUBLE_SPACE }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                        RobotWordType.DOUBLE_SPACE }, 0, new FilePosition(1,
+                        prefix.length() + 1), new String[] {});
 
         IContextElement elementThree = recognize.get(2);
-        assertThat(elementThree).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(elementThree).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
         assertThat(contextThree.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
@@ -196,19 +392,20 @@ public class PipeSeparatorRecognizerTest extends ARecognizerTest {
                 new FilePosition(1, 1), new String[] {});
 
         IContextElement elementTwo = recognize.get(1);
-        assertThat(elementTwo).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(elementTwo)
+                .isInstanceOf(OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart contextTwo = (OneLineSingleRobotContextPart) elementTwo;
         assertThat(contextTwo.getType()).isEqualTo(
                 SimpleRobotContextType.PIPE_SEPARATED);
         assertTokensForUnknownWords(contextTwo.getContextTokens(),
                 new IRobotTokenType[] { RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotSingleCharTokenType.SINGLE_PIPE,
-                        RobotWordType.DOUBLE_SPACE }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                        RobotWordType.DOUBLE_SPACE }, 0, new FilePosition(1,
+                        prefix.length() + 1), new String[] {});
 
         IContextElement elementThree = recognize.get(2);
-        assertThat(elementThree).isInstanceOf(OneLineSingleRobotContextPart.class);
+        assertThat(elementThree).isInstanceOf(
+                OneLineSingleRobotContextPart.class);
         OneLineSingleRobotContextPart contextThree = (OneLineSingleRobotContextPart) elementThree;
         assertThat(contextThree.getType()).isEqualTo(
                 SimpleRobotContextType.PRETTY_ALIGN);
