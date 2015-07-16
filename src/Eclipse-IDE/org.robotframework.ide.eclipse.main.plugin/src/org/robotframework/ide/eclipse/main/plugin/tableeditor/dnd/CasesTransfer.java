@@ -30,7 +30,7 @@ public class CasesTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasCases(final Clipboard clipboard) {
-        return clipboard.getContents(getInstance()) != null;
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
     }
 
     @Override
