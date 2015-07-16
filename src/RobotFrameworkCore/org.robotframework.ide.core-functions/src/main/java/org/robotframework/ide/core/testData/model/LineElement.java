@@ -319,4 +319,10 @@ public class LineElement {
          */
         ARGUMENT_PARAMETER_VALUE;
     }
+
+
+    @Override
+    public String toString() {
+        return String.format("LineElement [types=%s, value=%s]", types, value);
+    }
 }
