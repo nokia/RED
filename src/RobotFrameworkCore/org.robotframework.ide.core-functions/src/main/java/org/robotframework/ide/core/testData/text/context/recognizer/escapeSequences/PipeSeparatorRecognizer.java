@@ -83,7 +83,17 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
             } else if (type == RobotSingleCharTokenType.SINGLE_TABULATOR
                     || type == RobotWordType.DOUBLE_SPACE
                     || type == RobotSingleCharTokenType.SINGLE_SPACE) {
-                context.addNextToken(token);
+                boolean shouldAdd = true;
+                if (type == RobotWordType.DOUBLE_SPACE
+                        || type == RobotSingleCharTokenType.SINGLE_SPACE) {
+                    if (wasEscape) {
+                        shouldAdd = false;
+                    }
+                }
+
+                if (shouldAdd) {
+                    context.addNextToken(token);
+                }
 
                 if (wasPipe) {
                     int sizeBefore = foundContexts.size();
@@ -95,13 +105,14 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
 
                 wasPipe = false;
                 wasEscape = false;
-            } else if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH) {
+            } else if (type == RobotSingleCharTokenType.SINGLE_ESCAPE_BACKSLASH
+                    || type == RobotWordType.DOUBLE_ESCAPE_BACKSLASH) {
                 int sizeBefore = foundContexts.size();
                 context = tryToExtractContexts(foundContexts, context, false);
                 int sizeAfter = foundContexts.size();
                 wasPreviousMerged = (sizeBefore != sizeAfter);
 
-                wasEscape = false;
+                wasEscape = true;
             } else {
                 int sizeBefore = foundContexts.size();
                 context = tryToExtractContexts(foundContexts, context,
@@ -157,7 +168,8 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
                 }
             }
 
-            newContext = new OneLineSingleRobotContextPart(context.getLineNumber());
+            newContext = new OneLineSingleRobotContextPart(
+                    context.getLineNumber());
         }
 
         return newContext;
@@ -181,7 +193,8 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
 
     private OneLineSingleRobotContextPart buildPipeSeparatedContext(
             final List<RobotToken> tokens, int pipeIndex, int lineNumber) {
-        OneLineSingleRobotContextPart separator = new OneLineSingleRobotContextPart(lineNumber);
+        OneLineSingleRobotContextPart separator = new OneLineSingleRobotContextPart(
+                lineNumber);
         if (pipeIndex - 1 >= 0) {
             separator.addNextToken(tokens.get(pipeIndex - 1));
         }
@@ -198,7 +211,8 @@ public class PipeSeparatorRecognizer implements IContextRecognizer {
 
     private OneLineSingleRobotContextPart extractPrettyAlignContext(
             final List<RobotToken> tokens, int from, int to, int lineNumber) {
-        OneLineSingleRobotContextPart pretty = new OneLineSingleRobotContextPart(lineNumber);
+        OneLineSingleRobotContextPart pretty = new OneLineSingleRobotContextPart(
+                lineNumber);
 
         if (from <= to && from > -1 && to < tokens.size()) {
             for (int i = from; i <= to; i++) {

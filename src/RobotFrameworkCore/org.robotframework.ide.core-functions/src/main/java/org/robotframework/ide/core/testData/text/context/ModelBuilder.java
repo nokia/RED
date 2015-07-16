@@ -1,8 +1,10 @@
 package org.robotframework.ide.core.testData.text.context;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
@@ -11,6 +13,7 @@ import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIt
 import org.robotframework.ide.core.testData.text.context.iterator.RobotSeparatorIteratorOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.SeparatorBaseIteratorBuilder;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
+import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -31,9 +34,9 @@ public class ModelBuilder {
         List<AggregatedOneLineRobotContexts> lineContexts = contexts
                 .getContexts();
 
-        ElementType etLast = null;
+        ElementType globalLineContext = null;
         for (AggregatedOneLineRobotContexts ctx : lineContexts) {
-            etLast = mapLine(output, ctx, etLast);
+            globalLineContext = mapLine(output, ctx, globalLineContext);
         }
 
         return output;
@@ -45,20 +48,241 @@ public class ModelBuilder {
             final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
         final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
                 .createSeparatorBaseIterator(ctx);
-        FilePosition fp = FilePosition.createMarkerForFirstColumn(ctx
-                .getSeparators().getLineNumber());
+        List<RobotToken> lineTokens = getWholeLineTokens(ctx);
+        if (lineTokens.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Line should contains any token even carritage return");
+        }
+
+        RobotLineSeparatorsContexts separators = ctx.getSeparators();
+        List<IContextElement> separatorsContexts = separators
+                .getFoundSeperatorsExcludeType().values();
+        List<IContextElement> childContexts = ctx.getChildContexts();
+
+        FilePosition fp = FilePosition.createMarkerForFirstColumn(separators
+                .getLineNumber());
+        List<LineElement> elems = new LinkedList<>();
         while(separatorBaseIterator.hasNext(fp)) {
-            RobotSeparatorIteratorOutput next = separatorBaseIterator.next();
+            RobotSeparatorIteratorOutput next = separatorBaseIterator.next(fp);
             if (next != null) {
+                if (next.hasSeparator()) {
+                    int separatorLength = 0;
+                    if (next.hasLeftPrettyAlign()) {
+                        LineElement leftAlign = new LineElement();
+                        leftAlign.setValue(next.getLeftPrettyAlign());
+                        leftAlign.setElemenTypes(Arrays
+                                .asList(ElementType.PRETTY_ALIGN));
+                        elems.add(leftAlign);
 
+                        separatorLength += leftAlign.getValue().length();
+                    }
+
+                    LineElement separator = new LineElement();
+                    separator.setValue(next.getSeparator());
+                    separator.setElemenTypes(getSeparatorTypes(next));
+                    separatorLength += separator.getValue().length();
+                    elems.add(separator);
+
+                    if (next.hasRightPrettyAlign()) {
+                        LineElement rightAlign = new LineElement();
+                        rightAlign.setValue(next.getLeftPrettyAlign());
+                        rightAlign.setElemenTypes(Arrays
+                                .asList(ElementType.PRETTY_ALIGN));
+                        elems.add(rightAlign);
+
+                        separatorLength += rightAlign.getValue().length();
+                    }
+
+                    fp = new FilePosition(fp.getLine(), fp.getColumn()
+                            + separatorLength);
+                } else {
+                    childContexts = filterContextsByColumn(childContexts, fp);
+                    separatorsContexts = filterContextsByColumn(
+                            separatorsContexts, fp);
+
+                    List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>(
+                            childContexts);
+                    separatorsAndNormalCtxs.addAll(separatorsContexts);
+
+                    List<IContextElement> nearestCtxs = findNearestContexts(
+                            separatorsAndNormalCtxs, fp);
+                    List<RobotToken> gapTokens = findGapTokens(nearestCtxs,
+                            lineTokens, fp);
+                    if (!gapTokens.isEmpty()) {
+                        RobotToken robotToken = gapTokens
+                                .get(gapTokens.size() - 1);
+                        fp = robotToken.getEndPosition();
+                    } else {
+                        // dummy code for check propose
+                        OneLineSingleRobotContextPart c = (OneLineSingleRobotContextPart) nearestCtxs
+                                .get(0);
+                        fp = c.getContextTokens()
+                                .get(c.getContextTokens().size() - 1)
+                                .getEndPosition();
+                    }
+                }
+            } else {
+                break;
             }
-
-            // do merguje to co pasuje pretty align i separator potem wez
-            // pozycje i sobie z szamaja wszystko co pasuje do danego kontekstu
-
         }
 
         return etLast;
+    }
+
+
+    @VisibleForTesting
+    protected List<RobotToken> findGapTokens(
+            final List<IContextElement> nearestCtxs,
+            final List<RobotToken> tokens, final FilePosition fp) {
+        List<RobotToken> gapTokens = new LinkedList<>();
+
+        int column = fp.getColumn();
+        int gapEndPosition = findGapEndPosition(nearestCtxs, tokens);
+        for (RobotToken token : tokens) {
+            int tokenStartColumn = token.getStartPosition().getColumn();
+            if (column <= tokenStartColumn) {
+                int tokenEndColumn = token.getEndPosition().getColumn();
+                if (gapEndPosition >= tokenEndColumn) {
+                    gapTokens.add(token);
+                } else {
+                    // all tokens from gap region collected
+                    break;
+                }
+            }
+        }
+
+        return gapTokens;
+    }
+
+
+    @VisibleForTesting
+    protected int findGapEndPosition(final List<IContextElement> nearestCtxs,
+            List<RobotToken> lineTokens) {
+        int gapEndPosition = 0;
+        if (nearestCtxs.isEmpty()) {
+            // unexpected situation no more contexts found
+            RobotToken lastTokenInLine = lineTokens.get(lineTokens.size() - 1);
+            gapEndPosition = lastTokenInLine.getEndPosition().getColumn();
+        } else {
+            // every contexts are have the same start position and contains
+            // minimum one token
+            IContextElement ctx = nearestCtxs.get(0);
+            if (ctx instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
+                List<RobotToken> contextTokens = currentCtx.getContextTokens();
+                RobotToken token = contextTokens.get(0);
+                gapEndPosition = token.getStartPosition().getColumn();
+            } else {
+                reportProblemWithType(ctx);
+            }
+
+        }
+
+        return gapEndPosition;
+    }
+
+
+    @VisibleForTesting
+    protected List<IContextElement> findNearestContexts(
+            final List<IContextElement> availableContexts, final FilePosition fp) {
+        List<IContextElement> nearests = new LinkedList<>();
+
+        int column = fp.getColumn();
+        int currentDistance = Integer.MAX_VALUE;
+        for (IContextElement ctx : availableContexts) {
+            if (ctx instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
+                List<RobotToken> contextTokens = currentCtx.getContextTokens();
+                if (contextTokens != null && !contextTokens.isEmpty()) {
+                    RobotToken token = contextTokens.get(0);
+                    int distance = token.getStartPosition().getColumn()
+                            - column;
+                    if (distance > 0) {
+                        if (distance < currentDistance) {
+                            // we found more near context
+                            nearests.clear();
+                            currentDistance = distance;
+                        }
+
+                        nearests.add(ctx);
+                    }
+                }
+            } else {
+                reportProblemWithType(ctx);
+            }
+        }
+
+        return nearests;
+    }
+
+
+    @VisibleForTesting
+    protected List<IContextElement> filterContextsByColumn(
+            final List<IContextElement> childContexts, final FilePosition fp) {
+        List<IContextElement> foundCtxs = new LinkedList<>();
+        int column = fp.getColumn();
+
+        for (IContextElement ctx : childContexts) {
+            if (ctx instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
+                List<RobotToken> contextTokens = currentCtx.getContextTokens();
+                if (contextTokens != null && !contextTokens.isEmpty()) {
+                    RobotToken token = contextTokens.get(0);
+                    if (token.getStartPosition().getColumn() >= column) {
+                        foundCtxs.add(ctx);
+                    }
+                }
+            } else {
+                reportProblemWithType(ctx);
+            }
+        }
+
+        return foundCtxs;
+    }
+
+
+    @VisibleForTesting
+    protected List<RobotToken> getWholeLineTokens(
+            final AggregatedOneLineRobotContexts ctx) {
+        List<RobotToken> tokens = new LinkedList<>();
+
+        List<IContextElement> comments = ctx.getChildContextTypes().get(
+                SimpleRobotContextType.UNDECLARED_COMMENT);
+        // search for the context with the biggest number of tokens
+        for (IContextElement context : comments) {
+            if (context instanceof OneLineSingleRobotContextPart) {
+                OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) context;
+                List<RobotToken> contextTokens = currentCtx.getContextTokens();
+                if (contextTokens.size() > tokens.size()) {
+                    tokens = contextTokens;
+                }
+            } else {
+                reportProblemWithType(context);
+            }
+        }
+
+        return tokens;
+    }
+
+
+    @VisibleForTesting
+    protected void reportProblemWithType(IContextElement lastCtx) {
+        throw new IllegalArgumentException(String.format(
+                "Type %s is not supported.",
+                ((lastCtx != null) ? lastCtx.getClass() : "null")));
+    }
+
+
+    private List<ElementType> getSeparatorTypes(
+            final RobotSeparatorIteratorOutput next) {
+        List<ElementType> type = new LinkedList<>();
+        if (next.getSeparatorType() == SimpleRobotContextType.PIPE_SEPARATED) {
+            type.add(ElementType.PIPE_SEPARATOR);
+        } else {
+            type.add(ElementType.WHITESPACE_SEPARATOR);
+        }
+
+        return type;
     }
 
     public static class ModelOutput {
