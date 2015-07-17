@@ -26,6 +26,11 @@ public class LineElement {
     }
 
 
+    public void appendValue(StringBuilder value) {
+        this.value.append(value);
+    }
+
+
     public void setValue(StringBuilder value) {
         this.value = value;
     }
@@ -35,6 +40,10 @@ public class LineElement {
          * nothing just CR or LF
          */
         EMPTY_LINE,
+        /**
+         * 
+         */
+        EMPTY_CELL,
         /**
          * additional whitespace for visibility improvement
          */
