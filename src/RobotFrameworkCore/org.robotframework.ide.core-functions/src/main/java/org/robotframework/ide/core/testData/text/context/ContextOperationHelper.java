@@ -90,7 +90,7 @@ public class ContextOperationHelper {
                     RobotToken token = contextTokens.get(0);
                     int distance = token.getStartPosition().getColumn()
                             - column;
-                    if (distance > 0) {
+                    if (distance >= 0) {
                         if (distance < currentDistance) {
                             // we found more near context
                             nearests.clear();
