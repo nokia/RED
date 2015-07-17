@@ -5,17 +5,18 @@ Element-Name: SimpleRobotScript
 Element-Type: context
 Element-Version: 2.0
 Id: _dCes0BXWEeW05sQKg0mypw
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/18/15 6:24 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 7/17/15 2:41 PM
 
 ------=_contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot-9d9b2701-707a-3cab-8878-2a5e28a69be5
 Content-Type: q7/binary
 Entry-Name: contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot
 
-UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnTT0tJSCEssykxMykktVtDS0uLlUqku
-gwrUchrycvFyAUUVglNLSjLz0qFKIGIhqcUlCs6JxTCNaZlFxSUgQV4uTp/8dE4kg4AiyMYCTYPbymlo
-gFU9xA7v1Mry/KIUsA1cAFBLBwgJIAu4YgAAAK0AAABQSwECFAAUAAgICAAAACEACSALuGIAAACtAAAA
-CAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAAmAAAAAAA
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnTT0tJSCEssykxMykktVtDS0uJSqS6D
+8msVgMCQiwsoqhCcWlKSmZcOUQIWCUktLlFwTiyGakvLLCouAYlxcfrkp3MimcKFzOEEGgS3kNPQAFM1
+V3Fqcn5eCsQod6Bqn9S89JIMBQWlktSKEiUuiO3eqZXl+UUpELsBUEsHCIhHHMd5AAAAxQAAAFBLAQIU
+ABQACAgIAAAAIQCIRxzHeQAAAMUAAAAIAAAAAAAAAAAAAAAAAAAAAAAuY29udGVudFBLBQYAAAAAAQAB
+ADYAAACvAAAAAAA=
 ------=_contents/RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot-9d9b2701-707a-3cab-8878-2a5e28a69be5--
 ------=_contents/RunRobotScriptInDebugPerspective/.project-04ee61e3-3f3a-3a5f-885e-6b42b76e5d51
 Content-Type: q7/binary
