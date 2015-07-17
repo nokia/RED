@@ -47,7 +47,7 @@ public class RobotProject extends RobotContainer {
         return env == null ? "???" : env.getVersion();
     }
 
-    public boolean hasStandardLibraries() {
+    public synchronized boolean hasStandardLibraries() {
         readProjectConfigurationIfNeeded();
         if (stdLibsSpecs != null && !stdLibsSpecs.isEmpty()) {
             return true;
@@ -55,7 +55,7 @@ public class RobotProject extends RobotContainer {
         return configuration != null;
     }
 
-    public List<LibrarySpecification> getStandardLibraries() {
+    public synchronized List<LibrarySpecification> getStandardLibraries() {
         if (stdLibsSpecs != null) {
             return stdLibsSpecs;
         }
@@ -93,7 +93,7 @@ public class RobotProject extends RobotContainer {
         return stdLibsSpecs;
     }
 
-    public boolean hasReferencedLibraries() {
+    public synchronized boolean hasReferencedLibraries() {
         readProjectConfigurationIfNeeded();
         if (refLibsSpecs != null && !refLibsSpecs.isEmpty()) {
             return true;
@@ -101,7 +101,7 @@ public class RobotProject extends RobotContainer {
         return configuration != null && configuration.hasReferencedLibraries();
     }
 
-    public List<LibrarySpecification> getReferencedLibraries() {
+    public synchronized List<LibrarySpecification> getReferencedLibraries() {
         if (refLibsSpecs != null) {
             return refLibsSpecs;
         }
@@ -148,13 +148,13 @@ public class RobotProject extends RobotContainer {
         return configuration;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         configuration = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
     }
 
-    public RobotRuntimeEnvironment getRuntimeEnvironment() {
+    public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
         readProjectConfigurationIfNeeded();
         if (configuration == null || configuration.usesPreferences()) {
             return RobotFramework.getDefault().getActiveRobotInstallation();
@@ -170,7 +170,7 @@ public class RobotProject extends RobotContainer {
         return getProject().getFile(filename);
     }
 
-    public List<String> getClasspath() {
+    public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
             final Set<String> cp = newHashSet(".");
