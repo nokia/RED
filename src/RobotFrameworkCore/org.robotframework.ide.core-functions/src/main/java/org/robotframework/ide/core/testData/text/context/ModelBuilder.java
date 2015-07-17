@@ -94,6 +94,7 @@ public class ModelBuilder {
                             gapTokens, mappedType);
                     mappedType = mapOut.getMappedElementType();
                     fp = mapOut.getNextPosition();
+
                 }
             } else {
                 model.addBuildMessage(BuildMessage.buildError(
