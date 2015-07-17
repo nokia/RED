@@ -102,7 +102,7 @@ public class RobotDebugEventDispatcher extends Job {
     private void runEventsLoop(final BufferedReader eventReader) throws IOException, MissingFileToExecuteException {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
-        while (target.isTerminated() || event != null) {
+        while (!target.isTerminated() && event != null) {
 
             final Map<?, ?> eventMap = mapper.readValue(event, Map.class);
             final String eventType = getEventType(eventMap);
