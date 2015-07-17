@@ -102,7 +102,7 @@ public class RobotDebugEventDispatcher extends Job {
     private void runEventsLoop(final BufferedReader eventReader) throws IOException, MissingFileToExecuteException {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
-        while (!target.isTerminated() && event != null) {
+        while (target.isTerminated() || event != null) {
 
             final Map<?, ?> eventMap = mapper.readValue(event, Map.class);
             final String eventType = getEventType(eventMap);
@@ -115,6 +115,9 @@ public class RobotDebugEventDispatcher extends Job {
                     break;
                 case "start_suite":
                     handleStartSuiteEvent(eventMap);
+                    break;
+                case "start_test":
+                    handleStartTestEvent(eventMap);
                     break;
                 case "start_keyword":
                     handleStartKeywordEvent(eventMap);
@@ -143,6 +146,9 @@ public class RobotDebugEventDispatcher extends Job {
                 case "end_keyword":
                     handleEndKeywordEvent(eventMap);
                     break;
+                case "end_test":
+                	handleEndTestEvent(eventMap);
+                	break;
                 case "end_suite":
                     handleEndSuiteEvent();
                     break;
@@ -174,6 +180,13 @@ public class RobotDebugEventDispatcher extends Job {
         executedFile = extractSuiteFile(currentSuite, suiteResources);
     }
 
+    private void handleStartTestEvent(final Map<?, ?> eventMap) {
+        final List<?> testList = (List<?>) eventMap.get("start_test");
+        final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
+        final String line = "Starting test: " + testElements.get("longname") + '\n';
+        robotEventBroker.sendAppendLineEventToMessageLogView(line);
+    }
+    
     private void handleStartKeywordEvent(final Map<?, ?> eventMap) {
         if (executedFile == null) {
             throw new MissingFileToExecuteException("Missing suite file for execution");
@@ -391,9 +404,17 @@ public class RobotDebugEventDispatcher extends Job {
         }
     }
 
+    private void handleEndTestEvent(final Map<?, ?> eventMap) {
+        final List<?> testList = (List<?>) eventMap.get("end_test");
+        final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
+        final String line = "Ending test: " + testElements.get("longname") + '\n';
+        robotEventBroker.sendAppendLineEventToMessageLogView(line);
+    }
+    
     private void handleEndSuiteEvent() {
         target.clearStackFrames();
     }
+
 
     private void handleCloseEvent() {
         robotEventBroker.sendClearAllEventToTextEditor();
