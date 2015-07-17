@@ -407,7 +407,7 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleEndTestEvent(final Map<?, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("end_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
-        final String line = "Ending test: " + testElements.get("longname") + '\n';
+        final String line = "Ending test: " + testElements.get("longname") + "\n\n";
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
     }
     
