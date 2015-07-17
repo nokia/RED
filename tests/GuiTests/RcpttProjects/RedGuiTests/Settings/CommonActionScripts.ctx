@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/15/15 2:28 PM
+Save-Time: 7/16/15 4:00 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -41,6 +41,8 @@ let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 		global [val RCPTT_project_path $temp]
 	}
 }
+
+global [val RED_workspace_path [substitute-variables "${workspace_loc}"]]
 
 //----------------------------procedures -----------------------------------------------------
 
