@@ -1,0 +1,51 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _gURaQCu6EeW667Afdo4DcA
+Element-Name: ProjectWithoutRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _VCN3MCu6EeW667Afdo4DcA
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 7/17/15 11:00 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot" | double-click
+get-button "Run*" | click
+//check Message log    
+get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: OnlyRobotSuiteFile\.SimpleLoggingTestCase\.firstTest\n" 
+[concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"  "10"]] "\nEnding test: OnlyRobotSuiteFile\.SimpleLoggingTestCase\.firstTest"]| verify-true
+
+//check console log
+get-view Console | get-text-viewer | get-property text 
+    | matches "^Command: .*\n"
+    + "Suite Executor: .*\n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile                                                            \n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile.SimpleLoggingTestCase                                      \n"
+    + "==============================================================================\n"
+    + "firstTest                                                             \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "OnlyRobotSuiteFile.SimpleLoggingTestCase                              \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile                                                    \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*eport.html" | verify-true
+   
+//check if there wer no problems    
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
