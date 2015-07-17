@@ -8,7 +8,9 @@ import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
+import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage.Level;
+import org.robotframework.ide.core.testData.text.context.ModelElementsMapper.MapperOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator;
 import org.robotframework.ide.core.testData.text.context.iterator.RobotSeparatorIteratorOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.SeparatorBaseIteratorBuilder;
@@ -22,11 +24,13 @@ public class ModelBuilder {
 
     private final SeparatorBaseIteratorBuilder separatorIterBuilder;
     private final ContextOperationHelper ctxHelper;
+    private final ModelElementsMapper mapper;
 
 
     public ModelBuilder() {
         this.separatorIterBuilder = new SeparatorBaseIteratorBuilder();
         this.ctxHelper = new ContextOperationHelper();
+        this.mapper = new ModelElementsMapper();
     }
 
 
@@ -48,6 +52,7 @@ public class ModelBuilder {
     @VisibleForTesting
     protected ElementType mapLine(final ModelOutput model,
             final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
+        ElementType mappedType = etLast;
         final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
                 .createSeparatorBaseIterator(ctx);
         List<RobotToken> lineTokens = ctxHelper.getWholeLineTokens(ctx);
@@ -81,27 +86,26 @@ public class ModelBuilder {
 
                     List<IContextElement> nearestCtxs = ctxHelper
                             .findNearestContexts(separatorsAndNormalCtxs, fp);
+
                     List<RobotToken> gapTokens = findGapTokens(nearestCtxs,
                             lineTokens, fp);
-                    if (!gapTokens.isEmpty()) {
-                        RobotToken robotToken = gapTokens
-                                .get(gapTokens.size() - 1);
-                        fp = robotToken.getEndPosition();
-                    } else {
-                        // dummy code for check propose
-                        OneLineSingleRobotContextPart c = (OneLineSingleRobotContextPart) nearestCtxs
-                                .get(0);
-                        fp = c.getContextTokens()
-                                .get(c.getContextTokens().size() - 1)
-                                .getEndPosition();
-                    }
+
+                    MapperOutput mapOut = mapper.map(model, ctx, nearestCtxs,
+                            gapTokens, mappedType);
+                    mappedType = mapOut.getMappedElementType();
+                    fp = mapOut.getNextPosition();
                 }
             } else {
+                model.addBuildMessage(BuildMessage.buildError(
+                        "Internall error in " + separatorBaseIterator
+                                + " returns null as next position", "line: "
+                                + separators.getLineNumber() + ", position: "
+                                + fp));
                 break;
             }
         }
 
-        return etLast;
+        return mappedType;
     }
 
 
