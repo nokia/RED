@@ -16,6 +16,16 @@ public class ModelElementsMapper {
             final List<RobotToken> gapTokens, final ElementType etLast) {
         MapperOutput mapOut = new MapperOutput();
 
+        if (gapTokens.isEmpty()) {
+            List<RobotToken> contextTokens = ((OneLineSingleRobotContextPart) nearestCtxs
+                    .get(1)).getContextTokens();
+            mapOut.setNextPosition(contextTokens.get(contextTokens.size() - 1)
+                    .getEndPosition());
+        } else {
+            mapOut.setNextPosition(gapTokens.get(gapTokens.size() - 1)
+                    .getEndPosition());
+        }
+
         return mapOut;
     }
 
