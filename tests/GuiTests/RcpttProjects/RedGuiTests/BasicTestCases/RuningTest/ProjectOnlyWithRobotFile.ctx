@@ -1,0 +1,42 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.workspace
+Element-Name: ProjectOnlyWithRobotFile
+Element-Type: context
+Element-Version: 2.0
+Id: _gURaQCu6EeW667Afdo4DcA
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 7/16/15 3:16 PM
+
+------=_contents/OnlyRobotSuiteFile/SimpleLoggingTestCase.robot-52acf636-0b8e-3e40-be36-58a41b493521
+Content-Type: q7/binary
+Entry-Name: contents/OnlyRobotSuiteFile/SimpleLoggingTestCase.robot
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnTT0tJSCEssykxMykktVtDS0uLlUqku
+gwrUchrycvFyAUUVglNLSjLz0qFKIGIhqcUlCs6JxTCNaZlFxSUgQV4uTp/8dE4kg4AiyMYCTYPbymlo
+gFU9xA7v1Mry/KIUsA1cAFBLBwgJIAu4YgAAAK0AAABQSwECFAAUAAgICAAAACEACSALuGIAAACtAAAA
+CAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAAmAAAAAAA
+------=_contents/OnlyRobotSuiteFile/SimpleLoggingTestCase.robot-52acf636-0b8e-3e40-be36-58a41b493521--
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf
+Content-Type: q7/binary
+Entry-Name: .q7.content
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnSVkcFOhDAQhu8mvgPp3VaNQUPAzQY1
+MdGou2vwZtgydKvQEhgE394pC3gxGm+d9vu/mbbhoi8L7wPqRlsTsRN+zDww0mbaqIi1mB9dsMXl4UFo
+a8VBFrpqgNeyQuQSe97Z+r2pUglBMq1iaxB69PpSB7P31Hmpk2kC2o/YDrEKhOi6jttScZKLl/vbCfmj
+1xyfGBcfOEGcmDnmmbQk+rG2byDxwRSficbdym4t3uiCznUWsVf1vEqf4ta/hsT3z5d5Zs+u5JLRpT0v
+lO42BoeCymqvakazUw66dasRBudIEptTOYF8DNLj9iBbTLcF7WLdAhM/J9a6rAq4s0rRT2ygwTh1r+Ga
+/SIJxTThfnzxPX8o/vuFFPoCUEsHCJ12nCsYAQAAHwIAAFBLAQIUABQACAgIAAAAIQCddpwrGAEAAB8C
+AAAIAAAAAAAAAAAAAAAAAAAAAAAuY29udGVudFBLBQYAAAAAAQABADYAAABOAQAAAAA=
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
+------=_contents/OnlyRobotSuiteFile/.project-37f5b995-f5b1-38e3-96b4-8ac862e41d3b
+Content-Type: q7/binary
+Entry-Name: contents/OnlyRobotSuiteFile/.project
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnRVT7sOwjAMnEHiH6rspLAxpGFBHUGi
+8AFtaipDXkpSHn9PGiiok32+s+/Mtk8lszs4j0YXZE1XJAMtTIu6K8j5VC43ZMsXc2aduYIIO/DCoQ1R
+HaczpmsF/KDl62gaE6oeA5QogeWJGBTCKAU6cJaP3TD9nvMJ5BPU9CjbyoL4cFOo69A7SMIRcOM66gb7
+i4umD+NuFFugICRaD1TVqKmVfRdLku3T2hAxrSeX/91fmumrb1BLBwiJOkcuswAAACkBAABQSwECFAAU
+AAgICAAAACEAiTpHLrMAAAApAQAACAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2
+AAAA6QAAAAAA
+------=_contents/OnlyRobotSuiteFile/.project-37f5b995-f5b1-38e3-96b4-8ac862e41d3b--
