@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ILineBreakpoint;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * @author mmarzec
@@ -17,14 +16,14 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class KeywordFinder {
 
-    public boolean isKeywordInBreakpointLine(IBreakpoint breakpoint, int breakpointLine, String keyword,
-            List<String> args, int currentExecutionLine) {
-        FileEditorInput fileEditorInput = new FileEditorInput((IFile) ((ILineBreakpoint) breakpoint).getMarker()
-                .getResource());
+    public boolean isKeywordInBreakpointLine(final IBreakpoint breakpoint, final int breakpointLine, String keyword,
+            final List<String> args, final int currentExecutionLine) {
+        final IFile editedFile = (IFile) ((ILineBreakpoint) breakpoint).getMarker().getResource();
+        if (editedFile == null) {
+            throw new IllegalArgumentException();
+        }
 
-        IFile editedFile = fileEditorInput.getFile();
-
-        String[] s = keyword.split("\\.");
+        final String[] s = keyword.split("\\.");
         keyword = s[s.length - 1];
 
         boolean result = false;
@@ -33,10 +32,10 @@ public class KeywordFinder {
         try (InputStream is = editedFile.getContents()) {
             scanner = new Scanner(is).useDelimiter("\\n");
             while (scanner.hasNext()) {
-                String line = scanner.next();
+                final String line = scanner.next();
                 if (line.contains(keyword)) {
                     int count = 0;
-                    for (String arg : args) {
+                    for (final String arg : args) {
                         if (line.contains(arg)) {
                             count++;
                         }
@@ -59,10 +58,10 @@ public class KeywordFinder {
         return result;
     }
 
-    public int getKeywordLine(IFile editedFile, String keyword, List<String> args,
-            List<Integer> executedLines) {
+    public int getKeywordLine(final IFile editedFile, String keyword, final List<String> args,
+            final List<Integer> executedLines) {
 
-        String[] s = keyword.split("\\.");
+        final String[] s = keyword.split("\\.");
         keyword = s[s.length - 1];
 
         int result = -1;
@@ -71,10 +70,10 @@ public class KeywordFinder {
         try (InputStream is = editedFile.getContents()) {
             scanner = new Scanner(is).useDelimiter("\\n");
             while (scanner.hasNext()) {
-                String line = scanner.next();
+                final String line = scanner.next();
                 if (line.contains(keyword)) {
                     int count = 0;
-                    for (String arg : args) {
+                    for (final String arg : args) {
                         if (line.contains(arg)) {
                             count++;
                         }
