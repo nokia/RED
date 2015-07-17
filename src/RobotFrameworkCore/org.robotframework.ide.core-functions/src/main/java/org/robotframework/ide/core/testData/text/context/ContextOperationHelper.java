@@ -6,6 +6,8 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
+import com.google.common.collect.LinkedListMultimap;
+
 
 public class ContextOperationHelper {
 
@@ -26,8 +28,13 @@ public class ContextOperationHelper {
             final AggregatedOneLineRobotContexts ctx) {
         List<RobotToken> tokens = new LinkedList<>();
 
-        List<IContextElement> comments = ctx.getChildContextTypes().get(
-                SimpleRobotContextType.UNDECLARED_COMMENT);
+        LinkedListMultimap<IContextElementType, IContextElement> childContextTypes = ctx
+                .getChildContextTypes();
+        List<IContextElement> comments = childContextTypes
+                .get(SimpleRobotContextType.UNDECLARED_COMMENT);
+        if (comments.isEmpty()) {
+            comments = childContextTypes.get(SimpleRobotContextType.EMPTY_LINE);
+        }
         // search for the context with the biggest number of tokens
         for (IContextElement context : comments) {
             if (context instanceof OneLineSingleRobotContextPart) {

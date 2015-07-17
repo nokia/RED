@@ -56,10 +56,6 @@ public class ModelBuilder {
         final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
                 .createSeparatorBaseIterator(ctx);
         List<RobotToken> lineTokens = ctxHelper.getWholeLineTokens(ctx);
-        if (lineTokens.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Line should contains any token even carritage return");
-        }
 
         RobotLineSeparatorsContexts separators = ctx.getSeparators();
         List<IContextElement> separatorsContexts = separators
@@ -91,7 +87,8 @@ public class ModelBuilder {
                             lineTokens, fp);
 
                     MapperOutput mapOut = mapper.map(model, ctx, nearestCtxs,
-                            gapTokens, mappedType);
+                            gapTokens, elems, mappedType);
+
                     mappedType = mapOut.getMappedElementType();
                     fp = mapOut.getNextPosition();
 
