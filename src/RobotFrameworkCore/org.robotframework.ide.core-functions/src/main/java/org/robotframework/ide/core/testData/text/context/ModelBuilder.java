@@ -42,6 +42,7 @@ public class ModelBuilder {
                 .getContexts();
 
         ElementType globalLineContext = null;
+        // jezeli trash to nie zamieniaj :)
         for (AggregatedOneLineRobotContexts ctx : lineContexts) {
             globalLineContext = mapLine(output, ctx, globalLineContext);
         }
@@ -94,11 +95,12 @@ public class ModelBuilder {
                     // position
                     List<IContextElement> nearestCtxs = ctxHelper
                             .findNearestContexts(separatorsAndNormalCtxs, fp);
+                    mappingTempStore.setNearestContexts(nearestCtxs);
 
                     List<RobotToken> gapTokens = findGapTokens(nearestCtxs,
                             lineTokens, fp);
                     mappingTempStore.setTokensWithoutContext(gapTokens);
-
+                    mappingTempStore.setLastType(mappedType);
                     MapperOutput mapOut = mapper.map(mappingTempStore);
                     mappedType = mapOut.getMappedElementType();
                     fp = mapOut.getNextPosition();
@@ -185,16 +187,20 @@ public class ModelBuilder {
         } else {
             // every contexts are have the same start position and contains
             // minimum one token
-            IContextElement ctx = nearestCtxs.get(0);
-            if (ctx instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
-                List<RobotToken> contextTokens = currentCtx.getContextTokens();
-                RobotToken token = contextTokens.get(0);
-                gapEndPosition = token.getStartPosition().getColumn();
-            } else {
-                ctxHelper.reportProblemWithType(ctx);
+            for (IContextElement ctx : nearestCtxs) {
+                if (ctx instanceof OneLineSingleRobotContextPart) {
+                    OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
+                    if (currentCtx.getType() != SimpleRobotContextType.UNDECLARED_COMMENT) {
+                        List<RobotToken> contextTokens = currentCtx
+                                .getContextTokens();
+                        RobotToken token = contextTokens.get(0);
+                        gapEndPosition = token.getStartPosition().getColumn();
+                        break;
+                    }
+                } else {
+                    ctxHelper.reportProblemWithType(ctx);
+                }
             }
-
         }
 
         return gapEndPosition;
@@ -320,6 +326,23 @@ public class ModelBuilder {
             public static enum Level {
                 INFO, WARN, ERROR;
             }
+
+
+            @Override
+            public String toString() {
+                return String.format(
+                        "BuildMessage [message=%s, localization=%s, type=%s]",
+                        message, localization, type);
+            }
+
+        }
+
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "ModelOutput [fileModel=%s, buildMessages=%s]", fileModel,
+                    buildMessages);
         }
 
     }

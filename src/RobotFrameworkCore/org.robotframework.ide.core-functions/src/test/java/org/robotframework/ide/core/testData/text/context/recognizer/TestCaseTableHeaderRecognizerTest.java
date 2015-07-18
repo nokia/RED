@@ -14,8 +14,8 @@ import org.robotframework.ide.core.testData.text.context.OneLineSingleRobotConte
 import org.robotframework.ide.core.testData.text.context.SimpleRobotContextType;
 import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator;
 import org.robotframework.ide.core.testData.text.context.iterator.TokensLineIterator.LineTokenPosition;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
+import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.MultipleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotWordType;
@@ -34,6 +34,40 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
 
     public TestCaseTableHeaderRecognizerTest() {
         super(TestCaseTableHeaderRecognizer.class);
+    }
+
+
+    @Test
+    public void test_trashDataWithAsterisk_thenJustCorrectContextInWrongPlace_oneContext()
+            throws FileNotFoundException, IOException {
+        // prepare
+        String prefix = "** Context ";
+        String text = "*** Test Cases ***";
+        TokenOutput tokenOutput = createTokenOutput(prefix + text);
+
+        TokensLineIterator iter = new TokensLineIterator(tokenOutput);
+        LineTokenPosition line = iter.next();
+        ContextOutput out = new ContextOutput(tokenOutput);
+
+        // execute
+        List<IContextElement> recognize = context.recognize(out, line);
+
+        // verify
+        assertThat(out.getContexts()).isEmpty();
+        assertTheSameLinesContext(recognize,
+                OneLineSingleRobotContextPart.class, 1);
+
+        assertTokensForUnknownWords(
+                ((OneLineSingleRobotContextPart) recognize.get(0))
+                        .getContextTokens(),
+                new IRobotTokenType[] { MultipleCharTokenType.MANY_ASTERISKS,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.TEST_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        RobotWordType.CASES_WORD,
+                        RobotSingleCharTokenType.SINGLE_SPACE,
+                        MultipleCharTokenType.MANY_ASTERISKS }, 0,
+                new FilePosition(1, prefix.length() + 1), new String[] {});
     }
 
 
@@ -57,19 +91,21 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
 
         // verify
         assertThat(out.getContexts()).isEmpty();
-        assertTheSameLinesContext(recognize, OneLineSingleRobotContextPart.class, 2);
+        assertTheSameLinesContext(recognize,
+                OneLineSingleRobotContextPart.class, 2);
 
         assertTokensForUnknownWords(
-                ((OneLineSingleRobotContextPart) recognize.get(0)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(0))
+                        .getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.TEST_WORD, RobotWordType.DOUBLE_SPACE,
                         RobotWordType.CASE_WORD,
                         RobotSingleCharTokenType.SINGLE_ASTERISK }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                new FilePosition(1, prefix.length() + 1), new String[] {});
         assertTokensForUnknownWords(
-                ((OneLineSingleRobotContextPart) recognize.get(1)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(1))
+                        .getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.TEST_WORD, RobotWordType.DOUBLE_SPACE,
@@ -98,20 +134,22 @@ public class TestCaseTableHeaderRecognizerTest extends ARecognizerTest {
 
         // verify
         assertThat(out.getContexts()).isEmpty();
-        assertTheSameLinesContext(recognize, OneLineSingleRobotContextPart.class, 2);
+        assertTheSameLinesContext(recognize,
+                OneLineSingleRobotContextPart.class, 2);
 
         assertTokensForUnknownWords(
-                ((OneLineSingleRobotContextPart) recognize.get(0)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(0))
+                        .getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.TEST_WORD,
                         RobotSingleCharTokenType.SINGLE_SPACE,
                         RobotWordType.CASE_WORD,
                         RobotSingleCharTokenType.SINGLE_ASTERISK }, 0,
-                new FilePosition(1, prefix.length() + 1),
-                new String[] {});
+                new FilePosition(1, prefix.length() + 1), new String[] {});
         assertTokensForUnknownWords(
-                ((OneLineSingleRobotContextPart) recognize.get(1)).getContextTokens(),
+                ((OneLineSingleRobotContextPart) recognize.get(1))
+                        .getContextTokens(),
                 new IRobotTokenType[] {
                         RobotSingleCharTokenType.SINGLE_ASTERISK,
                         RobotWordType.TEST_WORD,
