@@ -9,6 +9,8 @@ public class ModelElementsMapper {
     public MapperOutput map(final MapperTemporaryStore store) {
         MapperOutput mapOut = new MapperOutput();
 
+        System.out.println(store);
+        System.exit(0);
         return mapOut;
     }
 
