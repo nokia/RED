@@ -1,15 +1,13 @@
 package org.robotframework.ide.core.testData.text.context;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
-import org.robotframework.ide.core.testData.text.lexer.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
-
-import com.google.common.annotations.VisibleForTesting;
 
 
 public class ModelElementsMapper {
@@ -22,6 +20,11 @@ public class ModelElementsMapper {
         MapperOutput mapOut = new MapperOutput();
 
         if (gapTokens.isEmpty()) {
+            if (etLast == null) {
+
+            } else {
+
+            }
             List<RobotToken> contextTokens = ((OneLineSingleRobotContextPart) nearestCtxs
                     .get(0)).getContextTokens();
             mapOut.setNextPosition(contextTokens.get(contextTokens.size() - 1)
@@ -29,40 +32,22 @@ public class ModelElementsMapper {
         } else {
             if (etLast == null) {
                 // nothing previously exists it is just comment not declared
+                RobotToken lastToken = null;
                 for (RobotToken token : gapTokens) {
                     LineElement elem = new LineElement();
-
+                    elem.setElemenTypes(Arrays.asList(ElementType.TRASH_DATA,
+                            ElementType.VALUE));
+                    elems.add(elem);
+                    lastToken = token;
                 }
-
+                mapOut.setMappedElementType(ElementType.TRASH_DATA);
+                mapOut.setNextPosition(lastToken.getEndPosition());
             } else {
 
             }
-
-            mapOut.setNextPosition(gapTokens.get(gapTokens.size() - 1)
-                    .getEndPosition());
         }
 
         return mapOut;
-    }
-
-
-    @VisibleForTesting
-    protected ElementType mapTokenType(IRobotTokenType type,
-            final ElementType etLast) {
-        ElementType et = ElementType.VALUE;
-
-        // etLast for column
-        return et;
-    }
-
-
-    @VisibleForTesting
-    protected ElementType mapTokenType(IContextElementType type,
-            final ElementType etLast) {
-        ElementType et = ElementType.VALUE;
-
-        // etLast for column
-        return et;
     }
 
     public static class MapperOutput {
