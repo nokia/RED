@@ -10,10 +10,11 @@ import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage.Level;
-import org.robotframework.ide.core.testData.text.context.ModelElementsMapper.MapperOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator;
 import org.robotframework.ide.core.testData.text.context.iterator.RobotSeparatorIteratorOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.SeparatorBaseIteratorBuilder;
+import org.robotframework.ide.core.testData.text.context.mapper.MapperOutput;
+import org.robotframework.ide.core.testData.text.context.mapper.MapperTemporaryStore;
 import org.robotframework.ide.core.testData.text.lexer.FilePosition;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
@@ -52,6 +53,7 @@ public class ModelBuilder {
     @VisibleForTesting
     protected ElementType mapLine(final ModelOutput model,
             final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
+        // prepare for mapping line
         ElementType mappedType = etLast;
         final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
                 .createSeparatorBaseIterator(ctx);
@@ -65,12 +67,18 @@ public class ModelBuilder {
         FilePosition fp = FilePosition.createMarkerForFirstColumn(separators
                 .getLineNumber());
         List<LineElement> elems = new LinkedList<>();
+        MapperTemporaryStore mappingTempStore = new MapperTemporaryStore(model,
+                elems);
         while(separatorBaseIterator.hasNext(fp)) {
             RobotSeparatorIteratorOutput next = separatorBaseIterator.next(fp);
             if (next != null) {
                 if (next.hasSeparator()) {
+                    // if this is separator we are adding it to elems list
+                    // representing one line of Robot test data file
                     fp = addSeparator(fp, elems, next);
                 } else {
+                    // search for contexts, which have current column position
+                    // equal or greater than current position in line
                     childContexts = ctxHelper.filterContextsByColumn(
                             childContexts, fp);
                     separatorsContexts = ctxHelper.filterContextsByColumn(
@@ -79,16 +87,19 @@ public class ModelBuilder {
                     List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>(
                             childContexts);
                     separatorsAndNormalCtxs.addAll(separatorsContexts);
+                    mappingTempStore
+                            .setSeparatorAndNormalContexts(separatorsAndNormalCtxs);
 
+                    // search for contexts which are the nearest to our current
+                    // position
                     List<IContextElement> nearestCtxs = ctxHelper
                             .findNearestContexts(separatorsAndNormalCtxs, fp);
 
                     List<RobotToken> gapTokens = findGapTokens(nearestCtxs,
                             lineTokens, fp);
+                    mappingTempStore.setTokensWithoutContext(gapTokens);
 
-                    MapperOutput mapOut = mapper.map(model, ctx, nearestCtxs,
-                            gapTokens, elems, mappedType);
-
+                    MapperOutput mapOut = mapper.map(mappingTempStore);
                     mappedType = mapOut.getMappedElementType();
                     fp = mapOut.getNextPosition();
                 }
