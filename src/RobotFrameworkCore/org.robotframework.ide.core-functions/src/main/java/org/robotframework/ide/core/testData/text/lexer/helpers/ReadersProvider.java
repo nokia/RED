@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
@@ -33,6 +34,11 @@ public class ReadersProvider {
 
     public Reader create(final File f) throws FileNotFoundException {
         return new InputStreamReader(new FileInputStream(f), charset);
+    }
+
+
+    public Reader create(final String fileContents) {
+        return new StringReader(fileContents);
     }
 
 
