@@ -14,17 +14,46 @@ import org.robotframework.ide.core.testData.text.lexer.matcher.RobotTokenMatcher
 
 public class TxtRobotFileReader {
 
+    private ModelOutput parse(final TokenOutput extractedTokens) {
+        ModelOutput model = null;
+
+        ContextBuilder contextBuilder = new ContextBuilder();
+        ContextOutput buildContexts = contextBuilder
+                .buildContexts(extractedTokens);
+        ModelBuilder modelBuilder = new ModelBuilder();
+        model = modelBuilder.build(buildContexts);
+
+        return model;
+    }
+
+
+    public ModelOutput parse(final StringBuilder robotFileContent,
+            final String pathToFile) {
+        ModelOutput model = null;
+
+        TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer();
+        try {
+            TokenOutput extractedTokens = lexer.extractTokens(robotFileContent);
+            model = parse(extractedTokens);
+        } catch (IOException e) {
+            if (model == null) {
+                model = new ModelOutput();
+            }
+
+            model.addBuildMessage(BuildMessage.buildError("" + e, pathToFile));
+        }
+
+        return model;
+    }
+
+
     public ModelOutput parse(final File robotOrTxtFile) {
         ModelOutput model = null;
 
         TxtRobotTestDataLexer lexer = new TxtRobotTestDataLexer();
         try {
             TokenOutput extractedTokens = lexer.extractTokens(robotOrTxtFile);
-            ContextBuilder contextBuilder = new ContextBuilder();
-            ContextOutput buildContexts = contextBuilder
-                    .buildContexts(extractedTokens);
-            ModelBuilder modelBuilder = new ModelBuilder();
-            model = modelBuilder.build(buildContexts);
+            model = parse(extractedTokens);
         } catch (IOException e) {
             if (model == null) {
                 model = new ModelOutput();

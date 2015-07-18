@@ -69,6 +69,10 @@ public class LineElement {
          */
         DECLARED_COMMENT,
         /**
+         * data before first table without any context
+         */
+        TRASH_DATA,
+        /**
          * <pre>
          * *** Settings *** or *** Metadata ***
          * </pre>

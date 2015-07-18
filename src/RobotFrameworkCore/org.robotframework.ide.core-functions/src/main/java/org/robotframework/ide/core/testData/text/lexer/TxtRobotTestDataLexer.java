@@ -1,9 +1,9 @@
 package org.robotframework.ide.core.testData.text.lexer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 
 import org.robotframework.ide.core.testData.text.lexer.helpers.ReadersProvider;
@@ -47,7 +47,7 @@ public class TxtRobotTestDataLexer {
 
 
     public TokenOutput extractTokens(final File robotTestDataFile)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         TokenOutput out = new TokenOutput();
         try (Reader reader = readersProvider.create(robotTestDataFile)) {
             out = extractTokens(reader);
@@ -57,7 +57,18 @@ public class TxtRobotTestDataLexer {
     }
 
 
-    private TokenOutput extractTokens(Reader reader) throws IOException {
+    public TokenOutput extractTokens(final StringBuilder fileContent)
+            throws IOException {
+        TokenOutput out = new TokenOutput();
+        if (fileContent != null) {
+            out = extractTokens(new StringReader(fileContent.toString()));
+        }
+
+        return out;
+    }
+
+
+    private TokenOutput extractTokens(final Reader reader) throws IOException {
         int readLength = 0;
         while((readLength = reader.read(tempBuffer)) != -1) {
             for (int charIndex = 0; charIndex < readLength; charIndex++) {

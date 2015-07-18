@@ -91,7 +91,6 @@ public class ModelBuilder {
 
                     mappedType = mapOut.getMappedElementType();
                     fp = mapOut.getNextPosition();
-
                 }
             } else {
                 model.addBuildMessage(BuildMessage.buildError(
