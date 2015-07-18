@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.LineElement;
+import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
@@ -14,7 +15,9 @@ public class MapperTemporaryStore {
     private ModelOutput model;
     private List<LineElement> currentLineElements;
     private List<RobotToken> tokensWithoutContext = new LinkedList<>();
+    private List<IContextElement> nearestContexts = new LinkedList<>();
     private List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>();
+    private ElementType lastType;
 
 
     public MapperTemporaryStore(final ModelOutput model,
@@ -70,4 +73,32 @@ public class MapperTemporaryStore {
         return tokensWithoutContext;
     }
 
+
+    public ElementType getLastType() {
+        return lastType;
+    }
+
+
+    public void setLastType(ElementType lastType) {
+        this.lastType = lastType;
+    }
+
+
+    public List<IContextElement> getNearestContexts() {
+        return nearestContexts;
+    }
+
+
+    public void setNearestContexts(List<IContextElement> nearestContexts) {
+        this.nearestContexts = nearestContexts;
+    }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("MapperTemporaryStore [model=%s, currentLineElements=%s, tokensWithoutContext=%s, nearestContexts=%s, separatorsAndNormalCtxs=%s, lastType=%s]",
+                        model, currentLineElements, tokensWithoutContext,
+                        nearestContexts, separatorsAndNormalCtxs, lastType);
+    }
 }
