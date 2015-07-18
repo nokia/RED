@@ -172,4 +172,15 @@ public class RobotTestDataFile {
          */
         TEST_SUITE_INITIALIZATION_FILE
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("RobotTestDataFile [settingsTable=%s, variablesTable=%s, testCaseTable=%s, keywordsTable=%s, isInitializeFile=%s, isDirectory=%s, type=%s, content=%s]",
+                        settingsTable, variablesTable, testCaseTable,
+                        keywordsTable, isInitializeFile, isDirectory, type,
+                        content);
+    }
+
 }
