@@ -175,6 +175,8 @@ public class TestCaseTableHeaderRecognizer implements IContextRecognizer {
 
                     context = new OneLineSingleRobotContextPart(
                             lineInterval.getLineNumber());
+                } else {
+                    context.removeAllContextTokens();
                 }
 
                 wasPrefixAsterisksPresent = false;
