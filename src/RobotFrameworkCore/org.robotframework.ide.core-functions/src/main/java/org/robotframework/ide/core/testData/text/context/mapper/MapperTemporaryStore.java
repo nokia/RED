@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
+import org.robotframework.ide.core.testData.model.RobotLine;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput;
 import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator.SeparationType;
@@ -19,14 +20,16 @@ public class MapperTemporaryStore {
     private List<IContextElement> nearestContexts = new LinkedList<>();
     private List<IContextElement> normalContexts = new LinkedList<>();
     private List<IContextElement> separatorContexts = new LinkedList<>();
+    private final RobotLine currentLine;
     private SeparationType separatorType = SeparationType.WHITESPACES;
     private ElementType lastType;
 
 
     public MapperTemporaryStore(final ModelOutput model,
-            final List<LineElement> elems) {
+            final List<LineElement> elems, final RobotLine currentLine) {
         this.model = model;
         this.currentLineElements = elems;
+        this.currentLine = currentLine;
     }
 
 
@@ -72,6 +75,21 @@ public class MapperTemporaryStore {
 
     public void setModel(ModelOutput model) {
         this.model = model;
+    }
+
+
+    public RobotLine getCurrentLine() {
+        return currentLine;
+    }
+
+
+    public void appendCurrentLineElements(List<LineElement> elems) {
+        currentLineElements.addAll(elems);
+    }
+
+
+    public void appendCurrentLineElements(LineElement elem) {
+        currentLineElements.add(elem);
     }
 
 

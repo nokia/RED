@@ -1,14 +1,19 @@
 package org.robotframework.ide.core.testData.model;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 
 public class LineElement {
 
-    private List<ElementType> types = Arrays.asList(ElementType.VALUE);
+    private List<ElementType> types = new LinkedList<>();
     private StringBuilder value = new StringBuilder();
+
+
+    public LineElement() {
+        types.add(ElementType.VALUE);
+    }
 
 
     public StringBuilder getValue() {
@@ -18,6 +23,11 @@ public class LineElement {
 
     public List<ElementType> getElementTypes() {
         return Collections.unmodifiableList(types);
+    }
+
+
+    public void addNewType(final ElementType type) {
+        this.types.add(type);
     }
 
 
@@ -330,7 +340,11 @@ public class LineElement {
          * {@link #ARGUMENT_PARAMETER_NAME} is not present it represents also
          * value
          */
-        ARGUMENT_PARAMETER_VALUE;
+        ARGUMENT_PARAMETER_VALUE,
+        /**
+         * 
+         */
+        LINE_END;
     }
 
 

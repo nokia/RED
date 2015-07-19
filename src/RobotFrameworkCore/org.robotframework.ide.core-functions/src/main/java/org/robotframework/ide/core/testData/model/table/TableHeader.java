@@ -24,4 +24,13 @@ public class TableHeader extends AModelElement {
                 || type == ElementType.VARIABLE_TABLE_HEADER
                 || type == ElementType.TEST_CASE_TABLE_HEADER || type == ElementType.KEYWORD_TABLE_HEADER);
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("TableHeader [getContainingLine()=%s, getOriginalElement()=%s, getType()=%s]",
+                        getContainingLine(), getOriginalElement(), getType());
+    }
+
 }

@@ -12,6 +12,6 @@ public class KeywordsTable extends ATableModel {
 
 
     public KeywordsTable(final TableHeader header) {
-        super(header);
+        super(header, "Keyword");
     }
 }

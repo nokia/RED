@@ -13,6 +13,6 @@ public class VariablesTable extends ATableModel {
 
 
     public VariablesTable(final TableHeader header) {
-        super(header);
+        super(header, "Variables");
     }
 }
