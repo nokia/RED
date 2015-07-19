@@ -98,4 +98,10 @@ public class WhitespaceSeparableIterator implements ContextTokenIterator {
 
         return result;
     }
+
+
+    @Override
+    public SeparationType getSeparatorType() {
+        return SeparationType.WHITESPACES;
+    }
 }

@@ -7,6 +7,7 @@ import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.text.context.IContextElement;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput;
+import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator.SeparationType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 
@@ -16,7 +17,9 @@ public class MapperTemporaryStore {
     private List<LineElement> currentLineElements;
     private List<RobotToken> tokensWithoutContext = new LinkedList<>();
     private List<IContextElement> nearestContexts = new LinkedList<>();
-    private List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>();
+    private List<IContextElement> normalContexts = new LinkedList<>();
+    private List<IContextElement> separatorContexts = new LinkedList<>();
+    private SeparationType separatorType = SeparationType.WHITESPACES;
     private ElementType lastType;
 
 
@@ -27,14 +30,38 @@ public class MapperTemporaryStore {
     }
 
 
-    public void setTokensWithoutContext(final List<RobotToken> gapTokens) {
-        this.tokensWithoutContext = gapTokens;
+    public List<IContextElement> getNormalContexts() {
+        return normalContexts;
     }
 
 
-    public void setSeparatorAndNormalContexts(
-            final List<IContextElement> separatorsAndNormalCtxs) {
-        this.separatorsAndNormalCtxs = separatorsAndNormalCtxs;
+    public void setNormalContexts(List<IContextElement> normalContexts) {
+        this.normalContexts = normalContexts;
+    }
+
+
+    public SeparationType getSeparatorType() {
+        return separatorType;
+    }
+
+
+    public void setSeparatorType(SeparationType separatorType) {
+        this.separatorType = separatorType;
+    }
+
+
+    public List<IContextElement> getSeparatorContexts() {
+        return separatorContexts;
+    }
+
+
+    public void setSeparatorContexts(List<IContextElement> separatorContexts) {
+        this.separatorContexts = separatorContexts;
+    }
+
+
+    public void setTokensWithoutContext(final List<RobotToken> gapTokens) {
+        this.tokensWithoutContext = gapTokens;
     }
 
 
@@ -55,17 +82,6 @@ public class MapperTemporaryStore {
 
     public void setCurrentLineElements(List<LineElement> currentLineElements) {
         this.currentLineElements = currentLineElements;
-    }
-
-
-    public List<IContextElement> getSeparatorsAndNormalCtxs() {
-        return separatorsAndNormalCtxs;
-    }
-
-
-    public void setSeparatorsAndNormalCtxs(
-            List<IContextElement> separatorsAndNormalCtxs) {
-        this.separatorsAndNormalCtxs = separatorsAndNormalCtxs;
     }
 
 
@@ -97,8 +113,9 @@ public class MapperTemporaryStore {
     @Override
     public String toString() {
         return String
-                .format("MapperTemporaryStore [model=%s, currentLineElements=%s, tokensWithoutContext=%s, nearestContexts=%s, separatorsAndNormalCtxs=%s, lastType=%s]",
+                .format("MapperTemporaryStore [model=%s, currentLineElements=%s, tokensWithoutContext=%s, nearestContexts=%s, normalContexts=%s, separatorContexts=%s, separatorType=%s, lastType=%s]",
                         model, currentLineElements, tokensWithoutContext,
-                        nearestContexts, separatorsAndNormalCtxs, lastType);
+                        nearestContexts, normalContexts, separatorContexts,
+                        separatorType, lastType);
     }
 }

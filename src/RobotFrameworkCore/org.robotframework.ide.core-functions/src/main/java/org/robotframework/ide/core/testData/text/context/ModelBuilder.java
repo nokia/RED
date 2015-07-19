@@ -42,7 +42,6 @@ public class ModelBuilder {
                 .getContexts();
 
         ElementType globalLineContext = null;
-        // jezeli trash to nie zamieniaj :)
         for (AggregatedOneLineRobotContexts ctx : lineContexts) {
             globalLineContext = mapLine(output, ctx, globalLineContext);
         }
@@ -70,6 +69,8 @@ public class ModelBuilder {
         List<LineElement> elems = new LinkedList<>();
         MapperTemporaryStore mappingTempStore = new MapperTemporaryStore(model,
                 elems);
+        mappingTempStore.setSeparatorType(separatorBaseIterator
+                .getSeparatorType());
         while(separatorBaseIterator.hasNext(fp)) {
             RobotSeparatorIteratorOutput next = separatorBaseIterator.next(fp);
             if (next != null) {
@@ -85,14 +86,14 @@ public class ModelBuilder {
                     separatorsContexts = ctxHelper.filterContextsByColumn(
                             separatorsContexts, fp);
 
-                    List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>(
-                            childContexts);
-                    separatorsAndNormalCtxs.addAll(separatorsContexts);
-                    mappingTempStore
-                            .setSeparatorAndNormalContexts(separatorsAndNormalCtxs);
+                    mappingTempStore.setNormalContexts(childContexts);
+                    mappingTempStore.setSeparatorContexts(separatorsContexts);
 
                     // search for contexts which are the nearest to our current
                     // position
+                    List<IContextElement> separatorsAndNormalCtxs = new LinkedList<>(
+                            childContexts);
+                    separatorsAndNormalCtxs.addAll(separatorsContexts);
                     List<IContextElement> nearestCtxs = ctxHelper
                             .findNearestContexts(separatorsAndNormalCtxs, fp);
                     mappingTempStore.setNearestContexts(nearestCtxs);
@@ -126,7 +127,7 @@ public class ModelBuilder {
         if (next.hasLeftPrettyAlign()) {
             LineElement leftAlign = new LineElement();
             leftAlign.setValue(next.getLeftPrettyAlign());
-            leftAlign.setElemenTypes(Arrays.asList(ElementType.PRETTY_ALIGN));
+            leftAlign.setElementTypes(Arrays.asList(ElementType.PRETTY_ALIGN));
             elems.add(leftAlign);
 
             separatorLength += leftAlign.getValue().length();
@@ -134,14 +135,14 @@ public class ModelBuilder {
 
         LineElement separator = new LineElement();
         separator.setValue(next.getSeparator());
-        separator.setElemenTypes(getSeparatorTypes(next));
+        separator.setElementTypes(getSeparatorTypes(next));
         separatorLength += separator.getValue().length();
         elems.add(separator);
 
         if (next.hasRightPrettyAlign()) {
             LineElement rightAlign = new LineElement();
             rightAlign.setValue(next.getRightPrettyAlign());
-            rightAlign.setElemenTypes(Arrays.asList(ElementType.PRETTY_ALIGN));
+            rightAlign.setElementTypes(Arrays.asList(ElementType.PRETTY_ALIGN));
             elems.add(rightAlign);
 
             separatorLength += rightAlign.getValue().length();
