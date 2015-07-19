@@ -16,4 +16,11 @@ public interface ContextTokenIterator {
      *         position is no separators
      */
     RobotSeparatorIteratorOutput next(FilePosition currentPositionInLine);
+
+
+    SeparationType getSeparatorType();
+
+    public static enum SeparationType {
+        PIPE, WHITESPACES
+    }
 }
