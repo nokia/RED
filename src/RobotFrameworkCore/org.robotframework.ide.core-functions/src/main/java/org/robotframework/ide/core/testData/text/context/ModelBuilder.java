@@ -180,12 +180,9 @@ public class ModelBuilder {
     @VisibleForTesting
     protected int findGapEndPosition(final List<IContextElement> nearestCtxs,
             List<RobotToken> lineTokens) {
-        int gapEndPosition = 0;
-        if (nearestCtxs.isEmpty()) {
-            // unexpected situation no more contexts found
-            RobotToken lastTokenInLine = lineTokens.get(lineTokens.size() - 1);
-            gapEndPosition = lastTokenInLine.getEndPosition().getColumn();
-        } else {
+        final int NOT_FOUND_POSITION = -1;
+        int gapEndPosition = NOT_FOUND_POSITION;
+        if (!nearestCtxs.isEmpty()) {
             // every contexts are have the same start position and contains
             // minimum one token
             for (IContextElement ctx : nearestCtxs) {
@@ -202,6 +199,12 @@ public class ModelBuilder {
                     ctxHelper.reportProblemWithType(ctx);
                 }
             }
+        }
+
+        if (gapEndPosition == NOT_FOUND_POSITION) {
+            FilePosition lastTokenEnd = lineTokens.get(lineTokens.size() - 1)
+                    .getEndPosition();
+            gapEndPosition = lastTokenEnd.getColumn();
         }
 
         return gapEndPosition;
