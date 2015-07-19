@@ -21,7 +21,7 @@ public class LineElement {
     }
 
 
-    public void setElemenTypes(final List<ElementType> types) {
+    public void setElementTypes(final List<ElementType> types) {
         this.types = types;
     }
 
