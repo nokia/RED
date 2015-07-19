@@ -1,22 +1,18 @@
 package org.robotframework.ide.core.testData.text.context;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput;
-import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage;
 import org.robotframework.ide.core.testData.text.context.iterator.ContextTokenIterator.SeparationType;
 import org.robotframework.ide.core.testData.text.context.mapper.IContextMapper;
 import org.robotframework.ide.core.testData.text.context.mapper.MapperOutput;
 import org.robotframework.ide.core.testData.text.context.mapper.MapperTemporaryStore;
 import org.robotframework.ide.core.testData.text.context.mapper.SettingTableHeaderMapper;
 import org.robotframework.ide.core.testData.text.context.mapper.VariableTableHeaderMapper;
-import org.robotframework.ide.core.testData.text.lexer.FilePosition;
-import org.robotframework.ide.core.testData.text.lexer.RobotSingleCharTokenType;
 import org.robotframework.ide.core.testData.text.lexer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -61,70 +57,10 @@ public class ModelElementsMapper {
                 throw new IllegalStateException(
                         "It is internal problem, because we have not any kind of context found and any garbage text.");
             } else {
-                IContextElement mostImportantContext = findMostImportantContext(nearestCtxs);
-                if (mostImportantContext instanceof OneLineSingleRobotContextPart) {
-                    OneLineSingleRobotContextPart c = (OneLineSingleRobotContextPart) mostImportantContext;
-                    List<RobotToken> contextTokens = c.getContextTokens();
-                    FilePosition start = contextTokens.get(0)
-                            .getStartPosition();
-                    FilePosition end = contextTokens.get(
-                            contextTokens.size() - 1).getEndPosition();
-                    IContextElementType ctxType = mostImportantContext
-                            .getType();
 
-                    if (isTableHeader(ctxType)) {
-                        List<IContextElement> breakContextElems = findSeparatorContextsWhichBreakCurrentContext(
-                                mostImportantContext, separatorCtxs,
-                                separatorType);
-                        if (breakContextElems.isEmpty()) {
-                            IContextMapper mapper = contextMappers
-                                    .get(mostImportantContext.getType());
-                            if (mapper != null) {
-                                mapOut = mapper
-                                        .map(store, mostImportantContext);
-                            } else {
-                                throw new IllegalStateException(
-                                        "Unsupported context found "
-                                                + mostImportantContext);
-                            }
-                        } else {
-                            if (lastType == null
-                                    || lastType == ElementType.TRASH_DATA) {
-                                handleBreakContextBySeparator(store, mapOut, c,
-                                        model, start, end);
-                            } else {
-                                // ??!!
-                            }
-                        }
-                    } else if (ctxType == SimpleRobotContextType.PRETTY_ALIGN) {
-                        handlePrettyAlign(store, mapOut, contextTokens, model,
-                                start, end);
-                    } else {
-                        // other contexts
-                    }
-                } else {
-                    coh.reportProblemWithType(mostImportantContext);
-                }
             }
         } else {
-            RobotToken theFirstTrashToken = tokensWithoutContext.get(0);
-            FilePosition trashDataBeginPosition = theFirstTrashToken
-                    .getStartPosition();
-            FilePosition trashDataEndPosition = tokensWithoutContext.get(
-                    tokensWithoutContext.size() - 1).getEndPosition();
-            if (lastType == null
-                    && isSingleSpacePrettyAlign(tokensWithoutContext)) {
-                handlePrettyAlign(store, mapOut, tokensWithoutContext, model,
-                        trashDataBeginPosition, trashDataEndPosition);
-            } else if (lastType == null || lastType == ElementType.TRASH_DATA) {
-                handleTrashData(store, mapOut, tokensWithoutContext, model,
-                        trashDataBeginPosition, trashDataEndPosition);
-            } else if (theFirstTrashToken.getType() == RobotSingleCharTokenType.CARRIAGE_RETURN
-                    || theFirstTrashToken.getType() == RobotSingleCharTokenType.LINE_FEED) {
-                mapOut = mapLineEnd(store, tokensWithoutContext, model);
-            } else {
-                // could be inside test case or comment
-            }
+            // trash tokens
         }
 
         return mapOut;
@@ -132,61 +68,15 @@ public class ModelElementsMapper {
 
 
     @VisibleForTesting
-    protected MapperOutput mapLineEnd(final MapperTemporaryStore store,
-            final List<RobotToken> tokensEndLine, final ModelOutput model) {
-        final MapperOutput mapOut = new MapperOutput();
-
-        LineElement element = new LineElement();
-        FilePosition lineEndPosition = null;
-        for (RobotToken t : tokensEndLine) {
-            element.appendValue(t.getText());
-            lineEndPosition = t.getEndPosition();
-        }
-        List<ElementType> types = new LinkedList<>();
-        types.add(ElementType.LINE_END);
-        element.setElementTypes(types);
-        store.appendCurrentLineElements(element);
-        mapOut.setNextPosition(lineEndPosition);
-        mapOut.setMappedElementType(ElementType.LINE_END);
-        return mapOut;
+    protected boolean isTableHeader(final ElementType type) {
+        return (type == ElementType.SETTING_TABLE_HEADER
+                || type == ElementType.VARIABLE_TABLE_HEADER
+                || type == ElementType.TEST_CASE_TABLE_HEADER || type == ElementType.KEYWORD_TABLE_HEADER);
     }
 
 
     @VisibleForTesting
-    protected boolean isSingleSpacePrettyAlign(
-            final List<RobotToken> tokensWithoutContext) {
-        boolean result = false;
-        if (tokensWithoutContext.size() == 1) {
-            RobotToken robotToken = tokensWithoutContext.get(0);
-            result = (robotToken.getType() == RobotSingleCharTokenType.SINGLE_SPACE);
-        }
-
-        return result;
-    }
-
-
-    private void handleBreakContextBySeparator(
-            final MapperTemporaryStore store, final MapperOutput mapOut,
-            final OneLineSingleRobotContextPart invalidContext,
-            final ModelOutput model, FilePosition trashDataBeginPosition,
-            FilePosition trashDataEndPosition) {
-        model.addBuildMessage(BuildMessage.buildWarn("Section "
-                + invalidContext.getType() + " was break by separator.",
-                "section start " + trashDataBeginPosition + ", end "
-                        + trashDataEndPosition));
-        ElementType additionalType = mapTypes(invalidContext.getType());
-        List<LineElement> trashData = convertToTrashData(invalidContext
-                .getContextTokens());
-        for (LineElement le : trashData) {
-            le.addNewType(additionalType);
-        }
-        store.appendCurrentLineElements(trashData);
-        mapOut.setNextPosition(trashDataEndPosition);
-        mapOut.setMappedElementType(ElementType.TRASH_DATA);
-    }
-
-
-    private ElementType mapTypes(IContextElementType type) {
+    protected ElementType mapTypes(IContextElementType type) {
         ElementType ets = ElementType.VALUE;
         if (type == SimpleRobotContextType.SETTING_TABLE_HEADER) {
             ets = ElementType.SETTING_TABLE_HEADER;
@@ -199,68 +89,6 @@ public class ModelElementsMapper {
         }
 
         return ets;
-    }
-
-
-    private void handlePrettyAlign(final MapperTemporaryStore store,
-            MapperOutput mapOut, final List<RobotToken> tokensWithoutContext,
-            final ModelOutput model, FilePosition dataBeginPosition,
-            FilePosition dataEndPosition) {
-        store.setCurrentLineElements(convertToPrettyAlign(tokensWithoutContext));
-        mapOut.setNextPosition(dataEndPosition);
-        mapOut.setMappedElementType(ElementType.PRETTY_ALIGN);
-    }
-
-
-    private void handleTrashData(final MapperTemporaryStore store,
-            MapperOutput mapOut, final List<RobotToken> tokensWithoutContext,
-            final ModelOutput model, FilePosition trashDataBeginPosition,
-            FilePosition trashDataEndPosition) {
-        addInformationAboutTrashDataFound(model, trashDataBeginPosition,
-                trashDataEndPosition);
-        store.setCurrentLineElements(convertToTrashData(tokensWithoutContext));
-        mapOut.setNextPosition(trashDataEndPosition);
-        mapOut.setMappedElementType(ElementType.TRASH_DATA);
-    }
-
-
-    @VisibleForTesting
-    protected List<IContextElement> findSeparatorContextsWhichBreakCurrentContext(
-            final IContextElement contextToCheck,
-            final List<IContextElement> separators,
-            final SeparationType separatorType) {
-        List<IContextElement> breakContextSeparators = null;
-
-        if (separatorType == SeparationType.PIPE) {
-            breakContextSeparators = new LinkedList<>();
-        } else {
-            if (contextToCheck instanceof OneLineSingleRobotContextPart) {
-                OneLineSingleRobotContextPart c = (OneLineSingleRobotContextPart) contextToCheck;
-                List<RobotToken> contextTokens = c.getContextTokens();
-                FilePosition start = contextTokens.get(0).getStartPosition();
-                FilePosition end = contextTokens.get(contextTokens.size() - 1)
-                        .getEndPosition();
-                breakContextSeparators = findSeparatorsInsideContext(
-                        separators,
-                        SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED,
-                        start, end);
-            } else {
-                coh.reportProblemWithType(contextToCheck);
-            }
-        }
-
-        return breakContextSeparators;
-    }
-
-
-    @VisibleForTesting
-    protected List<IContextElement> findSeparatorsInsideContext(
-            final List<IContextElement> separators,
-            final IContextElementType separatorType, final FilePosition start,
-            final FilePosition end) {
-        List<IContextElement> foundContextBetweenPosition = coh
-                .findContextBetweenPosition(separators, start, end);
-        return coh.filterByType(foundContextBetweenPosition, separatorType);
     }
 
 
@@ -403,48 +231,5 @@ public class ModelElementsMapper {
         return (type == SimpleRobotContextType.SETTING_TABLE_HEADER
                 || type == SimpleRobotContextType.VARIABLE_TABLE_HEADER
                 || type == SimpleRobotContextType.TEST_CASE_TABLE_HEADER || type == SimpleRobotContextType.KEYWORD_TABLE_HEADER);
-    }
-
-
-    @VisibleForTesting
-    protected void addInformationAboutTrashDataFound(final ModelOutput model,
-            final FilePosition trashBegin, final FilePosition trashEnd) {
-        model.addBuildMessage(BuildMessage
-                .buildWarn(
-                        "Garbage data found in file. It is recommand to use hash sign ('#') to comment out some user text without meaning.",
-                        "start " + trashBegin + ", end " + trashEnd));
-    }
-
-
-    @VisibleForTesting
-    protected List<LineElement> convertToPrettyAlign(
-            final List<RobotToken> tokens) {
-        List<LineElement> elems = new LinkedList<>();
-        for (RobotToken rt : tokens) {
-            LineElement le = new LineElement();
-            List<ElementType> et = new LinkedList<>();
-            et.add(0, ElementType.PRETTY_ALIGN);
-            le.setElementTypes(et);
-            le.setValue(rt.getText());
-            elems.add(le);
-        }
-
-        return elems;
-    }
-
-
-    @VisibleForTesting
-    protected List<LineElement> convertToTrashData(final List<RobotToken> tokens) {
-        List<LineElement> elems = new LinkedList<>();
-        for (RobotToken rt : tokens) {
-            LineElement le = new LineElement();
-            List<ElementType> et = new LinkedList<>();
-            et.add(0, ElementType.TRASH_DATA);
-            le.setElementTypes(et);
-            le.setValue(rt.getText());
-            elems.add(le);
-        }
-
-        return elems;
     }
 }
