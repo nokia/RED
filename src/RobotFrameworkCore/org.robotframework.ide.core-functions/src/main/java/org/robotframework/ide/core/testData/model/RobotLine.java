@@ -17,4 +17,11 @@ public class RobotLine {
     public void setElements(List<LineElement> elements) {
         this.elements = elements;
     }
+
+
+    @Override
+    public String toString() {
+        return String.format("RobotLine [elements=%s]", elements);
+    }
+
 }
