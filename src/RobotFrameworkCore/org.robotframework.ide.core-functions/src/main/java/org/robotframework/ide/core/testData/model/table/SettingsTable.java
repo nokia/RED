@@ -40,6 +40,6 @@ public class SettingsTable extends ATableModel {
 
 
     public SettingsTable(final TableHeader header) {
-        super(header);
+        super(header, "Settings");
     }
 }

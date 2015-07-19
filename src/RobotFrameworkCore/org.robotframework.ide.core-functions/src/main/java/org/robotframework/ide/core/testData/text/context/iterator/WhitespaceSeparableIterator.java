@@ -69,7 +69,7 @@ public class WhitespaceSeparableIterator implements ContextTokenIterator {
         OneLineSingleRobotContextPart separatorContext = (OneLineSingleRobotContextPart) separatorsAndPrettyAlign
                 .get(separatorIndex);
         List<RobotToken> contextTokens = separatorContext.getContextTokens();
-
+        result.setSeparator(contextTokens.get(0).getText());
     }
 
 
@@ -93,6 +93,8 @@ public class WhitespaceSeparableIterator implements ContextTokenIterator {
                 } else {
                     ctxHelper.reportProblemWithType(context);
                 }
+            } else {
+                System.out.println(context);
             }
         }
 
