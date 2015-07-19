@@ -310,6 +310,12 @@ public class ModelBuilder {
             }
 
 
+            public static BuildMessage buildDebug(String message,
+                    String localization) {
+                return new BuildMessage(message, localization, Level.DEBUG);
+            }
+
+
             public static BuildMessage buildInfo(String message,
                     String localization) {
                 return new BuildMessage(message, localization, Level.INFO);
@@ -328,7 +334,7 @@ public class ModelBuilder {
             }
 
             public static enum Level {
-                INFO, WARN, ERROR;
+                DEBUG, INFO, WARN, ERROR;
             }
 
 
