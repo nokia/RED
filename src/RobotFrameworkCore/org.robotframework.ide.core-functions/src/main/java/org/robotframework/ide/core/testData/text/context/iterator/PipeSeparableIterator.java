@@ -71,7 +71,6 @@ public class PipeSeparableIterator implements ContextTokenIterator {
         OneLineSingleRobotContextPart separatorContext = (OneLineSingleRobotContextPart) separatorsAndPrettyAlign
                 .get(separatorIndex);
         List<RobotToken> contextTokens = separatorContext.getContextTokens();
-
         StringBuilder leftAlign = new StringBuilder();
         StringBuilder separator = new StringBuilder();
         StringBuilder rightAlign = new StringBuilder();

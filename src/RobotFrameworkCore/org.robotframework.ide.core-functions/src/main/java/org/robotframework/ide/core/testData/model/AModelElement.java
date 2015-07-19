@@ -31,4 +31,13 @@ public abstract class AModelElement {
     public ElementType getType() {
         return type;
     }
+
+
+    @Override
+    public String toString() {
+        return String
+                .format("AModelElement [type=%s, containingLine=%s, originalElement=%s]",
+                        type, containingLine, originalElement);
+    }
+
 }

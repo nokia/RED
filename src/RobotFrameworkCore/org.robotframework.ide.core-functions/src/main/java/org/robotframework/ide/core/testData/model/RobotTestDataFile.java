@@ -54,6 +54,11 @@ public class RobotTestDataFile {
     }
 
 
+    public void addNextRobotLine(final RobotLine line) {
+        this.content.add(line);
+    }
+
+
     public SettingsTable getSettingsTable() {
         return settingsTable;
     }

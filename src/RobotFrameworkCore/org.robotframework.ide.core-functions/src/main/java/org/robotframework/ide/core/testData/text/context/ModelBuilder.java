@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.LineElement;
 import org.robotframework.ide.core.testData.model.LineElement.ElementType;
+import org.robotframework.ide.core.testData.model.RobotLine;
 import org.robotframework.ide.core.testData.model.RobotTestDataFile;
 import org.robotframework.ide.core.testData.text.context.ContextBuilder.ContextOutput;
 import org.robotframework.ide.core.testData.text.context.ModelBuilder.ModelOutput.BuildMessage;
@@ -40,12 +41,12 @@ public class ModelBuilder {
 
         List<AggregatedOneLineRobotContexts> lineContexts = contexts
                 .getContexts();
-
         ElementType globalLineContext = null;
         for (AggregatedOneLineRobotContexts ctx : lineContexts) {
             globalLineContext = mapLine(output, ctx, globalLineContext);
         }
 
+        System.out.println(output.getFileModel().getContent());
         return output;
     }
 
@@ -54,6 +55,7 @@ public class ModelBuilder {
     protected ElementType mapLine(final ModelOutput model,
             final AggregatedOneLineRobotContexts ctx, final ElementType etLast) {
         // prepare for mapping line
+        RobotLine currentLine = new RobotLine();
         ElementType mappedType = etLast;
         final ContextTokenIterator separatorBaseIterator = separatorIterBuilder
                 .createSeparatorBaseIterator(ctx);
@@ -68,7 +70,7 @@ public class ModelBuilder {
                 .getLineNumber());
         List<LineElement> elems = new LinkedList<>();
         MapperTemporaryStore mappingTempStore = new MapperTemporaryStore(model,
-                elems);
+                elems, currentLine);
         mappingTempStore.setSeparatorType(separatorBaseIterator
                 .getSeparatorType());
         while(separatorBaseIterator.hasNext(fp)) {
@@ -115,6 +117,8 @@ public class ModelBuilder {
                 break;
             }
         }
+        currentLine.setElements(elems);
+        model.getFileModel().addNextRobotLine(currentLine);
 
         return mappedType;
     }

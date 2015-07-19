@@ -12,6 +12,6 @@ public class TestCasesTable extends ATableModel {
 
 
     public TestCasesTable(final TableHeader header) {
-        super(header);
+        super(header, "Test Case");
     }
 }

@@ -10,10 +10,12 @@ public abstract class ATableModel implements IOptionalModelElement {
 
     private TableHeader header = null;
     private List<NamedTableColumn> columns = new LinkedList<>();
+    private final String tableName;
 
 
-    public ATableModel(TableHeader header) {
+    public ATableModel(TableHeader header, String tableName) {
         this.header = header;
+        this.tableName = tableName;
     }
 
 
@@ -40,5 +42,10 @@ public abstract class ATableModel implements IOptionalModelElement {
 
     public void setColumns(List<NamedTableColumn> columns) {
         this.columns = columns;
+    }
+
+
+    public String getTableName() {
+        return tableName;
     }
 }
