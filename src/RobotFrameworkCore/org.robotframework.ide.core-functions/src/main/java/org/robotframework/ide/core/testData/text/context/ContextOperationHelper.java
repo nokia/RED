@@ -92,19 +92,24 @@ public class ContextOperationHelper {
         for (IContextElement ctx : availableContexts) {
             if (ctx instanceof OneLineSingleRobotContextPart) {
                 OneLineSingleRobotContextPart currentCtx = (OneLineSingleRobotContextPart) ctx;
-                List<RobotToken> contextTokens = currentCtx.getContextTokens();
-                if (contextTokens != null && !contextTokens.isEmpty()) {
-                    RobotToken token = contextTokens.get(0);
-                    int distance = token.getStartPosition().getColumn()
-                            - column;
-                    if (distance >= 0) {
-                        if (distance < currentDistance) {
-                            // we found more near context
-                            nearests.clear();
-                            currentDistance = distance;
-                        }
+                if (currentCtx.getType() != SimpleRobotContextType.UNDECLARED_COMMENT) {
+                    List<RobotToken> contextTokens = currentCtx
+                            .getContextTokens();
+                    if (contextTokens != null && !contextTokens.isEmpty()) {
+                        RobotToken token = contextTokens.get(0);
+                        int distance = token.getStartPosition().getColumn()
+                                - column;
+                        if (distance >= 0) {
+                            if (distance < currentDistance) {
+                                // we found more near context
+                                nearests.clear();
+                                currentDistance = distance;
+                            }
 
-                        nearests.add(ctx);
+                            if (distance == currentDistance) {
+                                nearests.add(ctx);
+                            }
+                        }
                     }
                 }
             } else {
