@@ -237,6 +237,10 @@ public class RobotProjectConfig {
         }
     }
 
+    public static enum LibraryType {
+        VIRTUAL, PYTHON, JAVA
+    }
+
     @XmlRootElement(name = "remoteLocation")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
@@ -284,9 +288,5 @@ public class RobotProjectConfig {
         private static String pathWithoutSpecialCharacters(final String path) {
             return path.replaceAll("[^A-Za-z0-9]", "_");
         }
-    }
-
-    public enum LibraryType {
-        VIRTUAL, PYTHON, JAVA
     }
 }
