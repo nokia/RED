@@ -96,10 +96,6 @@
           </objectClass>
        </enablement>
     </decorator>
-    <decorator
-          id="org.robotframework.ide.eclipse.main.plugin.decorator1"
-          label="label">
-    </decorator>
  </extension>
 
 	<extension
@@ -435,6 +431,11 @@
           label="Table Editor"
           parentId="org.robotframework.ide.eclipse.theme">
     </themeElementCategory>
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.source.theme"
+          label="Source Editor"
+          parentId="org.robotframework.ide.eclipse.theme">
+    </themeElementCategory>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.table.theme"
           id="org.robotframework.ide.eclipse.cell.highlight"
@@ -456,7 +457,7 @@
        </description>
     </colorDefinition>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.ide.eclipse.comment"
           isEditable="true"
           label="Comments "
@@ -466,7 +467,7 @@
        </description>
     </colorDefinition>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.ide.eclipse.variable"
           isEditable="true"
           label="Variables"
@@ -474,6 +475,19 @@
        <description>
           Color used for variables in RED table editor
        </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          id="org.robotframework.ide.eclipse.section.header"
+          isEditable="true"
+          label="Section header"
+          value="255,0,0">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          id="org.robotframework.ide.eclipse.setting"
+          label="Setting "
+          value="255,205,165">
     </colorDefinition>
  </extension>
  <extension
