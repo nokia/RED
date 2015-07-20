@@ -23,9 +23,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
-import org.robotframework.ide.eclipse.main.plugin.project.build.FatalProblemsReporter.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RuntimeEnvironmentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.FatalProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.ProblemsReportingStrategy.ReportingInterruptedException;
 
 public class RobotLibrariesBuilder {
 
@@ -60,7 +62,7 @@ public class RobotLibrariesBuilder {
                         } catch (final CoreException e) {
                             // that's fine, lets try to build project
                         }
-                        buildLibrariesSpecs(project, monitor, new FatalProblemsReporter());
+                        buildLibrariesSpecs(project, monitor, new FatalProblemsReportingStrategy());
                         monitor.done();
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
@@ -80,7 +82,7 @@ public class RobotLibrariesBuilder {
     }
 
     private void buildLibrariesSpecs(final IProject project, final IProgressMonitor monitor,
-            final IProblemsReporter reporter) {
+            final ProblemsReportingStrategy reporter) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -119,7 +121,7 @@ public class RobotLibrariesBuilder {
     }
 
     private RobotProjectConfig provideConfiguration(final IProgressMonitor monitor, final RobotProject robotProject,
-            final IProblemsReporter reporter) {
+            final ProblemsReportingStrategy reporter) {
         try {
             if (!robotProject.getConfigurationFile().exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.DOES_NOT_EXIST);
@@ -127,8 +129,8 @@ public class RobotLibrariesBuilder {
             }
             return new RobotProjectConfigReader().readConfiguration(robotProject);
         } catch (final CannotReadProjectConfigurationException e) {
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.OTHER_PROBLEM);
-            problem.fillFormattedMessageWith(e.getMessage());
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.OTHER_PROBLEM).formatMessageWith(
+                    e.getMessage());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), e.getLineNumber());
             return null;
         } finally {
@@ -137,20 +139,21 @@ public class RobotLibrariesBuilder {
     }
 
     private RobotRuntimeEnvironment provideRuntimeEnvironment(final IProgressMonitor monitor,
-            final RobotProject robotProject, final RobotProjectConfig configuration, final IProblemsReporter reporter) {
+            final RobotProject robotProject, final RobotProjectConfig configuration,
+            final ProblemsReportingStrategy reporter) {
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT);
-                problem.fillFormattedMessageWith(configuration.providePythonLocation());
+                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT)
+                        .formatMessageWith(configuration.providePythonLocation());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.isValidPythonInstallation()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION);
-                problem.fillFormattedMessageWith(runtimeEnvironment.getFile());
+                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION)
+                        .formatMessageWith(runtimeEnvironment.getFile());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.hasRobotInstalled()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ROBOT);
-                problem.fillFormattedMessageWith(runtimeEnvironment.getFile());
+                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ROBOT)
+                        .formatMessageWith(runtimeEnvironment.getFile());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             }
             return runtimeEnvironment;
