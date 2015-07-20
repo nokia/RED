@@ -5,7 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.project.build.IProblemCause;
 
 public enum KeywordProblem implements IProblemCause {
     UNKNOWN_KEYWORD;
@@ -26,7 +25,7 @@ public enum KeywordProblem implements IProblemCause {
     }
 
     @Override
-    public String getFormattedProblemDescription(final Object... objects) {
+    public String getProblemDescription() {
         return "The keyword %s cannot be found";
     }
 
