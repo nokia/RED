@@ -1,5 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -32,11 +35,11 @@ public class RobotProblem {
         return this;
     }
 
-    public void createMarker(final IFile file, final int lineNumber) {
-        createMarker(file, lineNumber, null);
+    IMarker createMarker(final IFile file, final int lineNumber) {
+        return createMarker(file, lineNumber, null);
     }
 
-    public void createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange) {
+    IMarker createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange) {
         try {
             final IMarker marker = file.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage());
@@ -54,6 +57,34 @@ public class RobotProblem {
 
             marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
             marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
+            return marker;
+        } catch (final CoreException e) {
+            throw new IllegalStateException("Unable to create marker!", e);
+        }
+    }
+
+    public void createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange,
+            final Map<String, Object> additionalAttributes) {
+        try {
+            final IMarker marker = file.createMarker(TYPE_ID);
+            marker.setAttribute(IMarker.MESSAGE, getMessage());
+            marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
+            if (lineNumber >= 0) {
+                marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);
+                marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            } else {
+                marker.setAttribute(IMarker.LOCATION, "unknown line");
+            }
+            if (charRange != null && charRange.hasLowerBound() && charRange.hasUpperBound()) {
+                marker.setAttribute(IMarker.CHAR_START, charRange.lowerEndpoint());
+                marker.setAttribute(IMarker.CHAR_END, charRange.upperEndpoint());
+            }
+
+            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
+            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
+            for (final Entry<String, Object> entry : additionalAttributes.entrySet()) {
+                marker.setAttribute(entry.getKey(), entry.getValue());
+            }
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create marker!", e);
         }

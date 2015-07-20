@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.stream.Location;
@@ -22,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigRead
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 
@@ -53,11 +53,13 @@ class RobotProjectConfigFileValidator {
             validateRemoteLocation(location, configFile, linesMapping, reporter);
         }
 
+        int index = 0;
         for (final ReferencedLibrary library : model.getLibraries()) {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateReferencedLibrary(library, configFile, linesMapping, reporter);
+            validateReferencedLibrary(library, index, configFile, linesMapping, reporter);
+            index++;
         }
     }
 
@@ -77,18 +79,22 @@ class RobotProjectConfigFileValidator {
         }
     }
 
-    private void validateReferencedLibrary(final ReferencedLibrary library, final IFile configFile,
+    private void validateReferencedLibrary(final ReferencedLibrary library, final int index, final IFile configFile,
             final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) {
         final LibraryType libType = library.provideType();
         final IPath libraryPath = Path.fromPortableString(library.getPath());
         final int lineNumber = linesMapping.get(library).getLineNumber();
+
+        final Map<String, Object> additional = new HashMap<>();
+        additional.put(ConfigFileProblem.LIBRARY_INDEX, index);
+
         switch (libType) {
             case JAVA:
-                reporter.handleProblem(findJavaLibaryProblem(libraryPath, library.getName()),
-                    configFile, lineNumber);
+            reporter.handleProblem(findJavaLibaryProblem(libraryPath, library.getName()),
+                    configFile, lineNumber, additional);
                 break;
             case VIRTUAL:
-                reporter.handleProblem(findVirtualLibaryProblem(libraryPath), configFile, lineNumber);
+                reporter.handleProblem(findVirtualLibaryProblem(libraryPath), configFile, lineNumber, additional);
                 break;
             default:
                 break;
