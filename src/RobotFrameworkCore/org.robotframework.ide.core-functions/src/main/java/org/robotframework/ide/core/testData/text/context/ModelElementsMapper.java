@@ -128,7 +128,8 @@ public class ModelElementsMapper {
             if (elementType == ElementType.PRETTY_ALIGN) {
                 // nothing to do just skip
             } else if (elementType == ElementType.WHITESPACE_SEPARATOR
-                    || elementType == ElementType.PIPE_SEPARATOR) {
+                    || elementType == ElementType.PIPE_SEPARATOR
+                    || elementType == ElementType.TABLE_COLUMN_NAME) {
                 result = true;
                 break;
             } else {
@@ -166,9 +167,8 @@ public class ModelElementsMapper {
             final List<IContextElement> separatorContexts) {
         LineElement lineElement = new LineElement();
         FilePosition end = null;
-
         int toCopy = getSeparatorIndexInColumnName(tokensWithoutContext,
-                separatorContexts);
+                separatorContexts, separatorType);
         if (toCopy == -1) {
             toCopy = tokensWithoutContext.size();
         }
@@ -191,7 +191,8 @@ public class ModelElementsMapper {
     @VisibleForTesting
     protected int getSeparatorIndexInColumnName(
             final List<RobotToken> tokensWithoutContext,
-            final List<IContextElement> separatorContexts) {
+            final List<IContextElement> separatorContexts,
+            final SeparationType separatorType) {
         int index = -1;
         if (!separatorContexts.isEmpty()) {
             OneLineSingleRobotContextPart ctx = (OneLineSingleRobotContextPart) separatorContexts
@@ -201,7 +202,8 @@ public class ModelElementsMapper {
             int size = tokensWithoutContext.size();
             for (int i = 0; i < size; i++) {
                 RobotToken t = tokensWithoutContext.get(i);
-                if (t.getStartPosition().getColumn() == pos.getColumn()) {
+                if (t.getStartPosition().getColumn() == pos.getColumn()
+                        && isCorrectSeparator(ctx, separatorType)) {
                     index = i;
                     break;
                 }
@@ -209,6 +211,13 @@ public class ModelElementsMapper {
         }
 
         return index;
+    }
+
+
+    private boolean isCorrectSeparator(OneLineSingleRobotContextPart ctx,
+            final SeparationType separatorType) {
+        return (ctx.getType() == SimpleRobotContextType.PIPE_SEPARATED && separatorType == SeparationType.PIPE)
+                || (ctx.getType() == SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED && separatorType == SeparationType.WHITESPACES);
     }
 
 
@@ -259,6 +268,10 @@ public class ModelElementsMapper {
             ets = ElementType.TEST_CASE_TABLE_HEADER;
         } else if (type == SimpleRobotContextType.KEYWORD_TABLE_HEADER) {
             ets = ElementType.KEYWORD_TABLE_HEADER;
+        } else if (type == SimpleRobotContextType.PIPE_SEPARATED) {
+            ets = ElementType.PIPE_SEPARATOR;
+        } else if (type == SimpleRobotContextType.DOUBLE_SPACE_OR_TABULATOR_SEPARATED) {
+            ets = ElementType.WHITESPACE_SEPARATOR;
         }
 
         return ets;
