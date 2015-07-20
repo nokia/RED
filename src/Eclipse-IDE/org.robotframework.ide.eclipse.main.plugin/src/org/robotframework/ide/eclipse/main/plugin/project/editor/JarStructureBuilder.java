@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-class JarStructureBuilder {
+public class JarStructureBuilder {
 
-    List<JarClass> provideEntriesFromJarFile(final String path) {
+    public List<JarClass> provideEntriesFromJarFile(final String path) {
         final List<JarClass> jarClasses = newArrayList();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(path))) {
             ZipEntry entry = zipStream.getNextEntry();
@@ -30,7 +30,7 @@ class JarStructureBuilder {
         return entryName.endsWith(".class");
     }
 
-    static class JarClass {
+    public static class JarClass {
         private final String qualifiedName;
 
         private JarClass(final String qualifiedName) {
@@ -43,7 +43,7 @@ class JarStructureBuilder {
             return new JarClass(qualifiedName);
         }
 
-        String getQualifiedName() {
+        public String getQualifiedName() {
             return qualifiedName;
         }
     }

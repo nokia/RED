@@ -5,7 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.project.build.IProblemCause;
 
 public enum RuntimeEnvironmentProblem implements IProblemCause {
     MISSING_ENVIRONMENT {
@@ -15,8 +14,8 @@ public enum RuntimeEnvironmentProblem implements IProblemCause {
         }
 
         @Override
-        public String getFormattedProblemDescription(final Object... objects) {
-            return String.format("FATAL: %s is not defined in preferences. Fix this problem to build project", objects);
+        public String getProblemDescription() {
+            return "FATAL: %s is not defined in preferences. Fix this problem to build project";
         }
     },
     NON_PYTHON_INSTALLATION {
@@ -26,9 +25,8 @@ public enum RuntimeEnvironmentProblem implements IProblemCause {
         }
 
         @Override
-        public String getFormattedProblemDescription(final Object... objects) {
-            return String.format("FATAL: %s is not a Python installation directory. Fix this problem to build project",
-                    objects);
+        public String getProblemDescription() {
+            return "FATAL: %s is not a Python installation directory. Fix this problem to build project";
         }
     },
     MISSING_ROBOT {
@@ -38,9 +36,8 @@ public enum RuntimeEnvironmentProblem implements IProblemCause {
         }
 
         @Override
-        public String getFormattedProblemDescription(final Object... objects) {
-            return String.format(
-                    "FATAL: Python instalation %s has no Robot installed. Fix this problem to build project", objects);
+        public String getProblemDescription() {
+            return "FATAL: Python instalation %s has no Robot installed. Fix this problem to build project";
         }
     };
 

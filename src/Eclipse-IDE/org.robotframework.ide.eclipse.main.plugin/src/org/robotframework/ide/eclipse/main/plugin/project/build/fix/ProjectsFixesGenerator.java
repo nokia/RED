@@ -7,8 +7,8 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
-import org.robotframework.ide.eclipse.main.plugin.project.build.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
 public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
 
