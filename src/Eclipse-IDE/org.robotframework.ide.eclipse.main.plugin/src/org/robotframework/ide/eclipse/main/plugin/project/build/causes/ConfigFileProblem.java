@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateConfigurationFileFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveLibraryFromConfigurationFileFixer;
 
 public enum ConfigFileProblem implements IProblemCause {
     DOES_NOT_EXIST {
@@ -46,12 +47,12 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public boolean hasResolution() {
-            return false;
+            return true;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers() {
-            return newArrayList();
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
         @Override
@@ -63,12 +64,12 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public boolean hasResolution() {
-            return false;
+            return true;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers() {
-            return newArrayList();
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
         @Override
@@ -79,12 +80,12 @@ public enum ConfigFileProblem implements IProblemCause {
     JAVA_LIB_MISSING_CLASS {
         @Override
         public boolean hasResolution() {
-            return false;
+            return true;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers() {
-            return newArrayList();
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
         @Override
@@ -95,12 +96,12 @@ public enum ConfigFileProblem implements IProblemCause {
     ABSOLUTE_PATH {
         @Override
         public boolean hasResolution() {
-            return false;
+            return true;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers() {
-            return newArrayList();
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
         @Override
@@ -112,12 +113,12 @@ public enum ConfigFileProblem implements IProblemCause {
     MISSING_LIBSPEC_FILE {
         @Override
         public boolean hasResolution() {
-            return false;
+            return true;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers() {
-            return newArrayList();
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
         @Override
@@ -141,6 +142,8 @@ public enum ConfigFileProblem implements IProblemCause {
             return "FATAL: unable to read configuration file. %s Fix this problem in order to properly build project";
         }
     };
+
+    public static final String LIBRARY_INDEX = "marker.libraryIndex";
 
     @Override
     public Severity getSeverity() {
