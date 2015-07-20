@@ -7,7 +7,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
-class FileSectionsEmiter {
+public class FileSectionsEmiter {
 
     private final RobotSuiteFile file;
 
@@ -19,7 +19,7 @@ class FileSectionsEmiter {
         return new ByteArrayInputStream(emitString().getBytes(Charsets.UTF_8));
     }
 
-    private String emitString() {
+    public String emitString() {
         final StringBuilder builder = new StringBuilder();
 
         for (final RobotElement element : file.getChildren()) {
