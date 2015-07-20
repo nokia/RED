@@ -23,11 +23,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RuntimeEnvironmentProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.FatalProblemsReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.ProblemsReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.reporting.ProblemsReportingStrategy.ReportingInterruptedException;
 
 public class RobotLibrariesBuilder {
 

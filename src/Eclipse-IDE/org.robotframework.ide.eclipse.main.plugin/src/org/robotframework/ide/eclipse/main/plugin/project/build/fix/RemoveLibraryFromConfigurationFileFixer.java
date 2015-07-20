@@ -1,0 +1,49 @@
+package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
+
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
+
+
+public class RemoveLibraryFromConfigurationFileFixer implements IMarkerResolution {
+
+    @Override
+    public String getLabel() {
+        return "Remove library";
+    }
+
+    @Override
+    public void run(final IMarker marker) {
+        final IResource redFile = marker.getResource();
+        if (redFile == null || !redFile.exists() || !redFile.getName().equals(RobotProjectConfig.FILENAME)) {
+            throw new IllegalStateException("Marker is assigned to invalid file");
+        }
+        final int indexOfLibrary = marker.getAttribute(ConfigFileProblem.LIBRARY_INDEX, -1);
+        if (indexOfLibrary < 0) {
+            return;
+        }
+        
+        final RobotProjectConfigReader reader = new RobotProjectConfigReader();
+        final RobotProjectConfig config = reader.readConfiguration(redFile.getProject());
+        if (indexOfLibrary < config.getLibraries().size()) {
+            config.getLibraries().remove(indexOfLibrary);
+        }
+        final RobotProjectConfigWriter writer = new RobotProjectConfigWriter();
+        writer.writeConfiguration(config, redFile.getProject());
+        try {
+            marker.delete();
+        } catch (final CoreException e) {
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+                    StatusManager.SHOW);
+        }
+    }
+}
