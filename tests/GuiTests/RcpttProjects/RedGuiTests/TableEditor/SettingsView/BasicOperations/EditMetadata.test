@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 6/30/15 12:36 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 7/21/15 5:06 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -89,6 +89,9 @@ with [get-editor "TestFile.robot"] {
     close
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+
 get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "Metadata    Metadata    5    # Comment\r\n"
     + "Metadata    OtherData    value    # Other comment" | verify-true
 with [get-editor "TestFile.robot"] {
@@ -101,6 +104,7 @@ with [get-editor "TestFile.robot"] {
 }
 wait 500
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "Metadata    OtherData    value    # Other comment" | verify-false
 
 with [get-editor "TestFile.robot"] {
@@ -132,6 +136,9 @@ with [get-editor "TestFile.robot"] {
     close
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "Metadata    Metadata    5    # Comment\r\n"
     + "Metadata    data    data    # third comment" | verify-true 
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
