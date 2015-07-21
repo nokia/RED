@@ -15,7 +15,7 @@ class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
     public StyledString getStyledText(final Object element) {
         final ReferencedLibrary lib = (ReferencedLibrary) element;
 
-        if (lib.provideType() == LibraryType.JAVA) {
+        if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
             final StyledString label = new StyledString(lib.getName());
             label.append(" " + lib.getPath(), new Styler() {
                 @Override
