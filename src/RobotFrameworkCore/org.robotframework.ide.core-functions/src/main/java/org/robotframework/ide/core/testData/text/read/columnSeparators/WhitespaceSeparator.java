@@ -1,0 +1,41 @@
+package org.robotframework.ide.core.testData.text.read.columnSeparators;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+
+
+public class WhitespaceSeparator extends ALineSeparator {
+
+    public static final Pattern WHITESPACE_SEPARATOR = Pattern
+            .compile("(\\t+|[ ]{2,})");
+    private final Matcher matcher;
+
+
+    public WhitespaceSeparator(int lineNumber, String line) {
+        super(lineNumber, line);
+        this.matcher = WHITESPACE_SEPARATOR.matcher(line);
+    }
+
+
+    @Override
+    public Separator next() {
+        int start = matcher.start();
+        int end = matcher.end();
+
+        Separator s = new Separator();
+        s.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+        s.setStartColumn(start);
+        s.setText(new StringBuilder().append(line.substring(start, end)));
+        s.setLineNumber(getLineNumber());
+
+        return s;
+    }
+
+
+    @Override
+    public boolean hasNext() {
+        return matcher.find();
+    }
+}
