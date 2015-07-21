@@ -9,7 +9,8 @@ import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator
 public class PipeSeparator extends ALineSeparator {
 
     private static final Pattern PIPE_SEPARATOR = Pattern
-            .compile("(^[ ]?[|]([ ]|\\t)+)|(([ ]|\\t)+[|]([ ]|\\t)+)|(([ ]|\\t)+[|]([ ]|\\t)*$)");
+            .compile("(^[ ]?[|](\\s)+)" + "|" + "((\\s)+[|](\\s)+)" + "|"
+                    + "((\\s)+[|](\\s)*$)");
     private final Matcher matcher;
 
 
