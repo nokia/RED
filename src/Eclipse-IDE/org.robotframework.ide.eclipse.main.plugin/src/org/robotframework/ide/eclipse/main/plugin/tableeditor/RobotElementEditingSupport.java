@@ -42,9 +42,14 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ElementAddingToken) {
+            final int indexToActivate = index + getColumnShift();
             scheduleViewerRefreshAndEditorActivation(creator.createNew(((ElementAddingToken) element).getParent()),
-                    index);
+                    indexToActivate);
         }
+    }
+
+    protected int getColumnShift() {
+        return 0;
     }
 
     // refresh and cell editor activation has to be done in GUI thread but after
@@ -61,13 +66,13 @@ public abstract class RobotElementEditingSupport extends EditingSupport {
         });
     }
 
-    public static class NewElementsCreator {
+    public abstract static class NewElementsCreator {
 
         public RobotElement createNew() {
             return null;
         }
 
-        public RobotElement createNew(final Object parent) {
+        public RobotElement createNew(@SuppressWarnings("unused") final Object parent) {
             return createNew();
         }
     }
