@@ -4,10 +4,7 @@ import org.eclipse.jface.assist.RedContentProposalAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -65,45 +62,20 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     }
 
     @Override
-    protected Control createControl(final Composite parent) {
-        final Control control = super.createControl(parent);
-        control.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(final FocusEvent e) {
-                control.getDisplay().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        ActivationCharPreservingTextCellEditor.this.focusLostAsync();
-                    }
-                });
-            }
-        });
-        return control;
-    }
-
-    @Override
     protected boolean dependsOnExternalFocusListener() {
         return false;
     }
 
-    protected void focusLostAsync() {
-        if ((contentProposalAdapter == null || !isContentProposalFocused()) && isActivated()) {
+    @Override
+    protected void focusLost() {
+        if (isActivated() && (contentProposalAdapter == null || !isContentProposalOpened())) {
             fireApplyEditorValue();
             deactivate();
         }
     }
 
-    @Override
-    protected void focusLost() {
-        // we're using own focus listener, so that popup have a chance to get
-        // the focus actually
-        // in order to make it possible for hasProposalPoupFocus() to return
-        // true
-    }
-
-    protected final boolean isContentProposalFocused() {
-        return contentProposalAdapter != null && contentProposalAdapter.isProposalPopupOpen()
-                && contentProposalAdapter.hasProposalPopupFocus();
+    protected final boolean isContentProposalOpened() {
+        return contentProposalAdapter != null && contentProposalAdapter.isProposalPopupOpen();
     }
 
     @Override
