@@ -7,8 +7,8 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 
 public class RobotEventBroker {
 
-    IEventBroker broker;
-
+    private IEventBroker broker;
+    
     public RobotEventBroker(IEventBroker broker) {
         this.broker = broker;
     }

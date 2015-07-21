@@ -90,9 +90,17 @@ public class RobotProjectConfig {
         if (libraries == null) {
             libraries = newArrayList();
         }
-        final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setType(LibraryType.VIRTUAL.toString());
-        referencedLibrary.setPath(workspaceRelativePath.toPortableString());
+        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.VIRTUAL.toString(), null,
+                workspaceRelativePath);
+        libraries.add(referencedLibrary);
+    }
+
+    public void addReferencedLibraryInPython(final String name, final IPath systemAbsolutePath) {
+        if (libraries == null) {
+            libraries = newArrayList();
+        }
+        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.PYTHON.toString(), name,
+                systemAbsolutePath);
 
         libraries.add(referencedLibrary);
     }
@@ -101,12 +109,20 @@ public class RobotProjectConfig {
         if (libraries == null) {
             libraries = newArrayList();
         }
-        final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setType(LibraryType.JAVA.toString());
-        referencedLibrary.setName(name);
-        referencedLibrary.setPath(systemAbsolutePath.toPortableString());
+        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.JAVA.toString(), name,
+                systemAbsolutePath);
 
         libraries.add(referencedLibrary);
+    }
+    
+    private ReferencedLibrary createReferencedLibrary(final String type, final String name, final IPath path) {
+        final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
+        referencedLibrary.setType(type);
+        if (name != null) {
+            referencedLibrary.setName(name);
+        }
+        referencedLibrary.setPath(path.toPortableString());
+        return referencedLibrary;
     }
 
     public void addRemoteLocation(final RemoteLocation remoteLocation) {

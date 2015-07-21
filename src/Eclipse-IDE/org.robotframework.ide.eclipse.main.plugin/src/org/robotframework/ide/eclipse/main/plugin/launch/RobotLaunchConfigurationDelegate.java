@@ -70,6 +70,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+        
     }
 
     @Override
@@ -151,15 +152,19 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final SuiteExecutor executor = robotConfig.getExecutor();
         final IProject project = getProject(robotConfig);
         final List<IResource> suiteResources = getSuiteResources(robotConfig, project);
-        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(project);
+        final RobotProject robotProject = getRobotProject(project);
+        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
         final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
 
         final List<String> suites = getSuitesToRun(suiteResources);
         final String userArguments = robotConfig.getExecutorArguments();
-        final List<String> classpath = createClasspath(project);
-        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, project
-                .getLocation().toFile(), suites, userArguments, isDebugging);
+        
+        final List<String> pythonpath = robotProject.getPythonpath();
+        final List<String> classpath = robotProject.getClasspath();
+        
+        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, pythonpath,
+                project.getLocation().toFile(), suites, userArguments, isDebugging);
         final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
@@ -214,22 +219,27 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             }
         }
     }
-
-    private List<String> createClasspath(final IProject project) {
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
-        return robotProject.getClasspath();
-    }
-
+    
+    //TODO: unused?
     protected final RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotLaunchConfiguration robotConfig)
             throws CoreException {
-        return getRobotRuntimeEnvironment(getProject(robotConfig));
+        //return getRobotRuntimeEnvironment(getProject(robotConfig));
+        return null;
     }
 
-    private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final IProject project) throws CoreException {
+    private RobotProject getRobotProject(final IProject project) throws CoreException {
         final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        if(robotProject == null) {
+            throw newCoreException("There is no available Robot project", null);
+        }
+        return robotProject;
+    }
+    
+    private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotProject robotProject) throws CoreException {
+        
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
-            throw newCoreException("There is no active runtime environment for project '" + project.getName() + "'",
+            throw newCoreException("There is no active runtime environment for project '" + robotProject.getName() + "'",
                     null);
         }
         if (!runtimeEnvironment.hasRobotInstalled()) {

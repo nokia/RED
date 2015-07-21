@@ -104,6 +104,7 @@ public class RobotLibrariesBuilder {
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
         libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
+        libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getRemoteLibrariesToRecreate(configuration, libspecsFolder));
 
@@ -173,6 +174,23 @@ public class RobotLibrariesBuilder {
         } catch (final CoreException e) {
             // FIXME : handle this
             e.printStackTrace();
+        }
+        return generators;
+    }
+    
+    private List<ILibdocGenerator> getReferencedPythonLibrariesToRecreate(final RobotProjectConfig configuration,
+            final LibspecsFolder libspecsFolder) {
+        final List<ILibdocGenerator> generators = newArrayList();
+
+        for (final ReferencedLibrary lib : configuration.getLibraries()) {
+            if (lib.provideType() == LibraryType.PYTHON) {
+                final String libName = lib.getName();
+                final IFile specFile = libspecsFolder.getSpecFile(libName);
+                if (!specFile.exists()) {
+                    final String libPath = lib.getPath();
+                    generators.add(new PythonLibraryLibdocGenerator(libName, libPath, specFile));
+                }
+            }
         }
         return generators;
     }
