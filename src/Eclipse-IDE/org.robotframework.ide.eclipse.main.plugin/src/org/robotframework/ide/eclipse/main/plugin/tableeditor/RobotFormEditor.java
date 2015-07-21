@@ -15,11 +15,13 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -39,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
@@ -116,9 +119,45 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new TextEditorWrapper(), "Source", null);
 
-            setActivePage(4);
+            setActivePage(getPageToActivate());
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
+        }
+    }
+
+    private int getPageToActivate() {
+        final int def = 4;
+        if (getEditorInput() instanceof IFileEditorInput) {
+            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
+            final IFile file = fileInput.getFile();
+
+            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
+            final IDialogSettings dialogSettings = RobotFramework.getDefault().getDialogSettings();
+            final IDialogSettings section = dialogSettings.getSection(sectionName);
+            if (section == null) {
+                return def;
+            }
+            final int activeIndex = section.getInt("activePage");
+            if (activeIndex >= 0 && activeIndex <= 4) {
+                return activeIndex;
+            }
+            return def;
+        }
+        return def;
+    }
+
+    private void saveActivePage(final int index) {
+        if (getEditorInput() instanceof IFileEditorInput) {
+            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
+            final IFile file = fileInput.getFile();
+            
+            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
+            final IDialogSettings dialogSettings = RobotFramework.getDefault().getDialogSettings();
+            IDialogSettings section = dialogSettings.getSection(sectionName);
+            if (section == null) {
+                section = dialogSettings.addNewSection(sectionName);
+            }
+            section.put("activePage", index);
         }
     }
 
@@ -227,6 +266,7 @@ public class RobotFormEditor extends FormEditor {
     protected void pageChange(final int newPageIndex) {
         super.pageChange(newPageIndex);
         updateActivePage();
+        saveActivePage(newPageIndex);
     }
 
     private void updateActivePage() {
