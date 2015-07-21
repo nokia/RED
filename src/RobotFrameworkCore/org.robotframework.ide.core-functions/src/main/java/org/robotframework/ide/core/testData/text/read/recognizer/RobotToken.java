@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 
-public class RobotToken {
+
+public class RobotToken implements IRobotLineElement {
 
     public static final int NOT_SET = -1;
     private int lineNumber = NOT_SET;

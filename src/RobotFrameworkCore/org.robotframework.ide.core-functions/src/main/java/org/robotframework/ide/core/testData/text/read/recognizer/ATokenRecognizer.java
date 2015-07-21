@@ -12,7 +12,7 @@ public class ATokenRecognizer {
     private Matcher m;
     private int lineNumber = -1;
     private final RobotTokenType type;
-    private String text;
+    private StringBuilder text;
 
 
     protected ATokenRecognizer(final Pattern p, final RobotTokenType type) {
@@ -21,7 +21,7 @@ public class ATokenRecognizer {
     }
 
 
-    public boolean hasNext(String text, int lineNumber) {
+    public boolean hasNext(StringBuilder text, int lineNumber) {
         this.text = text;
         this.lineNumber = lineNumber;
         m = pattern.matcher(text);
@@ -32,14 +32,13 @@ public class ATokenRecognizer {
     public RobotToken next() {
         RobotToken t = new RobotToken();
         t.setLineNumber(lineNumber);
-        if (m.find()) {
-            int start = m.start();
-            t.setLineNumber(start);
-            int end = m.end();
-            t.setType(type);
-            t.setText(new StringBuilder().append(text.substring(start, end)));
-            t.setType(getProducedType());
-        }
+
+        int start = m.start();
+        t.setStartColumn(start);
+        int end = m.end();
+        t.setType(type);
+        t.setText(new StringBuilder().append(text.substring(start, end)));
+        t.setType(getProducedType());
 
         return t;
     }

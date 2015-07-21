@@ -1,6 +1,9 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
-public class Separator {
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+
+
+public class Separator implements IRobotLineElement {
 
     public static final int NOT_SET = -1;
     private int lineNumber = NOT_SET;
