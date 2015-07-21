@@ -168,8 +168,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         createNameColumn(creator);
         if (sectionIsDefined()) {
             final int maxLength = calculateLongestArgumentsList();
-            for (int i = 1; i <= maxLength; i++) {
-                createArgumentColumn(i - 1, creator);
+            for (int i = 0; i < maxLength; i++) {
+                createArgumentColumn(i, creator);
             }
             createCommentColumn(maxLength + 1, creator);
         }

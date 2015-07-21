@@ -166,8 +166,14 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                 protected IStatus run(final IProgressMonitor monitor) {
                     final RobotRuntimeEnvironment activeEnvironment = project == null ? null : project
                             .getRuntimeEnvironment();
+                    if (monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
                     final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RobotFramework.getDefault()
                             .getAllRuntimeEnvironments();
+                    if (monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
                     setProperty(createKey(activeEnv), activeEnvironment);
                     setProperty(createKey(allEnvs), allRuntimeEnvironments);
                     return Status.OK_STATUS;
@@ -179,12 +185,19 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) job.getProperty(createKey(activeEnv));
                     final List<?> allEnvironments = (List<?>) job.getProperty(createKey(allEnvs));
 
-                    whenEnvironmentWasLoaded(env, allEnvironments);
-
-                    form.setBusy(false);
+                    if (form != null && !form.isDisposed()) {
+                        whenEnvironmentWasLoaded(env, allEnvironments);
+                        form.setBusy(false);
+                    }
                 }
             });
             form.setBusy(true);
+            form.addDisposeListener(new DisposeListener() {
+                @Override
+                public void widgetDisposed(final DisposeEvent e) {
+                    job.cancel();
+                }
+            });
             job.schedule();
         }
 
