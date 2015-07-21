@@ -37,4 +37,9 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     public void setFocus() {
         getComponent().setFocus();
     }
+
+    @Override
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        return getComponent().getFocusedViewerAccessor();
+    }
 }

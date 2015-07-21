@@ -878,9 +878,14 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
-                definitionId="org.robotframework.singleElementHasFocusedCell">
-          </reference>
+          <and>
+             <reference
+                   definitionId="org.robotframework.singleElementHasFocusedCell">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.focusedCellHasContent">
+             </reference>
+          </and>
        </enabledWhen>
     </handler>
  </extension>
@@ -968,6 +973,9 @@
              </reference>
              <reference
                    definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.focusedCellHasContent">
              </reference>
           </and>
        </enabledWhen>
@@ -1741,7 +1749,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
           id="org.robotframework.focusedCellPropertyTester"
           namespace="org.robotframework.table.cell"
-          properties="focusedCellHasIndex,thereIsAFocusedCell"
+          properties="focusedCellHasIndex,thereIsAFocusedCell,focusedCellHasContent"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
  </extension>
@@ -2138,6 +2146,16 @@
              </test>
           </with>
        </and>
+    </definition>
+    <definition
+          id="org.robotframework.focusedCellHasContent">
+       <with
+             variable="activeEditor">
+          <test
+                property="org.robotframework.table.cell.focusedCellHasContent"
+                value="true">
+          </test>
+       </with>
     </definition>
  </extension>
  

@@ -94,7 +94,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             part.initialize(form.getBody());
         }
 
-        context.set(FocusedViewerAccessor.class, getActiveCellAccessor());
+        context.set(FocusedViewerAccessor.class, getFocusedViewerAccessor());
 
         site.setSelectionProvider(getSelectionProvider());
         prepareCommandsContext(site);
@@ -186,8 +186,6 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract List<? extends ISectionFormFragment> createFormFragments();
 
     protected abstract ISelectionProvider getSelectionProvider();
-
-    protected abstract FocusedViewerAccessor getActiveCellAccessor();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
         final IContextService service = (IContextService) site.getService(IContextService.class);
