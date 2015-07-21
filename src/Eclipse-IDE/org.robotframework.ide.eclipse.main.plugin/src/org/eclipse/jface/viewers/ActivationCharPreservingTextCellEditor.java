@@ -157,7 +157,8 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
         @Override
         public void afterEditorActivated(final ColumnViewerEditorActivationEvent event) {
             final Text text = (Text) ActivationCharPreservingTextCellEditor.this.getControl();
-            text.setSelection(prefix.length(), text.getText().length() - suffix.length());
+            final int end = text.getText().length() - suffix.length();
+            text.setSelection(end, end);
         }
 
         @Override
