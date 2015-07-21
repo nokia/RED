@@ -3,6 +3,8 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -246,43 +248,44 @@ public class RobotProjectConfig {
     public static class RemoteLocation {
 
         @XmlAttribute(required = true)
-        private String path;
+        private URI uri;
 
-        @XmlAttribute(required = true)
-        private int port;
-
-        public void setPath(final String path) {
-            this.path = path;
+        public void setUriAddress(final URI uri) {
+            this.uri = uri;
         }
 
-        public String getPath() {
-            return path;
+        public URI getUriAddress() {
+            return uri;
         }
 
-        public void setPort(final int port) {
-            this.port = port;
+        public void setUri(final String path) {
+            try {
+                this.uri = new URI(path);
+            } catch (final URISyntaxException e) {
+                throw new IllegalStateException("Invalid URI '" + path + "'", e);
+            }
         }
 
-        public int getPort() {
-            return port;
+        public String getUri() {
+            return uri.toString();
         }
 
         @Override
         public boolean equals(final Object obj) {
             if (obj instanceof RemoteLocation) {
                 final RemoteLocation that = (RemoteLocation) obj;
-                return Objects.equals(path, that.path) && port == that.port;
+                return Objects.equals(uri, that.uri);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(path, port);
+            return uri.hashCode();
         }
 
         public String createLibspecFileName() {
-            return "Remote_" + pathWithoutSpecialCharacters(path) + "_" + port;
+            return "Remote_" + pathWithoutSpecialCharacters(getUri());
         }
 
         private static String pathWithoutSpecialCharacters(final String path) {

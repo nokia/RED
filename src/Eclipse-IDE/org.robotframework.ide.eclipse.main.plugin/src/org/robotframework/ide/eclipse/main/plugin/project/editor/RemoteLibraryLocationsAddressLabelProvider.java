@@ -9,6 +9,6 @@ class RemoteLibraryLocationsAddressLabelProvider extends StylersDisposingLabelPr
     @Override
     public StyledString getStyledText(final Object element) {
         final RemoteLocation location = (RemoteLocation) element;
-        return new StyledString(location.getPath());
+        return new StyledString(location.getUri());
     }
 }

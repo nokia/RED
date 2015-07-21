@@ -202,7 +202,7 @@ public class RobotLibrariesBuilder {
             final IFile specFile = libspecsFolder.getSpecFile(location.createLibspecFileName());
 
             if (!specFile.exists()) {
-                generators.add(new RemoteLibraryLibdocGenerator(location.getPath(), location.getPort(), specFile));
+                generators.add(new RemoteLibraryLibdocGenerator(location.getUriAddress(), specFile));
             }
         }
         return generators;
