@@ -145,8 +145,10 @@ public class ViewerColumnsFactory {
                 }
                 final int scrollbarWidth = getScrollBarWidth(viewer);
 
+                final int borderWidth = viewer.getTable().getBorderWidth();
                 final int additional = shouldShowLastSep ? 1 : 0;
-                final int widthToOccupy = totalTableWidth - (otherColumnsTotalWidth + scrollbarWidth + additional);
+                final int widthToOccupy = totalTableWidth
+                        - (otherColumnsTotalWidth + scrollbarWidth + 2 * borderWidth + additional);
                 column.setWidth(Math.max(minimumWidth, widthToOccupy));
             }
 
@@ -209,8 +211,10 @@ public class ViewerColumnsFactory {
                 }
                 final int scrollbarWidth = getScrollBarWidth(viewer);
 
+                final int borderWidth = viewer.getTree().getBorderWidth();
                 final int additional = shouldShowLastSep ? 1 : 0;
-                final int widthToOccupy = totalTableWidth - (otherColumnsTotalWidth + scrollbarWidth + additional);
+                final int widthToOccupy = totalTableWidth
+                        - (otherColumnsTotalWidth + scrollbarWidth + 2 * borderWidth + additional);
                 column.setWidth(Math.max(minimumWidth, widthToOccupy));
             }
 
