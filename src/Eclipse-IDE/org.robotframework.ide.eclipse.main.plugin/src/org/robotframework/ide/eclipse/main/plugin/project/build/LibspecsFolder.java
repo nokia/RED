@@ -31,6 +31,10 @@ public class LibspecsFolder {
         this.folder = folder;
     }
 
+    public IFolder getResource() {
+        return folder;
+    }
+
     public static LibspecsFolder get(final IProject project) {
         return new LibspecsFolder(project.getFolder(FOLDER_NAME));
     }
