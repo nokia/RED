@@ -1,21 +1,39 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 
 
 public class Separator implements IRobotLineElement {
 
-    public static final int NOT_SET = -1;
     private int lineNumber = NOT_SET;
     private int startColumn = NOT_SET;
     private StringBuilder text = new StringBuilder();
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
 
-    public static enum SeparatorType {
-        TABULATOR_OR_DOUBLE_SPACE, PIPE
+    public static enum SeparatorType implements IRobotTokenType {
+        TABULATOR_OR_DOUBLE_SPACE("\t", "  "), PIPE("| ", " | ", "\t|", "|\t",
+                "\t|\t");
+
+        private final List<String> representationForNew = new LinkedList<>();
+
+
+        public List<String> getRepresentation() {
+            return representationForNew;
+        }
+
+
+        private SeparatorType(String... representation) {
+            representationForNew.addAll(Arrays.asList(representation));
+        }
     }
 
 
+    @Override
     public int getLineNumber() {
         return lineNumber;
     }
@@ -26,6 +44,7 @@ public class Separator implements IRobotLineElement {
     }
 
 
+    @Override
     public int getStartColumn() {
         return startColumn;
     }
@@ -36,11 +55,13 @@ public class Separator implements IRobotLineElement {
     }
 
 
+    @Override
     public int getEndColumn() {
         return startColumn + text.length();
     }
 
 
+    @Override
     public StringBuilder getText() {
         return text;
     }
@@ -51,6 +72,7 @@ public class Separator implements IRobotLineElement {
     }
 
 
+    @Override
     public SeparatorType getType() {
         return type;
     }

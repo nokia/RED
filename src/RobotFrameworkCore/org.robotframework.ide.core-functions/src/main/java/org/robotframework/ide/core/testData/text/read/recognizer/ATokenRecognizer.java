@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
 
-public class ATokenRecognizer {
+public abstract class ATokenRecognizer {
 
     private final Pattern pattern;
     private Matcher m;

@@ -10,6 +10,7 @@ public class RobotFileOutput {
     private File processedFile;
     private RobotFile fileModel;
     private List<BuildMessage> buildingMessages = new LinkedList<>();
+    private Status status = Status.FAILED;
 
 
     public File getProcessedFile() {
@@ -107,5 +108,9 @@ public class RobotFileOutput {
         public static enum LogLevel {
             INFO, WARN, ERROR;
         }
+    }
+
+    public static enum Status {
+        FAILED, PASSED
     }
 }
