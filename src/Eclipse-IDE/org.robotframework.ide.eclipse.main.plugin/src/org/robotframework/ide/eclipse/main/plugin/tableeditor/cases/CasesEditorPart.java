@@ -72,7 +72,7 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         }
 
         @Override
-        protected FocusedViewerAccessor getActiveCellAccessor() {
+        public FocusedViewerAccessor getFocusedViewerAccessor() {
             return new FocusedViewerAccessor(casesFragment.getViewer());
         }
     }

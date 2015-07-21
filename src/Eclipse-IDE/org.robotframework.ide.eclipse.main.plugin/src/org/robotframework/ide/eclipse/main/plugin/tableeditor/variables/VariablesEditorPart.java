@@ -11,8 +11,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart.VariablesEditor;
@@ -74,7 +74,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         }
 
         @Override
-        protected FocusedViewerAccessor getActiveCellAccessor() {
+        public FocusedViewerAccessor getFocusedViewerAccessor() {
             return new FocusedViewerAccessor(variablesFragment.getViewer());
         }
     }

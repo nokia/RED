@@ -7,6 +7,8 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
@@ -22,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionCommen
 import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
 import org.robotframework.viewers.Selections;
 
@@ -38,7 +41,8 @@ public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandl
 
         @Execute
         public Object deleteContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final FocusedViewerAccessor viewerAccessor) {
+                final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final Clipboard clipboard) {
+            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
             final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
             final int index = viewerAccessor.getFocusedCell().getColumnIndex();
             final int noOfColumns = ((TreeViewer) viewerAccessor.getViewer()).getTree().getColumnCount();

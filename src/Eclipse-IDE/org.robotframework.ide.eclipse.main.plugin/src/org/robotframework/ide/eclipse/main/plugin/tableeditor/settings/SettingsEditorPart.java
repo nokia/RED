@@ -12,8 +12,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart.SettingsEditor;
@@ -95,7 +95,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         }
 
         @Override
-        protected FocusedViewerAccessor getActiveCellAccessor() {
+        public FocusedViewerAccessor getFocusedViewerAccessor() {
             return new FocusedViewerAccessor(generalFragment.getViewer());
         }
     }
