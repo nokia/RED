@@ -25,6 +25,9 @@ public class TableCellPropertyTester extends PropertyTester {
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final boolean expected) {
         final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
+        if (viewerAccessor == null) {
+            return false;
+        }
         if ("thereIsAFocusedCell".equals(property)) {
             return viewerAccessor.getFocusedCell() != null == expected;
         } else if ("focusedCellHasContent".equals(property)) {
@@ -36,6 +39,9 @@ public class TableCellPropertyTester extends PropertyTester {
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final int expected) {
         final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
+        if (viewerAccessor == null) {
+            return false;
+        }
         if ("focusedCellHasIndex".equals(property)) {
             final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
             return focusedCell != null && focusedCell.getColumnIndex() == expected;
