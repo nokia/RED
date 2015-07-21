@@ -14,15 +14,19 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 public class TxtRobotFileParser {
@@ -46,11 +50,17 @@ public class TxtRobotFileParser {
             parsingOutput = parse(new InputStreamReader(new FileInputStream(
                     robotFile), Charset.forName("UTF-8")));
         } catch (FileNotFoundException e) {
-
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "File " + robotFile + " was not found.\nStack:" + e,
+                    "File " + robotFile));
         } catch (IOException e) {
-
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Problem during file " + robotFile + " reading.\nStack:"
+                            + e, "File " + robotFile));
         } catch (Exception e) {
-
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile
+                            + ".\nStack:" + e, "File " + robotFile));
         }
 
         parsingOutput.setProcessedFile(robotFile);
@@ -67,8 +77,7 @@ public class TxtRobotFileParser {
         BufferedReader lineReader = new BufferedReader(reader);
         int lineNumber = 0;
         String currentLineText = null;
-        final Stack<State> processingState = new Stack<>();
-        processingState.push(State.UNKNOWN);
+        final Stack<ParsingState> processingState = new Stack<>();
 
         while((currentLineText = lineReader.readLine()) != null) {
             RobotLine line = new RobotLine(lineNumber);
@@ -77,6 +86,7 @@ public class TxtRobotFileParser {
             // get separator for this line
             ALineSeparator separator = tokenSeparatorBuilder.createSeparator(
                     lineNumber, currentLineText);
+            RobotToken rt = null;
 
             int textLength = currentLineText.length();
             // check if is any data to process
@@ -91,10 +101,9 @@ public class TxtRobotFileParser {
                         // {$a} | {$b} in this case we check if {$a} was before
                         // '|' pipe separator
                         if (remainingData > 0) {
-                            RobotToken rt = processLineElement(processingState,
-                                    rf, lineNumber, startColumn,
-                                    text.substring(lastColumnProcessed,
-                                            startColumn));
+                            rt = processLineElement(processingState, rf,
+                                    lineNumber, startColumn, text.substring(
+                                            lastColumnProcessed, startColumn));
                             line.addLineElement(rt);
                         }
 
@@ -102,7 +111,7 @@ public class TxtRobotFileParser {
                         lastColumnProcessed = currentSeparator.getEndColumn();
                     } else {
                         // last element in line
-                        RobotToken rt = processLineElement(processingState, rf,
+                        rt = processLineElement(processingState, rf,
                                 lineNumber, lastColumnProcessed,
                                 text.substring(lastColumnProcessed));
                         line.addLineElement(rt);
@@ -113,23 +122,96 @@ public class TxtRobotFileParser {
 
             lineNumber++;
             rf.addNewLine(line);
+            updateStatus(processingState, null);
         }
 
         return parsingOutput;
     }
 
 
-    private RobotToken processLineElement(final Stack<State> processingState,
+    private void updateStatus(final Stack<ParsingState> processingState,
+            final RobotToken currentToken) {
+        ParsingState status = getCurrentParsingState(processingState);
+
+        if (currentToken == null) {
+            // line end
+        } else {
+
+        }
+    }
+
+
+    private RobotToken processLineElement(
+            final Stack<ParsingState> processingState,
             final RobotFile robotFile, int line, int startColumn, String text) {
         RobotToken rt = new RobotToken();
         rt.setLineNumber(line);
         rt.setStartColumn(startColumn);
         rt.setText(new StringBuilder(text));
 
+        ParsingState newStatus = ParsingState.UNKNOWN;
+        RobotToken robotToken = recognize(line, text);
+
+        newStatus = getStatus(robotToken);
+
+        if (robotToken != null) {
+            if (text.equals(robotToken.getText())) {
+                System.out.println("D");
+            } else {
+                System.out.println("P");
+            }
+        } else {
+            System.out.println("DUPA");
+        }
+
         return rt;
     }
 
-    private static enum State {
+
+    @VisibleForTesting
+    protected RobotToken recognize(int line, String text) {
+        RobotToken robotToken = null;
+        StringBuilder sb = new StringBuilder(text);
+        for (ATokenRecognizer rec : recognized) {
+            if (rec.hasNext(sb, line)) {
+                robotToken = rec.next();
+                break;
+            }
+        }
+        return robotToken;
+    }
+
+
+    private ParsingState getCurrentParsingState(
+            final Stack<ParsingState> processingState) {
+        ParsingState status;
+        if (!processingState.isEmpty()) {
+            status = processingState.peek();
+        } else {
+            status = ParsingState.TRASH;
+        }
+
+        return status;
+    }
+
+
+    private ParsingState getStatus(RobotToken t) {
+        ParsingState status = ParsingState.UNKNOWN;
+        IRobotTokenType type = t.getType();
+        if (type == RobotTokenType.SETTINGS_TABLE_HEADER) {
+            status = ParsingState.SETTING_TABLE_HEADER;
+        } else if (type == RobotTokenType.VARIABLES_TABLE_HEADER) {
+            // status = StateStatus.VARIABLE_TABLE_HEADER;
+        } else if (type == RobotTokenType.TEST_CASES_TABLE_HEADER) {
+            // status = StateStatus.TEST_CASE_TABLE_HEADER;
+        } else if (type == RobotTokenType.KEYWORDS_TABLE_HEADER) {
+            // status = StateStatus.KEYWORD_TABLE_HEADER;
+        }
+
+        return status;
+    }
+
+    private static enum ParsingState {
         /**
          * 
          */
@@ -141,30 +223,14 @@ public class TxtRobotFileParser {
         /**
          * 
          */
-        SETTING_TABLE,
+        TABLE_HEADER_COLUMN,
         /**
          * 
          */
-        VARIABLE_TABLE,
+        SETTING_TABLE_HEADER,
         /**
          * 
          */
-        TEST_CASE_TABLE,
-        /**
-         * 
-         */
-        TEST_CASE,
-        /**
-         * 
-         */
-        KEYWORD_TABLE,
-        /**
-         * 
-         */
-        KEYWORD,
-        /**
-         * 
-         */
-        FOR_LOOP
+        SETTING_TABLE_INSIDE;
     }
 }
