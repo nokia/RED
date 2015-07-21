@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,6 +36,8 @@ import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.viewers.Selections;
+
+import com.google.common.base.Strings;
 
 class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
 
@@ -76,17 +80,12 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         viewer = new TableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, true).span(1, 4).applyTo(viewer.getTable());
         viewer.getTable().setEnabled(false);
-        viewer.getTable().setHeaderVisible(true);
 
         viewer.setContentProvider(new RemoteLibraryLocationsContentProvider());
         
-        ViewerColumnsFactory.newColumn("Path").withWidth(100)
-            .shouldGrabAllTheSpaceLeft(false).withMinWidth(50)
+        ViewerColumnsFactory.newColumn("").withWidth(100)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
             .labelsProvidedBy(new RemoteLibraryLocationsAddressLabelProvider())
-            .createFor(viewer);
-        ViewerColumnsFactory.newColumn("Port").withWidth(40)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(30)
-            .labelsProvidedBy(new RemoteLibraryLocationsPortLabelProvider())
             .createFor(viewer);
 
         final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
@@ -174,11 +173,24 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
 
+    private static URI createUriWithDefaultsIfMissing(final URI uri, final int defaultPort, final String defaultPath) {
+        try {
+            final int port = uri.getPort() != -1 ? uri.getPort() : defaultPort;
+            final String uriPath = uri.getPath();
+            final String path = !Strings.isNullOrEmpty(uriPath) ? uriPath : defaultPath;
+            final URI newUri = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), port, path, uri.getQuery(),
+                    uri.getFragment());
+            return newUri;
+        } catch (final URISyntaxException e) {
+            return uri;
+        }
+    }
+
     private static class RemoteLocationDialog extends Dialog {
 
-        private Text locationText;
-        private Text portText;
         private RemoteLocation location;
+        private Label exceptionLabel;
+        private Text uriText;
 
         protected RemoteLocationDialog(final Shell parentShell) {
             super(parentShell);
@@ -196,41 +208,51 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
             GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).applyTo(dialogComposite);
 
             final Label infoLabel = new Label(dialogComposite, SWT.WRAP);
-            infoLabel.setText("Specify address and port of XML-RPC server location. This server will be used"
+            infoLabel.setText("Specify URI of XML-RPC server location. This server will be used"
                     + " for running keywords using Remote library.");
             GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).span(2, 1).applyTo(infoLabel);
-            
-            final Label locationLabel = new Label(dialogComposite, SWT.NONE);
-            locationLabel.setText("Location");
-            
-            locationText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
-            locationText.setText("127.0.0.1");
-            GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(locationText);
 
-            final Label portLabel = new Label(dialogComposite, SWT.NONE);
-            portLabel.setText("Port");
+            final Label uriLabel = new Label(dialogComposite, SWT.NONE);
+            uriLabel.setText("URI");
             
-            portText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
-            portText.setText("8270");
-            GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(portText);
-            portText.addModifyListener(new ModifyListener() {
+            uriText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(uriText);
+            uriText.setText("http://127.0.0.1:8270/");
+            uriText.addModifyListener(new ModifyListener() {
 
                 @Override
                 public void modifyText(final ModifyEvent event) {
-                    final String portString = portText.getText();
                     try {
-                        Integer.parseInt(portString);
-                        portText.setBackground(portText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+                        final URI uri = new URI(uriText.getText());
                         getButton(IDialogConstants.OK_ID).setEnabled(true);
-                    } catch (final NumberFormatException e) {
-                        portText.setBackground(portText.getDisplay().getSystemColor(SWT.COLOR_RED));
-                        getButton(IDialogConstants.OK_ID).setEnabled(false);
-                    }
 
+                        if (Strings.isNullOrEmpty(uri.getPath()) && uri.getPort() == -1) {
+                            uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                            exceptionLabel
+                                    .setText("URI have an empty path and port. Path '/RPC2' and port 8270 will be used");
+                        } else if (Strings.isNullOrEmpty(uri.getPath())) {
+                            uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                            exceptionLabel.setText("URI have an empty path. Path '/RPC2' will be used");
+                        } else if (uri.getPort() == -1) {
+                            uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                            exceptionLabel.setText("URI have no port specified. Port 8270 will be used");
+                        } else {
+                            uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+                            exceptionLabel.setText("");
+                        }
+                    } catch (final URISyntaxException e) {
+                        uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_RED));
+                        getButton(IDialogConstants.OK_ID).setEnabled(false);
+                        exceptionLabel.setText("URI problem " + e.getMessage().toLowerCase());
+                    }
                 }
             });
 
-            locationText.setFocus();
+            exceptionLabel = new Label(dialogComposite, SWT.NONE);
+            exceptionLabel.setText("");
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(exceptionLabel);
+
+            uriText.setFocus();
 
             return dialogComposite;
         }
@@ -238,8 +260,11 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         @Override
         protected void okPressed() {
             location = new RemoteLocation();
-            location.setPath(locationText.getText());
-            location.setPort(Integer.parseInt(portText.getText()));
+            try {
+                location.setUriAddress(createUriWithDefaultsIfMissing(new URI(uriText.getText()), 8270, "/RPC2"));
+            } catch (final URISyntaxException e) {
+                throw new IllegalStateException("Can't happen. It is not possible to click ok with invalid URI", e);
+            }
 
             super.okPressed();
         }
