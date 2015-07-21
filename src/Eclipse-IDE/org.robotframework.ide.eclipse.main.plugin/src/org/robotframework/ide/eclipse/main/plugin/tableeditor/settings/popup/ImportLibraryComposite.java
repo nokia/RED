@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -71,15 +72,16 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 .applyTo(actualComposite);
 
         final Label titleLabel = getToolkit().createLabel(actualComposite,
-                "Standard libraries available in '" + fileModel.getProject().getName() + "'");
+                "Libraries available in '" + fileModel.getProject().getName() + "' project");
         titleLabel.setFont(JFaceResources.getBannerFont());
         titleLabel.setForeground(getToolkit().getColors().getColor(IFormColors.TITLE));
-        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(500, SWT.DEFAULT).applyTo(titleLabel);
+        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(700, SWT.DEFAULT).applyTo(titleLabel);
 
         leftViewer = new TableViewer(actualComposite);
         leftViewer.setContentProvider(new LibrariesToImportContentProvider());
-        GridDataFactory.fillDefaults().span(1, 2).grab(true, false).hint(220, 150).applyTo(leftViewer.getControl());
-        ViewerColumnsFactory.newColumn("").withWidth(200).labelsProvidedBy(new LibrariesLabelProvider())
+        GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(leftViewer.getControl());
+        ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
+                .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(leftViewer);
 
         final Button toImported = getToolkit().createButton(actualComposite, ">>", SWT.PUSH);
@@ -89,8 +91,9 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
 
         rightViewer = new TableViewer(actualComposite);
         rightViewer.setContentProvider(new LibrariesAlreadyImportedContentProvider());
-        GridDataFactory.fillDefaults().span(1, 2).grab(true, false).hint(220, 150).applyTo(rightViewer.getControl());
-        ViewerColumnsFactory.newColumn("").withWidth(200).labelsProvidedBy(new LibrariesLabelProvider())
+        GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(rightViewer.getControl());
+        ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
+                .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(rightViewer);
 
         final Button fromImported = getToolkit().createButton(actualComposite, "<<", SWT.PUSH);
@@ -126,8 +129,15 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
                 final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
                 for (final LibrarySpecification spec : specs) {
-                    commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Library", newArrayList(spec
-                            .getName())));
+                    final ArrayList<String> args = newArrayList(spec.getName());
+                    if (spec.isRemote()) {
+                        String host = spec.getAdditionalInformation();
+                        if (!host.startsWith("http://")) {
+                            host = "http://" + host;
+                        }
+                        args.add(host);
+                    }
+                    commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Library", args));
                 }
 
                 leftViewer.refresh();
@@ -247,6 +257,14 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
             if (spec.isAccessibleWithoutImport()) {
                 text.append(" ");
                 text.append("always accessible", new Styler() {
+                    @Override
+                    public void applyStyles(final TextStyle textStyle) {
+                        textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    }
+                });
+            } else if (spec.isRemote()) {
+                text.append(" ");
+                text.append(spec.getAdditionalInformation(), new Styler() {
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
                         textStyle.foreground = RobotTheme.getEclipseDecorationColor();

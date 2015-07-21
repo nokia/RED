@@ -40,7 +40,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unreachable remote server %s on port %s";
+            return "Unreachable remote server %s";
         }
     },
     MISSING_JAR_FILE {

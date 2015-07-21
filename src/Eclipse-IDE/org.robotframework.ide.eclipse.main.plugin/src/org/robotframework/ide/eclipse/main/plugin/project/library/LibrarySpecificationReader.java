@@ -28,7 +28,7 @@ public class LibrarySpecificationReader {
             final RemoteLocation remoteLocation) {
         final LibrarySpecification spec = readSpecification(libraryFile);
         spec.setRemote();
-        spec.setAdditionalInformation(remoteLocation.getPath() + ":" + remoteLocation.getPort());
+        spec.setAdditionalInformation(remoteLocation.getUri());
         return spec;
     }
 

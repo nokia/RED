@@ -3,6 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,16 +66,12 @@ class RobotProjectConfigFileValidator {
 
     private void validateRemoteLocation(final RemoteLocation location, final IFile configFile,
             final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) throws CoreException {
-        String address = location.getPath();
-        final String httpPrefix = "http://";
-        if (address.startsWith(httpPrefix)) {
-            address = address.substring(httpPrefix.length());
-        }
-        try (Socket s = new Socket(address, location.getPort())) {
+        final URI uriAddress = location.getUriAddress();
+        try (Socket s = new Socket(uriAddress.getHost(), uriAddress.getPort())) {
             // that's fine
         } catch (final IOException ex) {
             final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
-                    .formatMessageWith(address, location.getPort());
+                    .formatMessageWith(uriAddress);
             reporter.handleProblem(unreachableHostProblem, configFile, linesMapping.get(location).getLineNumber());
         }
     }
