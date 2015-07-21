@@ -35,34 +35,6 @@ public class RobotProblem {
         return this;
     }
 
-    IMarker createMarker(final IFile file, final int lineNumber) {
-        return createMarker(file, lineNumber, null);
-    }
-
-    IMarker createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange) {
-        try {
-            final IMarker marker = file.createMarker(TYPE_ID);
-            marker.setAttribute(IMarker.MESSAGE, getMessage());
-            marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
-            if (lineNumber >= 0) {
-                marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);
-                marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-            } else {
-                marker.setAttribute(IMarker.LOCATION, "unknown line");
-            }
-            if (charRange != null && charRange.hasLowerBound() && charRange.hasUpperBound()) {
-                marker.setAttribute(IMarker.CHAR_START, charRange.lowerEndpoint());
-                marker.setAttribute(IMarker.CHAR_END, charRange.upperEndpoint());
-            }
-
-            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
-            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
-            return marker;
-        } catch (final CoreException e) {
-            throw new IllegalStateException("Unable to create marker!", e);
-        }
-    }
-
     public void createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange,
             final Map<String, Object> additionalAttributes) {
         try {
