@@ -333,6 +333,20 @@ public class RobotRuntimeEnvironment {
             }
         }
     }
+    
+    public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file) {
+        if (hasRobotInstalled()) {
+            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
+
+            final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", "-P", libPath, 
+                    libName, file.getAbsolutePath());
+            try {
+                runExternalProcess(cmdLine, new NullLineHandler());
+            } catch (final IOException e) {
+                return;
+            }
+        }
+    }
 
     public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file) {
         if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
@@ -414,12 +428,12 @@ public class RobotRuntimeEnvironment {
     }
 
     public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
-            final File projectLocation,
-            final List<String> suites, final String userArguments, final boolean isDebugging) throws IOException {
+            final List<String> pythonpath, final File projectLocation, final List<String> suites,
+            final String userArguments, final boolean isDebugging) throws IOException {
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
 
-        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath));
+        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath, pythonpath));
         cmdLine.add("--listener");
         cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
 
@@ -448,26 +462,35 @@ public class RobotRuntimeEnvironment {
         return cmdLine;
     }
 
-    private List<String> getRunCommandLine(final SuiteExecutor executor, final List<String> classpath) {
+    private List<String> getRunCommandLine(final SuiteExecutor executor, final List<String> classpath, final List<String> pythonpath) {
         final List<String> cmdLine = new ArrayList<String>();
         if (executor == getInterpreter()) {
             cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
-            augmentClasspath(cmdLine, executor, classpath);
+            argumentClasspath(cmdLine, executor, classpath);
             cmdLine.add("-m");
             cmdLine.add("robot.run");
+            argumentPythonpath(cmdLine, pythonpath);
         } else {
             cmdLine.add(executor.executableName());
-            augmentClasspath(cmdLine, executor, classpath);
+            argumentClasspath(cmdLine, executor, classpath);
             cmdLine.add("\"" + getRunModulePath((PythonInstallationDirectory) location) + "\"");
+            argumentPythonpath(cmdLine, pythonpath);
         }
         return cmdLine;
     }
 
-    private void augmentClasspath(final List<String> cmdLine, final SuiteExecutor executor, final List<String> classpath) {
+    private void argumentClasspath(final List<String> cmdLine, final SuiteExecutor executor, final List<String> classpath) {
         if (executor == SuiteExecutor.Jython) {
             final String cpSeparator = isWindows() ? ";" : ":";
             cmdLine.add("-J-cp");
             cmdLine.add("\"" + Joiner.on(cpSeparator).join(classpath) + "\"");
+        }
+    }
+    
+    private void argumentPythonpath(final List<String> cmdLine, final List<String> pythonpath) {
+        if (!pythonpath.isEmpty()) {
+            cmdLine.add("-P");
+            cmdLine.add(Joiner.on(":").join(pythonpath));
         }
     }
 
