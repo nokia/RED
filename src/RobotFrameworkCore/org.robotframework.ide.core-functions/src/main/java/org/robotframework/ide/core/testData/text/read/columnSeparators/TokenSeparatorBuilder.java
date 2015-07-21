@@ -8,7 +8,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class TokenSeparatorBuilder {
 
     private static final Pattern PIPE_SEPARATOR_BEGIN = Pattern
-            .compile("^[ ]?[|]\\s+(.+)");
+            .compile("^[ ]?[|]\\s+");
 
 
     public ALineSeparator createSeparator(final int lineNumber,
@@ -25,6 +25,6 @@ public class TokenSeparatorBuilder {
 
     @VisibleForTesting
     protected boolean isPipeSeparated(final String line) {
-        return PIPE_SEPARATOR_BEGIN.matcher(line).matches();
+        return PIPE_SEPARATOR_BEGIN.matcher(line).find();
     }
 }
