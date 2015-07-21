@@ -123,7 +123,7 @@ public class RobotProject extends RobotContainer {
                                     return LibrarySpecificationReader.readSpecification((IFile) libspec);
                                 }
                                 return null;
-                            } else if (lib.provideType() == LibraryType.JAVA) {
+                            } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
                                 final IFile file = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
                                 return LibrarySpecificationReader.readSpecification(file);
                             } else {
@@ -168,6 +168,20 @@ public class RobotProject extends RobotContainer {
 
     public IFile getFile(final String filename) {
         return getProject().getFile(filename);
+    }
+    
+    public synchronized List<String> getPythonpath() {
+        readProjectConfigurationIfNeeded();
+        if (configuration != null) {
+            final Set<String> pp = newHashSet();
+            for (final ReferencedLibrary lib : configuration.getLibraries()) {
+                if (lib.provideType() == LibraryType.PYTHON) {
+                    pp.add(lib.getPath());
+                }
+            }
+            return newArrayList(pp);
+        }
+        return newArrayList();
     }
 
     public synchronized List<String> getClasspath() {

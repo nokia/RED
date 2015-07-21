@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
+import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,6 +15,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -36,6 +38,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.viewers.Selections;
 
@@ -113,6 +116,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton = toolkit.createButton(parent, "Add Python library", SWT.PUSH);
         addPythonLibButton.setEnabled(false);
         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addPythonLibButton);
+        addPythonHandler();
 
         addJavaLibButton = toolkit.createButton(parent, "Add Java library", SWT.PUSH);
         addJavaLibButton.setEnabled(false);
@@ -129,27 +133,64 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(removeButton);
         addRemoveHandler();
     }
+    
+    private void addPythonHandler() {
+        addPythonLibButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                
+                final FileDialog dialog = createReferencedLibFileDialog();
+                dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+                final String chosenFilePath = dialog.open();
+                if (chosenFilePath != null) {
+                    final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder();
+                    final List<PythonClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath);
+                    
+                    boolean added = false;
+                    if(pythonLibStructureBuilder.isArchive()) {
+                        final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(addPythonLibButton,
+                                pythonClasses, new PythonClassesLabelProvider());
+                        if (classesDialog.open() == Window.OK) {
+                            final Object[] result = classesDialog.getResult();
+                            
+                            for (final Object selectedClass : result) {
+                                final PythonClass pythonClass = (PythonClass) selectedClass;
+                                editorInput.getProjectConfiguration().addReferencedLibraryInPython(
+                                        pythonClass.getQualifiedName(), new Path(chosenFilePath));
+                                added = true;
+                            }
+                            
+                        } 
+                    } else {
+                        for (final PythonClass pythonClass : pythonClasses) {
+                            editorInput.getProjectConfiguration().addReferencedLibraryInPython(
+                                    pythonClass.getQualifiedName(), new Path(new File(chosenFilePath).getParent()));
+                            added = true;
+                        }
+                    }
+                    if (added) {
+                        dirtyProviderService.setDirtyState(true);
+                        viewer.refresh();
+                    }
+                }
+            }
+        });
+    }
 
     private void addJavaHandler() {
         addJavaLibButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final String startingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
-
-                final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
+                
+                final FileDialog dialog = createReferencedLibFileDialog();
                 dialog.setFilterExtensions(new String[] { "*.jar" });
-                dialog.setFilterPath(startingPath);
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     final List<JarClass> classesFromJar = new JarStructureBuilder()
                             .provideEntriesFromJarFile(chosenFilePath);
+                    final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(addJavaLibButton,
+                            classesFromJar, new JarClassesLabelProvider());
 
-                    final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(addJavaLibButton
-                            .getShell(), new JarClassesLabelProvider());
-                    classesDialog.setMultipleSelection(true);
-                    classesDialog.setTitle("Select library class");
-                    classesDialog.setMessage("Select the class(es) which defines library:");
-                    classesDialog.setElements(classesFromJar.toArray());
                     if (classesDialog.open() == Window.OK) {
                         final Object[] result = classesDialog.getResult();
 
@@ -168,6 +209,25 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 }
             }
         });
+    }
+    
+    private FileDialog createReferencedLibFileDialog() {
+        final String startingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
+        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
+        dialog.setFilterPath(startingPath);
+        return dialog;
+    }
+
+    private ElementListSelectionDialog createReferencedLibClassesDialog(final Button button, final List<?> classes,
+            final LabelProvider labelProvider) {
+        final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(button.getShell(),
+                labelProvider);
+        classesDialog.setMultipleSelection(true);
+        classesDialog.setTitle("Select library class");
+        classesDialog.setMessage("Select the class(es) which defines library:");
+        classesDialog.setElements(classes.toArray());
+
+        return classesDialog;
     }
 
     private void addLibspecHandler() {
