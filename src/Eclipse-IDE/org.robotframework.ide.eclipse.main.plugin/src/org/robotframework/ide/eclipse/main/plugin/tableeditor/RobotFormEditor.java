@@ -41,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
