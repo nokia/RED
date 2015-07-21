@@ -11,9 +11,11 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.CutCellContentHandler.E4CutCellContentHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
 import org.robotframework.viewers.Selections;
@@ -31,7 +33,8 @@ public class CutCellContentHandler extends DIHandler<E4CutCellContentHandler> {
 
         @Execute
         public Object cutContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final FocusedViewerAccessor viewerAccessor, final Clipboard clipboard) {
+                final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final Clipboard clipboard) {
+            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
 
             final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
             final String cellContent = focusedCell.getText();

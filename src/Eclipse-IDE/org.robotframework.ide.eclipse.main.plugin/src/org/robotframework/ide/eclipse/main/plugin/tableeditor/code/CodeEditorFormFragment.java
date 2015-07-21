@@ -220,6 +220,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     @Persist
     public void onSave() {
+        setFocus();
         isSaving = true;
     }
 

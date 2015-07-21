@@ -1,46 +1,45 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
-import javax.inject.Named;
-
-import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester.E4TableCellPropertyTester;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
-public class TableCellPropertyTester extends DIPropertyTester<E4TableCellPropertyTester> {
+import com.google.common.base.Preconditions;
 
-    public TableCellPropertyTester() {
-        super(E4TableCellPropertyTester.class);
+public class TableCellPropertyTester extends PropertyTester {
+
+    @Override
+    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
+        Preconditions.checkArgument(receiver instanceof RobotFormEditor,
+                "Property tester is unable to test properties of " + receiver.getClass().getName()
+                        + ". It should be used with " + RobotFormEditor.class.getName());
+
+        if (expectedValue instanceof Boolean) {
+            return testProperty((RobotFormEditor) receiver, property, ((Boolean) expectedValue).booleanValue());
+        } else if (expectedValue instanceof Integer) {
+            return testProperty((RobotFormEditor) receiver, property, ((Integer) expectedValue).intValue());
+        }
+        return false;
     }
 
-    public static class E4TableCellPropertyTester {
-
-        @PropertyTest
-        public Boolean testFocusedCellProperties(@Optional final FocusedViewerAccessor viewerAccessor,
-                @Named(DIPropertyTester.PROPERTY) final String propertyName,
-                @Named(DIPropertyTester.EXPECTED_VALUE) final Boolean expected) {
-
-            if (viewerAccessor == null) {
-                return false;
-            }
-
-            if ("thereIsAFocusedCell".equals(propertyName)) {
-                return viewerAccessor.getFocusedCell() != null == expected.booleanValue();
-            }
-            return true;
+    private boolean testProperty(final RobotFormEditor editor, final String property, final boolean expected) {
+        final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
+        if ("thereIsAFocusedCell".equals(property)) {
+            return viewerAccessor.getFocusedCell() != null == expected;
+        } else if ("focusedCellHasContent".equals(property)) {
+            final ViewerCell cell = viewerAccessor.getFocusedCell();
+            return (cell != null && !cell.getText().isEmpty()) == expected;
         }
+        return false;
+    }
 
-        @PropertyTest
-        public Boolean testFocusedCellProperties(final FocusedViewerAccessor viewerAccessor,
-                @Named(DIPropertyTester.PROPERTY) final String propertyName,
-                @Named(DIPropertyTester.EXPECTED_VALUE) final Integer expected) {
-
-            if ("focusedCellHasIndex".equals(propertyName)) {
-                final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
-                return focusedCell != null && focusedCell.getColumnIndex() == expected.intValue();
-            }
-            return true;
+    private boolean testProperty(final RobotFormEditor editor, final String property, final int expected) {
+        final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
+        if ("focusedCellHasIndex".equals(property)) {
+            final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
+            return focusedCell != null && focusedCell.getColumnIndex() == expected;
         }
+        return false;
     }
 }

@@ -224,6 +224,14 @@ public class RobotFormEditor extends FormEditor {
         ContextInjectionFactory.uninject(this, context);
     }
 
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        final IEditorPart activeEditor = getActiveEditor();
+        if (activeEditor instanceof ISectionEditorPart) {
+            return ((ISectionEditorPart) activeEditor).getFocusedViewerAccessor();
+        }
+        return null;
+    }
+
     @Inject
     @Optional
     private void closeEditorWhenResourceBecomesNotAvailable(

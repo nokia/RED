@@ -10,8 +10,8 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
@@ -72,7 +72,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         }
 
         @Override
-        protected FocusedViewerAccessor getActiveCellAccessor() {
+        public FocusedViewerAccessor getFocusedViewerAccessor() {
             return new FocusedViewerAccessor(keywordsFragment.getViewer());
         }
     }
