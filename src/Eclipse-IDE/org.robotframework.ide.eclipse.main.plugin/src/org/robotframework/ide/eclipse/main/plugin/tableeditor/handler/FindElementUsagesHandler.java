@@ -1,16 +1,25 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.FindElementUsagesHandler.E4FindUsagesHandler;
 import org.robotframework.viewers.Selections;
@@ -29,26 +38,51 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
             final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
             final String name = element.getName();
 
-            IResource placeToStart = null;
-            if ("workspace".equals(place)) {
-                placeToStart = ResourcesPlugin.getWorkspace().getRoot();
-            } else if ("project".equals(place)) {
-                placeToStart = element.getSuiteFile().getProject().getProject();
-            }
-
-            if (place == null) {
-                return null;
-            }
-
             try {
+                final List<IResource> resourcesToLookInto;
+                if ("workspace".equals(place)) {
+                    resourcesToLookInto = getResourcesToQuery(ResourcesPlugin.getWorkspace().getRoot());
+                } else if ("project".equals(place)) {
+                    resourcesToLookInto = getResourcesToQuery(element.getSuiteFile().getProject().getProject());
+                } else {
+                    throw new IllegalStateException("Unknown place for searching: " + place);
+                }
+
+                if (place == null) {
+                    return null;
+                }
                 final ISearchQuery query = TextSearchQueryProvider.getPreferred().createQuery(name,
-                        new IResource[] { placeToStart });
+                        resourcesToLookInto.toArray(new IResource[0]));
                 NewSearchUI.runQueryInBackground(query);
             } catch (final CoreException e) {
-                // TODO : show some message to the user
-                return null;
+                RobotFramework.log(IStatus.ERROR, "Unable to find usages of '" + name + "' in " + place, e);
             }
             return null;
+        }
+
+        private List<IResource> getResourcesToQuery(final IWorkspaceRoot workspaceRoot) throws CoreException {
+            final List<IResource> resources = newArrayList();
+            for (final IResource project : workspaceRoot.members()) {
+                resources.addAll(newArrayList(getResourcesToQuery((IProject) project)));
+            }
+            return resources;
+        }
+
+        private List<IResource> getResourcesToQuery(final IProject project) throws CoreException {
+            // returns resources from given project excluding libspec folder
+            final List<IResource> resources = newArrayList();
+            final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
+            if (!libspecsFolder.exists()) {
+                resources.add(project);
+                return resources;
+            }
+
+            for (final IResource child : project.members()) {
+                if (!libspecsFolder.getResource().equals(child)) {
+                    resources.add(child);
+                }
+            }
+            return resources;
         }
     }
 }
