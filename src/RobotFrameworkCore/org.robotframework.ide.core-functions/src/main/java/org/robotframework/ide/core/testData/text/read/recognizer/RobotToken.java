@@ -1,5 +1,10 @@
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+
 public class RobotToken {
 
     public static final int NOT_SET = -1;
@@ -57,27 +62,40 @@ public class RobotToken {
         /**
          * 
          */
-        UNKNOWN,
+        UNKNOWN(),
         /**
          * 
          */
-        EMPTY_CELL,
+        EMPTY_CELL(" \\ "),
         /**
          * 
          */
-        SETTINGS_TABLE_HEADER,
+        SETTINGS_TABLE_HEADER("Setting", "Settings", "Metadata"),
         /**
          * 
          */
-        VARIABLES_TABLE_HEADER,
+        VARIABLES_TABLE_HEADER("Variable", "Variables"),
         /**
          * 
          */
-        TEST_CASES_TABLE_HEADER,
+        TEST_CASES_TABLE_HEADER("Test Case", "Test Cases"),
         /**
         * 
         */
-        KEYWORDS_TABLE_HEADER;
+        KEYWORDS_TABLE_HEADER("Keyword", "Keywords", "User Keyword",
+                "User Keywords");
+
+        private final List<String> representationForNew = new LinkedList<>();
+
+
+        public List<String> getRepresentation() {
+            return representationForNew;
+        }
+
+
+        private RobotTokenType(String... representation) {
+            representationForNew.addAll(Arrays.asList(representation));
+        }
     }
 
 
