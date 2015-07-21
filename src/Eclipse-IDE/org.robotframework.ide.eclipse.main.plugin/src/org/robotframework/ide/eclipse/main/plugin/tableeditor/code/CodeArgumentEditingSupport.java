@@ -22,6 +22,11 @@ class CodeArgumentEditingSupport extends RobotElementEditingSupport {
     }
 
     @Override
+    protected int getColumnShift() {
+        return 1;
+    }
+
+    @Override
     protected CellEditor getCellEditor(final Object element) {
         final Composite parent = (Composite) getViewer().getControl();
         if (element instanceof RobotElement) {
