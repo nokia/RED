@@ -18,4 +18,6 @@ public interface ISectionEditorPart {
 
     void setFocus();
 
+    FocusedViewerAccessor getFocusedViewerAccessor();
+
 }
