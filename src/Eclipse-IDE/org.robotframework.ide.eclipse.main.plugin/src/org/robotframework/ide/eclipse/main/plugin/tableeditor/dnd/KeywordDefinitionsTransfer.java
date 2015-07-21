@@ -30,7 +30,7 @@ public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasKeywordDefinitions(final Clipboard clipboard) {
-        return clipboard.getContents(getInstance()) != null;
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasKeywordCalls(final Clipboard clipboard) {
-        return clipboard.getContents(getInstance()) != null;
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
     }
 
     @Override
