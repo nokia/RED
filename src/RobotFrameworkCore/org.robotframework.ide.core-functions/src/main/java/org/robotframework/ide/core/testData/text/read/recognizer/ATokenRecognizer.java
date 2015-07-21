@@ -48,4 +48,28 @@ public class ATokenRecognizer {
     public RobotTokenType getProducedType() {
         return type;
     }
+
+
+    public static String createUpperLowerCaseWord(final String text) {
+        StringBuilder str = new StringBuilder();
+        if (text != null && text.length() > 0) {
+
+            char[] ca = text.toCharArray();
+            int size = ca.length;
+            for (int i = 0; i < size; i++) {
+                str.append('[');
+                char c = ca[i];
+                if (Character.isLetter(c)) {
+                    str.append(Character.toUpperCase(c)).append('|')
+                            .append(Character.toLowerCase(c));
+                } else {
+                    str.append(c);
+                }
+
+                str.append(']');
+            }
+
+        }
+        return str.toString();
+    }
 }
