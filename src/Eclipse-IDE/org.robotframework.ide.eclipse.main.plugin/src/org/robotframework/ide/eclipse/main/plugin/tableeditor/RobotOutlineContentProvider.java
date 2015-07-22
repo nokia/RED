@@ -115,7 +115,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
 
     @Inject
     @Optional
-    private void whenSectionIsAddedOrRemoved(
+    private void whenStructuralChangeWasMade(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotElement affectedElement) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh(affectedElement);
@@ -163,9 +163,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
     private void whenVariableTypeChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE) final RobotVariable variable) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
-            // actually the sorting may have been affected, so we need to
-            // refresh parent
-            viewer.refresh(variable.getParent());
+            viewer.update(variable, null);
         }
     }
 
