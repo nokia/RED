@@ -87,42 +87,31 @@ public class RobotProjectConfig {
     }
 
     public void addReferencedLibrarySpecification(final IPath workspaceRelativePath) {
-        if (libraries == null) {
-            libraries = newArrayList();
-        }
-        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.VIRTUAL.toString(), null,
-                workspaceRelativePath);
-        libraries.add(referencedLibrary);
+        addReferencedLibrary(LibraryType.VIRTUAL.toString(), null, workspaceRelativePath);
     }
 
     public void addReferencedLibraryInPython(final String name, final IPath systemAbsolutePath) {
-        if (libraries == null) {
-            libraries = newArrayList();
-        }
-        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.PYTHON.toString(), name,
-                systemAbsolutePath);
-
-        libraries.add(referencedLibrary);
+        addReferencedLibrary(LibraryType.PYTHON.toString(), name, systemAbsolutePath);
     }
 
     public void addReferencedLibraryInJava(final String name, final IPath systemAbsolutePath) {
-        if (libraries == null) {
-            libraries = newArrayList();
-        }
-        final ReferencedLibrary referencedLibrary = createReferencedLibrary(LibraryType.JAVA.toString(), name,
-                systemAbsolutePath);
-
-        libraries.add(referencedLibrary);
+        addReferencedLibrary(LibraryType.JAVA.toString(), name, systemAbsolutePath);
     }
     
-    private ReferencedLibrary createReferencedLibrary(final String type, final String name, final IPath path) {
+    private void addReferencedLibrary(final String type, final String name, final IPath path) {
         final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
         referencedLibrary.setType(type);
         if (name != null) {
             referencedLibrary.setName(name);
         }
         referencedLibrary.setPath(path.toPortableString());
-        return referencedLibrary;
+        
+        if (libraries == null) {
+            libraries = newArrayList();
+        }
+        if (!libraries.contains(referencedLibrary)) {
+            libraries.add(referencedLibrary);
+        }
     }
 
     public void addRemoteLocation(final RemoteLocation remoteLocation) {
@@ -252,6 +241,22 @@ public class RobotProjectConfig {
                 default:
                     return RobotImages.getLibraryImage();
             }
+        }
+        
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (obj.getClass() == getClass()) {
+                final ReferencedLibrary other = (ReferencedLibrary) obj;
+                return Objects.equals(type, other.type) && Objects.equals(name, other.name) && Objects.equals(path, other.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, name, path);
         }
     }
 
