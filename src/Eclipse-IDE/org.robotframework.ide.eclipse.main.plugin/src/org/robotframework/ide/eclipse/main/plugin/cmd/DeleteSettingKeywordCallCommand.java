@@ -23,6 +23,6 @@ public class DeleteSettingKeywordCallCommand extends EditorCommand {
         final RobotSuiteFileSection settingsSection = (RobotSuiteFileSection) settingsToRemove.get(0).getParent();
         settingsSection.getChildren().removeAll(settingsToRemove);
 
-        eventBroker.post(RobotModelEvents.ROBOT_SETTING_REMOVED, settingsSection);
+        eventBroker.send(RobotModelEvents.ROBOT_SETTING_REMOVED, settingsSection);
     }
 }
