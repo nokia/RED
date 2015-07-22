@@ -13,6 +13,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -83,6 +85,16 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
                 .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(leftViewer);
+        leftViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(final DoubleClickEvent event) {
+                final Optional<LibrarySpecification> element = Selections.getOptionalFirstElement(
+                        (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
+                if (element.isPresent()) {
+                    handleLibraryAdd((Libraries) leftViewer.getInput(), newArrayList(element.get()));
+                }
+            }
+        });
 
         final Button toImported = getToolkit().createButton(actualComposite, ">>", SWT.PUSH);
         toImported.setEnabled(false);
@@ -95,6 +107,16 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
                 .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(rightViewer);
+        rightViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(final DoubleClickEvent event) {
+                final Optional<LibrarySpecification> element = Selections.getOptionalFirstElement(
+                        (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
+                if (element.isPresent()) {
+                    handleLibraryRemove((Libraries) rightViewer.getInput(), newArrayList(element.get()));
+                }
+            }
+        });
 
         final Button fromImported = getToolkit().createButton(actualComposite, "<<", SWT.PUSH);
         fromImported.setEnabled(false);
@@ -123,27 +145,31 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final List<LibrarySpecification> specs = Selections.getElements(
                         (IStructuredSelection) leftViewer.getSelection(), LibrarySpecification.class);
 
-                libs.getLibrariesToImport().removeAll(specs);
-                libs.getImportedLibraries().addAll(specs);
-
-                final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
-                final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
-                for (final LibrarySpecification spec : specs) {
-                    final ArrayList<String> args = newArrayList(spec.getName());
-                    if (spec.isRemote()) {
-                        String host = spec.getAdditionalInformation();
-                        if (!host.startsWith("http://")) {
-                            host = "http://" + host;
-                        }
-                        args.add(host);
-                    }
-                    commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Library", args));
-                }
-
-                leftViewer.refresh();
-                rightViewer.refresh();
+                handleLibraryAdd(libs, specs);
             }
         };
+    }
+
+    private void handleLibraryAdd(final Libraries libs, final List<LibrarySpecification> specs) {
+        libs.getLibrariesToImport().removeAll(specs);
+        libs.getImportedLibraries().addAll(specs);
+
+        final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
+        final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
+        for (final LibrarySpecification spec : specs) {
+            final ArrayList<String> args = newArrayList(spec.getName());
+            if (spec.isRemote()) {
+                String host = spec.getAdditionalInformation();
+                if (!host.startsWith("http://")) {
+                    host = "http://" + host;
+                }
+                args.add(host);
+            }
+            commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Library", args));
+        }
+
+        leftViewer.refresh();
+        rightViewer.refresh();
     }
 
     private SelectionListener createFromImportedListener() {
@@ -154,36 +180,54 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final List<LibrarySpecification> specs = Selections.getElements(
                         (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
 
-                libs.getImportedLibraries().removeAll(specs);
-                libs.getLibrariesToImport().addAll(specs);
-
-                final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
-                final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
-                final List<RobotSetting> settingsToRemove = getSettingsToRemove(settingsSection, specs);
-                commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
-
-                leftViewer.refresh();
-                rightViewer.refresh();
-            }
-
-            private List<RobotSetting> getSettingsToRemove(final RobotSuiteSettingsSection settingsSection,
-                    final List<LibrarySpecification> specs) {
-                final List<RobotSetting> settings = newArrayList();
-                final List<String>specNames = Lists.transform(specs, new Function<LibrarySpecification, String>(){
-                    @Override
-                    public String apply(final LibrarySpecification spec) {
-                        return spec.getName();
-                    }}); 
-                for (final RobotElement element : settingsSection.getImportSettings()) {
-                    final RobotSetting setting = (RobotSetting) element;
-                    final String name = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
-                    if (specNames.contains(name)) {
-                        settings.add(setting);
-                    }
-                }
-                return settings;
+                handleLibraryRemove(libs, specs);
             }
         };
+    }
+
+    private void handleLibraryRemove(final Libraries libs, final List<LibrarySpecification> specs) {
+        if (!doesNotContainAlwaysAccessible(specs)) {
+            return;
+        }
+
+        libs.getImportedLibraries().removeAll(specs);
+        libs.getLibrariesToImport().addAll(specs);
+
+        final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
+        final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
+        final List<RobotSetting> settingsToRemove = getSettingsToRemove(settingsSection, specs);
+        commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
+
+        leftViewer.refresh();
+        rightViewer.refresh();
+    }
+
+    private List<RobotSetting> getSettingsToRemove(final RobotSuiteSettingsSection settingsSection,
+            final List<LibrarySpecification> specs) {
+        final List<RobotSetting> settings = newArrayList();
+        final List<String> specNames = Lists.transform(specs, new Function<LibrarySpecification, String>() {
+            @Override
+            public String apply(final LibrarySpecification spec) {
+                return spec.getName();
+            }
+        });
+        for (final RobotElement element : settingsSection.getImportSettings()) {
+            final RobotSetting setting = (RobotSetting) element;
+            final String name = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
+            if (specNames.contains(name)) {
+                settings.add(setting);
+            }
+        }
+        return settings;
+    }
+
+    private boolean doesNotContainAlwaysAccessible(final List<LibrarySpecification> specs) {
+        for (final LibrarySpecification spec : specs) {
+            if (spec.isAccessibleWithoutImport()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void createViewerSelectionListener(final TableViewer viewer, final Button buttonToActivate) {
@@ -193,15 +237,6 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 final List<LibrarySpecification> specs = Selections.getElements(
                         (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
                 buttonToActivate.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
-            }
-
-            private boolean doesNotContainAlwaysAccessible(final List<LibrarySpecification> specs) {
-                for (final LibrarySpecification spec : specs) {
-                    if (spec.isAccessibleWithoutImport()) {
-                        return false;
-                    }
-                }
-                return true;
             }
         };
         viewer.addSelectionChangedListener(listener);
