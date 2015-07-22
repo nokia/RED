@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -52,14 +53,12 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
             final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
             final IFile file = LibspecsFolder.get(project).getFile(libName);
-
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
-            if(standardLibraryPath == null) {
-                //TODO: handle referenced libraries 
-                return;
+            
+            IPath location = extractLibraryLocation(robotProject, spec);
+            if(location == null) {
+                throw new CoreException(Status.CANCEL_STATUS);
             }
-            final IPath location = new Path(standardLibraryPath.getAbsolutePath());
+            
             file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
 
             IEditorDescriptor desc = IDE.getEditorDescriptor(file);
@@ -77,5 +76,20 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         } catch (final CoreException e) {
             throw new RuntimeException("Unable to open editor for library: " + spec.getName(), e);
         }
+    }
+    
+    private Path extractLibraryLocation(RobotProject robotProject, LibrarySpecification spec) {
+        if (robotProject.isStandardLibrary(spec)) {
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
+            return standardLibraryPath == null ? null : new Path(standardLibraryPath.getAbsolutePath());
+        } else if (robotProject.isReferencedLibrary(spec)) {
+            String pythonLibPath = robotProject.getPythonLibraryPath(spec.getName());
+            if (new File(pythonLibPath).exists()) {
+                return new Path(pythonLibPath);
+            }
+        }
+
+        return null;
     }
 }
