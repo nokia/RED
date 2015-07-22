@@ -101,9 +101,7 @@ public class RobotProjectConfig {
     private void addReferencedLibrary(final String type, final String name, final IPath path) {
         final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
         referencedLibrary.setType(type);
-        if (name != null) {
-            referencedLibrary.setName(name);
-        }
+        referencedLibrary.setName(name);
         referencedLibrary.setPath(path.toPortableString());
         
         if (libraries == null) {
