@@ -7,7 +7,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
@@ -41,7 +40,7 @@ public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandl
 
         @Execute
         public Object deleteContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final Clipboard clipboard) {
+                final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
             final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
             final int index = viewerAccessor.getFocusedCell().getColumnIndex();
