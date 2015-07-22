@@ -21,13 +21,15 @@ class PythonLibStructureBuilder {
         } else {
             try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(path))) {
                 ZipEntry entry = zipStream.getNextEntry();
+                if (entry != null) {
+                    isArchive = true;
+                }
                 while (entry != null) {
                     if (isPythonClass(entry.getName())) {
                         pythonClasses.add(PythonClass.create(entry.getName()));
                     }
                     entry = zipStream.getNextEntry();
                 }
-                isArchive = true;
             } catch (final IOException e) {
                 return pythonClasses;
             }
