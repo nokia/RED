@@ -197,4 +197,38 @@ public class RobotProject extends RobotContainer {
         }
         return newArrayList(".");
     }
+    
+    public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
+        if (stdLibsSpecs != null) {
+            for (final LibrarySpecification librarySpecification : stdLibsSpecs) {
+                if (librarySpecification == spec) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
+        if (refLibsSpecs != null) {
+            for (final LibrarySpecification librarySpecification : refLibsSpecs) {
+                if (librarySpecification == spec) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public synchronized String getPythonLibraryPath(String libName) {
+        readProjectConfigurationIfNeeded();
+        if (configuration != null) {
+            for (final ReferencedLibrary lib : configuration.getLibraries()) {
+                if (lib.provideType() == LibraryType.PYTHON && lib.getName().equals(libName)) {
+                    return lib.getPath() + "/" + lib.getName() + ".py";
+                }
+            }
+        }
+        return "";
+    }
 }
