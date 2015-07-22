@@ -20,11 +20,12 @@ import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
@@ -114,6 +115,51 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
 
     @Inject
     @Optional
+    private void whenSectionIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotElement affectedElement) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.refresh(affectedElement);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenFileChangesExternally(
+            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
+        if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null
+                && !viewer.getTree().isDisposed()) {
+            viewer.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.update(testCase, null);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordDefinitionNameChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_NAME_CHANGE) final RobotKeywordDefinition keywordDef) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.update(keywordDef, null);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordCallNameChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE) final RobotKeywordCall keywordCall) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
+            viewer.update(keywordCall, null);
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenVariableTypeChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE) final RobotVariable variable) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
@@ -132,67 +178,15 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
         }
     }
 
-    @SuppressWarnings("unused")
     @Inject
     @Optional
-    private void whenSectionChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotSuiteFile affectedFile) {
+    private void whenSettingArgumentChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE) final RobotSetting setting) {
+        // in case of Library/Resource/etc. import or metadata, we are also
+        // interested in changes of first argument to keyword call, since it
+        // used as label
         if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.refresh();
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenSectionChanges(
-            @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null
-                && !viewer.getTree().isDisposed()) {
-            viewer.refresh();
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenVariablesSectionChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.refresh(section);
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenSettingsSectionChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.refresh(section);
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenCasesSectionChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_CASE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (viewer != null) {
-            viewer.refresh(section);
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenKeywordsSectionChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.refresh(section);
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
-        if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.update(testCase, null);
+            viewer.update(setting, null);
         }
     }
 }
