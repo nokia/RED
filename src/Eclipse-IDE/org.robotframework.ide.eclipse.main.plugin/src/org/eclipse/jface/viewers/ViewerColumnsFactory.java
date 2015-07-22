@@ -121,7 +121,9 @@ public class ViewerColumnsFactory {
             viewer.getTable().addControlListener(resizeListener);
         }
 
-        column.setLabelProvider(labelProvider);
+        if (labelProvider != null) {
+            column.setLabelProvider(labelProvider);
+        }
         if (shouldAddEditingSupport) {
             column.setEditingSupport(editingSupport);
         }
@@ -186,7 +188,9 @@ public class ViewerColumnsFactory {
             viewer.getTree().addControlListener(resizeListener);
         }
 
-        column.setLabelProvider(labelProvider);
+        if (labelProvider != null) {
+            column.setLabelProvider(labelProvider);
+        }
         if (shouldAddEditingSupport) {
             column.setEditingSupport(editingSupport);
         }
