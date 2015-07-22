@@ -8,7 +8,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 
 public class SettingsTableHeaderRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[*]+[\\s]*("
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?[*]+[\\s]*("
             + createUpperLowerCaseWord("Settings") + "|"
             + createUpperLowerCaseWord("Setting") + "|"
             + createUpperLowerCaseWord("Metadata") + ")[\\s]*[*]*");

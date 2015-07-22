@@ -108,6 +108,14 @@ public class RobotFileOutput {
         public static enum LogLevel {
             INFO, WARN, ERROR;
         }
+
+
+        @Override
+        public String toString() {
+            return String
+                    .format("BuildMessage [type=%s, message=%s, fileName=%s, fileRegion=%s]",
+                            type, message, fileName, fileRegion);
+        }
     }
 
     public static enum Status {
