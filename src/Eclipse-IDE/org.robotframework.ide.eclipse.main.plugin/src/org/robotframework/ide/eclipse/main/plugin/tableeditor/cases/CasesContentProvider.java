@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
-public class CasesContentProvider implements ITreeContentProvider {
+class CasesContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
