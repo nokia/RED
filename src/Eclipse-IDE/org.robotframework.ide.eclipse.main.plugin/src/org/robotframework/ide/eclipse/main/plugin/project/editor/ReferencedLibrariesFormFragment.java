@@ -33,14 +33,14 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.viewers.Selections;
 
 class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 

@@ -46,10 +46,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSectionCommand;
+import org.robotframework.red.forms.RedFormToolkit;
 
 public abstract class SectionEditorPart implements ISectionEditorPart {
 

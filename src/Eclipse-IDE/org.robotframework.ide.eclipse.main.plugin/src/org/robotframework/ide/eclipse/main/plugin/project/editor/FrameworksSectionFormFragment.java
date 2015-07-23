@@ -40,7 +40,6 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
@@ -51,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPre
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.red.forms.RedFormToolkit;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;

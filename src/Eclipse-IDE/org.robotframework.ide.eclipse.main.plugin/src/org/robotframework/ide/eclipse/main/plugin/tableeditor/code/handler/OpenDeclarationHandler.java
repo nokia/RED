@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> {
 

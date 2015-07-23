@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.MoveCaseDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.MoveKeywordCallDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseDownHandler.E4MoveCaseDownHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 

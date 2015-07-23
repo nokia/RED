@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler.E4PasteKeywordsHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class PasteKeywordsHandler extends DIHandler<E4PasteKeywordsHandler> {
     public PasteKeywordsHandler() {

@@ -36,12 +36,12 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationEditorPart.ProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.red.forms.RedFormToolkit;
 
 class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfigurationEditor> {
 

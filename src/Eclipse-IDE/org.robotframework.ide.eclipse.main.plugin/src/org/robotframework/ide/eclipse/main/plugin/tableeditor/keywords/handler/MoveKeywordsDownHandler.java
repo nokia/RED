@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.MoveKeywordCallDownCommand
 import org.robotframework.ide.eclipse.main.plugin.cmd.MoveKeywordDefinitionDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsDownHandler.E4MoveKeywordDownHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 

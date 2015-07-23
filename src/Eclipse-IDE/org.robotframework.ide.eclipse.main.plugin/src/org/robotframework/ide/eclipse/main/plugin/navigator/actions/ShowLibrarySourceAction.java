@@ -24,7 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class ShowLibrarySourceAction extends Action implements IEnablementUpdatingAction {
 

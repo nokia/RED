@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.PasteCellContentHandler.E4PasteCellContentHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class PasteCellContentHandler extends DIHandler<E4PasteCellContentHandler> {
 

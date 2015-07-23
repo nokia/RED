@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteCasesCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler.E4DeleteCasesHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class DeleteCasesHandler extends DIHandler<E4DeleteCasesHandler> {
 

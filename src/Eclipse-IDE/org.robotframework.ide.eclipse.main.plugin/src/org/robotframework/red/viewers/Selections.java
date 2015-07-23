@@ -1,4 +1,4 @@
-package org.robotframework.viewers;
+package org.robotframework.red.viewers;
 
 import static com.google.common.collect.Lists.newArrayList;
 

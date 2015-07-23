@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class CopyKeywordsHandler extends DIHandler<E4CopyKeywordsHandler> {
 
