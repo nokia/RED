@@ -1,6 +1,5 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
 public class RobotElementChange {
 

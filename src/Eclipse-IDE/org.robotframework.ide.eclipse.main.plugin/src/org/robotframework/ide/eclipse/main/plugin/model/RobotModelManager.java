@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 
 public final class RobotModelManager {
 

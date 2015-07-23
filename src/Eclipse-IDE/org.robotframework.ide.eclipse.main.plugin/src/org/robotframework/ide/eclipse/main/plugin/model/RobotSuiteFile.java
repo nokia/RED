@@ -21,7 +21,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsEmiter;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
-import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
