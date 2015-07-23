@@ -2059,7 +2059,7 @@
                    ifEmpty="false"
                    operator="and">
                 <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement">
+                      value="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement">
                 </instanceof>
              </iterate>
              <count
@@ -2124,7 +2124,7 @@
                 ifEmpty="false"
                 operator="and">
              <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement">
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement">
              </instanceof>
           </iterate>
        </with>
