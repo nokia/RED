@@ -2240,6 +2240,12 @@
             id="org.robotframework.ide.eclipse.main.plugin.preferences.installed"
             name="Installed frameworks">
       </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.ValidationPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.validation"
+            name="Validation">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

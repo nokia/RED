@@ -24,8 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy.ReportingInterruptedException;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RuntimeEnvironmentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 
 public class RobotLibrariesBuilder {
 
@@ -123,13 +122,15 @@ public class RobotLibrariesBuilder {
             final ProblemsReportingStrategy reporter) {
         try {
             if (!robotProject.getConfigurationFile().exists()) {
-                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.DOES_NOT_EXIST);
+                final RobotProblem problem = RobotProblem
+                        .causedBy(ProjectConfigurationProblem.CONFIG_FILE_MISSING);
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
             return new RobotProjectConfigReader().readConfiguration(robotProject);
         } catch (final CannotReadProjectConfigurationException e) {
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.OTHER_PROBLEM).formatMessageWith(
-                    e.getMessage());
+            final RobotProblem problem = RobotProblem.causedBy(
+                    ProjectConfigurationProblem.CONFIG_FILE_READING_PROBLEM)
+                    .formatMessageWith(e.getMessage());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), e.getLineNumber());
             return null;
         } finally {
@@ -143,15 +144,18 @@ public class RobotLibrariesBuilder {
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ENVIRONMENT)
-                        .formatMessageWith(configuration.providePythonLocation());
+                final RobotProblem problem = RobotProblem.causedBy(
+                        ProjectConfigurationProblem.ENVIRONMENT_MISSING).formatMessageWith(
+                        configuration.providePythonLocation());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.isValidPythonInstallation()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.NON_PYTHON_INSTALLATION)
-                        .formatMessageWith(runtimeEnvironment.getFile());
+                final RobotProblem problem = RobotProblem.causedBy(
+                        ProjectConfigurationProblem.ENVIRONMENT_NOT_A_PYTHON).formatMessageWith(
+                        runtimeEnvironment.getFile());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             } else if (!runtimeEnvironment.hasRobotInstalled()) {
-                final RobotProblem problem = RobotProblem.causedBy(RuntimeEnvironmentProblem.MISSING_ROBOT)
+                final RobotProblem problem = RobotProblem.causedBy(
+                        ProjectConfigurationProblem.ENVIRONMENT_HAS_NO_ROBOT)
                         .formatMessageWith(runtimeEnvironment.getFile());
                 reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
             }
