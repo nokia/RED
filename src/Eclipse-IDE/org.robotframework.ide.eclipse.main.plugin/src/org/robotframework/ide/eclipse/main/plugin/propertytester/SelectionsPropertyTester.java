@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Preconditions;
 

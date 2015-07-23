@@ -182,7 +182,7 @@
             restorable="true">
       </view>
       <view
-            class="org.robotframework.tmp.ModelViewWrapper"
+            class="org.robotframework.red.tmp.ModelViewWrapper"
             id="org.robotframework.ide.eclipse.main.plugin.view1"
             name="Model"
             restorable="true">

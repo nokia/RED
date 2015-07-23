@@ -1,4 +1,4 @@
-package org.robotframework.tmp;
+package org.robotframework.red.tmp;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;

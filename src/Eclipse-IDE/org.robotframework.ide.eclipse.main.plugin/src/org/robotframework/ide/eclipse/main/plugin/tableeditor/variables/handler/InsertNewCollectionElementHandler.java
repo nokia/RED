@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewCollectionElementHandler.E4InsertNewCollectionElementHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class InsertNewCollectionElementHandler extends DIHandler<E4InsertNewCollectionElementHandler> {
 

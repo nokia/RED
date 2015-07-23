@@ -44,7 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCo
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;

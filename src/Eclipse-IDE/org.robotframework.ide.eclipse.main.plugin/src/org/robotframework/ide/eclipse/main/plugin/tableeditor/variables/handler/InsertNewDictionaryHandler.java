@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
 import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewDictionaryHandler.E4InsertNewHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class InsertNewDictionaryHandler extends DIHandler<E4InsertNewHandler> {
 

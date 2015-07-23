@@ -40,8 +40,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.forms.RedFormToolkit;
-import org.robotframework.forms.Sections;
 import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
@@ -59,6 +57,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStra
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.forms.Sections;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment {
 

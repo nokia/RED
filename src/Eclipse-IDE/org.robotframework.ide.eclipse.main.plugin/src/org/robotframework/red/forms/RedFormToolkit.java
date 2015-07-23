@@ -1,4 +1,4 @@
-package org.robotframework.forms;
+package org.robotframework.red.forms;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.FormColors;

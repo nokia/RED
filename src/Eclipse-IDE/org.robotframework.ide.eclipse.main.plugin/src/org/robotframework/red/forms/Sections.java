@@ -1,4 +1,4 @@
-package org.robotframework.forms;
+package org.robotframework.red.forms;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
