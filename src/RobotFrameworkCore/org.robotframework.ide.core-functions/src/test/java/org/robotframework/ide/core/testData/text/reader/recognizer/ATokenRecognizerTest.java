@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.reader.recognizer.header;
+package org.robotframework.ide.core.testData.text.reader.recognizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
