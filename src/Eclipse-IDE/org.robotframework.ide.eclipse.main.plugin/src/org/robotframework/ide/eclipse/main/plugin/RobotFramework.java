@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -24,12 +25,12 @@ public class RobotFramework extends AbstractUIPlugin {
         return plugin;
     }
 
-    static ImageDescriptor getImageDescriptor(final String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
     public static RobotModelManager getModelManager() {
         return RobotModelManager.getInstance();
+    }
+
+    static ImageDescriptor getImageDescriptor(final String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     @Override
@@ -63,11 +64,19 @@ public class RobotFramework extends AbstractUIPlugin {
         return InstalledRobotEnvironments.getAllRobotInstallation(getPreferenceStore());
     }
 
-    public static void log(final int severity, final String message) {
-        getDefault().getLog().log(new Status(severity, PLUGIN_ID, message));
+    public static void logInfo(final String message) {
+        getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
 
-    public static void log(final int severity, final String message, final Throwable cause) {
-        getDefault().getLog().log(new Status(severity, PLUGIN_ID, message, cause));
+    public static void logWarning(final String message) {
+        getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+    }
+
+    public static void logWarning(final String message, final Throwable cause) {
+        getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, cause));
+    }
+
+    public static void logError(final String message, final Throwable cause) {
+        getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, cause));
     }
 }
