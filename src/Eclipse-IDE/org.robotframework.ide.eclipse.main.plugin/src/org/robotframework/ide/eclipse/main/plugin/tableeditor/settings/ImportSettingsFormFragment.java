@@ -38,7 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -120,14 +120,14 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private List<RobotElement> getImportElements() {
-        final RobotSuiteSettingsSection section = getSettingsSection();
+        final RobotSettingsSection section = getSettingsSection();
         return section != null ? section.getImportSettings() : null;
     }
 
-    private RobotSuiteSettingsSection getSettingsSection() {
+    private RobotSettingsSection getSettingsSection() {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSuiteSettingsSection.class);
-        return (RobotSuiteSettingsSection) settingsSection.orNull();
+                .findSection(RobotSettingsSection.class);
+        return (RobotSettingsSection) settingsSection.orNull();
     }
 
     private void createColumns(final boolean createFirst) {

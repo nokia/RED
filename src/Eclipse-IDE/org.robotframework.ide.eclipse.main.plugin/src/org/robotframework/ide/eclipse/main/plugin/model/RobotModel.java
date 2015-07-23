@@ -15,6 +15,10 @@ public class RobotModel implements RobotElement {
 
     private final List<RobotElement> projects = new ArrayList<>();
 
+    RobotModel() {
+        // reducing visibility
+    }
+
     public RobotProject createRobotProject(final IProject project) {
         if (project == null) {
             return null;

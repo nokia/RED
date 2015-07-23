@@ -24,10 +24,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -69,8 +69,8 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
 
 	@Override
     public Object[] getChildren(final Object parentElement) {
-        if (parentElement instanceof RobotSuiteSettingsSection) {
-            final List<RobotElement> children = ((RobotElement) parentElement).getChildren();
+        if (parentElement instanceof RobotSettingsSection) {
+            final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
             return groupedChildren(children).toArray();
         } else if (parentElement instanceof RobotElement) {
             return ((RobotElement) parentElement).getChildren().toArray();
@@ -78,7 +78,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
         return new Object[0];
     }
 
-    private List<RobotElement> groupedChildren(final List<RobotElement> children) {
+    private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
         final List<RobotElement> grouped = new ArrayList<>(children);
         final Multimap<SettingsGroup, RobotElement> removedElements = LinkedHashMultimap.create();
 

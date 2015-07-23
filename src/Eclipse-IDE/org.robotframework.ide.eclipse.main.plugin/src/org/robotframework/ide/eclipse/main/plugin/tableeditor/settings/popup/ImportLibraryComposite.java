@@ -36,12 +36,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IFormColors;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.viewers.Selections;
@@ -154,8 +154,8 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
 
-        final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
-        final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
+        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
+        final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
         for (final LibrarySpecification spec : specs) {
             final ArrayList<String> args = newArrayList(spec.getName());
             if (spec.isRemote()) {
@@ -193,8 +193,8 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         libs.getImportedLibraries().removeAll(specs);
         libs.getLibrariesToImport().addAll(specs);
 
-        final Optional<RobotElement> section = fileModel.findSection(RobotSuiteSettingsSection.class);
-        final RobotSuiteSettingsSection settingsSection = (RobotSuiteSettingsSection) section.get();
+        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
+        final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
         final List<RobotSetting> settingsToRemove = getSettingsToRemove(settingsSection, specs);
         commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
 
@@ -202,7 +202,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         rightViewer.refresh();
     }
 
-    private List<RobotSetting> getSettingsToRemove(final RobotSuiteSettingsSection settingsSection,
+    private List<RobotSetting> getSettingsToRemove(final RobotSettingsSection settingsSection,
             final List<LibrarySpecification> specs) {
         final List<RobotSetting> settings = newArrayList();
         final List<String> specNames = Lists.transform(specs, new Function<LibrarySpecification, String>() {

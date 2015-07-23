@@ -30,13 +30,13 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -123,7 +123,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
         return new NewElementsCreator() {
             @Override
             public RobotElement createNew() {
-                final RobotSuiteSettingsSection settingsSection = getSection();
+                final RobotSettingsSection settingsSection = getSection();
                 commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Metadata", newArrayList("data")));
                 return settingsSection.getChildren().get(settingsSection.getChildren().size() - 1);
             }
@@ -145,14 +145,14 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     }
 
     private List<RobotElement> getMetadataElements() {
-        final RobotSuiteSettingsSection section = getSection();
+        final RobotSettingsSection section = getSection();
         return section != null ? section.getMetadataSettings() : null;
     }
 
-    private RobotSuiteSettingsSection getSection() {
+    private RobotSettingsSection getSection() {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSuiteSettingsSection.class);
-        return (RobotSuiteSettingsSection) settingsSection.orNull();
+                .findSection(RobotSettingsSection.class);
+        return (RobotSettingsSection) settingsSection.orNull();
     }
 
     @Override

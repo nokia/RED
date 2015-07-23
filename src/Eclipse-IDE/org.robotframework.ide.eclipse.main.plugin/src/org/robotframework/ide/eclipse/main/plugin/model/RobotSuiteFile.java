@@ -42,8 +42,7 @@ public class RobotSuiteFile implements RobotElement {
 
     private RobotEditorClosedListener listener;
 
-
-    public RobotSuiteFile(final RobotElement parent, final IFile file) {
+    RobotSuiteFile(final RobotElement parent, final IFile file) {
         this.parent = parent;
         this.file = file;
     }
@@ -53,8 +52,8 @@ public class RobotSuiteFile implements RobotElement {
         final boolean readOnly = !isEditable();
         if (name.equals(RobotVariablesSection.SECTION_NAME)) {
             section = new RobotVariablesSection(this, readOnly);
-        } else if (name.equals(RobotSuiteSettingsSection.SECTION_NAME)) {
-            section = new RobotSuiteSettingsSection(this, readOnly);
+        } else if (name.equals(RobotSettingsSection.SECTION_NAME)) {
+            section = new RobotSettingsSection(this, readOnly);
         } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
             section = new RobotCasesSection(this, readOnly);
         } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
@@ -75,7 +74,7 @@ public class RobotSuiteFile implements RobotElement {
         if (sections == null) {
             sections = new ArrayList<>();
             try {
-                sections.addAll(createParser().parseRobotFileSections(this));
+                createParser().parseRobotFileSections(this);
 
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
@@ -197,10 +196,10 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<LibrarySpecification> getImportedLibraries() {
-        final Optional<RobotElement> section = findSection(RobotSuiteSettingsSection.class);
+        final Optional<RobotElement> section = findSection(RobotSettingsSection.class);
         final List<String> alreadyImported = newArrayList();
         if (section.isPresent()) {
-            final List<RobotElement> importSettings = ((RobotSuiteSettingsSection) section.get()).getImportSettings();
+            final List<RobotElement> importSettings = ((RobotSettingsSection) section.get()).getImportSettings();
             for (final RobotElement element : importSettings) {
                 final RobotSetting setting = (RobotSetting) element;
                 if (SettingsGroup.LIBRARIES == setting.getGroup()) {
@@ -236,9 +235,9 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<IPath> getResourcesPaths() {
-        final Optional<RobotElement> optionalSettings = findSection(RobotSuiteSettingsSection.class);
+        final Optional<RobotElement> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
-            final RobotSuiteSettingsSection settings = (RobotSuiteSettingsSection) optionalSettings.get();
+            final RobotSettingsSection settings = (RobotSettingsSection) optionalSettings.get();
             return settings.getResourcesPaths();
         }
         return newArrayList();

@@ -19,7 +19,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     protected FileSectionsParser createParser() {
-        return new FileSectionsParser(input, readOnly);
+        return new FileSectionsParser(input);
     }
 
     @Override

@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -99,7 +98,7 @@ public class FileSectionsEmiter {
 
     private void emitKeywordCall(final StringBuilder builder, final String indent, final RobotKeywordCall call) {
         builder.append(indent);
-        final String name = call instanceof RobotCaseSetting ? "[" + call.getName() + "]" : call.getName();
+        final String name = call.getName();
         builder.append(name);
 
         if (!call.getArguments().isEmpty()) {

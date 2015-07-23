@@ -8,15 +8,20 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Keywords";
 
-    public RobotKeywordsSection(final RobotSuiteFile parent, final boolean readOnly) {
+    RobotKeywordsSection(final RobotSuiteFile parent, final boolean readOnly) {
         super(parent, SECTION_NAME, readOnly);
     }
 
-    public RobotKeywordDefinition createKeywordDefinition(final String name, final String[] arguments,
+    public RobotKeywordDefinition createKeywordDefinition(final String name, final List<String> arguments,
             final String comment) {
+        return createKeywordDefinition(getChildren().size(), name, arguments, comment);
+    }
+
+    public RobotKeywordDefinition createKeywordDefinition(final int index, final String name,
+            final List<String> arguments, final String comment) {
         final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name,
                 newArrayList(arguments), comment);
-        elements.add(keywordDefinition);
+        elements.add(index, keywordDefinition);
         return keywordDefinition;
     }
 
@@ -28,4 +33,9 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         return userKeywords;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<RobotKeywordDefinition> getChildren() {
+        return (List<RobotKeywordDefinition>) super.getChildren();
+    }
 }
