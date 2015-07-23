@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 
 public class RobotModel implements RobotElement {
 
