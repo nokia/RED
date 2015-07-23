@@ -15,7 +15,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;

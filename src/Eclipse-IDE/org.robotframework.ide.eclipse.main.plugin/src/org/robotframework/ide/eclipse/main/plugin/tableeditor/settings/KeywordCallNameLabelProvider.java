@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 class KeywordCallNameLabelProvider extends StylersDisposingLabelProvider {

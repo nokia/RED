@@ -1,8 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 
 public interface ISectionEditorPart {
 

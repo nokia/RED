@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+
 public class RobotElementChange {
 
     public enum Kind {

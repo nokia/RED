@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotKeywordDefinition implements RobotElement, Serializable {
 
@@ -25,7 +26,7 @@ public class RobotKeywordDefinition implements RobotElement, Serializable {
         this.comment = comment;
     }
 
-    RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
+    public RobotKeywordCall createKeywordCall(final String name, final String[] args, final String comment) {
         final RobotKeywordCall call = new RobotKeywordCall(this, name, newArrayList(args), comment);
         elements.add(call);
         return call;
@@ -40,6 +41,7 @@ public class RobotKeywordDefinition implements RobotElement, Serializable {
         this.name = newName;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
@@ -61,12 +63,11 @@ public class RobotKeywordDefinition implements RobotElement, Serializable {
         this.parent = parent;
     }
 
-    @Override
     public void fixParents(final RobotElement parent) {
         this.parent = (RobotKeywordsSection) parent;
 
         for (final RobotElement element : elements) {
-            element.fixParents(this);
+            ((RobotKeywordCall) element).fixParents(this);
         }
     }
 

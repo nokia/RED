@@ -4,7 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 
 import com.google.common.collect.Range;
 

@@ -6,11 +6,11 @@ import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 class CodeNamesLabelProvider extends StylersDisposingLabelProvider {

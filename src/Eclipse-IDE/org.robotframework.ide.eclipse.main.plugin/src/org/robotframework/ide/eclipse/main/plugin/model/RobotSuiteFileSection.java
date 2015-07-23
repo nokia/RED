@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotSuiteFileSection implements RobotElement {
 
@@ -14,7 +15,7 @@ public class RobotSuiteFileSection implements RobotElement {
     private final String name;
     private final boolean readOnly;
 
-    private RobotElement parent;
+    private final RobotElement parent;
     protected final List<RobotElement> elements = new ArrayList<>();
 
     public RobotSuiteFileSection(final RobotSuiteFile parent, final String name,
@@ -68,15 +69,6 @@ public class RobotSuiteFileSection implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
-    }
-
-    @Override
-    public void fixParents(final RobotElement parent) {
-        this.parent = parent;
-
-        for (final RobotElement element : elements) {
-            element.fixParents(this);
-        }
     }
 
     @Override

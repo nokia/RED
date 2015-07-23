@@ -3,9 +3,9 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 import java.util.Arrays;
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class InsertKeywordDefinitionsCommand extends EditorCommand {

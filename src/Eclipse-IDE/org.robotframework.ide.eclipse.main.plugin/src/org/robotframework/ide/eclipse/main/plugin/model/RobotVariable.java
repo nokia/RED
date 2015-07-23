@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotVariable implements RobotElement {
 
@@ -99,15 +100,11 @@ public class RobotVariable implements RobotElement {
     }
 
     @Override
-    public void fixParents(final RobotElement parent) {
-        this.parent = (RobotSuiteFileSection) parent;
-    }
-
-    @Override
     public List<RobotElement> getChildren() {
         return new ArrayList<>();
     }
 
+    @Override
     public String getComment() {
         return comment;
     }

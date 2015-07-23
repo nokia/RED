@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.cmd;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetVariableValueCommand extends EditorCommand {

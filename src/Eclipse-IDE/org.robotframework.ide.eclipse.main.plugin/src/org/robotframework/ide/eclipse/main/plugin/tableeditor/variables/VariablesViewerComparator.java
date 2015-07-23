@@ -3,7 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 /**
  * @author mmarzec

@@ -1,11 +1,11 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;

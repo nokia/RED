@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CommentsLabelProvider;
 
 class VariableCommentLabelProvider extends CommentsLabelProvider {

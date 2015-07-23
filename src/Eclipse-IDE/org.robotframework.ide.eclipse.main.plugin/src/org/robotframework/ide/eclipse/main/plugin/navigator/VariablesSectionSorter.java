@@ -4,8 +4,8 @@ import java.text.Collator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 
 public class VariablesSectionSorter extends ViewerSorter {
 

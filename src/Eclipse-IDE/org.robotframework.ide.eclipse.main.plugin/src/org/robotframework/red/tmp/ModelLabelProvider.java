@@ -1,7 +1,7 @@
 package org.robotframework.red.tmp;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
 public class ModelLabelProvider extends ColumnLabelProvider {
 
