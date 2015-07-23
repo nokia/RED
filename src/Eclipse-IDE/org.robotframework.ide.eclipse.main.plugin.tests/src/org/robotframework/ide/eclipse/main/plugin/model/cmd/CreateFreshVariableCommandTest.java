@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
