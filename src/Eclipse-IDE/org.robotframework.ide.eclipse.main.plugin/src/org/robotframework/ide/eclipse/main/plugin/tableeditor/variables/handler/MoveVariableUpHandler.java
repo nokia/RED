@@ -11,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.cmd.MoveVariableUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler.E4MoveVariableUpHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class MoveVariableUpHandler extends DIHandler<E4MoveVariableUpHandler> {
 

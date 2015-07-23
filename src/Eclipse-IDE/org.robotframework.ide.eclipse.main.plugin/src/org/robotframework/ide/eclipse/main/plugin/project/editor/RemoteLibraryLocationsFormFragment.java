@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Strings;
 

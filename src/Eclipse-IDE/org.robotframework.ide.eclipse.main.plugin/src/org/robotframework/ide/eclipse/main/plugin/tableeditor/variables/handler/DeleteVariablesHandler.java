@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteVariablesHandler.E4DeleteVariableHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class DeleteVariablesHandler extends DIHandler<E4DeleteVariableHandler> {
 

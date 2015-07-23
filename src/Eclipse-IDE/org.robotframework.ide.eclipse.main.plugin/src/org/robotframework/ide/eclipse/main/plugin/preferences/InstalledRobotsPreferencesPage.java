@@ -54,7 +54,7 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

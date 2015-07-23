@@ -6,7 +6,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.RenameKeywordsHandler.E4RenameKeywordsHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class RenameKeywordsHandler extends DIHandler<E4RenameKeywordsHandler> {
 

@@ -29,13 +29,13 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.forms.RedFormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.forms.RedFormToolkit;
 
 /**
  * @author mmarzec

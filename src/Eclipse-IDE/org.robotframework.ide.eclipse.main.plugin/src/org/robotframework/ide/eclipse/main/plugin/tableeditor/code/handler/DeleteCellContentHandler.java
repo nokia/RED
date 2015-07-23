@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler.E4DeleteCellContentHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandler> {
 

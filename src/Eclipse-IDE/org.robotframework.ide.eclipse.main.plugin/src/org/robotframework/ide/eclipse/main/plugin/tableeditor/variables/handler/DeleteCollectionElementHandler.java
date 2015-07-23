@@ -12,7 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteCollectionElementHandler.E4DeleteCollectionElementHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class DeleteCollectionElementHandler extends DIHandler<E4DeleteCollectionElementHandler> {
 
