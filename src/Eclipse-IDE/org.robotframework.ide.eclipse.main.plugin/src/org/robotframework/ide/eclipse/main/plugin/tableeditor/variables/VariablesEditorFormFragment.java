@@ -31,13 +31,13 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -142,7 +142,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         return new NewElementsCreator() {
             @Override
             public RobotElement createNew() {
-                final RobotSuiteFileSection section = (RobotSuiteFileSection) getViewer().getInput();
+                final RobotVariablesSection section = (RobotVariablesSection) getViewer().getInput();
                 commandsStack.execute(new CreateFreshVariableCommand(section, true));
 
                 return section.getChildren().get(section.getChildren().size() - 1);

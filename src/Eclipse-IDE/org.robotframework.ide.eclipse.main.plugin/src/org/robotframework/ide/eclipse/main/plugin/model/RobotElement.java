@@ -49,7 +49,7 @@ public interface RobotElement {
      * 
      * @return List of children elements
      */
-    List<RobotElement> getChildren();
+    List<? extends RobotElement> getChildren();
 
     /**
      * Gets image descriptor of this element
