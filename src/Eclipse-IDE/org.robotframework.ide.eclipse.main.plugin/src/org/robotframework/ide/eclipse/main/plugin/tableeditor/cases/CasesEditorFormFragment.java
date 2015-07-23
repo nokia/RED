@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 
-public class CasesEditorFormFragment extends CodeEditorFormFragment {
+class CasesEditorFormFragment extends CodeEditorFormFragment {
 
     @Override
     protected ITreeContentProvider createContentProvider() {

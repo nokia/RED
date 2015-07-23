@@ -17,7 +17,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     private final CheckboxTableViewer viewer;
 
-    InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
+    private InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
         this.viewer = viewer;
     }
 
