@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.search.ui.ISearchQuery;
@@ -55,7 +54,7 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
                         resourcesToLookInto.toArray(new IResource[0]));
                 NewSearchUI.runQueryInBackground(query);
             } catch (final CoreException e) {
-                RobotFramework.log(IStatus.ERROR, "Unable to find usages of '" + name + "' in " + place, e);
+                RobotFramework.logError("Unable to find usages of '" + name + "' in " + place, e);
             }
             return null;
         }
