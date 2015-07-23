@@ -1,0 +1,166 @@
+package org.robotframework.ide.core.testData.text.reader.recognizer.header;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+
+
+public class TestCasesTableHeaderRecognizerTest {
+
+    @ForClean
+    private ATokenRecognizer rec;
+
+
+    @Test
+    public void test_check_TestCase_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " * Test Case *";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_TestCase_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T * Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" * Test Case ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceTestCase_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" * Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_TestCase_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("* Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_TestCase_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " *** Test Case ***";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_TestCase_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T *** Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" *** Test Case ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceTestCase_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" *** Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_TestCase_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("*** Test Case ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_getPattern() {
+        assertThat(rec.getPattern().pattern()).isEqualTo(
+                "[ ]?[*]+[\\s]*"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
+                        + "[\\s]+("
+                        + ATokenRecognizer.createUpperLowerCaseWord("Cases")
+                        + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Case")
+                        + ")[\\s]*[*]*");
+    }
+
+
+    @Test
+    public void test_getProducedType() {
+        assertThat(rec.getProducedType()).isEqualTo(
+                RobotTokenType.TEST_CASES_TABLE_HEADER);
+    }
+
+
+    @Before
+    public void setUp() {
+        rec = new TestCasesTableHeaderRecognizer();
+    }
+
+
+    @After
+    public void tearDown() throws Exception {
+        ClassFieldCleaner.init(this);
+    }
+}
