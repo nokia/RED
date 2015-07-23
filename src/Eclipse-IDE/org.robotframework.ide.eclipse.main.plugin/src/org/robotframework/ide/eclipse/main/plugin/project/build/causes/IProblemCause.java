@@ -6,6 +6,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
+import com.google.common.base.CaseFormat;
+
 /**
  * This interface should be used together with
  * {@link RobotProblem#causedBy(IProblemCause)} static method.
@@ -41,11 +43,20 @@ public interface IProblemCause {
     List<? extends IMarkerResolution> createFixers();
     
     /**
+     * Returns category of problem. Multiple different problems may have the
+     * same category. Categories can be used e.g. to set different severity
+     * levels on different categories.
+     * 
+     * @return Category of problem
+     */
+    ProblemCategory getProblemCategory();
+
+    /**
      * Returns human-readable problem description. Returned string can use will
      * be filled with object array passed by
      * {@link RobotProblem#formatMessageWith(Object...)} method call, so they
      * can use formatted string as in {@link String#format(String, Object...)}
-     * method.
+     * method. This message should be used for newly created markers.
      * 
      * @return Human readable string with problem description. Can use
      *         formatting syntax inside.
@@ -61,6 +72,7 @@ public interface IProblemCause {
     String getEnumClassName();
 
     public static enum Severity {
+        FATAL(IMarker.SEVERITY_ERROR),
         ERROR(IMarker.SEVERITY_ERROR),
         WARNING(IMarker.SEVERITY_WARNING),
         INFO(IMarker.SEVERITY_INFO);
@@ -73,6 +85,10 @@ public interface IProblemCause {
 
         public int getLevel() {
             return severity;
+        }
+
+        public String getName() {
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name());
         }
     }
 }
