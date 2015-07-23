@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotCase implements RobotElement, Serializable {
 
@@ -56,12 +57,11 @@ public class RobotCase implements RobotElement, Serializable {
         this.parent = parent;
     }
 
-    @Override
     public void fixParents(final RobotElement parent) {
         this.parent = (RobotCasesSection) parent;
 
         for (final RobotElement element : elements) {
-            element.fixParents(this);
+            ((RobotKeywordCall) element).fixParents(this);
         }
     }
 

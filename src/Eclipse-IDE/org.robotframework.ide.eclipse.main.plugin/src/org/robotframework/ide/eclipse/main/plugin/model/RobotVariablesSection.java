@@ -1,6 +1,6 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable.Type;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 
 public class RobotVariablesSection extends RobotSuiteFileSection {
 
@@ -10,19 +10,19 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         super(parent, SECTION_NAME, readOnly);
     }
 
-    RobotVariable createListVariable(final String name, final String value, final String comment) {
+    public RobotVariable createListVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.LIST, name, value, comment);
         elements.add(robotVariable);
         return robotVariable;
     }
     
-    RobotVariable createDictionaryVariable(final String name, final String value, final String comment) {
+    public RobotVariable createDictionaryVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.DICTIONARY, name, value, comment);
         elements.add(robotVariable);
         return robotVariable;
     }
 
-    RobotVariable createScalarVariable(final String name, final String value, final String comment) {
+    public RobotVariable createScalarVariable(final String name, final String value, final String comment) {
         final RobotVariable robotVariable = new RobotVariable(this, Type.SCALAR, name, value, comment);
         elements.add(robotVariable);
         return robotVariable;

@@ -43,8 +43,8 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
