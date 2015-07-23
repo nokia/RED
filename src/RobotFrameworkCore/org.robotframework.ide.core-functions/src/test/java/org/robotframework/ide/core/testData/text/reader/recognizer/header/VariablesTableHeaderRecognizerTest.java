@@ -2,6 +2,8 @@ package org.robotframework.ide.core.testData.text.reader.recognizer.header;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +13,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+import org.robotframework.ide.core.testHelpers.CombinationGenerator;
 
 
 public class VariablesTableHeaderRecognizerTest {
@@ -230,6 +233,38 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_VariablesAllPossibilities_withAsterisks_atTheBeginAndEnd() {
+        assertAllCombinations("Variables");
+    }
+
+
+    @Test
+    public void test_check_VariableAllPossibilities_withAsterisks_atTheBeginAndEnd() {
+        assertAllCombinations("Variable");
+    }
+
+
+    private void assertAllCombinations(String text) {
+        List<String> combinations = new CombinationGenerator()
+                .combinations(text);
+
+        for (String comb : combinations) {
+            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb)
+                    .append(" ***");
+
+            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            RobotToken token = rec.next();
+            assertThat(token.getStartColumn()).isEqualTo(0);
+            assertThat(token.getLineNumber()).isEqualTo(1);
+            assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
+            assertThat(token.getText().toString()).isEqualTo(
+                    textOfHeader.toString());
+            assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        }
     }
 
 
