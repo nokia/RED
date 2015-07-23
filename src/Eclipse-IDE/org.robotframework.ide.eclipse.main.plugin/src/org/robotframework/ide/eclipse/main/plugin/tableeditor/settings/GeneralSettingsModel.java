@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 import com.google.common.base.Optional;
 
@@ -24,11 +24,11 @@ class GeneralSettingsModel {
         settings.put("Default Tags", null);
     }
 
-    private RobotSuiteSettingsSection settingsSection = null;
+    private RobotSettingsSection settingsSection = null;
 
     private RobotSetting documentation = null;
     
-    RobotSuiteSettingsSection getSection() {
+    RobotSettingsSection getSection() {
         return settingsSection;
     }
 
@@ -44,7 +44,7 @@ class GeneralSettingsModel {
         }
 
         if (settingsSection.isPresent()) {
-            this.settingsSection = (RobotSuiteSettingsSection) settingsSection.get();
+            this.settingsSection = (RobotSettingsSection) settingsSection.get();
             for (final RobotElement setting : settingsSection.get().getChildren()) {
                 final String settingName = setting.getName();
                 if (settings.containsKey(settingName)) {

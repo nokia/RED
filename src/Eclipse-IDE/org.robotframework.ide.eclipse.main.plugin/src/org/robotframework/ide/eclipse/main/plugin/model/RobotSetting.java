@@ -11,15 +11,20 @@ public class RobotSetting extends RobotKeywordCall {
 
     private final SettingsGroup group;
 
-    RobotSetting(final RobotSuiteSettingsSection section, final String name, final List<String> args,
+    RobotSetting(final RobotSettingsSection section, final String name, final List<String> args,
             final String comment) {
         this(section, SettingsGroup.NO_GROUP, name, args, comment);
     }
 
-    RobotSetting(final RobotSuiteSettingsSection section, final SettingsGroup group, final String name,
+    RobotSetting(final RobotSettingsSection section, final SettingsGroup group, final String name,
             final List<String> args, final String comment) {
         super(section, name, args, comment);
         this.group = group;
+    }
+
+    @Override
+    public RobotSettingsSection getParent() {
+        return (RobotSettingsSection) super.getParent();
     }
 
     public SettingsGroup getGroup() {
@@ -38,7 +43,7 @@ public class RobotSetting extends RobotKeywordCall {
 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), (RobotSuiteFileSection) getParent(),
+        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(),
                 this);
     }
 

@@ -1,57 +1,46 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 
 public class FileSectionsParser {
 
-    private final boolean readOnly;
     private IFile file;
     private InputStream stream;
 
 
     public FileSectionsParser(final IFile file) {
         this.file = file;
-        this.readOnly = file.isReadOnly();
     }
 
 
-    public FileSectionsParser(final InputStream stream, final boolean readOnly) {
+    public FileSectionsParser(final InputStream stream) {
         this.stream = stream;
-        this.readOnly = readOnly;
     }
 
 
-    public List<RobotElement> parseRobotFileSections(final RobotSuiteFile parent)
+    public void parseRobotFileSections(final RobotSuiteFile parent)
             throws IOException {
-        final List<RobotElement> sections = new ArrayList<>();
-
         InputStream inputStream = null;
-        IMarker[] markers;
         try {
             inputStream = file != null ? file.getContents(true) : stream;
-            markers = file == null ? new IMarker[0] : file.findMarkers(
-                    RobotProblem.TYPE_ID, true, 1);
         } catch (final CoreException e) {
             if (file != null) {
                 throw new IOException("Unable to get content of file: " + file.getLocation().toString(), e);
@@ -59,53 +48,27 @@ public class FileSectionsParser {
                 throw new IOException("Unable to read content from stream", e);
             }
         }
-        // final Multimap<Integer, IMarker> groupedMarkers =
-        // groupMarkersByLine(markers);
 
         try (final BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(inputStream, "UTF-8"))) {
             String line = bufferedReader.readLine();
 
-            RobotCasesSection casesSection = null;
             RobotCase testCase = null;
-            RobotKeywordsSection keywordsSection = null;
             RobotKeywordDefinition keywordDef = null;
-            RobotSuiteSettingsSection settingSection = null;
-            RobotVariablesSection varSection = null;
-            // int lineNumber = 1;
+            RobotSuiteFileSection currentSection = null;
+
             while(line != null) {
                 if (line.trim().isEmpty()) {
                     line = bufferedReader.readLine();
-                    // lineNumber++;
                     continue;
                 } else if (line.startsWith("*")) {
-                    casesSection = null;
                     testCase = null;
-                    keywordsSection = null;
                     keywordDef = null;
-                    settingSection = null;
-                    varSection = null;
+
                     final String sectionName = extractSectionName(line);
-                    if (RobotVariablesSection.SECTION_NAME.equals(sectionName)) {
-                        varSection = new RobotVariablesSection(parent, readOnly);
-                        sections.add(varSection);
-                    } else if (RobotCasesSection.SECTION_NAME
-                            .equals(sectionName)) {
-                        casesSection = new RobotCasesSection(parent, readOnly);
-                        sections.add(casesSection);
-                    } else if (RobotKeywordsSection.SECTION_NAME.equals(sectionName)) {
-                        keywordsSection = new RobotKeywordsSection(parent, readOnly);
-                        sections.add(keywordsSection);
-                    } else if (RobotSuiteSettingsSection.SECTION_NAME
-                            .equals(sectionName)) {
-                        settingSection = new RobotSuiteSettingsSection(parent,
-                                readOnly);
-                        sections.add(settingSection);
-                    } else {
-                        sections.add(new RobotSuiteFileSection(parent,
-                                sectionName, readOnly));
-                    }
-                } else if (varSection != null) {
+                    currentSection = parent.createRobotSection(sectionName);
+                } else if (currentSection != null
+                        && currentSection.getName().equals(RobotVariablesSection.SECTION_NAME)) {
                     final String comment = extractComment(line);
                     final String lineWithoutComment = removeComment(line);
 
@@ -114,17 +77,16 @@ public class FileSectionsParser {
                     value = (value == null) ? "" : value;
 
                     if (name != null) {
+                        final RobotVariablesSection variablesSection = (RobotVariablesSection) currentSection;
                         if (lineWithoutComment.startsWith("@")) {
-                            varSection.createListVariable(name, value, comment);
+                            variablesSection.createListVariable(name, value, comment);
                         } else if (lineWithoutComment.startsWith("&")) {
-                            varSection.createDictionaryVariable(name, value,
-                                    comment);
+                            variablesSection.createDictionaryVariable(name, value, comment);
                         } else {
-                            varSection.createScalarVariable(name, value,
-                                    comment);
+                            variablesSection.createScalarVariable(name, value, comment);
                         }
                     }
-                } else if (casesSection != null) {
+                } else if (currentSection != null && currentSection.getName().equals(RobotCasesSection.SECTION_NAME)) {
                     if (line.startsWith("  ") && testCase != null) {
                         final String comment = extractComment(line);
                         final String lineWithoutComment = removeComment(line);
@@ -134,15 +96,12 @@ public class FileSectionsParser {
                         final String[] args = split.length == 1 ? new String[0]
                                 : Arrays.copyOfRange(split, 1, split.length);
 
-                        if (name.startsWith("[") && name.endsWith("]")) {
-                            testCase.createSettting(name, args, comment);
-                        } else {
-                            testCase.createKeywordCall(name, args, comment);
-                        }
+                        testCase.createKeywordCall(name, newArrayList(args), comment);
                     } else {
+                        final RobotCasesSection casesSection = (RobotCasesSection) currentSection;
                         testCase = casesSection.createTestCase(line, extractComment(line));
                     }
-                } else if (keywordsSection != null) {
+                } else if (currentSection != null && currentSection.getName().equals(RobotKeywordsSection.SECTION_NAME)) {
                     if (line.startsWith("  ") && keywordDef != null) {
                         final String comment = extractComment(line);
                         final String lineWithoutComment = removeComment(line);
@@ -152,7 +111,7 @@ public class FileSectionsParser {
                         final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
                                 split.length);
 
-                        keywordDef.createKeywordCall(name, args, comment);
+                        keywordDef.createKeywordCall(name, newArrayList(args), comment);
                     } else {
                         final String comment = extractComment(line);
                         final String lineWithoutComment = removeComment(line);
@@ -162,9 +121,11 @@ public class FileSectionsParser {
                         final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
                                 split.length);
 
-                        keywordDef = keywordsSection.createKeywordDefinition(name, args, comment);
+                        final RobotKeywordsSection keywordsSection = (RobotKeywordsSection) currentSection;
+                        keywordDef = keywordsSection.createKeywordDefinition(name, newArrayList(args), comment);
                     }
-                } else if (settingSection != null) {
+                } else if (currentSection != null
+                        && currentSection.getName().equals(RobotSettingsSection.SECTION_NAME)) {
                     final String comment = extractComment(line);
                     final String lineWithoutComment = removeComment(line);
 
@@ -173,13 +134,12 @@ public class FileSectionsParser {
                     final String[] args = split.length == 1 ? new String[0]
                             : Arrays.copyOfRange(split, 1, split.length);
 
+                    final RobotSettingsSection settingSection = (RobotSettingsSection) currentSection;
                     settingSection.createSetting(name, comment, args);
                 }
                 line = bufferedReader.readLine();
-                // lineNumber++;
             }
         }
-        return sections;
     }
 
 

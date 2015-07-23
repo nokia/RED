@@ -1,0 +1,30 @@
+package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+public class SetVariableValueCommand extends EditorCommand {
+
+    private final RobotVariable variable;
+    private final String newValue;
+
+    public SetVariableValueCommand(final RobotVariable variable, final String newValue) {
+        this.variable = variable;
+        this.newValue = newValue;
+    }
+
+    @Override
+    public void execute() throws CommandExecutionException {
+        if (variable.getValue().equals(newValue)) {
+            return;
+        }
+        variable.setValue(newValue);
+        
+        // it has to be send, not posted
+        // otherwise it is not possible to traverse between cells, because the cell
+        // is traversed and then main thread has to handle incoming posted event which
+        // closes currently active cell editor
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
+    }
+}

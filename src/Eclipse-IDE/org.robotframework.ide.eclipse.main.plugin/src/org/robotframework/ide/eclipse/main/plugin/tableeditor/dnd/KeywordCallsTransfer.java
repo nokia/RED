@@ -90,7 +90,7 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
             final RobotKeywordCall[] objects = new RobotKeywordCall[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotKeywordCall) in.readObject();
-                objects[i].fixParents(null);
+                objects[i].fixParents();
             }
             in.close();
             return objects;

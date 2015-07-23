@@ -1,14 +1,10 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshCaseCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -16,6 +12,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
@@ -72,8 +70,7 @@ public class CasesEditorFormFragment extends CodeEditorFormFragment {
         final RobotSuiteFileSection section = getSection();
         int max = 5;
         if (section != null) {
-            final List<RobotElement> children = section.getChildren();
-            for (final RobotElement testCase : children) {
+            for (final RobotElement testCase : section.getChildren()) {
                 for (final RobotElement nestedElement : testCase.getChildren()) {
                     final RobotKeywordCall call = (RobotKeywordCall) nestedElement;
                     max = Math.max(max, call.getArguments().size());

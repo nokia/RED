@@ -18,8 +18,7 @@ public class RobotSuiteFileSection implements RobotElement {
     private final RobotElement parent;
     protected final List<RobotElement> elements = new ArrayList<>();
 
-    public RobotSuiteFileSection(final RobotSuiteFile parent, final String name,
-            final boolean readOnly) {
+    RobotSuiteFileSection(final RobotSuiteFile parent, final String name, final boolean readOnly) {
         this.parent = parent;
         this.file = parent == null ? null : parent.getFile();
         this.name = name;
@@ -72,7 +71,7 @@ public class RobotSuiteFileSection implements RobotElement {
     }
 
     @Override
-    public List<RobotElement> getChildren() {
+    public List<? extends RobotElement> getChildren() {
         return elements;
     }
 

@@ -90,7 +90,7 @@ public class CasesTransfer extends ByteArrayTransfer {
             final RobotCase[] objects = new RobotCase[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotCase) in.readObject();
-                objects[i].fixParents(null);
+                objects[i].fixParents();
             }
             in.close();
             return objects;
