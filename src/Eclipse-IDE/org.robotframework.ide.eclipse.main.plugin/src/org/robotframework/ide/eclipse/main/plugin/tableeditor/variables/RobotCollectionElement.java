@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 public class RobotCollectionElement {
 
@@ -8,21 +8,17 @@ public class RobotCollectionElement {
 
     private String value;
 
-    public RobotCollectionElement(int index, String value) {
+    public RobotCollectionElement(final int index, final String key, final String value) {
         this.index = index;
-        this.value = value;
-    }
-
-    public RobotCollectionElement(int index, String key, String value) {
-        this(index, value);
         this.key = key;
+        this.value = value;
     }
 
     public int getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
+    public void setIndex(final int index) {
         this.index = index;
     }
 
@@ -34,7 +30,7 @@ public class RobotCollectionElement {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
@@ -42,7 +38,7 @@ public class RobotCollectionElement {
         return key;
     }
 
-    public void setKey(String key) {
+    public void setKey(final String key) {
         this.key = key;
     }
 }
