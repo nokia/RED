@@ -24,8 +24,22 @@ public abstract class ATokenRecognizer {
     public boolean hasNext(StringBuilder text, int lineNumber) {
         this.text = text;
         this.lineNumber = lineNumber;
-        m = pattern.matcher(text);
+        if (m == null || isTextDifferent(text)) {
+            m = pattern.matcher(text);
+        }
         return m.find();
+    }
+
+
+    private boolean isTextDifferent(final StringBuilder text) {
+        boolean result = false;
+        if (this.text == null) {
+            result = true;
+        } else {
+            result = this.text.toString().equals(text.toString());
+        }
+
+        return result;
     }
 
 
@@ -69,5 +83,10 @@ public abstract class ATokenRecognizer {
 
         }
         return str.toString();
+    }
+
+
+    public Pattern getPattern() {
+        return this.pattern;
     }
 }
