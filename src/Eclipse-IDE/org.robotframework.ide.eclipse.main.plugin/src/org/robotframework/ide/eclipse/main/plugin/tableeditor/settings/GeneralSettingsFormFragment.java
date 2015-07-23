@@ -43,15 +43,15 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -170,7 +170,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void createColumns(final boolean createFirst) {
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Setting").withWidth(100)
-                .shouldGrabAllTheSpaceLeft(!fileModel.findSection(RobotSuiteSettingsSection.class).isPresent()).withMinWidth(100)
+                .shouldGrabAllTheSpaceLeft(!fileModel.findSection(RobotSettingsSection.class).isPresent()).withMinWidth(100)
                 .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
                 .createFor(viewer);
         }
@@ -242,7 +242,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     private void setInput(final boolean setDocumentation) {
         final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSuiteSettingsSection.class);
+                .findSection(RobotSettingsSection.class);
         model.update(settingsSection);
 
         documentation.setEnabled(settingsSection.isPresent());

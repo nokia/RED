@@ -90,7 +90,7 @@ public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
             final RobotKeywordDefinition[] objects = new RobotKeywordDefinition[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotKeywordDefinition) in.readObject();
-                objects[i].fixParents(null);
+                objects[i].fixParents();
             }
             in.close();
             return objects;

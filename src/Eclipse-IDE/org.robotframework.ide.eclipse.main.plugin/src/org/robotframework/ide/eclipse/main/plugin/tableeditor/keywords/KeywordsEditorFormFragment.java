@@ -1,20 +1,18 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
@@ -71,8 +69,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
         final RobotSuiteFileSection section = getSection();
         int max = 5;
         if (section != null) {
-            final List<RobotElement> children = section.getChildren();
-            for (final RobotElement element : children) {
+            for (final RobotElement element : section.getChildren()) {
                 final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
                 max = Math.max(max, keyword.getArguments().size());
 

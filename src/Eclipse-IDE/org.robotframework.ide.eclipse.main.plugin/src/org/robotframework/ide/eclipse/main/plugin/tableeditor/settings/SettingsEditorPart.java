@@ -10,7 +10,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
@@ -49,12 +49,12 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         protected String getSectionName() {
-            return RobotSuiteSettingsSection.SECTION_NAME;
+            return RobotSettingsSection.SECTION_NAME;
         }
 
         @Override
         public boolean isPartFor(final RobotSuiteFileSection section) {
-            return section instanceof RobotSuiteSettingsSection;
+            return section instanceof RobotSettingsSection;
         }
 
         @Override
@@ -77,7 +77,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public Optional<RobotElement> provideSection(final RobotSuiteFile suiteModel) {
-            return suiteModel.findSection(RobotSuiteSettingsSection.class);
+            return suiteModel.findSection(RobotSettingsSection.class);
         }
 
         @Override

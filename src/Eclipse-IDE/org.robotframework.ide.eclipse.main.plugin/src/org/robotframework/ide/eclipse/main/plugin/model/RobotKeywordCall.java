@@ -13,9 +13,10 @@ public class RobotKeywordCall implements RobotElement, Serializable {
     private String name;
     private final List<String> args;
     private String comment;
-    private transient RobotElement parent;
+    private transient IRobotCodeHoldingElement parent;
 
-    public RobotKeywordCall(final RobotElement parent, final String name, final List<String> args, final String comment) {
+    RobotKeywordCall(final IRobotCodeHoldingElement parent, final String name, final List<String> args,
+            final String comment) {
         this.parent = parent;
         this.name = name;
         this.args = args;
@@ -32,15 +33,19 @@ public class RobotKeywordCall implements RobotElement, Serializable {
     }
 
     @Override
-    public RobotElement getParent() {
+    public IRobotCodeHoldingElement getParent() {
         return parent;
     }
 
-    public void setParent(final RobotElement parent) {
+    public void setParent(final IRobotCodeHoldingElement parent) {
         this.parent = parent;
     }
 
-    public void fixParents(final RobotElement parent) {
+    public void fixParents() {
+        // nothing to fix
+    }
+
+    void fixParents(final IRobotCodeHoldingElement parent) {
         this.parent = parent;
     }
 

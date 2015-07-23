@@ -4,13 +4,13 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetCaseCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.cmd.SetKeywordDefinitionCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 

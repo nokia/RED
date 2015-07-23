@@ -1,0 +1,47 @@
+package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+
+import java.util.Collections;
+
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+public class MoveKeywordCallDownCommand extends EditorCommand {
+
+    private final RobotKeywordCall keywordCall;
+
+    public MoveKeywordCallDownCommand(final RobotKeywordCall keywordCall) {
+        this.keywordCall = keywordCall;
+    }
+
+    @Override
+    public void execute() throws CommandExecutionException {
+        final IRobotCodeHoldingElement codeElement = keywordCall.getParent();
+        final int size = codeElement.getChildren().size();
+        final int index = codeElement.getChildren().indexOf(keywordCall);
+        if (index == size - 1) {
+            // lets try to move the element down from here
+            final int defsSize = codeElement.getParent().getChildren().size();
+            final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
+            if (indexOfElement == defsSize - 1) {
+                return;
+            }
+            final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
+                    .getChildren().get(indexOfElement + 1);
+
+            codeElement.getChildren().remove(index);
+            targetElement.getChildren().add(0, keywordCall);
+            keywordCall.setParent(targetElement);
+
+            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
+            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
+
+            return;
+        }
+        Collections.swap(codeElement.getChildren(), index, index + 1);
+
+        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, codeElement);
+    }
+
+}

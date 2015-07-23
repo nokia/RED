@@ -292,7 +292,7 @@
              class="org.robotframework.ide.eclipse.main.plugin.navigator.SettingsSectionSorter">
           <parentExpression>
              <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection">
+                   value="org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection">
              </instanceof>
           </parentExpression>
        </commonSorter>

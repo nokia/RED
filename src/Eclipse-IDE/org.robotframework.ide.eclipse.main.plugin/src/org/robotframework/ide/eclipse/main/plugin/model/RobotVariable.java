@@ -59,13 +59,13 @@ public class RobotVariable implements RobotElement {
         return false;
     }
 
-    private RobotSuiteFileSection parent;
+    private RobotVariablesSection parent;
     private String name;
     private Type type;
     private String value;
     private String comment;
 
-    public RobotVariable(final RobotSuiteFileSection section, final Type type, final String name,
+    RobotVariable(final RobotVariablesSection section, final Type type, final String name,
             final String value, final String comment) {
         this.parent = section;
         this.type = type;
@@ -95,7 +95,7 @@ public class RobotVariable implements RobotElement {
     }
 
     @Override
-    public RobotElement getParent() {
+    public RobotVariablesSection getParent() {
         return parent;
     }
 
@@ -133,7 +133,7 @@ public class RobotVariable implements RobotElement {
         this.name = name;
     }
 
-    public void setParent(final RobotSuiteFileSection variablesSection) {
+    public void setParent(final RobotVariablesSection variablesSection) {
         this.parent = variablesSection;
     }
 
