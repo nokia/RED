@@ -11,9 +11,9 @@ import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
 import com.google.common.collect.Range;
 

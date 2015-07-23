@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 class VariableValueLabelProvider extends StylersDisposingLabelProvider {
 

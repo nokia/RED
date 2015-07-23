@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 class UserKeywordsContentProvider implements ITreeContentProvider {

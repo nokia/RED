@@ -1,9 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 
 import com.google.common.base.Optional;
 

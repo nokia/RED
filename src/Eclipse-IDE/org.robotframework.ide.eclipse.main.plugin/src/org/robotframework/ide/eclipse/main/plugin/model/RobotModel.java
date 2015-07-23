@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 
 public class RobotModel implements RobotElement {
 
@@ -67,13 +68,6 @@ public class RobotModel implements RobotElement {
     @Override
     public RobotElement getParent() {
         return null;
-    }
-
-    @Override
-    public void fixParents(final RobotElement parent) {
-        for (final RobotElement element : projects) {
-            element.fixParents(this);
-        }
     }
 
     @Override

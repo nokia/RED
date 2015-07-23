@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -19,7 +19,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.FileSectionsEmiter;
+import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
@@ -29,7 +34,7 @@ import com.google.common.collect.Lists;
 
 public class RobotSuiteFile implements RobotElement {
 
-    private RobotElement parent;
+    private final RobotElement parent;
 
     private final IFile file;
 
@@ -154,15 +159,6 @@ public class RobotSuiteFile implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
-    }
-
-    @Override
-    public void fixParents(final RobotElement parent) {
-        this.parent = parent;
-
-        for (final RobotElement element : sections) {
-            element.fixParents(this);
-        }
     }
 
     public IFile getFile() {

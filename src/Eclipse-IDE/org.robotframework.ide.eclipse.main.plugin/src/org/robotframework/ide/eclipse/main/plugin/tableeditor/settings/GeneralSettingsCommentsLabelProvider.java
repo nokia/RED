@@ -4,7 +4,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CommentsLabelProvider;
 
 class GeneralSettingsCommentsLabelProvider extends CommentsLabelProvider {

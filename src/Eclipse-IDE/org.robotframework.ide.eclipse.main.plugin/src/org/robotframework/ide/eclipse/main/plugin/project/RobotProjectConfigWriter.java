@@ -13,7 +13,7 @@ import javax.xml.bind.Marshaller;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public class RobotProjectConfigWriter {
 

@@ -4,7 +4,7 @@ import java.text.Collator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.robotframework.ide.eclipse.main.plugin.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 public class SettingsSectionSorter extends ViewerSorter {
 
