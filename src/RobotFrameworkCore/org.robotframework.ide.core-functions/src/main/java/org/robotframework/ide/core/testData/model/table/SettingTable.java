@@ -3,26 +3,20 @@ package org.robotframework.ide.core.testData.model.table;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.IOptional;
+import org.robotframework.ide.core.testData.model.table.setting.AImported;
 
 
-public class SettingTable implements IOptional {
+public class SettingTable extends ARobotSectionTable {
 
-    private List<TableHeader> headers = new LinkedList<>();
+    private List<AImported> imports = new LinkedList<>();
 
 
-    public void addHeader(final TableHeader header) {
-        headers.add(header);
+    public List<AImported> getImports() {
+        return imports;
     }
 
 
-    public List<TableHeader> getHeaders() {
-        return headers;
-    }
-
-
-    @Override
-    public boolean isPresent() {
-        return !headers.isEmpty();
+    public void addImported(final AImported imported) {
+        imports.add(imported);
     }
 }

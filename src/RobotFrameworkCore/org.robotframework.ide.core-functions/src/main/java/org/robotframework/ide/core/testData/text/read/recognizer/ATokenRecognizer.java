@@ -39,7 +39,6 @@ public abstract class ATokenRecognizer {
         t.setType(type);
         t.setText(new StringBuilder().append(text.substring(start, end)));
         t.setType(getProducedType());
-
         return t;
     }
 
