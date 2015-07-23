@@ -90,7 +90,19 @@ public class RobotToken implements IRobotLineElement {
         * 
         */
         KEYWORDS_TABLE_HEADER("Keyword", "Keywords", "User Keyword",
-                "User Keywords");
+                "User Keywords"),
+        /**
+         * 
+         */
+        TABLE_HEADER_COLUMN,
+        /**
+         * 
+         */
+        START_HASH_COMMENT("#"),
+        /**
+         * 
+         */
+        COMMENT_CONTINUE;
 
         private final List<String> representationForNew = new LinkedList<>();
 

@@ -3,13 +3,19 @@ package org.robotframework.ide.core.testData.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 
 
 public class RobotFile {
 
-    private List<SettingTable> settingsTable = new LinkedList<>();
+    private final SettingTable settingTable = new SettingTable();
+    private final VariableTable variableTable = new VariableTable();
+    private final TestCaseTable testCaseTable = new TestCaseTable();
+    private final KeywordTable keywordTable = new KeywordTable();
 
     private final List<RobotLine> fileContent = new LinkedList<>();
 
@@ -24,12 +30,23 @@ public class RobotFile {
     }
 
 
-    public List<SettingTable> getSettingTables() {
-        return settingsTable;
+    public SettingTable getSettingTable() {
+        return settingTable;
     }
 
 
-    public void addSettingTable(final SettingTable settings) {
-        settingsTable.add(settings);
+    public VariableTable getVariableTable() {
+        return variableTable;
     }
+
+
+    public TestCaseTable getTestCaseTable() {
+        return testCaseTable;
+    }
+
+
+    public KeywordTable getKeywordTable() {
+        return keywordTable;
+    }
+
 }
