@@ -77,7 +77,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private VariableValueEditForm valueEditForm;
     
     private Section editSection;
-    private boolean isSaving = false;
 
     TableViewer getViewer() {
         return viewer;
@@ -179,7 +178,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     
     @Persist
     public void onSave() {
-        isSaving = true;
+        // nothing to do now
     }
 
     private Section createValueEditSection(final Composite parent) {
@@ -283,8 +282,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED && !isSaving) {
-            isSaving = false;
+        if (change.getKind() == Kind.CHANGED) {
             setInput();
         }
     }
