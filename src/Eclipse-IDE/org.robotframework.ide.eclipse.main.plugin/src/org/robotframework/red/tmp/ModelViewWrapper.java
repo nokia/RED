@@ -1,4 +1,4 @@
-package org.robotframework.tmp;
+package org.robotframework.red.tmp;
 
 import org.eclipse.e4.tools.compat.parts.DIViewPart;
 

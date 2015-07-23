@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.cmd.DeleteKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler.E4DeleteKeywordsHandler;
-import org.robotframework.viewers.Selections;
+import org.robotframework.red.viewers.Selections;
 
 public class DeleteKeywordsHandler extends DIHandler<E4DeleteKeywordsHandler> {
 
