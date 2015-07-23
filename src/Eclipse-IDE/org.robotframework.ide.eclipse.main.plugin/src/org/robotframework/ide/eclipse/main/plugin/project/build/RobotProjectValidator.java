@@ -36,7 +36,7 @@ class RobotProjectValidator {
                     }
                     return Status.OK_STATUS;
                 } catch (final CoreException e) {
-                    RobotFramework.log(IStatus.ERROR, "Project validation was corrupted", e);
+                    RobotFramework.logError("Project validation was corrupted", e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
