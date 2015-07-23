@@ -110,7 +110,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(final Object element) {
-        if (element instanceof RobotCase) {
+        if (element instanceof RobotCase || element instanceof RobotKeywordDefinition) {
             return false;
         }
         if (element instanceof RobotElement) {
