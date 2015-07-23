@@ -62,8 +62,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     protected RowExposingTreeViewer viewer;
 
-    private boolean isSaving;
-
     private MenuManager viewerMenuManager;
     private MenuManager headerMenuManager;
 
@@ -221,7 +219,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     @Persist
     public void onSave() {
         setFocus();
-        isSaving = true;
     }
 
     protected final void setDirty() {
@@ -252,8 +249,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED && !isSaving) {
-            isSaving = false;
+        if (change.getKind() == Kind.CHANGED) {
             setInput();
         }
     }
