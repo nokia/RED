@@ -2,8 +2,8 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateSettingKeywordCallCommand extends EditorCommand {

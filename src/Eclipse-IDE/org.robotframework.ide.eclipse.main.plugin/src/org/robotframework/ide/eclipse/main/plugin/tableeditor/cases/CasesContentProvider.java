@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 public class CasesContentProvider implements ITreeContentProvider {

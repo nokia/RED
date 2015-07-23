@@ -3,9 +3,9 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 import java.util.Arrays;
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class InsertCasesCommand extends EditorCommand {

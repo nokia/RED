@@ -2,9 +2,9 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import java.util.Collections;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveCaseDownCommand extends EditorCommand {

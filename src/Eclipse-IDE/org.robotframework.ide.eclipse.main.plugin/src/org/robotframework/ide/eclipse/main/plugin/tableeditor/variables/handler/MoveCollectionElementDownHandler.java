@@ -8,7 +8,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RobotCollectionElement;
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementDownHandler.E4MoveCollectionElementDownHandler;
 import org.robotframework.red.viewers.Selections;
 

@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CommentsLabelProvider;
 
 class CodeCommentLabelProvider extends CommentsLabelProvider {

@@ -1,8 +1,9 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotCaseSetting extends RobotKeywordCall {
 

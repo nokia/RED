@@ -1,6 +1,8 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.InputStream;
+
+import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
 

@@ -12,8 +12,8 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.robotframework.ide.eclipse.main.plugin.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 
 public class CasesTransfer extends ByteArrayTransfer {
 
@@ -90,6 +90,7 @@ public class CasesTransfer extends ByteArrayTransfer {
             final RobotCase[] objects = new RobotCase[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotCase) in.readObject();
+                objects[i].fixParents(null);
             }
             in.close();
             return objects;

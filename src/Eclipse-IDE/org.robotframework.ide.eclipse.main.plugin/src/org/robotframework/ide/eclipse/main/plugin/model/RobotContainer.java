@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,11 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotElementChange;
 
 public abstract class RobotContainer implements RobotElement {
 
-    private RobotElement parent;
+    private final RobotElement parent;
     protected final IContainer container;
     private final List<RobotElement> elements;
 
@@ -77,15 +78,6 @@ public abstract class RobotContainer implements RobotElement {
     @Override
     public RobotElement getParent() {
         return parent;
-    }
-
-    @Override
-    public void fixParents(final RobotElement parent) {
-        this.parent = parent;
-
-        for (final RobotElement element : elements) {
-            element.fixParents(this);
-        }
     }
 
     @Override

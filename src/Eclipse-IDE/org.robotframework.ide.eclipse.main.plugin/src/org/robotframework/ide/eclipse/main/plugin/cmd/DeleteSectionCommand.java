@@ -2,9 +2,9 @@ package org.robotframework.ide.eclipse.main.plugin.cmd;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteSectionCommand extends EditorCommand {

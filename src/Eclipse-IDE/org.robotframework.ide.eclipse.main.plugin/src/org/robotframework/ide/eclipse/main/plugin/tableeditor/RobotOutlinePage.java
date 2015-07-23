@@ -3,7 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 
 class RobotOutlinePage extends ContentOutlinePage {

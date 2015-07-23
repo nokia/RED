@@ -4,7 +4,7 @@ import java.text.Collator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
 public class KeywordsSectionSorter extends ViewerSorter {
 

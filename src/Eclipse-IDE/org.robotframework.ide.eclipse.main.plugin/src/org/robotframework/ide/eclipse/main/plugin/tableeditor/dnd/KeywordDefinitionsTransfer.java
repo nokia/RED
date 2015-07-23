@@ -13,7 +13,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
 public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
 
@@ -90,6 +90,7 @@ public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
             final RobotKeywordDefinition[] objects = new RobotKeywordDefinition[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotKeywordDefinition) in.readObject();
+                objects[i].fixParents(null);
             }
             in.close();
             return objects;

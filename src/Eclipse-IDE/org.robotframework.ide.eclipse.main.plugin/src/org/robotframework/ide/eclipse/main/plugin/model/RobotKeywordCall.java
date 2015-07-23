@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotKeywordCall implements RobotElement, Serializable {
 
@@ -39,7 +40,6 @@ public class RobotKeywordCall implements RobotElement, Serializable {
         this.parent = parent;
     }
 
-    @Override
     public void fixParents(final RobotElement parent) {
         this.parent = parent;
     }
@@ -63,6 +63,7 @@ public class RobotKeywordCall implements RobotElement, Serializable {
         return args;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }

@@ -2,7 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import org.eclipse.core.resources.IProject;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 class RedProjectEditorInput {

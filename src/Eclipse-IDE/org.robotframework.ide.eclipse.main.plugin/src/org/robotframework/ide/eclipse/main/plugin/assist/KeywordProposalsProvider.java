@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 class KeywordProposalsProvider implements IContentProposalProvider {
 

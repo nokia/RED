@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.robotframework.ide.eclipse.main.plugin.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.robotframework.ide.eclipse.main.plugin.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 public class VariablesContentProvider implements IStructuredContentProvider {
