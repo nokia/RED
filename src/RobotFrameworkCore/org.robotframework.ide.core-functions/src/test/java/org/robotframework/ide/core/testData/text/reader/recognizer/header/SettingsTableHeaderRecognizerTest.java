@@ -1,0 +1,394 @@
+package org.robotframework.ide.core.testData.text.reader.recognizer.header;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+
+
+public class SettingsTableHeaderRecognizerTest {
+
+    @ForClean
+    private ATokenRecognizer rec;
+
+
+    @Test
+    public void test_check_Metadata_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " * Metadata *";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Metadata_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T * Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" * Metadata ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceMetadata_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" * Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Metadata_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("* Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Metadata_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " *** Metadata ***";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Metadata_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T *** Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" *** Metadata ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceMetadata_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" *** Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Metadata_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("*** Metadata ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Settings_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " * Settings *";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Settings_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T * Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" * Settings ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceSettings_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" * Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Settings_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("* Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Settings_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " *** Settings ***";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Settings_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T *** Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" *** Settings ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceSettings_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" *** Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Settings_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("*** Settings ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Setting_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " * Setting *";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Setting_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T * Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" * Setting ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceSetting_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" * Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Setting_withAsterisk_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("* Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Setting_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
+        String expectedToCut = " *** Setting ***";
+        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
+        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceLetterT_and_Setting_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("T *** Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(" *** Setting ***");
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_spaceSetting_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder(" *** Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_check_Setting_withAsterisks_atTheBeginAndEnd() {
+        StringBuilder text = new StringBuilder("*** Setting ***");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_getPattern() {
+        assertThat(rec.getPattern().pattern()).isEqualTo(
+                "[ ]?[*]+[\\s]*("
+                        + ATokenRecognizer.createUpperLowerCaseWord("Settings")
+                        + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Setting")
+                        + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
+                        + ")[\\s]*[*]*");
+    }
+
+
+    @Test
+    public void test_getProducedType() {
+        assertThat(rec.getProducedType()).isEqualTo(
+                RobotTokenType.SETTINGS_TABLE_HEADER);
+    }
+
+
+    @Before
+    public void setUp() {
+        rec = new SettingsTableHeaderRecognizer();
+    }
+
+
+    @After
+    public void tearDown() throws Exception {
+        ClassFieldCleaner.init(this);
+    }
+}
