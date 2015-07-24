@@ -9,9 +9,11 @@ import org.eclipse.ui.IWorkbenchPage;
 
 public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
 
+    private transient RobotSuiteFileSection parent;
+
     private String name;
     private String comment;
-    private transient RobotSuiteFileSection parent;
+
     private final List<RobotKeywordCall> calls = newArrayList();
 
     RobotCodeHoldingElement(final RobotSuiteFileSection parent, final String name, final String comment) {
@@ -29,6 +31,18 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         final RobotKeywordCall call = new RobotKeywordCall(this, name, args, comment);
         getChildren().add(index, call);
         return call;
+    }
+
+    public RobotDefinitionSetting createDefinitionSetting(final String name, final List<String> args,
+            final String comment) {
+        return createDefinitionSetting(getChildren().size(), name, args, comment);
+    }
+
+    public RobotDefinitionSetting createDefinitionSetting(final int index, final String name, final List<String> args,
+            final String comment) {
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, name, args, comment);
+        getChildren().add(index, setting);
+        return setting;
     }
 
     @Override
