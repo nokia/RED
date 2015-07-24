@@ -166,7 +166,9 @@ public class RobotProjectConfig {
         if (referencedVariableFiles == null) {
             referencedVariableFiles = newArrayList();
         }
-        referencedVariableFiles.add(variableFile);
+        if (!referencedVariableFiles.contains(variableFile)) {
+            referencedVariableFiles.add(variableFile);
+        }
     }
     
     public void removeReferencedVariableFiles(final List<ReferencedVariableFile> selectedFiles) {
@@ -376,6 +378,22 @@ public class RobotProjectConfig {
 
         public void setVariables(Map<String, String> variables) {
             this.variables = variables;
+        }
+        
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (obj.getClass() == getClass()) {
+                final ReferencedVariableFile other = (ReferencedVariableFile) obj;
+                return Objects.equals(name, other.name) && Objects.equals(path, other.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, path);
         }
     }
 }
