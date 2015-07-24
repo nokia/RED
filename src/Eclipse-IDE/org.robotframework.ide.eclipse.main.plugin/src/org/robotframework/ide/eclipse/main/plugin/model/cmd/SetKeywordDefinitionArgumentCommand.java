@@ -1,7 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -21,7 +23,14 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final List<String> arguments = definition.getArguments();
+        RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
+        if (argumentsSetting == null) {
+            argumentsSetting = definition.createDefinitionSetting(0, RobotKeywordDefinition.ARGUMENTS,
+                    new ArrayList<String>(), "");
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
+        }
+
+        final List<String> arguments = argumentsSetting.getArguments();
         boolean changed = false;
 
         for (int i = arguments.size(); i <= index; i++) {
@@ -34,11 +43,16 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
-            // it has to be send, not posted
-            // otherwise it is not possible to traverse between cells, because the cell
-            // is traversed and then main thread has to handle incoming posted event which
-            // closes currently active cell editor
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
+        }
+
+        boolean allAreEmpty = true;
+        for (final String argument : arguments) {
+            allAreEmpty &= argument.trim().isEmpty();
+        }
+        if (allAreEmpty) {
+            definition.getChildren().remove(argumentsSetting);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
         }
     }
 }

@@ -12,7 +12,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
@@ -68,8 +67,6 @@ public class DeleteCellContentHandler extends DIHandler<E4DeleteCellContentHandl
                     commandsStack.execute(new SetCaseNameCommand(testCase, attribute));
                 } else if (index == noOfColumns - 1) {
                     commandsStack.execute(new SetCaseCommentCommand(testCase, attribute));
-                } else {
-                    commandsStack.execute(new SetCaseArgumentCommand(testCase, index - 1, attribute));
                 }
             } else if (element instanceof RobotKeywordCall) {
                 final RobotKeywordCall call = (RobotKeywordCall) element;

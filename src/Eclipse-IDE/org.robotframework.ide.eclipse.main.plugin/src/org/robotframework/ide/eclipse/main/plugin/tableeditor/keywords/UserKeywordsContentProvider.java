@@ -1,13 +1,21 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 class UserKeywordsContentProvider implements ITreeContentProvider {
 
@@ -36,9 +44,21 @@ class UserKeywordsContentProvider implements ITreeContentProvider {
         if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition def = (RobotKeywordDefinition) element;
             final boolean isEditable = def.getSuiteFile().isEditable();
-            return extendWithAddingToken(element, def.getChildren().toArray(), "", 1, isEditable);
+            return extendWithAddingToken(element, getKeywordCalls(def), "", 1, isEditable);
         }
         return new Object[0];
+    }
+
+    private RobotKeywordCall[] getKeywordCalls(final RobotKeywordDefinition definition) {
+        final List<RobotKeywordCall> children = definition.getChildren();
+        final List<RobotKeywordCall> filtered = newArrayList(Iterables.filter(children,
+                new Predicate<RobotKeywordCall>() {
+                    @Override
+                    public boolean apply(final RobotKeywordCall call) {
+                        return !(call instanceof RobotDefinitionSetting);
+                    }
+                }));
+        return filtered.toArray(new RobotKeywordCall[0]);
     }
 
     private Object[] extendWithAddingToken(final Object parent, final Object[] elements, final String name,
