@@ -30,12 +30,12 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
@@ -102,20 +102,20 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         
         final NewElementsCreator creator = newElementsCreator();
         
-        final VariablesViewerComparator comparator = new VariablesViewerComparator();
-        
         ViewerColumnsFactory.newColumn("Variable").withWidth(270)
                 .labelsProvidedBy(new VariableNameLabelProvider())
                 .editingSupportedBy(new VariableNameEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
-                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 0))
+                .equipWithThreeWaySorting(VariablesViewerComparators.variableNamesAscendingComparator(),
+                        VariablesViewerComparators.variableNamesDescendingComparator())
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Value").withWidth(270)
                 .labelsProvidedBy(new VariableValueLabelProvider())
                 .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
-                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 1))
+                .equipWithThreeWaySorting(VariablesViewerComparators.variableValuesAscendingComparator(),
+                        VariablesViewerComparators.variableValuesDescendingComparator())
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Comment").withWidth(400)
@@ -123,7 +123,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .labelsProvidedBy(new VariableCommentLabelProvider())
                 .editingSupportedBy(new VariableCommentEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
-                .withSelectionListener(new VariablesViewerColumnSelectionListener(viewer, comparator, 2))
+                .equipWithThreeWaySorting(VariablesViewerComparators.variableCommentsAscendingComparator(),
+                        VariablesViewerComparators.variableCommentsDescendingComparator())
                 .createFor(viewer);
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
