@@ -15,7 +15,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.base.Joiner;
 
@@ -426,14 +429,60 @@ public class RobotRuntimeEnvironment {
         }
         return null;
     }
+    
+    public Map<?, ?> getVariablesFromFile(String path, List<String> args) {
+
+        if (hasRobotInstalled()) {
+            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
+            StringBuilder argsBuilder = new StringBuilder();
+            if (args != null && !args.isEmpty()) {
+                argsBuilder.append("[");
+                for (int i = 0; i < args.size(); i++) {
+                    argsBuilder.append("'" + args.get(i) + "'");
+                    if (i < args.size() - 1) {
+                        argsBuilder.append(",");
+                    }
+                }
+                argsBuilder.append("]");
+            } else {
+                argsBuilder.append("None");
+            }
+            final List<String> cmdLine = Arrays.asList(
+                    cmd,
+                    "-c",
+                    "import robot.variables as rv;vars=rv.Variables();vars.set_from_file('" + path + "',"
+                            + argsBuilder.toString() + ");print(str(vars.data))");
+
+            final StringBuilder result = new StringBuilder();
+            final ILineHandler linesHandler = new ILineHandler() {
+
+                @Override
+                public void processLine(final String line) {
+                    result.append(line);
+                }
+            };
+
+            try {
+                runExternalProcess(cmdLine, linesHandler);
+                final String resultVars = result.toString().trim();
+                final ObjectMapper mapper = new ObjectMapper();
+                final Map<?, ?> varsMap = mapper.readValue(resultVars.replaceAll("'", "\""), Map.class);
+                return varsMap;
+            } catch (final IOException e) {
+                return null;
+            }
+        }
+        return null;
+    }
 
     public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
-            final List<String> pythonpath, final File projectLocation, final List<String> suites,
-            final String userArguments, final boolean isDebugging) throws IOException {
+            final List<String> pythonpath, final List<String> variableFilesPath, final File projectLocation,
+            final List<String> suites, final String userArguments, final boolean isDebugging) throws IOException {
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
 
-        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath, pythonpath));
+        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath, pythonpath,
+                variableFilesPath));
         cmdLine.add("--listener");
         cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
 
@@ -462,20 +511,21 @@ public class RobotRuntimeEnvironment {
         return cmdLine;
     }
 
-    private List<String> getRunCommandLine(final SuiteExecutor executor, final List<String> classpath, final List<String> pythonpath) {
+    private List<String> getRunCommandLine(final SuiteExecutor executor, final List<String> classpath,
+            final List<String> pythonpath, final List<String> variableFilesPath) {
         final List<String> cmdLine = new ArrayList<String>();
         if (executor == getInterpreter()) {
             cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
             argumentClasspath(cmdLine, executor, classpath);
             cmdLine.add("-m");
             cmdLine.add("robot.run");
-            argumentPythonpath(cmdLine, pythonpath);
         } else {
             cmdLine.add(executor.executableName());
             argumentClasspath(cmdLine, executor, classpath);
             cmdLine.add("\"" + getRunModulePath((PythonInstallationDirectory) location) + "\"");
-            argumentPythonpath(cmdLine, pythonpath);
         }
+        addPythonpath(cmdLine, pythonpath);
+        addVariableFilesPath(cmdLine, variableFilesPath);
         return cmdLine;
     }
 
@@ -487,10 +537,19 @@ public class RobotRuntimeEnvironment {
         }
     }
     
-    private void argumentPythonpath(final List<String> cmdLine, final List<String> pythonpath) {
+    private void addPythonpath(final List<String> cmdLine, final List<String> pythonpath) {
         if (!pythonpath.isEmpty()) {
             cmdLine.add("-P");
             cmdLine.add(Joiner.on(":").join(pythonpath));
+        }
+    }
+    
+    private void addVariableFilesPath(final List<String> cmdLine, final List<String> variableFilesPath) {
+        if (!variableFilesPath.isEmpty()) {
+            for (String path : variableFilesPath) {
+                cmdLine.add("-V");
+                cmdLine.add(path);
+            }
         }
     }
 

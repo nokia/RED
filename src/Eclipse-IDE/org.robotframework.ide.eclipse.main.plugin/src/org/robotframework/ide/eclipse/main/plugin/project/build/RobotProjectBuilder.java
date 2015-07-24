@@ -23,6 +23,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(getDelta(project), kind);
 
             final Job buildJob = new RobotLibrariesBuilder(getProject()).createBuildJob(rebuildNeeded);
+            final Job buildVariablesJob = new RobotVariablesBuilder(getProject()).createBuildJob(true);
             final Job validationJob = new RobotProjectValidator(getProject()).createValidationJob(getDelta(project),
                     kind);
             final IProgressMonitor progressMonitor = Job.getJobManager().createProgressGroup();
@@ -32,6 +33,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 progressMonitor.beginTask("Building and validating " + projectPath + " project", 200);
 
                 buildJob.setProgressGroup(progressMonitor, 100);
+                buildVariablesJob.setProgressGroup(progressMonitor, 100);
                 validationJob.setProgressGroup(progressMonitor, 100);
 
                 monitor.subTask("waiting for project " + projectPath + " build end");
@@ -45,6 +47,13 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                         return new IProject[0];
                     }
                 }
+                
+                if (!monitor.isCanceled()) {
+                    monitor.subTask("waiting for project " + projectPath + " variables build end");
+                    buildVariablesJob.schedule();
+                    buildVariablesJob.join();
+                }
+                
                 RobotFramework.getModelManager().getModel().createRobotProject(project).clear();
                 project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 

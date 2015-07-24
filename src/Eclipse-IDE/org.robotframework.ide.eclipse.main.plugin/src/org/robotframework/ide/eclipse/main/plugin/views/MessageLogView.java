@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
  *
  */
 public class MessageLogView {
+    
     private StyledText styledText;
     
     @PostConstruct
