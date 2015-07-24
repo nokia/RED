@@ -13,7 +13,7 @@ class PythonLibStructureBuilder {
     
     private boolean isArchive;
 
-    List<PythonClass> provideEntriesFromFile(final String path) {
+    public List<PythonClass> provideEntriesFromFile(final String path) {
         final List<PythonClass> pythonClasses = newArrayList();
         
         if (isPythonClass(path)) {
@@ -58,7 +58,7 @@ class PythonLibStructureBuilder {
             return new PythonClass(qualifiedName);
         }
 
-        String getQualifiedName() {
+        public String getQualifiedName() {
             return qualifiedName;
         }
     }
