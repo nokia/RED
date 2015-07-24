@@ -1,7 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -32,9 +30,9 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         if (index == -1) {
-            keywordsSection.createKeywordDefinition(DEFAULT_NAME, new ArrayList<String>(), "");
+            keywordsSection.createKeywordDefinition(DEFAULT_NAME);
         } else {
-            keywordsSection.createKeywordDefinition(index, DEFAULT_NAME, new ArrayList<String>(), "");
+            keywordsSection.createKeywordDefinition(index, DEFAULT_NAME);
         }
 
         if (notifySync) {

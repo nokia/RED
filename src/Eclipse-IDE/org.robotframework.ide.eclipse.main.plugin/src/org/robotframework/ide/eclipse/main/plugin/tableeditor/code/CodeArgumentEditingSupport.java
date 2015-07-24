@@ -1,11 +1,14 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -40,7 +43,7 @@ class CodeArgumentEditingSupport extends RobotElementEditingSupport {
     protected Object getValue(final Object element) {
         List<String> arguments = null;
         if (element instanceof RobotKeywordDefinition) {
-            arguments = ((RobotKeywordDefinition) element).getArguments();
+            arguments = getKeywordDefinitionArguments((RobotKeywordDefinition) element);
         } else if (element instanceof RobotKeywordCall) {
             arguments = ((RobotKeywordCall) element).getArguments();
         }
@@ -61,4 +64,11 @@ class CodeArgumentEditingSupport extends RobotElementEditingSupport {
         }
     }
 
+    private List<String> getKeywordDefinitionArguments(final RobotKeywordDefinition def) {
+        if (def.hasArguments()) {
+            final RobotDefinitionSetting argumentsSetting = def.getArgumentsSetting();
+            return argumentsSetting.getArguments();
+        }
+        return newArrayList();
+    }
 }
