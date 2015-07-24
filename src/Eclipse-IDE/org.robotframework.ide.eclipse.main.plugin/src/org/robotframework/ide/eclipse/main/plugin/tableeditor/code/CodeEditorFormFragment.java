@@ -30,10 +30,10 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -178,6 +178,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void createNameColumn(final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(150)
             .shouldGrabAllTheSpaceLeft(!sectionIsDefined()).withMinWidth(50)
+            .equipWithThreeWaySorting(CodesViewerComparators.codeNamesAscendingComparator(),
+                    CodesViewerComparators.codeNamesDescendingComparator())
             .labelsProvidedBy(new CodeNamesLabelProvider())
             .editingSupportedBy(new CodeNamesEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
