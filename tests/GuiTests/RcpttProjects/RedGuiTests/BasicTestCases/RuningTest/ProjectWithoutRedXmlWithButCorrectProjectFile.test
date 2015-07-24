@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PG3S0DE7EeWbDptfbJdvqQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/23/15 4:17 PM
+Save-Time: 7/24/15 2:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,11 +56,16 @@ with [get-view "Project Explorer" | get-tree] {
 }
 
 //check if libspec are created
+
 get-view "Project Explorer" | get-tree 
-    | select [format "OnlyRobotSuiteFile/Robot Standard libraries [%s]" $robot_version]
+    | select [format "OnlyRobotSuiteFile/Robot Standard libraries [%s]" $robot_version] | double-click
+    
+
 with [get-view "Project Explorer" | get-tree] {
     get-item "OnlyRobotSuiteFile/Robot Standard libraries .*]" 
-        | get-property childCount | equals 12 | verify-true
+        | get-property childCount -raw| gt 11 | verify-true
+        
+/*        
     get-item "OnlyRobotSuiteFile/Robot Standard libraries .*]" 
         | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn (99)" | verify-true
     get-item "OnlyRobotSuiteFile/Robot Standard libraries .*]" 
@@ -85,7 +90,10 @@ with [get-view "Project Explorer" | get-tree] {
         | get-property "getItems().TreeItem[10].getText()" | equals "Telnet (20)" | verify-true
     get-item "OnlyRobotSuiteFile/Robot Standard libraries .*]" 
         | get-property "getItems().TreeItem[11].getText()" | equals "XML (37)" | verify-true
+*/        
 }
+
+
 //check if only robot icon is shown
 get-view "Project Explorer" | get-tree | get-item OnlyRobotSuiteFile | get-property "image.decorations[0].path" 
     | equals "org.robotframework.ide.eclipse.main.plugin/resources/robot_dec.png" | verify-true
@@ -124,5 +132,6 @@ get-view Console | get-text-viewer | get-property text
     + "Log:     .*log.html\n"
     + "Report:  .*eport.html" | verify-true
     
-    
+  
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
