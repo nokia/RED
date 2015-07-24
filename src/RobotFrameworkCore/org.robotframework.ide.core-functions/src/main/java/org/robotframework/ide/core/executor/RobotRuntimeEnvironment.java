@@ -29,6 +29,8 @@ public class RobotRuntimeEnvironment {
     private final File location;
 
     private String version;
+    
+    private ObjectMapper mapper;
 
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
@@ -447,11 +449,13 @@ public class RobotRuntimeEnvironment {
             } else {
                 argsBuilder.append("None");
             }
+            
             final List<String> cmdLine = Arrays.asList(
                     cmd,
                     "-c",
                     "import robot.variables as rv;vars=rv.Variables();vars.set_from_file('" + path + "',"
-                            + argsBuilder.toString() + ");print(str(vars.data))");
+                            + argsBuilder.toString() + ");exec('try:\\n\\tprint(str(vars.data))\\n"
+                            + "except AttributeError:\\n\\tprint(str(vars.store.data))')");
 
             final StringBuilder result = new StringBuilder();
             final ILineHandler linesHandler = new ILineHandler() {
@@ -464,10 +468,11 @@ public class RobotRuntimeEnvironment {
 
             try {
                 runExternalProcess(cmdLine, linesHandler);
-                final String resultVars = result.toString().trim();
-                final ObjectMapper mapper = new ObjectMapper();
-                final Map<?, ?> varsMap = mapper.readValue(resultVars.replaceAll("'", "\""), Map.class);
-                return varsMap;
+                final String resultVars = result.toString().trim().replaceAll("'", "\"");
+                if(mapper == null) {
+                    mapper = new ObjectMapper();
+                }
+                return mapper.readValue(resultVars, Map.class);
             } catch (final IOException e) {
                 return null;
             }
