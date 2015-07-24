@@ -6,6 +6,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -15,17 +17,18 @@ import org.eclipse.swt.widgets.TreeColumn;
 public class ViewerColumnsFactory {
 
     private final String name;
+    private int minimumWidth;
     private int width;
-    private CellLabelProvider labelProvider;
+    private boolean shouldShowLastSep;
+    private boolean shouldExtend;
     private boolean resizable = true;
     private Image image;
     private String tooltip;
-    private EditingSupport editingSupport;
+    private CellLabelProvider labelProvider;
     private boolean shouldAddEditingSupport;
-    private boolean shouldExtend;
-    private boolean shouldShowLastSep;
-    private int minimumWidth;
-    private SelectionListener selectionListener;
+    private EditingSupport editingSupport;
+    private ViewerComparator ascendingComparator;
+    private ViewerComparator descendingComparator;
 
     public static ViewerColumnsFactory newColumn(final String name) {
         return new ViewerColumnsFactory(name);
@@ -90,9 +93,15 @@ public class ViewerColumnsFactory {
         return this;
     }
     
-    public ViewerColumnsFactory withSelectionListener(final SelectionListener selectionListener) {
-        this.selectionListener = selectionListener;
+    public ViewerColumnsFactory equipWithThreeWaySorting(final ViewerComparator ascendingComparator,
+            final ViewerComparator descendingComparator) {
+        this.ascendingComparator = ascendingComparator;
+        this.descendingComparator = descendingComparator;
         return this;
+    }
+
+    public ViewerColumnsFactory equipWithThreeWaySorting(final ViewerComparator ascendingComparator) {
+        return equipWithThreeWaySorting(ascendingComparator, new ReversingViewerComparator(ascendingComparator));
     }
 
     public void createFor(final TableViewer viewer) {
@@ -128,8 +137,9 @@ public class ViewerColumnsFactory {
             column.setEditingSupport(editingSupport);
         }
         
-        if(selectionListener != null) {
-            column.getColumn().addSelectionListener(selectionListener);
+        final SelectionListener createSortSwitchingListener = createSortSwitchingListener(viewer);
+        if (createSortSwitchingListener != null) {
+            column.getColumn().addSelectionListener(createSortSwitchingListener);
         }
     }
 
@@ -159,6 +169,76 @@ public class ViewerColumnsFactory {
                 return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
             }
         };
+    }
+
+    private SelectionListener createSortSwitchingListener(final TableViewer viewer) {
+        if (ascendingComparator == null | ascendingComparator == null) {
+            return null;
+        }
+        return new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final TableColumn currentSortColumn = viewer.getTable().getSortColumn();
+                final TableColumn clickedColumn = (TableColumn) e.getSource();
+
+                int nextDirection;
+                if (currentSortColumn == clickedColumn) {
+                    nextDirection = getNextDirection(viewer.getTable().getSortDirection());
+                } else {
+                    nextDirection = getNextDirection(SWT.NONE);
+                }
+                viewer.getTable().setSortDirection(nextDirection);
+                viewer.getTable().setSortColumn(nextDirection == SWT.NONE ? null : clickedColumn);
+                viewer.setComparator(getNextComparator(nextDirection, ascendingComparator, descendingComparator));
+            }
+        };
+    }
+
+    private SelectionListener createSortSwitchingListener(final TreeViewer viewer) {
+        if (ascendingComparator == null | ascendingComparator == null) {
+            return null;
+        }
+        return new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final TreeColumn currentSortColumn = viewer.getTree().getSortColumn();
+                final TreeColumn clickedColumn = (TreeColumn) e.getSource();
+
+                int nextDirection;
+                if (currentSortColumn == clickedColumn) {
+                    nextDirection = getNextDirection(viewer.getTree().getSortDirection());
+                } else {
+                    nextDirection = getNextDirection(SWT.NONE);
+                }
+                viewer.getTree().setSortDirection(nextDirection);
+                viewer.getTree().setSortColumn(nextDirection == SWT.NONE ? null : clickedColumn);
+                viewer.setComparator(getNextComparator(nextDirection, ascendingComparator, descendingComparator));
+            }
+        };
+    }
+
+    private static ViewerComparator getNextComparator(final int direction, final ViewerComparator ascendingComparator,
+            final ViewerComparator descendingComparator) {
+        if (direction == SWT.NONE) {
+            return null;
+        } else if (direction == SWT.DOWN) {
+            return ascendingComparator;
+        } else if (direction == SWT.UP) {
+            return descendingComparator;
+        } else {
+            throw new IllegalArgumentException("Unrecognized sorting direction: " + direction);
+        }
+    }
+
+    private static int getNextDirection(final int direction) {
+        if (direction == SWT.NONE) {
+            return SWT.DOWN;
+        } else if (direction == SWT.DOWN) {
+            return SWT.UP;
+        } else if (direction == SWT.UP) {
+            return SWT.NONE;
+        }
+        throw new IllegalArgumentException("Unrecognized sorting direction : " + direction);
     }
 
     public TreeViewerColumn createFor(final TreeViewer viewer) {
@@ -195,8 +275,9 @@ public class ViewerColumnsFactory {
             column.setEditingSupport(editingSupport);
         }
 
-        if (selectionListener != null) {
-            column.getColumn().addSelectionListener(selectionListener);
+        final SelectionListener createSortSwitchingListener = createSortSwitchingListener(viewer);
+        if (createSortSwitchingListener != null) {
+            column.getColumn().addSelectionListener(createSortSwitchingListener);
         }
         return column;
     }
@@ -227,5 +308,30 @@ public class ViewerColumnsFactory {
                 return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
             }
         };
+    }
+
+    private static class ReversingViewerComparator extends ViewerComparator {
+
+        private final ViewerComparator wrappedComparator;
+
+        ReversingViewerComparator(final ViewerComparator comparator) {
+            this.wrappedComparator = comparator;
+        }
+
+        @Override
+        public int category(final Object element) {
+            return wrappedComparator.category(element);
+        }
+
+        @Override
+        public int compare(final Viewer viewer, final Object e1, final Object e2) {
+            final int signReverser = -1;
+            return signReverser * wrappedComparator.compare(viewer, e1, e2);
+        }
+
+        @Override
+        public boolean isSorterProperty(final Object element, final String property) {
+            return wrappedComparator.isSorterProperty(element, property);
+        }
     }
 }
