@@ -62,6 +62,8 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
         private ReferencedLibrariesFormFragment referencedFragment;
 
         private RemoteLibraryLocationsFormFragment remoteFragment;
+        
+        private VariableFilesFormFragment variablesFragment;
 
         private Form form;
 
@@ -113,7 +115,8 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
             frameworksFragment = new FrameworksSectionFormFragment();
             referencedFragment = new ReferencedLibrariesFormFragment();
             remoteFragment = new RemoteLibraryLocationsFormFragment();
-            return newArrayList(frameworksFragment, referencedFragment, remoteFragment);
+            variablesFragment = new VariableFilesFormFragment();
+            return newArrayList(frameworksFragment, referencedFragment, remoteFragment, variablesFragment);
         }
 
         private void injectToFormParts(final IEclipseContext context,
@@ -212,6 +215,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                     frameworksFragment.whenConfigurationFiledChanged();
                     referencedFragment.whenConfigurationFiledChanged();
                     remoteFragment.whenConfigurationFiledChanged();
+                    variablesFragment.whenConfigurationFiledChanged();
                 }
             });
         }
@@ -223,6 +227,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                     frameworksFragment.whenEnvironmentWasLoaded(env, allEnvironments);
                     referencedFragment.whenEnvironmentWasLoaded(env);
                     remoteFragment.whenEnvironmentWasLoaded();
+                    variablesFragment.whenEnvironmentWasLoaded();
                 }
             });
         }
