@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/16/15 4:00 PM
+Save-Time: 7/23/15 11:55 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -185,6 +185,97 @@ proc "add-values-to_dictionary-in-EditVariable" [val list_of_values] [val script
 	   } 
 	}
 }
+
+proc "add-new-keyword-by-double-click" [val keywords_list] [val script_name]{
+	$keywords_list| each [val keyword]{
+		with [get-editor $script_name | get-tree] {
+			get-item "...add new keyword" | double-click
+		    select Keyword | activate-cell-edit
+		    with [get-editbox]{
+		    	set-text $keyword
+		        key-type Enter
+		   	}
+		    apply-cell-edit -deactivate
+		}
+	}
+}
+
+proc "add-new-keyword-by-typing-enter" [val keywords_list] [val script_name]{
+	$keywords_list| each [val keyword]{
+		with [get-editor $script_name | get-tree] {
+			get-item "...add new keyword" | key-type Enter
+		    select Keyword | activate-cell-edit
+		    with [get-editbox]{
+		    	set-text $keyword
+		        key-type Enter
+		   	}
+		    apply-cell-edit -deactivate
+		}
+	}
+}
+
+proc "add-row-to-keyword-by-right-arrows" [val keyword_name] [val elements] [val script_name]{
+	
+	$elements| each [val element] [val index]{
+		$elements |get 0| let [val first_element -input]{
+			with [get-editor $script_name | get-tree] {
+				if [$index | equals 0]{
+				    get-item [format "%s/\.\.\." $keyword_name] | double-click
+				    get-item[format "%s/\.\.\." $keyword_name] | activate-cell-edit
+				    with [get-editbox] {
+				        set-text $element
+			        	key-type Enter
+			    	}
+			    	apply-cell-edit -deactivate
+			    	
+		    	
+		    	}-else{
+		    		key-type Right
+					//type-text 2
+				    get-item [format "%s/%s" $keyword_name $first_element] | activate-cell-edit -column $index
+				    with [get-editbox] {
+				    	set-text $element
+				        key-type Enter
+				    }
+				    apply-cell-edit -deactivate
+				    
+				   
+				}
+			}	
+		} 	
+	}
+}
+
+proc "add-row-to-keyword-by-double-click-on-cell" [val keyword_name] [val elements] [val script_name]{
+	get-editor $script_name | get-tree | get-item [format "%s/\.\.\." $keyword_name] | get-property index -raw |let [val line_index -input]{
+		$elements| each [val element] [val index]{
+			$elements |get 0| let [val first_element -input]{
+				with [get-editor $script_name | get-tree] {
+					if [$index | equals 0]{
+					    get-item [format "%s/\.\.\." $keyword_name] | double-click
+					    get-item[format "%s/\.\.\." $keyword_name] | activate-cell-edit
+					    with [get-editbox] {
+					        set-text $element
+				        	key-type Enter
+				    	}
+				    	apply-cell-edit -deactivate
+			    	
+			    	}-else{
+			    	    get-item [format "%s/%s" $keyword_name $first_element] -index $line_index|double-click
+					    get-item [format "%s/%s" $keyword_name $first_element] -index $line_index| activate-cell-edit -column $index
+					    with [get-editbox] {
+					    	set-text $element
+					        key-type Enter
+					    }
+					    apply-cell-edit -deactivate			   
+					}
+				}	
+			} 	
+		}
+	}
+}
+
+
 proc Create2MetadataInTableEditor [val EditorTitle]{
 // create 2 variables in table editor Vriables tab
 // input - Editor title - filename
@@ -293,5 +384,23 @@ proc replace [val input] [val old] [val new]{
 
 }
 
+proc "compare-message-log2" [val ref_content]{
+	get-view "Message Log" | get-editbox | get-property text -raw| let [val original_content -input]
+	{
+		if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+			exec-process [format "\"python.exe\"  \"%s/Settings/PythonScripts/compare_msg_log_as_strings.py\"  \"%s\" \"%s\""   $user_RCPTT_project_path $original_content $ref_content ]
+			| let [val result [ get stdout] ]{
+			 $result | equals "OK!\r\n" | assert-true -message [format "Message was: %s" $result]
+			 }
+	
+		}-else{
+			exec-process [format "python.exe"  "%s/Settings/PythonScripts/compare_msg_log_as_strings.py"  "%s" "%s"   $user_RCPTT_project_path $original_content $ref_content ]
+			| let [val result [ get stdout] ]{
+			 $result | equals "OK!\n" | assert-true -message [format "Message was: %s" $result]
+			 }
+		}	
+	}
+
+}
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
