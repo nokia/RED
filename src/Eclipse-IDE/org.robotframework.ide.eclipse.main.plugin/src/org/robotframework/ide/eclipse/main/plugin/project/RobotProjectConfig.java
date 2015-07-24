@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -21,7 +22,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 @XmlRootElement(name = "projectConfiguration")
-@XmlType(propOrder = { "version", "executionEnvironment", "libraries", "remoteLocations" })
+@XmlType(propOrder = { "version", "executionEnvironment", "libraries", "remoteLocations", "referencedVariableFiles" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -40,6 +41,9 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "remoteLocations", required = false)
     private List<RemoteLocation> remoteLocations = new ArrayList<>();
+    
+    @XmlElement(name = "variableFiles", required = false)
+    private List<ReferencedVariableFile> referencedVariableFiles = new ArrayList<>();
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -152,6 +156,21 @@ public class RobotProjectConfig {
 
     public boolean hasRemoteLibraries() {
         return remoteLocations != null && !remoteLocations.isEmpty();
+    }
+    
+    public List<ReferencedVariableFile> getReferencedVariableFiles() {
+        return referencedVariableFiles;
+    }
+
+    public void addReferencedVariableFile(final ReferencedVariableFile variableFile) {
+        if (referencedVariableFiles == null) {
+            referencedVariableFiles = newArrayList();
+        }
+        referencedVariableFiles.add(variableFile);
+    }
+    
+    public void removeReferencedVariableFiles(final List<ReferencedVariableFile> selectedFiles) {
+        referencedVariableFiles.removeAll(selectedFiles);
     }
 
     @Override
@@ -309,6 +328,54 @@ public class RobotProjectConfig {
 
         private static String pathWithoutSpecialCharacters(final String path) {
             return path.replaceAll("[^A-Za-z0-9]", "_");
+        }
+    }
+    
+    @XmlRootElement(name = "referencedVariableFile")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class ReferencedVariableFile {
+
+        @XmlAttribute
+        private String name;
+
+        @XmlAttribute
+        private String path;
+
+        @XmlAttribute
+        private List<String> arguments;
+
+        private Map<String, String> variables;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public List<String> getArguments() {
+            return arguments;
+        }
+
+        public void setArguments(List<String> arguments) {
+            this.arguments = arguments;
+        }
+
+        public Map<String, String> getVariables() {
+            return variables;
+        }
+
+        public void setVariables(Map<String, String> variables) {
+            this.variables = variables;
         }
     }
 }

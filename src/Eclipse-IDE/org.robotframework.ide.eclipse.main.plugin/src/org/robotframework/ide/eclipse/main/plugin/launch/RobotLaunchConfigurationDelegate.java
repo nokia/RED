@@ -162,9 +162,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         
         final List<String> pythonpath = robotProject.getPythonpath();
         final List<String> classpath = robotProject.getClasspath();
+        final List<String> variableFilesPath = robotProject.getVariableFiles();
         
         final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, pythonpath,
-                project.getLocation().toFile(), suites, userArguments, isDebugging);
+                variableFilesPath, project.getLocation().toFile(), suites, userArguments, isDebugging);
         final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);

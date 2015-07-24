@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
@@ -25,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadlibrarySpecificationException;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
@@ -231,5 +233,22 @@ public class RobotProject extends RobotContainer {
             }
         }
         return "";
+    }
+    
+    public synchronized List<String> getVariableFiles() {
+        readProjectConfigurationIfNeeded();
+        if (configuration != null) {
+            List<String> list = newArrayList();
+            for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
+                String path = variableFile.getPath();
+                List<String> args = variableFile.getArguments();
+                if (args != null && !args.isEmpty()) {
+                    path = path + ":" + Joiner.on(":").join(args);
+                }
+                list.add(path);
+            }
+            return list;
+        }
+        return newArrayList();
     }
 }
