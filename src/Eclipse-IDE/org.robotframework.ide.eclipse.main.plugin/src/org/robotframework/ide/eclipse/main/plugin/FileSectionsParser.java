@@ -96,10 +96,18 @@ public class FileSectionsParser {
                         final String[] args = split.length == 1 ? new String[0]
                                 : Arrays.copyOfRange(split, 1, split.length);
 
-                        testCase.createKeywordCall(name, newArrayList(args), comment);
+                        if (name.startsWith("[") && name.endsWith("]")) {
+                            testCase.createDefinitionSetting(name.substring(1, name.length() - 1), newArrayList(args),
+                                    comment);
+                        } else {
+                            testCase.createKeywordCall(name, newArrayList(args), comment);
+                        }
                     } else {
+                        final String comment = extractComment(line);
+                        final String lineWithoutComment = removeComment(line).trim();
+
                         final RobotCasesSection casesSection = (RobotCasesSection) currentSection;
-                        testCase = casesSection.createTestCase(line, extractComment(line));
+                        testCase = casesSection.createTestCase(lineWithoutComment, comment);
                     }
                 } else if (currentSection != null && currentSection.getName().equals(RobotKeywordsSection.SECTION_NAME)) {
                     if (line.startsWith("  ") && keywordDef != null) {
@@ -107,22 +115,22 @@ public class FileSectionsParser {
                         final String lineWithoutComment = removeComment(line);
 
                         final String[] split = lineWithoutComment.split("  +");
-                        final String name = split[0];
+                        final String name = split[0].trim();
                         final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
                                 split.length);
 
-                        keywordDef.createKeywordCall(name, newArrayList(args), comment);
+                        if (name.startsWith("[") && name.endsWith("]")) {
+                            keywordDef.createDefinitionSetting(name.substring(1, name.length() - 1),
+                                    newArrayList(args), comment);
+                        } else {
+                            keywordDef.createKeywordCall(name, newArrayList(args), comment);
+                        }
                     } else {
                         final String comment = extractComment(line);
-                        final String lineWithoutComment = removeComment(line);
-
-                        final String[] split = lineWithoutComment.split("  +");
-                        final String name = split[0];
-                        final String[] args = split.length == 1 ? new String[0] : Arrays.copyOfRange(split, 1,
-                                split.length);
+                        final String lineWithoutComment = removeComment(line).trim();
 
                         final RobotKeywordsSection keywordsSection = (RobotKeywordsSection) currentSection;
-                        keywordDef = keywordsSection.createKeywordDefinition(name, newArrayList(args), comment);
+                        keywordDef = keywordsSection.createKeywordDefinition(lineWithoutComment, comment);
                     }
                 } else if (currentSection != null
                         && currentSection.getName().equals(RobotSettingsSection.SECTION_NAME)) {

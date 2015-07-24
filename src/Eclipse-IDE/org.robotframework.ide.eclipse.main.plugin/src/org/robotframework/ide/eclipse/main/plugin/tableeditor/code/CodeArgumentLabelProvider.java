@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.jface.viewers.Stylers.mixStylers;
 import static org.eclipse.jface.viewers.Stylers.withFontStyle;
 import static org.eclipse.jface.viewers.Stylers.withForeground;
@@ -12,6 +13,7 @@ import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
@@ -29,7 +31,7 @@ class CodeArgumentLabelProvider extends StylersDisposingLabelProvider {
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition def = (RobotKeywordDefinition) element;
-            final List<String> arguments = def.getArguments();
+            final List<String> arguments = getKeywordDefinitionArguments(def);
             if (index < arguments.size()) {
                 final DisposeNeededStyler variableStyler = addDisposeNeededStyler(mixStylers(withForeground(RobotTheme
                         .getVariableColor().getRGB()), withFontStyle(SWT.BOLD)));
@@ -56,6 +58,14 @@ class CodeArgumentLabelProvider extends StylersDisposingLabelProvider {
             }
         }
         return new StyledString();
+    }
+
+    private List<String> getKeywordDefinitionArguments(final RobotKeywordDefinition def) {
+        if (def.hasArguments()) {
+            final RobotDefinitionSetting argumentsSetting = def.getArgumentsSetting();
+            return argumentsSetting.getArguments();
+        }
+        return newArrayList();
     }
 
 }

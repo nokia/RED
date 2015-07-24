@@ -71,7 +71,9 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
         if (section != null) {
             for (final RobotElement element : section.getChildren()) {
                 final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
-                max = Math.max(max, keyword.getArguments().size());
+                if (keyword.hasArguments()) {
+                    max = Math.max(max, keyword.getArgumentsSetting().getArguments().size());
+                }
 
                 for (final RobotElement nestedElement : element.getChildren()) {
                     final RobotKeywordCall call = (RobotKeywordCall) nestedElement;
@@ -105,6 +107,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_STRUCTURAL_ALL) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
             viewer.refresh(definition);
+            viewer.update(definition, null);
             setDirty();
         }
     }

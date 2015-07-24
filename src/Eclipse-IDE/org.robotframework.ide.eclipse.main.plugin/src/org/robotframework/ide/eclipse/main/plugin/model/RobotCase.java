@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -8,12 +9,11 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public class RobotCase extends RobotCodeHoldingElement {
 
+    public static List<String> ALLOWED_SETTINGS = newArrayList("Documentation", "Setup", "Template", "Timeout",
+            "Teardown");
+
     RobotCase(final RobotCasesSection parent, final String name, final String comment) {
         super(parent, name, comment);
-    }
-
-    public List<String> getArguments() {
-        return new ArrayList<String>();
     }
 
     @Override
