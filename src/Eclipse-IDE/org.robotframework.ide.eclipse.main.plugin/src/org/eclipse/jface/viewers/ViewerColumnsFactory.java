@@ -222,9 +222,9 @@ public class ViewerColumnsFactory {
         if (direction == SWT.NONE) {
             return null;
         } else if (direction == SWT.DOWN) {
-            return ascendingComparator;
-        } else if (direction == SWT.UP) {
             return descendingComparator;
+        } else if (direction == SWT.UP) {
+            return ascendingComparator;
         } else {
             throw new IllegalArgumentException("Unrecognized sorting direction: " + direction);
         }
