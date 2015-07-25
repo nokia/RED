@@ -221,21 +221,20 @@ public class ViewerColumnsFactory {
             final ViewerComparator descendingComparator) {
         if (direction == SWT.NONE) {
             return null;
-        } else if (direction == SWT.DOWN) {
-            return descendingComparator;
         } else if (direction == SWT.UP) {
             return ascendingComparator;
-        } else {
-            throw new IllegalArgumentException("Unrecognized sorting direction: " + direction);
+        } else if (direction == SWT.DOWN) {
+            return descendingComparator;
         }
+        throw new IllegalArgumentException("Unrecognized sorting direction: " + direction);
     }
 
     private static int getNextDirection(final int direction) {
         if (direction == SWT.NONE) {
-            return SWT.DOWN;
-        } else if (direction == SWT.DOWN) {
             return SWT.UP;
         } else if (direction == SWT.UP) {
+            return SWT.DOWN;
+        } else if (direction == SWT.DOWN) {
             return SWT.NONE;
         }
         throw new IllegalArgumentException("Unrecognized sorting direction : " + direction);
