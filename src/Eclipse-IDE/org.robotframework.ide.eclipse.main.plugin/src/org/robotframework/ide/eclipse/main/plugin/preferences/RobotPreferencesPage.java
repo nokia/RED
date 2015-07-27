@@ -9,7 +9,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class RobotPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
     public RobotPreferencesPage() {
-        super("Main Robot preference page");
+        super("Main RED preference page");
     }
 
     @Override

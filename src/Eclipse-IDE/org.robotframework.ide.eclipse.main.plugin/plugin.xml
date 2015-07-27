@@ -617,23 +617,33 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.copyCellContent"
-          name="Copy cell content">
+          id="org.robotframework.ide.eclipse.cutRow"
+          name="Cut row">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.cutCellContent"
-          name="Cut cell content">
+          id="org.robotframework.ide.eclipse.copyRow"
+          name="Copy row">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.pasteCellContent"
-          name="Paste cell content">
+          id="org.robotframework.ide.eclipse.pasteRow"
+          name="Paste row">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.clearCellContent"
-          name="Clear cell content">
+          id="org.robotframework.ide.eclipse.deleteRow"
+          name="Delete row">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertCell"
+          name="Insert cell">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.deleteCell"
+          name="Delete cell">
     </command>
  </extension>
  <extension
@@ -869,25 +879,6 @@
           </reference>
        </activeWhen>
     </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CopyCellContentHandler"
-          commandId="org.robotframework.ide.eclipse.copyCellContent">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.editorContextIsActive">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.focusedCellHasContent">
-             </reference>
-          </and>
-       </enabledWhen>
-    </handler>
  </extension>
  <extension
        name="Code commons handlers"
@@ -955,7 +946,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.CutCellContentHandler"
-          commandId="org.robotframework.ide.eclipse.cutCellContent">
+          commandId="org.eclipse.ui.edit.cut">
        <activeWhen>
           <or>
              <reference
@@ -981,8 +972,32 @@
        </enabledWhen>
     </handler>
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CopyCellContentHandler"
+          commandId="org.eclipse.ui.edit.copy">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActive">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActive">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.singleElementHasFocusedCell">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.focusedCellHasContent">
+             </reference>
+          </and>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.PasteCellContentHandler"
-          commandId="org.robotframework.ide.eclipse.pasteCellContent">
+          commandId="org.eclipse.ui.edit.paste">
        <activeWhen>
           <or>
              <reference
@@ -1013,7 +1028,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellContentHandler"
-          commandId="org.robotframework.ide.eclipse.clearCellContent">
+          commandId="org.eclipse.ui.edit.delete">
        <activeWhen>
           <or>
              <reference
@@ -1083,7 +1098,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CutCasesHandler"
-          commandId="org.eclipse.ui.edit.cut">
+          commandId="org.robotframework.ide.eclipse.cutRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.casesPartIsActiveAndEditable">
@@ -1097,7 +1112,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyCasesHandler"
-          commandId="org.eclipse.ui.edit.copy">
+          commandId="org.robotframework.ide.eclipse.copyRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.casesPartIsActive">
@@ -1111,7 +1126,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.PasteCasesHandler"
-          commandId="org.eclipse.ui.edit.paste">
+          commandId="org.robotframework.ide.eclipse.pasteRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.casesPartIsActiveAndEditable">
@@ -1125,7 +1140,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler"
-          commandId="org.eclipse.ui.edit.delete">
+          commandId="org.robotframework.ide.eclipse.deleteRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.casesPartIsActiveAndEditable">
@@ -1185,7 +1200,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler"
-          commandId="org.eclipse.ui.edit.cut">
+          commandId="org.robotframework.ide.eclipse.cutRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
@@ -1199,11 +1214,12 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler"
-          commandId="org.eclipse.ui.edit.copy">
+          commandId="org.robotframework.ide.eclipse.copyRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.keywordsPartIsActive">
-          </reference></activeWhen>
+          </reference>
+       </activeWhen>
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.selectedElementsHaveSameType">
@@ -1212,7 +1228,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler"
-          commandId="org.eclipse.ui.edit.paste">
+          commandId="org.robotframework.ide.eclipse.pasteRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
@@ -1226,7 +1242,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler"
-          commandId="org.eclipse.ui.edit.delete">
+          commandId="org.robotframework.ide.eclipse.deleteRow">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
@@ -1270,25 +1286,25 @@
        </parameter>
     </key>
     <key
-          commandId="org.robotframework.ide.eclipse.cutCellContent"
+          commandId="org.robotframework.ide.eclipse.cutRow"
           contextId="org.robotframework.ide.eclipse.tableeditor.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+X">
     </key>
     <key
-          commandId="org.robotframework.ide.eclipse.copyCellContent"
+          commandId="org.robotframework.ide.eclipse.copyRow"
           contextId="org.robotframework.ide.eclipse.tableeditor.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+C">
     </key>
     <key
-          commandId="org.robotframework.ide.eclipse.pasteCellContent"
+          commandId="org.robotframework.ide.eclipse.pasteRow"
           contextId="org.robotframework.ide.eclipse.tableeditor.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+V">
     </key>
     <key
-          commandId="org.robotframework.ide.eclipse.clearCellContent"
+          commandId="org.robotframework.ide.eclipse.deleteRow"
           contextId="org.robotframework.ide.eclipse.tableeditor.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+DEL">
@@ -1309,16 +1325,6 @@
              name="navigation"
              visible="true">
        </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementUp"
-             label="Move up"
-             style="push">
-       </command>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementDown"
-             label="Move down"
-             style="push">
-       </command>
        <separator
              name="globals"
              visible="true">
@@ -1363,37 +1369,41 @@
           </command>
        </menu>
        <menu
-             label="Cell">
+             label="Row">
           <command
-                commandId="org.robotframework.ide.eclipse.cutCellContent"
-                icon="resources/cut_cell.png"
-                label="Cut cell content"
+                commandId="org.robotframework.ide.eclipse.moveElementUp"
+                label="Move up"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.copyCellContent"
-                icon="resources/copy_cell.png"
-                label="Copy cell content"
+                commandId="org.robotframework.ide.eclipse.moveElementDown"
+                label="Move down"
+                style="push">
+          </command>
+          <separator
+                name="row.edit"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.cutRow"
+                label="Cut row"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.pasteCellContent"
-                icon="resources/paste_cell.png"
-                label="Paste to cell"
+                commandId="org.robotframework.ide.eclipse.copyRow"
+                label="Copy row"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.clearCellContent"
-                icon="resources/clear_cell.png"
-                label="Clear cell content"
+                commandId="org.robotframework.ide.eclipse.pasteRow"
+                label="Paste row"
                 style="push">
           </command>
-          <visibleWhen
-                checkEnabled="false">
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-          </visibleWhen>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteRow"
+                label="Delete row"
+                style="push">
+          </command>
        </menu>
        <separator
              name="actions"
@@ -1470,16 +1480,6 @@
              name="navigation"
              visible="true">
        </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementUp"
-             label="Move up"
-             style="push">
-       </command>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementDown"
-             label="Move down"
-             style="push">
-       </command>
        <separator
              name="globals"
              visible="true">
@@ -1524,37 +1524,41 @@
           </command>
        </menu>
        <menu
-             label="Cell">
+             label="Row">
           <command
-                commandId="org.robotframework.ide.eclipse.cutCellContent"
-                icon="resources/cut_cell.png"
-                label="Cut cell content"
+                commandId="org.robotframework.ide.eclipse.moveElementUp"
+                label="Move up"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.copyCellContent"
-                icon="resources/copy_cell.png"
-                label="Copy cell content"
+                commandId="org.robotframework.ide.eclipse.moveElementDown"
+                label="Move down"
+                style="push">
+          </command>
+          <separator
+                name="row.edit"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.cutRow"
+                label="Cut row"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.pasteCellContent"
-                icon="resources/paste_cell.png"
-                label="Paste to cell"
+                commandId="org.robotframework.ide.eclipse.copyRow"
+                label="Copy row"
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.ide.eclipse.clearCellContent"
-                icon="resources/clear_cell.png"
-                label="Clear cell content"
+                commandId="org.robotframework.ide.eclipse.pasteRow"
+                label="Paste row"
                 style="push">
           </command>
-          <visibleWhen
-                checkEnabled="false">
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-          </visibleWhen>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteRow"
+                label="Delete row"
+                style="push">
+          </command>
        </menu>
        <separator
              name="actions"
@@ -2245,6 +2249,12 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.ValidationPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.validation"
             name="Validation">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.SuiteEditorPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            name="Editor">
       </page>
    </extension>
    <extension

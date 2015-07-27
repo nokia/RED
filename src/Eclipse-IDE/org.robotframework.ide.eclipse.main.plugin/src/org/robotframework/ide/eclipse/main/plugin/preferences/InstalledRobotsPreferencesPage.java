@@ -49,6 +49,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
@@ -204,9 +205,10 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         final Job job = new Job("Looking for python installations") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final IPreferenceStore store = getPreferenceStore();
-                installations = InstalledRobotEnvironments.getAllRobotInstallation(store);
-                final RobotRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(store);
+                final RedPreferences preferences = new RedPreferences(getPreferenceStore());
+                installations = InstalledRobotEnvironments.getAllRobotInstallation(preferences);
+                final RobotRuntimeEnvironment active = InstalledRobotEnvironments
+                        .getActiveRobotInstallation(preferences);
                 setProperty(key, active);
                 return Status.OK_STATUS;
             }
@@ -310,8 +312,8 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                             return env.getFile().getAbsolutePath();
                         }
                     }));
-            getPreferenceStore().putValue(InstalledRobotEnvironments.ACTIVE_RUNTIME, activePath);
-            getPreferenceStore().putValue(InstalledRobotEnvironments.OTHER_RUNTIMES, allPaths);
+            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME, activePath);
+            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES, allPaths);
             
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
