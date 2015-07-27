@@ -68,8 +68,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     protected RowExposingTreeViewer viewer;
 
-    private MenuManager viewerMenuManager;
-    private MenuManager headerMenuManager;
+    private Menu viewerMenu;
+    private Menu headerMenu;
 
     private Section section;
 
@@ -81,8 +81,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     public void initialize(final Composite parent) {
         createViewer(parent);
         createDetailsPanel(parent);
-        createViewerMenuManager();
-        createHeaderMenuManager();
+        createViewerContextMenu();
+        createHeaderContextMenu();
 
         setInput();
         parent.layout();
@@ -111,13 +111,13 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             new MenuProvider() {
                 @Override
                 public Menu provide() {
-                    return createMenu(viewerMenuManager);
+                    return viewerMenu;
                 }
             }, 
             new MenuProvider() {
                 @Override
                 public Menu provide() {
-                    return createMenu(headerMenuManager);
+                    return headerMenu;
                 }
             });
     }
@@ -159,17 +159,21 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     protected abstract void createSettingsTable(final Composite parent);
 
-    private void createViewerMenuManager() {
-        viewerMenuManager = new MenuManager("Robot suite editor code page context menu", getViewerMenuId());
-        viewerMenuManager.setRemoveAllWhenShown(true);
-    }
+    // private void createViewerMenuManager() {
+    // viewerMenuManager = new
+    // MenuManager("Robot suite editor code page context menu",
+    // getViewerMenuId());
+    // viewerMenuManager.setRemoveAllWhenShown(true);
+    // }
 
     protected abstract String getViewerMenuId();
 
-    private void createHeaderMenuManager() {
-        headerMenuManager = new MenuManager("Robot suite editor code page header context menu", getHeaderMenuId());
-        headerMenuManager.setRemoveAllWhenShown(true);
-    }
+    // private void createHeaderMenuManager() {
+    // headerMenuManager = new
+    // MenuManager("Robot suite editor code page header context menu",
+    // getHeaderMenuId());
+    // headerMenuManager.setRemoveAllWhenShown(true);
+    // }
 
     protected abstract String getHeaderMenuId();
 
@@ -179,6 +183,26 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         control.setMenu(menu);
         site.registerContextMenu(menuManager.getId(), menuManager, viewer, false);
         return menu;
+    }
+
+    private void createViewerContextMenu() {
+        final String menuId = getViewerMenuId();
+
+        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
+        final Control control = viewer.getControl();
+        viewerMenu = manager.createContextMenu(control);
+        control.setMenu(viewerMenu);
+        site.registerContextMenu(menuId, manager, viewer, false);
+    }
+
+    private void createHeaderContextMenu() {
+        final String menuId = getHeaderMenuId();
+
+        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
+        final Control control = viewer.getControl();
+        headerMenu = manager.createContextMenu(control);
+        control.setMenu(headerMenu);
+        site.registerContextMenu(menuId, manager, viewer, false);
     }
 
     private void setInput() {
