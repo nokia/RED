@@ -36,12 +36,47 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     public RobotDefinitionSetting getArgumentsSetting() {
+        return findSetting(ARGUMENTS);
+    }
+
+    public boolean hasReturnValue() {
+        return getReturnValueSetting() != null;
+    }
+
+    public RobotDefinitionSetting getReturnValueSetting() {
+        return findSetting(RETURN);
+    }
+
+    public boolean hasDocumentation() {
+        return getReturnValueSetting() != null;
+    }
+
+    public RobotDefinitionSetting getDocumentationSetting() {
+        return findSetting(DOCUMENTATION);
+    }
+
+    public boolean hasTeardownValue() {
+        return getReturnValueSetting() != null;
+    }
+
+    public RobotDefinitionSetting getTeardownSetting() {
+        return findSetting(TEARDOWN);
+    }
+
+    public boolean hasTimeoutValue() {
+        return getReturnValueSetting() != null;
+    }
+
+    public RobotDefinitionSetting getTimeoutSetting() {
+        return findSetting(TIMEOUT);
+    }
+
+    private RobotDefinitionSetting findSetting(final String name) {
         for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting && call.getName().equals(ARGUMENTS)) {
+            if (call instanceof RobotDefinitionSetting && call.getName().equals(name)) {
                 return (RobotDefinitionSetting) call;
             }
         }
         return null;
     }
-
 }
