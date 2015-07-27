@@ -12,9 +12,9 @@ class RedProjectConfigurationFileChangeListener implements IResourceChangeListen
 
     private final IProject project;
 
-    private final Runnable performOnChange;
+    private final OnRedConfigFileChange performOnChange;
 
-    RedProjectConfigurationFileChangeListener(final IProject project, final Runnable performOnChange) {
+    RedProjectConfigurationFileChangeListener(final IProject project, final OnRedConfigFileChange performOnChange) {
         this.project = project;
         this.performOnChange = performOnChange;
     }
@@ -31,7 +31,11 @@ class RedProjectConfigurationFileChangeListener implements IResourceChangeListen
                             return false;
                         }
                         if (delta.getResource().equals(project.getFile(RobotProjectConfig.FILENAME))) {
-                            performOnChange.run();
+                            if (delta.getKind() == IResourceDelta.REMOVED) {
+                                performOnChange.whenFileWasRemoved();
+                            } else {
+                                performOnChange.whenFileChanged();
+                            }
                             return false;
                         }
                         return true;
@@ -41,5 +45,11 @@ class RedProjectConfigurationFileChangeListener implements IResourceChangeListen
                 // nothing to do
             }
         }
+    }
+
+    static interface OnRedConfigFileChange {
+        void whenFileChanged();
+
+        void whenFileWasRemoved();
     }
 }
