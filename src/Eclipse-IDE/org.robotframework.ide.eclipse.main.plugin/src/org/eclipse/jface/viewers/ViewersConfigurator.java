@@ -103,11 +103,6 @@ public class ViewersConfigurator {
             public void menuDetected(final MenuDetectEvent e) {
                 final Point pointRelativeToControl = Display.getCurrent().map(null, control,
                         new Point(e.x, e.y));
-                final Menu currentMenu = control.getMenu();
-                if (currentMenu != null) {
-                    currentMenu.dispose();
-                }
-
                 if (headerWasClicked(control, pointRelativeToControl)) {
                     control.setMenu(headerMenuProvider.provide());
                 } else {
