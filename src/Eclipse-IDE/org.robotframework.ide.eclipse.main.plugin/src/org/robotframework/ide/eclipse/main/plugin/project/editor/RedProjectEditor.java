@@ -12,6 +12,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
@@ -61,6 +62,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
         try {
             context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class)).getActiveLeaf();
             context.set(RedProjectEditorInput.class, redProjectEditorInput);
+            context.set(IEditorSite.class, getEditorSite());
+            context.set(RedProjectEditor.class, this);
             projectConfigPart = new RedProjectConfigurationEditorPart();
             ContextInjectionFactory.inject(projectConfigPart, context);
 
