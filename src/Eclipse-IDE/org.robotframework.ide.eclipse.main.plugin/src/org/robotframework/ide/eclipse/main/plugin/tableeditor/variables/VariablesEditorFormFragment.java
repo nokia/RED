@@ -337,14 +337,18 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void variableAdded(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection variablesSection) {
-        viewer.getTable().setSortColumn(null);
-        viewer.setComparator(null);
+        if (variablesSection.getSuiteFile() == fileModel) {
+            viewer.getTable().setSortColumn(null);
+            viewer.setComparator(null);
+        }
     }
     
     @Inject
     @Optional
     private void variableRemoved(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection variablesSection) {
-        clearValueEditFormPanel();
+        if (variablesSection.getSuiteFile() == fileModel) {
+            clearValueEditFormPanel();
+        }
     }
     
     private void clearValueEditFormPanel() {
