@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/27/15 4:17 PM
+Save-Time: 7/27/15 5:24 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -105,7 +105,8 @@ proc "add-value-to-variable" [val list_of_values] [val script_name]{
 
 	with [get-editor $script_name] {
 	    get-tab-folder | get-tab-item Variables | click
-	 
+	    //this is workaround to scroll up
+	    get-table | select ".*"
 	   	$list_of_values| each [val variable_value] [val index]{
 		   	with [get-table] {
 		        get-item ".*" -index $index | double-click
