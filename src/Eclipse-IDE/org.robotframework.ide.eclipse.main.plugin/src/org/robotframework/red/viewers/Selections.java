@@ -42,7 +42,7 @@ public class Selections {
     public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,
             final Class<T> elementsClass) {
         final List<T> elements = getElements(selection, elementsClass);
-        if (elements.size() == 1) {
+        if (!elements.isEmpty()) {
             return Optional.of(elements.get(0));
         }
         return Optional.absent();
