@@ -40,6 +40,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationEditorPart.ProjectConfigurationEditor;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 
@@ -69,6 +70,12 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
 
         @Inject
         private RedProjectEditorInput editorInput;
+
+        @Inject
+        private IEditorSite editorSite;
+
+        @Inject
+        private RedProjectEditor editor;
 
         @PostConstruct
         public final void postConstruct(final Composite parent, final IEditorPart editorPart) {
@@ -139,9 +146,14 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
         private void installResourceListener() {
             final IProject project = editorInput.getRobotProject().getProject();
             final IResourceChangeListener listener = new RedProjectConfigurationFileChangeListener(project,
-                    new Runnable() {
+                    new OnRedConfigFileChange() {
                         @Override
-                        public void run() {
+                        public void whenFileWasRemoved() {
+                            editorSite.getPage().closeEditor(editor, false);
+                        }
+
+                        @Override
+                        public void whenFileChanged() {
                             whenConfigurationFiledChanged();
                             setupEnvironmentLoadingJob();
                         }
