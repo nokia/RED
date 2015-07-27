@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/23/15 11:55 AM
+Save-Time: 7/27/15 4:17 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -379,7 +379,7 @@ proc replace [val input] [val old] [val new]{
 		exec-process  "\"python.exe\"" "-c"  "\"import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])\"" $input $old $new | get stdout 
 
 	}-else{
-		exec-process  "python.exe" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout 
+		exec-process  "python" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout 
 	}	
 
 }
@@ -394,7 +394,7 @@ proc "compare-message-log2" [val ref_content]{
 			 }
 	
 		}-else{
-			exec-process [format "python.exe"  "%s/Settings/PythonScripts/compare_msg_log_as_strings.py"  "%s" "%s"   $user_RCPTT_project_path $original_content $ref_content ]
+			exec-process [format "python"  "%s/Settings/PythonScripts/compare_msg_log_as_strings.py"  "%s" "%s"   $user_RCPTT_project_path $original_content $ref_content ]
 			| let [val result [ get stdout] ]{
 			 $result | equals "OK!\n" | assert-true -message [format "Message was: %s" $result]
 			 }
