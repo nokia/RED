@@ -217,6 +217,16 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
     @Inject
     @Optional
+    private void whenKeywordIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            viewer.setComparator(null);
+            viewer.getTree().setSortColumn(null);
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenKeywordCallIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_STRUCTURAL_ALL) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
