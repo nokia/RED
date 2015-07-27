@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table;
+package org.robotframework.ide.core.testData.model.table.mapping;
 
 import java.util.Stack;
 
@@ -26,7 +26,8 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            RobotToken rt, Stack<ParsingState> processingState) {
+            final RobotLine currentLine, RobotToken rt,
+            Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getType() != RobotTokenType.START_HASH_COMMENT) {
             if (processingState.isEmpty()) {

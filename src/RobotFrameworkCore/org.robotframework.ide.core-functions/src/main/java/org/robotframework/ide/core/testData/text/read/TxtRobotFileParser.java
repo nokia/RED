@@ -13,18 +13,26 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.HashCommentMapper;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
+import org.robotframework.ide.core.testData.model.mapping.HashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.GarbageBeforeFirstTableMapper;
-import org.robotframework.ide.core.testData.model.table.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.TableColumnMapper;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.GarbageBeforeFirstTableMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColumnMapper;
+import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasFixer;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryArgumentsMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryNameOrPathMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
-import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -34,6 +42,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.Keywords
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -43,19 +53,30 @@ public class TxtRobotFileParser {
     private final TokenSeparatorBuilder tokenSeparatorBuilder;
     private final List<ATokenRecognizer> recognized = new LinkedList<>();
     private final List<IParsingMapper> mappers = new LinkedList<>();
+    private final ElementsUtility utility;
+    private final LibraryAliasFixer libraryFixer;
 
 
     public TxtRobotFileParser() {
+        this.utility = new ElementsUtility();
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
+        this.libraryFixer = new LibraryAliasFixer();
         recognized.add(new SettingsTableHeaderRecognizer());
         recognized.add(new VariablesTableHeaderRecognizer());
         recognized.add(new TestCasesTableHeaderRecognizer());
         recognized.add(new KeywordsTableHeaderRecognizer());
         recognized.add(new HashCommentRecognizer());
+        recognized.add(new LibraryDeclarationRecognizer());
+        recognized.add(new LibraryAliasRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
-        mappers.add(new TableColumnMapper());
+        mappers.add(new TableHeaderColumnMapper());
         mappers.add(new HashCommentMapper());
+        mappers.add(new LibraryDeclarationMapper());
+        mappers.add(new LibraryNameOrPathMapper());
+        mappers.add(new LibraryArgumentsMapper());
+        mappers.add(new LibraryAliasDeclarationMapper());
+        mappers.add(new LibraryAliasMapper());
     }
 
 
@@ -144,6 +165,7 @@ public class TxtRobotFileParser {
 
             lineNumber++;
             lastColumnProcessed = 0;
+            checkAndFixLine(parsingOutput, processingState);
             rf.addNewLine(line);
             updateStatus(processingState, null);
         }
@@ -151,7 +173,43 @@ public class TxtRobotFileParser {
         for (RobotLine line : rf.getFileContent()) {
             System.out.println(line);
         }
+
         return parsingOutput;
+    }
+
+
+    @VisibleForTesting
+    protected void checkAndFixLine(final RobotFileOutput robotFileOutput,
+            final Stack<ParsingState> processingState) {
+        ParsingState state = findNearestNotCommentState(processingState);
+        if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
+            AImported imported = utility.getNearestImport(robotFileOutput);
+            LibraryImport lib;
+            if (imported instanceof LibraryImport) {
+                lib = (LibraryImport) imported;
+            } else {
+                lib = null;
+
+                // FIXME: sth wrong - declaration of library not inside setting
+                // and
+                // was not catch by previous library declaration logic
+            }
+
+            libraryFixer.applyFixes(lib, null, processingState);
+        }
+    }
+
+
+    @VisibleForTesting
+    protected ParsingState findNearestNotCommentState(
+            final Stack<ParsingState> processingState) {
+        ParsingState state = ParsingState.UNKNOWN;
+        for (ParsingState s : processingState) {
+            if (s != ParsingState.COMMENT) {
+                state = s;
+            }
+        }
+        return state;
     }
 
 
@@ -183,7 +241,7 @@ public class TxtRobotFileParser {
         boolean useMapper = true;
         RobotFile fileModel = robotFileOutput.getFileModel();
         if (isTableHeader(robotToken)) {
-            if (isTableHeaderInCorrectPlace(currentLine, robotToken)) {
+            if (utility.isTheFirstColumn(currentLine, robotToken)) {
                 TableHeader header = new TableHeader(robotToken);
                 ARobotSectionTable table = null;
                 if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
@@ -209,8 +267,8 @@ public class TxtRobotFileParser {
         if (useMapper) {
             List<IParsingMapper> matchedMappers = new LinkedList<>();
             for (IParsingMapper mapper : mappers) {
-                if (mapper.checkIfCanBeMapped(robotFileOutput, robotToken,
-                        processingState)) {
+                if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
+                        robotToken, processingState)) {
                     matchedMappers.add(mapper);
                 }
             }
@@ -220,9 +278,11 @@ public class TxtRobotFileParser {
 
                 robotToken = matchedMappers.get(0).map(currentLine,
                         processingState, robotFileOutput, robotToken, fp, text);
+
             } else {
                 // TODO: implement - error
-                System.out.println("ERR " + text + " matchers: " + size);
+                // System.out.println("ERR [" + processingState + "");
+                // System.out.println("ERR [" + text + "]");
             }
         }
 
@@ -231,37 +291,54 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    protected boolean isTableHeaderInCorrectPlace(RobotLine currentLine,
-            RobotToken robotToken) {
-        boolean result = false;
-        if (robotToken.getStartColumn() == 0) {
-            result = true;
-        } else {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            int size = lineElements.size();
-            if (size > 0) {
-                IRobotLineElement lastElement = lineElements.get(size - 1);
-                result = (lastElement.getType() == SeparatorType.PIPE && lastElement
-                        .getStartColumn() == 0);
-            } else {
-                result = true;
+    protected void updateStatus(final Stack<ParsingState> processingState,
+            final RobotToken currentToken) {
+
+        if (currentToken == null) {
+            // line end
+            boolean clean = true;
+            while(clean) {
+                ParsingState status = utility.getCurrentStatus(processingState);
+                if (isTableHeader(status)) {
+                    processingState.pop();
+                    if (status == ParsingState.SETTING_TABLE_HEADER) {
+                        processingState.push(ParsingState.SETTING_TABLE_INSIDE);
+                    } else if (status == ParsingState.VARIABLE_TABLE_HEADER) {
+                        processingState
+                                .push(ParsingState.VARIABLE_TABLE_INSIDE);
+                    } else if (status == ParsingState.TEST_CASE_TABLE_HEADER) {
+                        processingState
+                                .push(ParsingState.TEST_CASE_TABLE_INSIDE);
+                    } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
+                        processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
+                    }
+
+                    clean = false;
+                } else if (utility.isTableInsideState(status)) {
+                    clean = false;
+                } else if (!processingState.isEmpty()) {
+                    processingState.pop();
+                } else {
+                    clean = false;
+                }
             }
+        } else {
+
         }
-        return result;
     }
 
 
     @VisibleForTesting
-    protected void updateStatus(final Stack<ParsingState> processingState,
-            final RobotToken currentToken) {
-        ParsingState status = getCurrentParsingState(processingState);
-
-        if (currentToken == null) {
-            // line end
-        } else {
-
+    protected boolean isTableHeader(ParsingState state) {
+        boolean result = false;
+        if (state == ParsingState.SETTING_TABLE_HEADER
+                || state == ParsingState.VARIABLE_TABLE_HEADER
+                || state == ParsingState.TEST_CASE_TABLE_HEADER
+                || state == ParsingState.KEYWORD_TABLE_HEADER) {
+            result = true;
         }
+
+        return result;
     }
 
 
@@ -303,19 +380,6 @@ public class TxtRobotFileParser {
         robotToken.setStartColumn(fp.getColumn());
 
         return robotToken;
-    }
-
-
-    private ParsingState getCurrentParsingState(
-            final Stack<ParsingState> processingState) {
-        ParsingState status;
-        if (processingState.isEmpty()) {
-            status = ParsingState.TRASH;
-        } else {
-            status = processingState.peek();
-        }
-
-        return status;
     }
 
 
@@ -383,6 +447,26 @@ public class TxtRobotFileParser {
         /**
          * 
          */
-        KEYWORD_TABLE_INSIDE;
+        KEYWORD_TABLE_INSIDE,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_IMPORT,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_NAME_OR_PATH,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_ARGUMENTS,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_IMPORT_ALIAS,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_IMPORT_ALIAS_VALUE;
     }
 }
