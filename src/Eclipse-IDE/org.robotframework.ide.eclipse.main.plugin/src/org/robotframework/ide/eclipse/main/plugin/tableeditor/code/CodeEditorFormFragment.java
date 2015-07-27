@@ -188,7 +188,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void createViewerContextMenu() {
         final String menuId = getViewerMenuId();
 
-        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
+        final MenuManager manager = new MenuManager("Robot suite editor code elements page context menu", menuId);
         final Control control = viewer.getControl();
         viewerMenu = manager.createContextMenu(control);
         control.setMenu(viewerMenu);
@@ -198,7 +198,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void createHeaderContextMenu() {
         final String menuId = getHeaderMenuId();
 
-        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
+        final MenuManager manager = new MenuManager("Robot suite editor code elements page header context menu", menuId);
         final Control control = viewer.getControl();
         headerMenu = manager.createContextMenu(control);
         control.setMenu(headerMenu);
