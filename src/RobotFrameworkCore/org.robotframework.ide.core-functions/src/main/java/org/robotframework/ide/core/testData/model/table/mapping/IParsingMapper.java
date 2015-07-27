@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table;
+package org.robotframework.ide.core.testData.model.table.mapping;
 
 import java.util.Stack;
 
@@ -18,5 +18,6 @@ public interface IParsingMapper {
 
 
     boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotToken rt, final Stack<ParsingState> processingState);
+            final RobotLine currentLine, final RobotToken rt,
+            final Stack<ParsingState> processingState);
 }

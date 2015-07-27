@@ -102,7 +102,27 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        COMMENT_CONTINUE;
+        COMMENT_CONTINUE,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_DECLARATION("Library"),
+        /**
+         * 
+         */
+        SETTING_LIBRARY_NAME,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_ARGUMENT,
+        /**
+         * 
+         */
+        SETTING_LIBRARY_ALIAS("WITH NAME"),
+        /**
+         * 
+         */
+        SETTING_LIBRARY_ALIAS_VALUE;
 
         private final List<String> representationForNew = new LinkedList<>();
 

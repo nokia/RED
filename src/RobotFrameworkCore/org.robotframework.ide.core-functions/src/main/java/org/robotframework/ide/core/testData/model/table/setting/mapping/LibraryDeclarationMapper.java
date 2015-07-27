@@ -1,0 +1,79 @@
+package org.robotframework.ide.core.testData.model.table.setting.mapping;
+
+import java.util.Stack;
+
+import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.text.read.RobotLine;
+import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+
+import com.google.common.annotations.VisibleForTesting;
+
+
+public class LibraryDeclarationMapper implements IParsingMapper {
+
+    private final ElementsUtility utility;
+
+
+    public LibraryDeclarationMapper() {
+        this.utility = new ElementsUtility();
+    }
+
+
+    @Override
+    public RobotToken map(RobotLine currentLine,
+            Stack<ParsingState> processingState,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            String text) {
+        rt.setType(RobotTokenType.SETTING_LIBRARY_DECLARATION);
+        rt.setText(new StringBuilder(text));
+
+        SettingTable settings = robotFileOutput.getFileModel()
+                .getSettingTable();
+        LibraryImport library = new LibraryImport(rt);
+        settings.addImported(library);
+        processingState.push(ParsingState.SETTING_LIBRARY_IMPORT);
+
+        return rt;
+    }
+
+
+    @Override
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
+            RobotLine currentLine, RobotToken rt,
+            Stack<ParsingState> processingState) {
+        boolean result = false;
+        if (utility.isTheFirstColumn(currentLine, rt)) {
+            if (isIncludedInSettingTable(currentLine, processingState)) {
+                result = true;
+            } else {
+                // FIXME: it is in wrong place means no settings table
+                // declaration
+            }
+        } else {
+            // FIXME: wrong place | | Library or | Library | Library X | case.
+        }
+
+        return result;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isIncludedInSettingTable(final RobotLine line,
+            final Stack<ParsingState> processingState) {
+        boolean result;
+        if (!processingState.isEmpty()) {
+            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_TABLE_INSIDE);
+        } else {
+            result = false;
+        }
+
+        return result;
+    }
+}

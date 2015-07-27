@@ -9,7 +9,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class TableHeader {
 
     private final RobotToken tableHeader;
-    private List<String> columnNames = new LinkedList<>();
+    private List<RobotToken> columnNames = new LinkedList<>();
+    private List<RobotToken> comment = new LinkedList<>();
 
 
     public TableHeader(final RobotToken tableHeader) {
@@ -17,12 +18,12 @@ public class TableHeader {
     }
 
 
-    public void addColumnName(String columnName) {
+    public void addColumnName(RobotToken columnName) {
         columnNames.add(columnName);
     }
 
 
-    public List<String> getColumnNames() {
+    public List<RobotToken> getColumnNames() {
         return columnNames;
     }
 
@@ -30,4 +31,15 @@ public class TableHeader {
     public RobotToken getTableHeader() {
         return tableHeader;
     }
+
+
+    public List<RobotToken> getComment() {
+        return comment;
+    }
+
+
+    public void addComment(RobotToken commentWord) {
+        this.comment.add(commentWord);
+    }
+
 }
