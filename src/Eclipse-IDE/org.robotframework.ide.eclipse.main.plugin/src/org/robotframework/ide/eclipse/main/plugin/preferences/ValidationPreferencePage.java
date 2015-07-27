@@ -24,7 +24,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
     public ValidationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RobotFramework.PLUGIN_ID));
-        setDescription("Robot validation settings");
+        setDescription("RED validation settings");
     }
 
     @Override
@@ -34,11 +34,11 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
 
     @Override
     protected void createFieldEditors() {
-        Composite parent = getFieldEditorParent();
+        final Composite parent = getFieldEditorParent();
         createProjectConfigurationSection(parent);
     }
 
-    private void createProjectConfigurationSection(Composite parent) {
+    private void createProjectConfigurationSection(final Composite parent) {
         final ExpandableComposite redExpandableComposite = new ExpandableComposite(parent,
                 ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
         redExpandableComposite.setExpanded(true);

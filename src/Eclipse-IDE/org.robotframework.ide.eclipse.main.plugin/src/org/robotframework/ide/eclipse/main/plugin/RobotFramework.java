@@ -48,7 +48,7 @@ public class RobotFramework extends AbstractUIPlugin {
     }
 
     public RobotRuntimeEnvironment getActiveRobotInstallation() {
-        return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferenceStore());
+        return InstalledRobotEnvironments.getActiveRobotInstallation(new RedPreferences(getPreferenceStore()));
     }
 
     public RobotRuntimeEnvironment getRobotInstallation(final File file) {
@@ -61,7 +61,7 @@ public class RobotFramework extends AbstractUIPlugin {
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
-        return InstalledRobotEnvironments.getAllRobotInstallation(getPreferenceStore());
+        return InstalledRobotEnvironments.getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
     }
 
     public static void logInfo(final String message) {

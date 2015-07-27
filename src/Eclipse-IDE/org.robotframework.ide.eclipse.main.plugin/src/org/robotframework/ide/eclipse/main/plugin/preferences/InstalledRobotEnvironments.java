@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 
 import com.google.common.base.Function;
@@ -28,38 +28,35 @@ public class InstalledRobotEnvironments {
                             final org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent event) {
                         if (event == null) {
                             return;
-                        } else if (ACTIVE_RUNTIME.equals(event.getKey())) {
+                        } else if (RedPreferences.ACTIVE_RUNTIME.equals(event.getKey())) {
                             ACTIVE = createRuntimeEnvironment((String) event.getNewValue());
-                        } else if (OTHER_RUNTIMES.equals(event.getKey())) {
+                        } else if (RedPreferences.OTHER_RUNTIMES.equals(event.getKey())) {
                             ALL = createRuntimeEnvironments((String) event.getNewValue());
                         }
                     }
                 });
     }
 
-    public static final String OTHER_RUNTIMES = "otherRuntimes";
-    public static final String ACTIVE_RUNTIME = "activeRuntime";
-
-    public static synchronized RobotRuntimeEnvironment getActiveRobotInstallation(final IPreferenceStore store) {
+    public static RobotRuntimeEnvironment getActiveRobotInstallation(final RedPreferences preferences) {
         if (ACTIVE == null) {
-            ACTIVE = readActiveFromPreferences(store);
+            ACTIVE = readActiveFromPreferences(preferences);
         }
         return ACTIVE;
     }
-    
-    public static synchronized List<RobotRuntimeEnvironment> getAllRobotInstallation(final IPreferenceStore store) {
+
+    public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
         if (ALL == null) {
-            ALL = readALLFromPreferences(store);
+            ALL = readALLFromPreferences(preferences);
         }
         return ALL;
     }
-    
-    private static RobotRuntimeEnvironment readActiveFromPreferences(final IPreferenceStore store) {
-        return createRuntimeEnvironment(store.getString(ACTIVE_RUNTIME));
+
+    private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
+        return createRuntimeEnvironment(preferences.getActiveRuntime());
     }
     
-    private static List<RobotRuntimeEnvironment> readALLFromPreferences(final IPreferenceStore store) {
-        return createRuntimeEnvironments(store.getString(OTHER_RUNTIMES));
+    private static List<RobotRuntimeEnvironment> readALLFromPreferences(final RedPreferences preferences) {
+        return createRuntimeEnvironments(preferences.getAllRuntimes());
     }
 
     private static RobotRuntimeEnvironment createRuntimeEnvironment(final String prefValue) {
