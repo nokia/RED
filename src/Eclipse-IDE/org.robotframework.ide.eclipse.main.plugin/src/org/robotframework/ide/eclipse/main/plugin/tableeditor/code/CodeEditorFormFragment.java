@@ -11,8 +11,11 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -20,6 +23,8 @@ import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.viewers.ViewersConfigurator.MenuProvider;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -41,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.viewers.Selections;
 
 public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
@@ -58,12 +64,14 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     protected RobotEditorCommandsStack commandsStack;
 
     @Inject
-    private RedFormToolkit toolkit;
+    protected RedFormToolkit toolkit;
 
     protected RowExposingTreeViewer viewer;
 
     private MenuManager viewerMenuManager;
     private MenuManager headerMenuManager;
+
+    private Section section;
 
     public TreeViewer getViewer() {
         return viewer;
@@ -96,6 +104,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             }
         });
         viewer.setContentProvider(createContentProvider());
+        viewer.addSelectionChangedListener(createSelectionChangeListener());
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
         ViewersConfigurator.enableContextMenuOnHeader(viewer, 
@@ -113,10 +122,30 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             });
     }
 
+    private ISelectionChangedListener createSelectionChangeListener() {
+        final ISelectionChangedListener selectionChangeListener = new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(final SelectionChangedEvent event) {
+                final RobotElement selectedElement = Selections.getOptionalFirstElement(
+                        (IStructuredSelection) event.getSelection(), RobotElement.class).orNull();
+                whenElementSelectionChanged(selectedElement);
+            }
+        };
+        viewer.getTree().addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                viewer.removeSelectionChangedListener(selectionChangeListener);
+            }
+        });
+        return selectionChangeListener;
+    }
+
+    protected abstract void whenElementSelectionChanged(RobotElement selectedElement);
+
     protected abstract ITreeContentProvider createContentProvider();
 
     private void createDetailsPanel(final Composite parent) {
-        final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setExpanded(false);
         section.setText("Settings");
         GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
@@ -124,7 +153,11 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         final Composite composite = toolkit.createComposite(section);
         GridLayoutFactory.fillDefaults().applyTo(composite);
         section.setClient(composite);
+
+        createSettingsTable(composite);
     }
+
+    protected abstract void createSettingsTable(final Composite parent);
 
     private void createViewerMenuManager() {
         viewerMenuManager = new MenuManager("Robot suite editor code page context menu", getViewerMenuId());

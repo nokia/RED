@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -19,6 +20,18 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEv
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 
 class CasesEditorFormFragment extends CodeEditorFormFragment {
+
+    @Override
+    protected void createSettingsTable(final Composite composite) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void whenElementSelectionChanged(final RobotElement selectedElement) {
+        // TODO Auto-generated method stub
+
+    }
 
     @Override
     protected ITreeContentProvider createContentProvider() {
