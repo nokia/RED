@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 
 import com.google.common.base.Function;
@@ -32,9 +33,11 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
                         }
                     }));
             
-            preferences.put(InstalledRobotEnvironments.ACTIVE_RUNTIME, activePath);
-            preferences.put(InstalledRobotEnvironments.OTHER_RUNTIMES, allPaths);
+            preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
+            preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
         }
+
+        preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
     }
 
 }
