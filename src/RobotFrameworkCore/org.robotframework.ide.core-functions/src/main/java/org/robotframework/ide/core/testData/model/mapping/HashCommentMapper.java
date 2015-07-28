@@ -37,7 +37,11 @@ public class HashCommentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
+        boolean addToStack = false;
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            rt.setType(RobotTokenType.START_HASH_COMMENT);
+            addToStack = true;
+        } else {
             rt.setType(RobotTokenType.COMMENT_CONTINUE);
         }
 
@@ -52,6 +56,11 @@ public class HashCommentMapper implements IParsingMapper {
         } else if (commentHolder == ParsingState.SETTING_RESOURCE_IMPORT) {
             mapResourceComment(rt, commentHolder, fileModel);
         }
+
+        if (addToStack) {
+            processingState.push(ParsingState.COMMENT);
+        }
+
         return rt;
     }
 
