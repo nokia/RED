@@ -17,6 +17,7 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.mapping.HashCommentMapper;
+import org.robotframework.ide.core.testData.model.mapping.PreviousLineContinueMapper;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
@@ -41,9 +42,10 @@ import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSepa
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.HashCommentRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.HashCommentRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
@@ -74,6 +76,8 @@ public class TxtRobotFileParser {
         recognized.add(new TestCasesTableHeaderRecognizer());
         recognized.add(new KeywordsTableHeaderRecognizer());
         recognized.add(new HashCommentRecognizer());
+        recognized.add(new PreviousLineContinueRecognizer());
+
         recognized.add(new LibraryDeclarationRecognizer());
         recognized.add(new LibraryAliasRecognizer());
         recognized.add(new VariableDeclarationRecognizer());
@@ -82,6 +86,7 @@ public class TxtRobotFileParser {
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
         mappers.add(new HashCommentMapper());
+        mappers.add(new PreviousLineContinueMapper());
 
         mappers.add(new LibraryDeclarationMapper());
         mappers.add(new LibraryNameOrPathMapper());
@@ -364,14 +369,16 @@ public class TxtRobotFileParser {
     @VisibleForTesting
     protected boolean isTableHeader(RobotToken t) {
         boolean result = false;
-        IRobotTokenType type = t.getType();
-        if (type == RobotTokenType.SETTINGS_TABLE_HEADER) {
+        List<IRobotTokenType> declaredTypes = t.getTypes();
+        if (declaredTypes.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
             result = true;
-        } else if (type == RobotTokenType.VARIABLES_TABLE_HEADER) {
+        } else if (declaredTypes
+                .contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
             result = true;
-        } else if (type == RobotTokenType.TEST_CASES_TABLE_HEADER) {
+        } else if (declaredTypes
+                .contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
             result = true;
-        } else if (type == RobotTokenType.KEYWORDS_TABLE_HEADER) {
+        } else if (declaredTypes.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
             result = true;
         }
 
@@ -404,14 +411,14 @@ public class TxtRobotFileParser {
 
     private ParsingState getStatus(RobotToken t) {
         ParsingState status = ParsingState.UNKNOWN;
-        IRobotTokenType type = t.getType();
-        if (type == RobotTokenType.SETTINGS_TABLE_HEADER) {
+        List<IRobotTokenType> types = t.getTypes();
+        if (types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
             status = ParsingState.SETTING_TABLE_HEADER;
-        } else if (type == RobotTokenType.VARIABLES_TABLE_HEADER) {
+        } else if (types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
             status = ParsingState.VARIABLE_TABLE_HEADER;
-        } else if (type == RobotTokenType.TEST_CASES_TABLE_HEADER) {
+        } else if (types.contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
             status = ParsingState.TEST_CASE_TABLE_HEADER;
-        } else if (type == RobotTokenType.KEYWORDS_TABLE_HEADER) {
+        } else if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
             status = ParsingState.KEYWORD_TABLE_HEADER;
         }
 

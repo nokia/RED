@@ -60,7 +60,8 @@ public class LibraryArgumentsMapper implements IParsingMapper {
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || currentState == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-                if (rt.getType() == RobotTokenType.SETTING_LIBRARY_ALIAS) {
+                if (rt.getTypes()
+                        .contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
                     result = false;
                 } else {
                     result = true;

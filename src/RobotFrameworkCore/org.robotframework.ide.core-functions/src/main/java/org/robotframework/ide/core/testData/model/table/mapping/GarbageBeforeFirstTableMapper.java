@@ -29,7 +29,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
             final RobotLine currentLine, RobotToken rt,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getType() != RobotTokenType.START_HASH_COMMENT) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (processingState.isEmpty()) {
                 result = true;
             } else {

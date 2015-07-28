@@ -73,8 +73,10 @@ public class Separator implements IRobotLineElement {
 
 
     @Override
-    public SeparatorType getType() {
-        return type;
+    public List<IRobotTokenType> getTypes() {
+        List<IRobotTokenType> s = new LinkedList<>();
+        s.add(type);
+        return s;
     }
 
 
