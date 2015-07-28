@@ -9,7 +9,7 @@ import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator
 public class PipeSeparator extends ALineSeparator {
 
     private static final String REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE = "((?=\\s[|])|\\s+)";
-    private static final Pattern PIPE_SEPARATOR = Pattern.compile("(^[|]"
+    private static final Pattern PIPE_SEPARATOR = Pattern.compile("(^[ ]?[|]"
             + REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE
             + ")|" + "(\\s+[|]"
             + REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE
