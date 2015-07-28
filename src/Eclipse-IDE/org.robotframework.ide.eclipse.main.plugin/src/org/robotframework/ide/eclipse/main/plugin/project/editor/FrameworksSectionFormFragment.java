@@ -87,7 +87,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         section.setText("Robot framework");
         section.setDescription("In this section Robot framework location can be specified. The selected framework will"
                 + " be used by this project. Currently following framework is in use:");
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 3).applyTo(section);
 
         final Composite sectionInternal = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(sectionInternal);
