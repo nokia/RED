@@ -1152,6 +1152,24 @@
           </reference>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.InsertCellHandler"
+          commandId="org.robotframework.ide.eclipse.insertCell">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCellHandler"
+          commandId="org.robotframework.ide.eclipse.deleteCell">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Keywords part handlers"
@@ -1309,6 +1327,18 @@
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+DEL">
     </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.insertCell"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+I">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.deleteCell"
+          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+D">
+    </key>
  </extension>
  <extension
        point="org.eclipse.ui.menus">
@@ -1355,6 +1385,20 @@
        </separator>
        <menu
              label="Table">
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCell"
+                label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteCell"
+                label="Delete cell"
+                style="push">
+          </command>
+          <separator
+                name="table.state"
+                visible="true">
+          </separator>
           <command
                 commandId="org.robotframework.ide.eclipse.expandAll"
                 icon="resources/expandall.png"

@@ -7,6 +7,10 @@ import org.eclipse.swt.widgets.Display;
 
 public class RobotImages {
 
+    public static ImageDescriptor getFilterImage() {
+        return RobotFramework.getImageDescriptor("resources/filter.png");
+    }
+
     public static ImageDescriptor getCloseImage() {
         return RobotFramework.getImageDescriptor("resources/close.png");
     }

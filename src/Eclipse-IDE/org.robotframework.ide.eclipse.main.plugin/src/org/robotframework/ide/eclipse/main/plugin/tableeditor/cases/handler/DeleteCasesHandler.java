@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -24,11 +23,9 @@ public class DeleteCasesHandler extends DIHandler<E4DeleteCasesHandler> {
 
     public static class E4DeleteCasesHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public Object deleteCases(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public Object deleteCases(final RobotEditorCommandsStack commandsStack,
+                @Named(Selections.SELECTION) final IStructuredSelection selection) {
             final List<RobotKeywordCall> keywordCalls = Selections.getElements(selection, RobotKeywordCall.class);
             final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);
 

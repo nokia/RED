@@ -159,32 +159,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     protected abstract void createSettingsTable(final Composite parent);
 
-    // private void createViewerMenuManager() {
-    // viewerMenuManager = new
-    // MenuManager("Robot suite editor code page context menu",
-    // getViewerMenuId());
-    // viewerMenuManager.setRemoveAllWhenShown(true);
-    // }
-
-    protected abstract String getViewerMenuId();
-
-    // private void createHeaderMenuManager() {
-    // headerMenuManager = new
-    // MenuManager("Robot suite editor code page header context menu",
-    // getHeaderMenuId());
-    // headerMenuManager.setRemoveAllWhenShown(true);
-    // }
-
-    protected abstract String getHeaderMenuId();
-
-    private Menu createMenu(final MenuManager menuManager) {
-        final Control control = viewer.getControl();
-        final Menu menu = menuManager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuManager.getId(), menuManager, viewer, false);
-        return menu;
-    }
-
     private void createViewerContextMenu() {
         final String menuId = getViewerMenuId();
 
@@ -195,6 +169,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         site.registerContextMenu(menuId, manager, viewer, false);
     }
 
+    protected abstract String getViewerMenuId();
+
     private void createHeaderContextMenu() {
         final String menuId = getHeaderMenuId();
 
@@ -204,6 +180,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         control.setMenu(headerMenu);
         site.registerContextMenu(menuId, manager, viewer, false);
     }
+
+    protected abstract String getHeaderMenuId();
 
     private void setInput() {
         viewer.setInput(getSection());
@@ -237,7 +215,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .shouldGrabAllTheSpaceLeft(!sectionIsDefined()).withMinWidth(50)
             .equipWithThreeWaySorting(CodesViewerComparators.codeNamesAscendingComparator(),
                     CodesViewerComparators.codeNamesDescendingComparator())
-            .labelsProvidedBy(new CodeNamesLabelProvider())
+            .labelsProvidedBy(new CodeNamesLabelProvider(getMatchesProvider()))
             .editingSupportedBy(new CodeNamesEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
@@ -245,7 +223,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     private void createArgumentColumn(final int index, final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(100)
-            .labelsProvidedBy(new CodeArgumentLabelProvider(index))
+            .labelsProvidedBy(new CodeArgumentLabelProvider(getMatchesProvider(), index))
             .editingSupportedBy(new CodeArgumentEditingSupport(viewer, index, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
@@ -254,7 +232,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void createCommentColumn(final int index, final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
-            .labelsProvidedBy(new CodeCommentLabelProvider())
+            .labelsProvidedBy(new CodeCommentLabelProvider(getMatchesProvider()))
             .editingSupportedBy(new CodeCommentEditingSupport(viewer, index, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
@@ -263,6 +241,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     protected int calculateLongestArgumentsList() {
         return 5;
     }
+
+    protected abstract MatcherProvider getMatchesProvider();
 
     protected abstract boolean sectionIsDefined();
 

@@ -236,6 +236,11 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         editSection.layout();
     }
 
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
+
     @Inject
     @Optional
     private void whenSectionIsCreated(

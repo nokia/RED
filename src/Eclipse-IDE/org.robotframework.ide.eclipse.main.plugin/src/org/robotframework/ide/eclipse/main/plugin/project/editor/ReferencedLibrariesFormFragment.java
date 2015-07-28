@@ -302,4 +302,9 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     public void setFocus() {
         viewer.getTable().setFocus();
     }
+
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
 }
