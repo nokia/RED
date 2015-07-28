@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -32,11 +33,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStra
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.MatchesFilter;
 
 public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
     private RowExposingTableViewer settingsViewer;
     private Text documentation;
+    private MatchesCollection matches;
 
     @Override
     protected void createSettingsTable(final Composite parent) {
@@ -198,11 +201,44 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
         return max;
     }
 
+    @Override
+    protected MatcherProvider getMatchesProvider() {
+        return new MatcherProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
+    }
+
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        if (filter.isEmpty()) {
+            return null;
+        } else {
+            final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
+            keywordMatches.collect((RobotElement) viewer.getInput(), filter);
+            return keywordMatches;
+        }
+    }
+
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final String filter) {
-        // nothing to do yet
+            + RobotKeywordsSection.SECTION_NAME) final MatchesCollection matches) {
+        this.matches = matches;
+        try {
+            viewer.getTree().setRedraw(false);
+            if (matches == null) {
+                viewer.collapseAll();
+                viewer.setFilters(new ViewerFilter[0]);
+            } else {
+                viewer.expandAll();
+                viewer.setFilters(new ViewerFilter[] { new MatchesFilter(matches) });
+            }
+        } finally {
+            viewer.getTree().setRedraw(true);
+        }
     }
 
     @Inject

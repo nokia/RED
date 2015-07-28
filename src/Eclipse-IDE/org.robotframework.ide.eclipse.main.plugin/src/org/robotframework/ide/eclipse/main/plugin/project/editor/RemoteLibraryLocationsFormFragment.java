@@ -173,6 +173,11 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
 
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
+
     private static URI createUriWithDefaultsIfMissing(final URI uri, final int defaultPort, final String defaultPath) {
         try {
             final int port = uri.getPort() != -1 ? uri.getPort() : defaultPort;

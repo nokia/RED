@@ -311,4 +311,9 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     public TableViewer getViewer() {
         return viewer;
     }
+
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
 }
