@@ -146,6 +146,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         form.setHeadClient(filter);
 
         final Image filterImage = RobotImages.getFilterImage().createImage();
+        final Color filterSuccessFg = new Color(filterImage.getDevice(), 0, 200, 0);
+        final Color filterFailureFg = new Color(filterImage.getDevice(), 255, 0, 0);
 
         filter.addPaintListener(new PaintListener() {
             @Override
@@ -194,6 +196,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                                     final int rowsMatching = matches.getNumberOfMatchingElement();
                                     filterTip.setText("Filtering on: found " + allMatches + " matching places in "
                                             + rowsMatching + " elements");
+
+                                    filter.setForeground(allMatches == 0 ? filterFailureFg : filterSuccessFg);
                                     if (form.getMessage() == null) {
                                         form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
                                     }
