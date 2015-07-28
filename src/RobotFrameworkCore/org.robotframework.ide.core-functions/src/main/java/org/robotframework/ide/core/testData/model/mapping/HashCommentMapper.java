@@ -12,6 +12,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
+import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -45,8 +47,48 @@ public class HashCommentMapper implements IParsingMapper {
             mapTableHeaderComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SETTING_LIBRARY_IMPORT) {
             mapLibraryComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_VARIABLE_IMPORT) {
+            mapVariablesComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_RESOURCE_IMPORT) {
+            mapResourceComment(rt, commentHolder, fileModel);
         }
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapResourceComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<AImported> imports = fileModel.getSettingTable().getImports();
+        if (!imports.isEmpty()) {
+            AImported aImported = imports.get(imports.size() - 1);
+            if (aImported instanceof ResourceImport) {
+                ResourceImport res = (ResourceImport) aImported;
+                res.addCommentPart(rt);
+            } else {
+                // FIXME: error
+            }
+        } else {
+            // FIXME: errors
+        }
+    }
+
+
+    @VisibleForTesting
+    protected void mapVariablesComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<AImported> imports = fileModel.getSettingTable().getImports();
+        if (!imports.isEmpty()) {
+            AImported aImported = imports.get(imports.size() - 1);
+            if (aImported instanceof VariablesImport) {
+                VariablesImport vars = (VariablesImport) aImported;
+                vars.addCommentPart(rt);
+            } else {
+                // FIXME: error
+            }
+        } else {
+            // FIXME: errors
+        }
     }
 
 
@@ -119,7 +161,7 @@ public class HashCommentMapper implements IParsingMapper {
         for (int i = capacity - 1; i >= 0; i--) {
             ParsingState s = processingState.get(i);
             if (utility.isTableState(s) || isInsideTableState(s)
-                    || s == ParsingState.SETTING_LIBRARY_IMPORT) {
+                    || isSettingImports(s)) {
                 state = s;
                 break;
             }
@@ -130,8 +172,9 @@ public class HashCommentMapper implements IParsingMapper {
 
 
     @VisibleForTesting
-    protected boolean isSettingTableState(ParsingState state) {
-        return (state == ParsingState.SETTING_LIBRARY_IMPORT || state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);
+    protected boolean isSettingImports(ParsingState s) {
+        return (s == ParsingState.SETTING_LIBRARY_IMPORT
+                || s == ParsingState.SETTING_VARIABLE_IMPORT || s == ParsingState.SETTING_RESOURCE_IMPORT);
     }
 
 
