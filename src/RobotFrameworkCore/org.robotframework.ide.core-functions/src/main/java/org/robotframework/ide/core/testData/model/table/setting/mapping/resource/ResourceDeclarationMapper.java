@@ -49,7 +49,7 @@ public class ResourceDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getType() == RobotTokenType.SETTING_RESOURCE_DECLARATION) {
+        if (rt.getTypes().contains(RobotTokenType.SETTING_RESOURCE_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;
