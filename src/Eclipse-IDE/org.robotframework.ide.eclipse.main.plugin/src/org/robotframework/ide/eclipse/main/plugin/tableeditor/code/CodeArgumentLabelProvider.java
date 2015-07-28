@@ -9,33 +9,36 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
 import com.google.common.collect.Range;
 
-class CodeArgumentLabelProvider extends StylersDisposingLabelProvider {
+class CodeArgumentLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final int index;
 
-    CodeArgumentLabelProvider(final int index) {
+    CodeArgumentLabelProvider(final MatcherProvider matchesProvider, final int index) {
+        super(matchesProvider);
         this.index = index;
     }
 
     @Override
     public StyledString getStyledText(final Object element) {
+        StyledString label = null;
         if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition def = (RobotKeywordDefinition) element;
             final List<String> arguments = getKeywordDefinitionArguments(def);
             if (index < arguments.size()) {
                 final DisposeNeededStyler variableStyler = addDisposeNeededStyler(mixStylers(withForeground(RobotTheme
                         .getVariableColor().getRGB()), withFontStyle(SWT.BOLD)));
-                return new StyledString(arguments.get(index), variableStyler);
+                label = new StyledString(arguments.get(index), variableStyler);
             }
         } else if (element instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) element;
@@ -43,21 +46,21 @@ class CodeArgumentLabelProvider extends StylersDisposingLabelProvider {
             if (index < arguments.size()) {
                 final String argument = arguments.get(index);
 
-                final StyledString label = new StyledString(argument);
+                final StyledString variablesLabel = new StyledString(argument);
 
                 final List<Range<Integer>> variablesPositions = RobotExpressions.getVariablesPositions(argument);
                 if (!variablesPositions.isEmpty()) {
                     final DisposeNeededStyler variableStyler = addDisposeNeededStyler(withForeground(RobotTheme
                             .getVariableColor().getRGB()));
                     for (final Range<Integer> range : variablesPositions) {
-                        label.setStyle(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint() + 1,
+                        variablesLabel.setStyle(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint() + 1,
                                 variableStyler);
                     }
                 }
-                return label;
+                label = variablesLabel;
             }
         }
-        return new StyledString();
+        return highlightMatches(label);
     }
 
     private List<String> getKeywordDefinitionArguments(final RobotKeywordDefinition def) {

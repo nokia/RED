@@ -3,7 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
@@ -13,25 +12,32 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
 import com.google.common.base.Joiner;
 
-class CodeNamesLabelProvider extends StylersDisposingLabelProvider {
+class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
+
+    public CodeNamesLabelProvider(final MatcherProvider matchesProvider) {
+        super(matchesProvider);
+    }
 
     @Override
     public StyledString getStyledText(final Object element) {
+        StyledString label = null;
         if (element instanceof RobotKeywordDefinition) {
             final DisposeNeededStyler styler = addDisposeNeededStyler(Stylers.withFontStyle(SWT.BOLD));
-            return new StyledString(((RobotKeywordDefinition) element).getName(), styler);
+            label = new StyledString(((RobotKeywordDefinition) element).getName(), styler);
         } else if (element instanceof RobotCase) {
             final DisposeNeededStyler styler = addDisposeNeededStyler(Stylers.withFontStyle(SWT.BOLD));
-            return new StyledString(((RobotCase) element).getName(), styler);
+            label = new StyledString(((RobotCase) element).getName(), styler);
         } else if (element instanceof RobotKeywordCall) {
-            return new StyledString(((RobotKeywordCall) element).getName());
+            label = new StyledString(((RobotKeywordCall) element).getName());
         } else if (element instanceof ElementAddingToken) {
-            return ((ElementAddingToken) element).getStyledText();
+            label = ((ElementAddingToken) element).getStyledText();
         }
-        return null;
+        return highlightMatches(label);
     }
 
     @Override
