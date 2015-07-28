@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 
 public abstract class InputLoadingFormComposite extends Composite {
 
@@ -122,7 +123,9 @@ public abstract class InputLoadingFormComposite extends Composite {
 
     protected abstract Control createControl(Composite parent);
 
-    protected abstract void createActions();
+    protected void createActions() {
+        addAction(new CloseDialogAction(getShell(), RobotImages.getCloseImage()));
+    }
 
     protected final void addAction(final Action action) {
         form.getToolBarManager().add(action);
