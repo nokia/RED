@@ -1,13 +1,13 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.resource;
 
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
-import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
-import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -16,12 +16,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class LibraryDeclarationMapper implements IParsingMapper {
+public class ResourceDeclarationMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public LibraryDeclarationMapper() {
+    public ResourceDeclarationMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -31,14 +31,14 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_DECLARATION);
+        rt.setType(RobotTokenType.SETTING_RESOURCE_DECLARATION);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        LibraryImport library = new LibraryImport(rt);
-        settings.addImported(library);
-        processingState.push(ParsingState.SETTING_LIBRARY_IMPORT);
+        ResourceImport resource = new ResourceImport(rt);
+        settings.addImported(resource);
+        processingState.push(ParsingState.SETTING_RESOURCE_IMPORT);
 
         return rt;
     }
@@ -49,17 +49,19 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (utility.isTheFirstColumn(currentLine, rt)) {
-            if (isIncludedInSettingTable(currentLine, processingState)) {
-                result = true;
+        if (rt.getType() == RobotTokenType.SETTING_RESOURCE_DECLARATION) {
+            if (utility.isTheFirstColumn(currentLine, rt)) {
+                if (isIncludedInSettingTable(currentLine, processingState)) {
+                    result = true;
+                } else {
+                    // FIXME: it is in wrong place means no settings table
+                    // declaration
+                }
             } else {
-                // FIXME: it is in wrong place means no settings table
-                // declaration
+                // FIXME: wrong place | | Library or | Library | Library X |
+                // case.
             }
-        } else {
-            // FIXME: wrong place | | Library or | Library | Library X | case.
         }
-
         return result;
     }
 

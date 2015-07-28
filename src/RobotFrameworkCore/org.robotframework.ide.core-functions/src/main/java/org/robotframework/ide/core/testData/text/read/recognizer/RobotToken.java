@@ -122,7 +122,31 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_LIBRARY_ALIAS_VALUE;
+        SETTING_LIBRARY_ALIAS_VALUE,
+        /**
+         * 
+         */
+        SETTING_VARIABLES_DECLARATION("Variables"),
+        /**
+         * 
+         */
+        SETTING_VARIABLES_FILE_NAME,
+        /**
+         * 
+         */
+        SETTING_VARIABLES_ARGUMENT,
+        /**
+         * 
+         */
+        SETTING_RESOURCE_DECLARATION("Resource"),
+        /**
+         * 
+         */
+        SETTING_RESOURCE_FILE_NAME,
+        /**
+         * 
+         */
+        SETTING_RESOURCE_UNWANTED_ARGUMENT;
 
         private final List<String> representationForNew = new LinkedList<>();
 

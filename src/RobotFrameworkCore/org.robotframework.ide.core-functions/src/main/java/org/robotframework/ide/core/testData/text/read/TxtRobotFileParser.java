@@ -25,12 +25,18 @@ import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColumnMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasDeclarationMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasFixer;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryAliasMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryArgumentsMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryDeclarationMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.LibraryNameOrPathMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryArgumentsMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryNameOrPathMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceImportPathMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceTrashDataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesArgumentsMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesDeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesImportPathMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
@@ -44,6 +50,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCase
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.ResourceDeclarationRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -68,15 +76,26 @@ public class TxtRobotFileParser {
         recognized.add(new HashCommentRecognizer());
         recognized.add(new LibraryDeclarationRecognizer());
         recognized.add(new LibraryAliasRecognizer());
+        recognized.add(new VariableDeclarationRecognizer());
+        recognized.add(new ResourceDeclarationRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
         mappers.add(new HashCommentMapper());
+
         mappers.add(new LibraryDeclarationMapper());
         mappers.add(new LibraryNameOrPathMapper());
         mappers.add(new LibraryArgumentsMapper());
         mappers.add(new LibraryAliasDeclarationMapper());
         mappers.add(new LibraryAliasMapper());
+
+        mappers.add(new VariablesDeclarationMapper());
+        mappers.add(new VariablesImportPathMapper());
+        mappers.add(new VariablesArgumentsMapper());
+
+        mappers.add(new ResourceDeclarationMapper());
+        mappers.add(new ResourceImportPathMapper());
+        mappers.add(new ResourceTrashDataMapper());
     }
 
 
@@ -170,9 +189,9 @@ public class TxtRobotFileParser {
             updateStatus(processingState, null);
         }
 
-        for (RobotLine line : rf.getFileContent()) {
-            System.out.println(line);
-        }
+        // for (RobotLine line : rf.getFileContent()) {
+        // System.out.println(line);
+        // }
 
         return parsingOutput;
     }
@@ -281,8 +300,8 @@ public class TxtRobotFileParser {
 
             } else {
                 // TODO: implement - error
-                // System.out.println("ERR [" + processingState + "");
-                // System.out.println("ERR [" + text + "]");
+                System.out.println("ERR [" + processingState + "");
+                System.out.println("ERR [" + text + "]");
             }
         }
 
@@ -467,6 +486,30 @@ public class TxtRobotFileParser {
         /**
          * 
          */
-        SETTING_LIBRARY_IMPORT_ALIAS_VALUE;
+        SETTING_LIBRARY_IMPORT_ALIAS_VALUE,
+        /**
+         * 
+         */
+        SETTING_VARIABLE_IMPORT,
+        /**
+         * 
+         */
+        SETTING_VARIABLE_IMPORT_PATH,
+        /**
+         * 
+         */
+        SETTING_VARIABLE_ARGUMENTS,
+        /**
+         * 
+         */
+        SETTING_RESOURCE_IMPORT,
+        /**
+         * 
+         */
+        SETTING_RESOURCE_IMPORT_PATH,
+        /**
+         * 
+         */
+        SETTING_RESOURCE_UNWANTED_ARGUMENTS;
     }
 }

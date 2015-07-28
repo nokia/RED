@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.library;
 
 import java.util.Stack;
 
@@ -14,12 +14,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
 
-public class LibraryArgumentsMapper implements IParsingMapper {
+public class LibraryNameOrPathMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public LibraryArgumentsMapper() {
+    public LibraryNameOrPathMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -29,7 +29,7 @@ public class LibraryArgumentsMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
+        rt.setType(RobotTokenType.SETTING_LIBRARY_NAME);
         rt.setText(new StringBuilder(text));
         AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
@@ -41,11 +41,9 @@ public class LibraryArgumentsMapper implements IParsingMapper {
             // FIXME: sth wrong - declaration of library not inside setting and
             // was not catch by previous library declaration logic
         }
+        lib.setPathOrName(rt);
 
-        lib.addArgument(rt);
-
-        processingState.push(ParsingState.SETTING_LIBRARY_ARGUMENTS);
-
+        processingState.push(ParsingState.SETTING_LIBRARY_NAME_OR_PATH);
         return rt;
     }
 
@@ -56,22 +54,11 @@ public class LibraryArgumentsMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
-                    .getCurrentStatus(processingState);
-            if (currentState == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
-                    || currentState == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-                if (rt.getType() == RobotTokenType.SETTING_LIBRARY_ALIAS) {
-                    result = false;
-                } else {
-                    result = true;
-                }
-            } else {
-                result = false;
-            }
+            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_LIBRARY_IMPORT);
         } else {
             result = false;
         }
+
         return result;
     }
-
 }
