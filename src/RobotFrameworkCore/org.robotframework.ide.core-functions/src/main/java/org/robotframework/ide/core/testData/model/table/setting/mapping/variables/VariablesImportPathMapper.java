@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.variables;
 
 import java.util.Stack;
 
@@ -7,19 +7,19 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
-import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
 
-public class LibraryNameOrPathMapper implements IParsingMapper {
+public class VariablesImportPathMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public LibraryNameOrPathMapper() {
+    public VariablesImportPathMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -29,21 +29,22 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_NAME);
+        rt.setType(RobotTokenType.SETTING_VARIABLES_FILE_NAME);
         rt.setText(new StringBuilder(text));
         AImported imported = utility.getNearestImport(robotFileOutput);
-        LibraryImport lib;
-        if (imported instanceof LibraryImport) {
-            lib = (LibraryImport) imported;
+        VariablesImport vars;
+        if (imported instanceof VariablesImport) {
+            vars = (VariablesImport) imported;
         } else {
-            lib = null;
+            vars = null;
 
-            // FIXME: sth wrong - declaration of library not inside setting and
-            // was not catch by previous library declaration logic
+            // FIXME: sth wrong - declaration of variables not inside setting
+            // and
+            // was not catch by previous variables declaration logic
         }
-        lib.setLibraryNameOrPathToFile(rt);
+        vars.setPathOrName(rt);
 
-        processingState.push(ParsingState.SETTING_LIBRARY_NAME_OR_PATH);
+        processingState.push(ParsingState.SETTING_VARIABLE_IMPORT_PATH);
         return rt;
     }
 
@@ -54,7 +55,7 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_LIBRARY_IMPORT);
+            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_VARIABLE_IMPORT);
         } else {
             result = false;
         }

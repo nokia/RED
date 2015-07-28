@@ -6,24 +6,13 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class LibraryImport extends AImported {
+public class VariablesImport extends AImported {
 
     private final List<RobotToken> arguments = new LinkedList<>();
-    private LibraryAlias alias;
 
 
-    public LibraryImport(final RobotToken libraryDeclaration) {
-        super(Type.LIBRARY, libraryDeclaration);
-    }
-
-
-    public LibraryAlias getAlias() {
-        return alias;
-    }
-
-
-    public void setAlias(LibraryAlias alias) {
-        this.alias = alias;
+    public VariablesImport(final RobotToken variablesDeclaration) {
+        super(Type.VARIABLES, variablesDeclaration);
     }
 
 
