@@ -13,7 +13,12 @@ public class RobotToken implements IRobotLineElement {
     private int lineNumber = NOT_SET;
     private int startColumn = NOT_SET;
     private StringBuilder text = new StringBuilder();
-    private RobotTokenType type = RobotTokenType.UNKNOWN;
+    private List<IRobotTokenType> types = new LinkedList<>();
+
+
+    public RobotToken() {
+        types.add(RobotTokenType.UNKNOWN);
+    }
 
 
     @Override
@@ -56,13 +61,14 @@ public class RobotToken implements IRobotLineElement {
 
 
     @Override
-    public RobotTokenType getType() {
-        return type;
+    public List<IRobotTokenType> getTypes() {
+        return types;
     }
 
 
-    public void setType(RobotTokenType type) {
-        this.type = type;
+    public void setType(final IRobotTokenType type) {
+        types.clear();
+        types.add(type);
     }
 
     public static enum RobotTokenType implements IRobotTokenType {
@@ -103,6 +109,10 @@ public class RobotToken implements IRobotLineElement {
          * 
          */
         COMMENT_CONTINUE,
+        /**
+         * 
+         */
+        PREVIOUS_LINE_CONTINUE("..."),
         /**
          * 
          */
@@ -164,9 +174,9 @@ public class RobotToken implements IRobotLineElement {
 
     @Override
     public String toString() {
-        return String.format(
-                "RobotToken [lineNumber=%s, startColumn=%s, text=%s, type=%s]",
-                lineNumber, startColumn, text, type);
+        return String
+                .format("RobotToken [lineNumber=%s, startColumn=%s, text=%s, types=%s]",
+                        lineNumber, startColumn, text, types);
     }
 
 }

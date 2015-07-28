@@ -55,7 +55,7 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         if (!processingState.isEmpty()
-                && rt.getType() != RobotTokenType.START_HASH_COMMENT) {
+                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             ParsingState state = processingState.peek();
             result = (utility.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
         }

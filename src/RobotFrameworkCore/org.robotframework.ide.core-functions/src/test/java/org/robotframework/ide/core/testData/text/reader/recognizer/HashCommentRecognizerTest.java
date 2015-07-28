@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.reader.recognizer.header;
+package org.robotframework.ide.core.testData.text.reader.recognizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,9 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.HashCommentRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.HashCommentRecognizer;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
 import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
 
@@ -29,7 +29,7 @@ public class HashCommentRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -43,7 +43,7 @@ public class HashCommentRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -57,7 +57,7 @@ public class HashCommentRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -71,7 +71,7 @@ public class HashCommentRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -85,7 +85,7 @@ public class HashCommentRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 

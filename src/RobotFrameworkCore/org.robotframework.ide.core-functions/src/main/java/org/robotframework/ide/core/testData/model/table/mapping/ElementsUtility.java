@@ -41,7 +41,7 @@ public class ElementsUtility {
             int size = lineElements.size();
             if (size > 0) {
                 IRobotLineElement lastElement = lineElements.get(size - 1);
-                result = (lastElement.getType() == SeparatorType.PIPE && lastElement
+                result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
                         .getStartColumn() == 0);
             } else {
                 result = true;
