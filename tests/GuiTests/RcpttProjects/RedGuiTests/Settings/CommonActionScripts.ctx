@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/27/15 5:44 PM
+Save-Time: 7/28/15 1:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -42,8 +42,8 @@ let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 	}
 }
 
-global [val RED_workspace_path [substitute-variables "${workspace_loc}"]]
-
+//global [val RED_workspace_path [substitute-variables "${workspace_loc}"]]
+// get-workspace-location -  the same
 //----------------------------procedures -----------------------------------------------------
 
 proc CreateVariablesInTableEditor [val EditorTitle] {
@@ -109,8 +109,8 @@ proc "add-value-to-variable" [val list_of_values] [val script_name]{
 	    get-table | select ".*"
 	   	$list_of_values| each [val variable_value] [val index]{
 		   	with [get-table] {
-		        get-item ".*" -index $index | double-click
-		      	get-item ".*"  -index $index | activate-cell-edit -column 1
+		        select [get-item ".*" -index $index] | double-click
+		      	select [get-item ".*"  -index $index] | activate-cell-edit -column 1
 		        with [get-editbox] {
 		            set-text $variable_value
 		            key-type Enter
@@ -122,6 +122,8 @@ proc "add-value-to-variable" [val list_of_values] [val script_name]{
 }
 
 
+
+
 proc "add-comment-to-variable" [val list_of_comments] [val script_name]{
 
 	with [get-editor $script_name] {
@@ -130,8 +132,8 @@ proc "add-comment-to-variable" [val list_of_comments] [val script_name]{
 	    get-table | select ".*"
 	   	$list_of_comments| each [val comment_text] [val index]{
 		   	with [get-table] {
-		        get-item ".*" -index $index| double-click
-		      	get-item ".*" -index $index| activate-cell-edit -column 02
+		        select [get-item ".*" -index $index]| double-click
+		      	select [get-item ".*" -index $index]| activate-cell-edit -column 02
 		        with [get-editbox] {
         			set-text $comment_text
         			key-type "NUMPAD_ENTER" "\\u000D"
