@@ -6,7 +6,10 @@ try:
 except:
     # the std libraries set was moved to other place since Robot 2.9.1
     import robot.libraries
-    tab = join(robot.libraries.STDLIBS)
+    tab=[]
+    tab=sorted(list(robot.libraries.STDLIBS))
     tab.remove("Remote")
-    print " ".join(tab)
-
+    str=''
+    for i in tab:
+        str+=i+' '
+    print str
