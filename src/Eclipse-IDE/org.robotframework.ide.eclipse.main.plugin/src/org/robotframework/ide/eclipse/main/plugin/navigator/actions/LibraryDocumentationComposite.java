@@ -119,11 +119,6 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
     }
 
     @Override
-    protected void createActions() {
-        // nothing to do
-    }
-
-    @Override
     protected InputLoadingFormComposite.InputJob provideInputCollectingJob() {
         return collectingJob;
     }
