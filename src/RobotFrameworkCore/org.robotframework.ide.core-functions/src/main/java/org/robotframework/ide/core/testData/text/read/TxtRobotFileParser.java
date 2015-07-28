@@ -191,12 +191,13 @@ public class TxtRobotFileParser {
             lastColumnProcessed = 0;
             checkAndFixLine(parsingOutput, processingState);
             rf.addNewLine(line);
-            updateStatus(processingState, null);
+            // updateStatus(processingState, null);
         }
 
-        // for (RobotLine line : rf.getFileContent()) {
-        // System.out.println(line);
-        // }
+        System.out.println("processingState: " + processingState);
+        for (RobotLine line : rf.getFileContent()) {
+            System.out.println(line);
+        }
 
         return parsingOutput;
     }
