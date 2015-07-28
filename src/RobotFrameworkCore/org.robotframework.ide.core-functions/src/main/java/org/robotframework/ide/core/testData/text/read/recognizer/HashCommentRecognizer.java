@@ -1,8 +1,7 @@
-package org.robotframework.ide.core.testData.text.read.recognizer.header;
+package org.robotframework.ide.core.testData.text.read.recognizer;
 
 import java.util.regex.Pattern;
 
-import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
 

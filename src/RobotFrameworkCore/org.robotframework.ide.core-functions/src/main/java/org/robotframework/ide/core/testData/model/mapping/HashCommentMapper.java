@@ -37,7 +37,7 @@ public class HashCommentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        if (rt.getType() != RobotTokenType.START_HASH_COMMENT) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             rt.setType(RobotTokenType.COMMENT_CONTINUE);
         }
 
@@ -140,7 +140,7 @@ public class HashCommentMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
 
-        if (rt.getType() == RobotTokenType.START_HASH_COMMENT) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             processingState.push(ParsingState.COMMENT);
             result = true;
         } else if (!processingState.isEmpty()) {

@@ -49,7 +49,7 @@ public class TestCasesTableHeaderRecognizerTest {
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
             assertThat(token.getText().toString()).isEqualTo(
                     textOfHeader.toString());
-            assertThat(token.getType()).isEqualTo(rec.getProducedType());
+            assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
 
@@ -65,7 +65,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
         assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -79,7 +79,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(" *  Test Cases ***");
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -93,7 +93,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -107,7 +107,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -122,7 +122,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
         assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -137,7 +137,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString())
                 .isEqualTo(" ***  Test Cases ***");
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -151,7 +151,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -165,7 +165,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -180,7 +180,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
         assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -194,7 +194,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(" * Test Case ***");
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -208,7 +208,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -222,7 +222,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -237,7 +237,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
         assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -251,7 +251,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(" *** Test Case ***");
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -265,7 +265,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
@@ -279,7 +279,7 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
         assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getType()).isEqualTo(rec.getProducedType());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
 
