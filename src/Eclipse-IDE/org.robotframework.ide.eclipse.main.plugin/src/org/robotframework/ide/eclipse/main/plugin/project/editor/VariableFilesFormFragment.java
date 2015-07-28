@@ -176,7 +176,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 if (event.getSelection() != null && event.getSelection() instanceof StructuredSelection) {
                     final StructuredSelection selection = (StructuredSelection) event.getSelection();
                     if (!selection.isEmpty()) {
-                        ReferencedVariableFile variableFile = (ReferencedVariableFile) selection.getFirstElement();
+                        final ReferencedVariableFile variableFile = (ReferencedVariableFile) selection.getFirstElement();
                         final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(),
                                 fileDialogStartingPath, variableFile);
                         if (dialog.open() == Window.OK) {
@@ -217,6 +217,11 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
 
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
+
     private static class VariableFileDialog extends Dialog {
 
         private ReferencedVariableFile variableFile;
@@ -225,7 +230,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
         private Text argsText;
 
-        private String startingPath;
+        private final String startingPath;
 
         private ControlDecoration decoration;
 
@@ -282,7 +287,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
             if (variableFile != null) {
                 pathText.setText(new Path(variableFile.getPath()).toOSString());
-                List<String> args = variableFile.getArguments();
+                final List<String> args = variableFile.getArguments();
                 if (args != null && !args.isEmpty()) {
                     argsText.setText(Joiner.on(" | ").join(args));
                 }
@@ -298,7 +303,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                     variableFile = new ReferencedVariableFile();
                 }
                 variableFile.setPath(new Path(pathText.getText()).toPortableString());
-                String args = argsText.getText();
+                final String args = argsText.getText();
                 if (args != null && !args.equals("")) {
                     final String[] argsArray = args.split("\\s*[|]\\s*");
                     final List<String> argsList = new ArrayList<String>();

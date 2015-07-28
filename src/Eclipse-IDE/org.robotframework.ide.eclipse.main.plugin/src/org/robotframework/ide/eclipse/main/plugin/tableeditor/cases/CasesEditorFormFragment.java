@@ -5,12 +5,12 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseCommand;
@@ -18,8 +18,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCa
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.MatchesFilter;
 
 class CasesEditorFormFragment extends CodeEditorFormFragment {
+
+    private MatchesCollection matches;
 
     @Override
     protected void createSettingsTable(final Composite composite) {
@@ -93,11 +96,45 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
         return max;
     }
 
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        if (filter.isEmpty()) {
+            return null;
+        } else {
+            final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
+            casesMatches.collect((RobotElement) viewer.getInput(), filter);
+            return casesMatches;
+        }
+    }
+
+    @Override
+    protected MatcherProvider getMatchesProvider() {
+        return new MatcherProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
+    }
+
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final String filter) {
-        // nothing to do yet
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
+            + "/Test_Cases") final MatchesCollection matches) {
+        this.matches = matches;
+
+        try {
+            viewer.getTree().setRedraw(false);
+            if (matches == null) {
+                viewer.collapseAll();
+                viewer.setFilters(new ViewerFilter[0]);
+            } else {
+                viewer.expandAll();
+                viewer.setFilters(new ViewerFilter[] { new MatchesFilter(matches) });
+            }
+        } finally {
+            viewer.getTree().setRedraw(true);
+        }
     }
 
     @Inject

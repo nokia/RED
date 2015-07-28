@@ -11,7 +11,9 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -22,6 +24,8 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.window.DefaultToolTip;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -31,6 +35,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -46,9 +51,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
+import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSectionCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
 
 public abstract class SectionEditorPart implements ISectionEditorPart {
@@ -73,6 +80,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     private IHyperlinkListener createSectionLinkListener;
 
     private IEclipseContext context;
+
+    private Text filter;
 
     @PostConstruct
     public final void postConstruct(final Composite parent, final IEditorPart editorPart) {
@@ -132,9 +141,11 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     }
 
     private void createFilter() {
-        final Text filter = toolkit.createText(form.getHead(), "");
+        filter = toolkit.createText(form.getHead(), "");
         filter.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
         form.setHeadClient(filter);
+
+        final Image filterImage = RobotImages.getFilterImage().createImage();
 
         filter.addPaintListener(new PaintListener() {
             @Override
@@ -147,6 +158,12 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                 }
             }
         });
+        filter.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                filterImage.dispose();
+            }
+        });
         filter.addModifyListener(new ModifyListener() {
             private Job notifyingJob = null;
 
@@ -155,20 +172,55 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                 if (notifyingJob != null && notifyingJob.getState() == Job.SLEEPING) {
                     notifyingJob.cancel();
                 }
+                form.setBusy(true);
                 notifyingJob = new Job("filtering section") {
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
                         filter.getDisplay().syncExec(new Runnable() {
                             @Override
                             public void run() {
-                                eventBroker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + getSectionName(),
-                                        filter.getText());
+                                MatchesCollection matches = null;
+                                for (final ISectionFormFragment fragment : formFragments) {
+                                    final MatchesCollection currentMatches = fragment.collectMatches(filter.getText());
+                                    if (matches == null) {
+                                        matches = currentMatches;
+                                    } else {
+                                        matches.addAll(currentMatches);
+                                    }
+                                }
+                                final DefaultToolTip filterTip = new DefaultToolTip(filter, ToolTip.RECREATE, true);
+                                if (matches != null) {
+                                    final int allMatches = matches.getNumberOfAllMatches();
+                                    final int rowsMatching = matches.getNumberOfMatchingElement();
+                                    filterTip.setText("Filtering on: found " + allMatches + " matching places in "
+                                            + rowsMatching + " elements");
+                                    if (form.getMessage() == null) {
+                                        form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
+                                    }
+                                } else {
+                                    if (form.getMessage() != null && form.getMessage().startsWith("Filtering")) {
+                                        form.setMessage(null);
+                                    }
+                                    filterTip.setText("Filtering off");
+                                }
+                                filterTip.setHideDelay(3000);
+                                filterTip.setImage(filterImage);
+                                filterTip.show(new Point(0, filter.getSize().y));
+                                eventBroker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
+                                        + getSectionName().replaceAll(" ", "_"), matches);
                             }
                         });
+                        monitor.done();
                         return Status.OK_STATUS;
                     }
                 };
-                notifyingJob.schedule(200);
+                notifyingJob.addJobChangeListener(new JobChangeAdapter() {
+                    @Override
+                    public void done(final IJobChangeEvent event) {
+                        form.setBusy(false);
+                    }
+                });
+                notifyingJob.schedule(350);
             }
         });
     }
@@ -218,6 +270,10 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             createSectionLinkListener = createHyperlinkListener();
             form.addMessageHyperlinkListener(createSectionLinkListener);
             form.setMessage("Section is not yet defined, do you want to create it?", IMessageProvider.ERROR);
+        }
+        
+        if (!filter.getText().isEmpty() && form.getMessage() == null) {
+            form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
         }
     }
 
