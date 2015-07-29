@@ -6,14 +6,14 @@ import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognize
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
 
-public class VariableDeclarationRecognizer extends ATokenRecognizer {
+public class SettingDocumentationRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern.compile("[ ]?("
-            + createUpperLowerCaseWord("Variables:") + "|"
-            + createUpperLowerCaseWord("Variables") + ")");
+            + createUpperLowerCaseWord("Documentation:") + "|"
+            + createUpperLowerCaseWord("Documentation") + ")");
 
 
-    public VariableDeclarationRecognizer() {
-        super(EXPECTED, RobotTokenType.SETTING_VARIABLES_DECLARATION);
+    public SettingDocumentationRecognizer() {
+        super(EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
     }
 }
