@@ -52,6 +52,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.Keywords
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.ResourceDeclarationRecognizer;
@@ -86,6 +87,8 @@ public class TxtRobotFileParser {
         recognized.add(new LibraryAliasRecognizer());
         recognized.add(new VariableDeclarationRecognizer());
         recognized.add(new ResourceDeclarationRecognizer());
+
+        recognized.add(new SettingDocumentationRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());

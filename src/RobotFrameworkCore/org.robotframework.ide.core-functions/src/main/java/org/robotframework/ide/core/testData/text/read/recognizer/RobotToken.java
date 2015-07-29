@@ -116,7 +116,7 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_LIBRARY_DECLARATION("Library"),
+        SETTING_LIBRARY_DECLARATION("Library", "Library:"),
         /**
          * 
          */
@@ -136,7 +136,7 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_VARIABLES_DECLARATION("Variables"),
+        SETTING_VARIABLES_DECLARATION("Variables", "Variables:"),
         /**
          * 
          */
@@ -148,7 +148,7 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_RESOURCE_DECLARATION("Resource"),
+        SETTING_RESOURCE_DECLARATION("Resource", "Resource:"),
         /**
          * 
          */
@@ -156,7 +156,15 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_RESOURCE_UNWANTED_ARGUMENT;
+        SETTING_RESOURCE_UNWANTED_ARGUMENT,
+        /**
+         * 
+         */
+        SETTING_DOCUMENTATION_DECLARATION("Documentation", "Documentation:"),
+        /**
+         * 
+         */
+        SETTING_DOCUMENTATION_TEXT;
 
         private final List<String> representationForNew = new LinkedList<>();
 
