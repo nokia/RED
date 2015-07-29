@@ -198,8 +198,8 @@ public class RobotSuiteFile implements RobotElement {
         final Optional<RobotElement> section = findSection(RobotSettingsSection.class);
         final List<String> alreadyImported = newArrayList();
         if (section.isPresent()) {
-            final List<RobotElement> importSettings = ((RobotSettingsSection) section.get()).getImportSettings();
-            for (final RobotElement element : importSettings) {
+            final List<RobotKeywordCall> importSettings = ((RobotSettingsSection) section.get()).getImportSettings();
+            for (final RobotKeywordCall element : importSettings) {
                 final RobotSetting setting = (RobotSetting) element;
                 if (SettingsGroup.LIBRARIES == setting.getGroup()) {
                     final String name = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);

@@ -2,31 +2,33 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
-class SettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class SettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final int index;
-    private final boolean withAddingTokenInfo;
+    private final boolean shouldProvideLabelForAddingToken;
 
-    SettingsArgsLabelProvider(final int index) {
-        this(index, false);
+    SettingsArgsLabelProvider(final MatcherProvider matchesProvider, final int index) {
+        this(matchesProvider, index, false);
     }
 
-    SettingsArgsLabelProvider(final int index, final boolean withAddingTokenInfo) {
+    SettingsArgsLabelProvider(final MatcherProvider matchesProvider, final int index,
+            final boolean shouldProvideLabelForAddingToken) {
+        super(matchesProvider);
         this.index = index;
-        this.withAddingTokenInfo = withAddingTokenInfo;
+        this.shouldProvideLabelForAddingToken = shouldProvideLabelForAddingToken;
     }
 
     @Override
     public Image getImage(final Object element) {
-        if (withAddingTokenInfo && element instanceof ElementAddingToken) {
+        if (shouldProvideLabelForAddingToken && element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getImage();
         }
         return super.getImage(element);
@@ -47,8 +49,8 @@ class SettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLa
     @Override
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotSetting) {
-            return new StyledString(getText(element));
-        } else if (withAddingTokenInfo && element instanceof ElementAddingToken) {
+            return highlightMatches(new StyledString(getText(element)));
+        } else if (shouldProvideLabelForAddingToken && element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getStyledText();
         }
         return new StyledString();

@@ -1,6 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -71,5 +74,14 @@ class GeneralSettingsModel {
 
     boolean contains(final RobotSetting setting) {
         return settings.values().contains(setting);
+    }
+
+    public List<RobotElement> getSettings() {
+        final List<RobotElement> collectedSettings = newArrayList();
+        collectedSettings.add(documentation);
+        for (final RobotElement element : settings.values()) {
+            collectedSettings.add(element);
+        }
+        return collectedSettings;
     }
 }
