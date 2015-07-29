@@ -4,15 +4,17 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-class Libraries {
+class Settings {
 
     private final List<LibrarySpecification> toImport;
     private final List<LibrarySpecification> imported;
+    private final List<IPath> importedResources;
 
-    static Libraries create(final RobotSuiteFile fileModel) {
+    static Settings create(final RobotSuiteFile fileModel) {
         final List<LibrarySpecification> standardLibraries = fileModel.getProject().getStandardLibraries();
         final List<LibrarySpecification> referencedLibraries = fileModel.getProject().getReferencedLibraries();
 
@@ -20,12 +22,15 @@ class Libraries {
         final List<LibrarySpecification> toImport = newArrayList(standardLibraries);
         toImport.addAll(referencedLibraries);
         toImport.removeAll(imported);
-        return new Libraries(toImport, imported);
+        final List<IPath> importedResources = fileModel.getResourcesPaths();
+        return new Settings(toImport, imported, importedResources);
     }
 
-    private Libraries(final List<LibrarySpecification> toImport, final List<LibrarySpecification> imported) {
+    private Settings(final List<LibrarySpecification> toImport, final List<LibrarySpecification> imported,
+            final List<IPath> importedResources) {
         this.toImport = toImport;
         this.imported = imported;
+        this.importedResources = importedResources;
     }
 
     List<LibrarySpecification> getLibrariesToImport() {
@@ -35,4 +40,9 @@ class Libraries {
     List<LibrarySpecification> getImportedLibraries() {
         return imported;
     }
+
+    public List<IPath> getImportedResources() {
+        return importedResources;
+    }
+
 }

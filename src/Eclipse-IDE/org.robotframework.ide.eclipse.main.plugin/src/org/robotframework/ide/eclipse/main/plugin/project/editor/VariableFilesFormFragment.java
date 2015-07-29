@@ -243,7 +243,11 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         @Override
         public void create() {
             super.create();
-            getShell().setText("Add Variable File");
+            if(variableFile != null) {
+                getShell().setText("Edit Variable File");
+            } else {
+                getShell().setText("Add Variable File");
+            }
         }
 
         @Override

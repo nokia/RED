@@ -48,6 +48,8 @@ public class RobotModelEvents {
     public static final String ROBOT_SETTING_ADDED = "robot/model/editor/file/structural/setting/added";
 
     public static final String ROBOT_SETTING_REMOVED = "robot/model/editor/file/structural/setting/removed";
+    
+    public static final String ROBOT_SETTING_CHANGED = "robot/model/editor/file/structural/setting/changed";
 
 
     public static final String ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL = "robot/model/editor/file/structural/keyword/*";

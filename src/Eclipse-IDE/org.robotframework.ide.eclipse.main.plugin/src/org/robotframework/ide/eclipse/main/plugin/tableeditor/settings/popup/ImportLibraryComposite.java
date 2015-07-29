@@ -5,9 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.InputLoadingFormComposite;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -23,8 +20,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -34,6 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IFormColors;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -50,98 +46,128 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
-public class ImportLibraryComposite extends InputLoadingFormComposite {
+public class ImportLibraryComposite {
 
-    private final RobotEditorCommandsStack commandsStack;
-    private final RobotSuiteFile fileModel;
+    private RobotEditorCommandsStack commandsStack;
+
+    private FormToolkit formToolkit;
+
+    private RobotSuiteFile fileModel;
+
     private TableViewer leftViewer;
+
     private TableViewer rightViewer;
 
-    public ImportLibraryComposite(final Composite parent, final RobotEditorCommandsStack commandsStack,
-            final RobotSuiteFile fileModel) {
-        super(parent, SWT.NONE, "Import");
+    private ISelectionChangedListener leftViewerSelectionChangedListener;
+
+    private ISelectionChangedListener rightViewerSelectionChangedListener;
+
+    public ImportLibraryComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
+            final FormToolkit formToolkit) {
         this.commandsStack = commandsStack;
+        this.formToolkit = formToolkit;
         this.fileModel = fileModel;
-        createComposite();
     }
 
-    @Override
-    protected Composite createControl(final Composite parent) {
-        setFormImage(RobotImages.getLibraryImage());
+    public Composite createImportResourcesComposite(final Composite parent) {
+        final Composite librariesComposite = formToolkit.createComposite(parent);
+        GridLayoutFactory.fillDefaults()
+                .numColumns(3)
+                .margins(3, 3)
+                .extendedMargins(0, 0, 0, 3)
+                .applyTo(librariesComposite);
 
-        final Composite actualComposite = getToolkit().createComposite(parent);
-        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 3)
-                .applyTo(actualComposite);
-
-        final Label titleLabel = getToolkit().createLabel(actualComposite,
-                "Libraries available in '" + fileModel.getProject().getName() + "' project");
+        final Label titleLabel = formToolkit.createLabel(librariesComposite, "Libraries available in '"
+                + fileModel.getProject().getName() + "' project");
         titleLabel.setFont(JFaceResources.getBannerFont());
-        titleLabel.setForeground(getToolkit().getColors().getColor(IFormColors.TITLE));
+        titleLabel.setForeground(formToolkit.getColors().getColor(IFormColors.TITLE));
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(700, SWT.DEFAULT).applyTo(titleLabel);
 
-        leftViewer = new TableViewer(actualComposite);
+        leftViewer = new TableViewer(librariesComposite);
         leftViewer.setContentProvider(new LibrariesToImportContentProvider());
         GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(leftViewer.getControl());
-        ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
+        ViewerColumnsFactory.newColumn("")
+                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(200)
                 .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(leftViewer);
         leftViewer.addDoubleClickListener(new IDoubleClickListener() {
+
             @Override
             public void doubleClick(final DoubleClickEvent event) {
                 final Optional<LibrarySpecification> element = Selections.getOptionalFirstElement(
                         (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
                 if (element.isPresent()) {
-                    handleLibraryAdd((Libraries) leftViewer.getInput(), newArrayList(element.get()));
+                    handleLibraryAdd((Settings) leftViewer.getInput(), newArrayList(element.get()));
                 }
             }
         });
 
-        final Button toImported = getToolkit().createButton(actualComposite, ">>", SWT.PUSH);
+        final Button toImported = formToolkit.createButton(librariesComposite, ">>", SWT.PUSH);
         toImported.setEnabled(false);
         toImported.addSelectionListener(createToImportedListener());
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(toImported);
 
-        rightViewer = new TableViewer(actualComposite);
+        rightViewer = new TableViewer(librariesComposite);
         rightViewer.setContentProvider(new LibrariesAlreadyImportedContentProvider());
         GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(rightViewer.getControl());
-        ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
+        ViewerColumnsFactory.newColumn("")
+                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(200)
                 .labelsProvidedBy(new LibrariesLabelProvider())
                 .createFor(rightViewer);
         rightViewer.addDoubleClickListener(new IDoubleClickListener() {
+
             @Override
             public void doubleClick(final DoubleClickEvent event) {
                 final Optional<LibrarySpecification> element = Selections.getOptionalFirstElement(
                         (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
                 if (element.isPresent()) {
-                    handleLibraryRemove((Libraries) rightViewer.getInput(), newArrayList(element.get()));
+                    handleLibraryRemove((Settings) rightViewer.getInput(), newArrayList(element.get()));
                 }
             }
         });
 
-        final Button fromImported = getToolkit().createButton(actualComposite, "<<", SWT.PUSH);
+        final Button fromImported = formToolkit.createButton(librariesComposite, "<<", SWT.PUSH);
         fromImported.setEnabled(false);
         fromImported.addSelectionListener(createFromImportedListener());
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(fromImported);
 
-        final Label separator = getToolkit().createLabel(actualComposite, "", SWT.SEPARATOR | SWT.HORIZONTAL);
+        final Label separator = formToolkit.createLabel(librariesComposite, "", SWT.SEPARATOR | SWT.HORIZONTAL);
         GridDataFactory.fillDefaults().indent(0, 5).grab(false, false).span(3, 1).applyTo(separator);
-        final Label tooltipLabel = getToolkit().createLabel(actualComposite,
+        final Label tooltipLabel = formToolkit.createLabel(librariesComposite,
                 "Choose libraries to import. Only libraries which are imported by project are available. "
-                        + "Edit project properties if you need other libraries",
-                SWT.WRAP);
+                        + "Edit project properties if you need other libraries", SWT.WRAP);
         GridDataFactory.fillDefaults().span(3, 1).hint(500, SWT.DEFAULT).applyTo(tooltipLabel);
 
-        createViewerSelectionListener(leftViewer, toImported);
-        createViewerSelectionListener(rightViewer, fromImported);
+        createLeftViewerSelectionListener(toImported);
+        createRightViewerSelectionListener(fromImported);
 
-        return actualComposite;
+        return librariesComposite;
+    }
+
+    public ISelectionChangedListener getLeftViewerSelectionChangedListener() {
+        return leftViewerSelectionChangedListener;
+    }
+
+    public ISelectionChangedListener getRightViewerSelectionChangedListener() {
+        return rightViewerSelectionChangedListener;
+    }
+
+    public TableViewer getLeftViewer() {
+        return leftViewer;
+    }
+
+    public TableViewer getRightViewer() {
+        return rightViewer;
     }
 
     private SelectionListener createToImportedListener() {
         return new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final Libraries libs = (Libraries) leftViewer.getInput();
+                final Settings libs = (Settings) leftViewer.getInput();
                 final List<LibrarySpecification> specs = Selections.getElements(
                         (IStructuredSelection) leftViewer.getSelection(), LibrarySpecification.class);
 
@@ -150,7 +176,21 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         };
     }
 
-    private void handleLibraryAdd(final Libraries libs, final List<LibrarySpecification> specs) {
+    private SelectionListener createFromImportedListener() {
+        return new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Settings libs = (Settings) rightViewer.getInput();
+                final List<LibrarySpecification> specs = Selections.getElements(
+                        (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
+
+                handleLibraryRemove(libs, specs);
+            }
+        };
+    }
+
+    private void handleLibraryAdd(final Settings libs, final List<LibrarySpecification> specs) {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
 
@@ -172,20 +212,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         rightViewer.refresh();
     }
 
-    private SelectionListener createFromImportedListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final Libraries libs = (Libraries) rightViewer.getInput();
-                final List<LibrarySpecification> specs = Selections.getElements(
-                        (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
-
-                handleLibraryRemove(libs, specs);
-            }
-        };
-    }
-
-    private void handleLibraryRemove(final Libraries libs, final List<LibrarySpecification> specs) {
+    private void handleLibraryRemove(final Settings libs, final List<LibrarySpecification> specs) {
         if (!doesNotContainAlwaysAccessible(specs)) {
             return;
         }
@@ -206,6 +233,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
             final List<LibrarySpecification> specs) {
         final List<RobotSetting> settings = newArrayList();
         final List<String> specNames = Lists.transform(specs, new Function<LibrarySpecification, String>() {
+
             @Override
             public String apply(final LibrarySpecification spec) {
                 return spec.getName();
@@ -230,8 +258,9 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         return true;
     }
 
-    private void createViewerSelectionListener(final TableViewer viewer, final Button buttonToActivate) {
-        final ISelectionChangedListener listener = new ISelectionChangedListener() {
+    private void createLeftViewerSelectionListener(final Button buttonToActivate) {
+        leftViewerSelectionChangedListener = new ISelectionChangedListener() {
+
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 final List<LibrarySpecification> specs = Selections.getElements(
@@ -239,35 +268,24 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
                 buttonToActivate.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
             }
         };
-        viewer.addSelectionChangedListener(listener);
-        addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeSelectionChangedListener(listener);
-            }
-        });
+        leftViewer.addSelectionChangedListener(leftViewerSelectionChangedListener);
     }
 
-    @Override
-    protected InputLoadingFormComposite.InputJob provideInputCollectingJob() {
-        return new InputJob("Gathering resources for import") {
+    private void createRightViewerSelectionListener(final Button buttonToActivate) {
+        rightViewerSelectionChangedListener = new ISelectionChangedListener() {
 
             @Override
-            protected Object createInput(final IProgressMonitor monitor) {
-                setStatus(Status.OK_STATUS);
-                return Libraries.create(fileModel);
+            public void selectionChanged(final SelectionChangedEvent event) {
+                final List<LibrarySpecification> specs = Selections.getElements(
+                        (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
+                buttonToActivate.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
             }
         };
-    }
-
-    @Override
-    protected void fillControl(final Object jobResult) {
-        final Libraries libs = (Libraries) jobResult;
-        leftViewer.setInput(libs);
-        rightViewer.setInput(libs);
+        rightViewer.addSelectionChangedListener(rightViewerSelectionChangedListener);
     }
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+
         private final Image bookImage = RobotImages.getBookImage().createImage();
 
         @Override
@@ -283,10 +301,11 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
         @Override
         public StyledString getStyledText(final Object element) {
             final LibrarySpecification spec = (LibrarySpecification) element;
-            final StyledString text = new StyledString(spec.getName()) ;
+            final StyledString text = new StyledString(spec.getName());
             if (spec.isAccessibleWithoutImport()) {
                 text.append(" ");
                 text.append("always accessible", new Styler() {
+
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
                         textStyle.foreground = RobotTheme.getEclipseDecorationColor();
@@ -295,6 +314,7 @@ public class ImportLibraryComposite extends InputLoadingFormComposite {
             } else if (spec.isRemote()) {
                 text.append(" ");
                 text.append(spec.getAdditionalInformation(), new Styler() {
+
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
                         textStyle.foreground = RobotTheme.getEclipseDecorationColor();
