@@ -45,7 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportLibraryPopup;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 
@@ -178,7 +178,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         return new NewElementsCreator() {
             @Override
             public RobotElement createNew() {
-                new ImportLibraryPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
+                new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
                 return null;
             }
         };

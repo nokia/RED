@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-class LibrariesToImportContentProvider implements IStructuredContentProvider {
+class ImportResourcesContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
@@ -22,12 +22,12 @@ class LibrariesToImportContentProvider implements IStructuredContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        final List<LibrarySpecification> libraries = ((Settings) inputElement).getLibrariesToImport();
-        Collections.sort(libraries, new Comparator<LibrarySpecification>() {
+        final List<IPath> libraries = ((Settings) inputElement).getImportedResources();
+        Collections.sort(libraries, new Comparator<IPath>() {
 
             @Override
-            public int compare(final LibrarySpecification spec1, final LibrarySpecification spec2) {
-                return spec1.getName().compareTo(spec2.getName());
+            public int compare(final IPath spec1, final IPath spec2) {
+                return spec1.lastSegment().compareTo(spec2.lastSegment());
             }
         });
         return libraries.toArray();

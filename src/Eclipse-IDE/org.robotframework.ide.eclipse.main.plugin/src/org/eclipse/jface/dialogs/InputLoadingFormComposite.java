@@ -80,7 +80,7 @@ public abstract class InputLoadingFormComposite extends Composite {
         switchLoadingControl();
         scheduleInputCollectingJob();
     }
-
+    
     private Form createForm(final Composite parent) {
         final Form form = formToolkit.createForm(parent);
         form.setMessage("");
@@ -119,6 +119,11 @@ public abstract class InputLoadingFormComposite extends Composite {
         final Label loadingLabel = formToolkit.createLabel(parent, "loading...", SWT.NONE);
         loadingLabel.setAlignment(SWT.CENTER);
         return loadingLabel;
+    }
+    
+    protected void addHeadClient(Control control) {
+        control.setParent(form.getHead());
+        form.setHeadClient(control);
     }
 
     protected abstract Control createControl(Composite parent);

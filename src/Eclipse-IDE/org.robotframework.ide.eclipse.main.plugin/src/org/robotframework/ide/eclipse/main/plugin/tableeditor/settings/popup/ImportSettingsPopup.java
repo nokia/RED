@@ -8,13 +8,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
-public class ImportLibraryPopup extends RobotPopupDialog {
+public class ImportSettingsPopup extends RobotPopupDialog {
 
     private InputLoadingFormComposite composite;
     private final RobotEditorCommandsStack commandsStack;
     private final RobotSuiteFile fileModel;
 
-    public ImportLibraryPopup(final Shell parent, final RobotEditorCommandsStack commandsStack,
+    public ImportSettingsPopup(final Shell parent, final RobotEditorCommandsStack commandsStack,
             final RobotSuiteFile fileModel) {
         super(parent);
         this.commandsStack = commandsStack;
@@ -23,7 +23,7 @@ public class ImportLibraryPopup extends RobotPopupDialog {
 
     @Override
     protected Control createDialogControls(final Composite parent) {
-        composite = new ImportLibraryComposite(parent, commandsStack, fileModel);
+        composite = new ImportSettingsComposite(parent, commandsStack, fileModel);
         return composite;
     }
 
