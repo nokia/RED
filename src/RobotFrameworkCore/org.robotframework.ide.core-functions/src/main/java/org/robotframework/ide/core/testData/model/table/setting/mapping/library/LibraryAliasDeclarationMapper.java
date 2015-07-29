@@ -69,7 +69,7 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt,
+            RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result;
         if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {

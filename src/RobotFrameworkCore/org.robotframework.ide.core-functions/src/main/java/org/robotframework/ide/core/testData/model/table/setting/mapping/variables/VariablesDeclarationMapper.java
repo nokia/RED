@@ -47,7 +47,7 @@ public class VariablesDeclarationMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt,
-            Stack<ParsingState> processingState) {
+            String text, Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes()
                 .contains(RobotTokenType.SETTING_VARIABLES_DECLARATION)) {

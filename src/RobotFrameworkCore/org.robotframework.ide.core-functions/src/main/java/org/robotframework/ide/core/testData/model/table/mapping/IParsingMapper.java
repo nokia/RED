@@ -18,6 +18,6 @@ public interface IParsingMapper {
 
 
     boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt,
+            final RobotLine currentLine, final RobotToken rt, String text,
             final Stack<ParsingState> processingState);
 }

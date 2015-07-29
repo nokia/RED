@@ -47,7 +47,7 @@ public class ResourceDeclarationMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt,
-            Stack<ParsingState> processingState) {
+            String text, Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes().contains(RobotTokenType.SETTING_RESOURCE_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
