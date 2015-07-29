@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -31,6 +32,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -43,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 
@@ -67,6 +70,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     private RowExposingTableViewer viewer;
 
     private Section section;
+
+    private MatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -97,19 +102,26 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        final MatcherProvider matchesProvider = new MatcherProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
         final NewElementsCreator creator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Metadata").withWidth(140)
-                .labelsProvidedBy(new SettingsArgsLabelProvider(0, true))
+                .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, 0, true))
                 .editingSupportedBy(new SettingsArgsEditingSupport(viewer, 0, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
-        ViewerColumnsFactory.newColumn("Value").withWidth(200).labelsProvidedBy(new SettingsArgsLabelProvider(1))
+        ViewerColumnsFactory.newColumn("Value").withWidth(200)
+                .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, 1))
                 .editingSupportedBy(new SettingsArgsEditingSupport(viewer, 1, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
                 .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-                .labelsProvidedBy(new SettingsCommentsLabelProvider())
+                .labelsProvidedBy(new SettingsCommentsLabelProvider(matchesProvider))
                 .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
@@ -144,7 +156,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
         viewer.setInput(getMetadataElements());
     }
 
-    private List<RobotElement> getMetadataElements() {
+    private List<RobotKeywordCall> getMetadataElements() {
         final RobotSettingsSection section = getSection();
         return section != null ? section.getMetadataSettings() : null;
     }
@@ -170,9 +182,34 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public MatchesCollection collectMatches(final String filter) {
-        return null;
+        if (filter.isEmpty()) {
+            return null;
+        } else {
+            final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
+            settingsMatches.collect((List<RobotElement>) viewer.getInput(), filter);
+            return settingsMatches;
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
+            + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
+        this.matches = matches;
+
+        try {
+            viewer.getTable().setRedraw(false);
+            if (matches == null) {
+                viewer.setFilters(new ViewerFilter[0]);
+            } else {
+                viewer.setFilters(new ViewerFilter[] { new MetadataMatchesFilter(matches) });
+            }
+        } finally {
+            viewer.getTable().setRedraw(true);
+        }
     }
 
     @Inject

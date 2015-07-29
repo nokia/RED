@@ -5,7 +5,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
-public class VariablesMatchesCollection extends MatchesCollection {
+class VariablesMatchesCollection extends MatchesCollection {
 
     @Override
     public void collect(final RobotElement element, final String filter) {
@@ -14,7 +14,7 @@ public class VariablesMatchesCollection extends MatchesCollection {
         }
     }
 
-    public void collectMatches(final RobotVariablesSection section, final String filter) {
+    private void collectMatches(final RobotVariablesSection section, final String filter) {
         for (final RobotVariable variable : section.getChildren()) {
             collectMatches(variable, filter);
         }

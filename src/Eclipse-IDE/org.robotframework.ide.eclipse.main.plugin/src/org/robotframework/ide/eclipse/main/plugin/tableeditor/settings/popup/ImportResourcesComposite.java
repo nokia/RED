@@ -42,6 +42,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -56,13 +57,13 @@ import com.google.common.base.Optional;
 
 public class ImportResourcesComposite {
 
-    private RobotEditorCommandsStack commandsStack;
+    private final RobotEditorCommandsStack commandsStack;
     private static IProject currentProject;
-    private FormToolkit formToolkit;
-    private Shell shell;
+    private final FormToolkit formToolkit;
+    private final Shell shell;
     private TableViewer resourcesViewer;
     private ISelectionChangedListener selectionChangedListener;
-    private RobotSettingsSection settingsSection;
+    private final RobotSettingsSection settingsSection;
     
     public ImportResourcesComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
             final FormToolkit formToolkit, final Shell shell) {
@@ -92,7 +93,7 @@ public class ImportResourcesComposite {
                 .labelsProvidedBy(new ResourcesLabelProvider())
                 .createFor(resourcesViewer);
         
-        Composite addResourceButtons = formToolkit.createComposite(resourcesComposite);
+        final Composite addResourceButtons = formToolkit.createComposite(resourcesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addResourceButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addResourceButtons);
         
@@ -103,15 +104,15 @@ public class ImportResourcesComposite {
         addResourceFromWorkspaceBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final ElementTreeSelectionDialog dialog = createAddResourceSelectionDialog(newShell, true, null);
                 if (dialog.open() == Window.OK) {
-                    Object[] results = dialog.getResult();
+                    final Object[] results = dialog.getResult();
                     if (results != null) {
-                        List<String> resourcesPaths = newArrayList();
+                        final List<String> resourcesPaths = newArrayList();
                         for (int i = 0; i < results.length; i++) {
                             final IResource resource = (IResource) results[i];
-                            String path = extractResourcePath(resource);
+                            final String path = extractResourcePath(resource);
                             resourcesPaths.add(path);
                         }
                         handleResourceAdd(resourcesPaths);
@@ -125,7 +126,7 @@ public class ImportResourcesComposite {
         addExternalResourceBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
                 dialog.setFilterPath(currentProject.getLocation().toOSString());
                 final String chosenFilePath = dialog.open();
@@ -143,7 +144,7 @@ public class ImportResourcesComposite {
         editResourceBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final Settings resources = (Settings) resourcesViewer.getInput();
                 final IPath path = Selections.getSingleElement(
                         (IStructuredSelection) resourcesViewer.getSelection(), IPath.class);
@@ -156,10 +157,10 @@ public class ImportResourcesComposite {
                         filePath = chosenFilePath;
                     }
                 } else {
-                    IResource initialSelection = currentProject.findMember(path);
+                    final IResource initialSelection = currentProject.findMember(path);
                     final ElementTreeSelectionDialog dialog = createAddResourceSelectionDialog(newShell, false, initialSelection);
                     if (dialog.open() == Window.OK) {
-                        Object result = dialog.getFirstResult();
+                        final Object result = dialog.getFirstResult();
                         if (result != null) {
                             final IResource resource = (IResource) result;
                             filePath = extractResourcePath(resource);
@@ -179,7 +180,7 @@ public class ImportResourcesComposite {
         removeResourceBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final Settings resources = (Settings) resourcesViewer.getInput();
                 final List<IPath> paths = Selections.getElements(
                         (IStructuredSelection) resourcesViewer.getSelection(), IPath.class);
@@ -199,7 +200,7 @@ public class ImportResourcesComposite {
         return selectionChangedListener;
     }
     
-    private ElementTreeSelectionDialog createAddResourceSelectionDialog(Shell shell, boolean allowMultiple, IResource initialSelection) {
+    private ElementTreeSelectionDialog createAddResourceSelectionDialog(final Shell shell, final boolean allowMultiple, final IResource initialSelection) {
         final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(),
                 new BaseWorkbenchContentProvider());
         dialog.setAllowMultiple(allowMultiple);
@@ -212,7 +213,7 @@ public class ImportResourcesComposite {
         return dialog;
     }
     
-    private String extractResourcePath(IResource resource) {
+    private String extractResourcePath(final IResource resource) {
         if (resource.getProject().equals(currentProject)) {
             return resource.getProjectRelativePath().toString();
         } else {
@@ -221,9 +222,9 @@ public class ImportResourcesComposite {
     }
 
     private void handleResourceAdd(final List<String> paths) {
-        List<IPath> currentPaths = ((Settings) resourcesViewer.getInput()).getImportedResources();
-        for (String newPathString : paths) {
-            IPath newPath = new Path(newPathString);
+        final List<IPath> currentPaths = ((Settings) resourcesViewer.getInput()).getImportedResources();
+        for (final String newPathString : paths) {
+            final IPath newPath = new Path(newPathString);
             if (!currentPaths.contains(newPath)) {
                 final ArrayList<String> args = newArrayList(newPathString);
                 commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Resource", args));
@@ -235,10 +236,10 @@ public class ImportResourcesComposite {
     
     private void handleResourceRemove(final Settings importedSettings, final List<IPath> resourcesToRemove) {
         final List<RobotSetting> settingsToRemove = newArrayList();
-        List<RobotElement> currentResources = settingsSection.getResourcesSettings();
-        for (RobotElement element : currentResources) {
+        final List<RobotKeywordCall> currentResources = settingsSection.getResourcesSettings();
+        for (final RobotKeywordCall element : currentResources) {
             final RobotSetting setting = (RobotSetting) element;
-            List<String> args = setting.getArguments();
+            final List<String> args = setting.getArguments();
             if(!args.isEmpty()) {
                 if(resourcesToRemove.contains(new Path(args.get(0)))) {
                     settingsToRemove.add(setting);
@@ -251,18 +252,18 @@ public class ImportResourcesComposite {
     }
     
     private void handleResourceEdit(final Settings importedSettings, final IPath oldPath, final String newPath) {
-        List<RobotElement> currentResources = settingsSection.getResourcesSettings();
-        for (RobotElement element : currentResources) {
+        final List<RobotKeywordCall> currentResources = settingsSection.getResourcesSettings();
+        for (final RobotKeywordCall element : currentResources) {
             final RobotSetting setting = (RobotSetting) element;
-            List<String> args = setting.getArguments();
+            final List<String> args = setting.getArguments();
             if(!args.isEmpty()) {
                 if(oldPath.equals(new Path(args.get(0)))) {
                     commandsStack.execute(new SetSettingKeywordCallCommand(setting, newArrayList(newPath)));
                 }
             }
         }
-        List<IPath> resources = importedSettings.getImportedResources();
-        int index = resources.indexOf(oldPath);
+        final List<IPath> resources = importedSettings.getImportedResources();
+        final int index = resources.indexOf(oldPath);
         if(index >= 0) {
             resources.set(index, new Path(newPath));
         }
@@ -273,7 +274,7 @@ public class ImportResourcesComposite {
         selectionChangedListener = new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                boolean isSettingSelected = resourcesViewer.getTable().getSelectionCount() == 1;
+                final boolean isSettingSelected = resourcesViewer.getTable().getSelectionCount() == 1;
                 removeBtn.setEnabled(isSettingSelected);
                 editBtn.setEnabled(isSettingSelected);
             }
@@ -298,7 +299,7 @@ public class ImportResourcesComposite {
         public StyledString getStyledText(final Object element) {
             final IPath path = (IPath) element;
             final StyledString text = new StyledString(path.lastSegment());
-            String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
+            final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
             text.append(" - " + parentPath, new Styler() {
 
                 @Override

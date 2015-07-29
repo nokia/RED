@@ -3,20 +3,21 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
-class GeneralSettingsArgsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class GeneralSettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final int index;
 
-    GeneralSettingsArgsLabelProvider(final int index) {
+    GeneralSettingsArgsLabelProvider(final MatcherProvider matcherProvider, final int index) {
+        super(matcherProvider);
         this.index = index;
     }
 
@@ -38,7 +39,7 @@ class GeneralSettingsArgsLabelProvider extends ColumnLabelProvider implements IS
 
     @Override
     public StyledString getStyledText(final Object element) {
-        return new StyledString(getText(element));
+        return highlightMatches(new StyledString(getText(element)));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -32,6 +33,12 @@ public interface ISectionFormFragment {
         public void collect(final RobotElement element, final String filter) {
             // nothing to collect here, override this method
         }
+
+        public void collect(final List<RobotElement> elements, final String filter) {
+            for (final RobotElement element : elements) {
+                collect(element, filter);
+            }
+        }
         
         public Collection<Range<Integer>> getRanges(final String label) {
             return matches.get(label);
@@ -44,9 +51,9 @@ public interface ISectionFormFragment {
         public void addAll(final MatchesCollection from) {
             if (from != null) {
                 matches.putAll(from.matches);
+                allMatches += from.allMatches;
+                rowsMatching += from.rowsMatching;
             }
-            allMatches += from.allMatches;
-            rowsMatching += from.rowsMatching;
         }
 
         public int getNumberOfAllMatches() {
