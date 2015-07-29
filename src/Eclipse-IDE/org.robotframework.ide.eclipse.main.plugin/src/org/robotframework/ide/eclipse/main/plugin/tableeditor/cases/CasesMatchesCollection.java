@@ -6,8 +6,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
-import com.google.common.collect.Range;
-
 public class CasesMatchesCollection extends MatchesCollection {
 
     @Override
@@ -46,16 +44,5 @@ public class CasesMatchesCollection extends MatchesCollection {
         if (isMatching) {
             rowsMatching++;
         }
-    }
-
-    private boolean collectMatches(final String filter, final String label) {
-        int index = label.indexOf(filter);
-        final boolean result = index >= 0;
-        while (index >= 0) {
-            put(label, Range.closed(index, index + filter.length()));
-            allMatches++;
-            index = label.indexOf(filter, index + 1);
-        }
-        return result;
     }
 }

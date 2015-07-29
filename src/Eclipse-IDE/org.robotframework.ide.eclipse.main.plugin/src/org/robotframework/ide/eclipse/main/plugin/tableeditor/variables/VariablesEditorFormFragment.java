@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -43,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.viewers.Selections;
@@ -76,6 +78,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private VariableValueEditForm valueEditForm;
     
     private Section editSection;
+    private MatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -102,8 +105,14 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         
         final NewElementsCreator creator = newElementsCreator();
         
+        final MatcherProvider matchesProvider = new MatcherProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
         ViewerColumnsFactory.newColumn("Variable").withWidth(270)
-                .labelsProvidedBy(new VariableNameLabelProvider())
+                .labelsProvidedBy(new VariableNameLabelProvider(matchesProvider))
                 .editingSupportedBy(new VariableNameEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .equipWithThreeWaySorting(VariablesViewerComparators.variableNamesAscendingComparator(),
@@ -111,7 +120,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Value").withWidth(270)
-                .labelsProvidedBy(new VariableValueLabelProvider())
+                .labelsProvidedBy(new VariableValueLabelProvider(matchesProvider))
                 .editingSupportedBy(new VariableValueEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .equipWithThreeWaySorting(VariablesViewerComparators.variableValuesAscendingComparator(),
@@ -120,7 +129,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         ViewerColumnsFactory.newColumn("Comment").withWidth(400)
                 .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-                .labelsProvidedBy(new VariableCommentLabelProvider())
+                .labelsProvidedBy(new VariableCommentLabelProvider(matchesProvider))
                 .editingSupportedBy(new VariableCommentEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .equipWithThreeWaySorting(VariablesViewerComparators.variableCommentsAscendingComparator(),
@@ -238,7 +247,31 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     @Override
     public MatchesCollection collectMatches(final String filter) {
-        return null;
+        if (filter.isEmpty()) {
+            return null;
+        } else {
+            final VariablesMatchesCollection variablesMatches = new VariablesMatchesCollection();
+            variablesMatches.collect((RobotElement) viewer.getInput(), filter);
+            return variablesMatches;
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
+            + RobotVariablesSection.SECTION_NAME) final MatchesCollection matches) {
+        this.matches = matches;
+
+        try {
+            viewer.getTable().setRedraw(false);
+            if (matches == null) {
+                viewer.setFilters(new ViewerFilter[0]);
+            } else {
+                viewer.setFilters(new ViewerFilter[] { new VariablesMatchesFilter(matches) });
+            }
+        } finally {
+            viewer.getTable().setRedraw(true);
+        }
     }
 
     @Inject

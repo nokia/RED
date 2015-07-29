@@ -1,12 +1,17 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
-class VariableValueLabelProvider extends StylersDisposingLabelProvider {
+class VariableValueLabelProvider extends MatchesHighlightingLabelProvider {
+
+    VariableValueLabelProvider(final MatcherProvider matchesProvider) {
+        super(matchesProvider);
+    }
 
     @Override
     public String getText(final Object element) {
@@ -15,7 +20,7 @@ class VariableValueLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {
-        return new StyledString(getText(element));
+        return highlightMatches(new StyledString(getText(element)));
     }
 
     @Override
