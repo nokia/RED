@@ -1,5 +1,6 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping.library;
+package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -7,7 +8,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -16,12 +17,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class LibraryDeclarationMapper implements IParsingMapper {
+public class SettingDocumentationTextMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public LibraryDeclarationMapper() {
+    public SettingDocumentationTextMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -31,14 +32,19 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_DECLARATION);
+        rt.setType(RobotTokenType.SETTING_DOCUMENTATION_TEXT);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        LibraryImport library = new LibraryImport(rt);
-        settings.addImported(library);
-        processingState.push(ParsingState.SETTING_LIBRARY_IMPORT);
+        List<SuiteDocumentation> documentation = settings.getDocumentation();
+        if (!documentation.isEmpty()) {
+            documentation.get(documentation.size() - 1)
+                    .addDocumentationText(rt);
+        } else {
+            // FIXME: some error
+        }
+        processingState.push(ParsingState.SETTING_DOCUMENTATION_TEXT);
 
         return rt;
     }
@@ -49,18 +55,10 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_DECLARATION)) {
-            if (utility.isTheFirstColumn(currentLine, rt)) {
-                if (isIncludedInSettingTable(currentLine, processingState)) {
-                    result = true;
-                } else {
-                    // FIXME: it is in wrong place means no settings table
-                    // declaration
-                }
-            } else {
-                // FIXME: wrong place | | Library or | Library | Library X |
-                // case.
-            }
+        ParsingState state = utility.getCurrentStatus(processingState);
+        if (state == ParsingState.SETTING_DOCUMENTATION
+                || state == ParsingState.SETTING_DOCUMENTATION_TEXT) {
+            result = true;
         }
 
         return result;
