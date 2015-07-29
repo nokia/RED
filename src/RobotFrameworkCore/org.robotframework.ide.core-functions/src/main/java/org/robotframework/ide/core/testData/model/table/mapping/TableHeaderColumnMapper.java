@@ -52,7 +52,7 @@ public class TableHeaderColumnMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt,
-            Stack<ParsingState> processingState) {
+            String text, Stack<ParsingState> processingState) {
         boolean result = false;
         if (!processingState.isEmpty()
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {

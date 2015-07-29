@@ -53,7 +53,7 @@ public class ResourceTrashDataMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt,
-            Stack<ParsingState> processingState) {
+            String text, Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             ParsingState currentState = utility

@@ -51,7 +51,7 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt,
-            Stack<ParsingState> processingState) {
+            String text, Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_LIBRARY_IMPORT);

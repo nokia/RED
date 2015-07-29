@@ -54,7 +54,7 @@ public class LibraryAliasMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt,
+            RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result;
 
