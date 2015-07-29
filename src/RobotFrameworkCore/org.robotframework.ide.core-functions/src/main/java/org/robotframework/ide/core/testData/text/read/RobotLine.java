@@ -30,6 +30,11 @@ public class RobotLine {
     }
 
 
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+
     @Override
     public String toString() {
         return String.format("RobotLine [lineNumber=%s, lineElements=%s]",

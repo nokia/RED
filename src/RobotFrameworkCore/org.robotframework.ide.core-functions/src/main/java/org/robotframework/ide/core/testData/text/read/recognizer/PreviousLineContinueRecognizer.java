@@ -10,7 +10,7 @@ public class PreviousLineContinueRecognizer extends ATokenRecognizer {
     /**
      * must not start from '\' and contains at the beginning '#'
      */
-    public static final Pattern EXPECTED = Pattern.compile("^[.]{3,}.*$");
+    public static final Pattern EXPECTED = Pattern.compile("^[.]{3,}");
 
 
     public PreviousLineContinueRecognizer() {
