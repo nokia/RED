@@ -164,7 +164,19 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SETTING_DOCUMENTATION_TEXT;
+        SETTING_DOCUMENTATION_TEXT,
+        /**
+         * 
+         */
+        SETTING_METADATA_DECLARATION("Metadata", "Metadata:"),
+        /**
+         * 
+         */
+        SETTING_METADATA_KEY,
+        /**
+         * 
+         */
+        SETTING_METADATA_VALUE;
 
         private final List<String> representationForNew = new LinkedList<>();
 

@@ -12,11 +12,12 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
@@ -58,6 +59,8 @@ public class HashCommentMapper implements IParsingMapper {
             mapResourceComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SETTING_DOCUMENTATION) {
             mapSettingDocumentationComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_METADATA) {
+            mapSettingMetadataComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -65,6 +68,19 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapSettingMetadataComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<Metadata> metadatas = fileModel.getSettingTable().getMetadatas();
+        if (!metadatas.isEmpty()) {
+            Metadata metadata = metadatas.get(metadatas.size() - 1);
+            metadata.addCommentPart(rt);
+        } else {
+            // FIXME: errors
+        }
     }
 
 
@@ -200,7 +216,7 @@ public class HashCommentMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean isSettingTableElement(ParsingState s) {
-        return (s == ParsingState.SETTING_DOCUMENTATION);
+        return (s == ParsingState.SETTING_DOCUMENTATION || s == ParsingState.SETTING_METADATA);
     }
 
 
