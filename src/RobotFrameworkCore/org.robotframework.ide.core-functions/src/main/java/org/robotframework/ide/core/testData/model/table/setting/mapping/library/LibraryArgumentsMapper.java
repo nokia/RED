@@ -8,8 +8,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
@@ -52,8 +52,8 @@ public class LibraryArgumentsMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+            RobotLine currentLine, RobotToken rt, String text,
+            Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             ParsingState currentState = utility

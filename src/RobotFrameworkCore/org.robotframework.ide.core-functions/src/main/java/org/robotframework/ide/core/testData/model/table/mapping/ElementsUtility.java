@@ -9,8 +9,8 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 

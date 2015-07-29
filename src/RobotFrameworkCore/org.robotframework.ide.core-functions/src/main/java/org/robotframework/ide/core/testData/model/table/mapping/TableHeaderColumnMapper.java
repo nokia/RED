@@ -6,8 +6,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
@@ -51,8 +51,8 @@ public class TableHeaderColumnMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+            RobotLine currentLine, RobotToken rt, String text,
+            Stack<ParsingState> processingState) {
         boolean result = false;
         if (!processingState.isEmpty()
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
