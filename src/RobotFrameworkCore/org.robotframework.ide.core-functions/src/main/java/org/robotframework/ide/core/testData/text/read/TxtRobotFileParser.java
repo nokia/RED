@@ -28,6 +28,9 @@ import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColum
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataKeyMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataValueMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationTextMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
@@ -56,6 +59,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCase
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.MetadataRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.ResourceDeclarationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
@@ -91,6 +95,7 @@ public class TxtRobotFileParser {
         recognized.add(new ResourceDeclarationRecognizer());
 
         recognized.add(new SettingDocumentationRecognizer());
+        recognized.add(new MetadataRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
@@ -112,6 +117,9 @@ public class TxtRobotFileParser {
 
         mappers.add(new SettingDocumentationMapper());
         mappers.add(new SettingDocumentationTextMapper());
+        mappers.add(new MetadataMapper());
+        mappers.add(new MetadataKeyMapper());
+        mappers.add(new MetadataValueMapper());
     }
 
 
@@ -496,108 +504,5 @@ public class TxtRobotFileParser {
         }
 
         return status;
-    }
-
-    public static enum ParsingState {
-        /**
-         * 
-         */
-        UNKNOWN,
-        /**
-         * 
-         */
-        TRASH,
-        /**
-         * 
-         */
-        TABLE_HEADER_COLUMN,
-        /**
-         * 
-         */
-        COMMENT,
-        /**
-         * 
-         */
-        SETTING_TABLE_HEADER,
-        /**
-         * 
-         */
-        SETTING_TABLE_INSIDE,
-        /**
-         * 
-         */
-        VARIABLE_TABLE_HEADER,
-        /**
-         * 
-         */
-        VARIABLE_TABLE_INSIDE,
-        /**
-         * 
-         */
-        TEST_CASE_TABLE_HEADER,
-        /**
-         * 
-         */
-        TEST_CASE_TABLE_INSIDE,
-        /**
-         * 
-         */
-        KEYWORD_TABLE_HEADER,
-        /**
-         * 
-         */
-        KEYWORD_TABLE_INSIDE,
-        /**
-         * 
-         */
-        SETTING_LIBRARY_IMPORT,
-        /**
-         * 
-         */
-        SETTING_LIBRARY_NAME_OR_PATH,
-        /**
-         * 
-         */
-        SETTING_LIBRARY_ARGUMENTS,
-        /**
-         * 
-         */
-        SETTING_LIBRARY_IMPORT_ALIAS,
-        /**
-         * 
-         */
-        SETTING_LIBRARY_IMPORT_ALIAS_VALUE,
-        /**
-         * 
-         */
-        SETTING_VARIABLE_IMPORT,
-        /**
-         * 
-         */
-        SETTING_VARIABLE_IMPORT_PATH,
-        /**
-         * 
-         */
-        SETTING_VARIABLE_ARGUMENTS,
-        /**
-         * 
-         */
-        SETTING_RESOURCE_IMPORT,
-        /**
-         * 
-         */
-        SETTING_RESOURCE_IMPORT_PATH,
-        /**
-         * 
-         */
-        SETTING_RESOURCE_UNWANTED_ARGUMENTS,
-        /**
-         * 
-         */
-        SETTING_DOCUMENTATION,
-        /**
-         * 
-         */
-        SETTING_DOCUMENTATION_TEXT;
     }
 }

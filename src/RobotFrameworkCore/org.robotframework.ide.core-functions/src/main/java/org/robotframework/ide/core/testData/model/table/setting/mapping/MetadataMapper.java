@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping.variables;
+package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
 import java.util.Stack;
 
@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -16,12 +16,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class VariablesDeclarationMapper implements IParsingMapper {
+public class MetadataMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public VariablesDeclarationMapper() {
+    public MetadataMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -31,14 +31,14 @@ public class VariablesDeclarationMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_VARIABLES_DECLARATION);
+        rt.setType(RobotTokenType.SETTING_METADATA_DECLARATION);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        VariablesImport variables = new VariablesImport(rt);
-        settings.addImported(variables);
-        processingState.push(ParsingState.SETTING_VARIABLE_IMPORT);
+        Metadata metadata = new Metadata(rt);
+        settings.addMetadata(metadata);
+        processingState.push(ParsingState.SETTING_METADATA);
 
         return rt;
     }
@@ -49,8 +49,7 @@ public class VariablesDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes()
-                .contains(RobotTokenType.SETTING_VARIABLES_DECLARATION)) {
+        if (rt.getTypes().contains(RobotTokenType.SETTING_METADATA_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;
@@ -63,6 +62,7 @@ public class VariablesDeclarationMapper implements IParsingMapper {
                 // case.
             }
         }
+
         return result;
     }
 

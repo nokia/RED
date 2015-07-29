@@ -4,7 +4,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
