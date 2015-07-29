@@ -28,6 +28,8 @@ public class LibraryAliasFixer {
                     RobotToken aliasToken = alias.getLibraryAliasDeclaration();
                     aliasToken.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     lib.getArguments().add(aliasToken);
+                    lib.setAlias(new LibraryAlias(null));
+                    removeLibraryAliasState(processingState);
                 }
             }
         } else {
@@ -76,10 +78,31 @@ public class LibraryAliasFixer {
     @VisibleForTesting
     protected void cleanAliasAndValueFromState(
             final Stack<ParsingState> processingState) {
-        for (ParsingState ps : processingState) {
-            if (ps == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS
-                    || ps == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
-                processingState.pop();
+        removeLibraryAliasValueState(processingState);
+        removeLibraryAliasState(processingState);
+    }
+
+
+    @VisibleForTesting
+    protected void removeLibraryAliasValueState(
+            Stack<ParsingState> processingState) {
+        for (int i = processingState.size() - 1; i >= 0; i--) {
+            ParsingState state = processingState.get(i);
+            if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
+                processingState.remove(i);
+            } else {
+                break;
+            }
+        }
+    }
+
+
+    @VisibleForTesting
+    protected void removeLibraryAliasState(Stack<ParsingState> processingState) {
+        for (int i = processingState.size() - 1; i >= 0; i--) {
+            ParsingState state = processingState.get(i);
+            if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
+                processingState.remove(i);
             } else {
                 break;
             }

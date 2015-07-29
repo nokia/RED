@@ -9,7 +9,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class LibraryImport extends AImported {
 
     private final List<RobotToken> arguments = new LinkedList<>();
-    private LibraryAlias alias;
+    private LibraryAlias alias = new LibraryAlias(null);
 
 
     public LibraryImport(final RobotToken libraryDeclaration) {

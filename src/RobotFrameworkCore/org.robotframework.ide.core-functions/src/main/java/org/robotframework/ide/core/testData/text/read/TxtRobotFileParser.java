@@ -17,7 +17,8 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.mapping.HashCommentMapper;
-import org.robotframework.ide.core.testData.model.mapping.PreviousLineContinueMapper;
+import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
+import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler.LineContinueType;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
@@ -25,6 +26,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.GarbageBeforeFir
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColumnMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
@@ -65,12 +67,14 @@ public class TxtRobotFileParser {
     private final List<IParsingMapper> mappers = new LinkedList<>();
     private final ElementsUtility utility;
     private final LibraryAliasFixer libraryFixer;
+    private final PreviousLineHandler previousLineHandler;
 
 
     public TxtRobotFileParser() {
         this.utility = new ElementsUtility();
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
         this.libraryFixer = new LibraryAliasFixer();
+        this.previousLineHandler = new PreviousLineHandler();
         recognized.add(new SettingsTableHeaderRecognizer());
         recognized.add(new VariablesTableHeaderRecognizer());
         recognized.add(new TestCasesTableHeaderRecognizer());
@@ -86,7 +90,6 @@ public class TxtRobotFileParser {
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
         mappers.add(new HashCommentMapper());
-        mappers.add(new PreviousLineContinueMapper());
 
         mappers.add(new LibraryDeclarationMapper());
         mappers.add(new LibraryNameOrPathMapper());
@@ -133,6 +136,8 @@ public class TxtRobotFileParser {
 
 
     private RobotFileOutput parse(final Reader reader) throws IOException {
+        previousLineHandler.clear();
+
         RobotFileOutput parsingOutput = new RobotFileOutput();
         RobotFile rf = new RobotFile();
         parsingOutput.setFileModel(rf);
@@ -141,7 +146,7 @@ public class TxtRobotFileParser {
         int lineNumber = 0;
         String currentLineText = null;
         final Stack<ParsingState> processingState = new Stack<>();
-
+        boolean isNewLine = false;
         while((currentLineText = lineReader.readLine()) != null) {
             RobotLine line = new RobotLine(lineNumber);
             StringBuilder text = new StringBuilder(currentLineText);
@@ -168,8 +173,9 @@ public class TxtRobotFileParser {
                                     parsingOutput, new FilePosition(lineNumber,
                                             lastColumnProcessed),
                                     text.substring(lastColumnProcessed,
-                                            startColumn));
+                                            startColumn), isNewLine);
                             line.addLineElement(rt);
+                            isNewLine = false;
                         }
 
                         line.addLineElement(currentSeparator);
@@ -179,10 +185,11 @@ public class TxtRobotFileParser {
                         rt = processLineElement(line, processingState,
                                 parsingOutput, new FilePosition(lineNumber,
                                         lastColumnProcessed),
-                                text.substring(lastColumnProcessed));
+                                text.substring(lastColumnProcessed), isNewLine);
                         line.addLineElement(rt);
 
                         lastColumnProcessed = textLength;
+                        isNewLine = false;
                     }
                 }
             }
@@ -190,11 +197,12 @@ public class TxtRobotFileParser {
             lineNumber++;
             lastColumnProcessed = 0;
             checkAndFixLine(parsingOutput, processingState);
+            previousLineHandler.flushNew(processingState);
             rf.addNewLine(line);
-            // updateStatus(processingState, null);
+            updateStatusesForNewLine(processingState);
+            isNewLine = true;
         }
 
-        System.out.println("processingState: " + processingState);
         for (RobotLine line : rf.getFileContent()) {
             System.out.println(line);
         }
@@ -208,20 +216,74 @@ public class TxtRobotFileParser {
             final Stack<ParsingState> processingState) {
         ParsingState state = findNearestNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
-            AImported imported = utility.getNearestImport(robotFileOutput);
-            LibraryImport lib;
-            if (imported instanceof LibraryImport) {
-                lib = (LibraryImport) imported;
-            } else {
-                lib = null;
-
-                // FIXME: sth wrong - declaration of library not inside setting
-                // and
-                // was not catch by previous library declaration logic
-            }
+            LibraryImport lib = findNearestLibraryImport(robotFileOutput);
 
             libraryFixer.applyFixes(lib, null, processingState);
+        } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
+            LibraryImport lib = findNearestLibraryImport(robotFileOutput);
+
+            List<RobotToken> arguments = lib.getArguments();
+            int argumentsSize = arguments.size();
+            if (argumentsSize >= 2) {
+                RobotToken argumentPossibleAlias = arguments
+                        .get(argumentsSize - 2);
+                ATokenRecognizer rec = new LibraryAliasRecognizer();
+                if (rec.hasNext(argumentPossibleAlias.getText(),
+                        argumentPossibleAlias.getLineNumber())) {
+                    argumentPossibleAlias
+                            .setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
+                    LibraryAlias alias = new LibraryAlias(argumentPossibleAlias);
+                    RobotToken aliasValue = arguments.get(argumentsSize - 1);
+                    aliasValue
+                            .setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
+                    alias.setLibraryAlias(aliasValue);
+
+                    lib.setAlias(alias);
+                    arguments.remove(argumentsSize - 1);
+                    arguments.remove(argumentsSize - 2);
+                    replaceArgumentsByAliasDeclaration(processingState);
+                }
+            }
         }
+    }
+
+
+    private void replaceArgumentsByAliasDeclaration(
+            final Stack<ParsingState> processingState) {
+        int removedArguments = 0;
+        for (int i = processingState.size() - 1; i >= 0; i--) {
+            ParsingState state = processingState.get(i);
+            if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
+                if (removedArguments == 0) {
+                    // it is value
+                    processingState.set(i,
+                            ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE);
+                    removedArguments++;
+                } else if (removedArguments == 1) {
+                    // it is alias
+                    processingState.set(i,
+                            ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);
+                    break;
+                }
+            }
+        }
+    }
+
+
+    private LibraryImport findNearestLibraryImport(
+            final RobotFileOutput robotFileOutput) {
+        AImported imported = utility.getNearestImport(robotFileOutput);
+        LibraryImport lib;
+        if (imported instanceof LibraryImport) {
+            lib = (LibraryImport) imported;
+        } else {
+            lib = null;
+
+            // FIXME: sth wrong - declaration of library not inside setting
+            // and
+            // was not catch by previous library declaration logic
+        }
+        return lib;
     }
 
 
@@ -242,72 +304,81 @@ public class TxtRobotFileParser {
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text) {
+            String text, boolean isNewLine) {
         RobotToken robotToken = recognize(fp, text);
-        ParsingState newStatus = getStatus(robotToken);
-        if (robotToken != null) {
-            if (!text.equals(robotToken.getText().toString())) {
-                // FIXME: add information that type is incorrect missing
-                // separator
-                robotToken.setType(RobotTokenType.UNKNOWN);
+        LineContinueType lineContinueType = previousLineHandler
+                .computeLineContinue(processingState, isNewLine, currentLine,
+                        robotToken);
+        if (previousLineHandler.isSomethingToDo(lineContinueType)) {
+            previousLineHandler.restorePreviousStack(lineContinueType,
+                    processingState, currentLine, robotToken);
+        } else {
+            ParsingState newStatus = getStatus(robotToken);
+            if (robotToken != null) {
+                if (!text.equals(robotToken.getText().toString())) {
+                    // FIXME: add information that type is incorrect missing
+                    // separator
+                    robotToken.setType(RobotTokenType.UNKNOWN);
+                    robotToken.setText(new StringBuilder(text));
+                    newStatus = ParsingState.UNKNOWN;
+                }
+            } else {
+                robotToken = new RobotToken();
+                robotToken.setLineNumber(fp.getLine());
+                robotToken.setStartColumn(fp.getColumn());
                 robotToken.setText(new StringBuilder(text));
+                robotToken.setType(RobotTokenType.UNKNOWN);
+
                 newStatus = ParsingState.UNKNOWN;
             }
-        } else {
-            robotToken = new RobotToken();
-            robotToken.setLineNumber(fp.getLine());
-            robotToken.setStartColumn(fp.getColumn());
-            robotToken.setText(new StringBuilder(text));
-            robotToken.setType(RobotTokenType.UNKNOWN);
 
-            newStatus = ParsingState.UNKNOWN;
-        }
+            boolean useMapper = true;
+            RobotFile fileModel = robotFileOutput.getFileModel();
+            if (isTableHeader(robotToken)) {
+                if (utility.isTheFirstColumn(currentLine, robotToken)) {
+                    TableHeader header = new TableHeader(robotToken);
+                    ARobotSectionTable table = null;
+                    if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
+                        table = fileModel.getSettingTable();
+                    } else if (newStatus == ParsingState.VARIABLE_TABLE_HEADER) {
+                        table = fileModel.getVariableTable();
+                    } else if (newStatus == ParsingState.TEST_CASE_TABLE_HEADER) {
+                        table = fileModel.getTestCaseTable();
+                    } else if (newStatus == ParsingState.KEYWORD_TABLE_HEADER) {
+                        table = fileModel.getKeywordTable();
+                    }
 
-        boolean useMapper = true;
-        RobotFile fileModel = robotFileOutput.getFileModel();
-        if (isTableHeader(robotToken)) {
-            if (utility.isTheFirstColumn(currentLine, robotToken)) {
-                TableHeader header = new TableHeader(robotToken);
-                ARobotSectionTable table = null;
-                if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
-                    table = fileModel.getSettingTable();
-                } else if (newStatus == ParsingState.VARIABLE_TABLE_HEADER) {
-                    table = fileModel.getVariableTable();
-                } else if (newStatus == ParsingState.TEST_CASE_TABLE_HEADER) {
-                    table = fileModel.getTestCaseTable();
-                } else if (newStatus == ParsingState.KEYWORD_TABLE_HEADER) {
-                    table = fileModel.getKeywordTable();
-                }
+                    table.addHeader(header);
+                    processingState.clear();
+                    processingState.push(newStatus);
 
-                table.addHeader(header);
-                processingState.clear();
-                processingState.push(newStatus);
-
-                useMapper = false;
-            } else {
-                // FIXME: add warning about wrong place
-            }
-        }
-
-        if (useMapper) {
-            List<IParsingMapper> matchedMappers = new LinkedList<>();
-            for (IParsingMapper mapper : mappers) {
-                if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
-                        robotToken, processingState)) {
-                    matchedMappers.add(mapper);
+                    useMapper = false;
+                } else {
+                    // FIXME: add warning about wrong place
                 }
             }
 
-            int size = matchedMappers.size();
-            if (size == 1) {
+            if (useMapper) {
+                List<IParsingMapper> matchedMappers = new LinkedList<>();
+                for (IParsingMapper mapper : mappers) {
+                    if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
+                            robotToken, text, processingState)) {
+                        matchedMappers.add(mapper);
+                    }
+                }
 
-                robotToken = matchedMappers.get(0).map(currentLine,
-                        processingState, robotFileOutput, robotToken, fp, text);
+                int size = matchedMappers.size();
+                if (size == 1) {
 
-            } else {
-                // TODO: implement - error
-                System.out.println("ERR [" + processingState + "");
-                System.out.println("ERR [" + text + "]");
+                    robotToken = matchedMappers.get(0).map(currentLine,
+                            processingState, robotFileOutput, robotToken, fp,
+                            text);
+
+                } else {
+                    // TODO: implement - error
+                    System.out.println("ERR [" + processingState + "");
+                    System.out.println("ERR [" + text + "]");
+                }
             }
         }
 
@@ -316,39 +387,32 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    protected void updateStatus(final Stack<ParsingState> processingState,
-            final RobotToken currentToken) {
+    protected void updateStatusesForNewLine(
+            final Stack<ParsingState> processingState) {
 
-        if (currentToken == null) {
-            // line end
-            boolean clean = true;
-            while(clean) {
-                ParsingState status = utility.getCurrentStatus(processingState);
-                if (isTableHeader(status)) {
-                    processingState.pop();
-                    if (status == ParsingState.SETTING_TABLE_HEADER) {
-                        processingState.push(ParsingState.SETTING_TABLE_INSIDE);
-                    } else if (status == ParsingState.VARIABLE_TABLE_HEADER) {
-                        processingState
-                                .push(ParsingState.VARIABLE_TABLE_INSIDE);
-                    } else if (status == ParsingState.TEST_CASE_TABLE_HEADER) {
-                        processingState
-                                .push(ParsingState.TEST_CASE_TABLE_INSIDE);
-                    } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
-                        processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
-                    }
-
-                    clean = false;
-                } else if (utility.isTableInsideState(status)) {
-                    clean = false;
-                } else if (!processingState.isEmpty()) {
-                    processingState.pop();
-                } else {
-                    clean = false;
+        boolean clean = true;
+        while(clean) {
+            ParsingState status = utility.getCurrentStatus(processingState);
+            if (isTableHeader(status)) {
+                processingState.pop();
+                if (status == ParsingState.SETTING_TABLE_HEADER) {
+                    processingState.push(ParsingState.SETTING_TABLE_INSIDE);
+                } else if (status == ParsingState.VARIABLE_TABLE_HEADER) {
+                    processingState.push(ParsingState.VARIABLE_TABLE_INSIDE);
+                } else if (status == ParsingState.TEST_CASE_TABLE_HEADER) {
+                    processingState.push(ParsingState.TEST_CASE_TABLE_INSIDE);
+                } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
+                    processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
                 }
-            }
-        } else {
 
+                clean = false;
+            } else if (utility.isTableInsideState(status)) {
+                clean = false;
+            } else if (!processingState.isEmpty()) {
+                processingState.pop();
+            } else {
+                clean = false;
+            }
         }
     }
 
