@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
@@ -55,6 +56,8 @@ public class HashCommentMapper implements IParsingMapper {
             mapVariablesComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SETTING_RESOURCE_IMPORT) {
             mapResourceComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_DOCUMENTATION) {
+            mapSettingDocumentationComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -62,6 +65,21 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapSettingDocumentationComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<SuiteDocumentation> documentations = fileModel.getSettingTable()
+                .getDocumentation();
+        if (!documentations.isEmpty()) {
+            SuiteDocumentation suiteDoc = documentations.get(documentations
+                    .size() - 1);
+            suiteDoc.addCommentPart(rt);
+        } else {
+            // FIXME: errors
+        }
     }
 
 
@@ -145,8 +163,8 @@ public class HashCommentMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+            RobotLine currentLine, RobotToken rt, String text,
+            Stack<ParsingState> processingState) {
         boolean result = false;
 
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -170,13 +188,19 @@ public class HashCommentMapper implements IParsingMapper {
         for (int i = capacity - 1; i >= 0; i--) {
             ParsingState s = processingState.get(i);
             if (utility.isTableState(s) || isInsideTableState(s)
-                    || isSettingImports(s)) {
+                    || isSettingImports(s) || isSettingTableElement(s)) {
                 state = s;
                 break;
             }
         }
 
         return state;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isSettingTableElement(ParsingState s) {
+        return (s == ParsingState.SETTING_DOCUMENTATION);
     }
 
 
