@@ -22,7 +22,7 @@ class LibrariesAlreadyImportedContentProvider implements IStructuredContentProvi
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        final List<LibrarySpecification> libraries = ((Libraries) inputElement).getImportedLibraries();
+        final List<LibrarySpecification> libraries = ((Settings) inputElement).getImportedLibraries();
         Collections.sort(libraries, new Comparator<LibrarySpecification>() {
 
             @Override
