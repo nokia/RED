@@ -41,35 +41,35 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return (List<RobotKeywordCall>) super.getChildren();
     }
 
-    public List<RobotElement> getMetadataSettings() {
+    public List<RobotKeywordCall> getMetadataSettings() {
         return getSettingsFromGroup(SettingsGroup.METADATA);
     }
 
-    public List<RobotElement> getResourcesSettings() {
+    public List<RobotKeywordCall> getResourcesSettings() {
         return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }
 
-    public List<RobotElement> getImportSettings() {
-        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
+    public List<RobotKeywordCall> getImportSettings() {
+        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
             @Override
-            public boolean apply(final RobotElement element) {
+            public boolean apply(final RobotKeywordCall element) {
                 return SettingsGroup.getImportsGroupsSet()
                                 .contains((((RobotSetting) element).getGroup()));
             }
         }));
     }
 
-    private List<RobotElement> getSettingsFromGroup(final SettingsGroup group) {
-        return newArrayList(Iterables.filter(elements, new Predicate<RobotElement>() {
+    private List<RobotKeywordCall> getSettingsFromGroup(final SettingsGroup group) {
+        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
             @Override
-            public boolean apply(final RobotElement element) {
+            public boolean apply(final RobotKeywordCall element) {
                 return (((RobotSetting) element).getGroup() == group);
             }
         }));
     }
 
     public List<IPath> getResourcesPaths() {
-        final List<RobotElement> resources = getResourcesSettings();
+        final List<RobotKeywordCall> resources = getResourcesSettings();
         final List<IPath> paths = newArrayList();
         for (final RobotElement element : resources) {
             final RobotSetting setting = (RobotSetting) element;
