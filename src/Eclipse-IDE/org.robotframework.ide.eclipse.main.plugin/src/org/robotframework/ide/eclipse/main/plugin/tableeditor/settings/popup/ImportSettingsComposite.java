@@ -47,7 +47,7 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
         final Composite librariesComposite = createLibrariesComposite(mainComposite);
         final Composite resourcesComposite = createResourcesComposite(mainComposite);
         final Composite variablesComposite = createVariablesComposite(mainComposite);
-        stackLayout.topControl = resourcesComposite;
+        stackLayout.topControl = librariesComposite;
 
         createImportTypeRadioButtons(parent, stackLayout, mainComposite, librariesComposite, resourcesComposite,
                 variablesComposite);
