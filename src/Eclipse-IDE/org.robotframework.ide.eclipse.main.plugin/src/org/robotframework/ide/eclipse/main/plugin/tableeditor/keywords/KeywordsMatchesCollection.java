@@ -7,8 +7,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
-import com.google.common.collect.Range;
-
 public class KeywordsMatchesCollection extends MatchesCollection {
 
     @Override
@@ -53,16 +51,5 @@ public class KeywordsMatchesCollection extends MatchesCollection {
         if (isMatching) {
             rowsMatching++;
         }
-    }
-
-    private boolean collectMatches(final String filter, final String label) {
-        int index = label.indexOf(filter);
-        final boolean result = index >= 0;
-        while (index >= 0) {
-            put(label, Range.closed(index, index + filter.length()));
-            allMatches++;
-            index = label.indexOf(filter, index + 1);
-        }
-        return result;
     }
 }
