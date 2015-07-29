@@ -4,8 +4,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
 
@@ -26,8 +26,8 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+            final RobotLine currentLine, RobotToken rt, String text,
+            Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (processingState.isEmpty()) {
