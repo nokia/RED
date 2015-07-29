@@ -22,6 +22,84 @@ public class LibraryDeclarationRecognizerTest {
 
 
     @Test
+    public void test_libraryColonWord_allCombinations() {
+        List<String> combinations = new CombinationGenerator()
+                .combinations("Library:");
+
+        for (String comb : combinations) {
+            StringBuilder textOfHeader = new StringBuilder(comb);
+
+            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            RobotToken token = rec.next();
+            assertThat(token.getStartColumn()).isEqualTo(0);
+            assertThat(token.getLineNumber()).isEqualTo(1);
+            assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
+            assertThat(token.getText().toString()).isEqualTo(
+                    textOfHeader.toString());
+            assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        }
+    }
+
+
+    @Test
+    public void test_twoSpacesAndLibraryColonThanWord() {
+        StringBuilder text = new StringBuilder(" Library:");
+        StringBuilder d = new StringBuilder(" ").append(text);
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(d.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleSpaceAndLibraryColonThanWord() {
+        StringBuilder text = new StringBuilder(" Library:");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleLibraryColonThanLetterCWord() {
+        StringBuilder text = new StringBuilder("Library:");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleLibraryColonWord() {
+        StringBuilder text = new StringBuilder("Library:");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
     public void test_libraryWord_allCombinations() {
         List<String> combinations = new CombinationGenerator()
                 .combinations("Library");
@@ -102,7 +180,11 @@ public class LibraryDeclarationRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?" + ATokenRecognizer.createUpperLowerCaseWord("Library"));
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Library:")
+                        + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Library")
+                        + ")");
+
     }
 
 

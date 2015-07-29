@@ -27,8 +27,8 @@ public class PreviousLineContinueRecognizerTest {
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getEndColumn()).isEqualTo(3);
+        assertThat(token.getText().toString()).isEqualTo("...");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
@@ -79,7 +79,7 @@ public class PreviousLineContinueRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo("^[.]{3,}.*$");
+        assertThat(rec.getPattern().pattern()).isEqualTo("^[.]{3,}");
     }
 
 
