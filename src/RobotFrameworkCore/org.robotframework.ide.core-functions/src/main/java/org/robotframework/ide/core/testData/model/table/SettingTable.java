@@ -4,13 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
-import org.robotframework.ide.core.testData.model.table.setting.Documentation;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 
 
 public class SettingTable extends ARobotSectionTable {
 
     private List<AImported> imports = new LinkedList<>();
-    private List<Documentation> documentations = new LinkedList<>();
+    private List<SuiteDocumentation> documentations = new LinkedList<>();
 
 
     public List<AImported> getImports() {
@@ -23,12 +23,12 @@ public class SettingTable extends ARobotSectionTable {
     }
 
 
-    public List<Documentation> getDocumentation() {
+    public List<SuiteDocumentation> getDocumentation() {
         return documentations;
     }
 
 
-    public void addDocumentation(final Documentation doc) {
+    public void addDocumentation(final SuiteDocumentation doc) {
         documentations.add(doc);
     }
 }

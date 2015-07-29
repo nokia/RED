@@ -7,14 +7,14 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class Documentation extends AModelElement {
+public class SuiteDocumentation extends AModelElement {
 
     private final RobotToken declaration;
     private final List<RobotToken> text = new LinkedList<>();
     private final List<RobotToken> comment = new LinkedList<>();
 
 
-    public Documentation(final RobotToken declaration) {
+    public SuiteDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
     }
 

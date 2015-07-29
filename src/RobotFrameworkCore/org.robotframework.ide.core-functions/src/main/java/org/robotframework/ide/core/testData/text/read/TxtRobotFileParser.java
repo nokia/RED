@@ -28,6 +28,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColum
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationTextMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasMapper;
@@ -52,10 +54,10 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.Keywords
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.ResourceDeclarationRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -107,6 +109,9 @@ public class TxtRobotFileParser {
         mappers.add(new ResourceDeclarationMapper());
         mappers.add(new ResourceImportPathMapper());
         mappers.add(new ResourceTrashDataMapper());
+
+        mappers.add(new SettingDocumentationMapper());
+        mappers.add(new SettingDocumentationTextMapper());
     }
 
 
@@ -585,6 +590,14 @@ public class TxtRobotFileParser {
         /**
          * 
          */
-        SETTING_RESOURCE_UNWANTED_ARGUMENTS;
+        SETTING_RESOURCE_UNWANTED_ARGUMENTS,
+        /**
+         * 
+         */
+        SETTING_DOCUMENTATION,
+        /**
+         * 
+         */
+        SETTING_DOCUMENTATION_TEXT;
     }
 }
