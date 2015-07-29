@@ -11,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 public class RobotKeywordCall implements RobotElement, Serializable {
 
     private String name;
-    private final List<String> args;
+    private List<String> args;
     private String comment;
     private transient IRobotCodeHoldingElement parent;
 
@@ -66,6 +66,10 @@ public class RobotKeywordCall implements RobotElement, Serializable {
 
     public List<String> getArguments() {
         return args;
+    }
+    
+    public void setArgs(List<String> args) {
+        this.args = args;
     }
 
     @Override
