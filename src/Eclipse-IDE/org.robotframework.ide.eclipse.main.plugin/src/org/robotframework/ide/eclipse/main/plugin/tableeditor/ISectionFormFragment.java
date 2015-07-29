@@ -25,7 +25,7 @@ public interface ISectionFormFragment {
     public static class MatchesCollection {
 
         private final Multimap<String, Range<Integer>> matches = ArrayListMultimap.create();
-        protected int allMatches = 0;
+        private int allMatches = 0;
         protected int rowsMatching = 0;
 
         @SuppressWarnings("unused")
@@ -49,16 +49,23 @@ public interface ISectionFormFragment {
             rowsMatching += from.rowsMatching;
         }
 
-        protected final void put(final String key, final Range<Integer> range) {
-            matches.put(key, range);
-        }
-
         public int getNumberOfAllMatches() {
             return allMatches;
         }
 
         public int getNumberOfMatchingElement() {
             return rowsMatching;
+        }
+
+        protected final boolean collectMatches(final String filter, final String label) {
+            int index = label.indexOf(filter);
+            final boolean result = index >= 0;
+            while (index >= 0) {
+                matches.put(label, Range.closed(index, index + filter.length()));
+                allMatches++;
+                index = label.indexOf(filter, index + 1);
+            }
+            return result;
         }
     }
 }
