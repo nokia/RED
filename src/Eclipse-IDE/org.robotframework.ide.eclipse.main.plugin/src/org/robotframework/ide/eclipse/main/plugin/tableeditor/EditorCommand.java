@@ -9,7 +9,7 @@ public abstract class EditorCommand {
     @Inject
     protected IEventBroker eventBroker;
 
-    public abstract void execute() throws CommandExecutionException;
+    protected abstract void execute() throws CommandExecutionException;
 
     public class CommandExecutionException extends RuntimeException {
 

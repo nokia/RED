@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Color;
@@ -15,8 +13,10 @@ import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
-class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final Map<String, String> tooltips = new LinkedHashMap<>(); {
         tooltips.put("Suite Setup",
@@ -35,6 +35,10 @@ class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider implements I
         tooltips.put("Default Tags", "Sets tags to all tests cases in this suite, unless test case specifies own tags");
     }
 
+    GeneralSettingsNamesLabelProvider(final MatcherProvider matcherProvider) {
+        super(matcherProvider);
+    }
+
     @Override
     public Color getBackground(final Object element) {
         final Entry<String, RobotElement> entry = getEntry(element);
@@ -50,9 +54,9 @@ class GeneralSettingsNamesLabelProvider extends ColumnLabelProvider implements I
     public StyledString getStyledText(final Object element) {
         final RobotSetting setting = getSetting(element);
         if (setting == null) {
-            return new StyledString(getSettingName(element), Stylers.withForeground(200, 200, 200));
+            return highlightMatches(new StyledString(getSettingName(element), Stylers.withForeground(200, 200, 200)));
         } else {
-            return new StyledString(setting.getName());
+            return highlightMatches(new StyledString(setting.getName()));
         }
     }
 

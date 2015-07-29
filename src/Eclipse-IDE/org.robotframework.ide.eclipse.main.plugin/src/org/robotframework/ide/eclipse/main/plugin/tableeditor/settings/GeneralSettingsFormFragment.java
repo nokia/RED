@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
@@ -23,9 +24,12 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -36,7 +40,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -57,8 +60,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStra
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+
+import com.google.common.collect.Range;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
@@ -80,11 +86,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     private RowExposingTableViewer viewer;
 
-    private Text documentation;
+    private StyledText documentation;
 
     private final GeneralSettingsModel model = new GeneralSettingsModel();
 
     private Section section;
+
+    private MatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -120,25 +128,27 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = toolkit.createText(panel, "", SWT.MULTI);
+        documentation = new StyledText(panel, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         documentation.setEditable(fileModel.isEditable());
         documentation.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(final PaintEvent e) {
-                final Text text = (Text) e.widget;
+                final StyledText text = (StyledText) e.widget;
                 if (text.getText().isEmpty() && !text.isFocusControl()) {
                     final Color current = e.gc.getForeground();
                     e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
-                    e.gc.drawString("Documentation", 3, 3);
+                    e.gc.drawString("Documentation", 0, 0);
                     e.gc.setForeground(current);
                 }
             }
         });
+        toolkit.adapt(documentation, true, false);
+        toolkit.paintBordersFor(documentation);
         if (fileModel.isEditable()) {
             documentation.addModifyListener(new ModifyListener() {
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    if (!((Text) e.getSource()).getText().equals(model.getDocumentation())) {
+                    if (!((StyledText) e.getSource()).getText().equals(model.getDocumentation())) {
                         dirtyProviderService.setDirtyState(true);
                     }
                 }
@@ -168,10 +178,17 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns(final boolean createFirst) {
+        final MatcherProvider matcherProvider = new MatcherProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
+
         if (createFirst) {
             ViewerColumnsFactory.newColumn("Setting").withWidth(100)
                 .shouldGrabAllTheSpaceLeft(!fileModel.findSection(RobotSettingsSection.class).isPresent()).withMinWidth(100)
-                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider())
+                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider))
                 .createFor(viewer);
         }
         if (!model.areSettingsExist()) {
@@ -181,14 +198,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         final int max = calcualateLongestArgumentsLength();
         for (int i = 0; i < max; i++) {
             ViewerColumnsFactory.newColumn("").withWidth(120)
-                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(i))
+                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, i))
                 .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
         }
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider())
+            .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider(matcherProvider))
             .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
@@ -209,7 +226,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
                                 ViewerColumnsFactory
                                         .newColumn("")
                                         .withWidth(80)
-                                        .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(index - 1))
+                                        .labelsProvidedBy(
+                                                new GeneralSettingsArgsLabelProvider(matcherProvider, index - 1))
                                         .editingSupportedBy(
                                                 new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack))
                                         .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
@@ -287,6 +305,53 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        if (filter.isEmpty()) {
+            return null;
+        } else {
+            final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
+            final GeneralSettingsModel model = (GeneralSettingsModel) viewer.getInput();
+            settingsMatches.collect(model.getSettings(), filter);
+            return settingsMatches;
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
+            + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
+        this.matches = matches;
+
+        try {
+            viewer.getTable().setRedraw(false);
+            if (matches == null) {
+                clearDocumentationMatches();
+                viewer.setFilters(new ViewerFilter[0]);
+            } else {
+                setDocumentationMatches(matches);
+                viewer.setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
+            }
+        } finally {
+            viewer.getTable().setRedraw(true);
+        }
+    }
+
+    private void setDocumentationMatches(final MatchesCollection settingsMatches) {
+        clearDocumentationMatches();
+
+        final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
+        for (final Range<Integer> range : ranges) {
+            final Color bg = new Color(documentation.getDisplay(), 255, 255, 175);
+            documentation.setStyleRange(new StyleRange(range.lowerEndpoint(), range.upperEndpoint()
+                    - range.lowerEndpoint(), null, bg));
+        }
+    }
+
+    private void clearDocumentationMatches() {
+        documentation.setStyleRange(null);
+    }
+
     @Persist
     public void whenSaving() {
         final String newDocumentation = documentation.getText().replaceAll("\t", " ").replaceAll("  +", " ");
@@ -304,11 +369,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         } else if (currentSetting != null) {
             commandsStack.execute(new SetKeywordCallArgumentCommand(currentSetting, 0, newDocumentation));
         }
-    }
-
-    @Override
-    public MatchesCollection collectMatches(final String filter) {
-        return null;
     }
 
     @Inject
