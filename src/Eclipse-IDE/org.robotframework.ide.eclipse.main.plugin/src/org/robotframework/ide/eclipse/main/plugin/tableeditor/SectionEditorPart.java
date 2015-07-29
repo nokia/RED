@@ -164,6 +164,8 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             @Override
             public void widgetDisposed(final DisposeEvent e) {
                 filterImage.dispose();
+                filterSuccessFg.dispose();
+                filterFailureFg.dispose();
             }
         });
         filter.addModifyListener(new ModifyListener() {
@@ -194,8 +196,9 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                                 if (matches != null) {
                                     final int allMatches = matches.getNumberOfAllMatches();
                                     final int rowsMatching = matches.getNumberOfMatchingElement();
-                                    filterTip.setText("Filtering on: found " + allMatches + " matching places in "
-                                            + rowsMatching + " elements");
+                                    final String elementForm = rowsMatching == 1 ? "element" : "elements";
+                                    filterTip.setText("Filtering on: found " + allMatches + " match in " + rowsMatching
+                                            + " " + elementForm);
 
                                     filter.setForeground(allMatches == 0 ? filterFailureFg : filterSuccessFg);
                                     if (form.getMessage() == null) {
