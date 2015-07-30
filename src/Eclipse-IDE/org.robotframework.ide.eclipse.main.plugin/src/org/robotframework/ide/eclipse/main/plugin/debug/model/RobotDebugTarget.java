@@ -548,7 +548,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             final String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
             sendChangeCollectionRequest(root, childNameList, expression);
         } else {
-            sendChangeVariableRequest(name, expression);
+            sendChangeVariableRequest(variableName, expression);
         }
     }
 
