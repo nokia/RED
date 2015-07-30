@@ -257,7 +257,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED) {
+        if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             setInput();
         }
     }
