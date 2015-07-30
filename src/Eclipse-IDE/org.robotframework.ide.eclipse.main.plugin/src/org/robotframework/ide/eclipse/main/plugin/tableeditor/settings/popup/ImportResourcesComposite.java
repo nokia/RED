@@ -98,8 +98,6 @@ public class ImportResourcesComposite {
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addResourceButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addResourceButtons);
         
-        //final Shell newShell = new Shell(shell);
-        
         final Button addResourceFromWorkspaceBtn = formToolkit.createButton(addResourceButtons, "Add Resource", SWT.PUSH);
         GridDataFactory.fillDefaults().grab(false, true).applyTo(addResourceFromWorkspaceBtn);
         addResourceFromWorkspaceBtn.addSelectionListener(new SelectionAdapter() {
