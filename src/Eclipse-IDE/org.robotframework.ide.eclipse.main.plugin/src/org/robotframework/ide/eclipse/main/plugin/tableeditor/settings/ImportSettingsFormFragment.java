@@ -10,10 +10,6 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
-import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
-import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -31,7 +27,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -165,23 +161,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
             .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
-
-        final int newColumnsStartingPosition = max + 1;
-
-        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
-                .getGreyedImage(RobotImages.getAddImage());
-        ViewerColumnsFactory.newColumn("").withWidth(28)
-                .resizable(false)
-                .withTooltip("Activate cell in this column to add new arguments columns")
-                .withImage(addImage.createImage())
-                .labelsProvidedBy(new ColumnAddingLabelProvider())
-                .editingSupportedBy(
-                        new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
-                            @Override
-                            public void createColumn(final int index) {
-                                createArgumentColumn("", index - 1, matchesProvider, creator);
-                            }
-                        })).editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
     }
 
     private NewElementsCreator newElementsCreator() {
@@ -195,7 +174,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private int calcualateLongestArgumentsLength() {
-        int max = 1;
+        int max = RobotFramework.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         final List<?> elements = (List<?>) viewer.getInput();
         if (elements != null) {
             for (final Object element : elements) {
@@ -314,7 +293,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED) {
+        if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             refreshInput();
         }
     }

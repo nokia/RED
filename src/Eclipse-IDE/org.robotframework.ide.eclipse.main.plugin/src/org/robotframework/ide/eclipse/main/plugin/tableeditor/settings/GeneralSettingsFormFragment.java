@@ -15,10 +15,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ColumnAddingEditingSupport;
-import org.eclipse.jface.viewers.ColumnAddingEditingSupport.ColumnProviders;
-import org.eclipse.jface.viewers.ColumnAddingLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -43,7 +39,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -209,32 +204,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
-
-        final int newColumnsStartingPosition = max + 1;
-
-        final ImageDescriptor addImage = fileModel.isEditable() ? RobotImages.getAddImage() : RobotImages
-                .getGreyedImage(RobotImages.getAddImage());
-        ViewerColumnsFactory.newColumn("").withWidth(28)
-                .resizable(false)
-                .withTooltip("Activate cell in this column to add new arguments columns")
-                .withImage(addImage.createImage())
-                .labelsProvidedBy(new ColumnAddingLabelProvider())
-                .editingSupportedBy(
-                        new ColumnAddingEditingSupport(viewer, newColumnsStartingPosition, new ColumnProviders() {
-                            @Override
-                            public void createColumn(final int index) {
-                                ViewerColumnsFactory
-                                        .newColumn("")
-                                        .withWidth(80)
-                                        .labelsProvidedBy(
-                                                new GeneralSettingsArgsLabelProvider(matcherProvider, index - 1))
-                                        .editingSupportedBy(
-                                                new GeneralSettingsArgsEditingSupport(viewer, index - 1, commandsStack))
-                                        .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
-                            }
-                        }))
-                .editingEnabledOnlyWhen(fileModel.isEditable())
-                .createFor(viewer);
     }
 
     private int calcualateLongestArgumentsLength() {
@@ -416,7 +385,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED) {
+        if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             setInput(false);
         }
     }
