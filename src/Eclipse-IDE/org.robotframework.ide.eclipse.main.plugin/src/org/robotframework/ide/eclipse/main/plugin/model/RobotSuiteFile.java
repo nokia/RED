@@ -21,8 +21,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsEmiter;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -146,7 +146,7 @@ public class RobotSuiteFile implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getRobotImage();
+        return RedImages.getRobotImage();
     }
 
     @Override
@@ -178,7 +178,7 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public RobotProject getProject() {
-        return RobotFramework.getModelManager().getModel().createRobotProject(file.getProject());
+        return RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
     }
 
     public void commitChanges(final IProgressMonitor monitor) throws CoreException {

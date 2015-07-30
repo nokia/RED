@@ -11,12 +11,13 @@ import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 class GeneralSettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -26,15 +27,14 @@ class GeneralSettingsCommentsLabelProvider extends MatchesHighlightingLabelProvi
 
     @Override
     public Color getBackground(final Object element) {
-        // FIXME : resource leak
-        return getSetting(element) == null ? new Color(Display.getDefault(), 250, 250, 250) : null;
+        return getSetting(element) == null ? ColorsManager.getColor(250, 250, 250) : null;
     }
 
     @Override
     public final StyledString getStyledText(final Object element) {
         final String comment = getComment(element);
         if (!comment.isEmpty()) {
-            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RobotTheme
+            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RedTheme
                     .getCommentsColor().getRGB()), withFontStyle(SWT.ITALIC)));
             final String prefix = "# ";
             return highlightMatches(new StyledString(prefix + comment, commentStyler), prefix.length(), comment);
@@ -49,7 +49,7 @@ class GeneralSettingsCommentsLabelProvider extends MatchesHighlightingLabelProvi
 
     @Override
     public Image getToolTipImage(final Object element) {
-        return RobotImages.getTooltipImage().createImage();
+        return ImagesManager.getImage(RedImages.getTooltipImage());
     }
 
     private String getComment(final Object element) {

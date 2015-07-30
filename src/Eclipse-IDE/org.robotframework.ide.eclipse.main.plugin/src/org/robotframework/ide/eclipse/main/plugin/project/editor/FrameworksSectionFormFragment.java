@@ -41,7 +41,7 @@ import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
@@ -51,6 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -108,7 +109,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private void createCurrentFrameworkInfo(final Composite parent) {
         currentFramework = toolkit.createFormText(parent, true);
-        currentFramework.setImage(IMAGE_FOR_LINK, RobotImages.getRobotImage().createImage());
+        currentFramework.setImage(IMAGE_FOR_LINK, ImagesManager.getImage(RedImages.getRobotImage()));
         GridDataFactory.fillDefaults().grab(true, false).indent(15, 5).applyTo(currentFramework);
 
         final IHyperlinkListener hyperlinkListener = createHyperlinkListener();

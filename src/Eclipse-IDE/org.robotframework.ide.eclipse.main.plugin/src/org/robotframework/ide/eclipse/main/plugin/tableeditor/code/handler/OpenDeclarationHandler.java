@@ -13,7 +13,7 @@ import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorSite;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -57,7 +57,7 @@ public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> 
                     final IPath currentPath = fileParentsPath.append(resourcePath);
                     final IFile potentialTarget = wsRoot.getFile(currentPath);
                     if (potentialTarget.exists()) {
-                        final RobotSuiteFile potentialModel = RobotFramework.getModelManager().createSuiteFile(
+                        final RobotSuiteFile potentialModel = RedPlugin.getModelManager().createSuiteFile(
                                 potentialTarget);
                         openingStrategy = getOpeningStrategy(potentialModel, keywordName);
                         if (openingStrategy != null) {

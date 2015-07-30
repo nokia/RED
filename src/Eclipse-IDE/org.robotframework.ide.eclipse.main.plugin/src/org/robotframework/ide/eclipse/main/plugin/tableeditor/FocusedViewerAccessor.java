@@ -5,17 +5,25 @@ import org.eclipse.jface.viewers.ViewerCell;
 
 public class FocusedViewerAccessor {
 
-    private final ColumnViewer viewer;
+    private final ColumnViewer[] viewers;
 
-    public FocusedViewerAccessor(final ColumnViewer viewer) {
-        this.viewer = viewer;
+    public FocusedViewerAccessor(final ColumnViewer... viewers) {
+        this.viewers = viewers;
     }
 
     public ColumnViewer getViewer() {
-        return viewer;
+        if (viewers.length == 0) {
+            return null;
+        }
+        for (final ColumnViewer viewer : viewers) {
+            if (viewer.getControl().isFocusControl()) {
+                return viewer;
+            }
+        }
+        return viewers[0];
     }
 
     public ViewerCell getFocusedCell() {
-        return viewer.getColumnViewerEditor().getFocusCell();
+        return getViewer().getColumnViewerEditor().getFocusCell();
     }
 }

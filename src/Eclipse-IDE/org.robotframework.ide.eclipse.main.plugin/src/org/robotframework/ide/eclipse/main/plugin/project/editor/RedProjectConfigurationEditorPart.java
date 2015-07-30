@@ -37,7 +37,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationEditorPart.ProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectConfigurationFileChangeListener.OnRedConfigFileChange;
@@ -184,7 +184,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                     if (monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
-                    final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RobotFramework.getDefault()
+                    final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RedPlugin.getDefault()
                             .getAllRuntimeEnvironments();
                     if (monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
@@ -217,7 +217,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
         }
 
         private QualifiedName createKey(final String localName) {
-            return new QualifiedName(RobotFramework.PLUGIN_ID, localName);
+            return new QualifiedName(RedPlugin.PLUGIN_ID, localName);
         }
 
         private void whenConfigurationFiledChanged() {

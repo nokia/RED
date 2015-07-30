@@ -20,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -51,7 +51,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         try {
             final String libName = spec.getName() + ".py";
             final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
-            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final IFile file = LibspecsFolder.get(project).getFile(libName);
             
             IPath location = extractLibraryLocation(robotProject, spec);

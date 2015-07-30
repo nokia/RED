@@ -9,6 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.CasesTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
 
 import com.google.common.base.Preconditions;
 
@@ -49,6 +50,10 @@ public class RobotEditorPropertyTester extends PropertyTester {
         } else if ("thereAreCasesElementsInClipboard".equals(property)) {
             final Clipboard clipboard = editor.getClipboard();
             return CasesTransfer.hasCases(clipboard) == expected;
+
+        } else if ("thereAreVariablesInClipboard".equals(property)) {
+            final Clipboard clipboard = editor.getClipboard();
+            return VariablesTransfer.hasVariables(clipboard) == expected;
 
         } else if ("thereIsTextInClipboard".equals(property)) {
             final Clipboard clipborad = editor.getClipboard();

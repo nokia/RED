@@ -11,7 +11,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.ImagesManager;
 
 public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
 
@@ -62,11 +63,11 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
     public Image getToolTipImage(final Object element) {
         final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
-            return RobotImages.getTooltipProhibitedImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipProhibitedImage());
         } else if (!env.hasRobotInstalled()) {
-            return RobotImages.getTooltipWarnImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipWarnImage());
         }
-        return RobotImages.getTooltipImage().createImage();
+        return ImagesManager.getImage(RedImages.getTooltipImage());
     }
 
     public static class InstalledRobotsNamesLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {

@@ -6,7 +6,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 public class CellsHighlighter extends FocusCellHighlighter {
 
@@ -46,12 +46,12 @@ public class CellsHighlighter extends FocusCellHighlighter {
     }
 
     private void removeSelectionInformation(final Event event) {
-        paint(event, RobotTheme.getHiglihtedRowColor(), getBlackColor());
+        paint(event, RedTheme.getHiglihtedRowColor(), getBlackColor());
     }
 
     private void markFocusedCell(final Event event, final ViewerCell cell) {
         final Color background = (cell.getControl().isFocusControl()) ? 
-                RobotTheme.getHighlightedCellColor() : RobotTheme.getHiglihtedRowColor();
+                RedTheme.getHighlightedCellColor() : RedTheme.getHiglihtedRowColor();
         paint(event, background, getBlackColor());
     }
 

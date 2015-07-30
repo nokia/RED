@@ -68,7 +68,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
@@ -90,7 +89,7 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.FindReplaceAction;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
@@ -104,6 +103,7 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOcc
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TxtScanner;
+import org.robotframework.red.graphics.ColorsManager;
 
 /**
  * @author mmarzec
@@ -121,8 +121,6 @@ public class TextEditor {
 	@Inject
 	IDirtyProviderService dirtyProviderService;
 	
-    private Color highlightingColor; // this should probably be moved to themes
-
 	private IFile editedFile;
 	private IEditorInput input;
 	private SourceViewer viewer;
@@ -141,8 +139,6 @@ public class TextEditor {
     
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
-        highlightingColor = new Color(parent.getDisplay(), 198, 219, 174);
-        
 	    this.input = input;
 
 		final FillLayout layout = new FillLayout();
@@ -228,7 +224,7 @@ public class TextEditor {
 		viewer.setUndoManager(undoManager);
 		undoManager.connect(viewer);
 		
-		final RobotSuiteFile suiteFile = RobotFramework.getModelManager().createSuiteFile(editedFile);
+		final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(editedFile);
         final Map<String, TextEditorContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
         
         textHover = new TextEditorTextHover(keywordMap);
@@ -374,9 +370,8 @@ public class TextEditor {
             textHover.setDebugVariables((Map<String, Object>) event.getProperty("vars"));
 	        final int line = Integer.parseInt((String) event.getProperty("line"));
 	        if(line > 0) {
-                
                 viewer.getTextWidget().setLineBackground(breakpointLine, 1, null);
-                viewer.getTextWidget().setLineBackground(line - 1, 1, highlightingColor);
+                viewer.getTextWidget().setLineBackground(line - 1, 1, ColorsManager.getColor(198, 219, 174));
                 showHighlightedLine(line);
                 compositeRuler.immediateUpdate();
                 breakpointLine = line - 1;
@@ -424,17 +419,19 @@ public class TextEditor {
 		return cmd;
 	}
 	
-    private void activateFindReplaceAction(Composite parent, IEditorPart editorPart) {
+    private void activateFindReplaceAction(final Composite parent, final IEditorPart editorPart) {
 
         final FindReplaceAction findAction = new FindReplaceAction(
                 ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedTextEditorMessages"), null,
                 parent.getShell(), viewer.getFindReplaceTarget());
-        IHandlerService hs = (IHandlerService) editorPart.getSite().getService(IHandlerService.class);
-        IHandler findReplaceHandler = new AbstractHandler() {
+        final IHandlerService hs = (IHandlerService) editorPart.getSite().getService(IHandlerService.class);
+        final IHandler findReplaceHandler = new AbstractHandler() {
 
-            public Object execute(ExecutionEvent event) throws ExecutionException {
-                if (viewer != null && viewer.getDocument() != null)
+            @Override
+            public Object execute(final ExecutionEvent event) throws ExecutionException {
+                if (viewer != null && viewer.getDocument() != null) {
                     findAction.run();
+                }
                 return null;
             }
         };
@@ -607,7 +604,6 @@ public class TextEditor {
 
     @PreDestroy
     public void preDestroy() {
-        highlightingColor.dispose();
         if (txtScanner != null) {
             txtScanner.disposeResources();
         }

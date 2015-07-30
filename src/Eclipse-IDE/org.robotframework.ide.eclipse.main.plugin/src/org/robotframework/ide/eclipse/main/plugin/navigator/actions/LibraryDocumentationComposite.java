@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 class LibraryDocumentationComposite extends InputLoadingFormComposite {
@@ -47,7 +47,7 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
 
     @Override
     protected Composite createControl(final Composite parent) {
-        setFormImage(RobotImages.getBookImage());
+        setFormImage(RedImages.getBookImage());
 
         final Composite actualComposite = getToolkit().createComposite(parent);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(actualComposite);

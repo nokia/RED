@@ -5,7 +5,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -14,7 +13,8 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class Sections {
 
@@ -22,14 +22,7 @@ public class Sections {
         final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
         final ToolItem item = new ToolItem(bar, SWT.PUSH);
         item.setToolTipText("Maximize section");
-        final Image icon = RobotImages.getFocusSectionImage().createImage();
-        item.setImage(icon);
-        item.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                icon.dispose();
-            }
-        });
+        item.setImage(ImagesManager.getImage(RedImages.getFocusSectionImage()));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {

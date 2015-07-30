@@ -3,14 +3,13 @@ package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 import java.util.Arrays;
 
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 
 public class TextEditorContentAssistKeywordContext {
-
-    private static final Image IMAGE = RobotImages.getKeywordImage().createImage();
 
     private final RedKeywordProposal proposal;
 
@@ -35,11 +34,8 @@ public class TextEditorContentAssistKeywordContext {
         final String doc = System.lineSeparator() + proposal.getDocumentation();
         return Joiner.on(separator).join(Arrays.asList(name, source, args, doc));
     }
-
     
     public Image getImage() {
-        return IMAGE;
+        return ImagesManager.getImage(RedImages.getKeywordImage());
     }
-
-    
 }

@@ -41,10 +41,11 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
@@ -138,7 +139,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 return false;
             }
 
-            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final SuiteExecutor selectedExecutor = SuiteExecutor.fromName(comboExecutorName.getText());
             final SuiteExecutor projectInterpreter = robotProject.getRuntimeEnvironment().getInterpreter();
             if (selectedExecutor != projectInterpreter) {
@@ -179,7 +180,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public Image getImage() {
-        return RobotImages.getRobotImage().createImage();
+        return ImagesManager.getImage(RedImages.getRobotImage());
     }
 
     @Override
@@ -271,7 +272,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
                 if (dialog.open() == Window.OK) {
                     final IProject project = (IProject) dialog.getFirstResult();
-                    final RobotProject robotProject = RobotFramework.getModelManager().getModel()
+                    final RobotProject robotProject = RedPlugin.getModelManager().getModel()
                             .createRobotProject(project);
                     final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
                     if (interpreter != null) {

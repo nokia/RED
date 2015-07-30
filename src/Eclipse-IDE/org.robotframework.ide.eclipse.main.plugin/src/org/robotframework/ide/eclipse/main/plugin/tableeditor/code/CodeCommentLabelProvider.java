@@ -8,11 +8,12 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ImagesManager;
 
 class CodeCommentLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -28,7 +29,7 @@ class CodeCommentLabelProvider extends MatchesHighlightingLabelProvider {
 
         StyledString label = null;
         if (!comment.isEmpty()) {
-            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RobotTheme
+            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RedTheme
                     .getCommentsColor().getRGB()), withFontStyle(SWT.ITALIC)));
             label = new StyledString(prefix + comment, commentStyler);
         }
@@ -53,7 +54,7 @@ class CodeCommentLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getToolTipImage(final Object element) {
         if (element instanceof RobotElement) {
-            return RobotImages.getTooltipImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipImage());
         }
         return null;
     }

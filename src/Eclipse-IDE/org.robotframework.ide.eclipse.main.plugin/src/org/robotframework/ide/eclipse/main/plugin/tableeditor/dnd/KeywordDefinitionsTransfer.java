@@ -12,7 +12,7 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
 public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
@@ -70,7 +70,7 @@ public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
             super.javaToNative(bytes, transferData);
         } catch (final IOException e) {
             StatusManager.getManager().handle(
-                    new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID,
+                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "Failed to convert from java to native. Reason: " + e.getMessage(), e),
                     StatusManager.LOG | StatusManager.BLOCK);
             throw new IllegalStateException(e);
@@ -96,7 +96,7 @@ public class KeywordDefinitionsTransfer extends ByteArrayTransfer {
             return objects;
         } catch (ClassNotFoundException | IOException e) {
             StatusManager.getManager().handle(
-                    new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, "Failed to copy item data. Reason: "
+                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Failed to copy item data. Reason: "
                             + e.getMessage(), e), StatusManager.LOG);
         }
         // it has to return null, as this is part of the contract for this method;

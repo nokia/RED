@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotKeywordCall implements RobotElement, Serializable {
 
@@ -61,7 +61,7 @@ public class RobotKeywordCall implements RobotElement, Serializable {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getKeywordImage();
+        return RedImages.getKeywordImage();
     }
 
     public List<String> getArguments() {

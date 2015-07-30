@@ -14,13 +14,13 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class RobotProjectNature implements IProjectNature {
 
-    private static String ROBOT_NATURE = RobotFramework.PLUGIN_ID + ".robotNature";
+    private static String ROBOT_NATURE = RedPlugin.PLUGIN_ID + ".robotNature";
 
-    private static String ROBOT_LIBRARIES_BUILDER = RobotFramework.PLUGIN_ID + ".robotLibrariesBuilder";
+    private static String ROBOT_LIBRARIES_BUILDER = RedPlugin.PLUGIN_ID + ".robotLibrariesBuilder";
 
     private static String SUITE_INIT_FILE = "__init__.robot";
 
