@@ -97,7 +97,7 @@ public class ImportResourcesComposite {
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addResourceButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addResourceButtons);
         
-        final Shell newShell = new Shell(shell);
+        //final Shell newShell = new Shell(shell);
         
         final Button addResourceFromWorkspaceBtn = formToolkit.createButton(addResourceButtons, "Add Resource", SWT.PUSH);
         GridDataFactory.fillDefaults().grab(false, true).applyTo(addResourceFromWorkspaceBtn);
@@ -105,6 +105,7 @@ public class ImportResourcesComposite {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
+                final Shell newShell = new Shell(shell);
                 final ElementTreeSelectionDialog dialog = createAddResourceSelectionDialog(newShell, true, null);
                 if (dialog.open() == Window.OK) {
                     final Object[] results = dialog.getResult();
@@ -118,6 +119,7 @@ public class ImportResourcesComposite {
                         handleResourceAdd(resourcesPaths);
                     }
                 }
+                newShell.dispose();
             }
         });
         
@@ -127,11 +129,13 @@ public class ImportResourcesComposite {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
+                final Shell newShell = new Shell(shell);
                 final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
+                dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.txt" });
                 dialog.setFilterPath(currentProject.getLocation().toOSString());
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    handleResourceAdd(newArrayList(chosenFilePath));
+                    handleResourceAdd(newArrayList(new Path(chosenFilePath).toPortableString()));
                 }
                 newShell.dispose();
             }
@@ -149,12 +153,14 @@ public class ImportResourcesComposite {
                 final IPath path = Selections.getSingleElement(
                         (IStructuredSelection) resourcesViewer.getSelection(), IPath.class);
                 String filePath = null;
+                final Shell newShell = new Shell(shell);
                 if (path.isAbsolute()) {
                     final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
+                    dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.txt" });
                     dialog.setFilterPath(path.toOSString());
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
-                        filePath = chosenFilePath;
+                        filePath = new Path(chosenFilePath).toPortableString();
                     }
                 } else {
                     final IResource initialSelection = currentProject.findMember(path);
@@ -167,6 +173,7 @@ public class ImportResourcesComposite {
                         }
                     }
                 }
+                newShell.dispose();
                 if(filePath != null) {
                     handleResourceEdit(resources, path, filePath);
                 }
@@ -240,10 +247,8 @@ public class ImportResourcesComposite {
         for (final RobotKeywordCall element : currentResources) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
-            if(!args.isEmpty()) {
-                if(resourcesToRemove.contains(new Path(args.get(0)))) {
-                    settingsToRemove.add(setting);
-                }
+            if(!args.isEmpty() && resourcesToRemove.contains(new Path(args.get(0)))) {
+                settingsToRemove.add(setting);
             }
         }
         importedSettings.getImportedResources().removeAll(resourcesToRemove);
@@ -256,10 +261,9 @@ public class ImportResourcesComposite {
         for (final RobotKeywordCall element : currentResources) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
-            if(!args.isEmpty()) {
-                if(oldPath.equals(new Path(args.get(0)))) {
-                    commandsStack.execute(new SetSettingKeywordCallCommand(setting, newArrayList(newPath)));
-                }
+            if(!args.isEmpty() && oldPath.equals(new Path(args.get(0)))) {
+                commandsStack.execute(new SetSettingKeywordCallCommand(setting, newArrayList(newPath)));
+                break;
             }
         }
         final List<IPath> resources = importedSettings.getImportedResources();

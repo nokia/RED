@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedVariablesFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 class Settings {
@@ -13,6 +14,7 @@ class Settings {
     private final List<LibrarySpecification> toImport;
     private final List<LibrarySpecification> imported;
     private final List<IPath> importedResources;
+    private final List<ImportedVariablesFile> importedVariables;
 
     static Settings create(final RobotSuiteFile fileModel) {
         final List<LibrarySpecification> standardLibraries = fileModel.getProject().getStandardLibraries();
@@ -23,14 +25,16 @@ class Settings {
         toImport.addAll(referencedLibraries);
         toImport.removeAll(imported);
         final List<IPath> importedResources = fileModel.getResourcesPaths();
-        return new Settings(toImport, imported, importedResources);
+        final List<ImportedVariablesFile> importedVariables = fileModel.getImportedVariables();
+        return new Settings(toImport, imported, importedResources, importedVariables);
     }
 
     private Settings(final List<LibrarySpecification> toImport, final List<LibrarySpecification> imported,
-            final List<IPath> importedResources) {
+            final List<IPath> importedResources, final List<ImportedVariablesFile> importedVariables) {
         this.toImport = toImport;
         this.imported = imported;
         this.importedResources = importedResources;
+        this.importedVariables = importedVariables;
     }
 
     List<LibrarySpecification> getLibrariesToImport() {
@@ -43,6 +47,10 @@ class Settings {
 
     public List<IPath> getImportedResources() {
         return importedResources;
+    }
+
+    public List<ImportedVariablesFile> getImportedVariables() {
+        return importedVariables;
     }
 
 }
