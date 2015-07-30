@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 
@@ -43,9 +44,9 @@ class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getImage(final Object element) {
         if (element instanceof RobotKeywordDefinition) {
-            return RobotImages.getUserKeywordImage().createImage();
+            return ImagesManager.getImage(RedImages.getUserKeywordImage());
         } else if (element instanceof RobotCase) {
-            return RobotImages.getTestCaseImage().createImage();
+            return ImagesManager.getImage(RedImages.getTestCaseImage());
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getImage();
         }
@@ -99,7 +100,7 @@ class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getToolTipImage(final Object element) {
         if (element instanceof RobotElement) {
-            return RobotImages.getTooltipImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipImage());
         }
         return null;
     }

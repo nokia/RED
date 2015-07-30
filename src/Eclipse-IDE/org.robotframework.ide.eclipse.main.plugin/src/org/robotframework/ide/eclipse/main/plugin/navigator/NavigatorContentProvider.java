@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -71,7 +71,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 	@Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof IFile) {
-            return RobotFramework.getModelManager().createSuiteFile((IFile) parentElement).getSections().toArray();
+            return RedPlugin.getModelManager().createSuiteFile((IFile) parentElement).getSections().toArray();
         } else if (parentElement instanceof RobotSettingsSection) {
             final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
             return groupedChildren(children).toArray();

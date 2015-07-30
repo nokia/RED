@@ -10,7 +10,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * Those objects are used in order to have additional entry in table which can
@@ -53,12 +55,8 @@ public class ElementAddingToken {
         if (rank > 0) {
             return null;
         }
-        final ImageDescriptor descriptor = RobotImages.getAddImage();
-        if (enabled) {
-            return descriptor.createImage();
-        } else {
-            return RobotImages.getGreyedImage(descriptor).createImage();
-        }
+        ImageDescriptor addImage = RedImages.getAddImage();
+        return ImagesManager.getImage(enabled ? addImage : RedImages.getGreyedImage(addImage));
     }
 
     public StyledString getStyledText() {
@@ -77,12 +75,12 @@ public class ElementAddingToken {
         if (enabled && enabledColor != null) {
             return enabledColor;
         } else if (enabled) {
-            enabledColor = new Color(Display.getCurrent(), 30, 127, 60);
+            enabledColor = ColorsManager.getColor(30, 127, 60);
             return enabledColor;
         } else if (!enabled && disabledColor != null) {
             return disabledColor;
         } else if (!enabled) {
-            disabledColor = new Color(Display.getCurrent(), 200, 200, 200);
+            disabledColor = ColorsManager.getColor(200, 200, 200);
             return disabledColor;
         }
         return null;

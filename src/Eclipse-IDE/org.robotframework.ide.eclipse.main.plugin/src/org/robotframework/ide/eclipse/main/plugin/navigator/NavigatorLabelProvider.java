@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorLabelProvider extends ColumnLabelProvider {
 
@@ -33,7 +34,7 @@ public class NavigatorLabelProvider extends ColumnLabelProvider {
 	public Image getImage(final Object element) {
         if (element instanceof RobotElement) {
             final ImageDescriptor image = ((RobotElement) element).getImage();
-            return image == null ? null : image.createImage();
+            return image == null ? null : ImagesManager.getImage(image);
         }
         return null;
 	}

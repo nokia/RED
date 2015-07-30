@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart.VariablesEditor;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
 
@@ -23,7 +24,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
     public VariablesEditorPart() {
         super(VariablesEditor.class);
-        setTitleImage(RobotImages.getRobotVariableImage().createImage());
+        setTitleImage(ImagesManager.getImage(RedImages.getRobotVariableImage()));
     }
 
     public static class VariablesEditor extends SectionEditorPart {

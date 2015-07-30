@@ -5,9 +5,10 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.red.graphics.ImagesManager;
 
 class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
 
@@ -20,7 +21,7 @@ class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
             label.append(" " + lib.getPath(), new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
             return label;
@@ -32,6 +33,6 @@ class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
     @Override
     public Image getImage(final Object element) {
         final ReferencedLibrary library = (ReferencedLibrary) element;
-        return library.getImage().createImage();
+        return ImagesManager.getImage(library.getImage());
     }
 }

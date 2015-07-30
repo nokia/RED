@@ -21,7 +21,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
@@ -36,7 +36,7 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
     @Override
     public void run(final IMarker marker) {
         final IProject project = marker.getResource().getProject();
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
         try {
@@ -44,7 +44,7 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
             project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
             project.build(IncrementalProjectBuilder.FULL_BUILD, null);
         } catch (final CoreException e) {
-            StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
                     StatusManager.SHOW);
         }
     }
@@ -77,13 +77,13 @@ public class InstallRobotUsingPipFixer extends MissingPythonInstallationFixer {
                         selectedInstalation.installRobotUsingPip(linesHandler, downloadStableVersion);
                     } catch (final RobotEnvironmentException e) {
                         StatusManager.getManager().handle(
-                                new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+                                new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
                                 StatusManager.BLOCK);
                     }
                     }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-            StatusManager.getManager().handle(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, e.getMessage()),
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
                     StatusManager.SHOW);
         }
     }

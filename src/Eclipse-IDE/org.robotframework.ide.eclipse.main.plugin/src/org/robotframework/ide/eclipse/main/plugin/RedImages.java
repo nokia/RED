@@ -5,122 +5,122 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class RobotImages {
+public class RedImages {
 
     public static ImageDescriptor getFilterImage() {
-        return RobotFramework.getImageDescriptor("resources/filter.png");
+        return RedPlugin.getImageDescriptor("resources/filter.png");
     }
 
     public static ImageDescriptor getCloseImage() {
-        return RobotFramework.getImageDescriptor("resources/close.png");
+        return RedPlugin.getImageDescriptor("resources/close.png");
     }
 
     public static ImageDescriptor getRobotImage() {
-        return RobotFramework.getImageDescriptor("resources/robot.png");
+        return RedPlugin.getImageDescriptor("resources/robot.png");
     }
 
     public static ImageDescriptor getRobotDecoratorImage() {
-        return RobotFramework.getImageDescriptor("resources/robot_dec.png");
+        return RedPlugin.getImageDescriptor("resources/robot_dec.png");
     }
 
     public static ImageDescriptor getRobotCasesFileSectionImage() {
-        return RobotFramework.getImageDescriptor("resources/section.png");
+        return RedPlugin.getImageDescriptor("resources/section.png");
     }
 
     public static ImageDescriptor getRobotCasesFileDeleteSectionImage() {
-        return RobotFramework.getImageDescriptor("resources/section_delete.png");
+        return RedPlugin.getImageDescriptor("resources/section_delete.png");
     }
 
     public static ImageDescriptor getRobotVariableImage() {
-        return RobotFramework.getImageDescriptor("resources/variable.png");
+        return RedPlugin.getImageDescriptor("resources/variable.png");
     }
 
     public static ImageDescriptor getRobotScalarVariableImage() {
-        return RobotFramework.getImageDescriptor("resources/variable_scalar.png");
+        return RedPlugin.getImageDescriptor("resources/variable_scalar.png");
     }
 
     public static ImageDescriptor getRobotListVariableImage() {
-        return RobotFramework.getImageDescriptor("resources/variable_list.png");
+        return RedPlugin.getImageDescriptor("resources/variable_list.png");
     }
 
     public static ImageDescriptor getRobotDictionaryVariableImage() {
-        return RobotFramework.getImageDescriptor("resources/variable_dict.png");
+        return RedPlugin.getImageDescriptor("resources/variable_dict.png");
     }
 
     public static ImageDescriptor getRobotSettingImage() {
-        return RobotFramework.getImageDescriptor("resources/gear.png");
+        return RedPlugin.getImageDescriptor("resources/gear.png");
     }
 
     public static ImageDescriptor getTestCaseImage() {
-        return RobotFramework.getImageDescriptor("resources/case.png");
+        return RedPlugin.getImageDescriptor("resources/case.png");
     }
 
     public static ImageDescriptor getTestCaseSettingImage() {
-        return RobotFramework.getImageDescriptor("resources/gear_small.png");
+        return RedPlugin.getImageDescriptor("resources/gear_small.png");
     }
 
     public static ImageDescriptor getAddImage() {
-        return RobotFramework.getImageDescriptor("resources/add.png");
+        return RedPlugin.getImageDescriptor("resources/add.png");
     }
 
     public static ImageDescriptor getMagnifierImage() {
-        return RobotFramework.getImageDescriptor("resources/magnifier.png");
+        return RedPlugin.getImageDescriptor("resources/magnifier.png");
     }
 
     public static ImageDescriptor getTooltipImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip.png");
     }
 
     public static ImageDescriptor getTooltipAddImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip_add.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip_add.png");
     }
 
     public static ImageDescriptor getTooltipRemoveImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip_remove.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip_remove.png");
     }
 
     public static ImageDescriptor getTooltipMoreImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip_more.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip_more.png");
     }
 
     public static ImageDescriptor getTooltipWarnImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip_warn.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip_warn.png");
     }
 
     public static ImageDescriptor getTooltipProhibitedImage() {
-        return RobotFramework.getImageDescriptor("resources/tooltip_prohibited.png");
+        return RedPlugin.getImageDescriptor("resources/tooltip_prohibited.png");
     }
 
     public static ImageDescriptor getLibraryImage() {
-        return RobotFramework.getImageDescriptor("resources/library.png");
+        return RedPlugin.getImageDescriptor("resources/library.png");
     }
 
     public static ImageDescriptor getJavaLibraryImage() {
-        return RobotFramework.getImageDescriptor("resources/java_jar.png");
+        return RedPlugin.getImageDescriptor("resources/java_jar.png");
     }
 
     public static ImageDescriptor getJavaClassImage() {
-        return RobotFramework.getImageDescriptor("resources/java_class.png");
+        return RedPlugin.getImageDescriptor("resources/java_class.png");
     }
 
     public static ImageDescriptor getBookImage() {
-        return RobotFramework.getImageDescriptor("resources/book.png");
+        return RedPlugin.getImageDescriptor("resources/book.png");
     }
 
     public static ImageDescriptor getKeywordImage() {
-        return RobotFramework.getImageDescriptor("resources/keyword.png");
+        return RedPlugin.getImageDescriptor("resources/keyword.png");
     }
 
     public static ImageDescriptor getUserKeywordImage() {
-        return RobotFramework.getImageDescriptor("resources/keyword_user.png");
+        return RedPlugin.getImageDescriptor("resources/keyword_user.png");
     }
 
     public static ImageDescriptor getRobotProjectConfigFile() {
-        return RobotFramework.getImageDescriptor("resources/config.png");
+        return RedPlugin.getImageDescriptor("resources/config.png");
     }
 
     public static ImageDescriptor getFocusSectionImage() {
-        return RobotFramework.getImageDescriptor("resources/focus_section.png");
+        return RedPlugin.getImageDescriptor("resources/focus_section.png");
     }
 
     /**

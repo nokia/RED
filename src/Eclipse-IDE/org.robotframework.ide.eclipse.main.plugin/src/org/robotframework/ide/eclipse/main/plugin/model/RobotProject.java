@@ -12,7 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -160,9 +160,9 @@ public class RobotProject extends RobotContainer {
     public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
         readProjectConfigurationIfNeeded();
         if (configuration == null || configuration.usesPreferences()) {
-            return RobotFramework.getDefault().getActiveRobotInstallation();
+            return RedPlugin.getDefault().getActiveRobotInstallation();
         }
-        return RobotFramework.getDefault().getRobotInstallation(configuration.providePythonLocation());
+        return RedPlugin.getDefault().getRobotInstallation(configuration.providePythonLocation());
     }
 
     public IFile getConfigurationFile() {

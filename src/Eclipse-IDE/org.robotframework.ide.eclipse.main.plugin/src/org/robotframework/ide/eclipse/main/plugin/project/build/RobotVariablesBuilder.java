@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
@@ -43,7 +43,7 @@ public class RobotVariablesBuilder {
                         monitor.done();
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
-                        return new Status(IStatus.CANCEL, RobotFramework.PLUGIN_ID, "Unable to build variables", e);
+                        return new Status(IStatus.CANCEL, RedPlugin.PLUGIN_ID, "Unable to build variables", e);
                     }
                 }
             };
@@ -68,7 +68,7 @@ public class RobotVariablesBuilder {
         subMonitor.beginTask("Building", 100);
         subMonitor.subTask("checking Robot execution environment");
 
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final RobotProjectConfig configuration = provideConfiguration(subMonitor.newChild(10), robotProject, reporter);
         if (subMonitor.isCanceled()) {
             return;

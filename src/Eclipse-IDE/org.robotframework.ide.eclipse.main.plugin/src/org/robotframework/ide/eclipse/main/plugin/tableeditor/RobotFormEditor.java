@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFolder;
@@ -131,7 +131,7 @@ public class RobotFormEditor extends FormEditor {
             final IFile file = fileInput.getFile();
 
             final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
-            final IDialogSettings dialogSettings = RobotFramework.getDefault().getDialogSettings();
+            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
             final IDialogSettings section = dialogSettings.getSection(sectionName);
             if (section == null) {
                 return def;
@@ -151,7 +151,7 @@ public class RobotFormEditor extends FormEditor {
             final IFile file = fileInput.getFile();
             
             final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
-            final IDialogSettings dialogSettings = RobotFramework.getDefault().getDialogSettings();
+            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
             IDialogSettings section = dialogSettings.getSection(sectionName);
             if (section == null) {
                 section = dialogSettings.addNewSection(sectionName);
@@ -256,7 +256,7 @@ public class RobotFormEditor extends FormEditor {
             return suiteModel;
         }
         if (getEditorInput() instanceof FileEditorInput) {
-            suiteModel = RobotFramework.getModelManager().createSuiteFile(
+            suiteModel = RedPlugin.getModelManager().createSuiteFile(
                     ((FileEditorInput) getEditorInput()).getFile());
         } else {
             final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);

@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -20,7 +20,7 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
     @Override
     public void initializeDefaultPreferences() {
         final IScopeContext scope = DefaultScope.INSTANCE;
-        final IEclipsePreferences preferences = scope.getNode(RobotFramework.PLUGIN_ID);
+        final IEclipsePreferences preferences = scope.getNode(RedPlugin.PLUGIN_ID);
 
         final List<PythonInstallationDirectory> pybotPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
         if (!pybotPaths.isEmpty()) {

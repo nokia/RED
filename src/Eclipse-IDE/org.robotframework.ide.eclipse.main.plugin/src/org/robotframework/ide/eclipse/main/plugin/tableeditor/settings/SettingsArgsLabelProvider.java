@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ImagesManager;
 
 class SettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -68,7 +69,7 @@ class SettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getToolTipImage(final Object element) {
         if (element instanceof RobotSetting) {
-            return RobotImages.getTooltipImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipImage());
         }
         return null;
     }

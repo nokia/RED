@@ -12,7 +12,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
@@ -23,7 +23,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
 
     public ValidationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RobotFramework.PLUGIN_ID));
+        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("RED validation settings");
     }
 
