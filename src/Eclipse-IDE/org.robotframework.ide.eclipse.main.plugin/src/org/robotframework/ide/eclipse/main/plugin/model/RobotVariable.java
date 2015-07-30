@@ -1,14 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-public class RobotVariable implements RobotElement {
+public class RobotVariable implements RobotElement, Serializable {
 
     public enum Type {
         SCALAR {
@@ -19,7 +20,7 @@ public class RobotVariable implements RobotElement {
 
             @Override
             public ImageDescriptor getImage() {
-                return RobotImages.getRobotScalarVariableImage();
+                return RedImages.getRobotScalarVariableImage();
             }
         },
         LIST {
@@ -30,7 +31,7 @@ public class RobotVariable implements RobotElement {
 
             @Override
             public ImageDescriptor getImage() {
-                return RobotImages.getRobotListVariableImage();
+                return RedImages.getRobotListVariableImage();
             }
         },
         DICTIONARY {
@@ -41,7 +42,7 @@ public class RobotVariable implements RobotElement {
 
             @Override
             public ImageDescriptor getImage() {
-                return RobotImages.getRobotDictionaryVariableImage();
+                return RedImages.getRobotDictionaryVariableImage();
             }
         };
 
@@ -59,7 +60,7 @@ public class RobotVariable implements RobotElement {
         return false;
     }
 
-    private RobotVariablesSection parent;
+    private transient RobotVariablesSection parent;
     private String name;
     private Type type;
     private String value;
@@ -99,6 +100,14 @@ public class RobotVariable implements RobotElement {
         return parent;
     }
 
+    public void setParent(final RobotVariablesSection variablesSection) {
+        this.parent = variablesSection;
+    }
+
+    public void fixParents() {
+        // nothing to do
+    }
+
     @Override
     public List<RobotElement> getChildren() {
         return new ArrayList<>();
@@ -131,10 +140,6 @@ public class RobotVariable implements RobotElement {
 
     public void setName(final String name) {
         this.name = name;
-    }
-
-    public void setParent(final RobotVariablesSection variablesSection) {
-        this.parent = variablesSection;
     }
 
     @Override

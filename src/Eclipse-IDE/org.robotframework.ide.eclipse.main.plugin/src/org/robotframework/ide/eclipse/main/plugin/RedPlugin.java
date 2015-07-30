@@ -12,16 +12,19 @@ import org.osgi.framework.BundleContext;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.FontsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
-public class RobotFramework extends AbstractUIPlugin {
+public class RedPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "org.robotframework.ide.eclipse.main.plugin";
 
-    private static RobotFramework plugin;
+    private static RedPlugin plugin;
 
     private final List<File> installedPythons = new ArrayList<>();
 
-    public static RobotFramework getDefault() {
+    public static RedPlugin getDefault() {
         return plugin;
     }
 
@@ -44,7 +47,14 @@ public class RobotFramework extends AbstractUIPlugin {
         super.stop(context);
         plugin = null;
         installedPythons.clear();
+        ColorsManager.disposeColors();
+        FontsManager.disposeFonts();
+        ImagesManager.disposeImages();
         RobotModelManager.getInstance().dispose();
+    }
+
+    public RedPreferences getPreferences() {
+        return new RedPreferences(getPreferenceStore());
     }
 
     public RobotRuntimeEnvironment getActiveRobotInstallation() {

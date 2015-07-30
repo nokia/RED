@@ -6,34 +6,19 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
-
-    private Image libraryImage = RobotImages.getLibraryImage().createImage();
-    private Image bookImage = RobotImages.getBookImage().createImage();
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (libraryImage != null) {
-            libraryImage.dispose();
-            libraryImage = null;
-        }
-        if (bookImage != null) {
-            bookImage.dispose();
-            bookImage = null;
-        }
-    }
 
     @Override
     public Image getImage(final Object element) {
         if (element instanceof RobotProjectDependencies) {
-            return libraryImage;
+            return ImagesManager.getImage(RedImages.getLibraryImage());
         } else if (element instanceof LibrarySpecification) {
-            return bookImage;
+            return ImagesManager.getImage(RedImages.getBookImage());
         }
         return null;
     }
@@ -61,7 +46,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             return styled.append(additionalInfo, new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
         } else if (element instanceof LibrarySpecification) {
@@ -73,7 +58,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                 styled.append(additonalInfo, new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
                 });
             }
@@ -81,7 +66,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             return styled.append("(" + libSpec.getKeywords().size() + ")", new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
         }

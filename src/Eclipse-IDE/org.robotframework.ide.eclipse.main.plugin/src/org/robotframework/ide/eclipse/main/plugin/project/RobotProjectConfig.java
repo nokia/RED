@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "libraries", "remoteLocations", "referencedVariableFiles" })
@@ -256,9 +256,9 @@ public class RobotProjectConfig {
         public ImageDescriptor getImage() {
             switch (provideType()) {
                 case JAVA:
-                    return RobotImages.getJavaLibraryImage();
+                    return RedImages.getJavaLibraryImage();
                 default:
-                    return RobotImages.getLibraryImage();
+                    return RedImages.getLibraryImage();
             }
         }
         

@@ -7,7 +7,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class SuiteEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -15,7 +15,7 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
 
     public SuiteEditorPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RobotFramework.PLUGIN_ID));
+        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("RED suite editor settings");
     }
 

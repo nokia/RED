@@ -13,13 +13,11 @@ public class DIParameterizedHandler<C> extends AbstractHandler {
     private final C component;
 
     public DIParameterizedHandler(final Class<C> clazz) {
-        final IEclipseContext context = getActiveContext();
-        component = ContextInjectionFactory.make(clazz, context);
+        component = ContextInjectionFactory.make(clazz, getActiveContext());
     }
 
     private static IEclipseContext getActiveContext() {
-        final IEclipseContext parentContext = getParentContext();
-        return parentContext.getActiveLeaf();
+        return getParentContext().getActiveLeaf();
     }
 
     private static IEclipseContext getParentContext() {
@@ -28,8 +26,7 @@ public class DIParameterizedHandler<C> extends AbstractHandler {
 
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
-        final IEclipseContext activeContext = getActiveContext();
-        final IEclipseContext child = activeContext.createChild();
+        final IEclipseContext child = getActiveContext().createChild();
         
         for (final Object key : event.getParameters().keySet()) {
             if (key instanceof String) {

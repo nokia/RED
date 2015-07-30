@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -174,7 +174,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private int calcualateLongestArgumentsLength() {
-        int max = RobotFramework.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         final List<?> elements = (List<?>) viewer.getInput();
         if (elements != null) {
             for (final Object element : elements) {

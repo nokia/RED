@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -40,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
@@ -48,11 +49,11 @@ import com.google.common.collect.Lists;
 
 public class ImportLibraryComposite {
 
-    private RobotEditorCommandsStack commandsStack;
+    private final RobotEditorCommandsStack commandsStack;
 
-    private FormToolkit formToolkit;
+    private final FormToolkit formToolkit;
 
-    private RobotSuiteFile fileModel;
+    private final RobotSuiteFile fileModel;
 
     private TableViewer leftViewer;
 
@@ -286,11 +287,9 @@ public class ImportLibraryComposite {
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
-        private final Image bookImage = RobotImages.getBookImage().createImage();
-
         @Override
         public Image getImage(final Object element) {
-            return bookImage;
+            return ImagesManager.getImage(RedImages.getBookImage());
         }
 
         @Override
@@ -308,7 +307,7 @@ public class ImportLibraryComposite {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
                     }
                 });
             } else if (spec.isRemote()) {
@@ -317,17 +316,11 @@ public class ImportLibraryComposite {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
                     }
                 });
             }
             return text;
-        }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            bookImage.dispose();
         }
     }
 }

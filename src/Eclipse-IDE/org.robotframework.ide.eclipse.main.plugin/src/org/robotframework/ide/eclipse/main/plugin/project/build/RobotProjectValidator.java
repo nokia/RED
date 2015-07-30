@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 class RobotProjectValidator {
 
@@ -36,7 +36,7 @@ class RobotProjectValidator {
                     }
                     return Status.OK_STATUS;
                 } catch (final CoreException e) {
-                    RobotFramework.logError("Project validation was corrupted", e);
+                    RedPlugin.logError("Project validation was corrupted", e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();

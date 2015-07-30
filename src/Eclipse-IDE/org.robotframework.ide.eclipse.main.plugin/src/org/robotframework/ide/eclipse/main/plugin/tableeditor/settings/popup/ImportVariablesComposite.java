@@ -43,8 +43,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -55,6 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
@@ -63,10 +64,10 @@ import com.google.common.base.Optional;
 public class ImportVariablesComposite {
 
     private static IProject currentProject;
-    private RobotEditorCommandsStack commandsStack;
-    private FormToolkit formToolkit;
-    private Shell shell;
-    private RobotSettingsSection settingsSection;
+    private final RobotEditorCommandsStack commandsStack;
+    private final FormToolkit formToolkit;
+    private final Shell shell;
+    private final RobotSettingsSection settingsSection;
     private TableViewer variablesViewer;
     private ISelectionChangedListener selectionChangedListener;
     
@@ -100,7 +101,7 @@ public class ImportVariablesComposite {
                 .labelsProvidedBy(new VariablesLabelProvider())
                 .createFor(variablesViewer);
         
-        Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
+        final Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addVariablesButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addVariablesButtons);
         
@@ -111,16 +112,16 @@ public class ImportVariablesComposite {
         addVariableFromWorkspaceBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final Shell newShell = new Shell(shell);
                 final ElementTreeSelectionDialog dialog = createAddVariableSelectionDialog(newShell, true, null);
                 if (dialog.open() == Window.OK) {
-                    Object[] results = dialog.getResult();
+                    final Object[] results = dialog.getResult();
                     if (results != null) {
-                        List<String> variablesPaths = newArrayList();
+                        final List<String> variablesPaths = newArrayList();
                         for (int i = 0; i < results.length; i++) {
                             final IResource resource = (IResource) results[i];
-                            String path = extractResourcePath(resource);
+                            final String path = extractResourcePath(resource);
                             variablesPaths.add(path);
                         }
                         handleVariableAdd(variablesPaths);
@@ -135,7 +136,7 @@ public class ImportVariablesComposite {
         addExternalVariablesBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final Shell newShell = new Shell(shell);
                 final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
@@ -162,7 +163,7 @@ public class ImportVariablesComposite {
                 final List<String> args = variablesFile.getArgs();
                 final Shell newShell = new Shell(shell);
                 if (args != null && !args.isEmpty()) {
-                    IPath path = new Path(args.get(0));
+                    final IPath path = new Path(args.get(0));
                     String filePath = null;
                     if (path.isAbsolute()) {
                         final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
@@ -173,11 +174,11 @@ public class ImportVariablesComposite {
                             filePath = new Path(chosenFilePath).toPortableString();
                         }
                     } else {
-                        IResource initialSelection = currentProject.findMember(path);
+                        final IResource initialSelection = currentProject.findMember(path);
                         final ElementTreeSelectionDialog dialog = createAddVariableSelectionDialog(newShell, false,
                                 initialSelection);
                         if (dialog.open() == Window.OK) {
-                            Object result = dialog.getFirstResult();
+                            final Object result = dialog.getFirstResult();
                             if (result != null) {
                                 final IResource resource = (IResource) result;
                                 filePath = extractResourcePath(resource);
@@ -207,7 +208,7 @@ public class ImportVariablesComposite {
                 final Shell newShell = new Shell(shell);
                 final EditArgumentsDialog dialog = new EditArgumentsDialog(newShell, args);
                 if (dialog.open() == Window.OK) {
-                    List<String> newArgs = dialog.getArguments();
+                    final List<String> newArgs = dialog.getArguments();
                     handleVariablesArgsEdit(variables, variablesFile, newArgs);
                 }
                 newShell.dispose();
@@ -221,7 +222,7 @@ public class ImportVariablesComposite {
         removeVariablesBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final Settings variables = (Settings) variablesViewer.getInput();
                 final List<ImportedVariablesFile> paths = Selections.getElements(
                         (IStructuredSelection) variablesViewer.getSelection(), ImportedVariablesFile.class);
@@ -242,7 +243,7 @@ public class ImportVariablesComposite {
         return selectionChangedListener;
     }
 
-    private ElementTreeSelectionDialog createAddVariableSelectionDialog(Shell shell, boolean allowMultiple, IResource initialSelection) {
+    private ElementTreeSelectionDialog createAddVariableSelectionDialog(final Shell shell, final boolean allowMultiple, final IResource initialSelection) {
         final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(),
                 new BaseWorkbenchContentProvider());
         dialog.setAllowMultiple(allowMultiple);
@@ -255,7 +256,7 @@ public class ImportVariablesComposite {
         return dialog;
     }
     
-    private String extractResourcePath(IResource resource) {
+    private String extractResourcePath(final IResource resource) {
         if (resource.getProject().equals(currentProject)) {
             return resource.getProjectRelativePath().toString();
         } else {
@@ -264,8 +265,8 @@ public class ImportVariablesComposite {
     }
     
     private void handleVariableAdd(final List<String> paths) {
-        List<ImportedVariablesFile> currentVariables = ((Settings) variablesViewer.getInput()).getImportedVariables();
-        for (String newPathString : paths) {
+        final List<ImportedVariablesFile> currentVariables = ((Settings) variablesViewer.getInput()).getImportedVariables();
+        for (final String newPathString : paths) {
             final ArrayList<String> args = newArrayList(newPathString);
             commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Variables", args));
             currentVariables.add(new ImportedVariablesFile(args));
@@ -275,10 +276,10 @@ public class ImportVariablesComposite {
     
     private void handleVariableRemove(final Settings importedSettings, final List<ImportedVariablesFile> resourcesToRemove) {
         final List<RobotSetting> settingsToRemove = newArrayList();
-        List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (RobotElement element : currentVariables) {
+        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotElement element : currentVariables) {
             final RobotSetting setting = (RobotSetting) element;
-            List<String> args = setting.getArguments();
+            final List<String> args = setting.getArguments();
             if(!args.isEmpty()) {
                 if(resourcesToRemove.contains(new ImportedVariablesFile(args))) {
                     settingsToRemove.add(setting);
@@ -291,10 +292,10 @@ public class ImportVariablesComposite {
     }
     
     private void handleVariablesPathEdit(final Settings importedSettings, final ImportedVariablesFile variablesFile, final String newPath) {
-        List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (RobotElement element : currentVariables) {
+        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotElement element : currentVariables) {
             final RobotSetting setting = (RobotSetting) element;
-            List<String> args = setting.getArguments();
+            final List<String> args = setting.getArguments();
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 args.set(0, newPath);
                 commandsStack.execute(new SetSettingKeywordCallCommand(setting, args));
@@ -305,13 +306,13 @@ public class ImportVariablesComposite {
         variablesViewer.refresh();
     }
     
-    private void handleVariablesArgsEdit(final Settings importedSettings, ImportedVariablesFile variablesFile, final List<String> newArgs) {
-        List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (RobotElement element : currentVariables) {
+    private void handleVariablesArgsEdit(final Settings importedSettings, final ImportedVariablesFile variablesFile, final List<String> newArgs) {
+        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotElement element : currentVariables) {
             final RobotSetting setting = (RobotSetting) element;
-            List<String> args = setting.getArguments();
+            final List<String> args = setting.getArguments();
             if(!args.isEmpty() && args.equals(variablesFile.getArgs())) {
-                List<String> newVariablesArguments = newArrayList(args.get(0));
+                final List<String> newVariablesArguments = newArrayList(args.get(0));
                 newVariablesArguments.addAll(newArgs);
                 commandsStack.execute(new SetSettingKeywordCallCommand(setting, newVariablesArguments));
                 variablesFile.setArgs(newVariablesArguments);
@@ -325,7 +326,7 @@ public class ImportVariablesComposite {
         selectionChangedListener = new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                boolean isSettingSelected = variablesViewer.getTable().getSelectionCount() == 1;
+                final boolean isSettingSelected = variablesViewer.getTable().getSelectionCount() == 1;
                 removeBtn.setEnabled(isSettingSelected);
                 editPathBtn.setEnabled(isSettingSelected);
                 editArgsBtn.setEnabled(isSettingSelected);
@@ -335,11 +336,10 @@ public class ImportVariablesComposite {
     }
     
     private static class VariablesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
-        private final Image variableImage = RobotImages.getRobotScalarVariableImage().createImage();
 
         @Override
         public Image getImage(final Object element) {
-            return variableImage;
+            return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
         }
 
         @Override
@@ -353,29 +353,22 @@ public class ImportVariablesComposite {
             final List<String> args = importedVariable.getArgs();
             final StyledString text = new StyledString("");
             if(args != null && !args.isEmpty()) {
-                IPath path = new Path(args.get(0));
-                String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
-                StringBuilder fileArgs = new StringBuilder("");
+                final IPath path = new Path(args.get(0));
+                final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
+                final StringBuilder fileArgs = new StringBuilder("");
                 for (int i = 1; i < args.size(); i++) {
                     fileArgs.append(":" + args.get(i));
                 }
                 
                 text.append(path.lastSegment());
                 text.append(fileArgs.toString() + " - " + parentPath, new Styler() {
-
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
                     }
                 });
             }
             return text;
-        }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            variableImage.dispose();
         }
     }
     
@@ -438,7 +431,7 @@ public class ImportVariablesComposite {
         @Override
         protected void okPressed() {
             final List<String> newArgs = newArrayList();
-            for (String arg : argsEditor.getArguments()) {
+            for (final String arg : argsEditor.getArguments()) {
                 if (!arg.equals("")) {
                     newArgs.add(arg);
                 }

@@ -6,7 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 class ToolbarContributions {
 
@@ -14,7 +14,7 @@ class ToolbarContributions {
             final String sectionName) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
                 serviceLocator, null, "org.robotframework.ide.eclipse.deleteSection", SWT.PUSH);
-        contributionParameters.icon = RobotImages.getRobotCasesFileDeleteSectionImage();
+        contributionParameters.icon = RedImages.getRobotCasesFileDeleteSectionImage();
         contributionParameters.tooltip = "Delete " + sectionName + " section";
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("org.robotframework.ide.eclipse.deleteSection.sectionName", sectionName);

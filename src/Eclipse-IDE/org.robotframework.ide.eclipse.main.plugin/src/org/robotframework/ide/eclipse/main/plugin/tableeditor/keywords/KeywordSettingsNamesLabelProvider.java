@@ -11,10 +11,11 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class KeywordSettingsNamesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
@@ -42,7 +43,7 @@ public class KeywordSettingsNamesLabelProvider extends ColumnLabelProvider imple
         final Entry<String, RobotDefinitionSetting> entry = getEntry(element);
 
         if (entry.getValue() == null) {
-            return new Color(Display.getDefault(), 250, 250, 250);
+            return ColorsManager.getColor(250, 250, 250);
         } else {
             return null;
         }
@@ -77,7 +78,7 @@ public class KeywordSettingsNamesLabelProvider extends ColumnLabelProvider imple
 
     @Override
     public Image getToolTipImage(final Object object) {
-        return RobotImages.getTooltipImage().createImage();
+        return ImagesManager.getImage(RedImages.getTooltipImage());
     }
 
     @SuppressWarnings("unchecked")

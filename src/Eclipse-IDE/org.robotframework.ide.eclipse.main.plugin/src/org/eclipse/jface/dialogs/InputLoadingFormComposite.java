@@ -28,7 +28,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.ImagesManager;
 
 public abstract class InputLoadingFormComposite extends Composite {
 
@@ -71,6 +72,10 @@ public abstract class InputLoadingFormComposite extends Composite {
         setLayout(new FillLayout(SWT.VERTICAL));
 
         form = createForm(this);
+        final Control headClient = createHeadClient(form.getHead());
+        if (headClient != null) {
+            form.setHeadClient(headClient);
+        }
         innerComposite = createBodyComposite(form.getBody());
         loadingControl = createLoadingInfoControl(innerComposite);
         control = createControl(innerComposite);
@@ -80,7 +85,7 @@ public abstract class InputLoadingFormComposite extends Composite {
         switchLoadingControl();
         scheduleInputCollectingJob();
     }
-    
+
     private Form createForm(final Composite parent) {
         final Form form = formToolkit.createForm(parent);
         form.setMessage("");
@@ -97,14 +102,12 @@ public abstract class InputLoadingFormComposite extends Composite {
     }
 
     protected final void setFormImage(final ImageDescriptor image) {
-        final Image img = image.createImage();
-        addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                img.dispose();
-            }
-        });
-        form.setImage(img);
+        form.setImage(ImagesManager.getImage(image));
+    }
+
+    protected Control createHeadClient(final Composite head) {
+        // nothing to do, override if needed
+        return null;
     }
 
     private Composite createBodyComposite(final Composite parent) {
@@ -120,16 +123,11 @@ public abstract class InputLoadingFormComposite extends Composite {
         loadingLabel.setAlignment(SWT.CENTER);
         return loadingLabel;
     }
-    
-    protected void addHeadClient(Control control) {
-        control.setParent(form.getHead());
-        form.setHeadClient(control);
-    }
 
     protected abstract Control createControl(Composite parent);
 
     protected void createActions() {
-        addAction(new CloseDialogAction(getShell(), RobotImages.getCloseImage()));
+        addAction(new CloseDialogAction(getShell(), RedImages.getCloseImage()));
     }
 
     protected final void addAction(final Action action) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotSetting extends RobotKeywordCall {
 
@@ -38,7 +38,7 @@ public class RobotSetting extends RobotKeywordCall {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getRobotSettingImage();
+        return RedImages.getRobotSettingImage();
     }
 
     @Override

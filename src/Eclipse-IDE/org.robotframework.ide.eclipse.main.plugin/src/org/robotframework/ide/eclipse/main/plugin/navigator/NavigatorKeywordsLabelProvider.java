@@ -4,15 +4,16 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
         if (element instanceof KeywordSpecification) {
-            return RobotImages.getKeywordImage().createImage();
+            return ImagesManager.getImage(RedImages.getKeywordImage());
         }
         return null;
     }

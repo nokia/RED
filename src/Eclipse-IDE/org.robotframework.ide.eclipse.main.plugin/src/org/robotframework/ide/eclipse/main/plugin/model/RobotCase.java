@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotCase extends RobotCodeHoldingElement {
 
@@ -23,6 +23,6 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getTestCaseImage();
+        return RedImages.getTestCaseImage();
     }
 }

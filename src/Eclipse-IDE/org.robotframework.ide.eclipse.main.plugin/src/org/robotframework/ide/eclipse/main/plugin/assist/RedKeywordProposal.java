@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -121,7 +121,7 @@ public class RedKeywordProposal {
     }
 
     public enum KeywordType {
-        RESERVED(null), STD_LIBRARY(RobotImages.getKeywordImage()), USER_DEFINED(RobotImages.getUserKeywordImage());
+        RESERVED(null), STD_LIBRARY(RedImages.getKeywordImage()), USER_DEFINED(RedImages.getUserKeywordImage());
 
         private ImageDescriptor image;
 

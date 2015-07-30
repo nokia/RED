@@ -6,14 +6,14 @@ import java.util.Map.Entry;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
 import com.google.common.collect.Range;
 
 public class RobotProblem {
 
-    public static final String TYPE_ID = RobotFramework.PLUGIN_ID + ".robotProblem";
+    public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".robotProblem";
 
     public static final String CAUSE_ENUM_CLASS = "class";
     public static final String CAUSE_ATTRIBUTE = "cause";

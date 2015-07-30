@@ -43,7 +43,7 @@ import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
 import org.robotframework.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -229,7 +229,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private RobotProject getRobotProject(final IProject project) throws CoreException {
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         if(robotProject == null) {
             throw newCoreException("There is no available Robot project", null);
         }
@@ -284,7 +284,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private static CoreException newCoreException(final String message, final Throwable cause) {
-        return new CoreException(new Status(IStatus.ERROR, RobotFramework.PLUGIN_ID, message, cause));
+        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
 
     private List<String> getSuitesToRun(final List<IResource> suites) {

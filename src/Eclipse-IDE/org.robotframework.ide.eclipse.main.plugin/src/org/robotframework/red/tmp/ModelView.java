@@ -10,7 +10,11 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.eclipse.swt.widgets.Label;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.FontsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 public class ModelView {
 
@@ -22,6 +26,9 @@ public class ModelView {
         layout.marginHeight = 2;
         layout.marginWidth = 2;
         parent.setLayout(layout);
+        
+        final Label label = new Label(parent, SWT.NONE);
+        label.setText("Images: 0 Fonts: 0 Colors: 0");
 
         final TreeViewer viewer = new TreeViewer(parent);
         viewer.getTree().setHeaderVisible(true);
@@ -49,7 +56,10 @@ public class ModelView {
                     parent.getDisplay().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            viewer.setInput(RobotFramework.getModelManager().getModel());
+                            label.setText("Images: " + ImagesManager.size() + " Fonts: " + FontsManager.size()
+                                    + " Colors: " + ColorsManager.size());
+
+                            viewer.setInput(RedPlugin.getModelManager().getModel());
                             viewer.expandAll();
 
                             viewer2.setInput(new Object());

@@ -14,7 +14,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
@@ -56,7 +56,7 @@ public class RobotLaunchConfiguration {
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = resources.get(0).getProject();
-        final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
 
         robotConfig.setExecutor(interpreter);

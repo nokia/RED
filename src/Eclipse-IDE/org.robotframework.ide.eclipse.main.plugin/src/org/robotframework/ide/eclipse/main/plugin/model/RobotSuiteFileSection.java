@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotSuiteFileSection implements RobotElement {
 
@@ -53,7 +53,7 @@ public class RobotSuiteFileSection implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return RobotImages.getRobotCasesFileSectionImage();
+        return RedImages.getRobotCasesFileSectionImage();
     }
 
     @Override

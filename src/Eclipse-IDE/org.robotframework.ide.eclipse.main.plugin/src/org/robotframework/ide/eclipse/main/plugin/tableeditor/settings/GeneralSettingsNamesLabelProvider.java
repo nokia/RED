@@ -9,12 +9,13 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -44,7 +45,7 @@ class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider
         final Entry<String, RobotElement> entry = getEntry(element);
 
         if (entry.getValue() == null) {
-            return new Color(Display.getDefault(), 250, 250, 250);
+            return ColorsManager.getColor(250, 250, 250);
         } else {
             return null;
         }
@@ -76,7 +77,7 @@ class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider
 
     @Override
     public Image getToolTipImage(final Object object) {
-        return RobotImages.getTooltipImage().createImage();
+        return ImagesManager.getImage(RedImages.getTooltipImage());
     }
 
     @SuppressWarnings("unchecked")
