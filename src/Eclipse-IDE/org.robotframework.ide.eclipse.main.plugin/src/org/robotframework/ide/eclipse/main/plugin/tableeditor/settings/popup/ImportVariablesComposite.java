@@ -54,6 +54,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedV
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.VariableFilesArgumentsEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -104,8 +105,6 @@ public class ImportVariablesComposite {
         final Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addVariablesButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addVariablesButtons);
-        
-        //final Shell newShell = new Shell(shell);
         
         final Button addVariableFromWorkspaceBtn = formToolkit.createButton(addVariablesButtons, "Add Variables", SWT.PUSH);
         GridDataFactory.fillDefaults().grab(false, true).applyTo(addVariableFromWorkspaceBtn);
@@ -403,7 +402,7 @@ public class ImportVariablesComposite {
 
         private List<String> currentArgs;
         
-        private VariablesFileArgumentsEditor argsEditor;
+        private VariableFilesArgumentsEditor argsEditor;
 
         protected EditArgumentsDialog(final Shell parentShell, final List<String> currentArgs) {
             super(parentShell);
@@ -422,7 +421,7 @@ public class ImportVariablesComposite {
             GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(dialogComposite);
             GridDataFactory.fillDefaults().grab(true, true).minSize(400, 200).applyTo(dialogComposite);
 
-            argsEditor = new VariablesFileArgumentsEditor();
+            argsEditor = new VariableFilesArgumentsEditor();
             argsEditor.createArgumentsEditor(dialogComposite, currentArgs);
 
             return dialogComposite;
@@ -430,13 +429,7 @@ public class ImportVariablesComposite {
 
         @Override
         protected void okPressed() {
-            final List<String> newArgs = newArrayList();
-            for (final String arg : argsEditor.getArguments()) {
-                if (!arg.equals("")) {
-                    newArgs.add(arg);
-                }
-            }
-            currentArgs = newArgs;
+            currentArgs = argsEditor.getArguments();
             super.okPressed();
         }
 

@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
+package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -27,13 +27,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStra
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 
-public class VariablesFileArgumentsEditor {
+public class VariableFilesArgumentsEditor {
 
     private RowExposingTableViewer argumentsViewer;
 
     private List<String> arguments;
 
-    public VariablesFileArgumentsEditor() {
+    public VariableFilesArgumentsEditor() {
     }
 
     public Composite createArgumentsEditor(Composite parent, List<String> currentArguments) {
@@ -56,12 +56,18 @@ public class VariablesFileArgumentsEditor {
     }
     
     public List<String> getArguments() {
-        return arguments;
+        final List<String> newArgs = newArrayList();
+        for (final String arg : arguments) {
+            if (!arg.equals("")) {
+                newArgs.add(arg);
+            }
+        }
+        return newArgs;
     }
     
     private void createTable() {
         ViewerColumnsFactory.newColumn("Argument")
-                .withWidth(200)
+                .withWidth(300)
                 .labelsProvidedBy(new ArgumentsLabelProvider())
                 .editingSupportedBy(new ArgumentsEditingSupport(argumentsViewer))
                 .editingEnabledOnlyWhen(true)
