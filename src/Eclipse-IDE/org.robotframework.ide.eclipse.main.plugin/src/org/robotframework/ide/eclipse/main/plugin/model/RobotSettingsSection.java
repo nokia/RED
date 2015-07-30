@@ -48,6 +48,10 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     public List<RobotKeywordCall> getResourcesSettings() {
         return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }
+    
+    public List<RobotKeywordCall> getVariablesSettings() {
+        return getSettingsFromGroup(SettingsGroup.VARIABLES);
+    }
 
     public List<RobotKeywordCall> getImportSettings() {
         return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {

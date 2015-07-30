@@ -27,7 +27,7 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     private ImportResourcesComposite importResourcesComposite;
 
     private ImportVariablesComposite importVariablesComposite;
-
+    
     public ImportSettingsComposite(final Composite parent, final RobotEditorCommandsStack commandsStack,
             final RobotSuiteFile fileModel) {
         super(parent, SWT.NONE, "Import");
@@ -105,7 +105,7 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
 
     private Composite createVariablesComposite(final Composite parent) {
         importVariablesComposite = new ImportVariablesComposite(commandsStack, fileModel, getToolkit(), getShell());
-        return importVariablesComposite.createImportLibrariesComposite(parent);
+        return importVariablesComposite.createImportVariablesComposite(parent);
     }
 
     private void createDisposeListener() {
@@ -120,6 +120,8 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
                         importLibrariesComposite.getRightViewerSelectionChangedListener());
                 importResourcesComposite.getResourcesViewer().removeSelectionChangedListener(
                         importResourcesComposite.getSelectionChangedListener());
+                importVariablesComposite.getVariablesViewer().removeSelectionChangedListener(
+                        importVariablesComposite.getSelectionChangedListener());
             }
         });
     }
@@ -142,5 +144,6 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
         importLibrariesComposite.getLeftViewer().setInput(libs);
         importLibrariesComposite.getRightViewer().setInput(libs);
         importResourcesComposite.getResourcesViewer().setInput(libs);
+        importVariablesComposite.getVariablesViewer().setInput(libs);
     }
 }

@@ -241,4 +241,49 @@ public class RobotSuiteFile implements RobotElement {
         }
         return newArrayList();
     }
+    
+    public List<ImportedVariablesFile> getImportedVariables() {
+        final Optional<RobotElement> section = findSection(RobotSettingsSection.class);
+        final List<ImportedVariablesFile> alreadyImported = newArrayList();
+        if (section.isPresent()) {
+            final List<RobotKeywordCall> importSettings = ((RobotSettingsSection) section.get()).getVariablesSettings();
+            for (final RobotElement element : importSettings) {
+                final RobotSetting setting = (RobotSetting) element;
+                alreadyImported.add(new ImportedVariablesFile(setting.getArguments()));
+            }
+            return alreadyImported;
+        }
+        return newArrayList();
+    }
+    
+    public static class ImportedVariablesFile {
+
+        private List<String> args;
+
+        public ImportedVariablesFile(List<String> args) {
+            this.args = args;
+        }
+
+        public List<String> getArgs() {
+            return args;
+        }
+
+        public void setArgs(List<String> args) {
+            this.args = args;
+        }
+        
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == ImportedVariablesFile.class) {
+                final ImportedVariablesFile other = (ImportedVariablesFile) obj;
+                return Objects.equals(args, other.args);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return args.hashCode();
+        }
+    }
 }
