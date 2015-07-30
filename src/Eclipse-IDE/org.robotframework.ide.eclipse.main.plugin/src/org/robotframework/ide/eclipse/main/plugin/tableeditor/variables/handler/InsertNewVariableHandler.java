@@ -4,17 +4,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler.E4InsertNewHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class InsertNewVariableHandler extends DIHandler<E4InsertNewHandler> {
+public class InsertNewVariableHandler extends DIParameterizedHandler<E4InsertNewHandler> {
 
     public InsertNewVariableHandler() {
         super(E4InsertNewHandler.class);
@@ -26,12 +26,13 @@ public class InsertNewVariableHandler extends DIHandler<E4InsertNewHandler> {
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public Object addNewVariable(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public Object addNewVariable(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                @Named("org.robotframework.ide.eclipse.insertNew.variableType") final String place) {
             final RobotVariable selectedVariable = Selections.getSingleElement(selection, RobotVariable.class);
             final RobotVariablesSection variablesSection = selectedVariable.getParent();
             final int index = variablesSection.getChildren().indexOf(selectedVariable);
             
-            stack.execute(new CreateFreshVariableCommand(variablesSection, index, Type.SCALAR));
+            stack.execute(new CreateFreshVariableCommand(variablesSection, index, Type.valueOf(place)));
             return null;
         }
     }

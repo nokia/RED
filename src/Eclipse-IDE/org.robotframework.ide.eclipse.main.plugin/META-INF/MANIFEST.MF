@@ -30,4 +30,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
  lib/guava-18.0.jar,
  .
-Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RobotFramework
+Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RedPlugin

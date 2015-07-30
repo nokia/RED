@@ -4,7 +4,7 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.PlatformUI;
 
-public class RobotTheme {
+public class RedTheme {
 
     private static final String SECTION_HEADER = "org.robotframework.ide.eclipse.section.header";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";

@@ -50,7 +50,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -81,7 +81,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     @Override
     protected IPreferenceStore doGetPreferenceStore() {
-        return RobotFramework.getDefault().getPreferenceStore();
+        return RedPlugin.getDefault().getPreferenceStore();
     }
 
     @Override
@@ -201,7 +201,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
     }
 
     private void initializeValues() {
-        final QualifiedName key = new QualifiedName(RobotFramework.PLUGIN_ID, "result");
+        final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
         final Job job = new Job("Looking for python installations") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {

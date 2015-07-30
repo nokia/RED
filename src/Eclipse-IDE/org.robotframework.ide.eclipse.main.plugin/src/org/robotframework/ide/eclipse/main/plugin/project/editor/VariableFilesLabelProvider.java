@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 import com.google.common.base.Joiner;
@@ -29,7 +29,7 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
 
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                textStyle.foreground = RedTheme.getEclipseDecorationColor();
             }
         });
         return label;

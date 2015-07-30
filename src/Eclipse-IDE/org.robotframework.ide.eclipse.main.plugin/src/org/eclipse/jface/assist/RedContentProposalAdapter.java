@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 /**
  * This is slighlty modified version of ContentProposalAdapter. Copy&Pasted with
@@ -615,7 +615,7 @@ public class RedContentProposalAdapter {
             // set the proposals to force population of the table.
             setProposals(filterProposals(proposals, filterText));
 
-            final Color decorationColor = RobotTheme.getEclipseDecorationColor();
+            final Color decorationColor = RedTheme.getEclipseDecorationColor();
             proposalTable.addListener(SWT.MeasureItem, new Listener() {
 
                 @Override

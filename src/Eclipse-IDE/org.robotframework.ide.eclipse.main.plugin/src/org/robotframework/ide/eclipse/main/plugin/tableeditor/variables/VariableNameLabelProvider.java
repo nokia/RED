@@ -5,11 +5,12 @@ import static org.eclipse.jface.viewers.Stylers.withForeground;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ImagesManager;
 
 class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -54,7 +55,7 @@ class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getToolTipImage(final Object element) {
         if (element instanceof RobotVariable) {
-            return RobotImages.getTooltipImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipImage());
         }
         return null;
     }

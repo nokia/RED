@@ -11,12 +11,13 @@ import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -42,9 +43,9 @@ class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
     public final StyledString getStyledText(final Object element) {
         final String comment = getComment(element);
         if (!comment.isEmpty()) {
-            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RobotTheme
+            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RedTheme
                     .getCommentsColor().getRGB()), withFontStyle(SWT.ITALIC)));
-            String prefix = "# ";
+            final String prefix = "# ";
             return highlightMatches(new StyledString(prefix + comment, commentStyler), prefix.length(), comment);
         }
         return new StyledString();
@@ -53,7 +54,7 @@ class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Color getBackground(final Object element) {
         if (element instanceof Entry<?, ?> && ((Entry<?, ?>) element).getValue() == null) {
-            return new Color(Display.getDefault(), 250, 250, 250);
+            return ColorsManager.getColor(250, 250, 250);
         } else {
             return null;
         }
@@ -70,7 +71,7 @@ class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public Image getToolTipImage(final Object element) {
         if (element instanceof RobotSetting || element instanceof Entry<?, ?>) {
-            return RobotImages.getTooltipImage().createImage();
+            return ImagesManager.getImage(RedImages.getTooltipImage());
         }
         return null;
     }

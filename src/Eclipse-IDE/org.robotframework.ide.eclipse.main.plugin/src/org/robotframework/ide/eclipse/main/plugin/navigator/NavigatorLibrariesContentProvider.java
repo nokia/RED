@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
@@ -83,7 +83,7 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof IProject) {
             final IProject project = (IProject) parentElement;
-            final RobotProject robotProject = RobotFramework.getModelManager().getModel().createRobotProject(project);
+            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final List<RobotProjectDependencies> dependencies = newArrayList();
             if (robotProject.hasStandardLibraries()) {
                 dependencies.add(new RobotProjectDependencies(robotProject));

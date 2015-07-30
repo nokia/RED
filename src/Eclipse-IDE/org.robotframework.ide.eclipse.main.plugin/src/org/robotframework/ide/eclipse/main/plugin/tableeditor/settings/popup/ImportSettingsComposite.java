@@ -12,7 +12,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.eclipse.swt.widgets.Control;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -28,6 +29,12 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
 
     private ImportVariablesComposite importVariablesComposite;
     
+    private Composite librariesComposite;
+
+    private Composite resourcesComposite;
+
+    private Composite variablesComposite;
+
     public ImportSettingsComposite(final Composite parent, final RobotEditorCommandsStack commandsStack,
             final RobotSuiteFile fileModel) {
         super(parent, SWT.NONE, "Import");
@@ -37,63 +44,78 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     }
 
     @Override
+    protected Control createHeadClient(final Composite head) {
+        final Composite importChooseComposite = getToolkit().createComposite(head);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(importChooseComposite);
+        importChooseComposite.setBackground(null);
+
+        createLibrariesSwitcher(importChooseComposite);
+        createResourcesSwitcher(importChooseComposite);
+        createVariablesSwitcher(importChooseComposite);
+        return importChooseComposite;
+    }
+
+    private void createVariablesSwitcher(final Composite importChooseComposite) {
+        final Button varsBtn = getToolkit().createButton(importChooseComposite, "Variables", SWT.RADIO);
+        varsBtn.setBackground(null);
+        varsBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Composite parent = librariesComposite.getParent();
+                ((StackLayout) parent.getLayout()).topControl = variablesComposite;
+                parent.layout();
+            }
+        });
+    }
+
+    private void createResourcesSwitcher(final Composite importChooseComposite) {
+        final Button resBtn = getToolkit().createButton(importChooseComposite, "Resources", SWT.RADIO);
+        resBtn.setBackground(null);
+        resBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Composite parent = librariesComposite.getParent();
+                ((StackLayout) parent.getLayout()).topControl = resourcesComposite;
+                parent.layout();
+            }
+        });
+    }
+
+    private void createLibrariesSwitcher(final Composite importChooseComposite) {
+        final Button libBtn = getToolkit().createButton(importChooseComposite, "Libraries", SWT.RADIO);
+        libBtn.setSelection(true);
+        libBtn.setBackground(null);
+        libBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Composite parent = librariesComposite.getParent();
+                ((StackLayout) parent.getLayout()).topControl = librariesComposite;
+                parent.layout();
+            }
+        });
+    }
+
+    @Override
     protected Composite createControl(final Composite parent) {
-        setFormImage(RobotImages.getLibraryImage());
+        setFormImage(RedImages.getLibraryImage());
 
         final Composite mainComposite = getToolkit().createComposite(parent);
         final StackLayout stackLayout = new StackLayout();
         mainComposite.setLayout(stackLayout);
 
-        final Composite librariesComposite = createLibrariesComposite(mainComposite);
-        final Composite resourcesComposite = createResourcesComposite(mainComposite);
-        final Composite variablesComposite = createVariablesComposite(mainComposite);
+        librariesComposite = createLibrariesComposite(mainComposite);
+        resourcesComposite = createResourcesComposite(mainComposite);
+        variablesComposite = createVariablesComposite(mainComposite);
         stackLayout.topControl = librariesComposite;
-
-        createImportTypeRadioButtons(parent, stackLayout, mainComposite, librariesComposite, resourcesComposite,
-                variablesComposite);
 
         createDisposeListener();
 
         return mainComposite;
     }
 
-    private void createImportTypeRadioButtons(final Composite parent, final StackLayout stackLayout,
-            final Composite mainComposite, final Composite librariesComposite, final Composite resourcesComposite,
-            final Composite variablesComposite) {
-        final Composite importChooseComposite = getToolkit().createComposite(parent);
-        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(importChooseComposite);
-        final Button libBtn = getToolkit().createButton(importChooseComposite, "Libraries", SWT.RADIO);
-        libBtn.setSelection(true);
-        libBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                stackLayout.topControl = librariesComposite;
-                mainComposite.layout();
-            }
-        });
-        final Button resBtn = getToolkit().createButton(importChooseComposite, "Resources", SWT.RADIO);
-        resBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                stackLayout.topControl = resourcesComposite;
-                mainComposite.layout();
-            }
-        });
-        final Button varsBtn = getToolkit().createButton(importChooseComposite, "Variables", SWT.RADIO);
-        varsBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                stackLayout.topControl = variablesComposite;
-                mainComposite.layout();
-            }
-        });
-        super.addHeadClient(importChooseComposite);
-    }
-
-    private Composite createLibrariesComposite(Composite parent) {
+    private Composite createLibrariesComposite(final Composite parent) {
         importLibrariesComposite = new ImportLibraryComposite(commandsStack, fileModel, getToolkit());
         return importLibrariesComposite.createImportResourcesComposite(parent);
     }

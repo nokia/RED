@@ -51,12 +51,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSectionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 public abstract class SectionEditorPart implements ISectionEditorPart {
 
@@ -102,7 +104,6 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         for (final ISectionFormFragment part : formFragments) {
             part.initialize(form.getBody());
         }
-
         context.set(FocusedViewerAccessor.class, getFocusedViewerAccessor());
 
         site.setSelectionProvider(getSelectionProvider());
@@ -145,9 +146,9 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         filter.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
         form.setHeadClient(filter);
 
-        final Image filterImage = RobotImages.getFilterImage().createImage();
-        final Color filterSuccessFg = new Color(filterImage.getDevice(), 0, 200, 0);
-        final Color filterFailureFg = new Color(filterImage.getDevice(), 255, 0, 0);
+        final Image filterImage = ImagesManager.getImage(RedImages.getFilterImage());
+        final Color filterSuccessFg = ColorsManager.getColor(0, 200, 0);
+        final Color filterFailureFg = ColorsManager.getColor(255, 0, 0);
 
         filter.addPaintListener(new PaintListener() {
             @Override
@@ -158,14 +159,6 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
                     e.gc.drawText("filter elements", 3, 1);
                     e.gc.setForeground(current);
                 }
-            }
-        });
-        filter.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                filterImage.dispose();
-                filterSuccessFg.dispose();
-                filterFailureFg.dispose();
             }
         });
         filter.addModifyListener(new ModifyListener() {

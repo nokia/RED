@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.project.build.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
@@ -54,7 +54,7 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
                         resourcesToLookInto.toArray(new IResource[0]));
                 NewSearchUI.runQueryInBackground(query);
             } catch (final CoreException e) {
-                RobotFramework.logError("Unable to find usages of '" + name + "' in " + place, e);
+                RedPlugin.logError("Unable to find usages of '" + name + "' in " + place, e);
             }
             return null;
         }

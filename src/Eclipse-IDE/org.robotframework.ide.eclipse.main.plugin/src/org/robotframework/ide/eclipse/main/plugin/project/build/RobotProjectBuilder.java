@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
@@ -41,7 +41,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 buildJob.join();
 
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL) {
-                    RobotFramework.getModelManager().getModel().createRobotProject(project).clear();
+                    RedPlugin.getModelManager().getModel().createRobotProject(project).clear();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
                         return new IProject[0];
@@ -54,7 +54,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                     buildVariablesJob.join();
                 }
                 
-                RobotFramework.getModelManager().getModel().createRobotProject(project).clear();
+                RedPlugin.getModelManager().getModel().createRobotProject(project).clear();
                 project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
                 if (!monitor.isCanceled()) {
@@ -76,7 +76,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-        RobotFramework.getModelManager().getModel().createRobotProject(getProject()).clear();
+        RedPlugin.getModelManager().getModel().createRobotProject(getProject()).clear();
 
         LibspecsFolder.get(getProject()).removeNonSpecResources();
     }

@@ -5,18 +5,19 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart.SettingsEditor;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
 
@@ -24,7 +25,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
     public SettingsEditorPart() {
         super(SettingsEditor.class);
-        setTitleImage(RobotImages.getRobotSettingImage().createImage());
+        setTitleImage(ImagesManager.getImage(RedImages.getRobotSettingImage()));
     }
 
     public static class SettingsEditor extends SectionEditorPart {
@@ -96,7 +97,8 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return new FocusedViewerAccessor(generalFragment.getViewer());
+            return new FocusedViewerAccessor(generalFragment.getViewer(), metadataFragment.getViewer(),
+                    importFragment.getViewer());
         }
     }
 }

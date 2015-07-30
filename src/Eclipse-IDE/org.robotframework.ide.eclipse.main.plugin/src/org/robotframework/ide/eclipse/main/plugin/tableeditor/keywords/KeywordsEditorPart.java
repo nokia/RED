@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -15,6 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
 
@@ -22,7 +23,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
     public KeywordsEditorPart() {
         super(KeywordsEditor.class);
-        setTitleImage(RobotImages.getUserKeywordImage().createImage());
+        setTitleImage(ImagesManager.getImage(RedImages.getUserKeywordImage()));
     }
 
     public static class KeywordsEditor extends SectionEditorPart {

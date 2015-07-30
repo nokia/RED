@@ -15,7 +15,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class TextEditorOccurrenceMarksManager {
 
@@ -59,7 +59,7 @@ public class TextEditorOccurrenceMarksManager {
             wsJob.join();
             isMarkVisible = true;
         } catch (final BadLocationException | InterruptedException e) {
-            RobotFramework.logError("Unable to create occurences markers", e);
+            RedPlugin.logError("Unable to create occurences markers", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class TextEditorOccurrenceMarksManager {
             try {
                 editedFile.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
             } catch (final CoreException e) {
-                RobotFramework.logError("Unable to remove occurences markers", e);
+                RedPlugin.logError("Unable to remove occurences markers", e);
             }
             isMarkVisible = false;
         }
@@ -105,7 +105,7 @@ public class TextEditorOccurrenceMarksManager {
             marker.setAttribute(IMarker.CHAR_START, region.getOffset());
             marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
         } catch (final CoreException e) {
-            RobotFramework.logError("Unable to create occurences marker for '" + selectedText + "'", e);
+            RedPlugin.logError("Unable to create occurences marker for '" + selectedText + "'", e);
         }
     }
 }

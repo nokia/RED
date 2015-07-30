@@ -58,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.graphics.ColorsManager;
 
 import com.google.common.collect.Range;
 
@@ -311,7 +312,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
         final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
         for (final Range<Integer> range : ranges) {
-            final Color bg = new Color(documentation.getDisplay(), 255, 255, 175);
+            final Color bg = ColorsManager.getColor(255, 255, 175);
             documentation.setStyleRange(new StyleRange(range.lowerEndpoint(), range.upperEndpoint()
                     - range.lowerEndpoint(), null, bg));
         }

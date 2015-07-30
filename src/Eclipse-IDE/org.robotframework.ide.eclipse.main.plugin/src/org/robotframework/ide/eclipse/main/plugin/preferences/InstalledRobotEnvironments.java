@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RobotFramework;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -21,7 +21,7 @@ public class InstalledRobotEnvironments {
     private static RobotRuntimeEnvironment ACTIVE = null;
     private static List<RobotRuntimeEnvironment> ALL = null;
     static {
-        InstanceScope.INSTANCE.getNode(RobotFramework.PLUGIN_ID).addPreferenceChangeListener(
+        InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(
                 new IPreferenceChangeListener() {
                     @Override
                     public void preferenceChange(

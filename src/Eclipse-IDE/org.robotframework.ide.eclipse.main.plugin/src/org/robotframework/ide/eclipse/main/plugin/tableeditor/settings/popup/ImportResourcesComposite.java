@@ -39,8 +39,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.robotframework.ide.eclipse.main.plugin.RobotImages;
-import org.robotframework.ide.eclipse.main.plugin.RobotTheme;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -50,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
@@ -287,11 +288,9 @@ public class ImportResourcesComposite {
     }
     
     private static class ResourcesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
-        private final Image resourceImage = RobotImages.getRobotSettingImage().createImage();
-
         @Override
         public Image getImage(final Object element) {
-            return resourceImage;
+            return ImagesManager.getImage(RedImages.getRobotSettingImage());
         }
 
         @Override
@@ -308,17 +307,11 @@ public class ImportResourcesComposite {
 
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RobotTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
 
             return text;
-        }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            resourceImage.dispose();
         }
     }
 }
