@@ -20,8 +20,6 @@ import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
@@ -47,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEv
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.viewers.Viewers;
 
 public class ImportSettingsFormFragment implements ISectionFormFragment {
 
@@ -90,18 +89,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         section.setClient(viewer.getTable());
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
-        viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
+        ViewersConfigurator.configureRowsHeight(viewer, 1.5);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
 
-            @Override
-            public void handleEvent(final Event event) {
-                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
-            }
-        });
         viewer.setContentProvider(new ImportSettingsContentProvider(fileModel.isEditable()));
+        Viewers.boundViewerWithContext(viewer, site,
+                "org.robotframework.ide.eclipse.tableeditor.settings.import.context");
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         createContextMenu();
 
         viewer.setInput(getImportElements());

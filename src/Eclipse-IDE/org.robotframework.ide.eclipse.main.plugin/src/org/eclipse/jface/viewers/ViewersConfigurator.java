@@ -1,5 +1,6 @@
 package org.eclipse.jface.viewers;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -8,6 +9,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
@@ -114,6 +117,15 @@ public class ViewersConfigurator {
             private boolean headerWasClicked(final Control control, final Point pt) {
                 final Rectangle clientArea = getClientArea(control);
                 return clientArea.y <= pt.y && pt.y <= clientArea.y + getHeaderHeight(control);
+            }
+        });
+    }
+
+    public static void configureRowsHeight(final ColumnViewer viewer, final double fontMetricsMultiplier) {
+        viewer.getControl().addListener(SWT.MeasureItem, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * fontMetricsMultiplier).intValue();
             }
         });
     }

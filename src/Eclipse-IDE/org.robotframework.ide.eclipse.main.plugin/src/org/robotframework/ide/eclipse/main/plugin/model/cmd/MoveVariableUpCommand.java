@@ -3,21 +3,22 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.Collections;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveVariableUpCommand extends EditorCommand {
 
-    private final RobotVariablesSection variablesSection;
-    private final int index;
+    private final RobotVariable variable;
 
-    public MoveVariableUpCommand(final RobotVariablesSection variablesSection, final int index) {
-        this.variablesSection = variablesSection;
-        this.index = index;
+    public MoveVariableUpCommand(final RobotVariable variable) {
+        this.variable = variable;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
+        final RobotVariablesSection variablesSection = variable.getParent();
+        final int index = variablesSection.getChildren().indexOf(variable);
         if (index == 0) {
             return;
         }

@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +16,8 @@ import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 public class KeywordCallsTransfer extends ByteArrayTransfer {
 
@@ -30,7 +34,47 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasKeywordCalls(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null
+                && hasKeywordCallsOnly(clipboard.getContents(getInstance()));
+    }
+
+    public static boolean hasGeneralSettings(final Clipboard clipboard) {
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null
+                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.NO_GROUP);
+    }
+
+    public static boolean hasMetadataSettings(final Clipboard clipboard) {
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null
+                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.METADATA);
+    }
+
+    public static boolean hasImportSettings(final Clipboard clipboard) {
+        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null
+                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.LIBRARIES,
+                        SettingsGroup.RESOURCES, SettingsGroup.VARIABLES);
+    }
+
+    private static boolean hasSettingsOnly(final Object content, final SettingsGroup... groups) {
+        if (content instanceof Object[]) {
+            for (final Object item : ((Object[])content)) {
+                if (item.getClass() != RobotSetting.class
+                        || !newHashSet(groups).contains(((RobotSetting) item).getGroup())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean hasKeywordCallsOnly(final Object content) {
+        if (content instanceof Object[]) {
+            for (final Object item : ((Object[]) content)) {
+                if (item.getClass() != RobotKeywordCall.class) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
