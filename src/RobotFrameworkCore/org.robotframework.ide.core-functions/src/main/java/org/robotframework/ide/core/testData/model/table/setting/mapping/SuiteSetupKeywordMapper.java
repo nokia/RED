@@ -1,24 +1,49 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class SuiteSetupKeywordMapper implements IParsingMapper {
+
+    private final ElementsUtility utility;
+
+
+    public SuiteSetupKeywordMapper() {
+        this.utility = new ElementsUtility();
+    }
+
 
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        // TODO Auto-generated method stub
-        return null;
+        rt.setType(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME);
+        rt.setText(new StringBuilder(text));
+
+        SettingTable settings = robotFileOutput.getFileModel()
+                .getSettingTable();
+        List<SuiteSetup> setups = settings.getSuiteSetups();
+        if (!setups.isEmpty()) {
+            setups.get(setups.size() - 1).setKeywordName(rt);
+        } else {
+            // FIXME: some internal error
+        }
+        processingState.push(ParsingState.SETTING_SUITE_SETUP_KEYWORD);
+
+        return rt;
     }
 
 
@@ -26,8 +51,13 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean result = false;
+        ParsingState state = utility.getCurrentStatus(processingState);
+        if (state == ParsingState.SETTING_SUITE_SETUP) {
+            List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
+                    .getSettingTable().getSuiteSetups();
+            result = !utility.checkIfHasAlreadyKeywordName(suiteSetups);
+        }
+        return result;
     }
-
 }
