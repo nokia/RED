@@ -51,6 +51,18 @@ public class RobotEditorPropertyTester extends PropertyTester {
             final Clipboard clipboard = editor.getClipboard();
             return CasesTransfer.hasCases(clipboard) == expected;
 
+        } else if ("thereAreGeneralSettingsInClipboard".equals(property)) {
+            final Clipboard clipboard = editor.getClipboard();
+            return KeywordCallsTransfer.hasGeneralSettings(clipboard) == expected;
+
+        } else if ("thereAreMetadataSettingsInClipboard".equals(property)) {
+            final Clipboard clipboard = editor.getClipboard();
+            return KeywordCallsTransfer.hasMetadataSettings(clipboard) == expected;
+
+        } else if ("thereAreImportSettingsInClipboard".equals(property)) {
+            final Clipboard clipboard = editor.getClipboard();
+            return KeywordCallsTransfer.hasImportSettings(clipboard) == expected;
+
         } else if ("thereAreVariablesInClipboard".equals(property)) {
             final Clipboard clipboard = editor.getClipboard();
             return VariablesTransfer.hasVariables(clipboard) == expected;

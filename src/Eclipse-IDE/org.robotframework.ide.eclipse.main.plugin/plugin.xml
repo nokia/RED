@@ -523,6 +523,24 @@
           parentId="org.robotframework.ide.eclipse.tableeditor.context">
     </context>
     <context
+          description="Context for Settings General section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.general.context"
+          name="General Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
+          description="Context for Settings Metadata section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.metadata.context"
+          name="Metadata Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
+          description="Context for Settings Imports section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.import.context"
+          name="Imports Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
           description="Context for Keywords section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.keywords.context"
           name="Test Cases Editor Context"
@@ -1201,6 +1219,56 @@
        </enabledWhen>
     </handler>
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutSettingsHandler"
+          commandId="org.robotframework.ide.eclipse.cutRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.atLeastOneSettingIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopySettingsHandler"
+          commandId="org.robotframework.ide.eclipse.copyRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.settingsPartIsActive">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.atLeastOneSettingIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler"
+          commandId="org.robotframework.ide.eclipse.pasteRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.canPasteToGeneralSettingsSectionEditorTable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.canPasteToMetadataSettingsSectionEditorTable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.canPasteToImportSettingsSectionEditorTable">
+             </reference>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteSettingsHandler"
           commandId="org.robotframework.ide.eclipse.deleteRow">
        <activeWhen>
@@ -1213,6 +1281,34 @@
                 definitionId="org.robotframework.atLeastOneSettingIsSelected">
           </reference>
        </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.MoveSettingUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.MoveSettingDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+          </and>
+       </activeWhen>
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.EditSettingsHandler"
@@ -1228,6 +1324,7 @@
           </reference>
        </enabledWhen>
     </handler>
+>>>>>>> .r7384
  </extension>
  <extension
        name="Variables part handlers"
@@ -2086,20 +2183,6 @@
        <menu
              label="Row">
           <command
-                commandId="org.robotframework.ide.eclipse.moveElementUp"
-                label="Move up"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.ide.eclipse.moveElementDown"
-                label="Move down"
-                style="push">
-          </command>
-          <separator
-                name="row.edit"
-                visible="true">
-          </separator>
-          <command
                 commandId="org.robotframework.ide.eclipse.cutRow"
                 label="Cut row"
                 style="push">
@@ -2286,7 +2369,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable,activeSectionEditorHasSection,thereIsTextInClipboard,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard,thereAreCasesElementsInClipboard,thereAreVariablesInClipboard"
+          properties="editorModelIsEditable,activeSectionEditorHasSection,thereIsTextInClipboard,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard,thereAreCasesElementsInClipboard,thereAreVariablesInClipboard,thereAreGeneralSettingsInClipboard,thereAreMetadataSettingsInClipboard,thereAreImportSettingsInClipboard"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -2725,6 +2808,72 @@
             </and>
          </or>
        </with>
+    </definition>
+    <definition
+          id="org.robotframework.canPasteToGeneralSettingsSectionEditorTable">
+       <and>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.thereAreGeneralSettingsInClipboard"
+                   value="true">
+             </test>
+          </with>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.settings.general.context">
+                </equals>
+             </iterate>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.canPasteToMetadataSettingsSectionEditorTable">
+       <and>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.thereAreMetadataSettingsInClipboard"
+                   value="true">
+             </test>
+          </with>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.settings.metadata.context">
+                </equals>
+             </iterate>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.canPasteToImportSettingsSectionEditorTable">
+       <and>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.thereAreImportSettingsInClipboard"
+                   value="true">
+             </test>
+          </with>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.settings.import.context">
+                </equals>
+             </iterate>
+          </with>
+       </and>
     </definition>
     <definition
           id="org.robotframework.canPasteToVariablesSectionEditorTable">
