@@ -180,8 +180,8 @@ public class LibraryDeclarationRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Library:")
-                        + "|"
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Library")
+                        + "[\\s]*:" + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Library")
                         + ")");
 

@@ -182,7 +182,8 @@ public class SettingDocumentationRecognizerTest {
         assertThat(rec.getPattern().pattern()).isEqualTo(
                 "[ ]?("
                         + ATokenRecognizer
-                                .createUpperLowerCaseWord("Documentation:")
+                                .createUpperLowerCaseWord("Documentation")
+                        + "[\\s]*:"
                         + "|"
                         + ATokenRecognizer
                                 .createUpperLowerCaseWord("Documentation")

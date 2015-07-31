@@ -180,9 +180,8 @@ public class ResourceDeclarationRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?("
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Resource:") + "|"
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Resource")
+                        + "[\\s]*:" + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Resource")
                         + ")");
 

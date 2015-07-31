@@ -9,7 +9,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.Robo
 public class SettingDocumentationRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern.compile("[ ]?("
-            + createUpperLowerCaseWord("Documentation:") + "|"
+            + createUpperLowerCaseWord("Documentation") + "[\\s]*:" + "|"
             + createUpperLowerCaseWord("Documentation") + ")");
 
 

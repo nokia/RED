@@ -112,5 +112,17 @@ public enum ParsingState {
     /**
      * 
      */
-    SETTING_METADATA_VALUE;
+    SETTING_METADATA_VALUE,
+    /**
+     * 
+     */
+    SETTING_SUITE_SETUP,
+    /**
+     * 
+     */
+    SETTING_SUITE_SETUP_KEYWORD,
+    /**
+     *  
+     */
+    SETTING_SUITE_SETUP_KEYWORD_ARGUMENT;
 }
