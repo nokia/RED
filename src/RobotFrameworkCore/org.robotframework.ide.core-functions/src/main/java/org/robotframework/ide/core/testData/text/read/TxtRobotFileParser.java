@@ -28,6 +28,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColum
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.ForceTagsMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.ForceTagsTagNameMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataKeyMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataValueMapper;
@@ -63,6 +65,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.header.Keywords
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.DefaultTagsRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.MetadataRecognizer;
@@ -106,6 +110,8 @@ public class TxtRobotFileParser {
         recognized.add(new MetadataRecognizer());
         recognized.add(new SuiteSetupRecognizer());
         recognized.add(new SuiteTeardownRecognizer());
+        recognized.add(new ForceTagsRecognizer());
+        recognized.add(new DefaultTagsRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
@@ -137,6 +143,8 @@ public class TxtRobotFileParser {
         mappers.add(new SuiteTeardownMapper());
         mappers.add(new SuiteTeardownKeywordMapper());
         mappers.add(new SuiteTeardownKeywordArgumentMapper());
+        mappers.add(new ForceTagsMapper());
+        mappers.add(new ForceTagsTagNameMapper());
     }
 
 

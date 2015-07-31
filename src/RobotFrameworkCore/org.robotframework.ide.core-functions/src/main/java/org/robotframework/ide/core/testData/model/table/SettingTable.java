@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
+import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
@@ -12,11 +14,13 @@ import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 
 public class SettingTable extends ARobotSectionTable {
 
-    private List<AImported> imports = new LinkedList<>();
-    private List<SuiteDocumentation> documentations = new LinkedList<>();
-    private List<Metadata> metadatas = new LinkedList<>();
-    private List<SuiteSetup> suiteSetups = new LinkedList<>();
-    private List<SuiteTeardown> suiteTeardowns = new LinkedList<>();
+    private final List<AImported> imports = new LinkedList<>();
+    private final List<SuiteDocumentation> documentations = new LinkedList<>();
+    private final List<Metadata> metadatas = new LinkedList<>();
+    private final List<SuiteSetup> suiteSetups = new LinkedList<>();
+    private final List<SuiteTeardown> suiteTeardowns = new LinkedList<>();
+    private final List<ForceTags> forceTags = new LinkedList<>();
+    private final List<DefaultTags> defaultTags = new LinkedList<>();
 
 
     public List<AImported> getImports() {
@@ -66,5 +70,25 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addSuiteTeardown(final SuiteTeardown suiteTeardown) {
         suiteTeardowns.add(suiteTeardown);
+    }
+
+
+    public List<ForceTags> getForceTags() {
+        return forceTags;
+    }
+
+
+    public void addForceTags(final ForceTags tags) {
+        forceTags.add(tags);
+    }
+
+
+    public List<DefaultTags> getDefaultTags() {
+        return defaultTags;
+    }
+
+
+    public void addDefaultTags(final DefaultTags tags) {
+        defaultTags.add(tags);
     }
 }
