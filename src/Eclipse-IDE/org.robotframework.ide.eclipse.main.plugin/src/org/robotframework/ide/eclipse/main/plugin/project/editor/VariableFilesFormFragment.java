@@ -279,7 +279,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
             final Section section = toolkit.createSection(dialogComposite, Section.EXPANDED | Section.TITLE_BAR
                     | Section.TWISTIE);
-            section.setText("Arguments");
+            section.setText("Add Arguments");
             section.addExpansionListener(new IExpansionListener() {
 
                 @Override

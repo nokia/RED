@@ -167,7 +167,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         return new NewElementsCreator() {
             @Override
             public RobotElement createNew() {
-                new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel).open();
+                new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel, null).open();
                 return null;
             }
         };
@@ -298,4 +298,10 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         }
     }
 
+    @Inject
+    @Optional
+    private void whenSettingIsEdited(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
+        new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel, setting).open();
+    }
 }
