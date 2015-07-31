@@ -1,0 +1,212 @@
+package org.robotframework.ide.core.testData.text.read.recognizer.settings;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner;
+import org.robotframework.ide.core.testHelpers.ClassFieldCleaner.ForClean;
+import org.robotframework.ide.core.testHelpers.CombinationGenerator;
+
+
+public class DefaultTagsRecognizerTest {
+
+    @ForClean
+    private ATokenRecognizer rec;
+
+
+    @Test
+    public void test_defaultTagsColonWord_allCombinations() {
+        List<String> combinations = new CombinationGenerator()
+                .combinations("Default Tags:");
+
+        for (String comb : combinations) {
+            StringBuilder textOfHeader = new StringBuilder(comb);
+
+            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            RobotToken token = rec.next();
+            assertThat(token.getStartColumn()).isEqualTo(0);
+            assertThat(token.getLineNumber()).isEqualTo(1);
+            assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
+            assertThat(token.getText().toString()).isEqualTo(
+                    textOfHeader.toString());
+            assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        }
+    }
+
+
+    @Test
+    public void test_twoSpacesAndDefaultTagsColonThanWord() {
+        StringBuilder text = new StringBuilder(" Default Tags:");
+        StringBuilder d = new StringBuilder(" ").append(text);
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(d.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleSpaceAndDefaultTagsColonThanWord() {
+        StringBuilder text = new StringBuilder(" Default Tags:");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleDefaultTagsColonThanLetterCWord() {
+        StringBuilder text = new StringBuilder("Default Tags:");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleDefaultTagsColonWord() {
+        StringBuilder text = new StringBuilder("Default Tags:");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_defaultTagsWord_allCombinations() {
+        List<String> combinations = new CombinationGenerator()
+                .combinations("Default Tags");
+
+        for (String comb : combinations) {
+            StringBuilder textOfHeader = new StringBuilder(comb);
+
+            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            RobotToken token = rec.next();
+            assertThat(token.getStartColumn()).isEqualTo(0);
+            assertThat(token.getLineNumber()).isEqualTo(1);
+            assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
+            assertThat(token.getText().toString()).isEqualTo(
+                    textOfHeader.toString());
+            assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        }
+    }
+
+
+    @Test
+    public void test_twoSpacesAndDefaultTagsThanWord() {
+        StringBuilder text = new StringBuilder(" Default Tags");
+        StringBuilder d = new StringBuilder(" ").append(text);
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(1);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(d.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleSpaceAndDefaultTagsThanWord() {
+        StringBuilder text = new StringBuilder(" Default Tags");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleDefaultTagsThanLetterCWord() {
+        StringBuilder text = new StringBuilder("Default Tags");
+        StringBuilder d = new StringBuilder(text).append("C");
+
+        assertThat(rec.hasNext(d, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_singleDefaultTagsWord() {
+        StringBuilder text = new StringBuilder("Default Tags");
+
+        assertThat(rec.hasNext(text, 1)).isTrue();
+        RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
+        assertThat(token.getLineNumber()).isEqualTo(1);
+        assertThat(token.getEndColumn()).isEqualTo(text.length());
+        assertThat(token.getText().toString()).isEqualTo(text.toString());
+        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+
+    @Test
+    public void test_getPattern() {
+        assertThat(rec.getPattern().pattern()).isEqualTo(
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Default")
+                        + "[\\s]+"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Tags")
+                        + "[\\s]*:" + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Default")
+                        + "[\\s]+"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Tags")
+                        + ")");
+
+    }
+
+
+    @Test
+    public void test_getProducedType() {
+        assertThat(rec.getProducedType()).isEqualTo(
+                RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
+    }
+
+
+    @Before
+    public void setUp() {
+        rec = new DefaultTagsRecognizer();
+    }
+
+
+    @After
+    public void tearDown() throws Exception {
+        ClassFieldCleaner.init(this);
+    }
+}
