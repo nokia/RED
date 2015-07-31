@@ -16,6 +16,7 @@ import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -66,6 +67,10 @@ public class HashCommentMapper implements IParsingMapper {
                 || commentHolder == ParsingState.SETTING_SUITE_SETUP_KEYWORD
                 || commentHolder == ParsingState.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT) {
             mapSuiteSetupComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_SUITE_TEARDOWN
+                || commentHolder == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD
+                || commentHolder == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT) {
+            mapSuiteTeardownComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -73,6 +78,21 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapSuiteTeardownComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<SuiteTeardown> suiteTeardowns = fileModel.getSettingTable()
+                .getSuiteTeardowns();
+        if (!suiteTeardowns.isEmpty()) {
+            SuiteTeardown suiteTeardown = suiteTeardowns.get(suiteTeardowns
+                    .size() - 1);
+            suiteTeardown.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 
