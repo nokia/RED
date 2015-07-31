@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.text.read.recognizer.settings;
 import java.util.regex.Pattern;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class SettingDocumentationRecognizer extends ATokenRecognizer {
