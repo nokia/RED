@@ -12,7 +12,7 @@ import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 

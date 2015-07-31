@@ -2,8 +2,6 @@ package org.robotframework.ide.core.testData.text.read.recognizer;
 
 import java.util.regex.Pattern;
 
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
-
 
 public class HashCommentRecognizer extends ATokenRecognizer {
 
