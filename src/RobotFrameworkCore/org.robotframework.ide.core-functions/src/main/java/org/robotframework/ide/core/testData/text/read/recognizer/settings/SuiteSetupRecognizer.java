@@ -20,6 +20,6 @@ public class SuiteSetupRecognizer extends ATokenRecognizer {
 
 
     public SuiteSetupRecognizer() {
-        super(EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
+        super(EXPECTED, RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
     }
 }
