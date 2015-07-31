@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -110,5 +111,20 @@ public class ElementsUtility {
         }
 
         return state;
+    }
+
+
+    public boolean checkIfHasAlreadyKeywordName(
+            List<? extends AKeywordBaseSetting> keywordBases) {
+        boolean result = false;
+        for (AKeywordBaseSetting setting : keywordBases) {
+            result = (setting.getKeywordName() != null);
+            result = result || !setting.getArguments().isEmpty();
+            if (result) {
+                break;
+            }
+        }
+
+        return result;
     }
 }

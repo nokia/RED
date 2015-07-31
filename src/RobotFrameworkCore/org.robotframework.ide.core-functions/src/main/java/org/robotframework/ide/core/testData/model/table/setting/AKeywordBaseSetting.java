@@ -10,6 +10,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public abstract class AKeywordBaseSetting extends AModelElement {
 
     private final RobotToken declaration;
+    private RobotToken keywordName;
     private final List<RobotToken> arguments = new LinkedList<>();
     private final List<RobotToken> comment = new LinkedList<>();
 
@@ -27,6 +28,16 @@ public abstract class AKeywordBaseSetting extends AModelElement {
 
     public RobotToken getDeclaration() {
         return declaration;
+    }
+
+
+    public RobotToken getKeywordName() {
+        return keywordName;
+    }
+
+
+    public void setKeywordName(RobotToken keywordName) {
+        this.keywordName = keywordName;
     }
 
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 
+
 public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
@@ -124,7 +125,20 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_SUITE_SETUP_KEYWORD_ARGUMENT;
+    SETTING_SUITE_SETUP_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_SUITE_TEARDOWN_DECLARATION("Suite Teardown", "Suite Teardown:",
+            "Suite Postcondition", "Suite Postcondition:"),
+    /**
+     * 
+     */
+    SETTING_SUITE_TEARDOWN_KEYWORD_NAME,
+    /**
+     * 
+     */
+    SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT;
 
     private final List<String> representationForNew = new LinkedList<>();
 
