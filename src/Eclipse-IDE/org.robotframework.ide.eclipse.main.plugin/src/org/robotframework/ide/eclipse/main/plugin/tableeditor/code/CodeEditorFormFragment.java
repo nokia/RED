@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -199,20 +200,17 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         final NewElementsCreator creator = provideNewElementsCreator();
 
         createNameColumn(creator);
-        if (sectionIsDefined()) {
-            final int maxLength = calculateLongestArgumentsList();
-            for (int i = 0; i < maxLength; i++) {
-                createArgumentColumn(i, creator);
-            }
-            createCommentColumn(maxLength + 1, creator);
+        final int maxLength = calculateLongestArgumentsList();
+        for (int i = 0; i < maxLength; i++) {
+            createArgumentColumn(i, creator);
         }
+        createCommentColumn(maxLength + 1, creator);
     }
 
     protected abstract NewElementsCreator provideNewElementsCreator();
 
     private void createNameColumn(final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(150)
-            .shouldGrabAllTheSpaceLeft(!sectionIsDefined()).withMinWidth(50)
             .equipWithThreeWaySorting(CodesViewerComparators.codeNamesAscendingComparator(),
                     CodesViewerComparators.codeNamesDescendingComparator())
             .labelsProvidedBy(new CodeNamesLabelProvider(getMatchesProvider()))
@@ -239,7 +237,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     }
 
     protected int calculateLongestArgumentsList() {
-        return 5;
+        return RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
     }
 
     protected abstract MatcherProvider getMatchesProvider();
