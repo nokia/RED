@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/30/15 3:20 PM
+Save-Time: 7/31/15 10:23 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -14,10 +14,13 @@ Content-Type: text/plain
 Entry-Name: .description
 
 Testcase:
-1. Creates 'Settings' section
-2. Adds 2 'Metadata' entries, verifies if they appeared in text view
-3. Deletes 1 of them, verifies if it is removed from text view
-4. Adds 1 mode entry, verifies if it appeared in text view
+ Creates 'Settings' section
+ Adds one metadata line 
+ Check if it visible in Text editor
+ Add 2 more & check
+ delete middle one by removing each row & check
+ delete whole row & check
+
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -93,4 +96,109 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
     get-item "Metadata_1" | get-property "columns[1]" | equals "Value_1" | verify-true
     get-item "Metadata_1" | get-property "columns[2]" | equals "# Comment_1" | verify-true
 }
+
+// add Metadata_2 & Metadata_3 rows respectivly
+ with [get-editor "TestFile.robot"] {
+    with [get-section Metadata | get-table] {
+        select "...add new metadata" | key-type Enter
+        select data | activate-cell-edit
+        with [get-editbox] {
+            set-text "Metadata_2"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        }
+}
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "Metadata_2" | double-click
+    select "Metadata_2" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text "Value_2"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+}
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "Metadata_2" | double-click
+    select "Metadata_2" | activate-cell-edit -column 2
+    with [get-editbox] {
+        set-text "Comment_2"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+}
+
+ with [get-editor "TestFile.robot"] {
+    with [get-section Metadata | get-table] {
+        select "...add new metadata" | key-type Enter
+        select data | activate-cell-edit
+        with [get-editbox] {
+            set-text "Metadata_3"
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        }
+}
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "Metadata_3" | double-click
+    select "Metadata_3" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text "Value_3"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+}
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "Metadata_3" | double-click
+    select "Metadata_3" | activate-cell-edit -column 2
+    with [get-editbox] {
+        set-text "Comment_3"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+}
+// Save file
+get-eclipse-window | key-type "M1+s"
+
+// verify if the 3 entries are visivle in Text Editor
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | get-menu "Open With/Robot Text Editor" | click
+get-editor "Robot Text Editor" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    Metadata_1    Value_1    # Comment_1\n"
+    + "Metadata    Metadata_2    Value_2    # Comment_2\n"
+    + "Metadata    Metadata_3    Value_3    # Comment_3" | verify-true
+// remove cells in middle entry by pressing delete - deleate each cell individualy & do not remove row
+get-editor "Robot Text Editor" | close
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "Metadata_2" | key-type Del
+    key-type Right
+    key-type Del
+    key-type Right
+    key-type Del
+    key-type "M1+s"
+}
+
+// verify if deleted cells are empty but vissible (row not removed)
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Open With/Robot Text Editor" 
+    | click
+get-editor "Robot Text Editor" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    Metadata_1    Value_1    # Comment_1\n"
+    + "Metadata        \n"
+    + "Metadata    Metadata_3    Value_3    # Comment_3" | verify-true
+
+// remove empty row by CTRL+DEL 
+get-editor "Robot Text Editor" | close
+with [get-editor "TestFile.robot" | get-section Metadata | get-table] {
+    select "" | key-type "M1+DEL"
+    key-type "M1+s"
+}
+
+// check if empty row was removed in Text Editor
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Open With/Robot Text Editor" 
+    | click
+get-editor "Robot Text Editor" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    Metadata_1    Value_1    # Comment_1\n"
+    + "Metadata    Metadata_3    Value_3    # Comment_3" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
