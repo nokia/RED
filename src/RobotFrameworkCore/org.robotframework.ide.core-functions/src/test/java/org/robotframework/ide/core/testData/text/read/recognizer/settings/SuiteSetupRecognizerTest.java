@@ -380,7 +380,7 @@ public class SuiteSetupRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
+                RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
     }
 
 
