@@ -124,5 +124,17 @@ public enum ParsingState {
     /**
      *  
      */
-    SETTING_SUITE_SETUP_KEYWORD_ARGUMENT;
+    SETTING_SUITE_SETUP_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_SUITE_TEARDOWN,
+    /**
+     * 
+     */
+    SETTING_SUITE_TEARDOWN_KEYWORD,
+    /**
+     *  
+     */
+    SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT;
 }
