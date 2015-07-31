@@ -8,19 +8,19 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class SuiteSetupKeywordMapper implements IParsingMapper {
+public class SuiteTeardownKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public SuiteSetupKeywordMapper() {
+    public SuiteTeardownKeywordMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,18 +30,18 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME);
+        rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<SuiteSetup> setups = settings.getSuiteSetups();
-        if (!setups.isEmpty()) {
-            setups.get(setups.size() - 1).setKeywordName(rt);
+        List<SuiteTeardown> teardowns = settings.getSuiteTeardowns();
+        if (!teardowns.isEmpty()) {
+            teardowns.get(teardowns.size() - 1).setKeywordName(rt);
         } else {
             // FIXME: some internal error
         }
-        processingState.push(ParsingState.SETTING_SUITE_SETUP_KEYWORD);
+        processingState.push(ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD);
 
         return rt;
     }
@@ -53,11 +53,10 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-
-        if (state == ParsingState.SETTING_SUITE_SETUP) {
-            List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
-                    .getSettingTable().getSuiteSetups();
-            result = !utility.checkIfHasAlreadyKeywordName(suiteSetups);
+        if (state == ParsingState.SETTING_SUITE_TEARDOWN) {
+            List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
+                    .getSettingTable().getSuiteTeardowns();
+            result = !utility.checkIfHasAlreadyKeywordName(suiteTeardowns);
         }
         return result;
     }

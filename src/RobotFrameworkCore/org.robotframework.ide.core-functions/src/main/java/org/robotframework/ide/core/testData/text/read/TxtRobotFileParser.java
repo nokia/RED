@@ -36,6 +36,9 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingD
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasMapper;
@@ -131,6 +134,9 @@ public class TxtRobotFileParser {
         mappers.add(new SuiteSetupMapper());
         mappers.add(new SuiteSetupKeywordMapper());
         mappers.add(new SuiteSetupKeywordArgumentMapper());
+        mappers.add(new SuiteTeardownMapper());
+        mappers.add(new SuiteTeardownKeywordMapper());
+        mappers.add(new SuiteTeardownKeywordArgumentMapper());
     }
 
 
