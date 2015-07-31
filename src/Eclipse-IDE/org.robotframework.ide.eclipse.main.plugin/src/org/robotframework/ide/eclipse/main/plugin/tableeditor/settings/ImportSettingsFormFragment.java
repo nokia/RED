@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -22,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -29,7 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -46,6 +48,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.Imp
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.viewers.Viewers;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 public class ImportSettingsFormFragment implements ISectionFormFragment {
 
@@ -98,36 +103,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        createColumns();
         createContextMenu();
-
-        viewer.setInput(getImportElements());
-        createColumns(true);
-        viewer.refresh();
-        viewer.packFirstColumn();
+        setInput();
+        // createColumns(true);
+        // viewer.refresh();
+        // viewer.packFirstColumn();
     }
 
-    private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
-
-        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
-        final Table control = viewer.getTable();
-        final Menu menu = manager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
-    }
-
-    private List<RobotKeywordCall> getImportElements() {
-        final RobotSettingsSection section = getSettingsSection();
-        return section != null ? section.getImportSettings() : null;
-    }
-
-    private RobotSettingsSection getSettingsSection() {
-        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSettingsSection.class);
-        return (RobotSettingsSection) settingsSection.orNull();
-    }
-
-    private void createColumns(final boolean createFirst) {
+    private void createColumns() {
         final NewElementsCreator creator = newElementsCreator();
         final MatcherProvider matchesProvider = new MatcherProvider() {
             @Override
@@ -135,24 +119,19 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
                 return matches;
             }
         };
-        if (createFirst) {
-            ViewerColumnsFactory.newColumn("Import").withWidth(100)
-                .shouldGrabAllTheSpaceLeft(viewer.getInput() == null).withMinWidth(100)
-                .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
-                .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
-                .editingEnabledOnlyWhen(fileModel.isEditable())
-                .createFor(viewer);
-        }
-        if (viewer.getInput() == null) {
-            return;
-        }
-        final int max = calcualateLongestArgumentsLength();
-        createArgumentColumn("Name / Path", 0, matchesProvider, creator);
-        for (int i = 1; i < max; i++) {
-            createArgumentColumn("", i, matchesProvider, creator);
+        ViewerColumnsFactory.newColumn("Import").withWidth(140)
+            .shouldGrabAllTheSpaceLeft(viewer.getInput() == null).withMinWidth(100)
+            .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
+            .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
+
+        for (int i = 0; i < calcualateLongestArgumentsLength(); i++) {
+            final String name = i == 0 ? "Name / Path" : "";
+            createArgumentColumn(name, i, matchesProvider, creator);
         }
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
             .labelsProvidedBy(new SettingsCommentsLabelProvider(matchesProvider))
             .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
@@ -191,6 +170,26 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
                 .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
     }
 
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+
+        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
+        final Table control = viewer.getTable();
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
+    }
+
+    private void setInput() {
+        viewer.setInput(getSettingsSection());
+    }
+
+    private RobotSettingsSection getSettingsSection() {
+        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
+                .findSection(RobotSettingsSection.class);
+        return (RobotSettingsSection) settingsSection.orNull();
+    }
+
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
@@ -204,14 +203,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     public void clearSettingsSelection() {
         viewer.setSelection(StructuredSelection.EMPTY);
-    }
-
-    private void refreshInput() {
-        viewer.setInput(getImportElements());
-        viewer.removeColumns(1);
-        createColumns(false);
-        viewer.refresh();
-        viewer.packFirstColumn();
     }
 
     @SuppressWarnings("unchecked")
@@ -249,7 +240,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            refreshInput();
+            setInput();
+            viewer.refresh();
             dirtyProviderService.setDirtyState(true);
         }
     }
@@ -259,7 +251,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            refreshInput();
+            setInput();
+            viewer.refresh();
             dirtyProviderService.setDirtyState(true);
         }
     }
@@ -268,11 +261,22 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        final List<?> input = (List<?>) viewer.getInput();
-        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
-            refreshInput();
+        final TableItem[] items = viewer.getTable().getItems();
+        if (setting.getSuiteFile() == fileModel && items != null && getDisplayedSettings(items).contains(setting)) {
+            viewer.refresh(setting);
             dirtyProviderService.setDirtyState(true);
         }
+    }
+
+    private List<RobotSetting> getDisplayedSettings(final TableItem[] items) {
+        final List<RobotSetting> settingDisplayed = Lists.transform(newArrayList(items),
+                new Function<TableItem, RobotSetting>() {
+                    @Override
+                    public RobotSetting apply(final TableItem item) {
+                        return (RobotSetting) item.getData();
+                    }
+                });
+        return settingDisplayed;
     }
 
     @Inject
@@ -280,7 +284,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            refreshInput();
+            viewer.refresh();
             dirtyProviderService.setDirtyState(true);
         }
     }
@@ -290,7 +294,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            refreshInput();
+            setInput();
+            viewer.refresh();
+            viewer.packFirstColumn();
         }
     }
 
