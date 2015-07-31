@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -59,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEv
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.collect.Range;
 
@@ -162,11 +164,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
             @Override
             public void handleEvent(final Event event) {
-                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 2).intValue();
+                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
         viewer.setContentProvider(new GeneralSettingsContentProvider());
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
+        Viewers.boundViewerWithContext(viewer, site,
+                "org.robotframework.ide.eclipse.tableeditor.settings.general.context");
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
@@ -208,7 +212,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private int calcualateLongestArgumentsLength() {
-        int max = 2;
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         for (final Entry<String, RobotElement> entry : model.getEntries()) {
             final RobotSetting setting = (RobotSetting) entry.getValue();
             if (setting != null) {

@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.viewers.Viewers;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
@@ -99,6 +100,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
             }
         });
         viewer.setContentProvider(new MetadataSettingsContentProvider(fileModel.isEditable()));
+        Viewers.boundViewerWithContext(viewer, site,
+                "org.robotframework.ide.eclipse.tableeditor.settings.metadata.context");
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 

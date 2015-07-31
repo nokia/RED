@@ -10,16 +10,17 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveVariableDownCommand extends EditorCommand {
 
-    private final RobotVariablesSection variablesSection;
-    private final int index;
+    private final RobotVariable variable;
 
-    public MoveVariableDownCommand(final RobotVariablesSection variablesSection, final int index) {
-        this.variablesSection = variablesSection;
-        this.index = index;
+    public MoveVariableDownCommand(final RobotVariable variable) {
+        this.variable = variable;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
+        final RobotVariablesSection variablesSection = variable.getParent();
+        final int index = variablesSection.getChildren().indexOf(variable);
+
         final List<RobotVariable> children = variablesSection.getChildren();
         if (index == children.size() - 1) {
             return;
