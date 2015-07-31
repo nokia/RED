@@ -180,16 +180,16 @@ public class RobotToken implements IRobotLineElement {
         /**
          * 
          */
-        SUITE_SETUP_DECLARATION("Suite Setup", "Suite Setup:",
+        SETTING_SUITE_SETUP_DECLARATION("Suite Setup", "Suite Setup:",
                 "Suite Precondition", "Suite Precondition:"),
         /**
          * 
          */
-        SUITE_SETUP_KEYWORD_NAME,
+        SETTING_SUITE_SETUP_KEYWORD_NAME,
         /**
          * 
          */
-        SUITE_SETUP_KEYWORD_ARGUMENT;
+        SETTING_SUITE_SETUP_KEYWORD_ARGUMENT;
 
         private final List<String> representationForNew = new LinkedList<>();
 
