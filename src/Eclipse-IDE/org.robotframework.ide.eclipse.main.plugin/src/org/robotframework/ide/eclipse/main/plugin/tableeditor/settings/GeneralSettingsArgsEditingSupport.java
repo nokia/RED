@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -55,10 +56,10 @@ class GeneralSettingsArgsEditingSupport extends EditingSupport {
 
         if (setting == null && !arg.isEmpty()) {
             final String keywordName = getSettingName(element);
-            final GeneralSettingsModel model = (GeneralSettingsModel) getViewer().getInput();
             final List<String> args = newArrayList(Collections.nCopies(index, ""));
             args.add(arg);
-            commandsStack.execute(new CreateSettingKeywordCallCommand(model.getSection(), keywordName, args));
+            final RobotSettingsSection section = (RobotSettingsSection) getViewer().getInput();
+            commandsStack.execute(new CreateSettingKeywordCallCommand(section, keywordName, args));
         } else if (setting != null) {
             commandsStack.execute(new SetKeywordCallArgumentCommand(setting, index, arg));
         }

@@ -26,13 +26,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -49,6 +49,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEv
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.viewers.Viewers;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
@@ -159,18 +162,11 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
-        viewer.setInput(getMetadataElements());
-    }
-
-    private List<RobotKeywordCall> getMetadataElements() {
-        final RobotSettingsSection section = getSection();
-        return section != null ? section.getMetadataSettings() : null;
+        viewer.setInput(getSection());
     }
 
     private RobotSettingsSection getSection() {
-        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSettingsSection.class);
-        return (RobotSettingsSection) settingsSection.orNull();
+        return (RobotSettingsSection) fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
     @Override
@@ -188,14 +184,13 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MatchesCollection collectMatches(final String filter) {
         if (filter.isEmpty()) {
             return null;
         } else {
             final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
-            settingsMatches.collect((List<RobotElement>) viewer.getInput(), filter);
+            settingsMatches.collect(getDisplayedSettings(), filter);
             return settingsMatches;
         }
     }
@@ -242,11 +237,28 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        final List<?> input = (List<?>) viewer.getInput();
-        if (setting.getSuiteFile() == fileModel && input != null && input.contains(setting)) {
-            setInput();
+        if (setting.getSuiteFile() == fileModel && getDisplayedSettings().contains(setting)) {
+            viewer.refresh(setting);
             dirtyProviderService.setDirtyState(true);
         }
+    }
+
+    private List<RobotElement> getDisplayedSettings() {
+        final TableItem[] items = viewer.getTable().getItems();
+        if (items == null) {
+            return newArrayList();
+        }
+        final List<RobotElement> settingDisplayed = Lists.transform(newArrayList(items),
+                new Function<TableItem, RobotElement>() {
+                    @Override
+                    public RobotSetting apply(final TableItem item) {
+                        if (item.getData() instanceof RobotSetting) {
+                            return (RobotSetting) item.getData();
+                        }
+                        return null;
+                    }
+                });
+        return settingDisplayed;
     }
 
     @Inject
@@ -254,7 +266,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            setInput();
+            viewer.refresh();
             dirtyProviderService.setDirtyState(true);
         }
     }
