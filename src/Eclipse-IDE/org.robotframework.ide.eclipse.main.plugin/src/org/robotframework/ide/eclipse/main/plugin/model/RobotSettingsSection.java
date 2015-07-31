@@ -72,6 +72,15 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         }));
     }
 
+    public RobotSetting getSetting(final String name) {
+        for (final RobotKeywordCall setting : getChildren()) {
+            if (name.equals(setting.getName())) {
+                return (RobotSetting) setting;
+            }
+        }
+        return null;
+    }
+
     public List<IPath> getResourcesPaths() {
         final List<RobotKeywordCall> resources = getResourcesSettings();
         final List<IPath> paths = newArrayList();
