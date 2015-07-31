@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
