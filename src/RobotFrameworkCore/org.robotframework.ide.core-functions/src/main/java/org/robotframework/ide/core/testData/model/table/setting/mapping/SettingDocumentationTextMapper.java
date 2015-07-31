@@ -14,8 +14,6 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 
 public class SettingDocumentationTextMapper implements IParsingMapper {
 
@@ -59,20 +57,6 @@ public class SettingDocumentationTextMapper implements IParsingMapper {
         if (state == ParsingState.SETTING_DOCUMENTATION
                 || state == ParsingState.SETTING_DOCUMENTATION_TEXT) {
             result = true;
-        }
-
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected boolean isIncludedInSettingTable(final RobotLine line,
-            final Stack<ParsingState> processingState) {
-        boolean result;
-        if (!processingState.isEmpty()) {
-            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_TABLE_INSIDE);
-        } else {
-            result = false;
         }
 
         return result;
