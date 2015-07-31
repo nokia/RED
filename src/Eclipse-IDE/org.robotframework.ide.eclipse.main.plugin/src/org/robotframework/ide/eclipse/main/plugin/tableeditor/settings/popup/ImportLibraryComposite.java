@@ -284,6 +284,19 @@ public class ImportLibraryComposite {
         };
         rightViewer.addSelectionChangedListener(rightViewerSelectionChangedListener);
     }
+    
+    protected void setInitialSelection(final RobotSetting initialSetting) {
+        final Settings libs = (Settings) rightViewer.getInput();
+        final List<LibrarySpecification> libSpecs = libs.getImportedLibraries();
+        final String name = initialSetting.getArguments().get(0);
+        for (LibrarySpecification librarySpecification : libSpecs) {
+            if(librarySpecification.getName().equals(name)) {
+                rightViewer.setSelection(Selections.createStructuredSelection(librarySpecification));
+                break;
+            }
+        }
+        
+    }
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 

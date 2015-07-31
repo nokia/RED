@@ -3,6 +3,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -16,9 +18,11 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -285,10 +289,14 @@ public class ImportResourcesComposite {
         resourcesViewer.addSelectionChangedListener(selectionChangedListener);
     }
     
+    protected void setInitialSelection(final RobotSetting initialSetting) {
+        resourcesViewer.setSelection(Selections.createStructuredSelection(new Path(initialSetting.getArguments().get(0))));
+    }
+    
     private static class ResourcesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
         @Override
         public Image getImage(final Object element) {
-            return ImagesManager.getImage(RedImages.getRobotSettingImage());
+            return ImagesManager.getImage(RedImages.getResourceImage());
         }
 
         @Override
@@ -311,5 +319,32 @@ public class ImportResourcesComposite {
 
             return text;
         }
+    }
+    
+    private static class ImportResourcesContentProvider implements IStructuredContentProvider {
+
+        @Override
+        public void dispose() {
+            // nothing to do
+        }
+
+        @Override
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+            // nothing to do
+        }
+
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            final List<IPath> libraries = ((Settings) inputElement).getImportedResources();
+            Collections.sort(libraries, new Comparator<IPath>() {
+
+                @Override
+                public int compare(final IPath spec1, final IPath spec2) {
+                    return spec1.lastSegment().compareTo(spec2.lastSegment());
+                }
+            });
+            return libraries.toArray();
+        }
+
     }
 }

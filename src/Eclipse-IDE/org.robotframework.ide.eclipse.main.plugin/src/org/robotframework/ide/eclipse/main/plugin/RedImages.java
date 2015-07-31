@@ -122,6 +122,10 @@ public class RedImages {
     public static ImageDescriptor getFocusSectionImage() {
         return RedPlugin.getImageDescriptor("resources/focus_section.png");
     }
+    
+    public static ImageDescriptor getResourceImage() {
+        return RedPlugin.getImageDescriptor("resources/resource.png");
+    }
 
     /**
      * For given image descriptor the gray version descriptor is created.
