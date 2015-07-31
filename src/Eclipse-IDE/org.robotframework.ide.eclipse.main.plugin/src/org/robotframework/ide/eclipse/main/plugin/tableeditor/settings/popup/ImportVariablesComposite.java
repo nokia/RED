@@ -334,6 +334,10 @@ public class ImportVariablesComposite {
         variablesViewer.addSelectionChangedListener(selectionChangedListener);
     }
     
+    protected void setInitialSelection(final RobotSetting initialSetting) {
+        variablesViewer.setSelection(Selections.createStructuredSelection(new ImportedVariablesFile(initialSetting.getArguments()))); 
+    }
+    
     private static class VariablesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
         @Override

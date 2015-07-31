@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -23,23 +25,32 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
 
     private final RobotSuiteFile fileModel;
 
+    private RobotSetting initialSetting;
+
     private ImportLibraryComposite importLibrariesComposite;
 
     private ImportResourcesComposite importResourcesComposite;
 
     private ImportVariablesComposite importVariablesComposite;
-    
+
     private Composite librariesComposite;
 
     private Composite resourcesComposite;
 
     private Composite variablesComposite;
 
+    private Button variablesSwitcher;
+
+    private Button resourcesSwitcher;
+
+    private Button librariesSwitcher;
+
     public ImportSettingsComposite(final Composite parent, final RobotEditorCommandsStack commandsStack,
-            final RobotSuiteFile fileModel) {
+            final RobotSuiteFile fileModel, final RobotSetting initialSetting) {
         super(parent, SWT.NONE, "Import");
         this.commandsStack = commandsStack;
         this.fileModel = fileModel;
+        this.initialSetting = initialSetting;
         createComposite();
     }
 
@@ -56,9 +67,9 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     }
 
     private void createVariablesSwitcher(final Composite importChooseComposite) {
-        final Button varsBtn = getToolkit().createButton(importChooseComposite, "Variables", SWT.RADIO);
-        varsBtn.setBackground(null);
-        varsBtn.addSelectionListener(new SelectionAdapter() {
+        variablesSwitcher = getToolkit().createButton(importChooseComposite, "Variables", SWT.RADIO);
+        variablesSwitcher.setBackground(null);
+        variablesSwitcher.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -70,9 +81,9 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     }
 
     private void createResourcesSwitcher(final Composite importChooseComposite) {
-        final Button resBtn = getToolkit().createButton(importChooseComposite, "Resources", SWT.RADIO);
-        resBtn.setBackground(null);
-        resBtn.addSelectionListener(new SelectionAdapter() {
+        resourcesSwitcher = getToolkit().createButton(importChooseComposite, "Resources", SWT.RADIO);
+        resourcesSwitcher.setBackground(null);
+        resourcesSwitcher.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -84,10 +95,10 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     }
 
     private void createLibrariesSwitcher(final Composite importChooseComposite) {
-        final Button libBtn = getToolkit().createButton(importChooseComposite, "Libraries", SWT.RADIO);
-        libBtn.setSelection(true);
-        libBtn.setBackground(null);
-        libBtn.addSelectionListener(new SelectionAdapter() {
+        librariesSwitcher = getToolkit().createButton(importChooseComposite, "Libraries", SWT.RADIO);
+        librariesSwitcher.setBackground(null);
+        librariesSwitcher.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final Composite parent = librariesComposite.getParent();
@@ -108,7 +119,7 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
         librariesComposite = createLibrariesComposite(mainComposite);
         resourcesComposite = createResourcesComposite(mainComposite);
         variablesComposite = createVariablesComposite(mainComposite);
-        stackLayout.topControl = librariesComposite;
+        setTopControl(stackLayout);
 
         createDisposeListener();
 
@@ -128,6 +139,24 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     private Composite createVariablesComposite(final Composite parent) {
         importVariablesComposite = new ImportVariablesComposite(commandsStack, fileModel, getToolkit(), getShell());
         return importVariablesComposite.createImportVariablesComposite(parent);
+    }
+    
+    private void setTopControl(StackLayout stackLayout) {
+        if (initialSetting == null) {
+            stackLayout.topControl = librariesComposite;
+            librariesSwitcher.setSelection(true);
+        } else {
+            if (initialSetting.getGroup() == SettingsGroup.RESOURCES) {
+                stackLayout.topControl = resourcesComposite;
+                resourcesSwitcher.setSelection(true);
+            } else if (initialSetting.getGroup() == SettingsGroup.VARIABLES) {
+                stackLayout.topControl = variablesComposite;
+                variablesSwitcher.setSelection(true);
+            } else {
+                stackLayout.topControl = librariesComposite;
+                librariesSwitcher.setSelection(true);
+            }
+        }
     }
 
     private void createDisposeListener() {
@@ -167,5 +196,19 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
         importLibrariesComposite.getRightViewer().setInput(libs);
         importResourcesComposite.getResourcesViewer().setInput(libs);
         importVariablesComposite.getVariablesViewer().setInput(libs);
+        
+        setInitialSelection();
+    }
+    
+    private void setInitialSelection() {
+        if (initialSetting != null) {
+            if (initialSetting.getGroup() == SettingsGroup.RESOURCES) {
+                importResourcesComposite.setInitialSelection(initialSetting);
+            } else if (initialSetting.getGroup() == SettingsGroup.VARIABLES) {
+                importVariablesComposite.setInitialSelection(initialSetting);
+            } else {
+                importLibrariesComposite.setInitialSelection(initialSetting);
+            }
+        }
     }
 }
