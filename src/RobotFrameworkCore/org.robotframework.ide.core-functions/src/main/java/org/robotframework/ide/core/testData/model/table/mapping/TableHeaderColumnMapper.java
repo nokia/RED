@@ -9,7 +9,7 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class TableHeaderColumnMapper implements IParsingMapper {

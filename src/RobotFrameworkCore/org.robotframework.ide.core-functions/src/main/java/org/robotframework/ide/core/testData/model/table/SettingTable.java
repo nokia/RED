@@ -6,6 +6,7 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 
 
 public class SettingTable extends ARobotSectionTable {
@@ -13,6 +14,7 @@ public class SettingTable extends ARobotSectionTable {
     private List<AImported> imports = new LinkedList<>();
     private List<SuiteDocumentation> documentations = new LinkedList<>();
     private List<Metadata> metadatas = new LinkedList<>();
+    private List<SuiteSetup> suiteSetups = new LinkedList<>();
 
 
     public List<AImported> getImports() {
@@ -42,5 +44,15 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addMetadata(final Metadata metadata) {
         metadatas.add(metadata);
+    }
+
+
+    public List<SuiteSetup> getSuiteSetups() {
+        return suiteSetups;
+    }
+
+
+    public void addSuiteSetup(final SuiteSetup suiteSetup) {
+        suiteSetups.add(suiteSetup);
     }
 }

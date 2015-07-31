@@ -1,13 +1,13 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.Metadata;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -16,12 +16,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class MetadataMapper implements IParsingMapper {
+public class SuiteSetupMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public MetadataMapper() {
+    public SuiteSetupMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -31,14 +31,14 @@ public class MetadataMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_METADATA_DECLARATION);
+        rt.setType(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        SettingTable settings = robotFileOutput.getFileModel()
-                .getSettingTable();
-        Metadata metadata = new Metadata(rt);
-        settings.addMetadata(metadata);
-        processingState.push(ParsingState.SETTING_METADATA);
+        List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
+                .getSettingTable().getSuiteSetups();
+        SuiteSetup setup = new SuiteSetup(rt);
+        suiteSetups.add(setup);
+        processingState.push(ParsingState.SETTING_SUITE_SETUP);
 
         return rt;
     }
@@ -49,7 +49,8 @@ public class MetadataMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.SETTING_METADATA_DECLARATION)) {
+        if (rt.getTypes().contains(
+                RobotTokenType.SETTING_SUITE_SETUP_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;
@@ -62,7 +63,6 @@ public class MetadataMapper implements IParsingMapper {
                 // case.
             }
         }
-
         return result;
     }
 
