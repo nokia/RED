@@ -138,7 +138,23 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT;
+    SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_FORCE_TAGS_DECLARATION("Force Tags", "Force Tags:"),
+    /**
+     * 
+     */
+    SETTING_FORCE_TAG,
+    /**
+     * 
+     */
+    SETTING_DEFAULT_TAGS_DECLARATION("Default Tags", "Default Tags:"),
+    /**
+     * 
+     */
+    SETTING_DEFAULT_TAG;
 
     private final List<String> representationForNew = new LinkedList<>();
 

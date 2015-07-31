@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
@@ -71,6 +72,9 @@ public class HashCommentMapper implements IParsingMapper {
                 || commentHolder == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD
                 || commentHolder == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT) {
             mapSuiteTeardownComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_FORCE_TAGS
+                || commentHolder == ParsingState.SETTING_FORCE_TAGS_TAG_NAME) {
+            mapForceTagsComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -78,6 +82,20 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapForceTagsComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<ForceTags> suiteForceTags = fileModel.getSettingTable()
+                .getForceTags();
+        if (!suiteForceTags.isEmpty()) {
+            ForceTags forceTags = suiteForceTags.get(suiteForceTags.size() - 1);
+            forceTags.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 
