@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +42,6 @@ class ImportSettingsContentProvider implements IStructuredContentProvider {
     }
 
     private List<RobotKeywordCall> getImportElements(final RobotSettingsSection section) {
-        return section != null ? section.getImportSettings() : null;
+        return section != null ? section.getImportSettings() : new ArrayList<RobotKeywordCall>();
     }
 }

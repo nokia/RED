@@ -1,7 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import java.util.Map;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 class GeneralSettingsContentProvider implements IStructuredContentProvider {
 
@@ -17,10 +21,10 @@ class GeneralSettingsContentProvider implements IStructuredContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        if (inputElement instanceof GeneralSettingsModel) {
-            final GeneralSettingsModel model = (GeneralSettingsModel) inputElement;
-            return model.getEntries().toArray();
-
+        final RobotSettingsSection section = (RobotSettingsSection) inputElement;
+        if (section != null) {
+            final Map<String, RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsMapping(section);
+            return generalSettings.entrySet().toArray();
         }
         return new Object[0];
     }

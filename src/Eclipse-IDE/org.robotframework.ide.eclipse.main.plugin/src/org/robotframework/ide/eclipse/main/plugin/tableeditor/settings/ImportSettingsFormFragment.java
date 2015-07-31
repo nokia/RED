@@ -185,9 +185,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private RobotSettingsSection getSettingsSection() {
-        final com.google.common.base.Optional<RobotElement> settingsSection = fileModel
-                .findSection(RobotSettingsSection.class);
-        return (RobotSettingsSection) settingsSection.orNull();
+        return (RobotSettingsSection) fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
     @Override
@@ -205,14 +203,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         viewer.setSelection(StructuredSelection.EMPTY);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MatchesCollection collectMatches(final String filter) {
         if (filter.isEmpty()) {
             return null;
         } else {
             final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-            settingsMatches.collect((List<RobotElement>) viewer.getInput(), filter);
+            settingsMatches.collect(getDisplayedSettings(), filter);
             return settingsMatches;
         }
     }
@@ -261,19 +258,25 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        final TableItem[] items = viewer.getTable().getItems();
-        if (setting.getSuiteFile() == fileModel && items != null && getDisplayedSettings(items).contains(setting)) {
+        if (setting.getSuiteFile() == fileModel && getDisplayedSettings().contains(setting)) {
             viewer.refresh(setting);
             dirtyProviderService.setDirtyState(true);
         }
     }
 
-    private List<RobotSetting> getDisplayedSettings(final TableItem[] items) {
-        final List<RobotSetting> settingDisplayed = Lists.transform(newArrayList(items),
-                new Function<TableItem, RobotSetting>() {
+    private List<RobotElement> getDisplayedSettings() {
+        final TableItem[] items = viewer.getTable().getItems();
+        if (items == null) {
+            return newArrayList();
+        }
+        final List<RobotElement> settingDisplayed = Lists.transform(newArrayList(items),
+                new Function<TableItem, RobotElement>() {
                     @Override
                     public RobotSetting apply(final TableItem item) {
-                        return (RobotSetting) item.getData();
+                        if (item.getData() instanceof RobotSetting) {
+                            return (RobotSetting) item.getData();
+                        }
+                        return null;
                     }
                 });
         return settingDisplayed;
