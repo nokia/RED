@@ -640,6 +640,11 @@
           id="org.robotframework.ide.eclipse.deleteCell"
           name="Delete cell">
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.editSetting"
+          name="Edit Setting">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1206,6 +1211,20 @@
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.atLeastOneSettingIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.EditSettingsHandler"
+          commandId="org.robotframework.ide.eclipse.editSetting">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -2185,6 +2204,12 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.editSetting"
+             label="Edit"
+             icon="resources/edit.png"
+             style="push">
+       </command>
        <separator
              name="globals"
              visible="true">

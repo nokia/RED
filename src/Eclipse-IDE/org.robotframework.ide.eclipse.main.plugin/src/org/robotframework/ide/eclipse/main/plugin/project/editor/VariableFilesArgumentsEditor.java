@@ -67,7 +67,7 @@ public class VariableFilesArgumentsEditor {
     
     private void createTable() {
         ViewerColumnsFactory.newColumn("Argument")
-                .withWidth(300)
+                .withWidth(350)
                 .labelsProvidedBy(new ArgumentsLabelProvider())
                 .editingSupportedBy(new ArgumentsEditingSupport(argumentsViewer))
                 .editingEnabledOnlyWhen(true)
