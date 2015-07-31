@@ -33,6 +33,7 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.Metadata
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataValueMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationTextMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
@@ -65,6 +66,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.settings.Metada
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.ResourceDeclarationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteSetupRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteTeardownRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -100,6 +102,7 @@ public class TxtRobotFileParser {
         recognized.add(new SettingDocumentationRecognizer());
         recognized.add(new MetadataRecognizer());
         recognized.add(new SuiteSetupRecognizer());
+        recognized.add(new SuiteTeardownRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
@@ -124,8 +127,10 @@ public class TxtRobotFileParser {
         mappers.add(new MetadataMapper());
         mappers.add(new MetadataKeyMapper());
         mappers.add(new MetadataValueMapper());
+
         mappers.add(new SuiteSetupMapper());
         mappers.add(new SuiteSetupKeywordMapper());
+        mappers.add(new SuiteSetupKeywordArgumentMapper());
     }
 
 

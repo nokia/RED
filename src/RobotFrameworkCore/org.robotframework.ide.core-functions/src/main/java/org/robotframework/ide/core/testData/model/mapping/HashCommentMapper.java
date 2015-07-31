@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -61,6 +62,10 @@ public class HashCommentMapper implements IParsingMapper {
             mapSettingDocumentationComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SETTING_METADATA) {
             mapSettingMetadataComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_SUITE_SETUP
+                || commentHolder == ParsingState.SETTING_SUITE_SETUP_KEYWORD
+                || commentHolder == ParsingState.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT) {
+            mapSuiteSetupComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -68,6 +73,20 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapSuiteSetupComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<SuiteSetup> suiteSetups = fileModel.getSettingTable()
+                .getSuiteSetups();
+        if (!suiteSetups.isEmpty()) {
+            SuiteSetup suiteSetup = suiteSetups.get(suiteSetups.size() - 1);
+            suiteSetup.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 
