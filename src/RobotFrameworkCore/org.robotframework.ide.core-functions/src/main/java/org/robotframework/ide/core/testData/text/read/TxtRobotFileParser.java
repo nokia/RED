@@ -28,6 +28,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.TableHeaderColum
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.DefaultTagsMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.DefaultTagsTagNameMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.ForceTagsMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.ForceTagsTagNameMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataKeyMapper;
@@ -145,6 +147,8 @@ public class TxtRobotFileParser {
         mappers.add(new SuiteTeardownKeywordArgumentMapper());
         mappers.add(new ForceTagsMapper());
         mappers.add(new ForceTagsTagNameMapper());
+        mappers.add(new DefaultTagsMapper());
+        mappers.add(new DefaultTagsTagNameMapper());
     }
 
 
