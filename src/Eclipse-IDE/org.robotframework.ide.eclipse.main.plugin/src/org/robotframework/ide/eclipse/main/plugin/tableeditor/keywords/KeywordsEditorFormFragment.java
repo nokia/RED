@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -184,7 +185,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
     @Override
     protected int calculateLongestArgumentsList() {
         final RobotSuiteFileSection section = getSection();
-        int max = 5;
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         if (section != null) {
             for (final RobotElement element : section.getChildren()) {
                 final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;

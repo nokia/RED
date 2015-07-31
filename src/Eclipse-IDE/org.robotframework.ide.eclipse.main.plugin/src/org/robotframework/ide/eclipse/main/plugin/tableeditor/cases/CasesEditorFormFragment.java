@@ -7,6 +7,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -84,7 +85,7 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
     @Override
     protected int calculateLongestArgumentsList() {
         final RobotSuiteFileSection section = getSection();
-        int max = 5;
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         if (section != null) {
             for (final RobotElement testCase : section.getChildren()) {
                 for (final RobotElement nestedElement : testCase.getChildren()) {

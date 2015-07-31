@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 
 class ImportSettingsContentProvider implements IStructuredContentProvider {
@@ -30,10 +32,15 @@ class ImportSettingsContentProvider implements IStructuredContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        final Object[] elements = ((List<?>) inputElement).toArray();
+        final RobotSettingsSection section = (RobotSettingsSection) inputElement;
+        final Object[] elements = getImportElements(section).toArray();
         final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
         elementAddingToken = new ElementAddingToken("import", editable);
         newElements[elements.length] = elementAddingToken;
         return newElements;
+    }
+
+    private List<RobotKeywordCall> getImportElements(final RobotSettingsSection section) {
+        return section != null ? section.getImportSettings() : null;
     }
 }

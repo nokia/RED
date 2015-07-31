@@ -100,11 +100,18 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
             }
         });
         viewer.setContentProvider(new MetadataSettingsContentProvider(fileModel.isEditable()));
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
         Viewers.boundViewerWithContext(viewer, site,
                 "org.robotframework.ide.eclipse.tableeditor.settings.metadata.context");
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
+        createColumns();
+        createContextMenu();
+        setInput();
+    }
+
+    private void createColumns() {
         final MatcherProvider matchesProvider = new MatcherProvider() {
             @Override
             public MatchesCollection getMatches() {
@@ -128,10 +135,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
                 .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
                 .editingEnabledOnlyWhen(fileModel.isEditable())
                 .createFor(viewer);
-
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
-        createContextMenu();
-        setInput();
     }
 
     private NewElementsCreator newElementsCreator() {
