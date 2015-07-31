@@ -181,7 +181,8 @@ public class VariablesDeclarationRecognizerTest {
         assertThat(rec.getPattern().pattern()).isEqualTo(
                 "[ ]?("
                         + ATokenRecognizer
-                                .createUpperLowerCaseWord("Variables:")
+                                .createUpperLowerCaseWord("Variables")
+                        + "[\\s]*:"
                         + "|"
                         + ATokenRecognizer
                                 .createUpperLowerCaseWord("Variables") + ")");

@@ -180,9 +180,8 @@ public class MetadataRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?("
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Metadata:") + "|"
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
+                        + "[\\s]*:" + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
                         + ")");
 
