@@ -43,6 +43,12 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSet
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasMapper;
@@ -76,6 +82,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.settings.Resour
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SettingDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteSetupRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteTeardownRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestSetupRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestTeardownRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -114,6 +122,8 @@ public class TxtRobotFileParser {
         recognized.add(new SuiteTeardownRecognizer());
         recognized.add(new ForceTagsRecognizer());
         recognized.add(new DefaultTagsRecognizer());
+        recognized.add(new TestSetupRecognizer());
+        recognized.add(new TestTeardownRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
@@ -149,6 +159,13 @@ public class TxtRobotFileParser {
         mappers.add(new ForceTagsTagNameMapper());
         mappers.add(new DefaultTagsMapper());
         mappers.add(new DefaultTagsTagNameMapper());
+
+        mappers.add(new TestSetupMapper());
+        mappers.add(new TestSetupKeywordMapper());
+        mappers.add(new TestSetupKeywordArgumentMapper());
+        mappers.add(new TestTeardownMapper());
+        mappers.add(new TestTeardownKeywordMapper());
+        mappers.add(new TestTeardownKeywordArgumentMapper());
     }
 
 

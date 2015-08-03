@@ -152,5 +152,29 @@ public enum ParsingState {
     /**
      * 
      */
-    SETTING_DEFAULT_TAGS_TAG_NAME;
+    SETTING_DEFAULT_TAGS_TAG_NAME,
+    /**
+     * 
+     */
+    SETTING_TEST_SETUP,
+    /**
+     * 
+     */
+    SETTING_TEST_SETUP_KEYWORD,
+    /**
+     *  
+     */
+    SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_TEST_TEARDOWN,
+    /**
+     * 
+     */
+    SETTING_TEST_TEARDOWN_KEYWORD,
+    /**
+     *  
+     */
+    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
 }
