@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
 
 import java.util.List;
 import java.util.Stack;
@@ -8,19 +8,19 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
+import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TestSetupKeywordMapper implements IParsingMapper {
+public class TestTimeoutTrashDataMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestSetupKeywordMapper() {
+    public TestTimeoutTrashDataMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,18 +30,19 @@ public class TestSetupKeywordMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME);
+        rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<TestSetup> setups = settings.getTestSetups();
-        if (!setups.isEmpty()) {
-            setups.get(setups.size() - 1).setKeywordName(rt);
+        List<TestTimeout> timeouts = settings.getTestTimeouts();
+        if (!timeouts.isEmpty()) {
+            timeouts.get(timeouts.size() - 1).addUnexpectedTrashArgument(rt);
         } else {
-            // FIXME: some internal error
+            // FIXME: some error
         }
-        processingState.push(ParsingState.SETTING_TEST_SETUP_KEYWORD);
+        processingState
+                .push(ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS);
 
         return rt;
     }
@@ -51,14 +52,20 @@ public class TestSetupKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
-
-        if (state == ParsingState.SETTING_TEST_SETUP) {
-            List<TestSetup> testSetups = robotFileOutput.getFileModel()
-                    .getSettingTable().getTestSetups();
-            result = !utility.checkIfHasAlreadyKeywordName(testSetups);
+        boolean result;
+        if (!processingState.isEmpty()) {
+            ParsingState currentState = utility
+                    .getCurrentStatus(processingState);
+            if (currentState == ParsingState.SETTING_TEST_TIMEOUT_VALUE
+                    || currentState == ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS) {
+                result = true;
+            } else {
+                result = false;
+            }
+        } else {
+            result = false;
         }
         return result;
     }
+
 }

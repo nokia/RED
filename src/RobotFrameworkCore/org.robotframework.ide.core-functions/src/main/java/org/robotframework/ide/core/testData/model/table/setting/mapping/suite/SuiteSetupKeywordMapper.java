@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.suite;
 
 import java.util.List;
 import java.util.Stack;
@@ -8,19 +8,19 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
+public class SuiteSetupKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestTeardownKeywordArgumentMapper() {
+    public SuiteSetupKeywordMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,19 +30,18 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
+        rt.setType(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<TestTeardown> teardowns = settings.getTestTeardowns();
-        if (!teardowns.isEmpty()) {
-            teardowns.get(teardowns.size() - 1).addArgument(rt);
+        List<SuiteSetup> setups = settings.getSuiteSetups();
+        if (!setups.isEmpty()) {
+            setups.get(setups.size() - 1).setKeywordName(rt);
         } else {
-            // FIXME: some error
+            // FIXME: some internal error
         }
-        processingState
-                .push(ParsingState.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
+        processingState.push(ParsingState.SETTING_SUITE_SETUP_KEYWORD);
 
         return rt;
     }
@@ -54,16 +53,12 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        if (state == ParsingState.SETTING_TEST_TEARDOWN) {
-            List<TestTeardown> testTeardowns = robotFileOutput.getFileModel()
-                    .getSettingTable().getTestTeardowns();
-            result = utility.checkIfHasAlreadyKeywordName(testTeardowns);
-        } else if (state == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD
-                || state == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT) {
-            result = true;
-        }
 
+        if (state == ParsingState.SETTING_SUITE_SETUP) {
+            List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
+                    .getSettingTable().getSuiteSetups();
+            result = !utility.checkIfHasAlreadyKeywordName(suiteSetups);
+        }
         return result;
     }
-
 }

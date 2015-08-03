@@ -37,18 +37,6 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.Metadata
 import org.robotframework.ide.core.testData.model.table.setting.mapping.MetadataValueMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.SettingDocumentationTextMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupKeywordMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteSetupMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownKeywordMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.SuiteTeardownMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupKeywordArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupKeywordMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestSetupMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownKeywordArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownKeywordMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.TestTeardownMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasMapper;
@@ -58,6 +46,24 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.library.
 import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceImportPathMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.resource.ResourceTrashDataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteSetupKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteSetupKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteSetupMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteTeardownKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteTeardownKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.suite.SuiteTeardownMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestSetupKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestSetupKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestSetupMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTeardownKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTeardownKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTeardownMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTemplateKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTemplateMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTemplateTrashDataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutTrashDataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutValueMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesArgumentsMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesDeclarationMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesImportPathMapper;
@@ -84,6 +90,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteS
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.SuiteTeardownRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestSetupRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestTeardownRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestTemplateRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.settings.TestTimeoutRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.VariableDeclarationRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -124,6 +132,8 @@ public class TxtRobotFileParser {
         recognized.add(new DefaultTagsRecognizer());
         recognized.add(new TestSetupRecognizer());
         recognized.add(new TestTeardownRecognizer());
+        recognized.add(new TestTemplateRecognizer());
+        recognized.add(new TestTimeoutRecognizer());
 
         mappers.add(new GarbageBeforeFirstTableMapper());
         mappers.add(new TableHeaderColumnMapper());
@@ -166,6 +176,12 @@ public class TxtRobotFileParser {
         mappers.add(new TestTeardownMapper());
         mappers.add(new TestTeardownKeywordMapper());
         mappers.add(new TestTeardownKeywordArgumentMapper());
+        mappers.add(new TestTemplateMapper());
+        mappers.add(new TestTemplateKeywordMapper());
+        mappers.add(new TestTemplateTrashDataMapper());
+        mappers.add(new TestTimeoutMapper());
+        mappers.add(new TestTimeoutValueMapper());
+        mappers.add(new TestTimeoutTrashDataMapper());
     }
 
 

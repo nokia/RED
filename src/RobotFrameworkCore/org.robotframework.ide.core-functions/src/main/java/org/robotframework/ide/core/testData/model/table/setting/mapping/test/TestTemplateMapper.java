@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
 
 import java.util.List;
 import java.util.Stack;
@@ -7,7 +7,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
+import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -16,12 +16,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class TestSetupMapper implements IParsingMapper {
+public class TestTemplateMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestSetupMapper() {
+    public TestTemplateMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -31,14 +31,14 @@ public class TestSetupMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_SETUP_DECLARATION);
+        rt.setType(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<TestSetup> testSetups = robotFileOutput.getFileModel()
-                .getSettingTable().getTestSetups();
-        TestSetup setup = new TestSetup(rt);
-        testSetups.add(setup);
-        processingState.push(ParsingState.SETTING_TEST_SETUP);
+        List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
+                .getSettingTable().getTestTemplates();
+        TestTemplate template = new TestTemplate(rt);
+        testTemplates.add(template);
+        processingState.push(ParsingState.SETTING_TEST_TEMPLATE);
 
         return rt;
     }
@@ -50,7 +50,7 @@ public class TestSetupMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes().contains(
-                RobotTokenType.SETTING_TEST_SETUP_DECLARATION)) {
+                RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;

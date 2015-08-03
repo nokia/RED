@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.setting.mapping.suite;
 
 import java.util.List;
 import java.util.Stack;
@@ -15,12 +15,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
+public class SuiteTeardownKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public SuiteTeardownKeywordArgumentMapper() {
+    public SuiteTeardownKeywordMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,19 +30,18 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT);
+        rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
         List<SuiteTeardown> teardowns = settings.getSuiteTeardowns();
         if (!teardowns.isEmpty()) {
-            teardowns.get(teardowns.size() - 1).addArgument(rt);
+            teardowns.get(teardowns.size() - 1).setKeywordName(rt);
         } else {
-            // FIXME: some error
+            // FIXME: some internal error
         }
-        processingState
-                .push(ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT);
+        processingState.push(ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD);
 
         return rt;
     }
@@ -57,13 +56,8 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
         if (state == ParsingState.SETTING_SUITE_TEARDOWN) {
             List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
                     .getSettingTable().getSuiteTeardowns();
-            result = utility.checkIfHasAlreadyKeywordName(suiteTeardowns);
-        } else if (state == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD
-                || state == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT) {
-            result = true;
+            result = !utility.checkIfHasAlreadyKeywordName(suiteTeardowns);
         }
-
         return result;
     }
-
 }
