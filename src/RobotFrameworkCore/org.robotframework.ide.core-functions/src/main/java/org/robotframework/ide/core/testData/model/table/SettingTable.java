@@ -12,6 +12,8 @@ import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
 import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
+import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 
 
 public class SettingTable extends ARobotSectionTable {
@@ -25,6 +27,8 @@ public class SettingTable extends ARobotSectionTable {
     private final List<DefaultTags> defaultTags = new LinkedList<>();
     private final List<TestSetup> testSetups = new LinkedList<>();
     private final List<TestTeardown> testTeardowns = new LinkedList<>();
+    private final List<TestTemplate> testTemplates = new LinkedList<>();
+    private final List<TestTimeout> testTimeouts = new LinkedList<>();
 
 
     public List<AImported> getImports() {
@@ -114,5 +118,25 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addTestTeardown(final TestTeardown testTeardown) {
         testTeardowns.add(testTeardown);
+    }
+
+
+    public List<TestTemplate> getTestTemplates() {
+        return testTemplates;
+    }
+
+
+    public void addTestTemplate(final TestTemplate testTemplate) {
+        testTemplates.add(testTemplate);
+    }
+
+
+    public List<TestTimeout> getTestTimeouts() {
+        return testTimeouts;
+    }
+
+
+    public void addTestTimeout(final TestTimeout testTimeout) {
+        testTimeouts.add(testTimeout);
     }
 }
