@@ -176,5 +176,29 @@ public enum ParsingState {
     /**
      *  
      */
-    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
+    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE,
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE_KEYWORD,
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS,
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT,
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT_VALUE,
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS;
 }

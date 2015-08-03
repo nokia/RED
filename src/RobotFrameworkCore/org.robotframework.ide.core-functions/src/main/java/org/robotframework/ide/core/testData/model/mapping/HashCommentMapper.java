@@ -19,6 +19,9 @@ import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
+import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
+import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
+import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -79,6 +82,18 @@ public class HashCommentMapper implements IParsingMapper {
         } else if (commentHolder == ParsingState.SETTING_DEFAULT_TAGS
                 || commentHolder == ParsingState.SETTING_DEFAULT_TAGS_TAG_NAME) {
             mapDefaultTagsComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_TEST_SETUP
+                || commentHolder == ParsingState.SETTING_TEST_SETUP_KEYWORD
+                || commentHolder == ParsingState.SETTING_TEST_SETUP_KEYWORD_ARGUMENT) {
+            mapTestSetupComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_TEST_TEARDOWN
+                || commentHolder == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD
+                || commentHolder == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT) {
+            mapTestTeardownComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_TEST_TEMPLATE
+                || commentHolder == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
+                || commentHolder == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
+            mapTestTemplateComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -86,6 +101,50 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestTemplateComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestTemplate> testTemplates = fileModel.getSettingTable()
+                .getTestTemplates();
+        if (!testTemplates.isEmpty()) {
+            TestTemplate testTemplate = testTemplates
+                    .get(testTemplates.size() - 1);
+            testTemplate.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestTeardownComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestTeardown> testTeardowns = fileModel.getSettingTable()
+                .getTestTeardowns();
+        if (!testTeardowns.isEmpty()) {
+            TestTeardown testTeardown = testTeardowns
+                    .get(testTeardowns.size() - 1);
+            testTeardown.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestSetupComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestSetup> testSetups = fileModel.getSettingTable()
+                .getTestSetups();
+        if (!testSetups.isEmpty()) {
+            TestSetup testSetup = testSetups.get(testSetups.size() - 1);
+            testSetup.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 

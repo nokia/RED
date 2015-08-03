@@ -180,7 +180,31 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
+    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE_DECLARATION("Test Template", "Test Template:"),
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE_KEYWORD_NAME,
+    /**
+     * 
+     */
+    SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT_DECLARATION("Test Timeout", "Test Timeout:"),
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT_VALUE,
+    /**
+     * 
+     */
+    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT;
 
     private final List<String> representationForNew = new LinkedList<>();
 
