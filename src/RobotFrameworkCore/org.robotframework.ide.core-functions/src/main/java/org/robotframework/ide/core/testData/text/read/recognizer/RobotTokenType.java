@@ -154,7 +154,33 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_DEFAULT_TAG;
+    SETTING_DEFAULT_TAG,
+    /**
+     * 
+     */
+    SETTING_TEST_SETUP_DECLARATION("Test Setup", "Test Setup:",
+            "Test Precondition", "Test Precondition:"),
+    /**
+     * 
+     */
+    SETTING_TEST_SETUP_KEYWORD_NAME,
+    /**
+     * 
+     */
+    SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
+    /**
+     * 
+     */
+    SETTING_TEST_TEARDOWN_DECLARATION("Test Teardown", "Test Teardown:",
+            "Test Postcondition", "Test Postcondition:"),
+    /**
+     * 
+     */
+    SETTING_TEST_TEARDOWN_KEYWORD_NAME,
+    /**
+     * 
+     */
+    SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
 
     private final List<String> representationForNew = new LinkedList<>();
 

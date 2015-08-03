@@ -10,6 +10,8 @@ import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
+import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
+import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 
 
 public class SettingTable extends ARobotSectionTable {
@@ -21,6 +23,8 @@ public class SettingTable extends ARobotSectionTable {
     private final List<SuiteTeardown> suiteTeardowns = new LinkedList<>();
     private final List<ForceTags> forceTags = new LinkedList<>();
     private final List<DefaultTags> defaultTags = new LinkedList<>();
+    private final List<TestSetup> testSetups = new LinkedList<>();
+    private final List<TestTeardown> testTeardowns = new LinkedList<>();
 
 
     public List<AImported> getImports() {
@@ -90,5 +94,25 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addDefaultTags(final DefaultTags tags) {
         defaultTags.add(tags);
+    }
+
+
+    public List<TestSetup> getTestSetups() {
+        return testSetups;
+    }
+
+
+    public void addTestSetup(final TestSetup testSetup) {
+        testSetups.add(testSetup);
+    }
+
+
+    public List<TestTeardown> getTestTeardowns() {
+        return testTeardowns;
+    }
+
+
+    public void addTestTeardown(final TestTeardown testTeardown) {
+        testTeardowns.add(testTeardown);
     }
 }

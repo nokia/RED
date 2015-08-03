@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
@@ -75,6 +76,9 @@ public class HashCommentMapper implements IParsingMapper {
         } else if (commentHolder == ParsingState.SETTING_FORCE_TAGS
                 || commentHolder == ParsingState.SETTING_FORCE_TAGS_TAG_NAME) {
             mapForceTagsComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_DEFAULT_TAGS
+                || commentHolder == ParsingState.SETTING_DEFAULT_TAGS_TAG_NAME) {
+            mapDefaultTagsComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -82,6 +86,21 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapDefaultTagsComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<DefaultTags> suiteDefaultTags = fileModel.getSettingTable()
+                .getDefaultTags();
+        if (!suiteDefaultTags.isEmpty()) {
+            DefaultTags defaultTags = suiteDefaultTags.get(suiteDefaultTags
+                    .size() - 1);
+            defaultTags.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 

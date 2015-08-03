@@ -50,7 +50,7 @@ public class DefaultTagsMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes().contains(
-                RobotTokenType.SETTING_FORCE_TAGS_DECLARATION)) {
+                RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION)) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;
