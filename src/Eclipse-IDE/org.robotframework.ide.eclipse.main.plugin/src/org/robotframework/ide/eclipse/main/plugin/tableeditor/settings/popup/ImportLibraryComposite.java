@@ -5,6 +5,10 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -19,6 +23,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,19 +32,32 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsDialog;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
@@ -53,6 +71,8 @@ public class ImportLibraryComposite {
 
     private final FormToolkit formToolkit;
 
+    private final Shell shell;
+
     private final RobotSuiteFile fileModel;
 
     private TableViewer leftViewer;
@@ -63,17 +83,21 @@ public class ImportLibraryComposite {
 
     private ISelectionChangedListener rightViewerSelectionChangedListener;
 
+    private RobotProject robotProject;
+
     public ImportLibraryComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
-            final FormToolkit formToolkit) {
+            final FormToolkit formToolkit, final Shell shell) {
         this.commandsStack = commandsStack;
         this.formToolkit = formToolkit;
         this.fileModel = fileModel;
+        this.shell = shell;
+        robotProject = fileModel.getProject();
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {
         final Composite librariesComposite = formToolkit.createComposite(parent);
         GridLayoutFactory.fillDefaults()
-                .numColumns(3)
+                .numColumns(4)
                 .margins(3, 3)
                 .extendedMargins(0, 0, 0, 3)
                 .applyTo(librariesComposite);
@@ -82,7 +106,7 @@ public class ImportLibraryComposite {
                 + fileModel.getProject().getName() + "' project");
         titleLabel.setFont(JFaceResources.getBannerFont());
         titleLabel.setForeground(formToolkit.getColors().getColor(IFormColors.TITLE));
-        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(700, SWT.DEFAULT).applyTo(titleLabel);
+        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).hint(700, SWT.DEFAULT).applyTo(titleLabel);
 
         leftViewer = new TableViewer(librariesComposite);
         leftViewer.setContentProvider(new LibrariesToImportContentProvider());
@@ -104,10 +128,18 @@ public class ImportLibraryComposite {
             }
         });
 
-        final Button toImported = formToolkit.createButton(librariesComposite, ">>", SWT.PUSH);
+        Composite moveBtnsComposite = formToolkit.createComposite(librariesComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(moveBtnsComposite);
+
+        final Button toImported = formToolkit.createButton(moveBtnsComposite, ">>", SWT.PUSH);
         toImported.setEnabled(false);
         toImported.addSelectionListener(createToImportedListener());
-        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(toImported);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(toImported);
+
+        final Button fromImported = formToolkit.createButton(moveBtnsComposite, "<<", SWT.PUSH);
+        fromImported.setEnabled(false);
+        fromImported.addSelectionListener(createFromImportedListener());
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(fromImported);
 
         rightViewer = new TableViewer(librariesComposite);
         rightViewer.setContentProvider(new LibrariesAlreadyImportedContentProvider());
@@ -129,20 +161,31 @@ public class ImportLibraryComposite {
             }
         });
 
-        final Button fromImported = formToolkit.createButton(librariesComposite, "<<", SWT.PUSH);
-        fromImported.setEnabled(false);
-        fromImported.addSelectionListener(createFromImportedListener());
-        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(fromImported);
+        Composite newLibBtnsComposite = formToolkit.createComposite(librariesComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(newLibBtnsComposite);
+
+        final Button addNewLibBtn = formToolkit.createButton(newLibBtnsComposite, "Add Library", SWT.PUSH);
+        addNewLibBtn.addSelectionListener(createAddNewLibListener());
+        GridDataFactory.fillDefaults().applyTo(addNewLibBtn);
+
+        final Button addNewExternalLibBtn = formToolkit.createButton(newLibBtnsComposite, "Add External Library", SWT.PUSH);
+        addNewExternalLibBtn.addSelectionListener(createAddNewExternalLibListener());
+        GridDataFactory.fillDefaults().applyTo(addNewExternalLibBtn);
+
+        final Button editLibArgsBtn = formToolkit.createButton(newLibBtnsComposite, "Edit Library Arguments", SWT.PUSH);
+        editLibArgsBtn.setEnabled(false);
+        editLibArgsBtn.addSelectionListener(createEditLibArgsListener());
+        GridDataFactory.fillDefaults().indent(0, 10).applyTo(editLibArgsBtn);
 
         final Label separator = formToolkit.createLabel(librariesComposite, "", SWT.SEPARATOR | SWT.HORIZONTAL);
-        GridDataFactory.fillDefaults().indent(0, 5).grab(false, false).span(3, 1).applyTo(separator);
+        GridDataFactory.fillDefaults().indent(0, 5).grab(false, false).span(4, 1).applyTo(separator);
         final Label tooltipLabel = formToolkit.createLabel(librariesComposite,
                 "Choose libraries to import. Only libraries which are imported by project are available. "
                         + "Edit project properties if you need other libraries", SWT.WRAP);
-        GridDataFactory.fillDefaults().span(3, 1).hint(500, SWT.DEFAULT).applyTo(tooltipLabel);
+        GridDataFactory.fillDefaults().span(4, 1).hint(500, SWT.DEFAULT).applyTo(tooltipLabel);
 
         createLeftViewerSelectionListener(toImported);
-        createRightViewerSelectionListener(fromImported);
+        createRightViewerSelectionListener(fromImported, editLibArgsBtn);
 
         return librariesComposite;
     }
@@ -191,6 +234,115 @@ public class ImportLibraryComposite {
         };
     }
 
+    private SelectionListener createAddNewLibListener() {
+        return new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Shell newShell = new Shell(shell);
+                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(newShell,
+                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+                dialog.setAllowMultiple(false);
+                dialog.setTitle("Select library file");
+                dialog.setMessage("Select the library file to import:");
+                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+                if (dialog.open() == Window.OK) {
+                    final Object result = dialog.getFirstResult();
+                    if (result != null) {
+                        final IResource resource = (IResource) result;
+                        final String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(resource.getFullPath());
+                        addNewLibraryToProjectConfiguration(
+                                new Path(ImportSettingFilePathResolver.extractResourceParentPath(resource,
+                                        robotProject.getProject())), nameWithoutExtension);
+                        addNewLibraryToSettingsSection(nameWithoutExtension);
+                    }
+                }
+                newShell.dispose();
+            }
+        };
+    }
+
+    private SelectionListener createAddNewExternalLibListener() {
+        return new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final Shell newShell = new Shell(shell);
+                final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
+                dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+                final String chosenFilePath = dialog.open();
+                if (chosenFilePath != null) {
+                    IPath path = new Path(chosenFilePath);
+                    String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(path);
+                    addNewLibraryToProjectConfiguration(
+                            ImportSettingFilePathResolver.createRelativePathToParentOfExternalFile(path,
+                                    robotProject.getProject().getLocation()), nameWithoutExtension);
+                    addNewLibraryToSettingsSection(nameWithoutExtension);
+                }
+                newShell.dispose();
+            }
+        };
+    }
+
+    private void addNewLibraryToProjectConfiguration(final IPath path, final String nameWithoutExtension) {
+        RobotProjectConfig config = robotProject.getRobotProjectConfig();
+        config.addReferencedLibraryInPython(nameWithoutExtension, path);
+        robotProject.clear();
+        new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+    }
+
+    private void addNewLibraryToSettingsSection(final String nameWithoutExtension) {
+        List<LibrarySpecification> specs = newArrayList();
+        final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
+        for (LibrarySpecification librarySpecification : referencedLibraries) {
+            if (librarySpecification.getName().equals(nameWithoutExtension)) {
+                specs.add(librarySpecification);
+                break;
+            }
+        }
+        final Settings libs = (Settings) rightViewer.getInput();
+        handleLibraryAdd(libs, specs);
+    }
+
+    private SelectionListener createEditLibArgsListener() {
+        return new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final LibrarySpecification spec = Selections.getSingleElement(
+                        (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
+                final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
+                final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
+                List<String> libArgs = newArrayList();
+                RobotSetting setting = null;
+                final List<RobotKeywordCall> settings = settingsSection.getImportSettings();
+                for (final RobotElement element : settings) {
+                    setting = (RobotSetting) element;
+                    if (setting.getGroup() == SettingsGroup.LIBRARIES) {
+                        final List<String> args = setting.getArguments();
+                        if (args != null && !args.isEmpty() && args.get(0).equals(spec.getName())) {
+                            if (args.size() > 1) {
+                                libArgs = args.subList(1, args.size());
+                            }
+                            break;
+                        }
+                    }
+                    setting = null;
+                }
+
+                if (setting != null) {
+                    final Shell newShell = new Shell(shell);
+                    final ImportSettingFileArgumentsDialog dialog = new ImportSettingFileArgumentsDialog(newShell,
+                            libArgs);
+                    if (dialog.open() == Window.OK) {
+                        handleEditLibraryArgs(spec, setting, dialog.getArguments());
+                    }
+                    newShell.dispose();
+                }
+            }
+        };
+    }
+
     private void handleLibraryAdd(final Settings libs, final List<LibrarySpecification> specs) {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
@@ -228,6 +380,13 @@ public class ImportLibraryComposite {
 
         leftViewer.refresh();
         rightViewer.refresh();
+    }
+
+    private void handleEditLibraryArgs(final LibrarySpecification spec, final RobotSetting setting,
+            final List<String> newArgs) {
+        final List<String> newLibraryArguments = newArrayList(spec.getName());
+        newLibraryArguments.addAll(newArgs);
+        commandsStack.execute(new SetSettingKeywordCallCommand(setting, newLibraryArguments));
     }
 
     private List<RobotSetting> getSettingsToRemove(final RobotSettingsSection settingsSection,
@@ -272,30 +431,38 @@ public class ImportLibraryComposite {
         leftViewer.addSelectionChangedListener(leftViewerSelectionChangedListener);
     }
 
-    private void createRightViewerSelectionListener(final Button buttonToActivate) {
+    private void createRightViewerSelectionListener(final Button importBtn, final Button editArgsBtn) {
         rightViewerSelectionChangedListener = new ISelectionChangedListener() {
 
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 final List<LibrarySpecification> specs = Selections.getElements(
                         (IStructuredSelection) event.getSelection(), LibrarySpecification.class);
-                buttonToActivate.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
+                importBtn.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
+
+                if (rightViewer.getTable().getSelectionCount() == 1) {
+                    editArgsBtn.setEnabled(true);
+                } else {
+                    editArgsBtn.setEnabled(false);
+                }
+
             }
         };
         rightViewer.addSelectionChangedListener(rightViewerSelectionChangedListener);
     }
-    
+
     protected void setInitialSelection(final RobotSetting initialSetting) {
         final Settings libs = (Settings) rightViewer.getInput();
         final List<LibrarySpecification> libSpecs = libs.getImportedLibraries();
-        final String name = initialSetting.getArguments().get(0);
-        for (LibrarySpecification librarySpecification : libSpecs) {
-            if(librarySpecification.getName().equals(name)) {
-                rightViewer.setSelection(Selections.createStructuredSelection(librarySpecification));
-                break;
+        if (!initialSetting.getArguments().isEmpty()) {
+            final String name = initialSetting.getArguments().get(0);
+            for (LibrarySpecification librarySpecification : libSpecs) {
+                if (librarySpecification.getName().equals(name)) {
+                    rightViewer.setSelection(Selections.createStructuredSelection(librarySpecification));
+                    break;
+                }
             }
         }
-        
     }
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -336,4 +503,5 @@ public class ImportLibraryComposite {
             return text;
         }
     }
+
 }

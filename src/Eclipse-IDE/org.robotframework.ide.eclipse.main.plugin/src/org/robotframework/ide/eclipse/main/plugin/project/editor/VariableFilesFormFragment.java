@@ -39,6 +39,7 @@ import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
@@ -231,7 +232,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
         private final String startingPath;
 
-        private VariableFilesArgumentsEditor argumentsEditor;
+        private ImportSettingFileArgumentsEditor argumentsEditor;
 
         protected VariableFileDialog(final Shell parentShell, final String startingPath,
                 final ReferencedVariableFile variableFile, final RedFormToolkit toolkit) {
@@ -317,7 +318,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 section.setExpanded(true);
             }
 
-            argumentsEditor = new VariableFilesArgumentsEditor();
+            argumentsEditor = new ImportSettingFileArgumentsEditor();
             argumentsEditor.createArgumentsEditor(sectionInternal, arguments);
 
             return dialogComposite;

@@ -54,6 +54,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
@@ -116,7 +117,7 @@ public class ImportResourcesComposite {
                         final List<String> resourcesPaths = newArrayList();
                         for (int i = 0; i < results.length; i++) {
                             final IResource resource = (IResource) results[i];
-                            final String path = extractResourcePath(resource);
+                            final String path = ImportSettingFilePathResolver.extractResourcePath(resource, currentProject);
                             resourcesPaths.add(path);
                         }
                         handleResourceAdd(resourcesPaths);
@@ -138,7 +139,8 @@ public class ImportResourcesComposite {
                 dialog.setFilterPath(currentProject.getLocation().toOSString());
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    handleResourceAdd(newArrayList(new Path(chosenFilePath).toPortableString()));
+                    handleResourceAdd(newArrayList(ImportSettingFilePathResolver.createRelativePathToExternalFile(
+                            new Path(chosenFilePath), currentProject.getLocation()).toPortableString()));
                 }
                 newShell.dispose();
             }
@@ -163,7 +165,8 @@ public class ImportResourcesComposite {
                     dialog.setFilterPath(path.toOSString());
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
-                        filePath = new Path(chosenFilePath).toPortableString();
+                        filePath = ImportSettingFilePathResolver.createRelativePathToExternalFile(
+                                new Path(chosenFilePath), currentProject.getLocation()).toPortableString();
                     }
                 } else {
                     final IResource initialSelection = currentProject.findMember(path);
@@ -172,7 +175,7 @@ public class ImportResourcesComposite {
                         final Object result = dialog.getFirstResult();
                         if (result != null) {
                             final IResource resource = (IResource) result;
-                            filePath = extractResourcePath(resource);
+                            filePath = ImportSettingFilePathResolver.extractResourcePath(resource, currentProject);
                         }
                     }
                 }
@@ -221,14 +224,6 @@ public class ImportResourcesComposite {
             dialog.setInitialSelection(initialSelection);
         }
         return dialog;
-    }
-    
-    private String extractResourcePath(final IResource resource) {
-        if (resource.getProject().equals(currentProject)) {
-            return resource.getProjectRelativePath().toString();
-        } else {
-            return ".." + resource.getFullPath().toString();
-        }
     }
 
     private void handleResourceAdd(final List<String> paths) {
@@ -290,7 +285,10 @@ public class ImportResourcesComposite {
     }
     
     protected void setInitialSelection(final RobotSetting initialSetting) {
-        resourcesViewer.setSelection(Selections.createStructuredSelection(new Path(initialSetting.getArguments().get(0))));
+        if (!initialSetting.getArguments().isEmpty()) {
+            resourcesViewer.setSelection(Selections.createStructuredSelection(new Path(initialSetting.getArguments()
+                    .get(0))));
+        }
     }
     
     private static class ResourcesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {

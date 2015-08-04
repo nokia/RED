@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -27,13 +27,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStra
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 
-public class VariableFilesArgumentsEditor {
+public class ImportSettingFileArgumentsEditor {
 
     private RowExposingTableViewer argumentsViewer;
 
     private List<String> arguments;
 
-    public VariableFilesArgumentsEditor() {
+    public ImportSettingFileArgumentsEditor() {
     }
 
     public Composite createArgumentsEditor(Composite parent, List<String> currentArguments) {
@@ -46,7 +46,9 @@ public class VariableFilesArgumentsEditor {
         CellsAcivationStrategy.addActivationStrategy(argumentsViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         arguments = newArrayList();
-        arguments.addAll(currentArguments);
+        if (currentArguments != null) {
+            arguments.addAll(currentArguments);
+        }
 
         createTable();
         argumentsViewer.setContentProvider(new ArgumentsContentProvider());

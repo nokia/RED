@@ -127,7 +127,7 @@ public class ImportSettingsComposite extends InputLoadingFormComposite {
     }
 
     private Composite createLibrariesComposite(final Composite parent) {
-        importLibrariesComposite = new ImportLibraryComposite(commandsStack, fileModel, getToolkit());
+        importLibrariesComposite = new ImportLibraryComposite(commandsStack, fileModel, getToolkit(), getShell());
         return importLibrariesComposite.createImportResourcesComposite(parent);
     }
 
