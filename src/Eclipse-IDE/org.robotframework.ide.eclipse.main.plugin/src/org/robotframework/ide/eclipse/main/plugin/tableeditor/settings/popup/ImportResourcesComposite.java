@@ -117,7 +117,7 @@ public class ImportResourcesComposite {
                         final List<String> resourcesPaths = newArrayList();
                         for (int i = 0; i < results.length; i++) {
                             final IResource resource = (IResource) results[i];
-                            final String path = ImportSettingFilePathResolver.extractResourcePath(resource, currentProject);
+                            final String path = ImportSettingFilePathResolver.createResourceRelativePath(resource, currentProject);
                             resourcesPaths.add(path);
                         }
                         handleResourceAdd(resourcesPaths);
@@ -139,7 +139,7 @@ public class ImportResourcesComposite {
                 dialog.setFilterPath(currentProject.getLocation().toOSString());
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    handleResourceAdd(newArrayList(ImportSettingFilePathResolver.createRelativePathToExternalFile(
+                    handleResourceAdd(newArrayList(ImportSettingFilePathResolver.createFileRelativePath(
                             new Path(chosenFilePath), currentProject.getLocation()).toPortableString()));
                 }
                 newShell.dispose();
@@ -165,7 +165,7 @@ public class ImportResourcesComposite {
                     dialog.setFilterPath(path.toOSString());
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
-                        filePath = ImportSettingFilePathResolver.createRelativePathToExternalFile(
+                        filePath = ImportSettingFilePathResolver.createFileRelativePath(
                                 new Path(chosenFilePath), currentProject.getLocation()).toPortableString();
                     }
                 } else {
@@ -175,7 +175,7 @@ public class ImportResourcesComposite {
                         final Object result = dialog.getFirstResult();
                         if (result != null) {
                             final IResource resource = (IResource) result;
-                            filePath = ImportSettingFilePathResolver.extractResourcePath(resource, currentProject);
+                            filePath = ImportSettingFilePathResolver.createResourceRelativePath(resource, currentProject);
                         }
                     }
                 }

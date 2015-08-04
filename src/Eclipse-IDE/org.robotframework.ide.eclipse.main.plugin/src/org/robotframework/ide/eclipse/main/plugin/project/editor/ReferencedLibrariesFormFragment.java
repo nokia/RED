@@ -1,6 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
-import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,10 +34,12 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
@@ -52,6 +53,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     private RedProjectEditorInput editorInput;
+    
+    private RobotProject currentProject;
 
     private TableViewer viewer;
 
@@ -67,6 +70,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
+        currentProject = editorInput.getRobotProject();
+        
         final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
                 | Section.DESCRIPTION | Section.TWISTIE);
         section.setText("Referenced libraries");
@@ -156,7 +161,9 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             for (final Object selectedClass : result) {
                                 final PythonClass pythonClass = (PythonClass) selectedClass;
                                 editorInput.getProjectConfiguration().addReferencedLibraryInPython(
-                                        pythonClass.getQualifiedName(), new Path(chosenFilePath));
+                                        pythonClass.getQualifiedName(),
+                                        ImportSettingFilePathResolver.createFileRelativePath(new Path(chosenFilePath),
+                                                currentProject.getProject().getLocation()));
                                 added = true;
                             }
                             
@@ -164,7 +171,9 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     } else {
                         for (final PythonClass pythonClass : pythonClasses) {
                             editorInput.getProjectConfiguration().addReferencedLibraryInPython(
-                                    pythonClass.getQualifiedName(), new Path(new File(chosenFilePath).getParent()));
+                                    pythonClass.getQualifiedName(),
+                                    ImportSettingFilePathResolver.createFileParentRelativePath(
+                                            new Path(chosenFilePath), currentProject.getProject().getLocation()));
                             added = true;
                         }
                     }
@@ -212,7 +221,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
     
     private FileDialog createReferencedLibFileDialog() {
-        final String startingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
+        final String startingPath = currentProject.getProject().getLocation().toOSString();
         final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
         dialog.setFilterPath(startingPath);
         return dialog;

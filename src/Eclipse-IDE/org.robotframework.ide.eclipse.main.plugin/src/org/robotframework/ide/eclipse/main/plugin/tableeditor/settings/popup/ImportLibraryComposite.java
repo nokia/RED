@@ -252,7 +252,7 @@ public class ImportLibraryComposite {
                         final IResource resource = (IResource) result;
                         final String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(resource.getFullPath());
                         addNewLibraryToProjectConfiguration(
-                                new Path(ImportSettingFilePathResolver.extractResourceParentPath(resource,
+                                new Path(ImportSettingFilePathResolver.createResourceParentRelativePath(resource,
                                         robotProject.getProject())), nameWithoutExtension);
                         addNewLibraryToSettingsSection(nameWithoutExtension);
                     }
@@ -275,7 +275,7 @@ public class ImportLibraryComposite {
                     IPath path = new Path(chosenFilePath);
                     String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(path);
                     addNewLibraryToProjectConfiguration(
-                            ImportSettingFilePathResolver.createRelativePathToParentOfExternalFile(path,
+                            ImportSettingFilePathResolver.createFileParentRelativePath(path,
                                     robotProject.getProject().getLocation()), nameWithoutExtension);
                     addNewLibraryToSettingsSection(nameWithoutExtension);
                 }

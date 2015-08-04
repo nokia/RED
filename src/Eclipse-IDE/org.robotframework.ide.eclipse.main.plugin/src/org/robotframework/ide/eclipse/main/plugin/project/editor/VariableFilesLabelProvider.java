@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -14,6 +15,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import com.google.common.base.Joiner;
 
 class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
+    
+    private String projectPath;
+    
+    public VariableFilesLabelProvider(final String projectPath) {
+        this.projectPath = projectPath;
+    }
 
     @Override
     public StyledString getStyledText(final Object element) {
@@ -25,7 +32,9 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
         if (args != null && !args.isEmpty()) {
             argString += ":" + Joiner.on(":").join(args);
         }
-        label.append(argString + " - " + new Path(varFile.getPath()).removeLastSegments(1).toOSString(), new Styler() {
+        final IPath path = new Path(varFile.getPath());
+        final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : projectPath;
+        label.append(argString + " - " + parentPath, new Styler() {
 
             @Override
             public void applyStyles(final TextStyle textStyle) {
