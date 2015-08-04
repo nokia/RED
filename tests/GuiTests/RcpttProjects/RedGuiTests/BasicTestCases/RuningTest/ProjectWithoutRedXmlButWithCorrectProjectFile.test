@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PG3S0DE7EeWbDptfbJdvqQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/31/15 12:34 PM
+Save-Time: 8/4/15 11:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -82,19 +82,14 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 			    	 $lib | matches [concat [$libs_from_python |get $index] " \(\\d+\)"] |assert-true -message [concat [$libs_from_python |get $index] " \(\\d+\)"]
 			    }
 	    }
+    
 }-else{
 	exec-process [format "python"  "%s/Settings/PythonScripts/StdLibrariesReaderWithNoRemote.py" $RCPTT_project_path]
-			| get stdout | split -sep " " -trimResults | to-list | let [val libs_from_python -input]{
-			get-view "Project Explorer" | get-tree 
-			    | get-item "OnlyRobotSuiteFile/Robot Standard libraries .*" | get-items 
-			    |foreach [val i]{
-			    $i |get-object |invoke getText }| to-list |each [val lib] [val index]
-			    {
-			    	 $lib | matches [concat [$libs_from_python |get $index] " \(\\d+\)"] |assert-true -message [concat [$libs_from_python |get $index] " \(\\d+\)"]
-			    }
-	    }
-}	    
-
+			| get stdout | let [val out -input] {
+			$out | eq "dd" | assert-true -message $out
+			
+			}
+}
 
 //check if only robot icon is shown
 get-view "Project Explorer" | get-tree | get-item OnlyRobotSuiteFile | get-property "image.decorations[0].path" 
