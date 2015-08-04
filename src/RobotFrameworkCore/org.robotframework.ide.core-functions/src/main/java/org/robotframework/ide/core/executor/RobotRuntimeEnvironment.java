@@ -1,5 +1,7 @@
 package org.robotframework.ide.core.executor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,7 @@ public class RobotRuntimeEnvironment {
     private static int runExternalProcess(final List<String> command, final ILineHandler linesHandler)
             throws IOException {
         try {
-            final Process process = new ProcessBuilder(command).start();
+            final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
 
             final InputStream inputStream = process.getInputStream();
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -326,34 +328,30 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public void createLibdocForStdLibrary(final String libName, final File file) {
+    public void createLibdocForStdLibrary(final String libName, final File file) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
             final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", libName,
                     file.getAbsolutePath());
-            try {
-                runExternalProcess(cmdLine, new NullLineHandler());
-            } catch (final IOException e) {
-                return;
-            }
+
+            runLibdoc(libName, cmdLine);
         }
     }
     
-    public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file) {
+    public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file)
+            throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
 
             final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", "-P", libPath, 
                     libName, file.getAbsolutePath());
-            try {
-                runExternalProcess(cmdLine, new NullLineHandler());
-            } catch (final IOException e) {
-                return;
-            }
+
+            runLibdoc(libName, cmdLine);
         }
     }
 
-    public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file) {
+    public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file)
+            throws RobotEnvironmentException {
         if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
             final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
 
@@ -362,11 +360,28 @@ public class RobotRuntimeEnvironment {
 
             final List<String> cmdLine = Arrays.asList(cmd, "-J-cp", classPath, "-m", "robot.libdoc", "-f", "XML",
                     libName, file.getAbsolutePath());
-            try {
-                runExternalProcess(cmdLine, new NullLineHandler());
-            } catch (final IOException e) {
-                return;
+
+            runLibdoc(libName, cmdLine);
+        }
+    }
+
+    private void runLibdoc(final String libName, final List<String> cmdLine) throws RobotEnvironmentException {
+        try {
+            final List<String> lines = newArrayList();
+            final ILineHandler handler = new ILineHandler() {
+                @Override
+                public void processLine(final String line) {
+                    lines.add(line);
+                }
+            };
+            final int returnCode = runExternalProcess(cmdLine, handler);
+            if (returnCode != 0) {
+                throw new RobotEnvironmentException("Unable to generate library specification file for library "
+                        + libName + "\nDetailed information:\n" + Joiner.on('\n').join(lines));
             }
+        } catch (final IOException e) {
+            throw new RobotEnvironmentException("Unable to generate library specification file for library " + libName,
+                    e);
         }
     }
 
@@ -432,11 +447,11 @@ public class RobotRuntimeEnvironment {
         return null;
     }
     
-    public Map<?, ?> getVariablesFromFile(String path, List<String> args) {
+    public Map<?, ?> getVariablesFromFile(final String path, final List<String> args) {
 
         if (hasRobotInstalled()) {
             final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-            StringBuilder argsBuilder = new StringBuilder();
+            final StringBuilder argsBuilder = new StringBuilder();
             if (args != null && !args.isEmpty()) {
                 argsBuilder.append("[");
                 for (int i = 0; i < args.size(); i++) {
@@ -551,7 +566,7 @@ public class RobotRuntimeEnvironment {
     
     private void addVariableFilesPath(final List<String> cmdLine, final List<String> variableFilesPath) {
         if (!variableFilesPath.isEmpty()) {
-            for (String path : variableFilesPath) {
+            for (final String path : variableFilesPath) {
                 cmdLine.add("-V");
                 cmdLine.add(path);
             }
@@ -631,13 +646,6 @@ public class RobotRuntimeEnvironment {
 
         public int getPort() {
             return port;
-        }
-    }
-
-    private static class NullLineHandler implements ILineHandler {
-        @Override
-        public void processLine(final String line) {
-            // nothing to do; this a null object
         }
     }
 }
