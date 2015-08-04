@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -113,7 +114,13 @@ public class RobotLibrariesBuilder {
                 return;
             }
             subMonitor.subTask(generator.getMessage());
-            generator.generateLibdoc(runtimeEnvironment);
+            try {
+                generator.generateLibdoc(runtimeEnvironment);
+            } catch (final RobotEnvironmentException e) {
+                final RobotProblem problem = RobotProblem.causedBy(
+                        ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED).formatMessageWith(e.getMessage());
+                new ProblemsReportingStrategy().handleProblem(problem, robotProject.getFile(".project"), 1);
+            }
             subMonitor.worked(1);
         }
     }
