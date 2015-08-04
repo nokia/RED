@@ -77,6 +77,17 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.CHOSEN_ENVIRONMENT_WITH_PYTHON_INSTALLATION_HAS_NO_ROBOT_INSTALLED;
         }
+    },
+    LIBRARY_SPEC_CANNOT_BE_GENERATED {
+        @Override
+        public String getProblemDescription() {
+            return "FATAL: %s";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.LIBRARY_SPECIFICATION_FILE_CANNOT_BE_GENERATED;
+        }
     };
 
     @Override
