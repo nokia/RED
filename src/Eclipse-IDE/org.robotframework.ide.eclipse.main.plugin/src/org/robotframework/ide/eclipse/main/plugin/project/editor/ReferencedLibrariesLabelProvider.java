@@ -18,7 +18,7 @@ class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
 
         if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
             final StyledString label = new StyledString(lib.getName());
-            label.append(" " + lib.getPath(), new Styler() {
+            label.append(" - " + lib.getPath(), new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = RedTheme.getEclipseDecorationColor();
