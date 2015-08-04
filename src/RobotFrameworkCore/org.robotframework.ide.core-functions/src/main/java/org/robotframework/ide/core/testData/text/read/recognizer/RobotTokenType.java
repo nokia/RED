@@ -204,7 +204,23 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT;
+    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT,
+    /**
+     * 
+     */
+    VARIABLES_SCALAR_DECLARATION,
+    /**
+     * 
+     */
+    VARIABLES_LIST_DECLARATION,
+    /**
+     * 
+     */
+    VARIABLES_DICTIONARY_DECLARATION,
+    /**
+     * 
+     */
+    VARIABLES_VARIABLE_VALUE;
 
     private final List<String> representationForNew = new LinkedList<>();
 

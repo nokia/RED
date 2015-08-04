@@ -22,6 +22,7 @@ import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
 import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -94,6 +95,10 @@ public class HashCommentMapper implements IParsingMapper {
                 || commentHolder == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
                 || commentHolder == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
             mapTestTemplateComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SETTING_TEST_TIMEOUT
+                || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_VALUE
+                || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS) {
+            mapTestTemplateComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -101,6 +106,20 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestTimeoutComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestTimeout> testTimeouts = fileModel.getSettingTable()
+                .getTestTimeouts();
+        if (!testTimeouts.isEmpty()) {
+            TestTimeout testTimeout = testTimeouts.get(testTimeouts.size() - 1);
+            testTimeout.addCommentPart(rt);
+        } else {
+            // FIXME: errors internal
+        }
     }
 
 
