@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 class RemoteLibraryLibdocGenerator implements ILibdocGenerator {
 
@@ -16,7 +17,7 @@ class RemoteLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) {
+    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
         final String libName = "Remote::" + uri;
         runtimeEnvironment.createLibdocForStdLibrary(libName, spec.getLocation().toFile());
     }

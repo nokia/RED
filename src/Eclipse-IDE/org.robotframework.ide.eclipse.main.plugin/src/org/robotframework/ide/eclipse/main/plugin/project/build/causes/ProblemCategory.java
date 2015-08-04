@@ -17,7 +17,9 @@ public enum ProblemCategory {
         + "to be a python main directory."),
     CHOSEN_ENVIRONMENT_WITH_PYTHON_INSTALLATION_HAS_NO_ROBOT_INSTALLED(
          "This problem occurs when location of specified Robot Environment is a python\n"
-         + "directory, but it seem to have no Robot modules installed.");
+         + "directory, but it seem to have no Robot modules installed."),
+    LIBRARY_SPECIFICATION_FILE_CANNOT_BE_GENERATED("This problems occurs when for some reason"
+        + " Robot framework is unable to generate library specification file.");
 
     private String id;
     private String description;

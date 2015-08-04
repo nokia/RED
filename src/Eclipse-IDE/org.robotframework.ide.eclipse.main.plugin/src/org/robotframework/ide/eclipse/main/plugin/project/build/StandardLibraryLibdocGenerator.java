@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
@@ -12,7 +13,7 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) {
+    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
         runtimeEnvironment.createLibdocForStdLibrary(getLibraryName(), spec.getLocation().toFile());
     }
 
