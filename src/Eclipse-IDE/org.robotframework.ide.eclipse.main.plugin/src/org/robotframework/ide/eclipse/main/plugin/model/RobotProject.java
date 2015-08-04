@@ -150,6 +150,11 @@ public class RobotProject extends RobotContainer {
         }
         return configuration;
     }
+    
+    public synchronized RobotProjectConfig getRobotProjectConfig() {
+        readProjectConfigurationIfNeeded();
+        return configuration;
+    }
 
     public synchronized void clear() {
         configuration = null;
@@ -186,7 +191,7 @@ public class RobotProject extends RobotContainer {
         }
         return newArrayList();
     }
-
+    
     public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
