@@ -153,7 +153,7 @@ public class TxtRobotFileParser {
             checkAndFixLine(parsingOutput, processingState);
             previousLineHandler.flushNew(processingState);
             rf.addNewLine(line);
-            updateStatusesForNewLine(processingState);
+            utility.updateStatusesForNewLine(processingState);
             isNewLine = true;
         }
 
@@ -168,7 +168,8 @@ public class TxtRobotFileParser {
     @VisibleForTesting
     protected void checkAndFixLine(final RobotFileOutput robotFileOutput,
             final Stack<ParsingState> processingState) {
-        ParsingState state = findNearestNotCommentState(processingState);
+        ParsingState state = utility
+                .findNearestNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             LibraryImport lib = findNearestLibraryImport(robotFileOutput);
 
@@ -242,19 +243,6 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    protected ParsingState findNearestNotCommentState(
-            final Stack<ParsingState> processingState) {
-        ParsingState state = ParsingState.UNKNOWN;
-        for (ParsingState s : processingState) {
-            if (s != ParsingState.COMMENT) {
-                state = s;
-            }
-        }
-        return state;
-    }
-
-
-    @VisibleForTesting
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
@@ -267,7 +255,7 @@ public class TxtRobotFileParser {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
         } else {
-            ParsingState newStatus = getStatus(robotToken);
+            ParsingState newStatus = utility.getStatus(robotToken);
             if (robotToken != null) {
                 if (!text.equals(robotToken.getText().toString())) {
                     // FIXME: add information that type is incorrect missing
@@ -288,7 +276,7 @@ public class TxtRobotFileParser {
 
             boolean useMapper = true;
             RobotFile fileModel = robotFileOutput.getFileModel();
-            if (isTableHeader(robotToken)) {
+            if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
                     TableHeader header = new TableHeader(robotToken);
                     ARobotSectionTable table = null;
@@ -341,71 +329,6 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    protected void updateStatusesForNewLine(
-            final Stack<ParsingState> processingState) {
-
-        boolean clean = true;
-        while(clean) {
-            ParsingState status = utility.getCurrentStatus(processingState);
-            if (isTableHeader(status)) {
-                processingState.pop();
-                if (status == ParsingState.SETTING_TABLE_HEADER) {
-                    processingState.push(ParsingState.SETTING_TABLE_INSIDE);
-                } else if (status == ParsingState.VARIABLE_TABLE_HEADER) {
-                    processingState.push(ParsingState.VARIABLE_TABLE_INSIDE);
-                } else if (status == ParsingState.TEST_CASE_TABLE_HEADER) {
-                    processingState.push(ParsingState.TEST_CASE_TABLE_INSIDE);
-                } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
-                    processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
-                }
-
-                clean = false;
-            } else if (utility.isTableInsideState(status)) {
-                clean = false;
-            } else if (!processingState.isEmpty()) {
-                processingState.pop();
-            } else {
-                clean = false;
-            }
-        }
-    }
-
-
-    @VisibleForTesting
-    protected boolean isTableHeader(ParsingState state) {
-        boolean result = false;
-        if (state == ParsingState.SETTING_TABLE_HEADER
-                || state == ParsingState.VARIABLE_TABLE_HEADER
-                || state == ParsingState.TEST_CASE_TABLE_HEADER
-                || state == ParsingState.KEYWORD_TABLE_HEADER) {
-            result = true;
-        }
-
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected boolean isTableHeader(RobotToken t) {
-        boolean result = false;
-        List<IRobotTokenType> declaredTypes = t.getTypes();
-        if (declaredTypes.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes
-                .contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes
-                .contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
-            result = true;
-        }
-
-        return result;
-    }
-
-
-    @VisibleForTesting
     protected RobotToken recognize(final FilePosition fp, String text) {
         RobotToken robotToken = null;
         StringBuilder sb = new StringBuilder(text);
@@ -425,22 +348,5 @@ public class TxtRobotFileParser {
         robotToken.setStartColumn(fp.getColumn());
 
         return robotToken;
-    }
-
-
-    private ParsingState getStatus(RobotToken t) {
-        ParsingState status = ParsingState.UNKNOWN;
-        List<IRobotTokenType> types = t.getTypes();
-        if (types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
-            status = ParsingState.SETTING_TABLE_HEADER;
-        } else if (types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
-            status = ParsingState.VARIABLE_TABLE_HEADER;
-        } else if (types.contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
-            status = ParsingState.TEST_CASE_TABLE_HEADER;
-        } else if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
-            status = ParsingState.KEYWORD_TABLE_HEADER;
-        }
-
-        return status;
     }
 }
