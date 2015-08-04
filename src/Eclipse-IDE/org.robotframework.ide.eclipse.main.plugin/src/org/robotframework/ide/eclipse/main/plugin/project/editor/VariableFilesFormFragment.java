@@ -40,6 +40,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
@@ -55,7 +56,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     private IDirtyProviderService dirtyProviderService;
 
     @Inject
-    private RedProjectEditorInput editorInput;
+    private static RedProjectEditorInput editorInput;
 
     private TableViewer viewer;
 
@@ -98,7 +99,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 .withWidth(100)
                 .shouldGrabAllTheSpaceLeft(true)
                 .withMinWidth(100)
-                .labelsProvidedBy(new VariableFilesLabelProvider())
+                .labelsProvidedBy(new VariableFilesLabelProvider(fileDialogStartingPath))
                 .createFor(viewer);
 
         final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
@@ -330,7 +331,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 if (variableFile == null) {
                     variableFile = new ReferencedVariableFile();
                 }
-                variableFile.setPath(new Path(pathText.getText()).toPortableString());
+                variableFile.setPath(ImportSettingFilePathResolver.createFileRelativePath(new Path(pathText.getText()),
+                        editorInput.getRobotProject().getProject().getLocation()).toPortableString());
                 variableFile.setArguments(argumentsEditor.getArguments());
             }
 

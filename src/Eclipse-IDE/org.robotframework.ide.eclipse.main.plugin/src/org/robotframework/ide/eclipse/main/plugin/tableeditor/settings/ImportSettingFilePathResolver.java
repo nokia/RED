@@ -9,15 +9,15 @@ public class ImportSettingFilePathResolver {
     private ImportSettingFilePathResolver() {
     }
 
-    public static IPath createRelativePathToExternalFile(final IPath filePath, final IPath projectPath) {
+    public static IPath createFileRelativePath(final IPath filePath, final IPath projectPath) {
         return filePath.makeRelativeTo(projectPath);
     }
 
-    public static IPath createRelativePathToParentOfExternalFile(final IPath filePath, final IPath projectPath) {
+    public static IPath createFileParentRelativePath(final IPath filePath, final IPath projectPath) {
         return filePath.removeLastSegments(1).makeRelativeTo(projectPath);
     }
 
-    public static String extractResourcePath(final IResource resource, final IProject currentProject) {
+    public static String createResourceRelativePath(final IResource resource, final IProject currentProject) {
         if (resource.getProject().equals(currentProject)) {
             return resource.getProjectRelativePath().toString();
         } else {
@@ -25,7 +25,7 @@ public class ImportSettingFilePathResolver {
         }
     }
 
-    public static String extractResourceParentPath(final IResource resource, final IProject currentProject) {
+    public static String createResourceParentRelativePath(final IResource resource, final IProject currentProject) {
         if (resource.getProject().equals(currentProject)) {
             return resource.getProjectRelativePath().removeLastSegments(1).toString();
         } else {
