@@ -10,13 +10,27 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class ElementsUtility {
+
+    public ParsingState findNearestNotCommentState(
+            final Stack<ParsingState> processingState) {
+        ParsingState state = ParsingState.UNKNOWN;
+        for (ParsingState s : processingState) {
+            if (s != ParsingState.COMMENT) {
+                state = s;
+            }
+        }
+        return state;
+    }
+
 
     public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
         AImported result;
@@ -29,6 +43,36 @@ public class ElementsUtility {
         }
 
         return result;
+    }
+
+
+    public void updateStatusesForNewLine(
+            final Stack<ParsingState> processingState) {
+
+        boolean clean = true;
+        while(clean) {
+            ParsingState status = getCurrentStatus(processingState);
+            if (isTableHeader(status)) {
+                processingState.pop();
+                if (status == ParsingState.SETTING_TABLE_HEADER) {
+                    processingState.push(ParsingState.SETTING_TABLE_INSIDE);
+                } else if (status == ParsingState.VARIABLE_TABLE_HEADER) {
+                    processingState.push(ParsingState.VARIABLE_TABLE_INSIDE);
+                } else if (status == ParsingState.TEST_CASE_TABLE_HEADER) {
+                    processingState.push(ParsingState.TEST_CASE_TABLE_INSIDE);
+                } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
+                    processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
+                }
+
+                clean = false;
+            } else if (isTableInsideState(status)) {
+                clean = false;
+            } else if (!processingState.isEmpty()) {
+                processingState.pop();
+            } else {
+                clean = false;
+            }
+        }
     }
 
 
@@ -103,6 +147,38 @@ public class ElementsUtility {
     }
 
 
+    public boolean isTableHeader(ParsingState state) {
+        boolean result = false;
+        if (state == ParsingState.SETTING_TABLE_HEADER
+                || state == ParsingState.VARIABLE_TABLE_HEADER
+                || state == ParsingState.TEST_CASE_TABLE_HEADER
+                || state == ParsingState.KEYWORD_TABLE_HEADER) {
+            result = true;
+        }
+
+        return result;
+    }
+
+
+    public boolean isTableHeader(RobotToken t) {
+        boolean result = false;
+        List<IRobotTokenType> declaredTypes = t.getTypes();
+        if (declaredTypes.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
+            result = true;
+        } else if (declaredTypes
+                .contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
+            result = true;
+        } else if (declaredTypes
+                .contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
+            result = true;
+        } else if (declaredTypes.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
+            result = true;
+        }
+
+        return result;
+    }
+
+
     public ParsingState getCurrentStatus(Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
 
@@ -126,5 +202,22 @@ public class ElementsUtility {
         }
 
         return result;
+    }
+
+
+    public ParsingState getStatus(RobotToken t) {
+        ParsingState status = ParsingState.UNKNOWN;
+        List<IRobotTokenType> types = t.getTypes();
+        if (types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
+            status = ParsingState.SETTING_TABLE_HEADER;
+        } else if (types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
+            status = ParsingState.VARIABLE_TABLE_HEADER;
+        } else if (types.contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
+            status = ParsingState.TEST_CASE_TABLE_HEADER;
+        } else if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
+            status = ParsingState.KEYWORD_TABLE_HEADER;
+        }
+
+        return status;
     }
 }
