@@ -43,6 +43,10 @@ public class CellsAcivationStrategy {
             protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
                 if (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
                     if (event.character == SWT.CR || isPrintableChar(event.character)) {
+                        // this is important to disable this event, because normally the
+                        // selection in tree or table will change to item which name starts
+                        // with the character being typed in. We only want to activate the editor
+                        // without changing selection
                         ((KeyEvent) event.sourceEvent).doit = false;
                         return true;
                     }
