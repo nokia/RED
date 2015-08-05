@@ -171,21 +171,23 @@ public class ImportVariablesComposite {
                 final Shell newShell = new Shell(shell);
                 if (args != null && !args.isEmpty()) {
                     final IPath path = new Path(args.get(0));
+                    final IResource initialProjectSelection = currentProject.findMember(path);
                     String filePath = null;
-                    if (path.isAbsolute()) {
+                    if (initialProjectSelection == null) {
                         final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
                         dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
-                        dialog.setFilterPath(path.toOSString());
+                        final IPath initialExtSelection = ImportSettingFilePathResolver.createFileAbsolutePath(path, currentProject);
+                        dialog.setFilterPath(initialExtSelection.removeLastSegments(1).toOSString());
+                        dialog.setFileName(initialExtSelection.lastSegment());
                         final String chosenFilePath = dialog.open();
                         if (chosenFilePath != null) {
                             filePath = ImportSettingFilePathResolver.createFileRelativePath(
-                                    new Path(chosenFilePath), currentProject.getProject().getLocation())
+                                    new Path(chosenFilePath), currentProject.getLocation())
                                     .toPortableString();
                         }
                     } else {
-                        final IResource initialSelection = currentProject.findMember(path);
                         final ElementTreeSelectionDialog dialog = createAddVariableSelectionDialog(newShell, false,
-                                initialSelection);
+                                initialProjectSelection);
                         if (dialog.open() == Window.OK) {
                             final Object result = dialog.getFirstResult();
                             if (result != null) {
