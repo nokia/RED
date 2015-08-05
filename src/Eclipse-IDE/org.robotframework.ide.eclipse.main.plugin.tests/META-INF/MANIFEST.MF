@@ -9,4 +9,5 @@ Bundle-Vendor: Nokia Networks
 Require-Bundle: org.junit;bundle-version="4.11.0"
 Bundle-ClassPath: .,
  lib/assertj-core-2.0.0.jar,
- lib/memoryfilesystem-0.6.4.jar
+ lib/memoryfilesystem-0.6.4.jar,
+ lib/mockito-all-1.10.19.jar
