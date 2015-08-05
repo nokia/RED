@@ -72,7 +72,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 | Section.DESCRIPTION | Section.TWISTIE);
         section.setText("Variable files");
         section.setDescription("In this section variable files can be specified. Those variables will "
-                + "be available for all suites within project.");
+                + "be available for all suites within project and will be accessible without importing.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
 
         final Composite internalComposite = toolkit.createComposite(section);

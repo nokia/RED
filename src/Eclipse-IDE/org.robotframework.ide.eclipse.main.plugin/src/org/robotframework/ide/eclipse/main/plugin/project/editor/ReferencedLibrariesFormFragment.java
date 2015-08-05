@@ -7,7 +7,9 @@ import javax.inject.Inject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -34,6 +36,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
@@ -301,7 +304,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         removeButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
     }
-
+    
     private void setInput() {
         final List<ReferencedLibrary> libspecs = editorInput.getProjectConfiguration().getLibraries();
         viewer.setInput(libspecs);
@@ -315,5 +318,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Override
     public MatchesCollection collectMatches(final String filter) {
         return null;
+    }
+    
+    @Inject
+    @Optional
+    private void changeEvent(@UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
+        editorInput.refreshProjectConfiguration();
+        setInput();
+        viewer.refresh();
     }
 }

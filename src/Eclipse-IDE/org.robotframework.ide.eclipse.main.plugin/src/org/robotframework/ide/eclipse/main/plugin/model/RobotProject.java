@@ -128,7 +128,7 @@ public class RobotProject extends RobotContainer {
                                 return null;
                             } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
                                 final IFile file = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
-                                return LibrarySpecificationReader.readSpecification(file);
+                                return LibrarySpecificationReader.readReferencedSpecification(file, lib.getPath());
                             } else {
                                 return null;
                             }
