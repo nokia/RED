@@ -18,6 +18,7 @@ public class LibrarySpecification {
 
     private List<KeywordSpecification> keywords;
     private boolean isRemote;
+    private boolean isReferenced;
     private String additionalInfo = "";
 
     public String getName() {
@@ -80,6 +81,14 @@ public class LibrarySpecification {
 
     public void setRemote() {
         isRemote = true;
+    }
+    
+    public boolean isReferenced() {
+        return isReferenced;
+    }
+
+    public void setReferenced() {
+        isReferenced = true;
     }
 
     public void propagateFormat() {

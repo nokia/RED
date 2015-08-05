@@ -9,7 +9,7 @@ class RedProjectEditorInput {
 
     private final IProject project;
     private final boolean isEditable;
-    private final RobotProjectConfig projectConfiguration;
+    private RobotProjectConfig projectConfiguration;
 
     RedProjectEditorInput(final boolean isEditable, final RobotProjectConfig projectConfig,
             final IProject project) {
@@ -28,5 +28,9 @@ class RedProjectEditorInput {
 
     boolean isEditable() {
         return isEditable;
+    }
+    
+    void refreshProjectConfiguration() {
+        projectConfiguration = RedPlugin.getModelManager().getModel().createRobotProject(project).getRobotProjectConfig();
     }
 }

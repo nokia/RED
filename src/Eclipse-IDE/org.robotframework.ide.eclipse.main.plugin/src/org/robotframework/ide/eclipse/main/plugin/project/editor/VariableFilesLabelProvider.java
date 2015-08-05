@@ -9,8 +9,10 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 
@@ -47,6 +49,6 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
-        return null;
+        return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
     }
 }

@@ -1,8 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import java.nio.file.FileSystems;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 public class ImportSettingFilePathResolver {
     
@@ -36,5 +39,11 @@ public class ImportSettingFilePathResolver {
     public static String createFileNameWithoutExtension(final IPath path) {
         final String name = path.lastSegment();
         return name.substring(0, name.length() - ("." + path.getFileExtension()).length());
+    }
+    
+    public static IPath createFileAbsolutePath(final IPath filePath, final IProject project) {
+        java.nio.file.Path basePath = FileSystems.getDefault().getPath(project.getLocation().toString());
+        java.nio.file.Path absolutePath = basePath.resolve(filePath.toString()).normalize(); 
+        return new Path(absolutePath.toString());
     }
 }
