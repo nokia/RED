@@ -32,7 +32,9 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.TABLE_HEADER_COLUMN);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.UNKNOWN);
+        types.add(0, RobotTokenType.TABLE_HEADER_COLUMN);
         rt.setText(new StringBuilder(text));
         ParsingState state = utility.getCurrentStatus(processingState);
         if (state != ParsingState.TABLE_HEADER_COLUMN) {
