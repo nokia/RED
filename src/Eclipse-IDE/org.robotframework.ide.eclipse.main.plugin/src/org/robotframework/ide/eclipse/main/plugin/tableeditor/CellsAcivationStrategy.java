@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 
 public class CellsAcivationStrategy {
@@ -42,6 +43,7 @@ public class CellsAcivationStrategy {
             protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
                 if (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
                     if (event.character == SWT.CR || isPrintableChar(event.character)) {
+                        ((KeyEvent) event.sourceEvent).doit = false;
                         return true;
                     }
                 } else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
