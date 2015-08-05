@@ -15,6 +15,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class CellsAcivationStrategy {
 
     public static void addActivationStrategy(final RowExposingTableViewer viewer, final RowTabbingStrategy rowTabbing) {
@@ -36,38 +38,45 @@ public class CellsAcivationStrategy {
                 | ColumnViewerEditor.TABBING_VERTICAL | rowTabbing.getStyle();
     }
 
-    private static ColumnViewerEditorActivationStrategy createActivationSupport(final ColumnViewer viewer) {
-        final ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-
-            @Override
-            protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
-                if (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
-                    if (event.character == SWT.CR || isPrintableChar(event.character)) {
-                        // this is important to disable this event, because normally the
-                        // selection in tree or table will change to item which name starts
-                        // with the character being typed in. We only want to activate the editor
-                        // without changing selection
-                        ((KeyEvent) event.sourceEvent).doit = false;
-                        return true;
-                    }
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
-                    if (event.sourceEvent instanceof MouseEvent) {
-                        return true;
-                    }
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL) {
-                    return true;
-                } else if (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC) {
-                    return true;
-                }
-                return false;
-            }
-
-            private boolean isPrintableChar(final char character) {
-                return ' ' <= character && character <= '~';
-            }
-        };
+    private static RedActivationStrategy createActivationSupport(final ColumnViewer viewer) {
+        final RedActivationStrategy activationSupport = new RedActivationStrategy(viewer);
         activationSupport.setEnableEditorActivationWithKeyboard(true);
         return activationSupport;
+    }
+
+    @VisibleForTesting
+    static final class RedActivationStrategy extends ColumnViewerEditorActivationStrategy {
+
+        RedActivationStrategy(final ColumnViewer viewer) {
+            super(viewer);
+        }
+
+        @Override
+        protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
+            if (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) {
+                if (event.character == SWT.CR || isPrintableChar(event.character)) {
+                    // this is important to disable this event, because normally the
+                    // selection in tree or table will change to item which name starts
+                    // with the character being typed in. We only want to activate the editor
+                    // without changing selection
+                    ((KeyEvent) event.sourceEvent).doit = false;
+                    return true;
+                }
+            } else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
+                if (event.sourceEvent instanceof MouseEvent) {
+                    return true;
+                }
+            } else if (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL) {
+                return true;
+            } else if (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC) {
+                return true;
+            }
+            return false;
+        }
+
+        private boolean isPrintableChar(final char character) {
+            return ' ' <= character && character <= '~';
+        }
     }
 
     public enum RowTabbingStrategy {
