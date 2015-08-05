@@ -2,6 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping;
 
 import java.util.Stack;
 
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -25,7 +26,8 @@ public class PreviousLineHandler {
 
     public LineContinueType computeLineContinue(
             final Stack<ParsingState> parsingStates, boolean isNewLine,
-            final RobotLine currentLine, final RobotToken currentToken) {
+            final RobotFile model, final RobotLine currentLine,
+            final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
         if (isNewLine) {
@@ -33,7 +35,8 @@ public class PreviousLineHandler {
                     RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
                 ParsingState currentState = utility
                         .getCurrentStatus(parsingStates);
-                if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
+                if (currentState == ParsingState.SETTING_TABLE_INSIDE
+                        && containsAnySetting(model)) {
                     if (utility.isTheFirstColumn(currentLine, currentToken)) {
                         continueType = LineContinueType.SETTING_TABLE_ELEMENT;
                     }
@@ -42,6 +45,12 @@ public class PreviousLineHandler {
         }
 
         return continueType;
+    }
+
+
+    @VisibleForTesting
+    protected boolean containsAnySetting(final RobotFile file) {
+        return !file.getSettingTable().isEmpty();
     }
 
 
@@ -55,7 +64,7 @@ public class PreviousLineHandler {
             final RobotLine currentLine, final RobotToken currentToken) {
         if (continueType == LineContinueType.SETTING_TABLE_ELEMENT) {
             parsingStates.clear();
-            removeLastCommentState(storedStack);
+            removeLastNotWantedStates(storedStack);
             parsingStates.addAll(storedStack);
         }
     }
@@ -77,11 +86,13 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected void removeLastCommentState(
+    protected void removeLastNotWantedStates(
             final Stack<ParsingState> parsingStates) {
         for (int i = parsingStates.size() - 1; i >= 0; i--) {
             ParsingState state = parsingStates.get(i);
-            if (state == ParsingState.COMMENT) {
+            if (state == ParsingState.COMMENT
+                    || state == ParsingState.SETTING_UNKNOWN
+                    || state == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT) {
                 parsingStates.remove(i);
             } else {
                 break;

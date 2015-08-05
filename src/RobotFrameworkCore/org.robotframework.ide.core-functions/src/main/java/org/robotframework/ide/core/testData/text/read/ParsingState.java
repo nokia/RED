@@ -200,5 +200,13 @@ public enum ParsingState {
     /**
      * 
      */
-    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS;
+    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS,
+    /**
+     * 
+     */
+    SETTING_UNKNOWN,
+    /**
+     * 
+     */
+    SETTING_UNKNOWN_TRASH_ELEMENT;
 }
