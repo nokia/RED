@@ -159,18 +159,20 @@ public class ImportResourcesComposite {
                         (IStructuredSelection) resourcesViewer.getSelection(), IPath.class);
                 String filePath = null;
                 final Shell newShell = new Shell(shell);
-                if (path.isAbsolute()) {
+                final IResource initialProjectSelection = currentProject.findMember(path);
+                if (initialProjectSelection == null) {
                     final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
                     dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.txt" });
-                    dialog.setFilterPath(path.toOSString());
+                    final IPath initialExtSelection = ImportSettingFilePathResolver.createFileAbsolutePath(path, currentProject);
+                    dialog.setFilterPath(initialExtSelection.removeLastSegments(1).toOSString());
+                    dialog.setFileName(initialExtSelection.lastSegment());
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
                         filePath = ImportSettingFilePathResolver.createFileRelativePath(
                                 new Path(chosenFilePath), currentProject.getLocation()).toPortableString();
                     }
                 } else {
-                    final IResource initialSelection = currentProject.findMember(path);
-                    final ElementTreeSelectionDialog dialog = createAddResourceSelectionDialog(newShell, false, initialSelection);
+                    final ElementTreeSelectionDialog dialog = createAddResourceSelectionDialog(newShell, false, initialProjectSelection);
                     if (dialog.open() == Window.OK) {
                         final Object result = dialog.getFirstResult();
                         if (result != null) {

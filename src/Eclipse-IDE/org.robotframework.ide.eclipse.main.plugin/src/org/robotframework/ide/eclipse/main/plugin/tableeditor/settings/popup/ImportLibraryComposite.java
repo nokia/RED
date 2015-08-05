@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -35,6 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -44,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -53,6 +57,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -84,6 +89,8 @@ public class ImportLibraryComposite {
     private ISelectionChangedListener rightViewerSelectionChangedListener;
 
     private RobotProject robotProject;
+    
+    private IEventBroker eventBroker;
 
     public ImportLibraryComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
             final FormToolkit formToolkit, final Shell shell) {
@@ -92,6 +99,7 @@ public class ImportLibraryComposite {
         this.fileModel = fileModel;
         this.shell = shell;
         robotProject = fileModel.getProject();
+        eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {
@@ -134,12 +142,12 @@ public class ImportLibraryComposite {
         final Button toImported = formToolkit.createButton(moveBtnsComposite, ">>", SWT.PUSH);
         toImported.setEnabled(false);
         toImported.addSelectionListener(createToImportedListener());
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(toImported);
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(toImported);
 
         final Button fromImported = formToolkit.createButton(moveBtnsComposite, "<<", SWT.PUSH);
         fromImported.setEnabled(false);
         fromImported.addSelectionListener(createFromImportedListener());
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(fromImported);
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(fromImported);
 
         rightViewer = new TableViewer(librariesComposite);
         rightViewer.setContentProvider(new LibrariesAlreadyImportedContentProvider());
@@ -172,10 +180,15 @@ public class ImportLibraryComposite {
         addNewExternalLibBtn.addSelectionListener(createAddNewExternalLibListener());
         GridDataFactory.fillDefaults().applyTo(addNewExternalLibBtn);
 
-        final Button editLibArgsBtn = formToolkit.createButton(newLibBtnsComposite, "Edit Library Arguments", SWT.PUSH);
+        final Button editLibPathBtn = formToolkit.createButton(newLibBtnsComposite, "Edit File Path", SWT.PUSH);
+        editLibPathBtn.setEnabled(false);
+        editLibPathBtn.addSelectionListener(createEditLibPathListener());
+        GridDataFactory.fillDefaults().indent(0, 10).applyTo(editLibPathBtn);
+        
+        final Button editLibArgsBtn = formToolkit.createButton(newLibBtnsComposite, "Edit Arguments", SWT.PUSH);
         editLibArgsBtn.setEnabled(false);
         editLibArgsBtn.addSelectionListener(createEditLibArgsListener());
-        GridDataFactory.fillDefaults().indent(0, 10).applyTo(editLibArgsBtn);
+        GridDataFactory.fillDefaults().applyTo(editLibArgsBtn);
 
         final Label separator = formToolkit.createLabel(librariesComposite, "", SWT.SEPARATOR | SWT.HORIZONTAL);
         GridDataFactory.fillDefaults().indent(0, 5).grab(false, false).span(4, 1).applyTo(separator);
@@ -185,7 +198,7 @@ public class ImportLibraryComposite {
         GridDataFactory.fillDefaults().span(4, 1).hint(500, SWT.DEFAULT).applyTo(tooltipLabel);
 
         createLeftViewerSelectionListener(toImported);
-        createRightViewerSelectionListener(fromImported, editLibArgsBtn);
+        createRightViewerSelectionListener(fromImported, editLibArgsBtn, editLibPathBtn);
 
         return librariesComposite;
     }
@@ -240,12 +253,7 @@ public class ImportLibraryComposite {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final Shell newShell = new Shell(shell);
-                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(newShell,
-                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
-                dialog.setAllowMultiple(false);
-                dialog.setTitle("Select library file");
-                dialog.setMessage("Select the library file to import:");
-                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+                final ElementTreeSelectionDialog dialog = createAddVariableSelectionDialog(shell, null);
                 if (dialog.open() == Window.OK) {
                     final Object result = dialog.getFirstResult();
                     if (result != null) {
@@ -285,14 +293,15 @@ public class ImportLibraryComposite {
     }
 
     private void addNewLibraryToProjectConfiguration(final IPath path, final String nameWithoutExtension) {
-        RobotProjectConfig config = robotProject.getRobotProjectConfig();
+        final RobotProjectConfig config = robotProject.getRobotProjectConfig();
         config.addReferencedLibraryInPython(nameWithoutExtension, path);
         robotProject.clear();
         new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+        eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
 
     private void addNewLibraryToSettingsSection(final String nameWithoutExtension) {
-        List<LibrarySpecification> specs = newArrayList();
+        final List<LibrarySpecification> specs = newArrayList();
         final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
         for (LibrarySpecification librarySpecification : referencedLibraries) {
             if (librarySpecification.getName().equals(nameWithoutExtension)) {
@@ -302,6 +311,76 @@ public class ImportLibraryComposite {
         }
         final Settings libs = (Settings) rightViewer.getInput();
         handleLibraryAdd(libs, specs);
+    }
+    
+    private SelectionListener createEditLibPathListener() {
+        return new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final LibrarySpecification spec = Selections.getSingleElement(
+                        (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
+                final IPath oldPath = new Path(spec.getAdditionalInformation());
+                final Shell newShell = new Shell(shell);
+                final IResource initialProjectSelection = robotProject.getProject().findMember(
+                        oldPath + "/" + spec.getName() + ".py");    //TODO: check file extension
+                String nameWithoutExtension = "";
+                String newPath = null;
+                if (initialProjectSelection == null) {
+                    final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
+                    dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+                    final IPath initialExtSelection = ImportSettingFilePathResolver.createFileAbsolutePath(oldPath,
+                            robotProject.getProject());
+                    dialog.setFilterPath(initialExtSelection.toOSString());
+                    final String chosenFilePath = dialog.open();
+                    if (chosenFilePath != null) {
+                        final IPath path = new Path(chosenFilePath);
+                        nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(path);
+                        newPath = ImportSettingFilePathResolver.createFileParentRelativePath(path,
+                                robotProject.getProject().getLocation()).toPortableString();
+                    }
+                } else {
+                    final ElementTreeSelectionDialog dialog = createAddVariableSelectionDialog(newShell, initialProjectSelection);
+                    if (dialog.open() == Window.OK) {
+                        final Object result = dialog.getFirstResult();
+                        if (result != null) {
+                            final IResource resource = (IResource) result;
+                            nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(resource.getFullPath());
+                            newPath = ImportSettingFilePathResolver.createResourceParentRelativePath(resource,
+                                    robotProject.getProject());
+                        }
+                    }
+                }
+                
+                newShell.dispose();
+                if(newPath != null) {
+                    if (!spec.getName().equals(nameWithoutExtension)) {
+                        MessageDialog.openError(shell, "Error", "Libraries names are not equal.");
+                    } else {
+                        editLibraryInProjectConfiguration(oldPath, newPath, nameWithoutExtension);
+                        spec.setAdditionalInformation(newPath);
+                        rightViewer.refresh();
+                        
+                    }
+                }
+            }
+        };
+    }
+    
+    private void editLibraryInProjectConfiguration(final IPath oldPath, final String newPath,
+            final String nameWithoutExtension) {
+        final RobotProjectConfig config = robotProject.getRobotProjectConfig();
+        final List<ReferencedLibrary> libs = config.getLibraries();
+        for (ReferencedLibrary referencedLibrary : libs) {
+            if (referencedLibrary.getName().equals(nameWithoutExtension)
+                    && referencedLibrary.getPath().equals(oldPath.toPortableString())) {
+                referencedLibrary.setPath(newPath);
+                break;
+            }
+        }
+        robotProject.clear();
+        new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+        eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
 
     private SelectionListener createEditLibArgsListener() {
@@ -342,7 +421,7 @@ public class ImportLibraryComposite {
             }
         };
     }
-
+    
     private void handleLibraryAdd(final Settings libs, final List<LibrarySpecification> specs) {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
@@ -431,7 +510,7 @@ public class ImportLibraryComposite {
         leftViewer.addSelectionChangedListener(leftViewerSelectionChangedListener);
     }
 
-    private void createRightViewerSelectionListener(final Button importBtn, final Button editArgsBtn) {
+    private void createRightViewerSelectionListener(final Button importBtn, final Button editArgsBtn, final Button editPathBtn) {
         rightViewerSelectionChangedListener = new ISelectionChangedListener() {
 
             @Override
@@ -441,8 +520,11 @@ public class ImportLibraryComposite {
                 importBtn.setEnabled(!specs.isEmpty() && doesNotContainAlwaysAccessible(specs));
 
                 if (rightViewer.getTable().getSelectionCount() == 1) {
-                    editArgsBtn.setEnabled(true);
+                    final LibrarySpecification spec = specs.get(0);
+                    editPathBtn.setEnabled(spec.isReferenced());
+                    editArgsBtn.setEnabled(!spec.isAccessibleWithoutImport());
                 } else {
+                    editPathBtn.setEnabled(false);
                     editArgsBtn.setEnabled(false);
                 }
 
@@ -463,6 +545,20 @@ public class ImportLibraryComposite {
                 }
             }
         }
+    }
+    
+    private ElementTreeSelectionDialog createAddVariableSelectionDialog(final Shell shell,
+            final IResource initialSelection) {
+        final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(),
+                new BaseWorkbenchContentProvider());
+        dialog.setAllowMultiple(false);
+        dialog.setTitle("Select library file");
+        dialog.setMessage("Select the library file to import:");
+        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+        if (initialSelection != null) {
+            dialog.setInitialSelection(initialSelection);
+        }
+        return dialog;
     }
 
     private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -490,9 +586,8 @@ public class ImportLibraryComposite {
                         textStyle.foreground = RedTheme.getEclipseDecorationColor();
                     }
                 });
-            } else if (spec.isRemote()) {
-                text.append(" ");
-                text.append(spec.getAdditionalInformation(), new Styler() {
+            } else if (!spec.getAdditionalInformation().equals("")) {
+                text.append(" - " + spec.getAdditionalInformation(), new Styler() {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {

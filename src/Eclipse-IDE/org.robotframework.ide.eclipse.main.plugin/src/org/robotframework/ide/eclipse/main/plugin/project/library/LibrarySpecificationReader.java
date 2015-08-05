@@ -31,6 +31,14 @@ public class LibrarySpecificationReader {
         spec.setAdditionalInformation(remoteLocation.getUri());
         return spec;
     }
+    
+    public static LibrarySpecification readReferencedSpecification(final IFile libraryFile,
+            final String location) {
+        final LibrarySpecification spec = readSpecification(libraryFile);
+        spec.setReferenced();
+        spec.setAdditionalInformation(location);
+        return spec;
+    }
 
     public static class CannotReadlibrarySpecificationException extends RuntimeException {
 
