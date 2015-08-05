@@ -27,7 +27,7 @@ public class CreateFreshCaseCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME);
+        final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME).trim();
 
         if (index == -1) {
             casesSection.createTestCase(name, "");
