@@ -6,10 +6,15 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
+import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 public class TableHeaderColumnMapper implements IParsingMapper {
@@ -55,7 +60,8 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         if (!processingState.isEmpty()
-                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                && isNotExistLineContinueAfterHeader(currentLine)) {
             ParsingState state = processingState.peek();
             result = (utility.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
         }
@@ -63,4 +69,24 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         return result;
     }
 
+
+    @VisibleForTesting
+    protected boolean isNotExistLineContinueAfterHeader(
+            final RobotLine currentLine) {
+        boolean result = true;
+        List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        for (int i = 0; i < lineElements.size() || i == 2; i++) {
+            IRobotLineElement element = lineElements.get(i);
+            List<IRobotTokenType> types = element.getTypes();
+            if (types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                result = false;
+                break;
+            } else if (!(types.contains(SeparatorType.PIPE) || types
+                    .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE))) {
+                break;
+            }
+        }
+
+        return result;
+    }
 }
