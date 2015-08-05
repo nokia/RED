@@ -26,6 +26,8 @@ import org.robotframework.ide.core.testData.model.table.mapping.SettingsMapperPr
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
@@ -44,6 +46,7 @@ public class TxtRobotFileParser {
     private final TokenSeparatorBuilder tokenSeparatorBuilder;
     private final List<ATokenRecognizer> recognized = new LinkedList<>();
     private final List<IParsingMapper> mappers = new LinkedList<>();
+    private final List<IParsingMapper> unknownTableElementsMapper = new LinkedList<>();
     private final ElementsUtility utility;
     private final LibraryAliasFixer libraryFixer;
     private final PreviousLineHandler previousLineHandler;
@@ -57,7 +60,8 @@ public class TxtRobotFileParser {
 
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
         mappers.addAll(new SettingsMapperProvider().getMappers());
-
+        unknownTableElementsMapper.add(new UnknownSettingMapper());
+        unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
     }
 
 
@@ -249,8 +253,8 @@ public class TxtRobotFileParser {
             String text, boolean isNewLine) {
         RobotToken robotToken = recognize(fp, text);
         LineContinueType lineContinueType = previousLineHandler
-                .computeLineContinue(processingState, isNewLine, currentLine,
-                        robotToken);
+                .computeLineContinue(processingState, isNewLine,
+                        robotFileOutput.getFileModel(), currentLine, robotToken);
         if (previousLineHandler.isSomethingToDo(lineContinueType)) {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
@@ -309,15 +313,24 @@ public class TxtRobotFileParser {
                     }
                 }
 
+                // check for unknown setting
                 int size = matchedMappers.size();
-                if (size == 1) {
+                if (size == 0) {
+                    for (IParsingMapper mapper : unknownTableElementsMapper) {
+                        if (mapper.checkIfCanBeMapped(robotFileOutput,
+                                currentLine, robotToken, text, processingState)) {
+                            matchedMappers.add(mapper);
+                        }
+                    }
+                }
 
+                size = matchedMappers.size();
+                if (size == 1) {
                     robotToken = matchedMappers.get(0).map(currentLine,
                             processingState, robotFileOutput, robotToken, fp,
                             text);
-
                 } else {
-                    // TODO: implement - error
+                    // TODO: implement - error to many
                     System.out.println("ERR [" + processingState + "");
                     System.out.println("ERR [" + text + "]");
                 }

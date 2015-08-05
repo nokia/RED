@@ -56,6 +56,14 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    SETTING_UNKNOWN,
+    /**
+     * 
+     */
+    SETTING_UNKNOWN_ARGUMENT,
+    /**
+     * 
+     */
     SETTING_LIBRARY_NAME,
     /**
      * 

@@ -14,6 +14,7 @@ import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
 import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
+import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
 
 
 public class SettingTable extends ARobotSectionTable {
@@ -29,6 +30,17 @@ public class SettingTable extends ARobotSectionTable {
     private final List<TestTeardown> testTeardowns = new LinkedList<>();
     private final List<TestTemplate> testTemplates = new LinkedList<>();
     private final List<TestTimeout> testTimeouts = new LinkedList<>();
+    private final List<UnknownSetting> unknownSettings = new LinkedList<>();
+
+
+    public boolean isEmpty() {
+        return imports.isEmpty() && documentations.isEmpty()
+                && metadatas.isEmpty() && suiteSetups.isEmpty()
+                && suiteTeardowns.isEmpty() && forceTags.isEmpty()
+                && defaultTags.isEmpty() && testSetups.isEmpty()
+                && testTeardowns.isEmpty() && testTemplates.isEmpty()
+                && testTimeouts.isEmpty();
+    }
 
 
     public List<AImported> getImports() {
@@ -138,5 +150,15 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addTestTimeout(final TestTimeout testTimeout) {
         testTimeouts.add(testTimeout);
+    }
+
+
+    public List<UnknownSetting> getUnknownSettings() {
+        return unknownSettings;
+    }
+
+
+    public void addUnknownSetting(final UnknownSetting unknownSetting) {
+        unknownSettings.add(unknownSetting);
     }
 }
