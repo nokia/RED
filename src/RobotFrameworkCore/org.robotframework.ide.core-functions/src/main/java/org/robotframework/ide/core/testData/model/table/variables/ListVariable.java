@@ -8,7 +8,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class ListVariable extends AVariable {
 
-    public final List<RobotToken> items = new LinkedList<>();
+    private final List<RobotToken> items = new LinkedList<>();
 
 
     public ListVariable(String name, RobotToken declaration) {

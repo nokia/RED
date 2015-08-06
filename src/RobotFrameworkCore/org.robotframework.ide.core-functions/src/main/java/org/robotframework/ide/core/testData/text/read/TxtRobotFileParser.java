@@ -23,6 +23,7 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.SettingsMapperProvider;
+import org.robotframework.ide.core.testData.model.table.mapping.VariablesDeclarationMapperProvider;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
@@ -36,6 +37,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognize
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.SettingsRecognizersProvider;
+import org.robotframework.ide.core.testData.text.read.recognizer.VariablesDeclarationRecognizersProvider;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -59,7 +61,12 @@ public class TxtRobotFileParser {
         this.previousLineHandler = new PreviousLineHandler();
 
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
+        recognized.addAll(new VariablesDeclarationRecognizersProvider()
+                .getRecognizers());
+
         mappers.addAll(new SettingsMapperProvider().getMappers());
+        mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
+
         unknownTableElementsMapper.add(new UnknownSettingMapper());
         unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
     }

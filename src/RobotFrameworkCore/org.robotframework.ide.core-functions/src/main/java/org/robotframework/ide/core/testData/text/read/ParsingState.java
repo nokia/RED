@@ -208,5 +208,29 @@ public enum ParsingState {
     /**
      * 
      */
-    SETTING_UNKNOWN_TRASH_ELEMENT;
+    SETTING_UNKNOWN_TRASH_ELEMENT,
+    /**
+     * 
+     */
+    SCALAR_VARIABLE_DECLARATION,
+    /**
+     * 
+     */
+    SCALAR_VARIABLE_VALUE,
+    /**
+     * 
+     */
+    LIST_VARIABLE_DECLARATION,
+    /**
+     * 
+     */
+    LIST_VARIABLE_VALUE,
+    /**
+     * 
+     */
+    DICTIONARY_VARIABLE_DECLARATION,
+    /**
+     * 
+     */
+    DICTIONARY_VARIABLE_VALUE;
 }

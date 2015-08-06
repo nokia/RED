@@ -16,8 +16,9 @@ public class DictionaryVariable extends AVariable {
     }
 
 
-    public void put(final RobotToken key, final RobotToken value) {
-        items.add(new DictionaryKeyValuePair(key, value));
+    public void put(final RobotToken raw, final RobotToken key,
+            final RobotToken value) {
+        items.add(new DictionaryKeyValuePair(raw, key, value));
     }
 
 
@@ -33,12 +34,14 @@ public class DictionaryVariable extends AVariable {
 
     public static class DictionaryKeyValuePair {
 
+        private RobotToken raw;
         private RobotToken key;
         private RobotToken value;
 
 
-        public DictionaryKeyValuePair(final RobotToken key,
-                final RobotToken value) {
+        public DictionaryKeyValuePair(final RobotToken raw,
+                final RobotToken key, final RobotToken value) {
+            this.raw = raw;
             this.key = key;
             this.value = value;
         }
@@ -62,5 +65,16 @@ public class DictionaryVariable extends AVariable {
         public void setValue(RobotToken value) {
             this.value = value;
         }
+
+
+        public RobotToken getRaw() {
+            return raw;
+        }
+
+
+        public void setRaw(RobotToken raw) {
+            this.raw = raw;
+        }
+
     }
 }

@@ -35,10 +35,13 @@ public class PreviousLineHandler {
                     RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
                 ParsingState currentState = utility
                         .getCurrentStatus(parsingStates);
-                if (currentState == ParsingState.SETTING_TABLE_INSIDE
-                        && containsAnySetting(model)) {
-                    if (utility.isTheFirstColumn(currentLine, currentToken)) {
+                if (utility.isTheFirstColumn(currentLine, currentToken)) {
+                    if (currentState == ParsingState.SETTING_TABLE_INSIDE
+                            && containsAnySetting(model)) {
                         continueType = LineContinueType.SETTING_TABLE_ELEMENT;
+                    } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
+                            && containsAnyVariables(model)) {
+                        continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
                     }
                 }
             }
@@ -54,6 +57,12 @@ public class PreviousLineHandler {
     }
 
 
+    @VisibleForTesting
+    protected boolean containsAnyVariables(final RobotFile file) {
+        return !file.getVariableTable().getVariables().isEmpty();
+    }
+
+
     public boolean isSomethingToDo(final LineContinueType type) {
         return (type != LineContinueType.NONE);
     }
@@ -62,7 +71,7 @@ public class PreviousLineHandler {
     public void restorePreviousStack(final LineContinueType continueType,
             final Stack<ParsingState> parsingStates,
             final RobotLine currentLine, final RobotToken currentToken) {
-        if (continueType == LineContinueType.SETTING_TABLE_ELEMENT) {
+        if (isSomethingToDo(continueType)) {
             parsingStates.clear();
             removeLastNotWantedStates(storedStack);
             parsingStates.addAll(storedStack);
@@ -81,7 +90,7 @@ public class PreviousLineHandler {
     }
 
     public static enum LineContinueType {
-        NONE, SETTING_TABLE_ELEMENT;
+        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT;
     }
 
 
