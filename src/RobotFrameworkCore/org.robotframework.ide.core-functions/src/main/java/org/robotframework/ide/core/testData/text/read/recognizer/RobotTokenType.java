@@ -220,6 +220,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    VARIABLES_SCALAR_AS_LIST_DECLARATION,
+    /**
+     * 
+     */
     VARIABLES_LIST_DECLARATION,
     /**
      * 
@@ -228,7 +232,19 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    VARIABLES_VARIABLE_VALUE;
+    VARIABLES_UNKNOWN_DECLARATION,
+    /**
+     * 
+     */
+    VARIABLES_VARIABLE_VALUE,
+    /**
+     * 
+     */
+    VARIABLES_DICTIONARY_KEY,
+    /**
+     * 
+     */
+    VARIABLES_DICTIONARY_VALUE;
 
     private final List<String> representationForNew = new LinkedList<>();
 

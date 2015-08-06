@@ -8,7 +8,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class ScalarVariable extends AVariable {
 
-    public final List<RobotToken> values = new LinkedList<>();
+    private final List<RobotToken> values = new LinkedList<>();
 
 
     public ScalarVariable(String name, RobotToken declaration) {
