@@ -1,26 +1,28 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.variables.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.Metadata;
+import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class MetadataValueMapper implements IParsingMapper {
+public class ListVariableValueMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public MetadataValueMapper() {
+    public ListVariableValueMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,18 +32,20 @@ public class MetadataValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_METADATA_VALUE);
-        rt.setText(new StringBuilder(text));
+        List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.UNKNOWN);
+        types.add(0, RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        SettingTable settings = robotFileOutput.getFileModel()
-                .getSettingTable();
-        List<Metadata> metadatas = settings.getMetadatas();
-        if (!metadatas.isEmpty()) {
-            metadatas.get(metadatas.size() - 1).setKey(rt);
+        VariableTable variableTable = robotFileOutput.getFileModel()
+                .getVariableTable();
+        List<IVariableHolder> variables = variableTable.getVariables();
+        if (!variables.isEmpty()) {
+            IVariableHolder var = variables.get(variables.size() - 1);
+            ((ListVariable) var).addItem(rt);
         } else {
             // FIXME: some error
         }
-        processingState.push(ParsingState.SETTING_METADATA_VALUE);
+        processingState.push(ParsingState.LIST_VARIABLE_VALUE);
 
         return rt;
     }
@@ -51,13 +55,7 @@ public class MetadataValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        if (state == ParsingState.SETTING_METADATA_KEY
-                || state == ParsingState.SETTING_METADATA_VALUE) {
-            result = true;
-        }
-
-        return result;
+        return (state == ParsingState.LIST_VARIABLE_DECLARATION || state == ParsingState.LIST_VARIABLE_VALUE);
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public abstract class AVariable extends AModelElement implements
@@ -52,34 +53,42 @@ public abstract class AVariable extends AModelElement implements
         /**
          * 
          */
-        SCALAR("$"),
+        SCALAR("$", RobotTokenType.VARIABLES_SCALAR_DECLARATION),
         /**
          * Deprecated
          */
-        SCALAR_AS_LIST("$"),
+        SCALAR_AS_LIST("$", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION),
         /**
          * 
          */
-        LIST("@"),
+        LIST("@", RobotTokenType.VARIABLES_LIST_DECLARATION),
         /**
          * 
          */
-        DICTIONARY("&"),
+        DICTIONARY("&", RobotTokenType.VARIABLES_DICTIONARY_DECLARATION),
         /**
          * 
          */
-        INVALID(null);
+        INVALID("\\s", RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
 
         private final String identificator;
+        private final RobotTokenType type;
 
 
-        private VariableType(final String identificator) {
+        private VariableType(final String identificator,
+                final RobotTokenType type) {
             this.identificator = identificator;
+            this.type = type;
         }
 
 
         public String getIdentificator() {
             return identificator;
+        }
+
+
+        public RobotTokenType getType() {
+            return type;
         }
     }
 }
