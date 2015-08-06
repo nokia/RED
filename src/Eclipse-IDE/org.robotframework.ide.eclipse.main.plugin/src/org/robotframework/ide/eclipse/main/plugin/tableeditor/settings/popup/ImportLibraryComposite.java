@@ -301,16 +301,36 @@ public class ImportLibraryComposite {
     }
 
     private void addNewLibraryToSettingsSection(final String nameWithoutExtension) {
-        final List<LibrarySpecification> specs = newArrayList();
-        final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
-        for (LibrarySpecification librarySpecification : referencedLibraries) {
-            if (librarySpecification.getName().equals(nameWithoutExtension)) {
-                specs.add(librarySpecification);
-                break;
+        if (!isLibraryAvailable(nameWithoutExtension)) {
+            final List<LibrarySpecification> specs = newArrayList();
+            final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
+            for (LibrarySpecification librarySpecification : referencedLibraries) {
+                if (librarySpecification.getName().equals(nameWithoutExtension)) {
+                    specs.add(librarySpecification);
+                    break;
+                }
+            }
+            final Settings libs = (Settings) rightViewer.getInput();
+            handleLibraryAdd(libs, specs);
+        } else {
+            MessageDialog.openError(shell, "Error", "Given library name '" + nameWithoutExtension
+                    + "' already exists in current project.");
+        }
+    }
+    
+    private boolean isLibraryAvailable(String libName) {
+        final Settings libs = (Settings) rightViewer.getInput();
+        for(LibrarySpecification spec : libs.getImportedLibraries()) {
+            if(spec.getName().equals(libName)) {
+                return true;
             }
         }
-        final Settings libs = (Settings) rightViewer.getInput();
-        handleLibraryAdd(libs, specs);
+        for(LibrarySpecification spec : libs.getLibrariesToImport()) {
+            if(spec.getName().equals(libName)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private SelectionListener createEditLibPathListener() {
@@ -360,7 +380,6 @@ public class ImportLibraryComposite {
                         editLibraryInProjectConfiguration(oldPath, newPath, nameWithoutExtension);
                         spec.setAdditionalInformation(newPath);
                         rightViewer.refresh();
-                        
                     }
                 }
             }
