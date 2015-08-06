@@ -663,6 +663,11 @@
           id="org.robotframework.ide.eclipse.editSetting"
           name="Edit Setting">
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.editVariable"
+          name="Edit Variable">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1324,7 +1329,7 @@
           </reference>
        </enabledWhen>
     </handler>
->>>>>>> .r7384
+
  </extension>
  <extension
        name="Variables part handlers"
@@ -1519,6 +1524,20 @@
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.atLeastOneVariableIsSelected">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.EditVariableHandler"
+          commandId="org.robotframework.ide.eclipse.editVariable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.variablesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
        </enabledWhen>
     </handler>
@@ -1979,6 +1998,16 @@
     <menuContribution
           allPopups="false"
           locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.editVariable"
+             label="Edit"
+             icon="resources/edit.png"
+             style="push">
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
        <command
              commandId="org.robotframework.ide.eclipse.insertNew"
              icon="resources/variable_scalar.png"
