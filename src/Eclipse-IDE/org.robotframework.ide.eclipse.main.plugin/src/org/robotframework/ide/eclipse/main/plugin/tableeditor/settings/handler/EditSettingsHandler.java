@@ -24,7 +24,7 @@ public class EditSettingsHandler extends DIHandler<E4EditSettingsHandler> {
         protected IEventBroker eventBroker;
 
         @Execute
-        public Object deleteSettings(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public Object editSettings(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final RobotSetting setting = Selections.getSingleElement(selection, RobotSetting.class);
             
             eventBroker.send(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT, setting);
