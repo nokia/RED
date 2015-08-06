@@ -75,6 +75,10 @@ public class FileSectionsEmiter {
                 emitKeywordCall(builder, setting);
             } else if (element instanceof RobotCase) {
                 builder.append(element.getName());
+                if (!element.getComment().isEmpty()) {
+                    builder.append(getCellsSeparator());
+                    builder.append("# " + element.getComment());
+                }
                 builder.append('\n');
 
                 for (final RobotElement el : element.getChildren()) {
@@ -83,6 +87,10 @@ public class FileSectionsEmiter {
                 builder.append('\n');
             } else if (element instanceof RobotKeywordDefinition) {
                 builder.append(element.getName());
+                if (!element.getComment().isEmpty()) {
+                    builder.append(getCellsSeparator());
+                    builder.append("# " + element.getComment());
+                }
                 builder.append('\n');
 
                 for (final RobotElement el : element.getChildren()) {
