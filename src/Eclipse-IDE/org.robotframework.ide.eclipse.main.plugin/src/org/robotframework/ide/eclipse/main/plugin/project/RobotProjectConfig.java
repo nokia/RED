@@ -268,14 +268,14 @@ public class RobotProjectConfig {
                 return false;
             } else if (obj.getClass() == getClass()) {
                 final ReferencedLibrary other = (ReferencedLibrary) obj;
-                return Objects.equals(type, other.type) && Objects.equals(name, other.name) && Objects.equals(path, other.path);
+                return Objects.equals(type, other.type) && Objects.equals(name, other.name);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, name, path);
+            return Objects.hash(type, name);
         }
     }
 
