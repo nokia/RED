@@ -175,8 +175,7 @@ public class TxtRobotFileParser {
         for (RobotLine line : rf.getFileContent()) {
             System.out.println(line);
         }
-        System.out.println(rf.getVariableTable().getVariables().get(1)
-                .getDeclaration());
+
         return parsingOutput;
     }
 

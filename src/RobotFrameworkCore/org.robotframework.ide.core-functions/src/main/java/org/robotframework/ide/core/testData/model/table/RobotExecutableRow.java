@@ -28,6 +28,16 @@ public class RobotExecutableRow extends AModelElement {
     }
 
 
+    public List<RobotToken> getArguments() {
+        return arguments;
+    }
+
+
+    public void addArgument(final RobotToken argument) {
+        arguments.add(argument);
+    }
+
+
     @Override
     public boolean isPresent() {
         return true;

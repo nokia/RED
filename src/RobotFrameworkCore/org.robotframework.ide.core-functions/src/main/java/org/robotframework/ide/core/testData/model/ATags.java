@@ -1,9 +1,8 @@
-package org.robotframework.ide.core.testData.model.table.setting;
+package org.robotframework.ide.core.testData.model;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 

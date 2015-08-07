@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting;
+package org.robotframework.ide.core.testData.model.table.userKeywords;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,15 +7,14 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public abstract class AKeywordBaseSetting extends AModelElement {
+public class KeywordArguments extends AModelElement {
 
     private final RobotToken declaration;
-    private RobotToken keywordName;
     private final List<RobotToken> arguments = new LinkedList<>();
     private final List<RobotToken> comment = new LinkedList<>();
 
 
-    protected AKeywordBaseSetting(final RobotToken declaration) {
+    public KeywordArguments(final RobotToken declaration) {
         this.declaration = declaration;
     }
 
@@ -28,16 +27,6 @@ public abstract class AKeywordBaseSetting extends AModelElement {
 
     public RobotToken getDeclaration() {
         return declaration;
-    }
-
-
-    public RobotToken getKeywordName() {
-        return keywordName;
-    }
-
-
-    public void setKeywordName(RobotToken keywordName) {
-        this.keywordName = keywordName;
     }
 
 

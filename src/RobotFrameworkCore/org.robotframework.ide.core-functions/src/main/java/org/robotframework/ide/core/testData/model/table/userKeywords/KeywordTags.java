@@ -1,12 +1,12 @@
-package org.robotframework.ide.core.testData.model.table.setting;
+package org.robotframework.ide.core.testData.model.table.userKeywords;
 
 import org.robotframework.ide.core.testData.model.ATags;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class ForceTags extends ATags {
+public class KeywordTags extends ATags {
 
-    public ForceTags(RobotToken declaration) {
+    public KeywordTags(RobotToken declaration) {
         super(declaration);
     }
 }
