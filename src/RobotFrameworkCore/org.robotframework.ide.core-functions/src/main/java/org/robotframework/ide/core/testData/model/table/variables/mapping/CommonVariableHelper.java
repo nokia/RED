@@ -23,7 +23,7 @@ public class CommonVariableHelper {
         }
 
         if (name != null) {
-            name = mergeNotEscapedWhitespaces(name);
+            name = mergeNotEscapedVariableWhitespaces(name);
         }
 
         return (name != null) ? name : "";
@@ -31,7 +31,7 @@ public class CommonVariableHelper {
 
 
     @VisibleForTesting
-    protected String mergeNotEscapedWhitespaces(String text) {
+    protected String mergeNotEscapedVariableWhitespaces(String text) {
         StringBuilder replaced = new StringBuilder();
 
         boolean wasWhitespace = false;
