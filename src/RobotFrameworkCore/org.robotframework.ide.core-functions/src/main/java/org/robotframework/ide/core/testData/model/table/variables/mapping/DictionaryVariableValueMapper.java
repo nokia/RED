@@ -8,6 +8,9 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor;
+import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.NamedSpecial;
+import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.Special;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -22,10 +25,12 @@ import com.google.common.annotations.VisibleForTesting;
 public class DictionaryVariableValueMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final SpecialEscapedCharactersExtractor escapedExtractor;
 
 
     public DictionaryVariableValueMapper() {
         this.utility = new ElementsUtility();
+        this.escapedExtractor = new SpecialEscapedCharactersExtractor();
     }
 
 
@@ -44,6 +49,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         if (!variables.isEmpty()) {
             IVariableHolder var = variables.get(variables.size() - 1);
             KeyValuePair keyValPair = splitKeyNameFromValue(rt);
+
             ((DictionaryVariable) var).put(rt, keyValPair.getKey(),
                     keyValPair.getValue());
         } else {
@@ -57,40 +63,64 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected KeyValuePair splitKeyNameFromValue(final RobotToken raw) {
+        List<Special> extract = escapedExtractor.extract(raw.getText());
+
+        boolean isValue = false;
         StringBuilder keyText = new StringBuilder();
+        StringBuilder keyTextRaw = new StringBuilder();
         StringBuilder valueText = new StringBuilder();
+        StringBuilder valueTextRaw = new StringBuilder();
 
-        boolean wasEquals = false;
-        StringBuilder rawText = raw.getText();
-        for (int i = 0; i < rawText.length(); i++) {
-            char c = rawText.charAt(i);
+        for (Special special : extract) {
+            String specialRawText = special.getText();
+            if (special.getType() == NamedSpecial.UNKNOWN_TEXT) {
+                if (isValue) {
+                    valueText.append(specialRawText);
+                    valueTextRaw.append(specialRawText);
+                } else {
+                    int equalsIndex = specialRawText.indexOf('=');
+                    if (equalsIndex > -1) {
+                        String keyPart = specialRawText.substring(0,
+                                equalsIndex);
+                        String valuePart = specialRawText
+                                .substring(equalsIndex + 1);
+                        keyText.append(keyPart);
+                        keyTextRaw.append(keyPart);
+                        valueText.append(valuePart);
+                        valueTextRaw.append(valuePart);
 
-            if (c == '=' && !wasEquals) {
-                wasEquals = true;
-                continue;
-            }
-
-            if (wasEquals) {
-                valueText.append(c);
+                        isValue = true;
+                    } else {
+                        keyText.append(specialRawText);
+                        keyTextRaw.append(specialRawText);
+                    }
+                }
             } else {
-                keyText.append(c);
+                if (isValue) {
+                    valueText.append(special.getType().getNormalized());
+                    valueTextRaw.append(specialRawText);
+                } else {
+                    keyText.append(special.getType().getNormalized());
+                    keyTextRaw.append(specialRawText);
+                }
             }
         }
 
         RobotToken key = new RobotToken();
         key.setLineNumber(raw.getLineNumber());
         key.setStartColumn(raw.getStartColumn());
+        key.setRaw(keyTextRaw);
         key.setText(keyText);
         key.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
         RobotToken value = new RobotToken();
         value.setLineNumber(raw.getLineNumber());
         if (valueText.length() > 0) {
-            // plus one for equals sign
             value.setStartColumn(key.getEndColumn() + 1);
         } else {
-            value.setStartColumn(value.getEndColumn());
+            value.setStartColumn(key.getEndColumn());
         }
+        value.setRaw(valueTextRaw);
         value.setText(valueText);
         value.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
