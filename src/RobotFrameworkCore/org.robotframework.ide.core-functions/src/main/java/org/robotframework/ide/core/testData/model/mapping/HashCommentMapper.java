@@ -24,6 +24,8 @@ import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -99,6 +101,14 @@ public class HashCommentMapper implements IParsingMapper {
                 || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_VALUE
                 || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS) {
             mapTestTemplateComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.SCALAR_VARIABLE_DECLARATION
+                || commentHolder == ParsingState.SCALAR_VARIABLE_VALUE
+                || commentHolder == ParsingState.LIST_VARIABLE_DECLARATION
+                || commentHolder == ParsingState.LIST_VARIABLE_VALUE
+                || commentHolder == ParsingState.DICTIONARY_VARIABLE_DECLARATION
+                || commentHolder == ParsingState.DICTIONARY_VARIABLE_VALUE
+                || commentHolder == ParsingState.VARIABLE_TABLE_INSIDE) {
+            mapVariableComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -106,6 +116,43 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapVariableComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<IVariableHolder> variables = fileModel.getVariableTable()
+                .getVariables();
+        if (variables.isEmpty()) {
+            ListVariable var = new ListVariable(null,
+                    createArtifactalListVariable(rt));
+            var.addCommentPart(rt);
+            variables.add(var);
+        } else {
+            IVariableHolder var = variables.get(variables.size() - 1);
+            if (var.getDeclaration().getLineNumber() == rt.getLineNumber()) {
+                var.addCommentPart(rt);
+            } else {
+                ListVariable newVar = new ListVariable(null,
+                        createArtifactalListVariable(rt));
+                newVar.addCommentPart(rt);
+                variables.add(newVar);
+            }
+        }
+    }
+
+
+    @VisibleForTesting
+    protected RobotToken createArtifactalListVariable(final RobotToken rt) {
+        RobotToken token = new RobotToken();
+        token.setLineNumber(rt.getLineNumber());
+        token.setStartColumn(rt.getStartColumn());
+        token.setText(new StringBuilder());
+        token.setRaw(new StringBuilder());
+        token.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
+
+        return token;
     }
 
 

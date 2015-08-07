@@ -30,6 +30,8 @@ import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
+import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
+import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
@@ -69,6 +71,8 @@ public class TxtRobotFileParser {
 
         unknownTableElementsMapper.add(new UnknownSettingMapper());
         unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
+        unknownTableElementsMapper.add(new UnknownVariableMapper());
+        unknownTableElementsMapper.add(new UnknownVariableValueMapper());
     }
 
 
@@ -171,7 +175,8 @@ public class TxtRobotFileParser {
         for (RobotLine line : rf.getFileContent()) {
             System.out.println(line);
         }
-
+        System.out.println(rf.getVariableTable().getVariables().get(1)
+                .getDeclaration());
         return parsingOutput;
     }
 
