@@ -1,12 +1,12 @@
-package org.robotframework.ide.core.testData.model.table.setting;
+package org.robotframework.ide.core.testData.model.table.userKeywords;
 
 import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestSetup extends AKeywordBaseSetting {
+public class KeywordTeardown extends AKeywordBaseSetting {
 
-    public TestSetup(final RobotToken declaration) {
+    public KeywordTeardown(RobotToken declaration) {
         super(declaration);
     }
 }
