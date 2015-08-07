@@ -11,6 +11,7 @@ public class RobotToken implements IRobotLineElement {
 
     private int lineNumber = NOT_SET;
     private int startColumn = NOT_SET;
+    private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private List<IRobotTokenType> types = new LinkedList<>();
 
@@ -54,6 +55,17 @@ public class RobotToken implements IRobotLineElement {
 
 
     @Override
+    public StringBuilder getRaw() {
+        return raw;
+    }
+
+
+    public void setRaw(StringBuilder raw) {
+        this.raw = raw;
+    }
+
+
+    @Override
     public int getEndColumn() {
         return startColumn + text.length();
     }
@@ -69,6 +81,7 @@ public class RobotToken implements IRobotLineElement {
         types.clear();
         types.add(type);
     }
+
 
     @Override
     public String toString() {
