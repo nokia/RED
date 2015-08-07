@@ -16,7 +16,7 @@ class NamesGenerator {
 
     static String generateUniqueName(final RobotElement parent, final String prefix) {
         final int maxNumber = getCurrentMaxNumber(parent, prefix);
-        return prefix + (maxNumber >= 0 ? maxNumber + 1 : "");
+        return prefix + (maxNumber >= 0 ? " " + (maxNumber + 1) : "");
     }
 
     private static int getCurrentMaxNumber(final RobotElement parent, final String prefix) {
@@ -32,7 +32,8 @@ class NamesGenerator {
             @Override
             public Integer apply(final String name) {
                 if (name.startsWith(prefix)) {
-                    final Integer num = Ints.tryParse(name.substring(prefix.length()));
+                    final String number = name.substring(prefix.length()).trim();
+                    final Integer num = Ints.tryParse(number);
                     return num == null ? 0 : num;
                 }
                 return -1;

@@ -6,7 +6,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshCaseCommand extends EditorCommand {
 
-    private static final String DEFAULT_NAME = "case ";
+    private static final String DEFAULT_NAME = "case";
     private final RobotCasesSection casesSection;
     private final int index;
     private final boolean notifySync;
@@ -27,7 +27,7 @@ public class CreateFreshCaseCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME).trim();
+        final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME);
 
         if (index == -1) {
             casesSection.createTestCase(name, "");
