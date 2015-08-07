@@ -44,12 +44,12 @@ public abstract class ATokenRecognizer {
     public RobotToken next() {
         RobotToken t = new RobotToken();
         t.setLineNumber(lineNumber);
-
         int start = m.start();
         t.setStartColumn(start);
         int end = m.end();
-        t.setType(type);
+
         t.setText(new StringBuilder().append(text.substring(start, end)));
+        t.setRaw(new StringBuilder().append(t.getText()));
         t.setType(getProducedType());
         return t;
     }
