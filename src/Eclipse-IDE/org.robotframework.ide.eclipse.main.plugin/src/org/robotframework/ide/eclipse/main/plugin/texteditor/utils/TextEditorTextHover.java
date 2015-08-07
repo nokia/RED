@@ -12,6 +12,7 @@ import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Shell;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssistKeywordContext;
 
 /**
  * @author mmarzec

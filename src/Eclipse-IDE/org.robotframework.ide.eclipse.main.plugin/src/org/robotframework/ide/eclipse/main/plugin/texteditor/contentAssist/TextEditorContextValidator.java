@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
+package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;

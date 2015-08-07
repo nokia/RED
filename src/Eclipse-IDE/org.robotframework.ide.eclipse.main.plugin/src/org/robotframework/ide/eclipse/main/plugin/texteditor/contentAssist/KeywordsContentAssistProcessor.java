@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
+package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * @author mmarzec
  */
-public class TextEditorContentAssistProcessor implements IContentAssistProcessor {
+public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
 
@@ -35,7 +35,7 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
 
     private Map<String, TextEditorContentAssistKeywordContext> keywordMap;
 
-    public TextEditorContentAssistProcessor(Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
+    public KeywordsContentAssistProcessor(Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
         this.keywordMap = keywordMap;
     }
 
@@ -69,6 +69,9 @@ public class TextEditorContentAssistProcessor implements IContentAssistProcessor
                     } else if (prevChar == '\n') {
                         return new ICompletionProposal[0];
                     }
+                }
+                if (prevChar == '\n') {
+                    return new ICompletionProposal[0];
                 }
                 currWord = currChar + currWord;
                 currOffset--;
