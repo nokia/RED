@@ -23,6 +23,8 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.SettingsMapperProvider;
+import org.robotframework.ide.core.testData.model.table.mapping.TestCaseMapperProvider;
+import org.robotframework.ide.core.testData.model.table.mapping.UserKeywordMapperProvider;
 import org.robotframework.ide.core.testData.model.table.mapping.VariablesDeclarationMapperProvider;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
@@ -39,6 +41,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognize
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.SettingsRecognizersProvider;
+import org.robotframework.ide.core.testData.text.read.recognizer.TestCaseRecognizersProvider;
+import org.robotframework.ide.core.testData.text.read.recognizer.UserKeywordRecognizersProvider;
 import org.robotframework.ide.core.testData.text.read.recognizer.VariablesDeclarationRecognizersProvider;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 
@@ -65,9 +69,14 @@ public class TxtRobotFileParser {
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
         recognized.addAll(new VariablesDeclarationRecognizersProvider()
                 .getRecognizers());
+        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers());
+        recognized
+                .addAll(new UserKeywordRecognizersProvider().getRecognizers());
 
         mappers.addAll(new SettingsMapperProvider().getMappers());
         mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
+        mappers.addAll(new TestCaseMapperProvider().getMappers());
+        mappers.addAll(new UserKeywordMapperProvider().getMappers());
 
         unknownTableElementsMapper.add(new UnknownSettingMapper());
         unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
@@ -262,7 +271,11 @@ public class TxtRobotFileParser {
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
             String text, boolean isNewLine) {
-        RobotToken robotToken = recognize(fp, text);
+        List<RobotToken> robotTokens = recognize(fp, text);
+        RobotToken robotToken = computeCorrectRobotToken(currentLine,
+                processingState, robotFileOutput, fp, text, isNewLine,
+                robotTokens);
+
         LineContinueType lineContinueType = previousLineHandler
                 .computeLineContinue(processingState, isNewLine,
                         robotFileOutput.getFileModel(), currentLine, robotToken);
@@ -353,24 +366,81 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    protected RobotToken recognize(final FilePosition fp, String text) {
-        RobotToken robotToken = null;
-        StringBuilder sb = new StringBuilder(text);
-        for (ATokenRecognizer rec : recognized) {
-            if (rec.hasNext(sb, fp.getLine())) {
-                robotToken = rec.next();
+    protected RobotToken computeCorrectRobotToken(RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            String text, boolean isNewLine, List<RobotToken> robotTokens) {
+        RobotToken correct = null;
+        if (robotTokens.size() > 1) {
+            ParsingState state = utility.getCurrentStatus(processingState);
+            for (RobotToken rt : robotTokens) {
+                if (isTypeForState(state, rt)) {
+                    correct = rt;
+                    break;
+                }
+            }
+
+            if (correct == null) {
+                // FIXME: error
+            }
+        } else {
+            correct = robotTokens.get(0);
+        }
+
+        return correct;
+    }
+
+
+    @VisibleForTesting
+    public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
+        RobotTokenType robotType = RobotTokenType.UNKNOWN;
+        boolean result = false;
+
+        List<RobotTokenType> typesForState = new LinkedList<>();
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForTestCasesTable();
+        } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForSettingsTable();
+        } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForVariablesTable();
+        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForKeywordsTable();
+        }
+
+        List<IRobotTokenType> types = rt.getTypes();
+        for (IRobotTokenType type : types) {
+            if (typesForState.contains(type)) {
+                result = true;
                 break;
             }
         }
 
-        if (robotToken == null) {
-            robotToken = new RobotToken();
-            robotToken.setLineNumber(fp.getLine());
-            robotToken.setText(new StringBuilder(text));
+        return result;
+    }
+
+
+    @VisibleForTesting
+    protected List<RobotToken> recognize(final FilePosition fp, String text) {
+        List<RobotToken> possibleRobotTokens = new LinkedList<>();
+        StringBuilder sb = new StringBuilder(text);
+        for (ATokenRecognizer rec : recognized) {
+            if (rec.hasNext(sb, fp.getLine())) {
+                RobotToken t = rec.next();
+                t.setStartColumn(fp.getColumn());
+                possibleRobotTokens.add(t);
+            }
         }
 
-        robotToken.setStartColumn(fp.getColumn());
+        if (possibleRobotTokens.isEmpty()) {
+            RobotToken rt = new RobotToken();
+            rt.setLineNumber(fp.getLine());
+            rt.setText(new StringBuilder(text));
+            rt.setRaw(new StringBuilder(text));
+            rt.setStartColumn(fp.getColumn());
 
-        return robotToken;
+            possibleRobotTokens.add(rt);
+        }
+
+        return possibleRobotTokens;
     }
 }
