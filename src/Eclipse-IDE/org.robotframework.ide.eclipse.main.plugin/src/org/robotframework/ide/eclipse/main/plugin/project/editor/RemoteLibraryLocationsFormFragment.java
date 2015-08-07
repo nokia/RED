@@ -62,7 +62,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
                 | Section.DESCRIPTION | Section.TWISTIE);
         section.setText("Remote library locations");
         section.setDescription("In this section locations of servers for Remote library can be specified. "
-                + "Those adresses will be available for all suites within project.");
+                + "Those addresses will be available for all suites within project.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
 
         final Composite internalComposite = toolkit.createComposite(section);

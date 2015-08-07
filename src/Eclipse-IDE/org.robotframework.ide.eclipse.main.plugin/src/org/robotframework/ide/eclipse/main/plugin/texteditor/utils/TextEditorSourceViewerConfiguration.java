@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
@@ -34,6 +35,13 @@ public class TextEditorSourceViewerConfiguration extends SourceViewerConfigurati
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
         return new IHyperlinkDetector[] { new KeywordHyperlinkDetector() };
+    }
+    
+    @Override
+    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+        return new String[] { IDocument.DEFAULT_CONTENT_TYPE, TextEditorPartitionScanner.TEST_CASES_SECTION,
+                TextEditorPartitionScanner.KEYWORDS_SECTION, TextEditorPartitionScanner.SETTINGS_SECTION,
+                TextEditorPartitionScanner.VARIABLES_SECTION };
     }
     
 }

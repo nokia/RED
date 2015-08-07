@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
+package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;

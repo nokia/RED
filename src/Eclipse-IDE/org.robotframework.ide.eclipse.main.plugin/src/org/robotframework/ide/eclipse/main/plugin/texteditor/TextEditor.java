@@ -47,12 +47,16 @@ import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewerUndoManager;
 import org.eclipse.jface.text.WhitespaceCharacterPainter;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.AnnotationRulerColumn;
 import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -95,14 +99,18 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.RulesGenerator;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistKeywordContext;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorPartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TxtScanner;
 import org.robotframework.red.graphics.ColorsManager;
 
 /**
@@ -129,13 +137,13 @@ public class TextEditor {
 	
 	private CompositeRuler compositeRuler;
 
-    private TxtScanner txtScanner;
-    
     private TextEditorTextHover textHover;
     
     private WhitespaceCharacterPainter whitespacePainter;
     
     private TextEditorOccurrenceMarksManager occurrenceMarksManager;
+    
+    private RulesGenerator rulesGenerator;
     
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
@@ -231,6 +239,8 @@ public class TextEditor {
         final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover);
         viewer.configure(svc);
         
+        createPartitioner(document);
+        
 		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap);
 		contentAssistant.install(viewer);
 		
@@ -271,6 +281,10 @@ public class TextEditor {
 					save(null);
 				}
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == SWT.SPACE)) {
+                    if (viewer.getTextWidget().getLineCount() == viewer.getTextWidget().getLineAtOffset(
+                            ((TextSelection) viewer.getSelection()).getOffset())+1) {
+                        viewer.getTextWidget().append("\n");
+                    }
 				    contentAssistant.showPossibleCompletions();
 				}
 				if((e.stateMask & SWT.CTRL) != 0 && (e.stateMask & SWT.SHIFT) != 0 && e.keyCode == 'v') {
@@ -568,7 +582,11 @@ public class TextEditor {
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
 		contentAssistant.setShowEmptyList(true);
-		contentAssistant.setContentAssistProcessor(new TextEditorContentAssistProcessor(keywordMap), IDocument.DEFAULT_CONTENT_TYPE);
+		KeywordsContentAssistProcessor contentAssistProcessor = new KeywordsContentAssistProcessor(keywordMap);
+		contentAssistant.setContentAssistProcessor(contentAssistProcessor, TextEditorPartitionScanner.TEST_CASES_SECTION);
+		contentAssistant.setContentAssistProcessor(contentAssistProcessor, TextEditorPartitionScanner.KEYWORDS_SECTION);
+		contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(), TextEditorPartitionScanner.SETTINGS_SECTION);
+		contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
 		contentAssistant.setEmptyMessage("No proposals");
 		contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
             @Override
@@ -579,14 +597,37 @@ public class TextEditor {
 		return contentAssistant;
 	}
 	
-	private PresentationReconciler createPresentationReconciler(final List<String> keywordList) {
-		final PresentationReconciler reconciler = new PresentationReconciler();
-        txtScanner = new TxtScanner(viewer.getTextWidget().getDisplay(), keywordList);
-		final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(txtScanner);
-		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		return reconciler;
+	private void createPartitioner(final IDocument document) {
+        IDocumentPartitioner partitioner = new FastPartitioner(new TextEditorPartitionScanner(), new String[] {
+                TextEditorPartitionScanner.TEST_CASES_SECTION, TextEditorPartitionScanner.KEYWORDS_SECTION,
+                TextEditorPartitionScanner.SETTINGS_SECTION, TextEditorPartitionScanner.VARIABLES_SECTION });
+        partitioner.connect(document);
+	    document.setDocumentPartitioner(partitioner);
 	}
+	
+    private PresentationReconciler createPresentationReconciler(final List<String> keywordList) {
+        final PresentationReconciler reconciler = new PresentationReconciler();
+        rulesGenerator = new RulesGenerator(viewer.getTextWidget().getDisplay(), keywordList);
+        setupPresentationReconciler(reconciler, TextEditorPartitionScanner.TEST_CASES_SECTION, new TextEditorScanner(
+                rulesGenerator.getTestCasesSectionRules()));
+        setupPresentationReconciler(reconciler, TextEditorPartitionScanner.KEYWORDS_SECTION, new TextEditorScanner(
+                rulesGenerator.getKeywordsSectionRules()));
+        setupPresentationReconciler(reconciler, TextEditorPartitionScanner.SETTINGS_SECTION, new TextEditorScanner(
+                rulesGenerator.getSettingsSectionRules()));
+        setupPresentationReconciler(reconciler, TextEditorPartitionScanner.VARIABLES_SECTION, new TextEditorScanner(
+                rulesGenerator.getVariablesSectionRules()));
+        setupPresentationReconciler(reconciler, IDocument.DEFAULT_CONTENT_TYPE,
+                new TextEditorScanner(rulesGenerator.getDefaultRules()));
+
+        return reconciler;
+    }
+	
+    private void setupPresentationReconciler(final PresentationReconciler reconciler, final String contentType,
+            final RuleBasedScanner scanner) {
+        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);
+        reconciler.setDamager(dr, contentType);
+        reconciler.setRepairer(dr, contentType);
+    }
 	
 	private int computeBreakpointLineNumber(final int eventY) {
         final int lineHeight = viewer.getTextWidget().getLineHeight();
@@ -604,9 +645,10 @@ public class TextEditor {
 
     @PreDestroy
     public void preDestroy() {
-        if (txtScanner != null) {
-            txtScanner.disposeResources();
+        if (rulesGenerator != null) {
+            rulesGenerator.disposeResources();
         }
+        
         occurrenceMarksManager.removeOldOccurrenceMarks();
     }
 
