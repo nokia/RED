@@ -6,7 +6,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
 
-    private static final String DEFAULT_NAME = "Keyword ";
+    private static final String DEFAULT_NAME = "Keyword";
     private final RobotKeywordsSection keywordsSection;
     private final int index;
     private final boolean notifySync;
@@ -29,7 +29,7 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final String name = NamesGenerator.generateUniqueName(keywordsSection, DEFAULT_NAME).trim();
+        final String name = NamesGenerator.generateUniqueName(keywordsSection, DEFAULT_NAME);
 
         if (index == -1) {
             keywordsSection.createKeywordDefinition(name);
