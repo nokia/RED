@@ -381,7 +381,7 @@ public class TxtRobotFileParser {
             }
 
             if (correct == null) {
-                // FIXME: error
+                // FIXME: error no matching tokens to state
             }
         } else {
             correct = robotTokens.get(0);
