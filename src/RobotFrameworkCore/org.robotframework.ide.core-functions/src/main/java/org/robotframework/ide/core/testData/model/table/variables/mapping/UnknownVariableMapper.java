@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping;
+package org.robotframework.ide.core.testData.model.table.variables.mapping;
 
 import java.util.List;
 import java.util.Stack;
@@ -7,19 +7,20 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
+import org.robotframework.ide.core.testData.model.table.variables.UnknownVariable;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class UnknownSettingArgumentMapper implements IParsingMapper {
+public class UnknownVariableMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public UnknownSettingArgumentMapper() {
+    public UnknownVariableMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -29,20 +30,20 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
+        List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.UNKNOWN);
+        types.add(0, RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
+        rt.setStartColumn(fp.getColumn());
         rt.setText(new StringBuilder(text));
-        rt.setType(RobotTokenType.SETTING_UNKNOWN_ARGUMENT);
+        rt.setRaw(new StringBuilder(text));
 
-        List<UnknownSetting> unknownSettings = robotFileOutput.getFileModel()
-                .getSettingTable().getUnknownSettings();
-        if (!unknownSettings.isEmpty()) {
-            UnknownSetting unknownSetting = unknownSettings.get(unknownSettings
-                    .size() - 1);
-            unknownSetting.addTrash(rt);
-        } else {
-            // FIXME: internall error
-        }
+        UnknownVariable varUnknown = new UnknownVariable(
+                rt.getRaw().toString(), rt);
+        robotFileOutput.getFileModel().getVariableTable()
+                .addVariable(varUnknown);
 
-        processingState.push(ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
+        processingState.push(ParsingState.VARIABLE_UNKNOWN);
+
         return rt;
     }
 
@@ -53,7 +54,6 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         ParsingState currentState = utility.getCurrentStatus(processingState);
 
-        return (currentState == ParsingState.SETTING_UNKNOWN || currentState == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
+        return (currentState == ParsingState.VARIABLE_TABLE_INSIDE);
     }
-
 }

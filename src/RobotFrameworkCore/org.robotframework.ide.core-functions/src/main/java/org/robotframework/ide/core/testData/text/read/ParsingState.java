@@ -232,5 +232,13 @@ public enum ParsingState {
     /**
      * 
      */
-    DICTIONARY_VARIABLE_VALUE;
+    DICTIONARY_VARIABLE_VALUE,
+    /**
+     * 
+     */
+    VARIABLE_UNKNOWN,
+    /**
+     * 
+     */
+    VARIABLE_UNKNOWN_VALUE;
 }
