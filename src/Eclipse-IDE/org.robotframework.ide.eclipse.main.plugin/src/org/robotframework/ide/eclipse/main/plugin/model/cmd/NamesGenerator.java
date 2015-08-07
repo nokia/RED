@@ -14,9 +14,19 @@ import com.google.common.primitives.Ints;
 
 class NamesGenerator {
 
-    static String generateUniqueName(final RobotElement parent, final String prefix) {
+    static String generateUniqueName(final RobotElement parent, final String prefix, final boolean includeSpace) {
         final int maxNumber = getCurrentMaxNumber(parent, prefix);
-        return prefix + (maxNumber >= 0 ? " " + (maxNumber + 1) : "");
+        if (maxNumber < 0) {
+            return prefix;
+        } else if (includeSpace) {
+            return prefix + " " + (maxNumber + 1);
+        } else {
+            return prefix + (maxNumber + 1);
+        }
+    }
+
+    static String generateUniqueName(final RobotElement parent, final String prefix) {
+        return generateUniqueName(parent, prefix, true);
     }
 
     private static int getCurrentMaxNumber(final RobotElement parent, final String prefix) {
