@@ -32,7 +32,7 @@ public class CreateFreshVariableCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final String name = NamesGenerator.generateUniqueName(variablesSection, DEFAULT_NAME);
+        final String name = NamesGenerator.generateUniqueName(variablesSection, DEFAULT_NAME, false);
 
         if (index == -1) {
             variablesSection.createVariable(variableType, name, "", "");
