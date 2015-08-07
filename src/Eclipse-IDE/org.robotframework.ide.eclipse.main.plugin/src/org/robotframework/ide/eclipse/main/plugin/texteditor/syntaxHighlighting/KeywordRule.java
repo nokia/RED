@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
+package org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +49,7 @@ class KeywordRule implements IRule {
 		}
 		
 		prevCharBeforeKeyword = (char) c;
+		
 		scanner.unread();
 		return Token.UNDEFINED;
 	}
