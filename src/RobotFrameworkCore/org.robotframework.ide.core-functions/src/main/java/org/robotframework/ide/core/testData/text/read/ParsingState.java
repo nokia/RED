@@ -240,5 +240,9 @@ public enum ParsingState {
     /**
      * 
      */
-    VARIABLE_UNKNOWN_VALUE;
+    VARIABLE_UNKNOWN_VALUE,
+    /**
+     * 
+     */
+    TEST_CASE_DECLARATION;
 }
