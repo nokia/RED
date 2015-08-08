@@ -3,10 +3,7 @@ package org.robotframework.ide.core.testData.text.read.recognizer;
 import java.util.Arrays;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
@@ -26,12 +23,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.settings.Variab
 public class SettingsRecognizersProvider {
 
     private static final List<ATokenRecognizer> recognized = Arrays.asList(
-            new SettingsTableHeaderRecognizer(),
-            new VariablesTableHeaderRecognizer(),
-            new TestCasesTableHeaderRecognizer(),
-            new KeywordsTableHeaderRecognizer(), new HashCommentRecognizer(),
+            new SettingsTableHeaderRecognizer(), new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
-
             new LibraryDeclarationRecognizer(), new LibraryAliasRecognizer(),
             new VariableDeclarationRecognizer(),
             new ResourceDeclarationRecognizer(),
