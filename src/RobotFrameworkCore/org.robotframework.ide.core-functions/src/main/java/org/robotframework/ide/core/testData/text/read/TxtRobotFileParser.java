@@ -279,6 +279,7 @@ public class TxtRobotFileParser {
         LineContinueType lineContinueType = previousLineHandler
                 .computeLineContinue(processingState, isNewLine,
                         robotFileOutput.getFileModel(), currentLine, robotToken);
+
         if (previousLineHandler.isSomethingToDo(lineContinueType)) {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
