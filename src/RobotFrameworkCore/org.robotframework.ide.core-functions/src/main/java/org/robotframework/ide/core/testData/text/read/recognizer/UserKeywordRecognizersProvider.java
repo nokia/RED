@@ -3,6 +3,7 @@ package org.robotframework.ide.core.testData.text.read.recognizer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.userKeywords.KeywordArgumentsRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.userKeywords.KeywordDocumentationRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.userKeywords.KeywordReturnRecognizer;
@@ -15,6 +16,7 @@ public class UserKeywordRecognizersProvider {
 
     private static volatile List<ATokenRecognizer> recognized = new LinkedList<>();
     static {
+        recognized.add(new KeywordsTableHeaderRecognizer());
         recognized.add(new KeywordDocumentationRecognizer());
         recognized.add(new KeywordTagsRecognizer());
         recognized.add(new KeywordArgumentsRecognizer());

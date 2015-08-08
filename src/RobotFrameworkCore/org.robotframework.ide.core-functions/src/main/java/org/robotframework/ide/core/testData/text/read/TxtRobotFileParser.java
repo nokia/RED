@@ -289,7 +289,7 @@ public class TxtRobotFileParser {
                 if (!text.equals(robotToken.getText().toString())) {
                     // FIXME: add information that type is incorrect missing
                     // separator
-                    robotToken.setType(RobotTokenType.UNKNOWN);
+                    robotToken.getTypes().add(0, RobotTokenType.UNKNOWN);
                     robotToken.setText(new StringBuilder(text));
                     newStatus = ParsingState.UNKNOWN;
                 }
@@ -373,16 +373,26 @@ public class TxtRobotFileParser {
             String text, boolean isNewLine, List<RobotToken> robotTokens) {
         RobotToken correct = null;
         if (robotTokens.size() > 1) {
-            ParsingState state = utility.getCurrentStatus(processingState);
-            for (RobotToken rt : robotTokens) {
-                if (isTypeForState(state, rt)) {
-                    correct = rt;
-                    break;
+            List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
+            if (!headersPossible.isEmpty()) {
+                if (headersPossible.size() == 1) {
+                    correct = headersPossible.get(0);
+                } else {
+                    // FIXME: error
                 }
-            }
+            } else {
+                ParsingState state = utility.getCurrentStatus(processingState);
+                for (RobotToken rt : robotTokens) {
+                    if (isTypeForState(state, rt)) {
+                        correct = rt;
+                        break;
+                    }
+                }
 
-            if (correct == null) {
-                // FIXME: error no matching tokens to state
+                if (correct == null) {
+                    // FIXME: error no matching tokens to state
+
+                }
             }
         } else {
             correct = robotTokens.get(0);
@@ -393,12 +403,27 @@ public class TxtRobotFileParser {
 
 
     @VisibleForTesting
-    public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
+    protected List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
+        List<RobotToken> found = new LinkedList<>();
+        for (RobotToken t : tokens) {
+            if (utility.isTableHeader(t)) {
+                found.add(t);
+            }
+        }
+
+        return found;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isTypeForState(final ParsingState state,
+            final RobotToken rt) {
         RobotTokenType robotType = RobotTokenType.UNKNOWN;
         boolean result = false;
 
         List<RobotTokenType> typesForState = new LinkedList<>();
-        if (state == ParsingState.TEST_CASE_TABLE_INSIDE) {
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE
+                || state == ParsingState.TEST_CASE_DECLARATION) {
             typesForState = robotType.getTypesForTestCasesTable();
         } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
             typesForState = robotType.getTypesForSettingsTable();
