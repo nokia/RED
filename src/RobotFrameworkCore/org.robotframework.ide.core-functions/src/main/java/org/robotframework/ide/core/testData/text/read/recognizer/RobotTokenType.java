@@ -280,6 +280,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    TEST_CASE_NAME(TableType.TEST_CASES),
+    /**
+     * 
+     */
     KEYWORD_SETTING_DOCUMENTATION(TableType.KEYWORDS, "[Documentation]"),
     /**
      * 
