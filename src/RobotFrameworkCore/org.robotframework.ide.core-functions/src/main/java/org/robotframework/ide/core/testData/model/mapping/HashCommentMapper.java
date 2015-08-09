@@ -24,6 +24,13 @@ import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseSetup;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTags;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTeardown;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTemplate;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
+import org.robotframework.ide.core.testData.model.table.testCases.TestDocumentation;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -109,6 +116,30 @@ public class HashCommentMapper implements IParsingMapper {
                 || commentHolder == ParsingState.DICTIONARY_VARIABLE_VALUE
                 || commentHolder == ParsingState.VARIABLE_TABLE_INSIDE) {
             mapVariableComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_DECLARATION) {
+            // it will be line inside test
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_DOCUMENTATION_DECLARATION
+                || commentHolder == ParsingState.TEST_CASE_SETTING_DOCUMENTATION_TEXT) {
+            mapTestCaseDocumentationComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_SETUP
+                || commentHolder == ParsingState.TEST_CASE_SETTING_SETUP_KEYWORD
+                || commentHolder == ParsingState.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT) {
+            mapTestCaseSetupComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_TEARDOWN
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT) {
+            mapTestCaseTeardownComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_TAGS
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME) {
+            mapTestCaseTagsComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
+            mapTestTemplateComment(rt, commentHolder, fileModel);
+        } else if (commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
+                || commentHolder == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE) {
+            mapTestCaseTimeoutComment(rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -116,6 +147,79 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return rt;
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseTimeoutComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestCaseTimeout> timeouts = testCase.getTimeouts();
+        TestCaseTimeout testCaseTimeout = timeouts.get(timeouts.size() - 1);
+        testCaseTimeout.addCommentPart(rt);
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseTemplateComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestCaseTemplate> templates = testCase.getTemplates();
+        TestCaseTemplate testCaseTemplate = templates.get(templates.size() - 1);
+        testCaseTemplate.addCommentPart(rt);
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseTagsComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestCaseTags> tags = testCase.getTags();
+        TestCaseTags testCaseTags = tags.get(tags.size() - 1);
+        testCaseTags.addCommentPart(rt);
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseTeardownComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestCaseTeardown> teardowns = testCase.getTeardowns();
+        TestCaseTeardown testCaseTeardown = teardowns.get(teardowns.size() - 1);
+        testCaseTeardown.addCommentPart(rt);
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseSetupComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestCaseSetup> setups = testCase.getSetups();
+        TestCaseSetup testCaseSetup = setups.get(setups.size() - 1);
+        testCaseSetup.addCommentPart(rt);
+    }
+
+
+    @VisibleForTesting
+    protected void mapTestCaseDocumentationComment(RobotToken rt,
+            ParsingState commentHolder, RobotFile fileModel) {
+        List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+
+        List<TestDocumentation> documentation = testCase.getDocumentation();
+        TestDocumentation testDocumentation = documentation.get(documentation
+                .size() - 1);
+        testDocumentation.addCommentPart(rt);
     }
 
 
