@@ -37,16 +37,28 @@ public class PreviousLineHandler {
         if (isNewLine) {
             if (currentToken.getTypes().contains(
                     RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
-                ParsingState currentState = utility
-                        .getCurrentStatus(parsingStates);
-                if (utility.isTheFirstColumn(currentLine, currentToken)
-                        && isSomethingToContinue(model, currentLine)) {
-                    if (currentState == ParsingState.SETTING_TABLE_INSIDE
-                            && containsAnySetting(model)) {
-                        continueType = LineContinueType.SETTING_TABLE_ELEMENT;
-                    } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
-                            && containsAnyVariables(model)) {
-                        continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
+                if (isSomethingToContinue(model, currentLine)) {
+                    ParsingState currentState = utility
+                            .getCurrentStatus(parsingStates);
+                    if (utility.isTheFirstColumn(currentLine, currentToken)) {
+                        if (currentState == ParsingState.SETTING_TABLE_INSIDE
+                                && containsAnySetting(model)) {
+                            continueType = LineContinueType.SETTING_TABLE_ELEMENT;
+                        } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
+                                && containsAnyVariables(model)) {
+                            continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
+                        }
+                    } else {
+                        if (utility.isTheFirstColumnAfterSeparator(currentLine,
+                                currentToken)) {
+                            if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
+                                    && containsAnyTestCases(model)) {
+                                continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
+                            } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
+                                    && containsAnyKeywords(model)) {
+                                continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
+                            }
+                        }
                     }
                 }
             }
@@ -107,6 +119,18 @@ public class PreviousLineHandler {
     }
 
 
+    @VisibleForTesting
+    protected boolean containsAnyTestCases(final RobotFile file) {
+        return !file.getTestCaseTable().getTestCases().isEmpty();
+    }
+
+
+    @VisibleForTesting
+    protected boolean containsAnyKeywords(final RobotFile file) {
+        return !file.getKeywordTable().getKeywords().isEmpty();
+    }
+
+
     public boolean isSomethingToDo(final LineContinueType type) {
         return (type != LineContinueType.NONE);
     }
@@ -134,7 +158,7 @@ public class PreviousLineHandler {
     }
 
     public static enum LineContinueType {
-        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT;
+        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT, TEST_CASE_TABLE_ELEMENT, KEYWORD_TABLE_ELEMENT;
     }
 
 

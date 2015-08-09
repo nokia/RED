@@ -9,6 +9,7 @@ import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCa
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTeardownMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTimeoutMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestDocumentationMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestDocumentationTextMapper;
 
 
 public class TestCaseMapperProvider {
@@ -22,6 +23,7 @@ public class TestCaseMapperProvider {
         mappers.add(new TestCaseTagsMapper());
         mappers.add(new TestCaseTimeoutMapper());
         mappers.add(new TestDocumentationMapper());
+        mappers.add(new TestDocumentationTextMapper());
     }
 
 
