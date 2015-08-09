@@ -271,6 +271,14 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    TEST_CASE_SETTING_SETUP_KEYWORD_NAME(TableType.TEST_CASES),
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT(TableType.TEST_CASES),
+    /**
+     * 
+     */
     TEST_CASE_SETTING_TEARDOWN(TableType.TEST_CASES, "[Teardown]",
             "[Postcondition]"),
     /**
