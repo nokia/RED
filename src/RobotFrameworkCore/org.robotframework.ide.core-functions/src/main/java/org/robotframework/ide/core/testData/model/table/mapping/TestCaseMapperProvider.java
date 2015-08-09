@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseNameMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseSetupKeywordArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseSetupKeywordMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseSetupMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTagsMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTeardownMapper;
@@ -18,6 +20,8 @@ public class TestCaseMapperProvider {
     static {
         mappers.add(new TestCaseNameMapper());
         mappers.add(new TestCaseSetupMapper());
+        mappers.add(new TestCaseSetupKeywordMapper());
+        mappers.add(new TestCaseSetupKeywordArgumentMapper());
         mappers.add(new TestCaseTagsMapper());
         mappers.add(new TestCaseTeardownMapper());
         mappers.add(new TestCaseTagsMapper());
