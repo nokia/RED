@@ -259,6 +259,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    TEST_CASE_SETTING_DOCUMENTATION_TEXT(TableType.TEST_CASES),
+    /**
+     * 
+     */
     TEST_CASE_SETTING_TAGS(TableType.TEST_CASES, "[Tags]"),
     /**
      * 
