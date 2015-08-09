@@ -244,5 +244,13 @@ public enum ParsingState {
     /**
      * 
      */
-    TEST_CASE_DECLARATION;
+    TEST_CASE_DECLARATION,
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_DOCUMENTATION_DECLARATION,
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_DOCUMENTATION_TEXT;
 }

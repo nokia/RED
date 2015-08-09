@@ -175,7 +175,19 @@ public class TxtRobotFileParser {
             lineNumber++;
             lastColumnProcessed = 0;
             checkAndFixLine(parsingOutput, processingState);
-            previousLineHandler.flushNew(processingState);
+            /**
+             * special for case
+             * 
+             * <pre>
+             * *** Settings
+             * Suite Setup      Keyword
+             * 
+             * ...              argument_x
+             * </pre>
+             */
+            if (!line.getLineElements().isEmpty()) {
+                previousLineHandler.flushNew(processingState);
+            }
             rf.addNewLine(line);
             utility.updateStatusesForNewLine(processingState);
             isNewLine = true;

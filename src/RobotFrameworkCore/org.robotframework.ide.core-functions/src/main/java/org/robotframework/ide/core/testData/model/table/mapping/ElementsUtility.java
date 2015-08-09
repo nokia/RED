@@ -92,6 +92,27 @@ public class ElementsUtility {
                 result = true;
             }
         }
+
+        return result;
+    }
+
+
+    public boolean isTheFirstColumnAfterSeparator(RobotLine currentLine,
+            RobotToken robotToken) {
+        boolean result = false;
+        if (robotToken.getStartColumn() > 0) {
+            List<IRobotLineElement> lineElements = currentLine
+                    .getLineElements();
+            int size = lineElements.size();
+            if (size > 0) {
+                IRobotLineElement lastElement = lineElements.get(size - 1);
+                List<IRobotTokenType> types = lastElement.getTypes();
+                result = ((types.contains(SeparatorType.PIPE) || types
+                        .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)) && lastElement
+                        .getStartColumn() == 0);
+            }
+        }
+
         return result;
     }
 
