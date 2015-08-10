@@ -23,6 +23,8 @@ class KeywordRule implements IRule {
 	
 	private int currentReadCount = 0;
 	
+	private int columnConstraint = -1;
+	
     KeywordRule(final IToken token, final List<String> keywords) {
 	    this.token = token;
 		this.keywords = keywords;
@@ -36,22 +38,30 @@ class KeywordRule implements IRule {
 		
 		final int c= scanner.read();
 		
-		if(isInKeyword((char) c, 1, tempKeywords)) {
-			if(keywordDetected(scanner)) {
-				final int nextCharAfterKeyword = scanner.read();
-				scanner.unread();
-				if((isSeparator((char) nextCharAfterKeyword) || nextCharAfterKeyword == ICharacterScanner.EOF) && isSeparator(prevCharBeforeKeyword)) {
-					return token;
-				} else {
-				    clearScanner(scanner, currentReadCount);
-				}
-			}
+		if (columnConstraint == -1 || (columnConstraint == scanner.getColumn() - 1)) {
+    		
+		    if(isInKeyword((char) c, 1, tempKeywords)) {
+    			if(keywordDetected(scanner)) {
+    				final int nextCharAfterKeyword = scanner.read();
+    				scanner.unread();
+    				if((isSeparator((char) nextCharAfterKeyword) || nextCharAfterKeyword == ICharacterScanner.EOF) && isSeparator(prevCharBeforeKeyword)) {
+    					return token;
+    				} else {
+    				    clearScanner(scanner, currentReadCount);
+    				}
+    			}
+    		}
+    		
+    		
 		}
-		
 		prevCharBeforeKeyword = (char) c;
 		
 		scanner.unread();
 		return Token.UNDEFINED;
+	}
+	
+	public void setColumnConstraint(int column) {
+	    columnConstraint = column;
 	}
 	
 	private boolean keywordDetected(final ICharacterScanner scanner) {
