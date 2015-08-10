@@ -1,15 +1,16 @@
-package org.robotframework.ide.core.testData.model.table.testCases.mapping;
+package org.robotframework.ide.core.testData.model.table.userKeywords.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTimeout;
+import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -18,12 +19,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class TestCaseTimeoutValueMapper implements IParsingMapper {
+public class KeywordTimeoutValueMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestCaseTimeoutValueMapper() {
+    public KeywordTimeoutValueMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -33,20 +34,20 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.UNKNOWN);
+        types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
+        rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 
-        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
-                .getTestCaseTable();
-        List<TestCase> testCases = testCaseTable.getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseTimeout> timeouts = testCase.getTimeouts();
-        if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).setTimeout(rt);
-        } else {
-            // FIXME: some internal error
-        }
-        processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE);
+        KeywordTable keywordTable = robotFileOutput.getFileModel()
+                .getKeywordTable();
+        List<UserKeyword> keywords = keywordTable.getKeywords();
+        UserKeyword keyword = keywords.get(keywords.size() - 1);
+        List<KeywordTimeout> timeouts = keyword.getTimeouts();
+
+        timeouts.get(timeouts.size() - 1).setTimeout(rt);
+        processingState.push(ParsingState.KEYWORD_SETTING_TIMEOUT_VALUE);
 
         return rt;
     }
@@ -59,11 +60,13 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
 
-        if (state == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
-            List<TestCase> tests = robotFileOutput.getFileModel()
-                    .getTestCaseTable().getTestCases();
-            List<TestCaseTimeout> timeouts = tests.get(tests.size() - 1)
-                    .getTimeouts();
+        if (state == ParsingState.KEYWORD_SETTING_TIMEOUT) {
+            KeywordTable keywordTable = robotFileOutput.getFileModel()
+                    .getKeywordTable();
+            List<UserKeyword> keywords = keywordTable.getKeywords();
+            UserKeyword keyword = keywords.get(keywords.size() - 1);
+            List<KeywordTimeout> timeouts = keyword.getTimeouts();
+
             result = !checkIfHasAlreadyValue(timeouts);
         }
         return result;
@@ -72,9 +75,9 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean checkIfHasAlreadyValue(
-            List<TestCaseTimeout> testCaseTimeouts) {
+            List<KeywordTimeout> keywordTimeouts) {
         boolean result = false;
-        for (TestCaseTimeout setting : testCaseTimeouts) {
+        for (KeywordTimeout setting : keywordTimeouts) {
             result = (setting.getTimeout() != null);
             result = result || !setting.getMessage().isEmpty();
             if (result) {

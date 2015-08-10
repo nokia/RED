@@ -14,6 +14,8 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 
 public class TestTimeoutMessageMapper implements IParsingMapper {
 
@@ -59,12 +61,31 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
             if (currentState == ParsingState.SETTING_TEST_TIMEOUT_VALUE
                     || currentState == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
                 result = true;
+            } else if (currentState == ParsingState.SETTING_TEST_TIMEOUT) {
+                List<TestTimeout> testTimeouts = robotFileOutput.getFileModel()
+                        .getSettingTable().getTestTimeouts();
+                result = checkIfHasAlreadyValue(testTimeouts);
             } else {
                 result = false;
             }
         } else {
             result = false;
         }
+        return result;
+    }
+
+
+    @VisibleForTesting
+    protected boolean checkIfHasAlreadyValue(List<TestTimeout> testTimeouts) {
+        boolean result = false;
+        for (TestTimeout setting : testTimeouts) {
+            result = (setting.getTimeout() != null);
+            result = result || !setting.getMessageArguments().isEmpty();
+            if (result) {
+                break;
+            }
+        }
+
         return result;
     }
 
