@@ -18,7 +18,7 @@ public interface ISectionFormFragment {
 
     public MatchesCollection collectMatches(String filter);
 
-    public interface MatcherProvider {
+    public interface MatchesProvider {
 
         MatchesCollection getMatches();
     }

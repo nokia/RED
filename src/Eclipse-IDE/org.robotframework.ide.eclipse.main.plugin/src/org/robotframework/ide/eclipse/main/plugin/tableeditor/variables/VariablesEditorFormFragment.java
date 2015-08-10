@@ -105,7 +105,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         
         final NewElementsCreator creator = newElementsCreator();
         
-        final MatcherProvider matchesProvider = new MatcherProvider() {
+        final MatchesProvider matchesProvider = new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
                 return matches;

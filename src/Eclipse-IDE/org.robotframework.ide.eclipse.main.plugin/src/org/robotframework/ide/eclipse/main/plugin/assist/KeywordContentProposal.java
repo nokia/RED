@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import org.eclipse.jface.assist.IDecoratedContentProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.red.jface.assist.IDecoratedContentProposal;
 
 import com.google.common.base.Strings;
 

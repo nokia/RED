@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -16,11 +16,11 @@ class SettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
     private final int index;
     private final boolean shouldProvideLabelForAddingToken;
 
-    SettingsArgsLabelProvider(final MatcherProvider matchesProvider, final int index) {
+    SettingsArgsLabelProvider(final MatchesProvider matchesProvider, final int index) {
         this(matchesProvider, index, false);
     }
 
-    SettingsArgsLabelProvider(final MatcherProvider matchesProvider, final int index,
+    SettingsArgsLabelProvider(final MatchesProvider matchesProvider, final int index,
             final boolean shouldProvideLabelForAddingToken) {
         super(matchesProvider);
         this.index = index;

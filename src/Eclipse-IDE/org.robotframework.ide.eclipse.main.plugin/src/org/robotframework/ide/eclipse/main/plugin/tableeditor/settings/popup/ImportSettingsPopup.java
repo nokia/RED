@@ -1,13 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
-import org.eclipse.jface.dialogs.InputLoadingFormComposite;
-import org.eclipse.jface.dialogs.RobotPopupDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
+import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 
 public class ImportSettingsPopup extends RobotPopupDialog {
 

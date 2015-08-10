@@ -911,6 +911,44 @@
           </and>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertCellHandler"
+          commandId="org.robotframework.ide.eclipse.insertCell">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.singleElementHasFocusedCell">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellHandler"
+          commandId="org.robotframework.ide.eclipse.deleteCell">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.singleElementHasFocusedCell">
+          </reference>
+       </enabledWhen>
+    </handler>
  </extension>
  <extension
        name="Test Cases part handlers"
@@ -1012,24 +1050,6 @@
                 definitionId="org.robotframework.selectedElementsHaveSameType">
           </reference>
        </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.InsertCellHandler"
-          commandId="org.robotframework.ide.eclipse.insertCell">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCellHandler"
-          commandId="org.robotframework.ide.eclipse.deleteCell">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
     </handler>
  </extension>
  <extension
@@ -1314,6 +1334,68 @@
              </reference>
           </and>
        </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.InsertCellHandler"
+          commandId="org.robotframework.ide.eclipse.insertCell">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+             </reference>
+             <with
+                   variable="activeContexts">
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <or>
+                      <equals
+                            value="org.robotframework.ide.eclipse.tableeditor.settings.import.context">
+                      </equals>
+                      <equals
+                            value="org.robotframework.ide.eclipse.tableeditor.settings.general.context">
+                      </equals>
+                   </or>
+                </iterate>
+             </with>
+          </and>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.singleElementHasFocusedCell">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteCellHandler"
+          commandId="org.robotframework.ide.eclipse.deleteCell">
+       <activeWhen>
+          <and>
+             <reference
+                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
+             </reference>
+             <with
+                   variable="activeContexts">
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <or>
+                      <equals
+                            value="org.robotframework.ide.eclipse.tableeditor.settings.import.context">
+                      </equals>
+                      <equals
+                            value="org.robotframework.ide.eclipse.tableeditor.settings.general.context">
+                      </equals>
+                   </or>
+                </iterate>
+             </with>
+          </and>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.singleElementHasFocusedCell">
+          </reference>
+       </enabledWhen>
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.EditSettingsHandler"
@@ -1884,6 +1966,20 @@
        <menu
              label="Table">
           <command
+                commandId="org.robotframework.ide.eclipse.insertCell"
+                label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteCell"
+                label="Delete cell"
+                style="push">
+          </command>
+          <separator
+                name="table.state"
+                visible="true">
+          </separator>
+          <command
                 commandId="org.robotframework.ide.eclipse.expandAll"
                 icon="resources/expandall.png"
                 label="Expand All"
@@ -2208,6 +2304,16 @@
        </separator>
        <menu
              label="Table">
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCell"
+                label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteCell"
+                label="Delete cell"
+                style="push">
+          </command>
        </menu>
        <menu
              label="Row">
@@ -2352,6 +2458,16 @@
        </separator>
        <menu
              label="Table">
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCell"
+                label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteCell"
+                label="Delete cell"
+                style="push">
+          </command>
        </menu>
        <menu
              label="Row">

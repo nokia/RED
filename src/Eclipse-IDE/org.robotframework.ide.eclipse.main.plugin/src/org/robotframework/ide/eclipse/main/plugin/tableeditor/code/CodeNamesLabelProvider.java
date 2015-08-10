@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Joiner;
 
 class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
-    public CodeNamesLabelProvider(final MatcherProvider matchesProvider) {
+    public CodeNamesLabelProvider(final MatchesProvider matchesProvider) {
         super(matchesProvider);
     }
 

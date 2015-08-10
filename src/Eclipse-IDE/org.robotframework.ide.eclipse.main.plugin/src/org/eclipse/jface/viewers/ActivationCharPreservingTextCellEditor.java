@@ -1,6 +1,5 @@
 package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.assist.RedContentProposalAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -9,6 +8,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 
 /**
  * This is a custom implementation of TextCellEditor which can be activated by

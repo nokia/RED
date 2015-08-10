@@ -1,4 +1,4 @@
-package org.eclipse.jface.assist;
+package org.robotframework.red.jface.assist;
 
 import java.util.ArrayList;
 
