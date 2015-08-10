@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.project.build;
+package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 

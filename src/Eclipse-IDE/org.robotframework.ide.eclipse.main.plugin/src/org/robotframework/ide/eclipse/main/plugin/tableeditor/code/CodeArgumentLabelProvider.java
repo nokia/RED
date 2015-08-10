@@ -15,7 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 
 import com.google.common.collect.Range;
@@ -24,7 +24,7 @@ class CodeArgumentLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final int index;
 
-    CodeArgumentLabelProvider(final MatcherProvider matchesProvider, final int index) {
+    CodeArgumentLabelProvider(final MatchesProvider matchesProvider, final int index) {
         super(matchesProvider);
         this.index = index;
     }

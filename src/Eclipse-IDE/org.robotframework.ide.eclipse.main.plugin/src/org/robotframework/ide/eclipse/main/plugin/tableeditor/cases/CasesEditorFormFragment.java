@@ -84,8 +84,8 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
 
     @Override
     protected int calculateLongestArgumentsList() {
-        final RobotSuiteFileSection section = getSection();
         int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        final RobotSuiteFileSection section = getSection();
         if (section != null) {
             for (final RobotElement testCase : section.getChildren()) {
                 for (final RobotElement nestedElement : testCase.getChildren()) {
@@ -109,8 +109,8 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected MatcherProvider getMatchesProvider() {
-        return new MatcherProvider() {
+    protected MatchesProvider getMatchesProvider() {
+        return new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
                 return matches;

@@ -9,17 +9,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
 import com.google.common.collect.Range;
 
 public abstract class MatchesHighlightingLabelProvider extends StylersDisposingLabelProvider {
 
-    private final MatcherProvider matchesProvider;
+    private final MatchesProvider matchesProvider;
     private final DisposeNeededStyler styler;
 
-    public MatchesHighlightingLabelProvider(final MatcherProvider matchesProvider) {
+    public MatchesHighlightingLabelProvider(final MatchesProvider matchesProvider) {
         this.matchesProvider = matchesProvider;
         this.styler = addDisposeNeededStyler(new DisposeNeededStyler() {
             @Override

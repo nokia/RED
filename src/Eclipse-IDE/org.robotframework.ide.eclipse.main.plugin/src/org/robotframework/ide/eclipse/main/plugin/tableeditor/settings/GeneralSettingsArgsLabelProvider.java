@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -17,7 +17,7 @@ class GeneralSettingsArgsLabelProvider extends MatchesHighlightingLabelProvider 
 
     private final int index;
 
-    GeneralSettingsArgsLabelProvider(final MatcherProvider matcherProvider, final int index) {
+    GeneralSettingsArgsLabelProvider(final MatchesProvider matcherProvider, final int index) {
         super(matcherProvider);
         this.index = index;
     }

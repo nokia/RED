@@ -76,7 +76,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return new FocusedViewerAccessor(variablesFragment.getViewer());
+            return new FocusedViewerAccessor(null, variablesFragment.getViewer());
         }
     }
 }

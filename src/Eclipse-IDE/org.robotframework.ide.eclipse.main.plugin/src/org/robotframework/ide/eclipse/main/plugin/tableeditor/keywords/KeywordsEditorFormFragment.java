@@ -203,8 +203,8 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected MatcherProvider getMatchesProvider() {
-        return new MatcherProvider() {
+    protected MatchesProvider getMatchesProvider() {
+        return new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
                 return matches;

@@ -15,12 +15,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
 
-class RobotProjectValidator {
+public class RobotArtifactsValidator {
 
     private final IProject project;
 
-    public RobotProjectValidator(final IProject project) {
+    public RobotArtifactsValidator(final IProject project) {
         this.project = project;
     }
 

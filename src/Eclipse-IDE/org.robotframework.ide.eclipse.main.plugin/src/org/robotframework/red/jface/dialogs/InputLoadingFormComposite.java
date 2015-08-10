@@ -1,4 +1,4 @@
-package org.eclipse.jface.dialogs;
+package org.robotframework.red.jface.dialogs;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

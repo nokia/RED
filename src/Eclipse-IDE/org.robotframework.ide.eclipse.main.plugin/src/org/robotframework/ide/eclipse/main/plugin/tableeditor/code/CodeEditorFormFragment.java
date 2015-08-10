@@ -10,6 +10,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,6 +19,8 @@ import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.viewers.ViewersConfigurator.MenuProvider;
@@ -42,6 +45,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -74,6 +79,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     private Section section;
 
+    private boolean isSaving = false;
+
     public TreeViewer getViewer() {
         return viewer;
     }
@@ -85,7 +92,12 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         createViewerContextMenu();
         createHeaderContextMenu();
 
-        setInput();
+        createColumns();
+
+        viewer.setInput(getSection());
+        viewer.refresh();
+        viewer.expandAll();
+
         parent.layout();
     }
 
@@ -184,14 +196,40 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     protected abstract String getHeaderMenuId();
 
-    private void setInput() {
-        viewer.setInput(getSection());
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
+            @Override
+            public void addColumn(final ColumnViewer viewer) {
+                final RowExposingTreeViewer treeViewer = (RowExposingTreeViewer) viewer;
+                final int index = treeViewer.getTree().getColumnCount() - 2;
 
-        viewer.removeAllColumns();
-        createColumns();
+                createArgumentColumn(index, provideNewElementsCreator());
+                treeViewer.moveLastColumnTo(index + 1);
+                treeViewer.reflowColumnsWidth();
+            }
 
-        viewer.refresh();
-        viewer.expandAll();
+            @Override
+            public void removeColumn(final ColumnViewer viewer) {
+                final RowExposingTreeViewer treeViewer = (RowExposingTreeViewer) viewer;
+
+                final int columnCount = treeViewer.getTree().getColumnCount();
+                if (columnCount <= 2) {
+                    return;
+                }
+                // always remove last columns which displays arguments
+                final int position = columnCount - 2;
+                final int orderIndexBeforeRemoving = treeViewer.getTree().getColumnOrder()[position];
+                treeViewer.removeColumnAtPosition(position);
+                treeViewer.reflowColumnsWidth();
+
+                final TreeViewerEditor editor = (TreeViewerEditor) treeViewer.getColumnViewerEditor();
+                final ViewerCell focusCell = editor.getFocusCell();
+                if (focusCell.getColumnIndex() == orderIndexBeforeRemoving) {
+                    treeViewer.setFocusCell(treeViewer.getTree().getColumnCount() - 2);
+                }
+            }
+        };
+        return new FocusedViewerAccessor(columnsManagingStrategy, viewer);
     }
 
     protected abstract RobotSuiteFileSection getSection();
@@ -208,6 +246,10 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     }
 
     protected abstract NewElementsCreator provideNewElementsCreator();
+
+    protected int calculateLongestArgumentsList() {
+        return RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+    }
 
     private void createNameColumn(final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn("").withWidth(150)
@@ -236,11 +278,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    protected int calculateLongestArgumentsList() {
-        return RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-    }
-
-    protected abstract MatcherProvider getMatchesProvider();
+    protected abstract MatchesProvider getMatchesProvider();
 
     protected abstract boolean sectionIsDefined();
 
@@ -255,6 +293,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     @Persist
     public void onSave() {
+        isSaving = true;
         setFocus();
     }
 
@@ -267,7 +306,9 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel && viewer.getInput() == null) {
-            setInput();
+            viewer.setInput(getSection());
+            viewer.refresh();
+
             dirtyProviderService.setDirtyState(true);
         }
     }
@@ -277,7 +318,9 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && viewer.getInput() != null) {
-            setInput();
+            viewer.setInput(getSection());
+            viewer.refresh();
+
             dirtyProviderService.setDirtyState(true);
         }
     }
@@ -287,7 +330,12 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            setInput();
+            if (isSaving) {
+                isSaving = false;
+            } else {
+                viewer.setInput(getSection());
+            }
+            viewer.refresh();
         }
     }
 }

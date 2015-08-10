@@ -97,8 +97,12 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return new FocusedViewerAccessor(generalFragment.getViewer(), metadataFragment.getViewer(),
-                    importFragment.getViewer());
+            if (metadataFragment.getViewer().getTable().isFocusControl()) {
+                return metadataFragment.getFocusedViewerAccessor();
+            } else if (importFragment.getViewer().getTable().isFocusControl()) {
+                return importFragment.getFocusedViewerAccessor();
+            }
+            return generalFragment.getFocusedViewerAccessor();
         }
     }
 }

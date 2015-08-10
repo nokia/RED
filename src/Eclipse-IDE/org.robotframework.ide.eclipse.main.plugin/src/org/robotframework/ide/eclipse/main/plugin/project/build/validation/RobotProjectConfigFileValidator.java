@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.project.build;
+package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,19 +23,21 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 
-class RobotProjectConfigFileValidator {
+public class RobotProjectConfigFileValidator {
 
     private final IFile configFile;
 
-    RobotProjectConfigFileValidator(final IFile configFile) {
+    public RobotProjectConfigFileValidator(final IFile configFile) {
         this.configFile = configFile;
     }
 
-    void validate(final IProgressMonitor monitor) throws CoreException {
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
         RobotProjectConfigWithLines config = null;
         try {

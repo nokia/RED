@@ -20,10 +20,13 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -62,6 +65,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -226,22 +231,38 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final MatcherProvider matcherProvider = new MatcherProvider() {
+        final MatchesProvider matcherProvider = getMatchesProvider();
+        createNameColumn(matcherProvider);
+
+        for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
+            createArgumentColumn(i, matcherProvider);
+        }
+        createCommentColumn(matcherProvider);
+    }
+
+    private MatchesProvider getMatchesProvider() {
+        return new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
                 return matches;
             }
         };
+    }
+
+    private void createNameColumn(final MatchesProvider matcherProvider) {
         ViewerColumnsFactory.newColumn("Setting").withWidth(100)
                 .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider)).createFor(viewer);
+    }
 
-        for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
-            ViewerColumnsFactory.newColumn("").withWidth(120)
-                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, i))
-                .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, i, commandsStack))
-                .editingEnabledOnlyWhen(fileModel.isEditable())
-                .createFor(viewer);
-        }
+    private void createArgumentColumn(final int index, final MatchesProvider matcherProvider) {
+        ViewerColumnsFactory.newColumn("").withWidth(120)
+                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, index))
+                .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, index, commandsStack))
+            .editingEnabledOnlyWhen(fileModel.isEditable())
+            .createFor(viewer);
+    }
+
+    private void createCommentColumn(final MatchesProvider matcherProvider) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider(matcherProvider))
@@ -329,6 +350,42 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     public void clearSettingsSelection() {
         viewer.setSelection(StructuredSelection.EMPTY);
+    }
+
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
+            @Override
+            public void addColumn(final ColumnViewer viewer) {
+                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+                final int index = tableViewer.getTable().getColumnCount() - 2;
+
+                createArgumentColumn(index, getMatchesProvider());
+                tableViewer.moveLastColumnTo(index + 1);
+                tableViewer.reflowColumnsWidth();
+            }
+
+            @Override
+            public void removeColumn(final ColumnViewer viewer) {
+                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+
+                final int columnCount = tableViewer.getTable().getColumnCount();
+                if (columnCount <= 2) {
+                    return;
+                }
+                // always remove last columns which displays arguments
+                final int position = columnCount - 2;
+                final int orderIndexBeforeRemoving = tableViewer.getTable().getColumnOrder()[position];
+                tableViewer.removeColumnAtPosition(position);
+                tableViewer.reflowColumnsWidth();
+
+                final TableViewerEditor editor = (TableViewerEditor) tableViewer.getColumnViewerEditor();
+                final ViewerCell focusCell = editor.getFocusCell();
+                if (focusCell.getColumnIndex() == orderIndexBeforeRemoving) {
+                    tableViewer.setFocusCell(tableViewer.getTable().getColumnCount() - 2);
+                }
+            }
+        };
+        return new FocusedViewerAccessor(columnsManagingStrategy, viewer);
     }
 
     @Override

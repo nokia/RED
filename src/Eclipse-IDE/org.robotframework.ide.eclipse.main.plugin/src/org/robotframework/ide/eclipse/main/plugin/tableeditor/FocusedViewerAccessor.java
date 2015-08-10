@@ -5,25 +5,36 @@ import org.eclipse.jface.viewers.ViewerCell;
 
 public class FocusedViewerAccessor {
 
-    private final ColumnViewer[] viewers;
+    private final ViewerColumnsManagingStrategy columnsManager;
+    private final ColumnViewer viewer;
 
-    public FocusedViewerAccessor(final ColumnViewer... viewers) {
-        this.viewers = viewers;
+    public FocusedViewerAccessor(final ViewerColumnsManagingStrategy columnsManager, final ColumnViewer viewer) {
+        this.viewer = viewer;
+        this.columnsManager = columnsManager;
     }
 
     public ColumnViewer getViewer() {
-        if (viewers.length == 0) {
-            return null;
-        }
-        for (final ColumnViewer viewer : viewers) {
-            if (viewer.getControl().isFocusControl()) {
-                return viewer;
-            }
-        }
-        return viewers[0];
+        return viewer;
     }
 
     public ViewerCell getFocusedCell() {
         return getViewer().getColumnViewerEditor().getFocusCell();
+    }
+
+    public ViewerColumnsManagingStrategy getColumnsManager() {
+        return columnsManager;
+    }
+
+    public static class ViewerColumnsManagingStrategy {
+
+        @SuppressWarnings("unused")
+        public void addColumn(final ColumnViewer viewer) {
+            // implement in subclasses
+        }
+
+        @SuppressWarnings("unused")
+        public void removeColumn(final ColumnViewer viewer) {
+            // implement in subclasses
+        }
     }
 }
