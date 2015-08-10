@@ -1,6 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -13,41 +13,56 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
 
-public class SettingsSectionContentAssistProcessor implements IContentAssistProcessor {
+/**
+ * @author mmarzec
+ */
+public class TestCasesSectionContentAssistProcessor implements IContentAssistProcessor {
+    
+    private Image settingImage = ImagesManager.getImage(RedImages.getRobotSettingImage());
 
     private String lastError = null;
 
-    private Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
+    private TextEditorContextValidator validator = new TextEditorContextValidator(this);
 
-    public SettingsSectionContentAssistProcessor() {
+    private Map<String, ContentAssistKeywordContext> keywordMap;
+
+    public TestCasesSectionContentAssistProcessor(final Map<String, ContentAssistKeywordContext> keywordMap) {
+        this.keywordMap = keywordMap;
     }
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-
+        lastError = null;
         final IDocument document = viewer.getDocument();
         int currentOffset = offset - 1;
 
         try {
             String currentWord = "";
 
-            if (document.getChar(currentOffset) == '\n') {
-                return TextEditorContentAssist.buildSimpleProposals(TextEditorContentAssist.getSettingsSectionWords(),
-                        currentWord, offset - currentWord.length(), image);
-            } else if (document.getChar(currentOffset) == '*') {
+            if (currentOffset < 0 || document.getChar(currentOffset) == '\n' || document.getChar(currentOffset) == '*') {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
                 return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
             } else {
-                currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
-                final List<String> filteredProposals = TextEditorContentAssist.filterProposals(
-                        TextEditorContentAssist.getSettingsSectionWords(), currentWord);
-                if (!filteredProposals.isEmpty()) {
-                    return TextEditorContentAssist.buildSimpleProposals(filteredProposals, currentWord, offset
-                            - currentWord.length(), image);
-                }
 
+                currentWord = TextEditorContentAssist.readEnteredKeyword(currentOffset, document);
+                if (currentWord == null) {
+                    return new ICompletionProposal[0];
+                }
+                
+                if(currentWord.startsWith("[")) {
+                    return TextEditorContentAssist.buildSimpleProposals(TextEditorContentAssist.getTestCasesSectionWords(),
+                            currentWord, offset - currentWord.length(), settingImage);
+                }
+                
+                final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
+                        keywordMap, currentWord);
+                ICompletionProposal[] proposals = null;
+                if (keywordProposals.size() > 0) {
+                    proposals = TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord, offset
+                            - currentWord.length());
+                }
+                return proposals;
             }
-            lastError = null;
         } catch (final BadLocationException e) {
             e.printStackTrace();
             lastError = e.getMessage();
@@ -79,7 +94,7 @@ public class SettingsSectionContentAssistProcessor implements IContentAssistProc
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator(this);
+        return validator;
     }
 
 }

@@ -497,12 +497,17 @@ public class RobotRuntimeEnvironment {
 
     public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
             final List<String> pythonpath, final List<String> variableFilesPath, final File projectLocation,
-            final List<String> suites, final String userArguments, final boolean isDebugging) throws IOException {
+            final List<String> suites, final String userArguments, final List<String> includedTags,
+            final List<String> excludedTags, final boolean isDebugging) throws IOException {
+   
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
 
         final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(executor, classpath, pythonpath,
                 variableFilesPath));
+        
+        addTags(cmdLine, includedTags, excludedTags);
+        
         cmdLine.add("--listener");
         cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":" + debugInfo);
 
@@ -570,6 +575,17 @@ public class RobotRuntimeEnvironment {
                 cmdLine.add("-V");
                 cmdLine.add(path);
             }
+        }
+    }
+    
+    private void addTags(final List<String> cmdLine, final List<String> includedTags, final List<String> excludedTags) {
+        for (String tag : includedTags) {
+            cmdLine.add("-i");
+            cmdLine.add(tag);
+        }
+        for (String tag : excludedTags) {
+            cmdLine.add("-e");
+            cmdLine.add(tag);
         }
     }
 

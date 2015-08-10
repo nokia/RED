@@ -26,6 +26,10 @@ public class RobotLaunchConfiguration {
 
     private static final String EXECUTOR_NAME = "Executor";
     private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
+    private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
+    private static final String INCLUDED_TAGS_ATTRIBUTE = "Included tags";
+    private static final String EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Exclude option enabled";
+    private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
 
@@ -51,6 +55,10 @@ public class RobotLaunchConfiguration {
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName("");
         robotConfig.setSuitePaths(new ArrayList<String>());
+        robotConfig.setIsIncludeTagsEnabled(false);
+        robotConfig.setIsExcludeTagsEnabled(false);
+        robotConfig.setIncludedTags(new ArrayList<String>());
+        robotConfig.setExcludedTags(new ArrayList<String>());
     }
 
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
@@ -68,6 +76,10 @@ public class RobotLaunchConfiguration {
                 return resource.getProjectRelativePath().toPortableString();
             }
         })));
+        robotConfig.setIsIncludeTagsEnabled(false);
+        robotConfig.setIsExcludeTagsEnabled(false);
+        robotConfig.setIncludedTags(new ArrayList<String>());
+        robotConfig.setExcludedTags(new ArrayList<String>());
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -106,6 +118,34 @@ public class RobotLaunchConfiguration {
             launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, names);
         }
     }
+    
+    public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isIncludeTagsEnabled);
+        }
+    }
+    
+    public void setIncludedTags(final List<String> tags) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(INCLUDED_TAGS_ATTRIBUTE, tags);
+        }
+    }
+    
+    public void setIsExcludeTagsEnabled(final boolean isExcludeTagsEnabled) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isExcludeTagsEnabled);
+        }
+    }
+    
+    public void setExcludedTags(final List<String> tags) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
+        }
+    }
 
     public SuiteExecutor getExecutor() throws CoreException {
         return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
@@ -121,6 +161,22 @@ public class RobotLaunchConfiguration {
 
     public List<String> getSuitePaths() throws CoreException {
         return configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
+    }
+    
+    public boolean isIncludeTagsEnabled() throws CoreException {
+        return configuration.getAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, false);
+    }
+    
+    public List<String> getIncludedTags() throws CoreException {
+        return configuration.getAttribute(INCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
+    }
+    
+    public boolean isExcludeTagsEnabled() throws CoreException {
+        return configuration.getAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, false);
+    }
+    
+    public List<String> getExcludedTags() throws CoreException {
+        return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
     }
 
     public boolean isSuitableFor(final List<IResource> resources) {
