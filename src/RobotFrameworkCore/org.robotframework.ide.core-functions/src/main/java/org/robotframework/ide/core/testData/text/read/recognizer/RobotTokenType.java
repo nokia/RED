@@ -219,7 +219,7 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT(TableType.SETTINGS),
+    SETTING_TEST_TIMEOUT_MESSAGE(TableType.SETTINGS),
     /**
      * 
      */
@@ -300,7 +300,23 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME(TableType.TEST_CASES),
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT(TableType.TEST_CASES),
+    /**
+     * 
+     */
     TEST_CASE_SETTING_TIMEOUT(TableType.TEST_CASES, "[Timeout]"),
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_TIMEOUT_VALUE(TableType.TEST_CASES),
+    /**
+     * 
+     */
+    TEST_CASE_SETTING_TIMEOUT_MESSAGE(TableType.TEST_CASES),
     /**
      * 
      */

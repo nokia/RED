@@ -1,14 +1,15 @@
-package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
+package org.robotframework.ide.core.testData.model.table.testCases.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -17,12 +18,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class TestTimeoutValueMapper implements IParsingMapper {
+public class TestCaseTimeoutValueMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestTimeoutValueMapper() {
+    public TestCaseTimeoutValueMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -32,18 +33,20 @@ public class TestTimeoutValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
+        rt.setType(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
         rt.setText(new StringBuilder(text));
 
-        SettingTable settings = robotFileOutput.getFileModel()
-                .getSettingTable();
-        List<TestTimeout> timeouts = settings.getTestTimeouts();
+        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
+                .getTestCaseTable();
+        List<TestCase> testCases = testCaseTable.getTestCases();
+        TestCase testCase = testCases.get(testCases.size() - 1);
+        List<TestCaseTimeout> timeouts = testCase.getTimeouts();
         if (!timeouts.isEmpty()) {
             timeouts.get(timeouts.size() - 1).setTimeout(rt);
         } else {
             // FIXME: some internal error
         }
-        processingState.push(ParsingState.SETTING_TEST_TIMEOUT_VALUE);
+        processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE);
 
         return rt;
     }
@@ -56,19 +59,22 @@ public class TestTimeoutValueMapper implements IParsingMapper {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
 
-        if (state == ParsingState.SETTING_TEST_TIMEOUT) {
-            List<TestTimeout> testTimeouts = robotFileOutput.getFileModel()
-                    .getSettingTable().getTestTimeouts();
-            result = !checkIfHasAlreadyValue(testTimeouts);
+        if (state == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
+            List<TestCase> tests = robotFileOutput.getFileModel()
+                    .getTestCaseTable().getTestCases();
+            List<TestCaseTimeout> timeouts = tests.get(tests.size() - 1)
+                    .getTimeouts();
+            result = !checkIfHasAlreadyValue(timeouts);
         }
         return result;
     }
 
 
     @VisibleForTesting
-    protected boolean checkIfHasAlreadyValue(List<TestTimeout> testTimeouts) {
+    protected boolean checkIfHasAlreadyValue(
+            List<TestCaseTimeout> testCaseTimeouts) {
         boolean result = false;
-        for (TestTimeout setting : testTimeouts) {
+        for (TestCaseTimeout setting : testCaseTimeouts) {
             result = (setting.getTimeout() != null);
             result = result || !setting.getMessageArguments().isEmpty();
             if (result) {
