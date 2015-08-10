@@ -18,7 +18,8 @@ public class PasteCodeCellContentHandler extends DIHandler<E4PasteCodeCellConten
         @Override
         protected Optional<? extends EditorCommand> provideCommandForAttributeChange(final RobotElement element,
                 final int index, final int noOfColumns, final String newAttribute) {
-            return new CodeAttributesCommandsProvider().provide(element, index, noOfColumns, newAttribute);
+            return new CodeAttributesCommandsProvider().provideChangeAttributeCommand(element, index, noOfColumns,
+                    newAttribute);
         }
     }
 }

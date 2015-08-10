@@ -12,10 +12,13 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -39,6 +42,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -113,14 +118,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final NewElementsCreator creator = newElementsCreator();
-        final MatcherProvider matchesProvider = new MatcherProvider() {
-            @Override
-            public MatchesCollection getMatches() {
-                return matches;
-            }
-        };
+        final MatchesProvider matchesProvider = getMatchesProvider();
         ViewerColumnsFactory.newColumn("Import").withWidth(140)
-            .shouldGrabAllTheSpaceLeft(viewer.getInput() == null).withMinWidth(100)
             .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
             .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
@@ -136,6 +135,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
             .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
             .editingEnabledOnlyWhen(fileModel.isEditable())
             .createFor(viewer);
+    }
+
+    private MatchesProvider getMatchesProvider() {
+        return new MatchesProvider() {
+            @Override
+            public MatchesCollection getMatches() {
+                return matches;
+            }
+        };
     }
 
     private NewElementsCreator newElementsCreator() {
@@ -162,7 +170,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         return max;
     }
 
-    private void createArgumentColumn(final String name, final int index, final MatcherProvider matchesProvider,
+    private void createArgumentColumn(final String name, final int index, final MatchesProvider matchesProvider,
             final NewElementsCreator creator) {
         ViewerColumnsFactory.newColumn(name).withWidth(120)
                 .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, index))
@@ -201,6 +209,43 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     public void clearSettingsSelection() {
         viewer.setSelection(StructuredSelection.EMPTY);
+    }
+
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
+            @Override
+            public void addColumn(final ColumnViewer viewer) {
+                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+                final int index = tableViewer.getTable().getColumnCount() - 2;
+
+                final String name = index == 0 ? "Name / Path" : "";
+                createArgumentColumn(name, index, getMatchesProvider(), newElementsCreator());
+                tableViewer.moveLastColumnTo(index + 1);
+                tableViewer.reflowColumnsWidth();
+            }
+
+            @Override
+            public void removeColumn(final ColumnViewer viewer) {
+                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+
+                final int columnCount = tableViewer.getTable().getColumnCount();
+                if (columnCount <= 2) {
+                    return;
+                }
+                // always remove last columns which displays arguments
+                final int position = columnCount - 2;
+                final int orderIndexBeforeRemoving = tableViewer.getTable().getColumnOrder()[position];
+                tableViewer.removeColumnAtPosition(position);
+                tableViewer.reflowColumnsWidth();
+
+                final TableViewerEditor editor = (TableViewerEditor) tableViewer.getColumnViewerEditor();
+                final ViewerCell focusCell = editor.getFocusCell();
+                if (focusCell.getColumnIndex() == orderIndexBeforeRemoving) {
+                    tableViewer.setFocusCell(tableViewer.getTable().getColumnCount() - 2);
+                }
+            }
+        };
+        return new FocusedViewerAccessor(columnsManagingStrategy, viewer);
     }
 
     @Override

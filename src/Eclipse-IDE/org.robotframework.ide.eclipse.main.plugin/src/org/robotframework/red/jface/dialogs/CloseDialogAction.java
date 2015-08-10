@@ -1,4 +1,4 @@
-package org.eclipse.jface.dialogs;
+package org.robotframework.red.jface.dialogs;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;

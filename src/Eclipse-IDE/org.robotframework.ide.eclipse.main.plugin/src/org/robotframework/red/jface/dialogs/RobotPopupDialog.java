@@ -1,5 +1,6 @@
-package org.eclipse.jface.dialogs;
+package org.robotframework.red.jface.dialogs;
 
+import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;

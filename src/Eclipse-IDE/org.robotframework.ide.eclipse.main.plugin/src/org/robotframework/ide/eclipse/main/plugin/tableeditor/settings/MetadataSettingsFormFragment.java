@@ -41,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -115,7 +116,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final MatcherProvider matchesProvider = new MatcherProvider() {
+        final MatchesProvider matchesProvider = new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
                 return matches;
@@ -182,6 +183,10 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
     public void clearSettingsSelection() {
         viewer.setSelection(StructuredSelection.EMPTY);
+    }
+
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        return new FocusedViewerAccessor(null, viewer);
     }
 
     @Override

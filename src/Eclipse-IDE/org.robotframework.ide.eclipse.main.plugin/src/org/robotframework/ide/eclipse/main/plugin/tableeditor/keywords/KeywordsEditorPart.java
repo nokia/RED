@@ -74,7 +74,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return new FocusedViewerAccessor(keywordsFragment.getViewer());
+            return keywordsFragment.getFocusedViewerAccessor();
         }
     }
 }

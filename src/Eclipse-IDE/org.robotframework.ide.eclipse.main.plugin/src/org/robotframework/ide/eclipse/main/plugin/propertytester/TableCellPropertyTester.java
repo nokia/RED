@@ -4,6 +4,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Preconditions;
 
@@ -44,7 +45,9 @@ public class TableCellPropertyTester extends PropertyTester {
         }
         if ("focusedCellHasIndex".equals(property)) {
             final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
-            return focusedCell != null && focusedCell.getColumnIndex() == expected;
+            final int positionIndex = Viewers.createOrderIndexToPositionIndex(viewerAccessor.getViewer(),
+                    focusedCell.getColumnIndex());
+            return focusedCell != null && positionIndex == expected;
         }
         return false;
     }
