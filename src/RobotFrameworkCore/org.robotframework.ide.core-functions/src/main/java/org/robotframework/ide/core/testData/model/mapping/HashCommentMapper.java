@@ -106,7 +106,7 @@ public class HashCommentMapper implements IParsingMapper {
             mapTestTemplateComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SETTING_TEST_TIMEOUT
                 || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_VALUE
-                || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS) {
+                || commentHolder == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
             mapTestTemplateComment(rt, commentHolder, fileModel);
         } else if (commentHolder == ParsingState.SCALAR_VARIABLE_DECLARATION
                 || commentHolder == ParsingState.SCALAR_VARIABLE_VALUE

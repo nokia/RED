@@ -37,7 +37,7 @@ import org.robotframework.ide.core.testData.model.table.setting.mapping.test.Tes
 import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTemplateMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTemplateTrashDataMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutMapper;
-import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutTrashDataMapper;
+import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutMessageMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.test.TestTimeoutValueMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesArgumentsMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.variables.VariablesDeclarationMapper;
@@ -77,7 +77,7 @@ public class SettingsMapperProvider {
             new TestTeardownKeywordArgumentMapper(), new TestTemplateMapper(),
             new TestTemplateKeywordMapper(), new TestTemplateTrashDataMapper(),
             new TestTimeoutMapper(), new TestTimeoutValueMapper(),
-            new TestTimeoutTrashDataMapper());
+            new TestTimeoutMessageMapper());
 
 
     public List<IParsingMapper> getMappers() {
