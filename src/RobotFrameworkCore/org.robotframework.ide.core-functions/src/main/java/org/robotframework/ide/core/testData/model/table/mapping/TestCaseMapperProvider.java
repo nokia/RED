@@ -12,7 +12,12 @@ import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCa
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTeardownKeywordArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTeardownKeywordMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTeardownMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTemplateKeywordMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTemplateKeywordTrashArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTemplateMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTimeoutMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTimeoutMessageMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseTimeoutValueMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestDocumentationMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestDocumentationTextMapper;
 
@@ -30,8 +35,12 @@ public class TestCaseMapperProvider {
         mappers.add(new TestCaseTeardownMapper());
         mappers.add(new TestCaseTeardownKeywordMapper());
         mappers.add(new TestCaseTeardownKeywordArgumentMapper());
-        mappers.add(new TestCaseTagsMapper());
+        mappers.add(new TestCaseTemplateMapper());
+        mappers.add(new TestCaseTemplateKeywordMapper());
+        mappers.add(new TestCaseTemplateKeywordTrashArgumentMapper());
         mappers.add(new TestCaseTimeoutMapper());
+        mappers.add(new TestCaseTimeoutValueMapper());
+        mappers.add(new TestCaseTimeoutMessageMapper());
         mappers.add(new TestDocumentationMapper());
         mappers.add(new TestDocumentationTextMapper());
     }

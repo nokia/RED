@@ -15,12 +15,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TestTimeoutTrashDataMapper implements IParsingMapper {
+public class TestTimeoutMessageMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
 
-    public TestTimeoutTrashDataMapper() {
+    public TestTimeoutMessageMapper() {
         this.utility = new ElementsUtility();
     }
 
@@ -30,19 +30,19 @@ public class TestTimeoutTrashDataMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENT);
+        rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
         List<TestTimeout> timeouts = settings.getTestTimeouts();
         if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).addUnexpectedTrashArgument(rt);
+            timeouts.get(timeouts.size() - 1).addMessageArgument(rt);
         } else {
             // FIXME: some error
         }
         processingState
-                .push(ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS);
+                .push(ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS);
 
         return rt;
     }
@@ -57,7 +57,7 @@ public class TestTimeoutTrashDataMapper implements IParsingMapper {
             ParsingState currentState = utility
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_TEST_TIMEOUT_VALUE
-                    || currentState == ParsingState.SETTING_TEST_TIMEOUT_UNWANTED_ARGUMENTS) {
+                    || currentState == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
                 result = true;
             } else {
                 result = false;

@@ -11,7 +11,7 @@ public class TestCaseTimeout extends AModelElement {
 
     private final RobotToken declaration;
     private RobotToken timeout;
-    private final List<RobotToken> unexpectedTrashArguments = new LinkedList<>();
+    private final List<RobotToken> message = new LinkedList<>();
 
     private final List<RobotToken> comment = new LinkedList<>();
 
@@ -42,13 +42,13 @@ public class TestCaseTimeout extends AModelElement {
     }
 
 
-    public List<RobotToken> getUnexpectedTrashArguments() {
-        return unexpectedTrashArguments;
+    public List<RobotToken> getMessageArguments() {
+        return message;
     }
 
 
-    public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
-        this.unexpectedTrashArguments.add(trashArgument);
+    public void addMessageArgument(final RobotToken messageArgument) {
+        this.message.add(messageArgument);
     }
 
 
