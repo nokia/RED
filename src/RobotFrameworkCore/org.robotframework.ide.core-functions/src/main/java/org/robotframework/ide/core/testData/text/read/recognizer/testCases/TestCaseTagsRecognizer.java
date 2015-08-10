@@ -8,6 +8,6 @@ public class TestCaseTagsRecognizer extends
         AExecutableElementSettingsRecognizer {
 
     public TestCaseTagsRecognizer() {
-        super(RobotTokenType.TEST_CASE_SETTING_TAGS);
+        super(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
     }
 }
