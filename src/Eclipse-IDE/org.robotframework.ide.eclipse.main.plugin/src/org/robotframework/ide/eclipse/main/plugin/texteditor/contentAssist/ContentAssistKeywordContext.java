@@ -9,11 +9,11 @@ import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 
-public class TextEditorContentAssistKeywordContext {
+public class ContentAssistKeywordContext {
 
     private final RedKeywordProposal proposal;
 
-    public TextEditorContentAssistKeywordContext(final RedKeywordProposal proposal) {
+    public ContentAssistKeywordContext(final RedKeywordProposal proposal) {
         this.proposal = proposal;
     }
 

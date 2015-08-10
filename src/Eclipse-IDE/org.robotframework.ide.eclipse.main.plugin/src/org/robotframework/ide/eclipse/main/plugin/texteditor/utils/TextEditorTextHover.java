@@ -12,7 +12,7 @@ import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Shell;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssistKeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 
 /**
  * @author mmarzec
@@ -20,13 +20,13 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextE
  */
 public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
-    private Map<String, TextEditorContentAssistKeywordContext> keywordMap;
+    private Map<String, ContentAssistKeywordContext> keywordMap;
 
     private Map<String, Object> debugVariables;
 
     private TextEditorHoverManager hoverManager;
 
-    public TextEditorTextHover(Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
+    public TextEditorTextHover(Map<String, ContentAssistKeywordContext> keywordMap) {
         this.keywordMap = keywordMap;
         hoverManager = new TextEditorHoverManager();
     }
@@ -42,7 +42,7 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
 
         try {
             String hoveredText = viewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
-            TextEditorContentAssistKeywordContext keywordContext = keywordMap.get(hoveredText);
+            ContentAssistKeywordContext keywordContext = keywordMap.get(hoveredText);
             if (keywordContext != null) {
                 return keywordContext.getDescription();
             }

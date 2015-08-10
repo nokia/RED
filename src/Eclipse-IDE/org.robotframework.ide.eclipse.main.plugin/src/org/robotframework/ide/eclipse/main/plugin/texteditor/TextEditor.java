@@ -102,7 +102,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssistKeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.RulesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorScanner;
@@ -233,7 +234,7 @@ public class TextEditor {
 		undoManager.connect(viewer);
 		
 		final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(editedFile);
-        final Map<String, TextEditorContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
+        final Map<String, ContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
         
         textHover = new TextEditorTextHover(keywordMap);
         final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover);
@@ -342,14 +343,14 @@ public class TextEditor {
         });
 	}
 
-    private Map<String, TextEditorContentAssistKeywordContext> provideContentAssistantKeywordsMapping(
+    private Map<String, ContentAssistKeywordContext> provideContentAssistantKeywordsMapping(
             final RobotSuiteFile suiteFile) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
         
-        final Map<String, TextEditorContentAssistKeywordContext> mapping = new LinkedHashMap<>();
+        final Map<String, ContentAssistKeywordContext> mapping = new LinkedHashMap<>();
         for (final RedKeywordProposal proposal : keywordProposals) {
-            mapping.put(proposal.getLabel(), new TextEditorContentAssistKeywordContext(proposal));
+            mapping.put(proposal.getLabel(), new ContentAssistKeywordContext(proposal));
         }
         return mapping;
     }
@@ -575,16 +576,15 @@ public class TextEditor {
 		return menu;
 	}
 	
-	private ContentAssistant createContentAssistant(final Map<String, TextEditorContentAssistKeywordContext> keywordMap) {
+	private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap) {
 		final ContentAssistant contentAssistant = new ContentAssistant();
 		contentAssistant.enableColoredLabels(true);
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
 		contentAssistant.setShowEmptyList(true);
-		KeywordsContentAssistProcessor contentAssistProcessor = new KeywordsContentAssistProcessor(keywordMap);
-		contentAssistant.setContentAssistProcessor(contentAssistProcessor, TextEditorPartitionScanner.TEST_CASES_SECTION);
-		contentAssistant.setContentAssistProcessor(contentAssistProcessor, TextEditorPartitionScanner.KEYWORDS_SECTION);
+		contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(keywordMap), TextEditorPartitionScanner.TEST_CASES_SECTION);
+		contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(keywordMap), TextEditorPartitionScanner.KEYWORDS_SECTION);
 		contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(), TextEditorPartitionScanner.SETTINGS_SECTION);
 		contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
 		contentAssistant.setEmptyMessage("No proposals");

@@ -30,7 +30,7 @@ public class RulesGenerator {
     private IToken settingsToken;
     private IToken keywordToken;
     
-    private WordRule settingsWordsRule;
+    private WordRule settingsSectionWordsRule;
     private WordRule asteriskWordRule;
     private WordRule testCasesSectionWordsRule;
     private WordRule keywordsSectionWordsRule;
@@ -48,6 +48,8 @@ public class RulesGenerator {
     
     private IRule keywordsRule;
     
+    private KeywordRule settingsSectionWordsWithSpaceRule;
+    
     private List<IRule> commonRules = newArrayList();
     
     public RulesGenerator(final Display display, final List<String> keywordList) {
@@ -64,7 +66,8 @@ public class RulesGenerator {
     
     public IRule[] getSettingsSectionRules() {
         List<IRule> rules = newArrayList();
-        rules.add(settingsWordsRule);
+        rules.add(settingsSectionWordsRule);
+        rules.add(settingsSectionWordsWithSpaceRule);
         rules.add(settingsSectionRule);
         rules.addAll(commonRules);
         
@@ -146,23 +149,25 @@ public class RulesGenerator {
     }
     
     private void createSettingsWordsRule() {
-        settingsWordsRule = setupWordRule();
-        settingsWordsRule.addWord("Library", settingsToken);
-        settingsWordsRule.addWord("Resource", settingsToken);
-        settingsWordsRule.addWord("Variables", settingsToken);
-        settingsWordsRule.addWord("Documentation", settingsToken);
-        settingsWordsRule.addWord("Metadata", settingsToken);
-        settingsWordsRule.setColumnConstraint(0);
-        /**
-        settingsWordsRule.addWord("Suite Setup", settingsToken);
-        settingsWordsRule.addWord("Suite Teardown", settingsToken);
-        settingsWordsRule.addWord("Force Tags", settingsToken);
-        settingsWordsRule.addWord("Default Tags", settingsToken);
-        settingsWordsRule.addWord("Test Setup", settingsToken);
-        settingsWordsRule.addWord("Test Teardown", settingsToken);
-        settingsWordsRule.addWord("Test Template", settingsToken);
-        settingsWordsRule.addWord("Test Timeout", settingsToken);
-        **/
+        settingsSectionWordsRule = setupWordRule();
+        settingsSectionWordsRule.addWord("Library", settingsToken);
+        settingsSectionWordsRule.addWord("Resource", settingsToken);
+        settingsSectionWordsRule.addWord("Variables", settingsToken);
+        settingsSectionWordsRule.addWord("Documentation", settingsToken);
+        settingsSectionWordsRule.addWord("Metadata", settingsToken);
+        settingsSectionWordsRule.setColumnConstraint(0);
+        final List<String> words = newArrayList();
+        words.add("Suite Setup");
+        words.add("Suite Teardown");
+        words.add("Force Tags");
+        words.add("Default Tags");
+        words.add("Test Setup");
+        words.add("Test Teardown");
+        words.add("Test Template");
+        words.add("Test Timeout");
+        settingsSectionWordsWithSpaceRule = new KeywordRule(settingsToken, words);
+        settingsSectionWordsWithSpaceRule.setColumnConstraint(0);
+        
         
         testCasesSectionWordsRule = setupWordRule();
         testCasesSectionWordsRule.addWord("[Documentation]", settingsToken);
