@@ -17,7 +17,6 @@ import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -105,7 +104,7 @@ public abstract class InputLoadingFormComposite extends Composite {
         form.setImage(ImagesManager.getImage(image));
     }
 
-    protected Control createHeadClient(final Composite head) {
+    protected Control createHeadClient(@SuppressWarnings("unused") final Composite head) {
         // nothing to do, override if needed
         return null;
     }
