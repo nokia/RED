@@ -15,6 +15,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,8 +43,8 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.graphics.ImagesManager;
@@ -63,6 +65,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private Text argumentsText;
     private Text projectText;
     private ListViewer viewer;
+    private Button includeTagsBtn;
+    private Text includeTagsText;
+    private Button excludeTagsBtn;
+    private Text excludeTagsText;
+    private ControlDecoration decoration;
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
@@ -90,6 +97,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             argumentsText.setText(robotConfig.getExecutorArguments());
             viewer.setInput(newArrayList(suites));
             viewer.refresh();
+            
+            includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
+            includeTagsText.setText(Joiner.on(", ").join(robotConfig.getIncludedTags()));
+            excludeTagsBtn.setSelection(robotConfig.isExcludeTagsEnabled());
+            excludeTagsText.setText(Joiner.on(", ").join(robotConfig.getExcludedTags()));
 
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
@@ -119,8 +131,12 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 return path.toPortableString();
             }
         }));
+        robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
+        robotConfig.setIncludedTags(extractTags(includeTagsText.getText()));
+        robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
+        robotConfig.setExcludedTags(extractTags(excludeTagsText.getText()));
     }
-
+    
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
@@ -193,6 +209,14 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         return "Please select a project";
     }
 
+    @Override
+    public void dispose() {
+        if (decoration != null) {
+            decoration.dispose();
+        }
+        super.dispose();
+    }
+    
     @SuppressWarnings("unchecked")
     private List<IPath> getSuites() {
         return (List<IPath>) viewer.getInput();
@@ -228,10 +252,52 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         lblArgs.setText("Arguments:");
 
         argumentsText = new Text(executorGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(argumentsText);
+        GridDataFactory.fillDefaults().grab(true, false).hint(450, SWT.DEFAULT).applyTo(argumentsText);
         argumentsText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        
+        includeTagsBtn = new Button(executorGroup, SWT.CHECK);
+        includeTagsBtn.setText("Only run tests with these tags:");
+        includeTagsBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        includeTagsText = new Text(executorGroup, SWT.BORDER);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(includeTagsText);
+        includeTagsText.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        decoration = new ControlDecoration(includeTagsText, SWT.RIGHT | SWT.TOP);
+        decoration.setDescriptionText("Separate multiple tags with a comma character like 'tag1, tag2...'");
+        decoration.setImage(FieldDecorationRegistry.getDefault()
+                .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage());
+        
+        excludeTagsBtn = new Button(executorGroup, SWT.CHECK);
+        excludeTagsBtn.setText("Skip tests with these tags:");
+        excludeTagsBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        excludeTagsText = new Text(executorGroup, SWT.BORDER);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(excludeTagsText);
+        excludeTagsText.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
@@ -354,5 +420,16 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
+    }
+    
+    private List<String> extractTags(final String tagsTxt) {
+        List<String> tagsList = newArrayList();
+        if(tagsTxt!=null && !tagsTxt.equals("")) {
+            String[] tags = tagsTxt.split(",");
+            for (int i = 0; i < tags.length; i++) {
+                tagsList.add(tags[i].trim());
+            }
+        }
+        return tagsList;
     }
 }
