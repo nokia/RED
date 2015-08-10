@@ -42,13 +42,13 @@ public class TestCaseTimeout extends AModelElement {
     }
 
 
-    public List<RobotToken> getMessageArguments() {
+    public List<RobotToken> getMessage() {
         return message;
     }
 
 
-    public void addMessageArgument(final RobotToken messageArgument) {
-        this.message.add(messageArgument);
+    public void addMessagePart(final RobotToken messagePart) {
+        this.message.add(messagePart);
     }
 
 

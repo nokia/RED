@@ -61,6 +61,7 @@ public class TestTimeoutValueMapper implements IParsingMapper {
                     .getSettingTable().getTestTimeouts();
             result = !checkIfHasAlreadyValue(testTimeouts);
         }
+
         return result;
     }
 
