@@ -18,7 +18,7 @@ public class CutCodeCellContentHandler extends DIHandler<E4CutCodeCellContentHan
         @Override
         protected Optional<? extends EditorCommand> provideCommandForAttributeChange(final RobotElement element,
                 final int index, final int noOfColumns) {
-            return new CodeAttributesCommandsProvider().provide(element, index, noOfColumns, "");
+            return new CodeAttributesCommandsProvider().provideChangeAttributeCommand(element, index, noOfColumns, "");
         }
     }
 }

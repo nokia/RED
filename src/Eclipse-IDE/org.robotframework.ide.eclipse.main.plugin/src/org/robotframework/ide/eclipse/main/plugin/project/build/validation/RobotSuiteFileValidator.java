@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.project.build;
+package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.io.IOException;
 
@@ -6,15 +6,15 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-class RobotSuiteFileValidator {
+public class RobotSuiteFileValidator {
 
     private final IFile file;
 
-    RobotSuiteFileValidator(final IFile file) {
+    public RobotSuiteFileValidator(final IFile file) {
         this.file = file;
     }
 
-    void validate(final IProgressMonitor monitor) throws CoreException, IOException {
+    public void validate(final IProgressMonitor monitor) throws CoreException, IOException {
         // final TxtRobotFileReader fileReader = new TxtRobotFileReader();
         // final ModelOutput modelOutput =
         // fileReader.parse(file.getLocation().toFile());

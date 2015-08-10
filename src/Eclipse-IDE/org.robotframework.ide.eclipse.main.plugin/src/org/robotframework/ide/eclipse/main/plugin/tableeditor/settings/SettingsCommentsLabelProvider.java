@@ -14,14 +14,14 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatcherProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
 
-    public SettingsCommentsLabelProvider(final MatcherProvider matchesProvider) {
+    public SettingsCommentsLabelProvider(final MatchesProvider matchesProvider) {
         super(matchesProvider);
     }
 

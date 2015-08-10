@@ -74,7 +74,7 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return new FocusedViewerAccessor(casesFragment.getViewer());
+            return casesFragment.getFocusedViewerAccessor();
         }
     }
 }
