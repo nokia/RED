@@ -403,7 +403,7 @@ public class TxtRobotFileParser {
 
                 if (correct == null) {
                     // FIXME: error no matching tokens to state
-
+                    throw new IllegalStateException("Some problem to fix.");
                 }
             }
         } else {
@@ -441,7 +441,8 @@ public class TxtRobotFileParser {
             typesForState = robotType.getTypesForSettingsTable();
         } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
             typesForState = robotType.getTypesForVariablesTable();
-        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE) {
+        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE
+                || state == ParsingState.KEYWORD_DECLARATION) {
             typesForState = robotType.getTypesForKeywordsTable();
         }
 

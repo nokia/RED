@@ -328,7 +328,15 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    KEYWORD_SETTING_DOCUMENTATION_TEXT(TableType.KEYWORDS),
+    /**
+     * 
+     */
     KEYWORD_SETTING_TAGS(TableType.KEYWORDS, "[Tags]"),
+    /**
+     * 
+     */
+    KEYWORD_SETTING_TAGS_TAG_NAME(TableType.KEYWORDS),
     /**
      * 
      */
@@ -336,7 +344,15 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    KEYWORD_SETTING_ARGUMENT(TableType.KEYWORDS),
+    /**
+     * 
+     */
     KEYWORD_SETTING_RETURN(TableType.KEYWORDS, "[Return]"),
+    /**
+     * 
+     */
+    KEYWORD_SETTING_RETURN_VALUE(TableType.KEYWORDS),
     /**
      * 
      */
@@ -344,7 +360,28 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    KEYWORD_SETTING_TIMEOUT(TableType.KEYWORDS, "[Timeout]");
+    KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT(TableType.KEYWORDS),
+
+    /**
+     * 
+     */
+    KEYWORD_SETTING_TIMEOUT(TableType.KEYWORDS, "[Timeout]"),
+    /**
+     * 
+     */
+    KEYWORD_SETTING_TIMEOUT_VALUE(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_SETTING_TIMEOUT_MESSAGE(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_NAME(TableType.KEYWORDS);
 
     private final List<String> representationForNew = new LinkedList<>();
     private final TableType type;
