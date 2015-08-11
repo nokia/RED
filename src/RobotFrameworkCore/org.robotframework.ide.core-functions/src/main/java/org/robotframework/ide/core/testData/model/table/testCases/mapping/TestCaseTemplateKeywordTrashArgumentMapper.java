@@ -37,6 +37,7 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
         types.add(
                 0,
                 RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
+
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
         List<TestCase> testCases = robotFileOutput.getFileModel()

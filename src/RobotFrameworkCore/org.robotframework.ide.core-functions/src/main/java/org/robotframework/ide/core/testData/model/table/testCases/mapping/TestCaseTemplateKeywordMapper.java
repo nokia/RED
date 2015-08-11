@@ -36,6 +36,7 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME);
+
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
         List<TestCase> testCases = robotFileOutput.getFileModel()

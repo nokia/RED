@@ -34,6 +34,7 @@ import org.robotframework.ide.core.testData.model.mapping.hashComment.tableUserK
 import org.robotframework.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTagsCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTeardownCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTimeoutCommentMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -44,6 +45,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 
 public class HashCommentMapper implements IParsingMapper {
+
+    private final ElementsUtility utility;
 
     private static final List<IHashCommentMapper> commentMappers = new LinkedList<>();
     static {
@@ -74,6 +77,11 @@ public class HashCommentMapper implements IParsingMapper {
         commentMappers.add(new UserKeywordSettingReturnCommentMapper());
         commentMappers.add(new UserKeywordSettingTeardownCommentMapper());
         commentMappers.add(new UserKeywordSettingTimeoutCommentMapper());
+    }
+
+
+    public HashCommentMapper() {
+        this.utility = new ElementsUtility();
     }
 
 
@@ -123,7 +131,10 @@ public class HashCommentMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
 
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        ParsingState nearestState = utility.getCurrentStatus(processingState);
+        if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
+            result = false;
+        } else if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             processingState.push(ParsingState.COMMENT);
             result = true;
         } else if (!processingState.isEmpty()) {
@@ -132,6 +143,18 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return result;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isInsideTestCase(final ParsingState state) {
+        return (state == ParsingState.TEST_CASE_INSIDE_ACTION || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
+    }
+
+
+    @VisibleForTesting
+    protected boolean isInsideKeyword(final ParsingState state) {
+        return (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
     }
 
 

@@ -33,6 +33,7 @@ public class PipeSeparator extends ALineSeparator {
         s.setType(SeparatorType.PIPE);
         s.setStartColumn(start);
         s.setText(new StringBuilder().append(line.substring(start, end)));
+        s.setRaw(new StringBuilder(s.getText()));
         s.setLineNumber(getLineNumber());
 
         return s;

@@ -28,6 +28,7 @@ public class WhitespaceSeparator extends ALineSeparator {
         s.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
         s.setStartColumn(start);
         s.setText(new StringBuilder().append(line.substring(start, end)));
+        s.setRaw(new StringBuilder(s.getText()));
         s.setLineNumber(getLineNumber());
 
         return s;
