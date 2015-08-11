@@ -90,7 +90,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        viewer.setContentProvider(new VariablesContentProvider());
+        viewer.setContentProvider(new VariablesContentProvider(fileModel.isEditable()));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
             @Override
