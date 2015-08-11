@@ -17,6 +17,7 @@ public class ExpandAllHandler extends DIHandler<E4ExpandAllHandler> {
     }
 
     public static class E4ExpandAllHandler {
+
         @Execute
         public Object expandAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();

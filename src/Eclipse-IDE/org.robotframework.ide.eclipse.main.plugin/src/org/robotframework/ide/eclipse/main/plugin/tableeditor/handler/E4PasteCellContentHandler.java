@@ -10,10 +10,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
@@ -23,11 +25,11 @@ public abstract class E4PasteCellContentHandler {
 
     @Execute
     public Object pasteCellContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-            final FocusedViewerAccessor viewerAccessor,
-            final RobotEditorCommandsStack commandsStack,
+            @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
             final Clipboard clipboard) {
         final String contents = (String) clipboard.getContents(TextTransfer.getInstance());
 
+        final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
         final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
         final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
         final ColumnViewer viewer = viewerAccessor.getViewer();
@@ -55,4 +57,3 @@ public abstract class E4PasteCellContentHandler {
         throw new IllegalStateException("Unknown viewer type");
     }
 }
-

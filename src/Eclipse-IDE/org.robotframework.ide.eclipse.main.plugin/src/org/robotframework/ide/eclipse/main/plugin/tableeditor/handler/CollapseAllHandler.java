@@ -17,6 +17,7 @@ public class CollapseAllHandler extends DIHandler<E4CollapseAllHandler> {
     }
 
     public static class E4CollapseAllHandler {
+
         @Execute
         public Object collapseAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();

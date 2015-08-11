@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -104,7 +105,6 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         for (final ISectionFormFragment part : formFragments) {
             part.initialize(form.getBody());
         }
-        context.set(FocusedViewerAccessor.class, getFocusedViewerAccessor());
 
         site.setSelectionProvider(getSelectionProvider());
         prepareCommandsContext(site);
