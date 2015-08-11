@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kvQxgD0WEeWUyZKiCzynFQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/11/15 1:45 PM
+Save-Time: 8/11/15 3:45 PM
 Testcase-Type: ecl
 Verifications: _fNsf0D9aEeW20a8v9jefTQ
 
@@ -67,7 +67,7 @@ with [get-editor "TestFile.robot" | get-tree] {
 
 //add 2 keywords
 add-keyword-with-elements-by-double-click -keyword_name "WWW sum 2 digits" -elements [list "${b} =" "set variable" "${1}"] -script_name "TestFile.robot"
-add-row-to-keyword-by-double-click-on-cell -keyword_name "WWW sum 2 digits" -keyword_index 0 -elements [list "${1} =" "set variable" "${2 }"] -script_name "TestFile.robot"
+add-row-to-keyword-by-double-click-on-cell -keyword_name "WWW sum 2 digits" -keyword_index 0 -elements [list "${1} =" "set variable" "${2 }"] -command_index 0 -script_name "TestFile.robot"
 add-keyword-by-double-click -keywords_list [list "Empty keyword"]  -script_name "TestFile.robot"
 with [get-editor "TestFile.robot" | get-tree] {
     get-item "...add new keyword"  | double-click

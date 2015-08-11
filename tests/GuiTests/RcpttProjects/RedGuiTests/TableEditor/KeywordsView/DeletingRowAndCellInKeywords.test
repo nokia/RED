@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Qzt-MD0YEeWUyZKiCzynFQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/11/15 12:01 PM
+Save-Time: 8/11/15 3:49 PM
 Testcase-Type: ecl
 Verifications: _Q2SqgD9cEeW20a8v9jefTQ
 
@@ -30,7 +30,7 @@ add-row-to-keyword-by-arrows-end-enter -keyword_name "Example 1" -keyword_index 
 
 //add keyword by double click
 add-keyword-with-elements-by-double-click -keyword_name "Open Login Page" -elements [list "Open Browser" "http://host/login.html"]  -script_name "TestFile.robot"
-add-row-to-keyword-by-double-click-on-cell -keyword_name "Open Login Page" -keyword_index 0 -elements [list "Title Should Be"  "Login Page"]   -script_name "TestFile.robot"
+add-row-to-keyword-by-double-click-on-cell -keyword_name "Open Login Page" -keyword_index 0 -elements [list "Title Should Be"  "Login Page"] -command_index 0 -script_name "TestFile.robot"
 
 //add keywords with arguments
 add-keyword-with-args-by-arrows -keywords_name "Three aruments" -arguments [list "${arg1}" "${arg2}" "${arg3}"] -script_name "TestFile.robot"
