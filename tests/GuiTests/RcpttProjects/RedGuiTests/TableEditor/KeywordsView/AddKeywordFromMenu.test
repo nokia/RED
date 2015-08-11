@@ -1,0 +1,96 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: AddKeywordFromMenu
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ZRk0sEAgEeW20a8v9jefTQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 8/11/15 2:26 PM
+Testcase-Type: ecl
+Verifications: _WCB6EEAhEeW20a8v9jefTQ
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot"  | double-click
+}
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Keywords | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+    get-tree | select "...add new keyword" | select "...add new keyword"
+}
+//check if add keyword is dispabled on button
+with [get-editor "TestFile.robot" | get-tree] {
+    get-menu "Add new keyword" | get-property caption | equals "Add new keyword" | verify-true
+    get-menu "Add new keyword" | get-property selection | equals false | verify-true
+    get-menu "Add new keyword" | get-property enablement | equals false | verify-true
+    get-menu "Add new keyword" | get-property index | equals 0 | verify-true
+    get-menu "Add new keyword" | get-property cascade | equals false | verify-true
+}
+//add 4 keyword: KW 2, KW 1, KW, KW3, KW
+with [get-editor "TestFile.robot" | get-tree] {
+    get-item "...add new keyword" | double-click
+    select Keyword | activate-cell-edit
+    get-editbox | key-type Enter
+    apply-cell-edit -deactivate
+    select Keyword | get-menu "Add new keyword" | click
+    select "Keyword 1"  | get-menu "Add new keyword" | click
+    select Keyword  | get-menu "Add new keyword" | click
+}
+//check if on "..." button menu Add keyword is disable
+get-editor "TestFile.robot" | get-tree | select "Keyword/..."
+with [get-editor "TestFile.robot" | get-tree] {
+    get-menu "Add new keyword" | get-property caption | equals "Add new keyword" | verify-true
+    get-menu "Add new keyword" | get-property selection | equals false | verify-true
+    get-menu "Add new keyword" | get-property enablement | equals false | verify-true
+    get-menu "Add new keyword" | get-property index | equals 0 | verify-true
+    get-menu "Add new keyword" | get-property cascade | equals false | verify-true
+}
+
+//add content to "Keyword"
+with [get-editor "TestFile.robot" | get-tree] {
+    get-item "Keyword/..." | double-click
+    select "Keyword/" | activate-cell-edit
+    with [get-editbox] {
+        set-text Log
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    key-type Right
+    type-text 4
+    select "Keyword/Log" | activate-cell-edit -column 1
+    get-editbox | key-type Enter
+    apply-cell-edit -deactivate
+    
+    //add keyword by clickin on "Log"
+    select "Keyword/Log" | get-menu "Add new keyword" | click
+    get-item "Keyword 2/..." | double-click
+    select "Keyword 2/" | activate-cell-edit
+    with [get-editbox] {
+        set-text "Set Tags"
+        key-type Enter -times 2
+        key-type Right
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    
+    //add content to Keyword 2
+    key-type Right
+    type-text t
+    select "Keyword 2/Set Tags" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text tag
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    
+    //add keyword by selecting line "Set Tags"
+    select "Keyword 2/Set Tags" | get-menu "Add new keyword" | click
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
