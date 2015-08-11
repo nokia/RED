@@ -10,6 +10,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -33,7 +34,9 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
+
         rt.setText(new StringBuilder(text));
 
         TestCaseTable testCaseTable = robotFileOutput.getFileModel()

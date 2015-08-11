@@ -5,10 +5,10 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseSetup;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -16,13 +16,15 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TestCaseSetupKeywordArgumentMapper implements IParsingMapper {
+public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final TestCaseFinder testCaseFinder;
 
 
-    public TestCaseSetupKeywordArgumentMapper() {
+    public TestCaseExecutableRowArgumentMapper() {
         this.utility = new ElementsUtility();
+        this.testCaseFinder = new TestCaseFinder();
     }
 
 
@@ -31,22 +33,18 @@ public class TestCaseSetupKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
+        TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(
+                currentLine, processingState, robotFileOutput, rt, fp);
         List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT);
+        types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
 
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
-        List<TestCase> testCases = robotFileOutput.getFileModel()
-                .getTestCaseTable().getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseSetup> setups = testCase.getSetups();
-        TestCaseSetup setup = setups.get(setups.size() - 1);
-        setup.addArgument(rt);
+        List<RobotExecutableRow> testExecutionRows = testCase
+                .getTestExecutionRows();
+        RobotExecutableRow robotExecutableRow = testExecutionRows
+                .get(testExecutionRows.size() - 1);
+        robotExecutableRow.addArgument(rt);
 
-        processingState
-                .push(ParsingState.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT);
-
+        processingState.push(ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
         return rt;
     }
 
@@ -57,18 +55,8 @@ public class TestCaseSetupKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        if (state == ParsingState.TEST_CASE_SETTING_SETUP) {
-            List<TestCase> tests = robotFileOutput.getFileModel()
-                    .getTestCaseTable().getTestCases();
-            List<TestCaseSetup> setups = tests.get(tests.size() - 1)
-                    .getSetups();
-            result = utility.checkIfHasAlreadyKeywordName(setups);
-        } else if (state == ParsingState.TEST_CASE_SETTING_SETUP_KEYWORD
-                || state == ParsingState.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT) {
-            result = true;
-        }
+        result = (state == ParsingState.TEST_CASE_INSIDE_ACTION || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
 
         return result;
     }
-
 }

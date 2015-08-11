@@ -324,6 +324,18 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    TEST_CASE_ACTION_NAME(TableType.TEST_CASES),
+    /**
+     * 
+     */
+    TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
+    /**
+     * 
+     */
+    TEST_CASE_THE_FIRST_ELEMENT(TableType.TEST_CASES),
+    /**
+     * 
+     */
     KEYWORD_SETTING_DOCUMENTATION(TableType.KEYWORDS, "[Documentation]"),
     /**
      * 
@@ -381,7 +393,19 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    KEYWORD_NAME(TableType.KEYWORDS);
+    KEYWORD_NAME(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_ACTION_NAME(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    KEYWORD_THE_FIRST_ELEMENT(TableType.KEYWORDS);
 
     private final List<String> representationForNew = new LinkedList<>();
     private final TableType type;

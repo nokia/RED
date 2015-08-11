@@ -1,11 +1,13 @@
 package org.robotframework.ide.core.testData.model.table.testCases.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestDocumentation;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -24,7 +26,10 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.add(0, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
+        types.add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
+
         rt.setText(new StringBuilder(text));
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,

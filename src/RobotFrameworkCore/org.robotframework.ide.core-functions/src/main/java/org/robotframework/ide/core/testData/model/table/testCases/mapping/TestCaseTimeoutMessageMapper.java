@@ -36,6 +36,7 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE);
+
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 
