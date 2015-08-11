@@ -9,6 +9,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken
 
 public class VariablesContentProvider implements IStructuredContentProvider {
 
+    private final boolean editable;
+
+    public VariablesContentProvider(final boolean editable) {
+        this.editable = editable;
+    }
+
     @Override
     public void dispose() {
         // nothing to do
@@ -25,7 +31,7 @@ public class VariablesContentProvider implements IStructuredContentProvider {
             final RobotSuiteFileSection section = (RobotSuiteFileSection) inputElement;
             final Object[] elements = section.getChildren().toArray();
             final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
-            newElements[elements.length] = new ElementAddingToken("scalar", !section.isReadOnly());
+            newElements[elements.length] = new ElementAddingToken("scalar", editable);
             return newElements;
         }
         return new Object[0];

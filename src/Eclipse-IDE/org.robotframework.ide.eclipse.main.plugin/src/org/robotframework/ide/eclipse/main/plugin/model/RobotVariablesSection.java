@@ -8,8 +8,8 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Variables";
 
-    RobotVariablesSection(final RobotSuiteFile parent, final boolean readOnly) {
-        super(parent, SECTION_NAME, readOnly);
+    RobotVariablesSection(final RobotSuiteFile parent) {
+        super(parent, SECTION_NAME);
     }
 
     public RobotVariable createScalarVariable(final String name, final String value, final String comment) {

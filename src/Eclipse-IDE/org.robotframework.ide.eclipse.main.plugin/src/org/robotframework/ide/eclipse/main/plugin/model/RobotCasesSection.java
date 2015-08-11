@@ -6,8 +6,8 @@ public class RobotCasesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Test Cases";
 
-    RobotCasesSection(final RobotSuiteFile parent, final boolean readOnly) {
-        super(parent, SECTION_NAME, readOnly);
+    RobotCasesSection(final RobotSuiteFile parent) {
+        super(parent, SECTION_NAME);
     }
 
     public RobotCase createTestCase(final String name, final String comment) {

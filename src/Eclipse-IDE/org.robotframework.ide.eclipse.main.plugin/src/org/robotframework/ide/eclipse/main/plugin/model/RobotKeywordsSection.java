@@ -8,8 +8,8 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Keywords";
 
-    RobotKeywordsSection(final RobotSuiteFile parent, final boolean readOnly) {
-        super(parent, SECTION_NAME, readOnly);
+    RobotKeywordsSection(final RobotSuiteFile parent) {
+        super(parent, SECTION_NAME);
     }
 
     public RobotKeywordDefinition createKeywordDefinition(final String name) {
