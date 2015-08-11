@@ -32,7 +32,7 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 
-        TestCase testCase = findOrCreateNearestTestCase(currentLine,
+        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         TestCaseTimeout timeout = new TestCaseTimeout(rt);
         testCase.addTimeout(timeout);

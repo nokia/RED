@@ -27,7 +27,7 @@ public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
         rt.setType(RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
         rt.setText(new StringBuilder(text));
 
-        UserKeyword keyword = findOrCreateNearestKeyword(currentLine,
+        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         KeywordArguments arguments = new KeywordArguments(rt);
         keyword.addArguments(arguments);

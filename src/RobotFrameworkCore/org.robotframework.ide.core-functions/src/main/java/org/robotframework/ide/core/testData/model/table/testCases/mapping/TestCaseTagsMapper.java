@@ -27,7 +27,7 @@ public class TestCaseTagsMapper extends ATestCaseSettingDeclarationMapper {
         rt.setType(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        TestCase testCase = findOrCreateNearestTestCase(currentLine,
+        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         TestCaseTags tags = new TestCaseTags(rt);
         testCase.addTag(tags);
