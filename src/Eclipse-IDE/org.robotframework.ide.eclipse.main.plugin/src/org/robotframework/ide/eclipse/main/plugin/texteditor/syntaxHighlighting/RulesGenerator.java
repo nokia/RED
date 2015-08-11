@@ -202,16 +202,17 @@ public class RulesGenerator {
     
     private WordRule setupWordRule() {
         return new WordRule(new IWordDetector() {
-            
+
             @Override
             public boolean isWordStart(char c) {
                 return !Character.isWhitespace(c);
             }
+
             @Override
             public boolean isWordPart(char c) {
                 return !Character.isWhitespace(c);
             }
-        }); 
+        });
     }
    
     public void disposeResources() {
