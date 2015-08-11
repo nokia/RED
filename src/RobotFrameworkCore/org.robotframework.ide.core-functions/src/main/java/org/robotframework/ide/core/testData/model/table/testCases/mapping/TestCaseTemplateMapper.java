@@ -31,7 +31,7 @@ public class TestCaseTemplateMapper extends ATestCaseSettingDeclarationMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
         rt.setText(new StringBuilder(text));
 
-        TestCase testCase = findOrCreateNearestTestCase(currentLine,
+        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         TestCaseTemplate template = new TestCaseTemplate(rt);
         testCase.addTemplate(template);

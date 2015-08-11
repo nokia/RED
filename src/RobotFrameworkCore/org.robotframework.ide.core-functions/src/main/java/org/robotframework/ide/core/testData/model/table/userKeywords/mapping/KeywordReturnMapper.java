@@ -27,7 +27,7 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
         rt.setType(RobotTokenType.KEYWORD_SETTING_RETURN);
         rt.setText(new StringBuilder(text));
 
-        UserKeyword keyword = findOrCreateNearestKeyword(currentLine,
+        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         KeywordReturn returned = new KeywordReturn(rt);
         keyword.addReturn(returned);

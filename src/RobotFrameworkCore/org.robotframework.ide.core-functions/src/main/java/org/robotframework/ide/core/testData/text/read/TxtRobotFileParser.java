@@ -32,6 +32,7 @@ import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseRobotExecutableRowMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
@@ -82,6 +83,7 @@ public class TxtRobotFileParser {
         unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
         unknownTableElementsMapper.add(new UnknownVariableMapper());
         unknownTableElementsMapper.add(new UnknownVariableValueMapper());
+        unknownTableElementsMapper.add(new TestCaseRobotExecutableRowMapper());
     }
 
 
