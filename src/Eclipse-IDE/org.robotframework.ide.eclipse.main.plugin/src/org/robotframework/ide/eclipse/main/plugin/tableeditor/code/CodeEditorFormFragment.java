@@ -332,9 +332,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             if (isSaving) {
                 isSaving = false;
-            } else {
-                viewer.setInput(getSection());
             }
+            viewer.setInput(getSection());
             viewer.refresh();
         }
     }
