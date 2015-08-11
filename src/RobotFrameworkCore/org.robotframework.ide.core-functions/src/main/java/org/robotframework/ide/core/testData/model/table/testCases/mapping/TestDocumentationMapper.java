@@ -27,7 +27,7 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
         rt.setType(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
         rt.setText(new StringBuilder(text));
 
-        TestCase testCase = findOrCreateNearestTestCase(currentLine,
+        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         TestDocumentation doc = new TestDocumentation(rt);
         testCase.addDocumentation(doc);

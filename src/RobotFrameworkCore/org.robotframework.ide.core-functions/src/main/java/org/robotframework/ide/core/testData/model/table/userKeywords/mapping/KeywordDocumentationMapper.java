@@ -33,7 +33,7 @@ public class KeywordDocumentationMapper extends
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 
-        UserKeyword keyword = findOrCreateNearestKeyword(currentLine,
+        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         KeywordDocumentation doc = new KeywordDocumentation(rt);
         keyword.addDocumentation(doc);
