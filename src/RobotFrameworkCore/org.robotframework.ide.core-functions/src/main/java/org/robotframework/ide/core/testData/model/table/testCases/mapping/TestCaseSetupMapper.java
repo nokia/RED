@@ -27,7 +27,7 @@ public class TestCaseSetupMapper extends ATestCaseSettingDeclarationMapper {
         rt.setType(RobotTokenType.TEST_CASE_SETTING_SETUP);
         rt.setText(new StringBuilder(text));
 
-        TestCase testCase = findOrCreateNearestTestCase(currentLine,
+        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         TestCaseSetup setup = new TestCaseSetup(rt);
         testCase.addSetup(setup);

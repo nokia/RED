@@ -27,7 +27,7 @@ public class KeywordTagsMapper extends AKeywordSettingDeclarationMapper {
         rt.setType(RobotTokenType.KEYWORD_SETTING_TAGS);
         rt.setText(new StringBuilder(text));
 
-        UserKeyword keyword = findOrCreateNearestKeyword(currentLine,
+        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         KeywordTags tags = new KeywordTags(rt);
         keyword.addTag(tags);

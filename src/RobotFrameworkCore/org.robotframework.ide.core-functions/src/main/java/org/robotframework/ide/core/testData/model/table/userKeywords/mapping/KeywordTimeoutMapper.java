@@ -32,7 +32,7 @@ public class KeywordTimeoutMapper extends AKeywordSettingDeclarationMapper {
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 
-        UserKeyword keyword = findOrCreateNearestKeyword(currentLine,
+        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         KeywordTimeout timeout = new KeywordTimeout(rt);
         keyword.addTimeout(timeout);
