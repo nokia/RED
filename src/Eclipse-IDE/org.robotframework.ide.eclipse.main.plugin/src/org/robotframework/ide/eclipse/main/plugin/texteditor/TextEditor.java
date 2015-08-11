@@ -54,7 +54,6 @@ import org.eclipse.jface.text.TextViewerUndoManager;
 import org.eclipse.jface.text.WhitespaceCharacterPainter;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.AnnotationRulerColumn;
@@ -99,13 +98,15 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.VariablesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.RulesGenerator;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorDamagerRepairer;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
@@ -582,12 +583,14 @@ public class TextEditor {
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
+		contentAssistant.setEmptyMessage("No proposals");
 		contentAssistant.setShowEmptyList(true);
 		contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(keywordMap), TextEditorPartitionScanner.TEST_CASES_SECTION);
 		contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(keywordMap), TextEditorPartitionScanner.KEYWORDS_SECTION);
 		contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(), TextEditorPartitionScanner.SETTINGS_SECTION);
+		contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(), TextEditorPartitionScanner.VARIABLES_SECTION);
 		contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
-		contentAssistant.setEmptyMessage("No proposals");
+		contentAssistant.setContextInformationPopupOrientation(ContentAssistant.CONTEXT_INFO_BELOW);
 		contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
             @Override
             protected IInformationControl doCreateInformationControl(final Shell parent) {
@@ -624,7 +627,7 @@ public class TextEditor {
 	
     private void setupPresentationReconciler(final PresentationReconciler reconciler, final String contentType,
             final RuleBasedScanner scanner) {
-        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);
+        final TextEditorDamagerRepairer dr = new TextEditorDamagerRepairer(scanner);
         reconciler.setDamager(dr, contentType);
         reconciler.setRepairer(dr, contentType);
     }
