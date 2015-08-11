@@ -11,10 +11,12 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
@@ -24,8 +26,9 @@ public abstract class E4CutCellContentHandler {
 
     @Execute
     public Object cutCellContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-            final FocusedViewerAccessor viewerAccessor, final RobotEditorCommandsStack commandsStack,
+            @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
             final Clipboard clipboard) {
+        final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
         final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
         final String cellContent = focusedCell.getText();
         clipboard.setContents(new String[] { cellContent }, new Transfer[] { TextTransfer.getInstance() });
@@ -34,12 +37,12 @@ public abstract class E4CutCellContentHandler {
         final ColumnViewer viewer = viewerAccessor.getViewer();
         final int index = Viewers.createOrderIndexToPositionIndex(viewer, focusedCell.getColumnIndex());
         final int noOfColumns = getNoOfColumns(viewer);
-        
+
         final Optional<? extends EditorCommand> command = provideCommandForAttributeChange(element, index, noOfColumns);
         if (command.isPresent()) {
             commandsStack.execute(command.get());
         }
-        
+
         return null;
     }
 
