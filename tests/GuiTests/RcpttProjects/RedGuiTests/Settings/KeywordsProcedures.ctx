@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _7-QNADzcEeWxlsQvwWxD9w
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/7/15 5:09 PM
+Save-Time: 8/11/15 3:19 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -67,12 +67,12 @@ proc "add-row-to-keyword-by-arrows-end-enter" [val keyword_name] [val keyword_in
 	}
 }
 
-proc "add-row-to-keyword-by-double-click-on-cell" [val keyword_name] [val keyword_index] [val elements] [val script_name]{
+proc "add-row-to-keyword-by-double-click-on-cell" [val keyword_name] [val keyword_index] [val command_index] [val elements] [val script_name]{
 	$elements| each [val element] [val index]{
 		$elements |get 0| let [val first_element -input]{
 			with [get-editor $script_name | get-tree] {
 				if [$index | equals 0]{
-				    get-item $keyword_name -index $keyword_index| get-item "..." | double-click
+				    get-item $keyword_name -index $keyword_index| get-item "\.\.\." | double-click
 				    with [get-editbox] {
 				        set-text $element
 			        	key-type Enter
@@ -80,8 +80,8 @@ proc "add-row-to-keyword-by-double-click-on-cell" [val keyword_name] [val keywor
 			    	apply-cell-edit -deactivate
 		    	
 		    	}-else{
-		    		select [format "%s/%s" $keyword_name $first_element]|double-click
-		    		select  [format "%s/%s" $keyword_name $first_element] | activate-cell-edit -column $index
+		    		select [get-item $keyword_name | get-item $first_element -index $command_index] |double-click
+		    		select [get-item $keyword_name | get-item $first_element -index $command_index] | activate-cell-edit -column $index
 				    with [get-editbox] {
 				    	set-text $element
 				        key-type Enter
@@ -121,7 +121,7 @@ proc "add-keyword-with-args-by-arrows" [val keywords_name] [val arguments] [val 
 } 
 
 
-proc "add-keyword-with-args-by-double-click" [val keyword_name] [val arguments] [val script_name]{ 
+proc "add-keyword-with-args-by-double-click" [val keyword_name] [val keyword_index ][val arguments] [val script_name]{ 
 	with [get-editor $script_name | get-tree] {
 		get-item "...add new keyword" | double-click
 	    with [get-editbox]{
@@ -132,8 +132,8 @@ proc "add-keyword-with-args-by-double-click" [val keyword_name] [val arguments] 
 	    
     	$arguments| each [val argument] [val index]{
 			with [get-editor $script_name | get-tree] {
-				select [format "%s/%s" $keyword_name $first_element]
-				select [format "%s/%s" $keyword_name $first_element] | activate-cell-edit -column [plus $index 1]
+				select [get-item  $keyword_name -index  $keyword_index] 
+				select [get-item  $keyword_name -index  $keyword_index] | activate-cell-edit -column [plus $index 1]
 				get-editbox | set-text $argument
 				apply-cell-edit -deactivate
     		}
