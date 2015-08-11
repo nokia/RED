@@ -21,8 +21,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsEmiter;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -48,17 +48,16 @@ public class RobotSuiteFile implements RobotElement {
 
     public RobotSuiteFileSection createRobotSection(final String name) {
         final RobotSuiteFileSection section;
-        final boolean readOnly = !isEditable();
         if (name.equals(RobotVariablesSection.SECTION_NAME)) {
-            section = new RobotVariablesSection(this, readOnly);
+            section = new RobotVariablesSection(this);
         } else if (name.equals(RobotSettingsSection.SECTION_NAME)) {
-            section = new RobotSettingsSection(this, readOnly);
+            section = new RobotSettingsSection(this);
         } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
-            section = new RobotCasesSection(this, readOnly);
+            section = new RobotCasesSection(this);
         } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
-            section = new RobotKeywordsSection(this, readOnly);
+            section = new RobotKeywordsSection(this);
         } else {
-            section = new RobotSuiteFileSection(this, name, readOnly);
+            section = new RobotSuiteFileSection(this, name);
         }
 
         if (getSections().contains(section)) {
@@ -93,7 +92,7 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
     void dispose() {
@@ -260,7 +259,7 @@ public class RobotSuiteFile implements RobotElement {
 
         private List<String> args;
 
-        public ImportedVariablesFile(List<String> args) {
+        public ImportedVariablesFile(final List<String> args) {
             this.args = args;
         }
 
@@ -268,7 +267,7 @@ public class RobotSuiteFile implements RobotElement {
             return args;
         }
 
-        public void setArgs(List<String> args) {
+        public void setArgs(final List<String> args) {
             this.args = args;
         }
         

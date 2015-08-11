@@ -14,8 +14,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public static final String SECTION_NAME = "Settings";
 
-    RobotSettingsSection(final RobotSuiteFile parent, final boolean readOnly) {
-        super(parent, SECTION_NAME, readOnly);
+    RobotSettingsSection(final RobotSuiteFile parent) {
+        super(parent, SECTION_NAME);
     }
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
