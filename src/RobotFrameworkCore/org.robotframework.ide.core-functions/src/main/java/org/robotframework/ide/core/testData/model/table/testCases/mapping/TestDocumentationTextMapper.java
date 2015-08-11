@@ -33,8 +33,8 @@ public class TestDocumentationTextMapper implements IParsingMapper {
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
-        types.add(0,
-                RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
+        types.add(0, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
+
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
         List<TestCase> testCases = robotFileOutput.getFileModel()

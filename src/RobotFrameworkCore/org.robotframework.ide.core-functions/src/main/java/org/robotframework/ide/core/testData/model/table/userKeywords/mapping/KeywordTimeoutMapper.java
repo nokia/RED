@@ -29,6 +29,8 @@ public class KeywordTimeoutMapper extends AKeywordSettingDeclarationMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
+        types.add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
+
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
 

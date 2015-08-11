@@ -1,15 +1,14 @@
-package org.robotframework.ide.core.testData.model.table.testCases.mapping;
+package org.robotframework.ide.core.testData.model.table.userKeywords.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTags;
+import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -17,13 +16,15 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TestCaseTagsTagNameMapper implements IParsingMapper {
+public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final KeywordFinder keywordFinder;
 
 
-    public TestCaseTagsTagNameMapper() {
+    public KeywordExecutableRowArgumentMapper() {
         this.utility = new ElementsUtility();
+        this.keywordFinder = new KeywordFinder();
     }
 
 
@@ -32,20 +33,18 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
+        UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(
+                currentLine, processingState, robotFileOutput, rt, fp);
         List<IRobotTokenType> types = rt.getTypes();
-        types.add(0, RobotTokenType.TEST_CASE_SETTING_TAGS);
-        rt.setText(new StringBuilder(text));
+        types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
 
-        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
-                .getTestCaseTable();
-        List<TestCase> testCases = testCaseTable.getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseTags> tags = testCase.getTags();
-        TestCaseTags testCaseTags = tags.get(tags.size() - 1);
-        testCaseTags.addTag(rt);
+        List<RobotExecutableRow> keywordExecutionRows = keyword
+                .getKeywordExecutionRows();
+        RobotExecutableRow robotExecutableRow = keywordExecutionRows
+                .get(keywordExecutionRows.size() - 1);
+        robotExecutableRow.addArgument(rt);
 
-        processingState.push(ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME);
-
+        processingState.push(ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
         return rt;
     }
 
@@ -56,9 +55,8 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        result = (state == ParsingState.TEST_CASE_SETTING_TAGS || state == ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME);
+        result = (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
 
         return result;
     }
-
 }

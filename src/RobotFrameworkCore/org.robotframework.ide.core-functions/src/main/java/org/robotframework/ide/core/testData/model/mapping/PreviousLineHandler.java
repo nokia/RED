@@ -41,9 +41,10 @@ public class PreviousLineHandler {
                     ParsingState currentState = utility
                             .getCurrentStatus(parsingStates);
                     if (utility.isTheFirstColumn(currentLine, currentToken)) {
-                        if (currentState == ParsingState.SETTING_TABLE_INSIDE
-                                && containsAnySetting(model)) {
-                            continueType = LineContinueType.SETTING_TABLE_ELEMENT;
+                        if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
+                            if (containsAnySetting(model)) {
+                                continueType = LineContinueType.SETTING_TABLE_ELEMENT;
+                            }
                         } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
                                 && containsAnyVariables(model)) {
                             continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
@@ -51,12 +52,20 @@ public class PreviousLineHandler {
                     } else {
                         if (utility.isTheFirstColumnAfterSeparator(currentLine,
                                 currentToken)) {
-                            if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
-                                    && containsAnyTestCases(model)) {
-                                continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
-                            } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
-                                    && containsAnyKeywords(model)) {
-                                continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
+                            if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE) {
+                                currentToken
+                                        .getTypes()
+                                        .add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
+                                if (containsAnyTestCases(model)) {
+                                    continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
+                                }
+                            } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE) {
+                                currentToken
+                                        .getTypes()
+                                        .add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
+                                if (containsAnyKeywords(model)) {
+                                    continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
+                                }
                             }
                         }
                     }

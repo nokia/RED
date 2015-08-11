@@ -261,6 +261,15 @@ public enum ParsingState {
     /**
      * 
      */
+    TEST_CASE_INSIDE_ACTION(TableType.TEST_CASE, TEST_CASE_DECLARATION),
+    /**
+     * 
+     */
+    TEST_CASE_INSIDE_ACTION_ARGUMENT(TableType.TEST_CASE,
+            TEST_CASE_INSIDE_ACTION),
+    /**
+     * 
+     */
     TEST_CASE_SETTING_DOCUMENTATION_DECLARATION(TableType.TEST_CASE,
             TEST_CASE_DECLARATION),
     /**
@@ -339,6 +348,14 @@ public enum ParsingState {
     /**
      * 
      */
+    KEYWORD_INSIDE_ACTION(TableType.KEYWORD, KEYWORD_DECLARATION),
+    /**
+     * 
+     */
+    KEYWORD_INSIDE_ACTION_ARGUMENT(TableType.KEYWORD, KEYWORD_INSIDE_ACTION),
+    /**
+     * 
+     */
     KEYWORD_SETTING_DOCUMENTATION_DECLARATION(TableType.KEYWORD,
             KEYWORD_DECLARATION),
     /**
@@ -410,6 +427,11 @@ public enum ParsingState {
     }
 
 
+    public TableType getTable() {
+        return table;
+    }
+
+
     public static List<ParsingState> getSettingsStates() {
         if (settingsStatuses.isEmpty()) {
             for (ParsingState s : ParsingState.values()) {
@@ -429,7 +451,7 @@ public enum ParsingState {
                 || state == ParsingState.VARIABLE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION);
     }
 
-    private enum TableType {
+    public enum TableType {
         SETTINGS, VARIABLES, KEYWORD, TEST_CASE;
     }
 }
