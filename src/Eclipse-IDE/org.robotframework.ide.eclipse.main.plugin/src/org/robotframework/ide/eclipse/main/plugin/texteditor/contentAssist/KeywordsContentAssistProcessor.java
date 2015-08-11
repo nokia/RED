@@ -54,6 +54,18 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                             currentWord, offset - currentWord.length(), settingImage);
                 }
                 
+                if (TextEditorContentAssist.shouldShowVariablesProposals(currentWord)) {
+                    currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
+                    final Map<String, String> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
+                            TextEditorContentAssist.getVariables(), currentWord);
+                    if (!filteredProposals.isEmpty()) {
+                        return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
+                                - currentWord.length());
+                    } else {
+                        return new ICompletionProposal[0];
+                    }
+                }
+                
                 final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
                         keywordMap, currentWord);
                 ICompletionProposal[] proposals = null;
