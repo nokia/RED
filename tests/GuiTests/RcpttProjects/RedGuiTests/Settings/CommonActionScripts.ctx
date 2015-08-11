@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/28/15 1:49 PM
+Save-Time: 8/7/15 10:19 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -190,94 +190,7 @@ proc "add-values-to_dictionary-in-EditVariable" [val list_of_values] [val script
 	}
 }
 
-proc "add-new-keyword-by-double-click" [val keywords_list] [val script_name]{
-	$keywords_list| each [val keyword]{
-		with [get-editor $script_name | get-tree] {
-			get-item "...add new keyword" | double-click
-		    select Keyword | activate-cell-edit
-		    with [get-editbox]{
-		    	set-text $keyword
-		        key-type Enter
-		   	}
-		    apply-cell-edit -deactivate
-		}
-	}
-}
 
-proc "add-new-keyword-by-typing-enter" [val keywords_list] [val script_name]{
-	$keywords_list| each [val keyword]{
-		with [get-editor $script_name | get-tree] {
-			get-item "...add new keyword" | key-type Enter
-		    select Keyword | activate-cell-edit
-		    with [get-editbox]{
-		    	set-text $keyword
-		        key-type Enter
-		   	}
-		    apply-cell-edit -deactivate
-		}
-	}
-}
-
-proc "add-row-to-keyword-by-right-arrows" [val keyword_name] [val elements] [val script_name]{
-	
-	$elements| each [val element] [val index]{
-		$elements |get 0| let [val first_element -input]{
-			with [get-editor $script_name | get-tree] {
-				if [$index | equals 0]{
-				    get-item [format "%s/\.\.\." $keyword_name] | double-click
-				    get-item[format "%s/\.\.\." $keyword_name] | activate-cell-edit
-				    with [get-editbox] {
-				        set-text $element
-			        	key-type Enter
-			    	}
-			    	apply-cell-edit -deactivate
-			    	
-		    	
-		    	}-else{
-		    		key-type Right
-					//type-text 2
-				    get-item [format "%s/%s" $keyword_name $first_element] | activate-cell-edit -column $index
-				    with [get-editbox] {
-				    	set-text $element
-				        key-type Enter
-				    }
-				    apply-cell-edit -deactivate
-				    
-				   
-				}
-			}	
-		} 	
-	}
-}
-
-proc "add-row-to-keyword-by-double-click-on-cell" [val keyword_name] [val elements] [val script_name]{
-	get-editor $script_name | get-tree | get-item [format "%s/\.\.\." $keyword_name] | get-property index -raw |let [val line_index -input]{
-		$elements| each [val element] [val index]{
-			$elements |get 0| let [val first_element -input]{
-				with [get-editor $script_name | get-tree] {
-					if [$index | equals 0]{
-					    get-item [format "%s/\.\.\." $keyword_name] | double-click
-					    get-item[format "%s/\.\.\." $keyword_name] | activate-cell-edit
-					    with [get-editbox] {
-					        set-text $element
-				        	key-type Enter
-				    	}
-				    	apply-cell-edit -deactivate
-			    	
-			    	}-else{
-			    	    get-item [format "%s/%s" $keyword_name $first_element] -index $line_index|double-click
-					    get-item [format "%s/%s" $keyword_name $first_element] -index $line_index| activate-cell-edit -column $index
-					    with [get-editbox] {
-					    	set-text $element
-					        key-type Enter
-					    }
-					    apply-cell-edit -deactivate			   
-					}
-				}	
-			} 	
-		}
-	}
-}
 
 
 proc Create2MetadataInTableEditor [val EditorTitle]{
