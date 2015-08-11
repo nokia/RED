@@ -36,7 +36,8 @@ public class DeleteSectionHandler extends DIHandler<E4DeleteSection> {
                 final ISectionEditorPart part = (ISectionEditorPart) activeEditor;
                 final Optional<RobotElement> section = part.provideSection(editor.provideSuiteModel());
                 if (section.isPresent()) {
-                    final List<RobotSuiteFileSection> sectionsToRemove = Arrays.asList((RobotSuiteFileSection)section.get());
+                    final List<RobotSuiteFileSection> sectionsToRemove = Arrays
+                            .asList((RobotSuiteFileSection) section.get());
                     stack.execute(new DeleteSectionCommand(sectionsToRemove));
                 }
             }
