@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.IRobotFileDumper;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -16,12 +17,12 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class TxtRobotFileDumper {
+public class TxtRobotFileDumper implements IRobotFileDumper {
 
     private final LineSeparatorFixer lineSeparatorFixer;
     private final static List<IElementDumper> dumpers = new LinkedList<>();
     static {
-        dumpers.add(new EmptyCellDumper());
+
     }
 
 
@@ -30,6 +31,7 @@ public class TxtRobotFileDumper {
     }
 
 
+    @Override
     public void dump(final File destFile, final RobotFile model)
             throws Exception {
         Path tempFile = Files.createTempFile(
@@ -91,5 +93,18 @@ public class TxtRobotFileDumper {
         }
 
         return dumper;
+    }
+
+
+    @Override
+    public boolean canDumpFile(File file) {
+        boolean result = false;
+
+        if (file != null && file.isFile()) {
+            String fileName = file.getName().toLowerCase();
+            result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
+        }
+
+        return result;
     }
 }

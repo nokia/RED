@@ -4,11 +4,14 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.importer.ResourceImportReference;
+
 
 public class RobotFileOutput {
 
     private File processedFile;
     private RobotFile fileModel;
+    private List<ResourceImportReference> resourceReferences = new LinkedList<>();
     private List<BuildMessage> buildingMessages = new LinkedList<>();
     private Status status = Status.FAILED;
 
@@ -40,6 +43,17 @@ public class RobotFileOutput {
 
     public void setFileModel(RobotFile fileModel) {
         this.fileModel = fileModel;
+    }
+
+
+    public void setResourceReferences(
+            final List<ResourceImportReference> references) {
+        this.resourceReferences = references;
+    }
+
+
+    public List<ResourceImportReference> getResourceImportReferences() {
+        return resourceReferences;
     }
 
     public static class BuildMessage {
@@ -130,5 +144,34 @@ public class RobotFileOutput {
 
     public static enum Status {
         FAILED, PASSED
+    }
+
+
+    public RobotFileType getType() {
+        RobotFileType judgedType = RobotFileType.UNKNOWN;
+        if (fileModel != null) {
+            if (processedFile.isFile()) {
+                String name = processedFile.getName().toLowerCase();
+                if (name.startsWith("__init__")) {
+                    judgedType = RobotFileType.TEST_SUITE_INIT;
+                } else {
+                    if (fileModel.getTestCaseTable().isPresent()) {
+                        judgedType = RobotFileType.TEST_SUITE;
+                    } else if (fileModel.containsAnyRobotSection()) {
+                        judgedType = RobotFileType.RESOURCE;
+                    } else {
+                        judgedType = RobotFileType.UNKNOWN;
+                    }
+                }
+            } else {
+                judgedType = RobotFileType.TEST_SUITE_DIR;
+            }
+        }
+
+        return judgedType;
+    }
+
+    public enum RobotFileType {
+        UNKNOWN, RESOURCE, TEST_SUITE, TEST_SUITE_DIR, TEST_SUITE_INIT;
     }
 }

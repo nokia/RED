@@ -19,4 +19,9 @@ public class KeywordTable extends ARobotSectionTable {
     public List<UserKeyword> getKeywords() {
         return userKeywords;
     }
+
+
+    public boolean isEmpty() {
+        return (userKeywords.isEmpty());
+    }
 }
