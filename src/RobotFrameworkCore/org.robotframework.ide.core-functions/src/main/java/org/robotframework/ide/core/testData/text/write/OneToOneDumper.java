@@ -6,7 +6,6 @@ import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class OneToOneDumper implements IElementDumper {
@@ -14,9 +13,8 @@ public class OneToOneDumper implements IElementDumper {
     @Override
     public boolean canDump(IRobotLineElement elem) {
         List<IRobotTokenType> types = elem.getTypes();
-        return (types.contains(SeparatorType.PIPE)
-                || types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE) || types
-                .get(0).equals(RobotTokenType.UNKNOWN));
+        return (types.contains(SeparatorType.PIPE) || types
+                .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE));
     }
 
 
