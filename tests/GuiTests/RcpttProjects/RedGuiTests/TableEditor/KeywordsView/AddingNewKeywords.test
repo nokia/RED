@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qkXbIDz_EeWUyZKiCzynFQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/12/15 1:46 PM
+Save-Time: 8/12/15 3:11 PM
 Testcase-Type: ecl
 Verifications: _bkC_ID0WEeWUyZKiCzynFQ
 
@@ -20,10 +20,11 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
 with [get-editor "TestFile.robot"] {
     get-link "Section is not yet defined, do you want to create it?" | click
+    get-editbox -after [get-label "User Keywords"] | key-type "M1+s"
 }  
 
 //save and close
-get-menu "File/Save" | click
+//get-menu "File/Save" | click
 wait 1000
 get-editor "TestFile.robot" | close
 
