@@ -4,12 +4,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class CreateSectionCommand extends EditorCommand {
+public class CreateFreshSectionCommand extends EditorCommand {
 
     private final RobotSuiteFile suite;
     private final String sectionName;
 
-    public CreateSectionCommand(final RobotSuiteFile suite, final String sectionName) {
+    public CreateFreshSectionCommand(final RobotSuiteFile suite, final String sectionName) {
         this.suite = suite;
         this.sectionName = sectionName;
     }

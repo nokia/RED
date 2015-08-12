@@ -49,7 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedVariablesFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -273,7 +273,7 @@ public class ImportVariablesComposite {
         final List<ImportedVariablesFile> currentVariables = ((Settings) variablesViewer.getInput()).getImportedVariables();
         for (final String newPathString : paths) {
             final ArrayList<String> args = newArrayList(newPathString);
-            commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Variables", args));
+            commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Variables", args));
             currentVariables.add(new ImportedVariablesFile(args));
         }
         variablesViewer.refresh();
