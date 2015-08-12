@@ -19,4 +19,9 @@ public class TestCaseTable extends ARobotSectionTable {
     public List<TestCase> getTestCases() {
         return testCases;
     }
+
+
+    public boolean isEmpty() {
+        return (testCases.isEmpty());
+    }
 }

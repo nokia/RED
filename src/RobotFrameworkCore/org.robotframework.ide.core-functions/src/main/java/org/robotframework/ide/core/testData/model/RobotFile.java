@@ -49,4 +49,9 @@ public class RobotFile {
         return keywordTable;
     }
 
+
+    public boolean containsAnyRobotSection() {
+        return (settingTable.isPresent() || variableTable.isPresent()
+                || testCaseTable.isPresent() || keywordTable.isPresent());
+    }
 }

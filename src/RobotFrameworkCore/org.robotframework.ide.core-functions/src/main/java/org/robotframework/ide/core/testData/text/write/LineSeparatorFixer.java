@@ -7,35 +7,51 @@ import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
 
 public class LineSeparatorFixer {
 
+    private final static SeparatorType DEFAULT_SEPARATOR = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
+
+
     public void separateLine(final RobotLine line) {
         List<IRobotLineElement> elems = line.getLineElements();
         boolean isLastSeparator = true;
-        SeparatorType separator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
-        int size = elems.size();
-        for (int i = 0; i < size; i++) {
+        SeparatorType separator = null;
+        for (int i = 0; i < elems.size(); i++) {
             IRobotLineElement e = elems.get(i);
             List<IRobotTokenType> types = e.getTypes();
 
             if (types.contains(SeparatorType.PIPE)) {
-                separator = SeparatorType.PIPE;
+                if (separator == null) {
+                    separator = SeparatorType.PIPE;
+                } else {
+                    // FIXME: sth wrong with separators
+                }
                 isLastSeparator = true;
             } else if (types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)) {
-                separator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
+                if (separator == null) {
+                    separator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
+                } else {
+                    // FIXME: sth wrong with separators
+                }
                 isLastSeparator = true;
             } else {
                 if (!isLastSeparator) {
+                    if (separator == null) {
+                        separator = DEFAULT_SEPARATOR;
+                    }
                     elems.add(i, createSeparator(separator, e));
                 }
 
                 isLastSeparator = false;
             }
         }
+
+        addBeginSeparatorIfRequired(elems, separator);
     }
 
 
@@ -65,15 +81,23 @@ public class LineSeparatorFixer {
 
 
     @VisibleForTesting
-    protected boolean isBeginSeparatorRequired(final RobotLine line) {
-        boolean result = false;
+    protected void addBeginSeparatorIfRequired(
+            final List<IRobotLineElement> elems,
+            final SeparatorType discoveredSeparator) {
+        if (!elems.isEmpty()) {
+            IRobotLineElement theFirstElement = elems.get(0);
+            List<IRobotTokenType> types = theFirstElement.getTypes();
+            if (types.contains(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT)
+                    || types.contains(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT)) {
+                SeparatorType toUse;
+                if (discoveredSeparator == null) {
+                    toUse = DEFAULT_SEPARATOR;
+                } else {
+                    toUse = discoveredSeparator;
+                }
 
-        List<IRobotLineElement> lineElements = line.getLineElements();
-        for (IRobotLineElement elem : lineElements) {
-            List<IRobotTokenType> types = elem.getTypes();
-
+                elems.add(0, createSeparator(toUse, theFirstElement));
+            }
         }
-
-        return result;
     }
 }
