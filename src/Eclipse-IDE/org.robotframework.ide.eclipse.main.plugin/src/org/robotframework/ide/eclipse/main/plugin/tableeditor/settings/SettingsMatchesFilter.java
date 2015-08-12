@@ -5,14 +5,16 @@ import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
-class SettingsMatchesFilter extends ViewerFilter {
+public class SettingsMatchesFilter extends ViewerFilter {
 
     private final MatchesCollection matches;
 
-    SettingsMatchesFilter(final MatchesCollection matches) {
+    public SettingsMatchesFilter(final MatchesCollection matches) {
         this.matches = matches;
     }
 
@@ -21,15 +23,17 @@ class SettingsMatchesFilter extends ViewerFilter {
         if (element instanceof RobotSetting) {
             return settingMatches((RobotSetting) element);
         } else if (element instanceof Entry<?, ?>) {
-            final RobotSetting setting = (RobotSetting) ((Entry<?, ?>) element).getValue();
-            if (setting != null) {
-                return settingMatches(setting);
+            final Object elem = ((Entry<?, ?>) element).getValue();
+            if (elem instanceof RobotSetting) {
+                return settingMatches((RobotSetting) element);
+            } else if (elem instanceof RobotDefinitionSetting) {
+                return settingMatches((RobotDefinitionSetting) elem);
             }
         }
         return true;
     }
 
-    private boolean settingMatches(final RobotSetting setting) {
+    private boolean settingMatches(final RobotKeywordCall setting) {
         return matches.contains(setting.getName()) || matches.contains(setting.getComment())
                 || matchesContainsArgument(setting.getArguments());
     }
