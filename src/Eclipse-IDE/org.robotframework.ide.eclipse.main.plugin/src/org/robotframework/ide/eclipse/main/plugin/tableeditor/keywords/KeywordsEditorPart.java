@@ -29,7 +29,9 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
     public static class KeywordsEditor extends SectionEditorPart {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.keywords.context";
+
         private KeywordsEditorFormFragment keywordsFragment;
+        private KeywordSettingsFormFragment detailsFragment;
 
         @Override
         protected String getContextId() {
@@ -64,7 +66,8 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             keywordsFragment = new KeywordsEditorFormFragment();
-            return newArrayList(keywordsFragment);
+            detailsFragment = new KeywordSettingsFormFragment();
+            return newArrayList(keywordsFragment, detailsFragment);
         }
 
         @Override

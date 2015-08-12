@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -86,25 +87,43 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
+        createViewer(parent);
+        createColumns();
+        createContextMenu();
+
+        viewer.setInput(getSection());
+        viewer.refresh();
+        
+        editSection = createValueEditSection(parent);
+        valueEditForm = new VariableValueEditForm(toolkit, editSection, eventBroker);
+        addSelectionListenerForValueEditing();
+    }
+
+    private void createViewer(final Composite parent) {
         viewer = new RowExposingTableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        viewer.setContentProvider(new VariablesContentProvider(fileModel.isEditable()));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
+        viewer.setUseHashlookup(true);
+        viewer.getTable().setLinesVisible(true);
+        viewer.getTable().setHeaderVisible(true);
         viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
+
             @Override
             public void handleEvent(final Event event) {
                 event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
+        viewer.setContentProvider(new VariablesContentProvider(fileModel.isEditable()));
+        viewer.setComparer(new VariableElementsComparer());
 
-        viewer.getTable().setLinesVisible(true);
-        viewer.getTable().setHeaderVisible(true);
-        viewer.setUseHashlookup(true);
-        
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+    }
+
+    private void createColumns() {
         final NewElementsCreator creator = newElementsCreator();
-        
         final MatchesProvider matchesProvider = new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
@@ -135,16 +154,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .equipWithThreeWaySorting(VariablesViewerComparators.variableCommentsAscendingComparator(),
                         VariablesViewerComparators.variableCommentsDescendingComparator())
                 .createFor(viewer);
-
-        ViewersConfigurator.enableDeselectionPossibility(viewer);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
-        createContextMenu();
-
-        setInput();
-        
-        editSection = createValueEditSection(parent);
-        valueEditForm = new VariableValueEditForm(toolkit, editSection, eventBroker);
-        addSelectionListenerForValueEditing();
     }
 
     private NewElementsCreator newElementsCreator() {
@@ -169,11 +178,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         site.registerContextMenu(menuId, manager, viewer, false);
     }
 
-    private void setInput() {
-        final com.google.common.base.Optional<RobotElement> variablesSection = fileModel
-                .findSection(RobotVariablesSection.class);
-        viewer.setInput(variablesSection.orNull());
-        viewer.refresh();
+    private RobotVariablesSection getSection() {
+        return (RobotVariablesSection) fileModel.findSection(RobotVariablesSection.class).orNull();
     }
 
     void revealVariable(final RobotVariable robotVariable) {
@@ -245,6 +251,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         editSection.layout();
     }
 
+    private void setDirty() {
+        dirtyProviderService.setDirtyState(true);
+    }
+
     @Override
     public MatchesCollection collectMatches(final String filter) {
         if (filter.isEmpty()) {
@@ -279,8 +289,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel && viewer.getInput() == null) {
-            setInput();
-            dirtyProviderService.setDirtyState(true);
+            viewer.setInput(getSection());
+            viewer.refresh();
+
+            setDirty();
         }
     }
 
@@ -289,9 +301,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && viewer.getInput() != null) {
-            setInput();
-            dirtyProviderService.setDirtyState(true);
+            viewer.setInput(getSection());
+            viewer.refresh();
             
+            setDirty();
             clearValueEditFormPanel();
         }
     }
@@ -301,8 +314,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableDetailChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
         if (variable.getSuiteFile() == fileModel) {
-            viewer.refresh();
-            dirtyProviderService.setDirtyState(true);
+            viewer.update(variable, null);
+
+            setDirty();
         }
     }
 
@@ -312,7 +326,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             viewer.refresh();
-            dirtyProviderService.setDirtyState(true);
+
+            setDirty();
         }
     }
 
@@ -321,7 +336,17 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            setInput();
+            try {
+                viewer.getTable().setRedraw(false);
+                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+                viewer.setInput(getSection());
+                viewer.refresh();
+                if (focusCell != null) {
+                    viewer.setFocusCell(focusCell.getColumnIndex());
+                }
+            } finally {
+                viewer.getTable().setRedraw(true);
+            }
         }
     }
     

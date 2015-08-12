@@ -4,16 +4,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -34,7 +33,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -52,12 +50,16 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.viewers.Selections;
 
 public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
+    public static final String MAIN_PART_SELECTION_CHANGED_TOPIC = "red/table/editor/code/main/selection/changed";
+
     @Inject
     private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IDirtyProviderService dirtyProviderService;
@@ -79,8 +81,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     private Section section;
 
-    private boolean isSaving = false;
-
     public TreeViewer getViewer() {
         return viewer;
     }
@@ -88,7 +88,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     @Override
     public void initialize(final Composite parent) {
         createViewer(parent);
-        createDetailsPanel(parent);
         createViewerContextMenu();
         createHeaderContextMenu();
 
@@ -117,6 +116,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             }
         });
         viewer.setContentProvider(createContentProvider());
+        viewer.setComparer(new CodeElementsComparer());
         viewer.addSelectionChangedListener(createSelectionChangeListener());
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
@@ -139,9 +139,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         final ISelectionChangedListener selectionChangeListener = new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                final RobotElement selectedElement = Selections.getOptionalFirstElement(
-                        (IStructuredSelection) event.getSelection(), RobotElement.class).orNull();
-                whenElementSelectionChanged(selectedElement);
+                eventBroker.send(MAIN_PART_SELECTION_CHANGED_TOPIC, event.getSelection());
             }
         };
         viewer.getTree().addDisposeListener(new DisposeListener() {
@@ -153,24 +151,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         return selectionChangeListener;
     }
 
-    protected abstract void whenElementSelectionChanged(RobotElement selectedElement);
-
     protected abstract ITreeContentProvider createContentProvider();
-
-    private void createDetailsPanel(final Composite parent) {
-        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
-        section.setExpanded(false);
-        section.setText("Settings");
-        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
-
-        final Composite composite = toolkit.createComposite(section);
-        GridLayoutFactory.fillDefaults().applyTo(composite);
-        section.setClient(composite);
-
-        createSettingsTable(composite);
-    }
-
-    protected abstract void createSettingsTable(final Composite parent);
 
     private void createViewerContextMenu() {
         final String menuId = getViewerMenuId();
@@ -293,7 +274,6 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     @Persist
     public void onSave() {
-        isSaving = true;
         setFocus();
     }
 
@@ -309,7 +289,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             viewer.setInput(getSection());
             viewer.refresh();
 
-            dirtyProviderService.setDirtyState(true);
+            setDirty();
         }
     }
 
@@ -321,7 +301,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             viewer.setInput(getSection());
             viewer.refresh();
 
-            dirtyProviderService.setDirtyState(true);
+            setDirty();
         }
     }
 
@@ -330,11 +310,18 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            if (isSaving) {
-                isSaving = false;
+            try {
+                viewer.getTree().setRedraw(false);
+                final Object[] expandedElements = viewer.getExpandedElements();
+                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+                viewer.setInput(getSection());
+                viewer.setExpandedElements(expandedElements);
+                if (focusCell != null) {
+                    viewer.setFocusCell(focusCell.getColumnIndex());
+                }
+            } finally {
+                viewer.getTree().setRedraw(true);
             }
-            viewer.setInput(getSection());
-            viewer.refresh();
         }
     }
 }

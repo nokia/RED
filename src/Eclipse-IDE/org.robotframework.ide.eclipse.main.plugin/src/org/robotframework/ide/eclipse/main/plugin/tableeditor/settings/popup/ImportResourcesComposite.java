@@ -50,7 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -234,7 +234,7 @@ public class ImportResourcesComposite {
             final IPath newPath = new Path(newPathString);
             if (!currentPaths.contains(newPath)) {
                 final ArrayList<String> args = newArrayList(newPathString);
-                commandsStack.execute(new CreateSettingKeywordCallCommand(settingsSection, "Resource", args));
+                commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Resource", args));
                 currentPaths.add(newPath);
             }
         }

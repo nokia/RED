@@ -9,9 +9,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordCallCommand extends EditorCommand {
 
-    private final List<RobotKeywordCall> callsToDelete;
+    private final List<? extends RobotKeywordCall> callsToDelete;
 
-    public DeleteKeywordCallCommand(final List<RobotKeywordCall> callsToDelete) {
+    public DeleteKeywordCallCommand(final List<? extends RobotKeywordCall> callsToDelete) {
         this.callsToDelete = callsToDelete;
     }
 
