@@ -19,4 +19,9 @@ public class VariableTable extends ARobotSectionTable {
     public void addVariable(final IVariableHolder variable) {
         variables.add(variable);
     }
+
+
+    public boolean isEmpty() {
+        return (variables.isEmpty());
+    }
 }

@@ -12,10 +12,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import org.robotframework.ide.core.testData.IRobotFileParser;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler.LineContinueType;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -53,7 +55,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.settings.Librar
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class TxtRobotFileParser {
+public class TxtRobotFileParser implements IRobotFileParser {
 
     private final TokenSeparatorBuilder tokenSeparatorBuilder;
     private final List<ATokenRecognizer> recognized = new LinkedList<>();
@@ -95,8 +97,23 @@ public class TxtRobotFileParser {
     }
 
 
+    @Override
+    public boolean canParseFile(File file) {
+        boolean result = false;
+
+        if (file != null && file.isFile()) {
+            String fileName = file.getName().toLowerCase();
+            result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
+        }
+
+        return result;
+    }
+
+
+    @Override
     public RobotFileOutput parse(final File robotFile) {
         RobotFileOutput parsingOutput = new RobotFileOutput();
+        boolean wasProcessingError = false;
         try {
             parsingOutput = parse(new InputStreamReader(new FileInputStream(
                     robotFile), Charset.forName("UTF-8")));
@@ -104,20 +121,28 @@ public class TxtRobotFileParser {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
                     "File " + robotFile));
+            wasProcessingError = true;
             // FIXME: position should be more descriptive
         } catch (IOException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Problem during file " + robotFile + " reading.\nStack:"
                             + e.getLocalizedMessage(), "File " + robotFile));
+            wasProcessingError = true;
         } catch (Exception e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Unknown problem during reading file " + robotFile
                             + ".\nStack:" + e, "File " + robotFile));
             // FIXME: stack trace adding
             e.printStackTrace();
+            wasProcessingError = true;
         }
 
         parsingOutput.setProcessedFile(robotFile);
+        if (wasProcessingError) {
+            parsingOutput.setStatus(Status.FAILED);
+        } else {
+            parsingOutput.setStatus(Status.PASSED);
+        }
 
         return parsingOutput;
     }
