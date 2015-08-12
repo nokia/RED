@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dZ2U0EAkEeW20a8v9jefTQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/11/15 3:55 PM
+Save-Time: 8/12/15 9:22 AM
 Testcase-Type: ecl
 Verifications: _a2CaoEAsEeW20a8v9jefTQ
 
@@ -41,7 +41,7 @@ add-row-to-keyword-by-double-click-on-cell -keyword_name "Required, Default, Var
 add-row-to-keyword-by-double-click-on-cell -keyword_name "Required, Default, Varargs" -keyword_index 0 -elements [list "Log" "Required: ${Empty}" "" "" "" "" "Comment 2" ] -command_index 1 -script_name "TestFile.robot" 
 
 
-get-button "Save (Ctrl+S)" | click
+get-menu "File/Save" | click
 get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | double-click
