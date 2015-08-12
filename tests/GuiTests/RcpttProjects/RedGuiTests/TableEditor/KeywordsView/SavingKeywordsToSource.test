@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dZ2U0EAkEeW20a8v9jefTQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/12/15 9:22 AM
+Save-Time: 8/12/15 1:49 PM
 Testcase-Type: ecl
 Verifications: _a2CaoEAsEeW20a8v9jefTQ
 
@@ -43,6 +43,7 @@ add-row-to-keyword-by-double-click-on-cell -keyword_name "Required, Default, Var
 
 get-menu "File/Save" | click
 get-editor "TestFile.robot" | close
+wait 1000
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | double-click
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
