@@ -55,7 +55,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSectionCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ColorsManager;
@@ -286,7 +286,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
             @Override
             public void linkActivated(final HyperlinkEvent e) {
-                commandsStack.execute(new CreateSectionCommand(fileModel, getSectionName()));
+                commandsStack.execute(new CreateFreshSectionCommand(fileModel, getSectionName()));
             }
         };
     }

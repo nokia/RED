@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -47,7 +47,7 @@ class GeneralSettingsCommentsEditingSupport extends EditingSupport {
         if (setting == null && !comment.isEmpty()) {
             final String keywordName = getSettingName(element);
             final RobotSettingsSection section = (RobotSettingsSection) getViewer().getInput();
-            commandsStack.execute(new CreateSettingKeywordCallCommand(section, keywordName,
+            commandsStack.execute(new CreateFreshGeneralSettingCommand(section, keywordName,
                     new ArrayList<String>(), comment));
         } else if (setting != null) {
             commandsStack.execute(new SetKeywordCallCommentCommand(setting, comment));

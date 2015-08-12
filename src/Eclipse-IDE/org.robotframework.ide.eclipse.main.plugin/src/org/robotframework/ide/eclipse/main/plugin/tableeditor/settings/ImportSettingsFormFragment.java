@@ -94,6 +94,14 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         Sections.switchGridCellGrabbingOnExpansion(section);
         Sections.installMaximazingPossibility(section);
 
+        createViewer();
+        createColumns();
+
+        createContextMenu();
+        viewer.setInput(getSection());
+    }
+
+    private void createViewer() {
         viewer = new RowExposingTableViewer(section, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
         section.setClient(viewer.getTable());
@@ -103,17 +111,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
 
         viewer.setContentProvider(new ImportSettingsContentProvider(fileModel.isEditable()));
+        viewer.setComparer(new SettingElementsComparer());
         Viewers.boundViewerWithContext(viewer, site,
                 "org.robotframework.ide.eclipse.tableeditor.settings.import.context");
         CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
-
-        createColumns();
-        createContextMenu();
-        setInput();
-        // createColumns(true);
-        // viewer.refresh();
-        // viewer.packFirstColumn();
     }
 
     private void createColumns() {
@@ -188,11 +190,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
     }
 
-    private void setInput() {
-        viewer.setInput(getSettingsSection());
+    private void setDirty() {
+        dirtyProviderService.setDirtyState(true);
     }
 
-    private RobotSettingsSection getSettingsSection() {
+    private RobotSettingsSection getSection() {
         return (RobotSettingsSection) fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
@@ -282,9 +284,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
+            viewer.setInput(getSection());
             viewer.refresh();
-            dirtyProviderService.setDirtyState(true);
+            setDirty();
         }
     }
 
@@ -293,9 +295,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
-            setInput();
+            viewer.setInput(getSection());
             viewer.refresh();
-            dirtyProviderService.setDirtyState(true);
+            setDirty();
         }
     }
 
@@ -304,8 +306,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && getDisplayedSettings().contains(setting)) {
-            viewer.refresh(setting);
-            dirtyProviderService.setDirtyState(true);
+            viewer.update(setting, null);
+            setDirty();
         }
     }
 
@@ -333,7 +335,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             viewer.refresh();
-            dirtyProviderService.setDirtyState(true);
+            setDirty();
         }
     }
 
@@ -342,9 +344,17 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            setInput();
-            viewer.refresh();
-            viewer.packFirstColumn();
+            try {
+                viewer.getTable().setRedraw(false);
+                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+                viewer.setInput(getSection());
+                viewer.refresh();
+                if (focusCell != null) {
+                    viewer.setFocusCell(focusCell.getColumnIndex());
+                }
+            } finally {
+                viewer.getTable().setRedraw(true);
+            }
         }
     }
 

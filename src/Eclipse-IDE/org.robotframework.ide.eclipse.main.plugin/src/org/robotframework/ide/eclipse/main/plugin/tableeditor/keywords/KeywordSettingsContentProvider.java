@@ -1,7 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
+import java.util.Map;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+
+import com.google.common.base.Optional;
 
 public class KeywordSettingsContentProvider implements IStructuredContentProvider {
 
@@ -17,8 +23,11 @@ public class KeywordSettingsContentProvider implements IStructuredContentProvide
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        final KeywordSettingsModel model = (KeywordSettingsModel) inputElement;
-        return model.getEntries().toArray();
+        @SuppressWarnings("unchecked")
+        final Optional<RobotKeywordDefinition> definition = (Optional<RobotKeywordDefinition>) inputElement;
+        final Map<String, RobotElement> keywordSettings = KeywordSettingsModel
+                .findKeywordSettingsMapping(definition.orNull());
+        return keywordSettings.entrySet().toArray();
     }
 
 }

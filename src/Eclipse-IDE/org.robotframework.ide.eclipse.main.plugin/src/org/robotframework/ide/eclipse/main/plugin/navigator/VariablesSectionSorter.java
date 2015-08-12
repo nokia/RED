@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.text.Collator;
+import java.util.EnumSet;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -19,7 +20,8 @@ public class VariablesSectionSorter extends ViewerSorter {
 
     @Override
     public int category(final Object element) {
-        return ((RobotVariable) element).getType() == Type.LIST ? 0 : 1;
+        final Type variableType = ((RobotVariable) element).getType();
+        return EnumSet.allOf(Type.class).size() - variableType.ordinal() - 1;
     }
 
     @Override

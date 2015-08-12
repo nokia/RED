@@ -6,7 +6,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -24,18 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.MatchesFilter
 class CasesEditorFormFragment extends CodeEditorFormFragment {
 
     private MatchesCollection matches;
-
-    @Override
-    protected void createSettingsTable(final Composite composite) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void whenElementSelectionChanged(final RobotElement selectedElement) {
-        // TODO Auto-generated method stub
-
-    }
 
     @Override
     protected ITreeContentProvider createContentProvider() {
