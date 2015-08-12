@@ -68,7 +68,7 @@ public class RobotKeywordCall implements RobotElement, Serializable {
         return args;
     }
     
-    public void setArgs(List<String> args) {
+    public void setArgs(final List<String> args) {
         this.args = args;
     }
 
