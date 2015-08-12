@@ -5,73 +5,57 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
-public class KeywordSettingsNamesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+public class KeywordSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final Map<String, String> tooltips = new LinkedHashMap<>();
     {
-        tooltips.put("Suite Setup",
-                "The keyword %s is executed before executing any of the test cases or lower level suites");
-        tooltips.put("Suite Teardown",
-                "The keyword %s is executed after all test cases and lower level suites have been executed");
-        tooltips.put("Test Setup",
-                "The keyword %s is executed before every test cases in this suite unless test cases override it");
-        tooltips.put("Test Teardown",
-                "The keyword %s is executed after every test cases in this suite unless test cases override it");
-        tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
-        tooltips.put(
-                "Test Timeout",
-                "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
-                        + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
-        tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
-        tooltips.put("Default Tags", "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        tooltips.put("Teardown", "The keyword %s is executed after every other keyword inside the definition");
+        tooltips.put("Timeout", "Specifies maximum time this keyword is allowed to execute before being aborted.\n"
+                + "This setting overrides Test Timeout setting set on suite level\n"
+                + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+        tooltips.put("Return", "Specify the return value for this keyword. Multiple values can be used.");
+    }
+
+    public KeywordSettingsNamesLabelProvider(final MatchesProvider matchesProvider) {
+        super(matchesProvider);
     }
 
     @Override
     public Color getBackground(final Object element) {
-        final Entry<String, RobotDefinitionSetting> entry = getEntry(element);
-
-        if (entry.getValue() == null) {
-            return ColorsManager.getColor(250, 250, 250);
-        } else {
-            return null;
-        }
+        return getSetting(element) == null ? ColorsManager.getColor(250, 250, 250) : null;
     }
 
     @Override
     public StyledString getStyledText(final Object element) {
         final RobotDefinitionSetting setting = getSetting(element);
         if (setting == null) {
-            return new StyledString(getSettingName(element), Stylers.withForeground(200, 200, 200));
+            return highlightMatches(new StyledString(getSettingName(element), Stylers.withForeground(200, 200, 200)));
         } else {
-            return new StyledString(setting.getName());
+            return highlightMatches(new StyledString(setting.getName()));
         }
     }
 
     @Override
     public String getToolTipText(final Object element) {
-        // final Entry<String, RobotDefinitionSetting> entry =
-        // getEntry(element);
-        // final RobotSetting setting = getSetting(element);
-        // final String keyword = setting == null ? "given in first argument" :
-        // getKeyword(setting);
-        //
-        // return String.format(tooltips.get(entry.getKey()), keyword);
-        return "";
+        final Entry<String, RobotDefinitionSetting> entry = getEntry(element);
+        final RobotDefinitionSetting setting = getSetting(element);
+        final String keyword = setting == null ? "given in first argument" : getKeyword(setting);
+
+        return String.format(tooltips.get(entry.getKey()), keyword);
     }
 
-    private String getKeyword(final RobotSetting element) {
+    private String getKeyword(final RobotDefinitionSetting element) {
         final List<String> arguments = element.getArguments();
         return arguments.isEmpty() ? "<empty>" : "'" + arguments.get(0) + "'";
     }
