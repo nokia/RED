@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.robotframework.ide.core.execution.ExecutionElementsParser;
+import org.robotframework.ide.core.execution.IExecutionHandler;
 
 import com.google.common.base.Joiner;
 
@@ -714,11 +716,11 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public void startTestRunnerAgentHandler(final int port,
-            final ILineHandler lineHandler) {
-        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(
-                port);
+    public void startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
+            final IExecutionHandler executionHandler) {
+        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
         testRunnerAgentHandler.addListener(new MessageLogParser(lineHandler));
+        testRunnerAgentHandler.addListener(new ExecutionElementsParser(executionHandler));
         final Thread handlerThread = new Thread(testRunnerAgentHandler);
         handlerThread.start();
     }
