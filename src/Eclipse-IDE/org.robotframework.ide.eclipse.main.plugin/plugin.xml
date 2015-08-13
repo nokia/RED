@@ -182,6 +182,14 @@
             restorable="true">
       </view>
       <view
+            category="org.robotframework.ide.eclipse.views"
+            class="org.robotframework.ide.eclipse.main.plugin.views.ExecutionViewWrapper"
+            icon="resources/robot.png"
+            id="org.robotframework.ide.ExecutionView"
+            name="Execution View"
+            restorable="true">
+      </view>
+      <view
             class="org.robotframework.red.tmp.ModelViewWrapper"
             id="org.robotframework.ide.eclipse.main.plugin.view1"
             name="Model"
