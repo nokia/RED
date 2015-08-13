@@ -42,6 +42,7 @@ import org.robotframework.ide.core.testData.model.table.variables.mapping.Unknow
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
+import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -115,8 +116,128 @@ public class TxtRobotFileParser implements IRobotFileParser {
         RobotFileOutput parsingOutput = new RobotFileOutput();
         boolean wasProcessingError = false;
         try {
-            parsingOutput = parse(new InputStreamReader(new FileInputStream(
-                    robotFile), Charset.forName("UTF-8")));
+            parsingOutput = parse(robotFile, new InputStreamReader(
+                    new FileInputStream(robotFile), Charset.forName("UTF-8")));
+        } catch (FileNotFoundException e) {
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "File " + robotFile + " was not found.\nStack:" + e,
+                    "File " + robotFile));
+            wasProcessingError = true;
+            // FIXME: position should be more descriptive
+        } catch (Exception e) {
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile
+                            + ".\nStack:" + e, "File " + robotFile));
+            // FIXME: stack trace adding
+            e.printStackTrace();
+            wasProcessingError = true;
+        }
+
+        if (wasProcessingError || parsingOutput.getStatus() == Status.FAILED) {
+            parsingOutput.setStatus(Status.FAILED);
+        } else {
+            parsingOutput.setStatus(Status.PASSED);
+        }
+
+        parsingOutput.setProcessedFile(robotFile);
+
+        return parsingOutput;
+    }
+
+
+    private RobotFileOutput parse(final File robotFile, final Reader reader) {
+        boolean wasProcessingError = false;
+        previousLineHandler.clear();
+
+        RobotFileOutput parsingOutput = new RobotFileOutput();
+        RobotFile rf = new RobotFile();
+        parsingOutput.setFileModel(rf);
+
+        BufferedReader lineReader = new BufferedReader(reader);
+        int lineNumber = 0;
+        String currentLineText = null;
+        final Stack<ParsingState> processingState = new Stack<>();
+        boolean isNewLine = false;
+        try {
+            while((currentLineText = lineReader.readLine()) != null) {
+                RobotLine line = new RobotLine(lineNumber);
+                StringBuilder text = new StringBuilder(currentLineText);
+                int lastColumnProcessed = 0;
+                // get separator for this line
+                ALineSeparator separator = tokenSeparatorBuilder
+                        .createSeparator(lineNumber, currentLineText);
+                RobotToken rt = null;
+
+                int textLength = currentLineText.length();
+                // check if is any data to process
+                if (textLength > 0) {
+                    // consume all data
+                    while(lastColumnProcessed < textLength) {
+                        if (separator.hasNext()) {
+                            // iterate column-by-column in robot file
+                            Separator currentSeparator = separator.next();
+                            int startColumn = currentSeparator.getStartColumn();
+                            int remainingData = startColumn
+                                    - lastColumnProcessed;
+                            // {$a} | {$b} in this case we check if {$a} was
+                            // before
+                            // '|' pipe separator
+                            if (remainingData > 0) {
+                                rt = processLineElement(line, processingState,
+                                        parsingOutput,
+                                        new FilePosition(lineNumber,
+                                                lastColumnProcessed),
+                                        text.substring(lastColumnProcessed,
+                                                startColumn), isNewLine);
+                                line.addLineElement(rt);
+                                isNewLine = false;
+                            }
+
+                            line.addLineElement(currentSeparator);
+                            lastColumnProcessed = currentSeparator
+                                    .getEndColumn();
+                        } else {
+                            // last element in line
+                            if (isNewExecutableSection(separator, line)) {
+                                processingState
+                                        .remove(ParsingState.TEST_CASE_DECLARATION);
+                                processingState
+                                        .remove(ParsingState.KEYWORD_DECLARATION);
+                            }
+
+                            rt = processLineElement(line, processingState,
+                                    parsingOutput, new FilePosition(lineNumber,
+                                            lastColumnProcessed),
+                                    text.substring(lastColumnProcessed),
+                                    isNewLine);
+                            line.addLineElement(rt);
+
+                            lastColumnProcessed = textLength;
+                            isNewLine = false;
+                        }
+                    }
+                }
+
+                lineNumber++;
+                lastColumnProcessed = 0;
+                checkAndFixLine(parsingOutput, processingState);
+                /**
+                 * special for case
+                 * 
+                 * <pre>
+                 * *** Settings
+                 * Suite Setup      Keyword
+                 * 
+                 * ...              argument_x
+                 * </pre>
+                 */
+                if (!line.getLineElements().isEmpty()) {
+                    previousLineHandler.flushNew(processingState);
+                }
+                rf.addNewLine(line);
+                utility.updateStatusesForNewLine(processingState);
+                isNewLine = true;
+            }
         } catch (FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
@@ -137,7 +258,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
             wasProcessingError = true;
         }
 
-        parsingOutput.setProcessedFile(robotFile);
         if (wasProcessingError) {
             parsingOutput.setStatus(Status.FAILED);
         } else {
@@ -148,91 +268,20 @@ public class TxtRobotFileParser implements IRobotFileParser {
     }
 
 
-    private RobotFileOutput parse(final Reader reader) throws IOException {
-        previousLineHandler.clear();
-
-        RobotFileOutput parsingOutput = new RobotFileOutput();
-        RobotFile rf = new RobotFile();
-        parsingOutput.setFileModel(rf);
-
-        BufferedReader lineReader = new BufferedReader(reader);
-        int lineNumber = 0;
-        String currentLineText = null;
-        final Stack<ParsingState> processingState = new Stack<>();
-        boolean isNewLine = false;
-        while((currentLineText = lineReader.readLine()) != null) {
-            RobotLine line = new RobotLine(lineNumber);
-            StringBuilder text = new StringBuilder(currentLineText);
-            int lastColumnProcessed = 0;
-            // get separator for this line
-            ALineSeparator separator = tokenSeparatorBuilder.createSeparator(
-                    lineNumber, currentLineText);
-            RobotToken rt = null;
-
-            int textLength = currentLineText.length();
-            // check if is any data to process
-            if (textLength > 0) {
-                // consume all data
-                while(lastColumnProcessed < textLength) {
-                    if (separator.hasNext()) {
-                        // iterate column-by-column in robot file
-                        Separator currentSeparator = separator.next();
-                        int startColumn = currentSeparator.getStartColumn();
-                        int remainingData = startColumn - lastColumnProcessed;
-                        // {$a} | {$b} in this case we check if {$a} was before
-                        // '|' pipe separator
-                        if (remainingData > 0) {
-                            rt = processLineElement(line, processingState,
-                                    parsingOutput, new FilePosition(lineNumber,
-                                            lastColumnProcessed),
-                                    text.substring(lastColumnProcessed,
-                                            startColumn), isNewLine);
-                            line.addLineElement(rt);
-                            isNewLine = false;
-                        }
-
-                        line.addLineElement(currentSeparator);
-                        lastColumnProcessed = currentSeparator.getEndColumn();
-                    } else {
-                        // last element in line
-                        rt = processLineElement(line, processingState,
-                                parsingOutput, new FilePosition(lineNumber,
-                                        lastColumnProcessed),
-                                text.substring(lastColumnProcessed), isNewLine);
-                        line.addLineElement(rt);
-
-                        lastColumnProcessed = textLength;
-                        isNewLine = false;
-                    }
-                }
+    @VisibleForTesting
+    protected boolean isNewExecutableSection(final ALineSeparator separator,
+            final RobotLine line) {
+        boolean result = false;
+        if (separator.getProducedType() == SeparatorType.PIPE) {
+            List<IRobotLineElement> lineElements = line.getLineElements();
+            if (lineElements.size() == 1) {
+                result = lineElements.get(0).getTypes()
+                        .contains(SeparatorType.PIPE);
             }
-
-            lineNumber++;
-            lastColumnProcessed = 0;
-            checkAndFixLine(parsingOutput, processingState);
-            /**
-             * special for case
-             * 
-             * <pre>
-             * *** Settings
-             * Suite Setup      Keyword
-             * 
-             * ...              argument_x
-             * </pre>
-             */
-            if (!line.getLineElements().isEmpty()) {
-                previousLineHandler.flushNew(processingState);
-            }
-            rf.addNewLine(line);
-            utility.updateStatusesForNewLine(processingState);
-            isNewLine = true;
+        } else {
+            result = line.getLineElements().isEmpty();
         }
-
-        for (RobotLine line : rf.getFileContent()) {
-            System.out.println(line);
-        }
-
-        return parsingOutput;
+        return result;
     }
 
 
@@ -489,6 +538,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
         }
 
+        if (!result
+                && (state == ParsingState.TEST_CASE_DECLARATION || state == ParsingState.KEYWORD_DECLARATION)) {
+            result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
+                    .contains(RobotTokenType.COMMENT_CONTINUE));
+        }
+
         return result;
     }
 
@@ -500,7 +555,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         for (ATokenRecognizer rec : recognized) {
             if (rec.hasNext(sb, fp.getLine())) {
                 RobotToken t = rec.next();
-                t.setStartColumn(fp.getColumn());
+                t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);
             }
         }
