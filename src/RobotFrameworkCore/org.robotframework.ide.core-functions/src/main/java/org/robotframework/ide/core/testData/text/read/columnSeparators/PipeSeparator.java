@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator
 
 public class PipeSeparator extends ALineSeparator {
 
+    private static final SeparatorType TYPE = SeparatorType.PIPE;
     private static final String REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE = "((?=\\s[|])|\\s+)";
     private static final Pattern PIPE_SEPARATOR = Pattern.compile("(^[ ]?[|]"
             + REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE
@@ -30,7 +31,7 @@ public class PipeSeparator extends ALineSeparator {
         int end = matcher.end();
 
         Separator s = new Separator();
-        s.setType(SeparatorType.PIPE);
+        s.setType(TYPE);
         s.setStartColumn(start);
         s.setText(new StringBuilder().append(line.substring(start, end)));
         s.setRaw(new StringBuilder(s.getText()));
@@ -43,5 +44,10 @@ public class PipeSeparator extends ALineSeparator {
     @Override
     public boolean hasNext() {
         return matcher.find();
+    }
+
+
+    public SeparatorType getProducedType() {
+        return TYPE;
     }
 }

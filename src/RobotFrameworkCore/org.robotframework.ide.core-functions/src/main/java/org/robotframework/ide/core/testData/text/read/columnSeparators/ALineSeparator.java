@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
+import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+
+
 public abstract class ALineSeparator {
 
     protected final int lineNumber;
@@ -16,6 +19,9 @@ public abstract class ALineSeparator {
 
 
     public abstract boolean hasNext();
+
+
+    public abstract SeparatorType getProducedType();
 
 
     public int getLineNumber() {

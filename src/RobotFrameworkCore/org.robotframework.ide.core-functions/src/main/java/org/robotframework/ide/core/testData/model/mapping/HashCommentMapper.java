@@ -101,7 +101,9 @@ public class HashCommentMapper implements IParsingMapper {
         ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
         RobotFile fileModel = robotFileOutput.getFileModel();
         IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
-        commentMapper.map(rt, commentHolder, fileModel);
+        if (commentHolder != ParsingState.TRASH || commentMapper != null) {
+            commentMapper.map(rt, commentHolder, fileModel);
+        }
 
         if (addToStack) {
             processingState.push(ParsingState.COMMENT);
@@ -132,11 +134,13 @@ public class HashCommentMapper implements IParsingMapper {
         boolean result = false;
 
         ParsingState nearestState = utility.getCurrentStatus(processingState);
-        if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
-            result = false;
-        } else if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-            processingState.push(ParsingState.COMMENT);
-            result = true;
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
+                result = false;
+            } else {
+                processingState.push(ParsingState.COMMENT);
+                result = true;
+            }
         } else if (!processingState.isEmpty()) {
             ParsingState state = processingState.peek();
             result = (state == ParsingState.COMMENT);
@@ -148,13 +152,15 @@ public class HashCommentMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean isInsideTestCase(final ParsingState state) {
-        return (state == ParsingState.TEST_CASE_INSIDE_ACTION || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
+        return (state == ParsingState.TEST_CASE_INSIDE_ACTION
+                || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT || state == ParsingState.TEST_CASE_DECLARATION);
     }
 
 
     @VisibleForTesting
     protected boolean isInsideKeyword(final ParsingState state) {
-        return (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
+        return (state == ParsingState.KEYWORD_INSIDE_ACTION
+                || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT || state == ParsingState.KEYWORD_DECLARATION);
     }
 
 
@@ -173,13 +179,5 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         return state;
-    }
-
-
-    @VisibleForTesting
-    protected boolean isInsideTableState(ParsingState state) {
-        return (state == ParsingState.KEYWORD_TABLE_INSIDE
-                || state == ParsingState.SETTING_TABLE_INSIDE
-                || state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.VARIABLE_TABLE_INSIDE);
     }
 }
