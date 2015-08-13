@@ -15,11 +15,11 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RedActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RedActivationStrategy;
 
 
 @RunWith(Theories.class)
-public class CellsAcivationStrategyTest {
+public class CellsActivationStrategyTest {
 
     @DataPoints
     public static char[] characters() {
