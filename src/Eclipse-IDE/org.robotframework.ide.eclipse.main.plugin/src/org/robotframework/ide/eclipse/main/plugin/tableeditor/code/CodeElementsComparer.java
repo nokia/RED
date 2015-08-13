@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IElementComparer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
@@ -40,7 +42,7 @@ class CodeElementsComparer implements IElementComparer {
         final List<Integer> address = newArrayList();
 
         RobotElement current = element;
-        while (!(current instanceof RobotSuiteFileSection)) {
+        while (current instanceof RobotKeywordCall || current instanceof RobotCodeHoldingElement) {
             address.add(0, index(current));
             current = current.getParent();
         }
