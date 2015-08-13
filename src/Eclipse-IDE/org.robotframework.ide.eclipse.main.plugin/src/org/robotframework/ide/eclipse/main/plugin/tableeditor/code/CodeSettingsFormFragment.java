@@ -288,6 +288,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
 
         viewer.setInput(codeElement);
         documentation.setText(getDocumentation(codeElement));
+        documentation.setSelection(documentation.getText().length());
 
         viewer.getTable().getParent().layout();
     }
