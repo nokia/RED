@@ -8,6 +8,7 @@ import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator
 
 public class WhitespaceSeparator extends ALineSeparator {
 
+    private static final SeparatorType TYPE = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
     public static final Pattern WHITESPACE_SEPARATOR = Pattern
             .compile("(\\t+|[ ]{2,})");
     private final Matcher matcher;
@@ -38,5 +39,10 @@ public class WhitespaceSeparator extends ALineSeparator {
     @Override
     public boolean hasNext() {
         return matcher.find();
+    }
+
+
+    public SeparatorType getProducedType() {
+        return TYPE;
     }
 }

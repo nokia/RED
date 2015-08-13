@@ -4,9 +4,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.importer.ResourceImportReference;
-import org.robotframework.ide.core.testData.importer.ResourceImporter;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
@@ -14,7 +13,6 @@ import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 public class RobotParser {
 
     private final RobotProjectHolder robotProject;
-    private final ResourceImporter resourceImporter;
 
     private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
     static {
@@ -24,7 +22,6 @@ public class RobotParser {
 
     public RobotParser(final RobotProjectHolder robotProject) {
         this.robotProject = robotProject;
-        this.resourceImporter = new ResourceImporter();
     }
 
 
@@ -63,11 +60,9 @@ public class RobotParser {
                     RobotFileOutput robotFile = parserToUse.parse(fileOrDir);
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);
-                    List<ResourceImportReference> importedResources = resourceImporter
-                            .importResources(this, robotFile);
-                    robotProject.addImportedResources(importedResources);
-                    // TODO: import variables
-                    // TODO: import library
+                    if (robotFile.getStatus() == Status.PASSED) {
+                        // TODO: import variables
+                    }
                 }
             }
         }

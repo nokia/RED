@@ -52,10 +52,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        result = (state == ParsingState.TEST_CASE_TABLE_INSIDE);
-
-        return result;
+        return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION);
     }
 }
