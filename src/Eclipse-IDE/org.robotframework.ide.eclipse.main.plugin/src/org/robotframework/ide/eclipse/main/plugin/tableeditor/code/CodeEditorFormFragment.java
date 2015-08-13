@@ -315,6 +315,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             try {
                 viewer.getTree().setRedraw(false);
+                final Object topItem = viewer.getTree().getTopItem().getData();
                 final Object[] expandedElements = viewer.getExpandedElements();
                 final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
                 viewer.setInput(getSection());
@@ -322,6 +323,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
                 if (focusCell != null) {
                     viewer.setFocusCell(focusCell.getColumnIndex());
                 }
+                viewer.setTopItem(topItem);
             } finally {
                 viewer.getTree().setRedraw(true);
             }
