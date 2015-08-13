@@ -4,25 +4,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.robotframework.ide.core.execution.ExecutionElement;
 
 public class RobotEventBroker {
 
     private IEventBroker broker;
-    
-    public RobotEventBroker(IEventBroker broker) {
+
+    public RobotEventBroker(final IEventBroker broker) {
         this.broker = broker;
     }
 
-    public void sendHighlightLineEventToTextEditor(String file, int line, Map<String, Object> variables) {
+    public void sendHighlightLineEventToTextEditor(final String file, final int line,
+            final Map<String, Object> variables) {
 
-        Map<String, Object> eventMap = new HashMap<>();
+        final Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("file", file);
         eventMap.put("line", String.valueOf(line));
         eventMap.put("vars", variables);
         broker.send("TextEditor/HighlightLine", eventMap);
     }
 
-    public void sendClearEventToTextEditor(String file) {
+    public void sendClearEventToTextEditor(final String file) {
 
         broker.send("TextEditor/ClearHighlightedLine", file);
     }
@@ -32,7 +34,7 @@ public class RobotEventBroker {
         broker.send("TextEditor/ClearHighlightedLine", "");
     }
 
-    public void sendAppendLineEventToMessageLogView(String line) {
+    public void sendAppendLineEventToMessageLogView(final String line) {
 
         broker.send("MessageLogView/AppendLine", line);
     }
@@ -40,5 +42,15 @@ public class RobotEventBroker {
     public void sendClearEventToMessageLogView() {
 
         broker.send("MessageLogView/Clear", "");
+    }
+
+    public void sendExecutionEventToExecutionView(final ExecutionElement executionElement) {
+
+        broker.send("ExecutionView/ExecutionEvent", executionElement);
+    }
+
+    public void sendClearEventToExecutionView() {
+
+        broker.send("ExecutionView/ClearEvent", "");
     }
 }
