@@ -67,12 +67,26 @@ public class ElementsUtility {
                 clean = false;
             } else if (isTableInsideState(status)) {
                 clean = false;
+            } else if (isKeywordExecution(status)) {
+                clean = false;
+            } else if (isTestCaseExecution(status)) {
+                clean = false;
             } else if (!processingState.isEmpty()) {
                 processingState.pop();
             } else {
                 clean = false;
             }
         }
+    }
+
+
+    public boolean isTestCaseExecution(ParsingState status) {
+        return (status == ParsingState.TEST_CASE_DECLARATION);
+    }
+
+
+    public boolean isKeywordExecution(ParsingState status) {
+        return (status == ParsingState.KEYWORD_DECLARATION);
     }
 
 
