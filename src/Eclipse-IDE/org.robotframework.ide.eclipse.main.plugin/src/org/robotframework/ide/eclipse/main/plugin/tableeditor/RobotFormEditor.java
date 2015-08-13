@@ -73,7 +73,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void prepareEclipseContext() {
-        final IEclipseContext eclipseContext = ((IEclipseContext) getSite().getService(IEclipseContext.class))
+        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
             @Override
@@ -91,7 +91,7 @@ public class RobotFormEditor extends FormEditor {
             isEditable = !((FileEditorInput) input).getFile().isReadOnly();
             setPartName(input.getName());
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 isEditable = !storage.isReadOnly();
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
@@ -172,7 +172,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void prepareCommandsContext() {
-        final IContextService commandsContext = (IContextService) getSite().getService(IContextService.class);
+        final IContextService commandsContext = getSite().getService(IContextService.class);
         commandsContext.activateContext(EDITOR_CONTEXT_ID);
     }
 
@@ -220,7 +220,7 @@ public class RobotFormEditor extends FormEditor {
 
         clipboard.dispose();
 
-        final IEclipseContext context = ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf();
+        final IEclipseContext context = getSite().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
     }
 
@@ -259,7 +259,7 @@ public class RobotFormEditor extends FormEditor {
             suiteModel = RedPlugin.getModelManager().createSuiteFile(
                     ((FileEditorInput) getEditorInput()).getFile());
         } else {
-            final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);
+            final IStorage storage = getEditorInput().getAdapter(IStorage.class);
             try {
                 suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
             } catch (final CoreException e) {
