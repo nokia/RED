@@ -22,8 +22,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 
@@ -43,7 +43,7 @@ public class ImportSettingFileArgumentsEditor {
 
         argumentsViewer = new RowExposingTableViewer(composite, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL
                 | SWT.V_SCROLL);
-        CellsAcivationStrategy.addActivationStrategy(argumentsViewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsActivationStrategy.addActivationStrategy(argumentsViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         arguments = newArrayList();
         if (currentArguments != null) {

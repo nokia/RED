@@ -36,17 +36,6 @@ class CodeElementsComparer implements IElementComparer {
         return 0;
     }
 
-    private Integer index(final RobotElement element) {
-        if (element.getParent() != null) {
-            for (int i = 0; i < element.getParent().getChildren().size(); i++) {
-                if (element.getParent().getChildren().get(i) == element) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     private List<Integer> getPositionInTree(final RobotElement element) {
         final List<Integer> address = newArrayList();
 
@@ -56,6 +45,17 @@ class CodeElementsComparer implements IElementComparer {
             current = current.getParent();
         }
         return address;
+    }
+
+    private Integer index(final RobotElement element) {
+        if (element.getParent() != null) {
+            for (int i = 0; i < element.getParent().getChildren().size(); i++) {
+                if (element.getParent().getChildren().get(i) == element) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     private List<Integer> getPositionInTree(final ElementAddingToken token) {

@@ -1,21 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
-    public static final String RETURN = "Return";
-    public static final String TEARDOWN = "Teardown";
-    public static final String TIMEOUT = "Timeout";
-    public static final String DOCUMENTATION = "Documentation";
     public static final String ARGUMENTS = "Arguments";
-    public static List<String> ALLOWED_SETTINGS = newArrayList(ARGUMENTS, DOCUMENTATION, TIMEOUT, TEARDOWN,
-            RETURN);
+    public static final String DOCUMENTATION = "Documentation";
+    public static final String TIMEOUT = "Timeout";
+    public static final String TEARDOWN = "Teardown";
+    public static final String RETURN = "Return";
     
     RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final String comment) {
         super(parent, name, comment);
@@ -48,7 +42,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     public boolean hasDocumentation() {
-        return getReturnValueSetting() != null;
+        return getDocumentationSetting() != null;
     }
 
     public RobotDefinitionSetting getDocumentationSetting() {
@@ -56,7 +50,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     public boolean hasTeardownValue() {
-        return getReturnValueSetting() != null;
+        return getTeardownSetting() != null;
     }
 
     public RobotDefinitionSetting getTeardownSetting() {
@@ -64,7 +58,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     public boolean hasTimeoutValue() {
-        return getReturnValueSetting() != null;
+        return getTimeoutSetting() != null;
     }
 
     public RobotDefinitionSetting getTimeoutSetting() {

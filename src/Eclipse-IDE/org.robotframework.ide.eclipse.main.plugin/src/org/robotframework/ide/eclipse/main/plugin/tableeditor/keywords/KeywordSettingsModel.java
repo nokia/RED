@@ -14,12 +14,12 @@ import com.google.common.collect.Iterables;
 
 class KeywordSettingsModel {
 
-    static List<RobotElement> findKeywordSettingsList(final RobotKeywordDefinition keywordDefinition) {
-        return newArrayList(Iterables.filter(newArrayList(findKeywordSettingsMapping(keywordDefinition).values()),
+    static List<RobotElement> buildKeywordSettingsList(final RobotKeywordDefinition keywordDefinition) {
+        return newArrayList(Iterables.filter(newArrayList(buildKeywordSettingsMapping(keywordDefinition).values()),
                 Predicates.notNull()));
     }
 
-    static Map<String, RobotElement> findKeywordSettingsMapping(final RobotKeywordDefinition def) {
+    static Map<String, RobotElement> buildKeywordSettingsMapping(final RobotKeywordDefinition def) {
         final Map<String, RobotElement> settings = new LinkedHashMap<>();
         settings.put(RobotKeywordDefinition.TIMEOUT, def == null ? null : def.getTimeoutSetting());
         settings.put(RobotKeywordDefinition.TEARDOWN, def == null ? null : def.getTeardownSetting());
