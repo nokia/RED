@@ -5,9 +5,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -20,17 +18,19 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDe
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.MatchesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
 
 public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
-    private RowExposingTableViewer settingsViewer;
-    private Text documentation;
     private MatchesCollection matches;
 
+    public KeywordsEditorFormFragment() {
+        super(RobotKeywordsSection.SECTION_NAME);
+    }
+    
     @Override
     protected ITreeContentProvider createContentProvider() {
-        return new UserKeywordsContentProvider();
+        return new KeywordsContentProvider();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
                 viewer.setFilters(new ViewerFilter[0]);
             } else {
                 viewer.expandAll();
-                viewer.setFilters(new ViewerFilter[] { new MatchesFilter(matches) });
+                viewer.setFilters(new ViewerFilter[] { new CodeMatchesFilter(matches) });
             }
         } finally {
             viewer.getTree().setRedraw(true);

@@ -31,8 +31,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.red.forms.RedFormToolkit;
 
@@ -125,7 +125,7 @@ public class VariableValueEditForm {
 
             tableViewer = new RowExposingTableViewer(composite, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL
                     | SWT.V_SCROLL);
-            CellsAcivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
+            CellsActivationStrategy.addActivationStrategy(tableViewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
             final String[] values = variable.getValue().split(COLLECTION_SEPARATOR_REGEX); 
 

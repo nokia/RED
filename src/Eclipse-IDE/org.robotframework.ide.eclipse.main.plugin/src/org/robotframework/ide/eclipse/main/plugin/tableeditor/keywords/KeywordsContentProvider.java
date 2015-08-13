@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-class UserKeywordsContentProvider implements ITreeContentProvider {
+class KeywordsContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
