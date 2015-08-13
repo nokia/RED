@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,9 +16,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightin
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
-public class KeywordSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
+class CodeSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
-    private final Map<String, String> tooltips = new LinkedHashMap<>();
+    private Map<String, String> tooltips = new LinkedHashMap<>();
     {
         tooltips.put("Teardown", "The keyword %s is executed after every other keyword inside the definition");
         tooltips.put("Timeout", "Specifies maximum time this keyword is allowed to execute before being aborted.\n"
@@ -27,8 +27,9 @@ public class KeywordSettingsNamesLabelProvider extends MatchesHighlightingLabelP
         tooltips.put("Return", "Specify the return value for this keyword. Multiple values can be used.");
     }
 
-    public KeywordSettingsNamesLabelProvider(final MatchesProvider matchesProvider) {
+    CodeSettingsNamesLabelProvider(final MatchesProvider matchesProvider, final Map<String, String> tooltips) {
         super(matchesProvider);
+        this.tooltips = tooltips;
     }
 
     @Override

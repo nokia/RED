@@ -10,11 +10,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 
-public class MatchesFilter extends ViewerFilter {
+public class CodeMatchesFilter extends ViewerFilter {
 
     private final MatchesCollection matches;
 
-    public MatchesFilter(final MatchesCollection matches) {
+    public CodeMatchesFilter(final MatchesCollection matches) {
         this.matches = matches;
     }
 
