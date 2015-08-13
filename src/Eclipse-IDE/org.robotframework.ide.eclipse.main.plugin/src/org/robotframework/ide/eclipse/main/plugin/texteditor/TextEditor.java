@@ -179,7 +179,7 @@ public class TextEditor {
         
         final String text = this.extractTextFromFile();
         
-        this.deleteMarkersFromFile();
+        //this.deleteMarkersFromFile();
 		//this.createMarkers();
         
 		final AnnotationType errorAnnotationType = new AnnotationType("org.eclipse.ui.workbench.texteditor.error", null);
