@@ -39,6 +39,8 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.core.execution.ExecutionElement;
+import org.robotframework.ide.core.execution.IExecutionHandler;
 import org.robotframework.ide.core.executor.ILineHandler;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
@@ -183,10 +185,17 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         DebugSocketManager socketManager = null;
         
         if (!isDebugging) {
+            robotEventBroker.sendClearEventToExecutionView();
             runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), new ILineHandler() {
                 @Override
                 public void processLine(final String line) {
                     robotEventBroker.sendAppendLineEventToMessageLogView(line);
+                }
+            }, new IExecutionHandler() {
+
+                @Override
+                public void processExecutionElement(ExecutionElement executionElement) {
+                    robotEventBroker.sendExecutionEventToExecutionView(executionElement);
                 }
             });
         } else {

@@ -126,6 +126,39 @@ public class RedImages {
     public static ImageDescriptor getResourceImage() {
         return RedPlugin.getImageDescriptor("resources/resource.png");
     }
+    
+    public static ImageDescriptor getCollapseAllImage() {
+        return RedPlugin.getImageDescriptor("resources/collapseall.png");
+    }
+    
+    public static ImageDescriptor getExpandAllImage() {
+        return RedPlugin.getImageDescriptor("resources/expandall.png");
+    }
+    
+    public static ImageDescriptor getTestPassImage() {
+        return RedPlugin.getImageDescriptor("resources/testok.png");
+    }
+    public static ImageDescriptor getTestFailImage() {
+        return RedPlugin.getImageDescriptor("resources/testerr.png");
+    }
+    public static ImageDescriptor getTestInProgressImage() {
+        return RedPlugin.getImageDescriptor("resources/testrun.png");
+    }
+    public static ImageDescriptor getSuitePassImage() {
+        return RedPlugin.getImageDescriptor("resources/tsuiteok.png");
+    }
+    public static ImageDescriptor getSuiteFailImage() {
+        return RedPlugin.getImageDescriptor("resources/tsuiteerror.png");
+    }
+    public static ImageDescriptor getSuiteInProgressImage() {
+        return RedPlugin.getImageDescriptor("resources/tsuiterun.png");
+    }
+    public static ImageDescriptor getSuccessImage() {
+        return RedPlugin.getImageDescriptor("resources/success.png");
+    }
+    public static ImageDescriptor getErrorImage() {
+        return RedPlugin.getImageDescriptor("resources/error.png");
+    }
 
     /**
      * For given image descriptor the gray version descriptor is created.
