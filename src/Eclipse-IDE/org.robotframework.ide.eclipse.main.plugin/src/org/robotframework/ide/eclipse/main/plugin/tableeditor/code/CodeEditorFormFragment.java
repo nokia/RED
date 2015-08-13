@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -41,8 +40,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsAcivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -79,7 +78,11 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private Menu viewerMenu;
     private Menu headerMenu;
 
-    private Section section;
+    private final String sectionName;
+
+    public CodeEditorFormFragment(final String sectionName) {
+        this.sectionName = sectionName;
+    }
 
     public TreeViewer getViewer() {
         return viewer;
@@ -102,7 +105,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
     private void createViewer(final Composite parent) {
         viewer = new RowExposingTreeViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        CellsAcivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTree());
@@ -139,7 +142,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         final ISelectionChangedListener selectionChangeListener = new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                eventBroker.send(MAIN_PART_SELECTION_CHANGED_TOPIC, event.getSelection());
+                eventBroker.send(MAIN_PART_SELECTION_CHANGED_TOPIC + "/" + sectionName, event.getSelection());
             }
         };
         viewer.getTree().addDisposeListener(new DisposeListener() {

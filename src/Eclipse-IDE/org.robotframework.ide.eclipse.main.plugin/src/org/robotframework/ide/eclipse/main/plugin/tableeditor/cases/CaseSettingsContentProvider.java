@@ -1,15 +1,15 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
 import java.util.Map;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
 import com.google.common.base.Optional;
 
-public class KeywordSettingsContentProvider implements IStructuredContentProvider {
+class CaseSettingsContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
@@ -24,9 +24,9 @@ public class KeywordSettingsContentProvider implements IStructuredContentProvide
     @Override
     public Object[] getElements(final Object inputElement) {
         @SuppressWarnings("unchecked")
-        final Optional<RobotKeywordDefinition> definition = (Optional<RobotKeywordDefinition>) inputElement;
-        final Map<String, RobotElement> keywordSettings = KeywordSettingsModel
-                .buildKeywordSettingsMapping(definition.orNull());
+        final Optional<RobotCase> testCase = (Optional<RobotCase>) inputElement;
+        final Map<String, RobotElement> keywordSettings = CaseSettingsModel
+                .buildCaseSettingsMapping(testCase.orNull());
         return keywordSettings.entrySet().toArray();
     }
 

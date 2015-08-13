@@ -18,11 +18,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCa
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.MatchesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
 
 class CasesEditorFormFragment extends CodeEditorFormFragment {
 
     private MatchesCollection matches;
+
+    public CasesEditorFormFragment() {
+        super(RobotCasesSection.SECTION_NAME.replaceAll(" ", "_"));
+    }
 
     @Override
     protected ITreeContentProvider createContentProvider() {
@@ -118,7 +122,7 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
                 viewer.setFilters(new ViewerFilter[0]);
             } else {
                 viewer.expandAll();
-                viewer.setFilters(new ViewerFilter[] { new MatchesFilter(matches) });
+                viewer.setFilters(new ViewerFilter[] { new CodeMatchesFilter(matches) });
             }
         } finally {
             viewer.getTree().setRedraw(true);

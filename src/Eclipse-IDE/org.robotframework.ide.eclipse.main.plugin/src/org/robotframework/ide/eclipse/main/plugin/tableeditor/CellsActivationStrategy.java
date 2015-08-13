@@ -17,7 +17,7 @@ import org.eclipse.swt.events.MouseEvent;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class CellsAcivationStrategy {
+public class CellsActivationStrategy {
 
     public static void addActivationStrategy(final RowExposingTableViewer viewer, final RowTabbingStrategy rowTabbing) {
         final CellsHighlighter highlighter = new CellsHighlighter(viewer);

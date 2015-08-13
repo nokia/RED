@@ -1,93 +1,93 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
-import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.viewers.Selections;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeSettingsFormFragment;
 
+public class CaseSettingsFormFragment extends CodeSettingsFormFragment {
 
-public class CaseSettingsFormFragment implements ISectionFormFragment {
-
-    @Inject
-    private IEditorSite site;
-
-    @Inject
-    private IDirtyProviderService dirtyProviderService;
-
-    @Inject
-    @Named(RobotEditorSources.SUITE_FILE_MODEL)
-    protected RobotSuiteFile fileModel;
-
-    @Inject
-    protected RobotEditorCommandsStack commandsStack;
-
-    @Inject
-    protected RedFormToolkit toolkit;
-
-    @Override
-    public void initialize(final Composite parent) {
-        createDetailsPanel(parent);
-    }
-
-    private void createDetailsPanel(final Composite parent) {
-        final Section section = toolkit.createSection(parent,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
-        section.setExpanded(false);
-        section.setText("Settings");
-        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
-
-        final Composite composite = toolkit.createComposite(section);
-        GridLayoutFactory.fillDefaults().applyTo(composite);
-        section.setClient(composite);
+    public CaseSettingsFormFragment() {
+        super("Test case %ssettings", "Provide test case documentation and settings");
     }
 
     @Override
-    public void setFocus() {
-        // nothing to do yet
+    protected IContentProvider createContentProvider() {
+        return new CaseSettingsContentProvider();
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
+    protected EditorCommand createCommandForDocumentationCreation(final RobotCodeHoldingElement codeElement,
+            final String newDocumentation) {
+        return new CreateFreshCaseSettingCommand((RobotCase) codeElement, 0, "Documentation",
+                newArrayList(newDocumentation));
+    }
+
+    @Override
+    protected Map<String, String> prepareTooltips() {
+        final HashMap<String, String> tooltips = new HashMap<>();
+        tooltips.put(RobotCase.TAGS, "These tags are set to this test case and they possibly override Default Tags");
+        tooltips.put(RobotCase.SETUP, "The keyword $s is executed before other keywords inside the definition");
+        tooltips.put(RobotCase.TEMPLATE, "The keyword %s is used as a template");
+        tooltips.put(RobotCase.TIMEOUT,
+                "Specifies maximum time this test case is allowed to execute before being aborted.\n"
+                        + "This setting overrides Test Timeout setting set on suite level\n"
+                        + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+        tooltips.put(RobotCase.TEARDOWN, "The keyword %s is executed after every other keyword inside the definition");
+        return tooltips;
+    }
+
+    @Override
+    protected RobotDefinitionSetting getDocumentationSetting(
+            final com.google.common.base.Optional<? extends RobotCodeHoldingElement> codeElement) {
+        if (codeElement.isPresent()) {
+            return ((RobotCase) codeElement.get()).getDocumentationSetting();
+        }
         return null;
+
+    }
+
+    @Override
+    protected List<RobotElement> getElementsForMatchesCollection() {
+        final RobotCase testCase = (RobotCase) getCurrentCodeElement();
+        final List<RobotElement> settings = CaseSettingsModel.buildCaseSettingsList(testCase);
+        if (testCase != null) {
+            final RobotDefinitionSetting docSetting = testCase.getDocumentationSetting();
+            if (docSetting != null) {
+                settings.add(docSetting);
+            }
+        }
+        return settings;
     }
 
     @Inject
     @Optional
-    private void whenKeywordSelectionChanged(
-            @UIEventTopic(CodeEditorFormFragment.MAIN_PART_SELECTION_CHANGED_TOPIC) final IStructuredSelection selection) {
-        final RobotElement selectedElement = Selections.getOptionalFirstElement(selection, RobotElement.class).orNull();
-
-        if (selectedElement instanceof RobotCase) {
-            newCaseWasSelected((RobotCase) selectedElement);
-        } else if (selectedElement instanceof RobotKeywordCall) {
-            final IRobotCodeHoldingElement parent = ((RobotKeywordCall) selectedElement).getParent();
-            if (parent instanceof RobotCase) {
-                newCaseWasSelected((RobotCase) parent);
-            }
-        }
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
+            + "/Test_Cases") final MatchesCollection matches) {
+        handleFilteringRequest(matches);
     }
 
-    private void newCaseWasSelected(final RobotCase testCase) {
-        // nothing to do yet
+    @Inject
+    @Optional
+    private void whenKeywordSelectionChanged(@UIEventTopic(CodeEditorFormFragment.MAIN_PART_SELECTION_CHANGED_TOPIC
+            + "/Test_Cases") final IStructuredSelection selection) {
+        selectionInMainViewerHasChanged(selection);
     }
 }
