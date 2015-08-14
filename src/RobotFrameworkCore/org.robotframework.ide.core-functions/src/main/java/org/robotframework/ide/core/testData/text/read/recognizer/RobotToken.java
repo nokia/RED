@@ -11,6 +11,7 @@ public class RobotToken implements IRobotLineElement {
 
     private int lineNumber = NOT_SET;
     private int startColumn = NOT_SET;
+    private int startOffset = NOT_SET;
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private List<IRobotTokenType> types = new LinkedList<>();
@@ -71,6 +72,17 @@ public class RobotToken implements IRobotLineElement {
     }
 
 
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
+
+
+    @Override
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+
     @Override
     public List<IRobotTokenType> getTypes() {
         return types;
@@ -86,8 +98,8 @@ public class RobotToken implements IRobotLineElement {
     @Override
     public String toString() {
         return String
-                .format("RobotToken [lineNumber=%s, startColumn=%s, text=%s, types=%s]",
-                        lineNumber, startColumn, text, types);
+                .format("RobotToken [lineNumber=%s, startColumn=%s, startOffset=%s, text=%s, types=%s]",
+                        lineNumber, startColumn, startOffset, text, types);
     }
 
 }
