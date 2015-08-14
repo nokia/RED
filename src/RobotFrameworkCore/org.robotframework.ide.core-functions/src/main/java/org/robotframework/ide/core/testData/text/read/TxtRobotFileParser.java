@@ -155,6 +155,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
         BufferedReader lineReader = new BufferedReader(reader);
         int lineNumber = 1;
+        int currentOffset = 0;
         String currentLineText = null;
         final Stack<ParsingState> processingState = new Stack<>();
         boolean isNewLine = false;
@@ -189,10 +190,14 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                                 lastColumnProcessed),
                                         text.substring(lastColumnProcessed,
                                                 startColumn), isNewLine);
+                                rt.setStartOffset(currentOffset);
+                                currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
                                 isNewLine = false;
                             }
 
+                            currentSeparator.setStartOffset(currentOffset);
+                            currentOffset += currentSeparator.getRaw().length();
                             line.addLineElement(currentSeparator);
                             lastColumnProcessed = currentSeparator
                                     .getEndColumn();
@@ -210,6 +215,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                             lastColumnProcessed),
                                     text.substring(lastColumnProcessed),
                                     isNewLine);
+                            rt.setStartOffset(currentOffset);
+                            currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
 
                             lastColumnProcessed = textLength;
@@ -218,6 +225,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     }
                 }
 
+                currentOffset++;
                 lineNumber++;
                 lastColumnProcessed = 0;
                 checkAndFixLine(parsingOutput, processingState);
