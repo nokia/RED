@@ -12,6 +12,7 @@ public class Separator implements IRobotLineElement {
 
     private int lineNumber = NOT_SET;
     private int startColumn = NOT_SET;
+    private int startOffset = NOT_SET;
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
@@ -53,6 +54,17 @@ public class Separator implements IRobotLineElement {
 
     public void setStartColumn(int startColumn) {
         this.startColumn = startColumn;
+    }
+
+
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
+
+
+    @Override
+    public int getStartOffset() {
+        return startOffset;
     }
 
 
@@ -99,8 +111,8 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public String toString() {
-        return String.format(
-                "Separator [lineNumber=%s, startColumn=%s, text=%s, type=%s]",
-                lineNumber, startColumn, text, type);
+        return String
+                .format("Separator [lineNumber=%s, startColumn=%s, startOffset=%s, text=%s, type=%s]",
+                        lineNumber, startColumn, startOffset, text, type);
     }
 }

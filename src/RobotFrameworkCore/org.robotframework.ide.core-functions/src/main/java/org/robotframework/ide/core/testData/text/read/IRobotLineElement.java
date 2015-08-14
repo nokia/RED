@@ -17,6 +17,9 @@ public interface IRobotLineElement {
     int getEndColumn();
 
 
+    int getStartOffset();
+
+
     StringBuilder getText();
 
 
