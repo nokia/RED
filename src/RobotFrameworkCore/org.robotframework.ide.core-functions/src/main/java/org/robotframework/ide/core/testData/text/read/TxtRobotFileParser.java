@@ -154,7 +154,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         parsingOutput.setFileModel(rf);
 
         BufferedReader lineReader = new BufferedReader(reader);
-        int lineNumber = 0;
+        int lineNumber = 1;
         String currentLineText = null;
         final Stack<ParsingState> processingState = new Stack<>();
         boolean isNewLine = false;
