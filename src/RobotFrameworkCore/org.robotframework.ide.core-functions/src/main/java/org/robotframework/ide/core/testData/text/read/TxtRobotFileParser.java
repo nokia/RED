@@ -264,6 +264,14 @@ public class TxtRobotFileParser implements IRobotFileParser {
             // FIXME: stack trace adding
             e.printStackTrace();
             wasProcessingError = true;
+        } finally {
+            try {
+                lineReader.close();
+            } catch (IOException e) {
+                parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                        "Error occured, when file was closing. Stack trace\n\t"
+                                + e, robotFile.getAbsolutePath()));
+            }
         }
 
         if (wasProcessingError) {
