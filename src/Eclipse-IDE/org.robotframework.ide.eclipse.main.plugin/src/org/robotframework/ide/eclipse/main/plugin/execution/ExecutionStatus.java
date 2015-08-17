@@ -26,12 +26,12 @@ public class ExecutionStatus {
 
     private String elapsedTime;
 
-    public ExecutionStatus(String name, Status status, ExecutionElementType type, List<ExecutionStatus> children,
-            ExecutionStatus parent) {
+    private String source;
+
+    public ExecutionStatus(String name, Status status, ExecutionElementType type, List<ExecutionStatus> children) {
         this.name = name;
         this.status = status;
         this.children = children;
-        this.parent = parent;
         this.type = type;
     }
 
@@ -89,6 +89,14 @@ public class ExecutionStatus {
 
     public void setElapsedTime(String elapsedTime) {
         this.elapsedTime = elapsedTime;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.robotframework.ide.core.execution.ExecutionElement.ExecutionElementType;
@@ -14,23 +15,26 @@ import org.robotframework.ide.core.executor.ILineHandler;
  */
 public class ExecutionElementsParser implements ILineHandler {
 
-    private static final String START_SUITE = "start_suite";
+    public static final String ROBOT_EXECUTION_PASS_STATUS = "PASS";
+    
+    
+    private static final String START_SUITE_EVENT = "start_suite";
 
-    private static final String END_SUITE = "end_suite";
+    private static final String END_SUITE_EVENT = "end_suite";
 
-    private static final String START_TEST = "start_test";
+    private static final String START_TEST_EVENT = "start_test";
 
-    private static final String END_TEST = "end_test";
+    private static final String END_TEST_EVENT = "end_test";
 
     private final ObjectMapper mapper;
 
-    private Map<String, Object> parsedLine;
+    private Map<String, Object> eventMap;
 
     private final IExecutionHandler executionHandler;
 
     public ExecutionElementsParser(final IExecutionHandler executionHandler) {
         this.mapper = new ObjectMapper();
-        this.parsedLine = new HashMap<String, Object>();
+        this.eventMap = new HashMap<String, Object>();
         this.executionHandler = executionHandler;
     }
 
@@ -38,45 +42,61 @@ public class ExecutionElementsParser implements ILineHandler {
     @Override
     public void processLine(final String line) {
         try {
-            parsedLine = mapper.readValue(line, Map.class);
+            eventMap = mapper.readValue(line, Map.class);
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (parsedLine.containsKey(START_SUITE)) {
-            final List<Object> list = (List<Object>) parsedLine.get(START_SUITE);
-            String name = (String) list.get(0);
-            ExecutionElement executionElement = new ExecutionElement(name, ExecutionElementType.SUITE);
-            final Map<String, String> elements = (Map<String, String>) list.get(1);
-            executionElement.setSource(elements.get("source"));
-            executionHandler.processExecutionElement(executionElement);
-        }
-        if (parsedLine.containsKey(END_SUITE)) {
-            final List<Object> list = (List<Object>) parsedLine.get(END_SUITE);
-            String name = (String) list.get(0);
-            ExecutionElement executionElement = new ExecutionElement(name, ExecutionElementType.SUITE);
-            final Map<String, Object> elements = (Map<String, Object>) list.get(1);
-            executionElement.setElapsedTime((Integer)elements.get("elapsedtime"));
-            executionElement.setMessage((String)elements.get("message"));
-            executionElement.setStatus((String)elements.get("status"));
-            executionHandler.processExecutionElement(executionElement);
-        }
         
-        if (parsedLine.containsKey(START_TEST)) {
-            final List<Object> list = (List<Object>) parsedLine.get(START_TEST);
-            String name = (String) list.get(0);
-            ExecutionElement executionElement = new ExecutionElement(name, ExecutionElementType.TEST);
-            executionHandler.processExecutionElement(executionElement);
+        final String eventType = getEventType(eventMap);
+        if (eventType == null) {
+            return;
         }
-        if (parsedLine.containsKey(END_TEST)) {
-            final List<Object> list = (List<Object>) parsedLine.get(END_TEST);
-            String name = (String) list.get(0);
-            ExecutionElement executionElement = new ExecutionElement(name, ExecutionElementType.TEST);
-            final Map<String, Object> elements = (Map<String, Object>) list.get(1);
-            executionElement.setElapsedTime((Integer)elements.get("elapsedtime"));
-            executionElement.setMessage((String)elements.get("message"));
-            executionElement.setStatus((String)elements.get("status"));
-            executionHandler.processExecutionElement(executionElement);
+
+        switch (eventType) {
+            case START_SUITE_EVENT:
+                final List<Object> startSuiteList = (List<Object>) eventMap.get(START_SUITE_EVENT);
+                ExecutionElement startSuiteElement = new ExecutionElement((String) startSuiteList.get(0), ExecutionElementType.SUITE);
+                final Map<String, String> startSuiteDetails = (Map<String, String>) startSuiteList.get(1);
+                startSuiteElement.setSource(startSuiteDetails.get("source"));
+                executionHandler.processExecutionElement(startSuiteElement);
+                break;
+            case END_SUITE_EVENT:
+                final List<Object> endSuiteList = (List<Object>) eventMap.get(END_SUITE_EVENT);
+                ExecutionElement endSuiteElement = new ExecutionElement((String) endSuiteList.get(0), ExecutionElementType.SUITE);
+                final Map<String, Object> endSuiteDetails = (Map<String, Object>) endSuiteList.get(1);
+                endSuiteElement.setElapsedTime((Integer)endSuiteDetails.get("elapsedtime"));
+                endSuiteElement.setMessage((String)endSuiteDetails.get("message"));
+                endSuiteElement.setStatus((String)endSuiteDetails.get("status"));
+                executionHandler.processExecutionElement(endSuiteElement);
+                break;
+            case START_TEST_EVENT:
+                final List<Object> testList = (List<Object>) eventMap.get(START_TEST_EVENT);
+                ExecutionElement startTestElement = new ExecutionElement((String)testList.get(0), ExecutionElementType.TEST);
+                executionHandler.processExecutionElement(startTestElement);
+                break;
+            case END_TEST_EVENT:
+                final List<Object> endTestList = (List<Object>) eventMap.get(END_TEST_EVENT);
+                ExecutionElement endTestElement = new ExecutionElement((String) endTestList.get(0), ExecutionElementType.TEST);
+                final Map<String, Object> endTestDetails = (Map<String, Object>) endTestList.get(1);
+                endTestElement.setElapsedTime((Integer)endTestDetails.get("elapsedtime"));
+                endTestElement.setMessage((String)endTestDetails.get("message"));
+                endTestElement.setStatus((String)endTestDetails.get("status"));
+                executionHandler.processExecutionElement(endTestElement);
+                break;
+            default:
+                break;
         }
     }
 
+    private String getEventType(final Map<?, ?> eventMap) {
+        if (eventMap == null) {
+            return null;
+        }
+        final Set<?> keySet = eventMap.keySet();
+        if (!keySet.isEmpty()) {
+            return (String) keySet.iterator().next();
+        }
+        return null;
+    }
+    
 }
