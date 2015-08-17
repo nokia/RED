@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.importer.ResourceImporter;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
+import org.robotframework.ide.core.testData.importer.VariablesImporter;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
@@ -47,7 +50,7 @@ public class RobotParser {
                     // TODO: place where in case of TH type we should put
                     // information
                 }
-            } else if (!robotProject.containsFile(fileOrDir)) {
+            } else if (robotProject.shouldBeLoaded(fileOrDir)) {
                 IRobotFileParser parserToUse = null;
                 for (IRobotFileParser parser : availableFormatParsers) {
                     if (parser.canParseFile(fileOrDir)) {
@@ -61,7 +64,18 @@ public class RobotParser {
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);
                     if (robotFile.getStatus() == Status.PASSED) {
-                        // TODO: import variables
+                        if (false) {
+                            // eager get resources example
+                            ResourceImporter resImporter = new ResourceImporter();
+                            resImporter.importResources(this, robotFile);
+                        }
+
+                        VariablesImporter varImporter = new VariablesImporter();
+                        List<VariablesFileImportReference> varsImported = varImporter
+                                .importVariables(
+                                        robotProject.getRobotRuntime(),
+                                        robotFile);
+                        robotFile.setVariablesReferenced(varsImported);
                     }
                 }
             }
