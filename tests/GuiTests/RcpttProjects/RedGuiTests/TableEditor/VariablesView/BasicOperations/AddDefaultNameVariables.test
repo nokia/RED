@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _p1kRQB_8EeWIFM1C_X1kYg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/12/15 9:29 AM
+Save-Time: 8/17/15 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -14,7 +14,6 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 with [get-view "Project Explorer" | get-tree] {
-    select RobotProject | double-click
     select "RobotProject/TestFile.robot" | double-click
 }
 
@@ -24,7 +23,7 @@ with [get-editor "TestFile.robot"] {
     get-link "Section is not yet defined, do you want to create it?" | click
     with [get-table] {
     	//add first new scalar
-        get-item "...add new scalar"|   double-click
+        get-item "...add new scalar"| double-click
         select "${var}" | activate-cell-edit
         with [get-editbox] {
             set-text "${text}"
