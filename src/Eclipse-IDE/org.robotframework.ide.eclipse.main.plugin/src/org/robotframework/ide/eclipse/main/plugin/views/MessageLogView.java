@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class MessageLogView {
     
+    public static final String ID = "org.robotframework.ide.MessageLogView";
+    
     private StyledText styledText;
     
     @PostConstruct

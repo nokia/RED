@@ -4,23 +4,23 @@ package org.robotframework.ide.core.execution;
  * @author mmarzec
  */
 public class ExecutionElement {
-
-    private String name;
-
-    private String source;
-
-    private int elapsedTime;
-
-    private String message;
-
-    private String status;
-
-    private ExecutionElementType type;
-
+    
     public enum ExecutionElementType {
         SUITE,
         TEST
     }
+
+    private String name;
+    
+    private ExecutionElementType type;
+    
+    private String status;
+
+    private String source;
+
+    private String message;
+
+    private int elapsedTime;
 
     public ExecutionElement(String name, ExecutionElementType type) {
         this.name = name;

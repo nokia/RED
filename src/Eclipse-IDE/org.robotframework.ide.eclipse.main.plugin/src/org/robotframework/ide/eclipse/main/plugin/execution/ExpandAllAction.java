@@ -6,7 +6,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 public class ExpandAllAction extends Action implements IWorkbenchAction {
 
-    private static final String ID = "org.robotframework.action.ExpandAllAction";
+    private static final String ID = "org.robotframework.action.executionView.ExpandAllAction";
 
     private TreeViewer viewer;
 

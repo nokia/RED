@@ -3,11 +3,11 @@ package org.robotframework.ide.eclipse.main.plugin.perspectives;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
+import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 
 public class RobotPerspective implements IPerspectiveFactory {
 	 
-    private static final String MESSAGE_LOG_VIEW = "org.robotframework.ide.MessageLogView";
-
     @Override
 	public void createInitialLayout(final IPageLayout layout) {
 	    final String editorArea = layout.getEditorArea();
@@ -21,13 +21,14 @@ public class RobotPerspective implements IPerspectiveFactory {
         bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
         
         final IFolderLayout bottomLog = layout.createFolder("bottom", IPageLayout.RIGHT, 0.50f, "bottom");
-        bottomLog.addView(MESSAGE_LOG_VIEW);
+        bottomLog.addView(MessageLogView.ID);
+        bottomLog.addView(ExecutionView.ID);
 
         final IFolderLayout topRight = layout.createFolder("topRight", IPageLayout.RIGHT, 0.75f, editorArea);
         topRight.addView(IPageLayout.ID_OUTLINE);
 
         layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
-        layout.addShowViewShortcut(MESSAGE_LOG_VIEW);
+        layout.addShowViewShortcut(MessageLogView.ID);
 
         layout.addShowInPart("org.eclipse.ui.navigator.ProjectExplorer");
 	}

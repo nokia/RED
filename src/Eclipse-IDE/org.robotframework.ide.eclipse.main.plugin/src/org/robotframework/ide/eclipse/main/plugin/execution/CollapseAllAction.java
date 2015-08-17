@@ -6,7 +6,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 public class CollapseAllAction extends Action implements IWorkbenchAction {
 
-    private static final String ID = "org.robotframework.action.CollapseAllAction";
+    private static final String ID = "org.robotframework.action.executionView.CollapseAllAction";
 
     private TreeViewer viewer;
 
