@@ -30,4 +30,9 @@ public class RobotFileDumper {
             dumperToUse.dump(file, output.getFileModel());
         }
     }
+
+
+    public StringBuilder dump(final RobotFileOutput output) {
+        return new TxtRobotFileDumper().dump(output.getFileModel());
+    }
 }
