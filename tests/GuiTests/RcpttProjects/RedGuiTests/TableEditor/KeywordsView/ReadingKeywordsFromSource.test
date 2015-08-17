@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _j0iKMEAtEeW20a8v9jefTQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/13/15 3:32 PM
+Save-Time: 8/17/15 2:59 PM
 Testcase-Type: ecl
 Verifications: _xjO5YEAuEeW20a8v9jefTQ
 
@@ -45,7 +45,25 @@ with [get-editor "TestFile.robot" | get-tab-folder] {
     get-tab-item Source | click
 }
 get-menu "File/Save" | click
+wait 2000
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-
-
+get-editor "TestFile.robot" | get-tree | select "Required, Default, Varargs" | select "Required, Default, Varargs" 
+    | get-menu "Table/Expand All" | click
+    
+get-editor "TestFile.robot" | get-tree | get-table-data | write-csv-file [uri-from-path  [format "%s/TableEditor/KeywordsView/Verification/reading_from_sorce.csv" $RCPTT_project_path]] 
+//
+//if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+//	exec-process [format "\"python.exe\"   \"%s/Settings/PythonScripts/compare_files.py\"  \"%s/TableEditor/KeywordsView/Verification/reading_from_sorce.csv\" \"%s/TableEditor/KeywordsView/Verification/ReadingKeywordsFromSource.csv\"" $RCPTT_project_path $RCPTT_project_path $RCPTT_project_path] 
+//	| let [val result [ get stdout] ]{
+//		$result | equals [str "OK\r\n"] |assert-true -message [format "Message was: %s" $result]
+//	}
+//}-else{
+//		exec-process [format "python.exe"   "%s/Settings/PythonScripts/compare_files.py"  "%s/TableEditor/KeywordsView/Verification/reading_from_sorce.csv" "%s/TableEditor/KeywordsView/Verification/ReadingKeywordsFromSource.csv" $RCPTT_project_path $RCPTT_project_path $RCPTT_project_path] 
+//	| let [val result [ get stdout] ]{
+//		$result | equals [str "OK\n"] |assert-true -message [format "Message was: %s" $result]
+//	}
+//}	
+//
+//delete-file [uri-from-path  [format "%s/TableEditor/KeywordsView/Verification/reading_from_sorce.csv" $RCPTT_project_path]]		 
+		 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
