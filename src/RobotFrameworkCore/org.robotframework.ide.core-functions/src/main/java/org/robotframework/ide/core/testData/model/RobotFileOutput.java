@@ -5,13 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 
 
 public class RobotFileOutput {
 
+    public static final long FILE_NOT_EXIST_EPOCH = 0;
     private File processedFile;
     private RobotFile fileModel;
+    private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private List<ResourceImportReference> resourceReferences = new LinkedList<>();
+    private List<VariablesFileImportReference> variablesReferenced = new LinkedList<>();
     private List<BuildMessage> buildingMessages = new LinkedList<>();
     private Status status = Status.FAILED;
 
@@ -23,6 +27,17 @@ public class RobotFileOutput {
 
     public void setProcessedFile(File processedFile) {
         this.processedFile = processedFile;
+        this.lastModificationEpoch = processedFile.lastModified();
+    }
+
+
+    public void setLastModificationEpochTime(final long lastModificationEpoch) {
+        this.lastModificationEpoch = lastModificationEpoch;
+    }
+
+
+    public long getLastModificationEpochTime() {
+        return lastModificationEpoch;
     }
 
 
@@ -54,6 +69,17 @@ public class RobotFileOutput {
 
     public List<ResourceImportReference> getResourceImportReferences() {
         return resourceReferences;
+    }
+
+
+    public void setVariablesReferenced(
+            final List<VariablesFileImportReference> varsImported) {
+        this.variablesReferenced = varsImported;
+    }
+
+
+    public List<VariablesFileImportReference> getVariablesImportReferences() {
+        return variablesReferenced;
     }
 
     public static class BuildMessage {

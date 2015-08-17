@@ -4,12 +4,24 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 
 
 public class RobotProjectHolder {
 
+    private RobotRuntimeEnvironment robotRuntime;
     private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
+
+
+    public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
+        this.robotRuntime = robotRuntime;
+    }
+
+
+    public RobotRuntimeEnvironment getRobotRuntime() {
+        return robotRuntime;
+    }
 
 
     public void addModelFile(final RobotFileOutput model) {
@@ -22,6 +34,11 @@ public class RobotProjectHolder {
         for (ResourceImportReference ref : referenced) {
             readableProjectFiles.add(ref.getReference());
         }
+    }
+
+
+    public boolean shouldBeLoaded(final File file) {
+        return !containsFile(file);
     }
 
 
