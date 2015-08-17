@@ -6,8 +6,9 @@ Element-Version: 3.0
 External-Reference: 
 Id: _eg-JoD0eEeWUyZKiCzynFQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/17/15 3:37 PM
+Save-Time: 8/17/15 5:30 PM
 Testcase-Type: ecl
+Verifications: _1CamwET0EeWq-NHkm2i3yA
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -180,6 +181,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Last Keyword\n"
     + "    Log    fistr arg    second arg" | verify-true
     
-    
-    
+//go to keyword for verification - all are expanded
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
