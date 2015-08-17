@@ -558,11 +558,12 @@ public class RobotRuntimeEnvironment {
                 argsBuilder.append("None");
             }
 
+            final String normalizedPath = path.replace('\\', '/');
             final List<String> cmdLine = Arrays
                     .asList(cmd,
                             "-c",
                             "import robot.variables as rv;vars=rv.Variables();vars.set_from_file('"
-                                    + path
+                                    + normalizedPath
                                     + "',"
                                     + argsBuilder.toString()
                                     + ");exec('try:\\n\\tprint(str(vars.data))\\n"
@@ -577,16 +578,17 @@ public class RobotRuntimeEnvironment {
                 }
             };
 
+            String resultVars = "";
             try {
                 runExternalProcess(cmdLine, linesHandler);
-                final String resultVars = result.toString().trim()
-                        .replaceAll("'", "\"");
+                resultVars = result.toString().trim().replaceAll("'", "\"");
                 if (mapper == null) {
                     mapper = new ObjectMapper();
                 }
                 variables = mapper.readValue(resultVars, Map.class);
             } catch (final IOException e) {
-
+                e.printStackTrace();
+                System.out.println("Command line output " + resultVars);
             }
         }
         return variables;
