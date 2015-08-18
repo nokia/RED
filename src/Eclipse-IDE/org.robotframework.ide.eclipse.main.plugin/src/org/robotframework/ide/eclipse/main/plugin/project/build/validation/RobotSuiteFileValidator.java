@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
@@ -14,6 +15,8 @@ import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 public class RobotSuiteFileValidator {
@@ -25,7 +28,10 @@ public class RobotSuiteFileValidator {
     }
 
     public void validate(final IProgressMonitor monitor) throws CoreException, IOException {
-        final RobotParser parser = new RobotParser(new RobotProjectHolder());
+        RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
+        final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
+        //TODO: Handle null runtime Environment
+        final RobotParser parser = new RobotParser(new RobotProjectHolder(runtimeEnvironment));
         final List<RobotFileOutput> parserOut = parser.parse(file.getLocation().toFile());
         if (!parserOut.isEmpty()) {
             validate(parserOut.get(0), monitor);
