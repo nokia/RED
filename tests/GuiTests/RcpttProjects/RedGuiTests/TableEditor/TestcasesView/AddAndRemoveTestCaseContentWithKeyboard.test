@@ -1,0 +1,53 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _DcB_IEWOEeWU9ZdhvlLvMA
+Element-Name: AddAndRemoveTestCaseContentWithKeyboard
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _26RnYEWQEeWU9ZdhvlLvMA
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 8/18/15 1:28 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+}
+
+add-testcases-with-keyboard
+// remove cell item by pressing delete
+get-editor "TestFile.robot" | get-tree | select "case 2/Log 2" | key-type Del
+// cell content should be removed, empty cell should be present
+get-editor "TestFile.robot" | get-tree | get-item "case 2/" | get-property caption | equals "" | verify-true
+// remove whole row with ctrl+del 
+with [get-editor "TestFile.robot" | get-tree] {    select "case 2/" |    key-type "M1+DEL"}
+// whole row should be removed
+get-editor "TestFile.robot" | get-tree | get-item "case 2" | get-property childCount | equals 1 | verify-true
+
+
+// add one cell to existing one, delete the first one, check if it was shifted to the left after save action 
+with [get-editor "TestFile.robot" | get-tree] {
+    select "case 1/Log 1" | double-click
+    select "case 1/Log 1" | activate-cell-edit -column 1
+    with [get-editbox] {
+        set-text test1
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+	key-type "ARROW_LEFT"
+    key-type Del
+}
+// save 
+get-eclipse-window | key-type "M1+s"
+
+// check if cell was removed and other existing moved one to the left
+with [get-editor "TestFile.robot" | get-tree] {
+    get-item "case 1/test1" | get-property caption | equals test1 | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
