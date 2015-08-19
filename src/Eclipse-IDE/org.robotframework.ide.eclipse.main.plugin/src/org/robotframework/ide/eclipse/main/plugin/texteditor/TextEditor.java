@@ -109,6 +109,7 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorDamagerRepairer;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorIndentLineAutoEditStrategy;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorPartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
@@ -146,6 +147,8 @@ public class TextEditor {
     private TextEditorOccurrenceMarksManager occurrenceMarksManager;
     
     private RulesGenerator rulesGenerator;
+    
+    private TextEditorIndentLineAutoEditStrategy indentLineAutoEditStrategy;
     
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
@@ -238,7 +241,8 @@ public class TextEditor {
         final Map<String, ContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
         
         textHover = new TextEditorTextHover(keywordMap);
-        final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover);
+        indentLineAutoEditStrategy = new TextEditorIndentLineAutoEditStrategy();
+        final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover, indentLineAutoEditStrategy);
         viewer.configure(svc);
         
         createPartitioner(document);
@@ -266,9 +270,16 @@ public class TextEditor {
 		viewer.getTextWidget().addKeyListener(new KeyListener() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
+			    if (e.keyCode == SWT.SHIFT) {
+                    indentLineAutoEditStrategy.setShiftPresssed(false);
+                }
 			}
 			@Override
 			public void keyPressed(final KeyEvent e) {
+			    if (e.keyCode == SWT.SHIFT) {
+			        indentLineAutoEditStrategy.setShiftPresssed(true);
+			    }
+			    
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'z')) {
 					if(undoManager.undoable()) {
 						undoManager.undo();
@@ -517,6 +528,39 @@ public class TextEditor {
 	
 	private Menu createContextMenu(final LineNumberRulerColumn lineNumberColumn, final ParameterizedCommand saveAsCommand) {
 		final Menu menu = new Menu(viewer.getControl());
+		
+		final MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
+		cutItem.setText("Cut\tCtrl+X");
+		cutItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (viewer.getTextWidget().getSelectionCount() > 0) {
+                    viewer.getTextWidget().cut();
+                }
+            }
+        });
+        final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
+        copyItem.setText("Copy\tCtrl+C");
+        copyItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (viewer.getTextWidget().getSelectionCount() > 0) {
+                    viewer.getTextWidget().copy();
+                }
+            }
+        });
+        final MenuItem pasteItem = new MenuItem(menu, SWT.PUSH);
+        pasteItem.setText("Paste\tCtrl+V");
+        pasteItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                viewer.getTextWidget().paste();
+            }
+        });
+        new MenuItem(menu, SWT.SEPARATOR);
 		final MenuItem saveAsItem = new MenuItem(menu, SWT.PUSH);
 		saveAsItem.setText("Save as...");
 		saveAsItem.addSelectionListener(new SelectionAdapter() {
@@ -571,6 +615,20 @@ public class TextEditor {
                 } else {
                     viewer.removePainter(whitespacePainter);
                     whitespacePainter = null;
+                }
+            }
+        });
+        final MenuItem enableBlockSelectionItem = new MenuItem(menu, SWT.CHECK);
+        enableBlockSelectionItem.setSelection(false);
+        enableBlockSelectionItem.setText("Enable block selection");
+        enableBlockSelectionItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (enableBlockSelectionItem.getSelection()) {
+                    viewer.getTextWidget().setBlockSelection(true);
+                } else {
+                    viewer.getTextWidget().setBlockSelection(false);
                 }
             }
         });
