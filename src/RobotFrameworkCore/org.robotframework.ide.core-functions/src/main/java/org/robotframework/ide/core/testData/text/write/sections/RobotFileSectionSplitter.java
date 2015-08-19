@@ -1,8 +1,10 @@
 package org.robotframework.ide.core.testData.text.write.sections;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
@@ -22,11 +24,13 @@ import com.google.common.annotations.VisibleForTesting;
 public class RobotFileSectionSplitter {
 
     private final ElementsUtility utility;
+    private final Map<SectionType, ISectionBuilder> builders = new LinkedHashMap<>();
 
 
     public RobotFileSectionSplitter() {
         this.utility = new ElementsUtility();
-
+        builders.put(SectionType.SETTINGS, new SettingsSectionBuilder());
+        builders.put(SectionType.VARIABLES, new VariablesSectionBuilder());
     }
 
 
@@ -35,7 +39,15 @@ public class RobotFileSectionSplitter {
 
         List<RobotLine> fileContent = new LinkedList<>(model.getFileContent());
         List<TableHeader> headers = getSortedAvailableTableHeaders(model);
-        Section trashSection = extractBeginTrashSection(headers, fileContent);
+        TableHeader theFirstHeader;
+        if (headers.isEmpty()) {
+            theFirstHeader = null;
+        } else {
+            theFirstHeader = headers.get(0);
+        }
+
+        Section trashSection = extractBeginTrashSection(theFirstHeader,
+                fileContent);
         if (trashSection.isSectionPresent()) {
             sections.add(trashSection);
         }
@@ -51,6 +63,12 @@ public class RobotFileSectionSplitter {
             }
 
             SectionType sectionType = getSectionType(header);
+            ISectionBuilder sectionBuilder = builders.get(sectionType);
+            Section builtSection = sectionBuilder.buildSection(model, header,
+                    nextHeader, fileContent);
+            if (builtSection.isSectionPresent()) {
+                sections.add(builtSection);
+            }
         }
 
         for (RobotLine line : fileContent) {
@@ -87,7 +105,7 @@ public class RobotFileSectionSplitter {
 
 
     @VisibleForTesting
-    protected Section extractBeginTrashSection(final List<TableHeader> headers,
+    protected Section extractBeginTrashSection(TableHeader header,
             final List<RobotLine> fileContent) {
         Section trashSection = new Section();
         trashSection.setType(SectionType.GARBAGE);
@@ -95,11 +113,10 @@ public class RobotFileSectionSplitter {
         if (!fileContent.isEmpty()) {
             boolean moveToEnd;
             int lastLineNumberToCopy = -1;
-            if (headers.isEmpty()) {
+            if (header == null) {
                 moveToEnd = true;
             } else {
-                int headerLineNumber = headers.get(0).getTableHeader()
-                        .getLineNumber();
+                int headerLineNumber = header.getTableHeader().getLineNumber();
                 if (headerLineNumber == IRobotLineElement.NOT_SET) {
                     moveToEnd = true;
                 } else {
