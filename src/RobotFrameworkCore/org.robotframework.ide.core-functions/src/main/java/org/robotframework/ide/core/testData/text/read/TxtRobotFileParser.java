@@ -189,7 +189,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                         new FilePosition(lineNumber,
                                                 lastColumnProcessed),
                                         text.substring(lastColumnProcessed,
-                                                startColumn), isNewLine);
+                                                startColumn),
+                                        robotFile.getName(), isNewLine);
                                 rt.setStartOffset(currentOffset);
                                 currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
@@ -214,7 +215,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                     parsingOutput, new FilePosition(lineNumber,
                                             lastColumnProcessed),
                                     text.substring(lastColumnProcessed),
-                                    isNewLine);
+                                    robotFile.getName(), isNewLine);
                             rt.setStartOffset(currentOffset);
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
@@ -382,7 +383,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, boolean isNewLine) {
+            String text, String fileName, boolean isNewLine) {
         List<RobotToken> robotTokens = recognize(fp, text);
         RobotToken robotToken = computeCorrectRobotToken(currentLine,
                 processingState, robotFileOutput, fp, text, isNewLine,
@@ -467,9 +468,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             processingState, robotFileOutput, robotToken, fp,
                             text);
                 } else {
-                    // TODO: implement - error to many
-                    System.out.println("ERR [" + processingState + "");
-                    System.out.println("ERR [" + text + "]");
+                    robotFileOutput.addBuildMessage(BuildMessage
+                            .createErrorMessage("Unknown data \'" + text
+                                    + "\' appears in " + fp
+                                    + ", during state: " + processingState,
+                                    fileName));
                 }
             }
         }
@@ -554,11 +557,14 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
         }
 
-        if (!result
-                && (state == ParsingState.TEST_CASE_DECLARATION || state == ParsingState.KEYWORD_DECLARATION)) {
-            result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
-                    .contains(RobotTokenType.COMMENT_CONTINUE));
-        }
+        if (!result)
+            if (state == ParsingState.TEST_CASE_DECLARATION
+                    || state == ParsingState.KEYWORD_DECLARATION
+                    || state == ParsingState.UNKNOWN) {
+                result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
+                        .contains(RobotTokenType.COMMENT_CONTINUE));
+
+            }
 
         return result;
     }

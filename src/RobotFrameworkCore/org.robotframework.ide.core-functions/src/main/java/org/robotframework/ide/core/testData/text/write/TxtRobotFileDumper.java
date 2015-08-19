@@ -6,28 +6,18 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.robotframework.ide.core.testData.IRobotFileDumper;
 import org.robotframework.ide.core.testData.model.RobotFile;
-import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
-import org.robotframework.ide.core.testData.text.read.RobotLine;
-
-import com.google.common.annotations.VisibleForTesting;
 
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
 
-    private final LineSeparatorFixer lineSeparatorFixer;
-    private final static List<IElementDumper> dumpers = new LinkedList<>();
-    static {
-
-    }
+    private final RobotFileSectionSplitter sectionSplitter;
 
 
     public TxtRobotFileDumper() {
-        this.lineSeparatorFixer = new LineSeparatorFixer();
+        this.sectionSplitter = new RobotFileSectionSplitter();
     }
 
 
@@ -38,11 +28,8 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                 destFile.getName() + System.currentTimeMillis(), "txt_temp");
         BufferedWriter writer = new BufferedWriter(new FileWriter(
                 tempFile.toFile()));
-        List<RobotLine> fileContent = model.getFileContent();
-        for (RobotLine line : fileContent) {
-            writer.write(dumpLine(line));
-            writer.newLine();
-        }
+
+        writer.write(dump(model).toString());
 
         writer.flush();
         writer.close();
@@ -55,44 +42,11 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
     public StringBuilder dump(final RobotFile model) {
         StringBuilder str = new StringBuilder();
-        List<RobotLine> fileContent = model.getFileContent();
-        for (RobotLine line : fileContent) {
-            str.append(dumpLine(line));
-            str.append(System.lineSeparator());
+        for (Section s : sectionSplitter.getSections(model)) {
+            System.out.println("Type: " + s.getType() + ": "
+                    + s.getSectionContent());
         }
-
         return str;
-    }
-
-
-    @VisibleForTesting
-    protected String dumpLine(final RobotLine line) {
-        StringBuilder output = new StringBuilder();
-
-        lineSeparatorFixer.separateLine(line);
-        List<IRobotLineElement> lineElements = line.getLineElements();
-        int size = lineElements.size();
-        for (int i = 0; i < size; i++) {
-            IRobotLineElement elem = lineElements.get(i);
-            IElementDumper dumper = findDumper(elem);
-            output.append(dumper.dump(line, i));
-        }
-
-        return output.toString();
-    }
-
-
-    @VisibleForTesting
-    protected IElementDumper findDumper(final IRobotLineElement elem) {
-        IElementDumper dumper = new OneToOneDumper();
-        for (IElementDumper d : dumpers) {
-            if (d.canDump(elem)) {
-                dumper = d;
-                break;
-            }
-        }
-
-        return dumper;
     }
 
 
