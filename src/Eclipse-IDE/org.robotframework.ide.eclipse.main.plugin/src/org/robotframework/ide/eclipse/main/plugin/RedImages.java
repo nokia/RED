@@ -14,7 +14,7 @@ public class RedImages {
     public static ImageDescriptor getCloseImage() {
         return RedPlugin.getImageDescriptor("resources/close.png");
     }
-
+    
     public static ImageDescriptor getRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
@@ -159,6 +159,15 @@ public class RedImages {
     public static ImageDescriptor getErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error.png");
     }
+    
+    public static ImageDescriptor getTagImage() {
+        return RedPlugin.getImageDescriptor("resources/tag.png");
+    }
+    
+    public static ImageDescriptor getRemoveTagImage() {
+        return RedPlugin.getImageDescriptor("resources/close_tag.png");
+    }
+
 
     /**
      * For given image descriptor the gray version descriptor is created.
