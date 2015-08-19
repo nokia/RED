@@ -195,19 +195,31 @@ public class ElementsUtility {
     }
 
 
+    public boolean isTableHeader(IRobotTokenType type) {
+        return (type == RobotTokenType.SETTINGS_TABLE_HEADER
+                || type == RobotTokenType.VARIABLES_TABLE_HEADER
+                || type == RobotTokenType.TEST_CASES_TABLE_HEADER || type == RobotTokenType.KEYWORDS_TABLE_HEADER);
+    }
+
+
     public boolean isTableHeader(RobotToken t) {
         boolean result = false;
         List<IRobotTokenType> declaredTypes = t.getTypes();
-        if (declaredTypes.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes
-                .contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes
-                .contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
-            result = true;
-        } else if (declaredTypes.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
-            result = true;
+        for (IRobotTokenType type : declaredTypes) {
+            if (isTableHeader(type)) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
+    public boolean isTableHeader(IRobotLineElement elem) {
+        boolean result = false;
+        if (elem instanceof RobotToken) {
+            result = isTableHeader((RobotToken) elem);
         }
 
         return result;
