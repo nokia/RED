@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.write;
+package org.robotframework.ide.core.testData.text.write.sections;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +60,21 @@ public class Section {
 
         public void setEndPosition(FilePosition endPosition) {
             this.endPosition = endPosition;
+        }
+
+
+        public boolean hasBoundaries() {
+            return (startPosition != null && endPosition != null);
+        }
+
+
+        public static ElementBoundaries create(final int startLine,
+                final int startColumn, final int endLine, final int endColumn) {
+            ElementBoundaries eb = new ElementBoundaries();
+            eb.setStartPosition(new FilePosition(startLine, startColumn));
+            eb.setEndPosition(new FilePosition(endColumn, endLine));
+
+            return eb;
         }
     }
 

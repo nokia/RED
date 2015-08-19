@@ -9,6 +9,8 @@ import java.nio.file.StandardCopyOption;
 
 import org.robotframework.ide.core.testData.IRobotFileDumper;
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.text.write.sections.RobotFileSectionSplitter;
+import org.robotframework.ide.core.testData.text.write.sections.Section;
 
 
 public class TxtRobotFileDumper implements IRobotFileDumper {

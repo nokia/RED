@@ -1,4 +1,4 @@
-package org.robotframework.ide.core.testData.text.write;
+package org.robotframework.ide.core.testData.text.write.sections;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
