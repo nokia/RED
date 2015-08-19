@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
@@ -12,9 +13,12 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 public class TextEditorSourceViewerConfiguration extends SourceViewerConfiguration {
 
     private TextEditorTextHover textEditorHover;
+    
+    private TextEditorIndentLineAutoEditStrategy indentLineAutoEditStrategy;
 
-    public TextEditorSourceViewerConfiguration(TextEditorTextHover textEditorHover) {
+    public TextEditorSourceViewerConfiguration(TextEditorTextHover textEditorHover, TextEditorIndentLineAutoEditStrategy indentLineAutoEditStrategy) {
         this.textEditorHover = textEditorHover;
+        this.indentLineAutoEditStrategy = indentLineAutoEditStrategy;
     }
 
     @Override
@@ -44,4 +48,8 @@ public class TextEditorSourceViewerConfiguration extends SourceViewerConfigurati
                 TextEditorPartitionScanner.VARIABLES_SECTION };
     }
     
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+        return new IAutoEditStrategy[] { indentLineAutoEditStrategy };
+    }
 }
