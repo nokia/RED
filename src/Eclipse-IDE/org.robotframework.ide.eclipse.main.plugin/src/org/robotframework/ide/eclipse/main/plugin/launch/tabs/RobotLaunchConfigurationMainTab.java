@@ -15,8 +15,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -27,15 +25,18 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -65,11 +66,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private Text argumentsText;
     private Text projectText;
     private ListViewer viewer;
+    
     private Button includeTagsBtn;
-    private Text includeTagsText;
     private Button excludeTagsBtn;
-    private Text excludeTagsText;
-    private ControlDecoration decoration;
+    private ScrolledComposite excludedTagsScrolledComposite;
+    private ScrolledComposite includedTagsScrolledComposite;
+    private Composite excludedTagsComposite;
+    private Composite includedTagsComposite;
+    private List<String> includedTags = newArrayList();
+    private List<String> excludedTags = newArrayList();
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
@@ -98,10 +103,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             viewer.setInput(newArrayList(suites));
             viewer.refresh();
             
+            clearTags();
             includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
-            includeTagsText.setText(Joiner.on(", ").join(robotConfig.getIncludedTags()));
+            for (String tag : robotConfig.getIncludedTags()) {
+                createTag(includedTagsScrolledComposite, includedTagsComposite, includedTags, tag);
+            }
             excludeTagsBtn.setSelection(robotConfig.isExcludeTagsEnabled());
-            excludeTagsText.setText(Joiner.on(", ").join(robotConfig.getExcludedTags()));
+            for (String tag : robotConfig.getExcludedTags()) {
+                createTag(excludedTagsScrolledComposite, excludedTagsComposite, excludedTags, tag);
+            }
 
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
@@ -121,8 +131,9 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig
-                .setExecutor(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())));
+        if (comboExecutorName.getSelectionIndex() >= 0) {
+            robotConfig.setExecutor(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())));
+        }
         robotConfig.setProjectName(projectText.getText());
         robotConfig.setExecutorArguments(argumentsText.getText());
         robotConfig.setSuitePaths(Lists.transform(getSuites(), new Function<IPath, String>() {
@@ -132,9 +143,9 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             }
         }));
         robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
-        robotConfig.setIncludedTags(extractTags(includeTagsText.getText()));
+        robotConfig.setIncludedTags(includedTags);
         robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
-        robotConfig.setExcludedTags(extractTags(excludeTagsText.getText()));
+        robotConfig.setExcludedTags(excludedTags);
     }
     
     @Override
@@ -211,9 +222,6 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public void dispose() {
-        if (decoration != null) {
-            decoration.dispose();
-        }
         super.dispose();
     }
     
@@ -236,8 +244,8 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     private void createExecutorGroup(final Composite topControl) {
         final Group executorGroup = new Group(topControl, SWT.NONE);
-        executorGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         executorGroup.setText("Executor");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
         GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(executorGroup);
 
         comboExecutorName = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -247,12 +255,13 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
+        GridDataFactory.fillDefaults().span(3, 1).applyTo(comboExecutorName);
 
         final Label lblArgs = new Label(executorGroup, SWT.NONE);
         lblArgs.setText("Arguments:");
 
         argumentsText = new Text(executorGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).hint(450, SWT.DEFAULT).applyTo(argumentsText);
+        GridDataFactory.fillDefaults().grab(true, false).hint(450, SWT.DEFAULT).span(2, 1).applyTo(argumentsText);
         argumentsText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
@@ -269,19 +278,10 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
-        includeTagsText = new Text(executorGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(includeTagsText);
-        includeTagsText.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        decoration = new ControlDecoration(includeTagsText, SWT.RIGHT | SWT.TOP);
-        decoration.setDescriptionText("Separate multiple tags with a comma character like 'tag1, tag2...'");
-        decoration.setImage(FieldDecorationRegistry.getDefault()
-                .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage());
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(includeTagsBtn);
+        includedTagsScrolledComposite = new ScrolledComposite(executorGroup, SWT.H_SCROLL);
+        includedTagsComposite = new Composite(includedTagsScrolledComposite, SWT.NONE);
+        initScrolledComposite(includedTagsScrolledComposite, includedTagsComposite, includedTags);
         
         excludeTagsBtn = new Button(executorGroup, SWT.CHECK);
         excludeTagsBtn.setText("Skip tests with these tags:");
@@ -292,17 +292,12 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
-        excludeTagsText = new Text(executorGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(excludeTagsText);
-        excludeTagsText.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(excludeTagsBtn);
+        excludedTagsScrolledComposite = new ScrolledComposite(executorGroup, SWT.H_SCROLL);
+        excludedTagsComposite = new Composite(excludedTagsScrolledComposite, SWT.NONE);
+        initScrolledComposite(excludedTagsScrolledComposite, excludedTagsComposite, excludedTags);
     }
-
+    
     private void createProjectGroup(final Composite composite) {
         final Group projectGroup = new Group(composite, SWT.NONE);
         projectGroup.setText("Project");
@@ -422,14 +417,97 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         });
     }
     
-    private List<String> extractTags(final String tagsTxt) {
-        List<String> tagsList = newArrayList();
-        if(tagsTxt!=null && !tagsTxt.equals("")) {
-            String[] tags = tagsTxt.split(",");
-            for (int i = 0; i < tags.length; i++) {
-                tagsList.add(tags[i].trim());
+    private void initScrolledComposite(final ScrolledComposite scrolledComposite, final Composite tagsComposite, final List<String> tags) {
+        scrolledComposite.setExpandHorizontal(true);
+        scrolledComposite.setExpandVertical(true);
+        scrolledComposite.setAlwaysShowScrollBars(false);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).hint(0, 24).applyTo(scrolledComposite);
+        scrolledComposite.setContent(tagsComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(tagsComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).spacing(3, 0).applyTo(tagsComposite);
+        createAddTagComposite(scrolledComposite, tagsComposite, tags);
+    }
+    
+    private Composite createAddTagComposite(final ScrolledComposite parent, final Composite tagsComposite, final List<String> tags) {
+        final Composite addTagComposite = new Composite(tagsComposite, SWT.NONE);
+        GridDataFactory.fillDefaults().applyTo(addTagComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).spacing(1, 0).applyTo(addTagComposite);
+        
+        final Text tagNameTxt = new Text(addTagComposite, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(false, false).hint(60, SWT.DEFAULT).applyTo(tagNameTxt);
+        
+        final Button addTagBtn = new Button(addTagComposite, SWT.PUSH);
+        addTagBtn.setImage(ImagesManager.getImage(RedImages.getAddImage()));
+        addTagBtn.setToolTipText("Add new tag");
+        GridDataFactory.fillDefaults().hint(22, 18).applyTo(addTagBtn);
+        addTagBtn.addSelectionListener(new SelectionAdapter() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                createTag(parent, tagsComposite, tags, tagNameTxt.getText());
+                tagNameTxt.setText("");
             }
+        });
+        
+        parent.setMinSize(tagsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        return tagsComposite;
+    }
+    
+    private void createTag(final ScrolledComposite scrolledComposite, final Composite tagsComposite, final List<String> tags, final String text) {
+        
+        if (!text.equals("") && !tags.contains(text)) {
+            tags.add(text);
+            updateLaunchConfigurationDialog();
+
+            final GridLayout tagsCompositeLayout = (GridLayout) tagsComposite.getLayout();
+            tagsCompositeLayout.numColumns = tagsCompositeLayout.numColumns + 1;
+            final int childrenLengthBeforeAdding = tagsComposite.getChildren().length;
+
+            final Composite newTag = new Composite(tagsComposite, SWT.BORDER);
+            newTag.setBackground(tagsComposite.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+            newTag.setBackgroundMode(SWT.INHERIT_FORCE);
+            GridDataFactory.fillDefaults().grab(false, false).applyTo(newTag);
+            GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(newTag);
+            
+            final CLabel newTagLabel = new CLabel(newTag, SWT.NONE);
+            newTagLabel.setImage(ImagesManager.getImage(RedImages.getTagImage()));
+            newTagLabel.setText(text);
+            GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 20).applyTo(newTagLabel);
+            
+            final Button newTagRemoveBtn = new Button(newTag, SWT.PUSH);
+            newTagRemoveBtn.setImage(ImagesManager.getImage(RedImages.getRemoveTagImage()));
+            newTagRemoveBtn.setToolTipText("Remove tag");
+            GridDataFactory.fillDefaults().hint(18, 16).applyTo(newTagRemoveBtn);
+            newTagRemoveBtn.addSelectionListener(new SelectionAdapter() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    tags.remove(newTagLabel.getText());
+                    newTag.dispose();
+                    tagsComposite.layout();
+                    updateLaunchConfigurationDialog();
+                }
+            });
+            
+            final Control[] children = tagsComposite.getChildren();
+            newTag.moveAbove(children[childrenLengthBeforeAdding-1]);
+
+            scrolledComposite.setMinSize(tagsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            tagsComposite.layout();
+            scrolledComposite.layout();
         }
-        return tagsList;
+    }
+    
+    private void clearTags() {
+        includedTags.clear();
+        excludedTags.clear();
+        Control[] children = includedTagsComposite.getChildren();
+        for (int i = 0; i < children.length-1; i++) {
+            children[i].dispose();
+        }
+        children = excludedTagsComposite.getChildren();
+        for (int i = 0; i < children.length-1; i++) {
+            children[i].dispose();
+        }
     }
 }
