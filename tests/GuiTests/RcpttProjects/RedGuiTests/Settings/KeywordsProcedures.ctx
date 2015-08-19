@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _7-QNADzcEeWxlsQvwWxD9w
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/11/15 3:19 PM
+Save-Time: 8/19/15 11:01 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -143,6 +143,7 @@ proc "add-keyword-with-args-by-double-click" [val keyword_name] [val keyword_ind
 
 proc "add-keyword-with-elements-by-arrows" [val keyword_name] [val elements]  [val script_name]{
 	with [get-editor $script_name | get-tree] {
+		select  "...add new keyword" 
 		get-item  "...add new keyword" | click
 		key-type Enter
 
