@@ -58,7 +58,7 @@ public class TextEditorSourceViewerConfiguration extends TextSourceViewerConfigu
     
     @Override
     public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-        return null; //must be null to avoid conflicts with reconciler defined directly in TextEditor class
+        return null;
     }
     
     @Override
@@ -75,5 +75,4 @@ public class TextEditorSourceViewerConfiguration extends TextSourceViewerConfigu
     public String[] getIndentPrefixes(ISourceViewer sourceViewer, String contentType) {
         return super.getIndentPrefixes(sourceViewer, contentType);
     }
-    
 }
