@@ -3,10 +3,11 @@ package org.robotframework.ide.core.testData.model.table;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.IOptional;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TableHeader {
+public class TableHeader implements IOptional {
 
     private final RobotToken tableHeader;
     private List<RobotToken> columnNames = new LinkedList<>();
@@ -42,4 +43,9 @@ public class TableHeader {
         this.comment.add(commentWord);
     }
 
+
+    @Override
+    public boolean isPresent() {
+        return (tableHeader != null);
+    }
 }
