@@ -7,24 +7,22 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 
-
 public class TextEditorIndentLineAutoEditStrategy implements IAutoEditStrategy {
-    
+
     private boolean isShiftPresssed;
 
     @Override
     public void customizeDocumentCommand(IDocument d, DocumentCommand c) {
         if (c.length == 0 && c.text != null && TextUtilities.endsWith(d.getLegalLineDelimiters(), c.text) != -1)
             autoIndentAfterNewLine(d, c);
-        else if(c.length > 0 && c.text != null && c.text.equals("\t")) {
-            System.out.println(isShiftPresssed);
-            if(!isShiftPresssed)
+        else if (c.length > 0 && c.text != null && c.text.equals("\t")) {
+            if (!isShiftPresssed)
                 addIndentToSelectedText(d, c);
-            else 
+            else
                 removeIndentFromSelectedText(d, c);
         }
     }
-    
+
     private void addIndentToSelectedText(IDocument d, DocumentCommand c) {
         if (c.offset == -1 || d.getLength() == 0)
             return;
@@ -45,7 +43,7 @@ public class TextEditorIndentLineAutoEditStrategy implements IAutoEditStrategy {
             // stop work
         }
     }
-    
+
     private void removeIndentFromSelectedText(IDocument d, DocumentCommand c) {
         if (c.offset == -1 || d.getLength() == 0)
             return;
@@ -84,7 +82,7 @@ public class TextEditorIndentLineAutoEditStrategy implements IAutoEditStrategy {
             // stop work
         }
     }
-    
+
     private void autoIndentAfterNewLine(IDocument d, DocumentCommand c) {
 
         if (c.offset == -1 || d.getLength() == 0)
@@ -92,29 +90,29 @@ public class TextEditorIndentLineAutoEditStrategy implements IAutoEditStrategy {
 
         try {
             // find start of line
-            int p= (c.offset == d.getLength() ? c.offset  - 1 : c.offset);
-            IRegion info= d.getLineInformationOfOffset(p);
-            int start= info.getOffset();
+            int p = (c.offset == d.getLength() ? c.offset - 1 : c.offset);
+            IRegion info = d.getLineInformationOfOffset(p);
+            int start = info.getOffset();
 
             // find white spaces
-            int end= findEndOfWhiteSpace(d, start, c.offset);
+            int end = findEndOfWhiteSpace(d, start, c.offset);
 
-            StringBuffer buf= new StringBuffer(c.text);
+            StringBuffer buf = new StringBuffer(c.text);
             if (end > start) {
                 // append to input
                 buf.append(d.get(start, end - start));
             }
 
-            c.text= buf.toString();
+            c.text = buf.toString();
 
         } catch (BadLocationException excp) {
             // stop work
         }
     }
-    
+
     protected int findEndOfWhiteSpace(IDocument document, int offset, int end) throws BadLocationException {
         while (offset < end) {
-            char c= document.getChar(offset);
+            char c = document.getChar(offset);
             if (c != ' ' && c != '\t') {
                 return offset;
             }
