@@ -135,6 +135,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/expandall.png");
     }
     
+    public static ImageDescriptor getRelaunchImage() {
+        return RedPlugin.getImageDescriptor("resources/relaunch.png");
+    }
+    
     public static ImageDescriptor getTestPassImage() {
         return RedPlugin.getImageDescriptor("resources/testok.png");
     }
