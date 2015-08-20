@@ -105,6 +105,7 @@ public class RulesGenerator {
     public IRule[] getDefaultRules() {
         List<IRule> rules = newArrayList();
         rules.add(asteriskWordRule);
+        rules.add(commentRule);
 
         return rules.toArray(new IRule[rules.size()]);
     }

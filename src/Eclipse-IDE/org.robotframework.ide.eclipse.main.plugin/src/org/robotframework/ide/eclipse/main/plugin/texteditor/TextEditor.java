@@ -54,6 +54,7 @@ import org.eclipse.jface.text.TextViewerUndoManager;
 import org.eclipse.jface.text.WhitespaceCharacterPainter;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.AnnotationRulerColumn;
@@ -106,7 +107,6 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestC
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.VariablesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.RulesGenerator;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorDamagerRepairer;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.TextEditorScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.SharedTextColors;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorIndentLineAutoEditStrategy;
@@ -233,7 +233,7 @@ public class TextEditor {
 		
 		final Menu contextMenu = this.createContextMenu(lineNumberColumn, saveAsCommand);
 
-		final TextViewerUndoManager undoManager = new TextViewerUndoManager(3);
+		final TextViewerUndoManager undoManager = new TextViewerUndoManager(5);
 		viewer.setUndoManager(undoManager);
 		undoManager.connect(viewer);
 		
@@ -679,13 +679,12 @@ public class TextEditor {
                 rulesGenerator.getVariablesSectionRules()));
         setupPresentationReconciler(reconciler, IDocument.DEFAULT_CONTENT_TYPE,
                 new TextEditorScanner(rulesGenerator.getDefaultRules()));
-
         return reconciler;
     }
 	
     private void setupPresentationReconciler(final PresentationReconciler reconciler, final String contentType,
             final RuleBasedScanner scanner) {
-        final TextEditorDamagerRepairer dr = new TextEditorDamagerRepairer(scanner);
+        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(dr, contentType);
         reconciler.setRepairer(dr, contentType);
     }
