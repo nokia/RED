@@ -18,14 +18,14 @@ public class ExecutionViewLabelProvider extends ColumnLabelProvider implements I
     }
 
     @Override
-    public StyledString getStyledText(Object element) {
+    public StyledString getStyledText(final Object element) {
 
         String elapsedTime = "";
-        String time = ((ExecutionStatus) element).getElapsedTime();
+        final String time = ((ExecutionStatus) element).getElapsedTime();
         if (time != null) {
             elapsedTime = " (" + time + " s)";
         }
-        StyledString label = new StyledString(((ExecutionStatus) element).getName());
+        final StyledString label = new StyledString(((ExecutionStatus) element).getName());
         label.append(elapsedTime, new Styler() {
 
             @Override
@@ -38,8 +38,8 @@ public class ExecutionViewLabelProvider extends ColumnLabelProvider implements I
     }
 
     @Override
-    public Image getImage(Object element) {
-        ExecutionStatus status = (ExecutionStatus) element;
+    public Image getImage(final Object element) {
+        final ExecutionStatus status = (ExecutionStatus) element;
 
         if (status.getType() == ExecutionElementType.SUITE) {
             if (status.getStatus() == Status.RUNNING) {
@@ -57,4 +57,5 @@ public class ExecutionViewLabelProvider extends ColumnLabelProvider implements I
             return ImagesManager.getImage(RedImages.getTestFailImage());
         }
     }
+
 }

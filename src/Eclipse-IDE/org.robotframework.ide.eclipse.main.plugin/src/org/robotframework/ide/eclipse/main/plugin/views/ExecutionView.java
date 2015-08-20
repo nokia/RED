@@ -28,9 +28,9 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Stat
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
+import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -59,9 +60,9 @@ public class ExecutionView {
     
     public static final String ID = "org.robotframework.ide.ExecutionView";
 
-    private CLabel passCounterLabel;
+    private Label passCounterLabel;
 
-    private CLabel failCounterLabel;
+    private Label failCounterLabel;
     
     private int passCounter = 0;
 
@@ -77,20 +78,23 @@ public class ExecutionView {
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
-
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(parent);
 
         final Composite labelsComposite = new Composite(parent, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(labelsComposite);
-        GridDataFactory.fillDefaults().applyTo(labelsComposite);
+        GridLayoutFactory.fillDefaults().numColumns(4).applyTo(labelsComposite);
+        GridDataFactory.fillDefaults().grab(true, false).indent(2, 2).applyTo(labelsComposite);
 
-        passCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        passCounterLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
+        final Label passImageLabel = new Label(labelsComposite, SWT.NONE);
+        passImageLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
+        passCounterLabel = new Label(labelsComposite, SWT.NONE);
+        GridDataFactory.fillDefaults().hint(70, 1).applyTo(passCounterLabel);
         passCounterLabel.setText("Passed: 0");
 
-        failCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        failCounterLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
+        final Label failImageLabel = new Label(labelsComposite, SWT.NONE);
+        failImageLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
+        failCounterLabel = new Label(labelsComposite, SWT.NONE);
+        GridDataFactory.fillDefaults().hint(70, 1).applyTo(passCounterLabel);
         failCounterLabel.setText("Failed: 0");
 
         executionViewer = new TreeViewer(parent);
@@ -223,6 +227,10 @@ public class ExecutionView {
         collapseAction.setText("Collapse All");
         collapseAction.setImageDescriptor(RedImages.getCollapseAllImage());
         toolBarManager.add(collapseAction);
+        final RerunAction rerunAction = new RerunAction();
+        rerunAction.setText("Rerun Tests");
+        rerunAction.setImageDescriptor(RedImages.getRelaunchImage());
+        toolBarManager.add(rerunAction);
     }
     
     private boolean isSuiteStartEvent(final ExecutionElement executionElement) {
@@ -265,7 +273,7 @@ public class ExecutionView {
         newTestExecutionStatus.setParent(lastSuite);
         newTestExecutionStatus.setSource(lastSuite.getSource());
         lastSuite.addChildren(newTestExecutionStatus);
-        executionViewer.expandToLevel(newTestExecutionStatus, 1);
+        executionViewer.reveal(newTestExecutionStatus);
     }
     
     private void handleSuiteEndEvent(final ExecutionElement executionElement) {
@@ -295,6 +303,7 @@ public class ExecutionView {
                     executionStatus.setMessage(message);
                 }
                 executionStatus.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
+                executionViewer.reveal(executionStatus);
                 break;
             }
         }
