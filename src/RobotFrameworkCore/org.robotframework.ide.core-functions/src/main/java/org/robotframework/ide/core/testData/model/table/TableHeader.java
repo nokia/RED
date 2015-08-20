@@ -3,11 +3,11 @@ package org.robotframework.ide.core.testData.model.table;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.IOptional;
+import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TableHeader implements IOptional {
+public class TableHeader extends AModelElement {
 
     private final RobotToken tableHeader;
     private List<RobotToken> columnNames = new LinkedList<>();
