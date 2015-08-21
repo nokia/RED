@@ -1,54 +1,81 @@
 package org.robotframework.ide.eclipse.main.plugin.execution;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
 
 public class ExecutionViewContentProvider implements ITreeContentProvider {
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+    private boolean isFailedFilterEnabled;
 
-	}
+    @Override
+    public void dispose() {
 
-	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
+    }
 
-	}
+    @Override
+    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
 
-	@Override
-	public Object[] getElements(Object inputElement) {
+    }
 
-		return (ExecutionStatus[]) inputElement;
-	}
+    @Override
+    public Object[] getElements(final Object inputElement) {
 
-	@Override
-	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof ExecutionStatus) {
-			List<ExecutionStatus> list = ((ExecutionStatus) parentElement)
-					.getChildren();
-			return list.toArray(new ExecutionStatus[list.size()]);
-		}
-		return null;
-	}
+        return (ExecutionStatus[]) inputElement;
+    }
 
-	@Override
-	public Object getParent(Object element) {
-		if (element instanceof ExecutionStatus) {
-			return ((ExecutionStatus) element).getParent();
-		}
-		return null;
-	}
+    @Override
+    public Object[] getChildren(final Object parentElement) {
+        
+        if (parentElement instanceof ExecutionStatus) {
+            final List<ExecutionStatus> children = ((ExecutionStatus) parentElement).getChildren();
 
-	@Override
-	public boolean hasChildren(Object element) {
-		if (element instanceof ExecutionStatus) {
-			return ((ExecutionStatus) element).getChildren().size() > 0;
-		}
-		return false;
-	}
+            if (isFailedFilterEnabled) {
+                final List<ExecutionStatus> failedChildren = new ArrayList<ExecutionStatus>();
+                for (ExecutionStatus executionStatus : children) {
+                    if (executionStatus.getStatus() == Status.FAIL) {
+                        failedChildren.add(executionStatus);
+                    }
+                }
+                return failedChildren.toArray(new ExecutionStatus[failedChildren.size()]);
+            }
+
+            return children.toArray(new ExecutionStatus[children.size()]);
+        }
+        return null;
+    }
+
+    @Override
+    public Object getParent(final Object element) {
+        
+        if (element instanceof ExecutionStatus) {
+            return ((ExecutionStatus) element).getParent();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean hasChildren(final Object element) {
+        
+        if (element instanceof ExecutionStatus) {
+            return ((ExecutionStatus) element).getChildren().size() > 0;
+        }
+        return false;
+    }
+    
+    public void setFailedFilterEnabled(final boolean isFailedFilterEnabled) {
+        this.isFailedFilterEnabled = isFailedFilterEnabled;
+    }
+
+    public void switchFailedFilter() {
+        if (isFailedFilterEnabled) {
+            isFailedFilterEnabled = false;
+        } else {
+            isFailedFilterEnabled = true;
+        }
+    }
 
 }

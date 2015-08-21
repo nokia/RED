@@ -41,14 +41,19 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewerUndoManager;
 import org.eclipse.jface.text.WhitespaceCharacterPainter;
@@ -63,6 +68,8 @@ import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.OverviewRuler;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CaretEvent;
+import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -79,6 +86,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tray;
+import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.team.internal.ui.history.FileRevisionEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -91,8 +100,10 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.FindReplaceAction;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -113,8 +124,10 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorInd
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorPartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSourceViewerConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorStatusLineManager;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
 import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author mmarzec
@@ -149,6 +162,8 @@ public class TextEditor {
     private RulesGenerator rulesGenerator;
     
     private TextEditorIndentLineAutoEditStrategy indentLineAutoEditStrategy;
+    
+    private TextEditorStatusLineManager statusLineManager;
     
 	@PostConstruct
 	public void postConstruct(final Composite parent, final IEditorInput input, final IEditorPart editorPart) {
@@ -353,6 +368,15 @@ public class TextEditor {
                 }
             }
         });
+        
+        statusLineManager = new TextEditorStatusLineManager(editorPart, viewer.getDocument());
+        viewer.getTextWidget().addCaretListener(new CaretListener() {
+
+            @Override
+            public void caretMoved(CaretEvent event) {
+                statusLineManager.updatePosition(event.caretOffset);
+            }
+        });
 	}
 
     private Map<String, ContentAssistKeywordContext> provideContentAssistantKeywordsMapping(
@@ -383,6 +407,7 @@ public class TextEditor {
 	@Focus
 	public void onFocus() {
         viewer.getTextWidget().setFocus();
+        statusLineManager.updatePosition(viewer.getTextWidget().getCaretOffset());
 	}
 	
 	@SuppressWarnings("unchecked")
