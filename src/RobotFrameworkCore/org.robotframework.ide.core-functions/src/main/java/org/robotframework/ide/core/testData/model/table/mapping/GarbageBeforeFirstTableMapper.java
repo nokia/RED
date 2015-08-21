@@ -1,9 +1,11 @@
 package org.robotframework.ide.core.testData.model.table.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -19,7 +21,11 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
             String text) {
         // nothing to do
         rt.setText(new StringBuilder(text));
-        rt.setType(RobotTokenType.UNKNOWN);
+        List<IRobotTokenType> types = rt.getTypes();
+        if (!types.contains(RobotTokenType.START_HASH_COMMENT)
+                && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+            rt.setType(RobotTokenType.UNKNOWN);
+        }
         return rt;
     }
 

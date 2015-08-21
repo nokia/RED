@@ -137,7 +137,7 @@ public class HashCommentMapper implements IParsingMapper {
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
                 result = false;
-            } else {
+            } else if (!processingState.isEmpty()) {
                 processingState.push(ParsingState.COMMENT);
                 result = true;
             }
