@@ -49,6 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewContent
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
+import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -70,7 +71,11 @@ public class ExecutionView {
     
     private TreeViewer executionViewer;
     
+    private ExecutionViewContentProvider executionViewContentProvider;
+    
     private StyledText messageText;
+    
+    private ShowFailedOnlyAction showFailedAction;
 
     private List<ExecutionStatus> executionViewerInput = new ArrayList<>();
 
@@ -105,11 +110,12 @@ public class ExecutionView {
                 .labelsProvidedBy(new ExecutionViewLabelProvider())
                 .withMinWidth(400)
                 .createFor(executionViewer);
-        executionViewer.setContentProvider(new ExecutionViewContentProvider());
+        executionViewContentProvider = new ExecutionViewContentProvider();
+        executionViewer.setContentProvider(executionViewContentProvider);
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
-
+        
         messageText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         messageText.setFont(JFaceResources.getTextFont());
         GridDataFactory.fillDefaults().grab(true, false).indent(3, 0).hint(0, 50).applyTo(messageText);
@@ -154,6 +160,8 @@ public class ExecutionView {
         executionViewerInput.clear();
         passCounter = 0;
         failCounter = 0;
+        executionViewContentProvider.setFailedFilterEnabled(false);
+        showFailedAction.setChecked(false);
         executionViewer.refresh();
     }
 
@@ -227,6 +235,11 @@ public class ExecutionView {
         collapseAction.setText("Collapse All");
         collapseAction.setImageDescriptor(RedImages.getCollapseAllImage());
         toolBarManager.add(collapseAction);
+        showFailedAction = new ShowFailedOnlyAction(executionViewer, executionViewContentProvider);
+        showFailedAction.setText("Show Failures Only");
+        showFailedAction.setImageDescriptor(RedImages.getFailuresImage());
+        showFailedAction.setChecked(false);
+        toolBarManager.add(showFailedAction);
         final RerunAction rerunAction = new RerunAction();
         rerunAction.setText("Rerun Tests");
         rerunAction.setImageDescriptor(RedImages.getRelaunchImage());
