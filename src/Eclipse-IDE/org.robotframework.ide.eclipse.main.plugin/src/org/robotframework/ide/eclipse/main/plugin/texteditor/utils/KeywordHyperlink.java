@@ -48,10 +48,10 @@ public class KeywordHyperlink implements IHyperlink {
     @Override
     public void open() {
 
-        int topIndexPosiiton;
+        int topIndexPosition;
         try {
-            topIndexPosiiton = viewer.getDocument().getLineOfOffset(result.getOffset());
-            viewer.getTextWidget().setTopIndex(topIndexPosiiton);
+            topIndexPosition = viewer.getDocument().getLineOfOffset(result.getOffset());
+            viewer.getTextWidget().setTopIndex(topIndexPosition);
             viewer.getTextWidget().setSelection(result.getOffset(), result.getOffset() + result.getLength());
 
         } catch (BadLocationException e) {
