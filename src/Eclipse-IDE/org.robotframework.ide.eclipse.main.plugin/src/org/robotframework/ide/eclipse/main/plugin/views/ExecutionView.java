@@ -1,8 +1,10 @@
 package org.robotframework.ide.eclipse.main.plugin.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -13,6 +15,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.IToolBarManager;
@@ -29,8 +32,14 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
@@ -58,6 +67,9 @@ import org.robotframework.red.graphics.ImagesManager;
  *
  */
 public class ExecutionView {
+    
+    @Inject
+    protected IEventBroker eventBroker;
     
     public static final String ID = "org.robotframework.ide.ExecutionView";
 
@@ -115,6 +127,8 @@ public class ExecutionView {
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
+        final Menu menu = createContextMenu();
+        executionViewer.getTree().addMouseListener(createMouseListener(menu));
         
         messageText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         messageText.setFont(JFaceResources.getTextFont());
@@ -197,33 +211,69 @@ public class ExecutionView {
                 if (event.getSelection() != null && event.getSelection() instanceof StructuredSelection) {
                     final StructuredSelection selection = (StructuredSelection) event.getSelection();
                     if (!selection.isEmpty()) {
-                        final ExecutionStatus executionStatus = (ExecutionStatus) selection.getFirstElement();
-                        if (executionStatus != null && executionStatus.getSource() != null) {
-                            final IPath sourcePath = new Path(executionStatus.getSource());
-                            final IFile sourceFile = ResourcesPlugin.getWorkspace()
-                                    .getRoot()
-                                    .getFileForLocation(sourcePath);
-                            if (sourceFile != null && sourceFile.exists()) {
-                                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-                                try {
-                                    final IEditorPart editor = PlatformUI.getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage()
-                                            .openEditor(new FileEditorInput(sourceFile), desc.getId());
-                                    if (editor instanceof RobotFormEditor) {
-                                        ((RobotFormEditor) editor).activateSourcePage();
-                                    }
-                                } catch (final PartInitException e) {
-                                    throw new RuntimeException("Unable to open editor for file: "
-                                            + sourceFile.getName(), e);
-                                }
-                            }
-                        }
+                        openExecutionStatusSourceFile((ExecutionStatus) selection.getFirstElement());
                     }
                 }
             }
         };
+    }
+    
+    private Menu createContextMenu() {
+        final Menu menu = new Menu(executionViewer.getTree());
+        final MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
+        cutItem.setText("Go to File");
+        cutItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
+        cutItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent event) {
+                final ExecutionStatus executionStatus = (ExecutionStatus) ((TreeSelection) executionViewer.getSelection()).getFirstElement();
+                openExecutionStatusSourceFile(executionStatus);
+            }
+        });
+        return menu;
+    }
+    
+    private MouseAdapter createMouseListener(final Menu menu) {
+        return new MouseAdapter() {
+
+            @Override
+            public void mouseDown(final MouseEvent e) {
+                if (e.button == 3 && executionViewer.getTree().getSelectionCount() == 1) {
+                    final TreeSelection selection = (TreeSelection) executionViewer.getSelection();
+                    if (selection != null
+                            && ((ExecutionStatus) selection.getFirstElement()).getType() == ExecutionElementType.TEST) {
+                        menu.setVisible(true);
+                    }
+                }
+            }
+        };
+    }
+    
+    private void openExecutionStatusSourceFile(final ExecutionStatus executionStatus) {
+        if (executionStatus != null && executionStatus.getSource() != null) {
+            final IPath sourcePath = new Path(executionStatus.getSource());
+            final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(sourcePath);
+            if (sourceFile != null && sourceFile.exists()) {
+                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
+                try {
+                    final IEditorPart editor = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow()
+                            .getActivePage()
+                            .openEditor(new FileEditorInput(sourceFile), desc.getId());
+                    if (editor instanceof RobotFormEditor) {
+                        ((RobotFormEditor) editor).activateSourcePage();
+                    }
+                    final Map<String, Object> eventMap = new HashMap<>();
+                    eventMap.put("testCaseName", executionStatus.getName());
+                    eventMap.put("fileName", sourceFile.getName());
+                    eventBroker.send("TextEditor/ShowTestCase", eventMap);
+                } catch (final PartInitException e) {
+                    throw new RuntimeException("Unable to open editor for file: " + sourceFile.getName(), e);
+                }
+            }
+        }
     }
     
     private void createToolbarActions(final IToolBarManager toolBarManager) {
