@@ -38,14 +38,20 @@ class KeywordRule implements IRule {
 		
 		final int c= scanner.read();
 		
-		if (columnConstraint == -1 || (columnConstraint == scanner.getColumn() - 1)) {
+		if (isColumnConstraintCompliant(scanner.getColumn(), prevCharBeforeKeyword)) {
     		
 		    if(isInKeyword((char) c, 1, tempKeywords)) {
     			if(keywordDetected(scanner)) {
     				final int nextCharAfterKeyword = scanner.read();
+    				int secondNextCharAfterKeyword = ICharacterScanner.EOF;
+    				if(nextCharAfterKeyword != ICharacterScanner.EOF && nextCharAfterKeyword != '\t') {
+    				    secondNextCharAfterKeyword = scanner.read();
+    				    scanner.unread();
+    				}
     				scanner.unread();
-    				if((isSeparator((char) nextCharAfterKeyword) || nextCharAfterKeyword == ICharacterScanner.EOF) && isSeparator(prevCharBeforeKeyword)) {
-    					return token;
+                    if (isSeparator((char) nextCharAfterKeyword) && isSeparator((char) secondNextCharAfterKeyword)
+                            && (isSeparator(prevCharBeforeKeyword) || columnConstraint == 0)) {
+                        return token;
     				} else {
     				    clearScanner(scanner, currentReadCount);
     				}
@@ -60,8 +66,22 @@ class KeywordRule implements IRule {
 		return Token.UNDEFINED;
 	}
 	
-	public void setColumnConstraint(int column) {
+	public void setColumnConstraint(final int column) {
 	    columnConstraint = column;
+	}
+	
+	private boolean isColumnConstraintCompliant(final int column, final char charBeforeKeyword) {
+	    
+	    if (columnConstraint > -1) {
+	        if(columnConstraint == (column - 1)) {
+	            return true;
+	        }
+	    } else {
+	        if(charBeforeKeyword == '\t' || (column - 1) > 1) {    //tab or 2 and more spaces after new line
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 	
 	private boolean keywordDetected(final ICharacterScanner scanner) {
@@ -141,11 +161,8 @@ class KeywordRule implements IRule {
 		return hasChar;
 	}
 	
-	private boolean isSeparator(final char c) {
-	    if(Character.isWhitespace(c) || !Character.isDefined(c)) {
-	        return true;
-	    }
-	    return false;
+    private boolean isSeparator(final char c) {
+	    return Character.isWhitespace(c) || c == ICharacterScanner.EOF || !Character.isDefined(c);
 	}
 
 }
