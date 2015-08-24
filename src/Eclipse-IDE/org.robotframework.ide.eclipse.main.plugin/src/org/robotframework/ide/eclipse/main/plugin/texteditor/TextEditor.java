@@ -41,15 +41,13 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IStatusLineManager;
-import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IInformationControl;
@@ -86,8 +84,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tray;
-import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.team.internal.ui.history.FileRevisionEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -100,10 +96,8 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.FindReplaceAction;
-import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -127,7 +121,6 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorSou
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorStatusLineManager;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorTextHover;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author mmarzec
@@ -458,6 +451,25 @@ public class TextEditor {
             viewer.getTextWidget().setLineBackground(breakpointLine, 1, null);
 	        breakpointLine = 0;
 	    }
+    }
+    
+    @Inject
+    @Optional
+    private void showTestCaseEvent(@UIEventTopic("TextEditor/ShowTestCase") final org.osgi.service.event.Event event) {
+        if (editedFile.getName().equals(event.getProperty("fileName"))) {
+            try {
+                final IRegion resultRegion = new FindReplaceDocumentAdapter(viewer.getDocument()).find(0,
+                        "^" + event.getProperty("testCaseName") + "\\b", true, true, false, true);
+                if (resultRegion != null) {
+                    final int topIndexPosition = viewer.getDocument().getLineOfOffset(resultRegion.getOffset());
+                    viewer.getTextWidget().setTopIndex(topIndexPosition);
+                    viewer.getTextWidget().setSelection(resultRegion.getOffset(),
+                            resultRegion.getOffset() + resultRegion.getLength());
+                }
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
     }
 	
 	private ParameterizedCommand createSaveAsCommand() {
