@@ -30,7 +30,6 @@ public class RulesGenerator {
     private IToken settingsToken;
     private IToken keywordToken;
     
-    private WordRule settingsSectionWordsRule;
     private WordRule asteriskWordRule;
     private WordRule testCasesSectionWordsRule;
     private WordRule keywordsSectionWordsRule;
@@ -40,15 +39,11 @@ public class RulesGenerator {
     private IRule keywordsSectionRule;
     private IRule variablesSectionRule;
     
-    private IRule scalarRule;
-    private IRule listRule;
-    private IRule dictionaryRule;
-    
     private IRule commentRule;
     
-    private IRule keywordsRule;
+    private KeywordRule keywordsRule;
     
-    private KeywordRule settingsSectionWordsWithSpaceRule;
+    private KeywordRule settingsSectionWordsRule;
     
     private List<IRule> commonRules = newArrayList();
     
@@ -56,7 +51,6 @@ public class RulesGenerator {
         createTokens(display);
         
         createSectionsRules();
-        createVariablesRules();
         createSettingsWordsRule();
         createKeywordRule(keywordList);
         createCommentRule();
@@ -67,7 +61,6 @@ public class RulesGenerator {
     public IRule[] getSettingsSectionRules() {
         List<IRule> rules = newArrayList();
         rules.add(settingsSectionWordsRule);
-        rules.add(settingsSectionWordsWithSpaceRule);
         rules.add(settingsSectionRule);
         rules.addAll(commonRules);
         
@@ -111,9 +104,15 @@ public class RulesGenerator {
     }
     
     private void fillCommonRules() {
+        
+        final SingleLineRule scalarRule = new SingleLineRule("${", "}", variableToken);
+        final SingleLineRule listRule = new SingleLineRule("@{", "}", variableToken);
+        final SingleLineRule dictionaryRule = new SingleLineRule("&{", "}", variableToken);
+        
         commonRules.add(scalarRule);
         commonRules.add(listRule);
         commonRules.add(dictionaryRule);
+        
         commonRules.add(commentRule);
         commonRules.add(asteriskWordRule);
     }
@@ -150,14 +149,12 @@ public class RulesGenerator {
     }
     
     private void createSettingsWordsRule() {
-        settingsSectionWordsRule = setupWordRule();
-        settingsSectionWordsRule.addWord("Library", settingsToken);
-        settingsSectionWordsRule.addWord("Resource", settingsToken);
-        settingsSectionWordsRule.addWord("Variables", settingsToken);
-        settingsSectionWordsRule.addWord("Documentation", settingsToken);
-        settingsSectionWordsRule.addWord("Metadata", settingsToken);
-        settingsSectionWordsRule.setColumnConstraint(0);
         final List<String> words = newArrayList();
+        words.add("Library");
+        words.add("Resource");
+        words.add("Variables");
+        words.add("Documentation");
+        words.add("Metadata");
         words.add("Suite Setup");
         words.add("Suite Teardown");
         words.add("Force Tags");
@@ -166,8 +163,8 @@ public class RulesGenerator {
         words.add("Test Teardown");
         words.add("Test Template");
         words.add("Test Timeout");
-        settingsSectionWordsWithSpaceRule = new KeywordRule(settingsToken, words);
-        settingsSectionWordsWithSpaceRule.setColumnConstraint(0);
+        settingsSectionWordsRule = new KeywordRule(settingsToken, words);
+        settingsSectionWordsRule.setColumnConstraint(0);
         
         
         testCasesSectionWordsRule = setupWordRule();
@@ -185,12 +182,6 @@ public class RulesGenerator {
         keywordsSectionWordsRule.addWord("[Return]", settingsToken);
         keywordsSectionWordsRule.addWord("[Teardown]", settingsToken);
         keywordsSectionWordsRule.addWord("[Timeout]", settingsToken);
-    }
-    
-    private void createVariablesRules() {
-        scalarRule = new SingleLineRule("${", "}", variableToken);
-        listRule = new SingleLineRule("@{", "}", variableToken);
-        dictionaryRule = new SingleLineRule("&{", "}", variableToken);
     }
     
     private void createCommentRule() {

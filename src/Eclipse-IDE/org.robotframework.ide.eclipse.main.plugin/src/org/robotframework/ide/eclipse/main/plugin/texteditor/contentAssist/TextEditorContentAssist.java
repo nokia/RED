@@ -20,7 +20,7 @@ import org.robotframework.red.graphics.ImagesManager;
 
 public class TextEditorContentAssist {
     
-    private static final String PROPOSAL_SEPARATOR = "  ";
+    private static final String PROPOSAL_SEPARATOR = "  ";  //placed after proposal text
     private static final String SECTION_PROPOSAL_SEPARATOR = "\n";
     private static Image variableImage = ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
 
@@ -267,7 +267,7 @@ public class TextEditorContentAssist {
     }
     
     public static boolean shouldShowVariablesProposals(final String currentWord) {
-        return currentWord.startsWith("$") || currentWord.startsWith("@") || currentWord.startsWith("$")
+        return currentWord.startsWith("$") || currentWord.startsWith("@") || currentWord.startsWith("&")
                 || currentWord.startsWith("{");
     }
 
