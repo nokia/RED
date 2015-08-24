@@ -116,7 +116,16 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private ILaunchConfiguration findLaunchConfiguration(final List<IResource> resources) throws CoreException {
-        for (final ILaunchConfiguration configuration : launchManager.getLaunchConfigurations(launchConfigurationType)) {
+        final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
+        if (resources.size() == 1) {
+            final String resourceName = resources.get(0).getName();
+            for (final ILaunchConfiguration configuration : launchConfigs) {
+                if (configuration.getName().equals(resourceName)) {
+                    return configuration;
+                }
+            }
+        }
+        for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             if (robotConfig.isSuitableFor(resources)) {
                 return configuration;
