@@ -90,8 +90,8 @@ public class VariableValueEditForm {
         this.isScalar = variable.getType() == RobotVariable.Type.SCALAR;
 
         Composite form = toolkit.createComposite(section);
-        GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(form);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(form);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(form);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 2).applyTo(form);
 
         createEditControls(form);
 
@@ -149,7 +149,7 @@ public class VariableValueEditForm {
         }
 
         table = tableViewer.getTable();
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+        GridDataFactory.fillDefaults().grab(true, true).minSize(1, 120).applyTo(table);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
     }
