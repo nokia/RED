@@ -143,6 +143,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/failures.png");
     }
     
+    public static ImageDescriptor getGoToImage() {
+        return RedPlugin.getImageDescriptor("resources/goto.png");
+    }
+    
     public static ImageDescriptor getTestPassImage() {
         return RedPlugin.getImageDescriptor("resources/testok.png");
     }
