@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
@@ -54,5 +55,11 @@ public class KeywordReturn extends AModelElement {
     @Override
     public ModelType getModelType() {
         return ModelType.USER_KEYWORD_RETURN;
+    }
+
+
+    @Override
+    public FilePosition getPosition() {
+        return getDeclaration().getFilePosition();
     }
 }

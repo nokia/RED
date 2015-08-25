@@ -106,4 +106,9 @@ public class RobotToken implements IRobotLineElement {
                 fp, text, types);
     }
 
+
+    @Override
+    public FilePosition getFilePosition() {
+        return fp;
+    }
 }
