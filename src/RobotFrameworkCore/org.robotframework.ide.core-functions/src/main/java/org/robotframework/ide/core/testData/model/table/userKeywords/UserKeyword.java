@@ -120,7 +120,7 @@ public class UserKeyword extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getKeywordName().getFilePosition();
     }
 }

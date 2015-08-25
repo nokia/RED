@@ -71,7 +71,7 @@ public class TestTemplate extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
 }

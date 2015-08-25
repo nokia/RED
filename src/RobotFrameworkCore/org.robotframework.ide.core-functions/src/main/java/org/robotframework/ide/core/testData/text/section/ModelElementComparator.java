@@ -26,9 +26,9 @@ public class ModelElementComparator implements Comparator<AModelElement> {
         int result = EQUAL;
 
         ModelType modelTypeO1 = o1.getModelType();
-        int positionO1 = o1.getPosition().getOffset();
+        int positionO1 = o1.getBeginPosition().getOffset();
         ModelType modelTypeO2 = o2.getModelType();
-        int positionO2 = o2.getPosition().getOffset();
+        int positionO2 = o2.getBeginPosition().getOffset();
 
         if (positionO1 != IRobotLineElement.NOT_SET
                 && positionO2 != IRobotLineElement.NOT_SET) {
