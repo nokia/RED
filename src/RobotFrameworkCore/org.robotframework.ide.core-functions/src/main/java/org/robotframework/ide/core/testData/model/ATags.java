@@ -50,7 +50,7 @@ public abstract class ATags extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return declaration.getFilePosition();
     }
 }

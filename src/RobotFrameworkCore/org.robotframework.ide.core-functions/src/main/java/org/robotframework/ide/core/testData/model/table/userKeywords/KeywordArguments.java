@@ -59,7 +59,7 @@ public class KeywordArguments extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
 }

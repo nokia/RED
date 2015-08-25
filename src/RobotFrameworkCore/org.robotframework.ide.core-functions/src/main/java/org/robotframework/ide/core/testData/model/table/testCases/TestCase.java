@@ -120,7 +120,7 @@ public class TestCase extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getTestName().getFilePosition();
     }
 }
