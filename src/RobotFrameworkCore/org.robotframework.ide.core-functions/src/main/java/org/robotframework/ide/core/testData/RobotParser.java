@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 public class RobotParser {
 
+    private boolean shouldEagerImport = false;
     private final RobotProjectHolder robotProject;
 
     private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
@@ -64,7 +65,7 @@ public class RobotParser {
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);
                     if (robotFile.getStatus() == Status.PASSED) {
-                        if (false) {
+                        if (shouldEagerImport) {
                             // eager get resources example
                             ResourceImporter resImporter = new ResourceImporter();
                             resImporter.importResources(this, robotFile);
@@ -80,5 +81,10 @@ public class RobotParser {
                 }
             }
         }
+    }
+
+
+    public void setEagerImport(final boolean shouldEagerImport) {
+        this.shouldEagerImport = shouldEagerImport;
     }
 }
