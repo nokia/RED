@@ -4,7 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class TableHeader extends AModelElement {
@@ -47,5 +50,25 @@ public class TableHeader extends AModelElement {
     @Override
     public boolean isPresent() {
         return (tableHeader != null);
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        ModelType type = ModelType.UNKNOWN;
+        if (isPresent()) {
+            IRobotTokenType tokenType = tableHeader.getTypes().get(0);
+            if (tokenType == RobotTokenType.SETTINGS_TABLE_HEADER) {
+                type = ModelType.SETTINGS_TABLE_HEADER;
+            } else if (tokenType == RobotTokenType.VARIABLES_TABLE_HEADER) {
+                type = ModelType.VARIABLES_TABLE_HEADER;
+            } else if (tokenType == RobotTokenType.TEST_CASES_TABLE_HEADER) {
+                type = ModelType.TEST_CASE_TABLE_HEADER;
+            } else if (tokenType == RobotTokenType.KEYWORDS_TABLE_HEADER) {
+                type = ModelType.KEYWORDS_TABLE_HEADER;
+            }
+        }
+
+        return type;
     }
 }

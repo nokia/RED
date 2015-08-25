@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -90,5 +91,24 @@ public abstract class AVariable extends AModelElement implements
         public RobotTokenType getType() {
             return type;
         }
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        ModelType modelType = ModelType.UNKNOWN;
+
+        if (type == VariableType.DICTIONARY) {
+            modelType = ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE;
+        } else if (type == VariableType.INVALID) {
+            modelType = ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE;
+        } else if (type == VariableType.LIST) {
+            modelType = ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE;
+        } else if (type == VariableType.SCALAR
+                || type == VariableType.SCALAR_AS_LIST) {
+            modelType = ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE;
+        }
+
+        return modelType;
     }
 }
