@@ -5,5 +5,6 @@ public abstract class AModelElement implements IOptional {
     public abstract ModelType getModelType();
 
 
-    public abstract FilePosition getPosition();
+    public abstract FilePosition getBeginPosition();
+
 }

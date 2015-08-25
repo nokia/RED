@@ -75,7 +75,7 @@ public class TableHeader extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         FilePosition pos = FilePosition.createNotSet();
         if (isPresent()) {
             pos = tableHeader.getFilePosition();

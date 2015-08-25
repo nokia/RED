@@ -45,7 +45,7 @@ public class LibraryAlias extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getLibraryAliasDeclaration().getFilePosition();
     }
 }
