@@ -2,6 +2,8 @@ package org.robotframework.ide.core.testData.text.read;
 
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
+
 
 public interface IRobotLineElement {
 
@@ -18,6 +20,9 @@ public interface IRobotLineElement {
 
 
     int getStartOffset();
+
+
+    FilePosition getFilePosition();
 
 
     StringBuilder getText();

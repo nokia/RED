@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -70,5 +71,15 @@ public class TableHeader extends AModelElement {
         }
 
         return type;
+    }
+
+
+    @Override
+    public FilePosition getPosition() {
+        FilePosition pos = FilePosition.createNotSet();
+        if (isPresent()) {
+            pos = tableHeader.getFilePosition();
+        }
+        return pos;
     }
 }

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
@@ -66,5 +67,11 @@ public class TestCaseTimeout extends AModelElement {
     @Override
     public ModelType getModelType() {
         return ModelType.TEST_CASE_TIMEOUT;
+    }
+
+
+    @Override
+    public FilePosition getPosition() {
+        return getDeclaration().getFilePosition();
     }
 }
