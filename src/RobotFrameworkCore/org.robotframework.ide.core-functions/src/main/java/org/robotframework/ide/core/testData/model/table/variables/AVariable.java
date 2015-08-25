@@ -115,7 +115,7 @@ public abstract class AVariable extends AModelElement implements
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
 }

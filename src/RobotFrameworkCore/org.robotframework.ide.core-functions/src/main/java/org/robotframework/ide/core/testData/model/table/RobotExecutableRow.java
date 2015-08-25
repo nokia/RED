@@ -64,7 +64,7 @@ public class RobotExecutableRow extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getAction().getFilePosition();
     }
 }

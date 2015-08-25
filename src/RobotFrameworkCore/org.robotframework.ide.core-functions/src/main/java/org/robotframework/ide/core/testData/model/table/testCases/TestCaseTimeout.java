@@ -71,7 +71,7 @@ public class TestCaseTimeout extends AModelElement {
 
 
     @Override
-    public FilePosition getPosition() {
+    public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
 }
