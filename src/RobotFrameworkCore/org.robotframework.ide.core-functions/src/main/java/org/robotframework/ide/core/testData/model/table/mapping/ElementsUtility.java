@@ -20,6 +20,45 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class ElementsUtility {
 
+    public boolean isComment(final RobotLine line) {
+        boolean result = false;
+        for (IRobotLineElement elem : line.getLineElements()) {
+            List<IRobotTokenType> types = elem.getTypes();
+            if (types.isEmpty()) {
+                result = false;
+                break;
+            } else {
+                IRobotTokenType tokenType = types.get(0);
+                if (tokenType == SeparatorType.PIPE
+                        || tokenType == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+                    continue;
+                } else if (tokenType == RobotTokenType.START_HASH_COMMENT) {
+                    result = true;
+                    break;
+                } else {
+                    result = false;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    public boolean isTableSection(final RobotLine line) {
+        boolean result = false;
+        for (IRobotLineElement elem : line.getLineElements()) {
+            if (isTableHeader(elem)) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
     public ParsingState findNearestNotCommentState(
             final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;

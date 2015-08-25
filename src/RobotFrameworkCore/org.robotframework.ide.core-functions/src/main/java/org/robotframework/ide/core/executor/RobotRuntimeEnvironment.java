@@ -718,11 +718,14 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public void startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
+    public void startTestRunnerAgentHandler(final int port,
+            final ILineHandler lineHandler,
             final IExecutionHandler executionHandler) {
-        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
+        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(
+                port);
         testRunnerAgentHandler.addListener(new MessageLogParser(lineHandler));
-        testRunnerAgentHandler.addListener(new ExecutionElementsParser(executionHandler));
+        testRunnerAgentHandler.addListener(new ExecutionElementsParser(
+                executionHandler));
         final Thread handlerThread = new Thread(testRunnerAgentHandler);
         handlerThread.start();
     }

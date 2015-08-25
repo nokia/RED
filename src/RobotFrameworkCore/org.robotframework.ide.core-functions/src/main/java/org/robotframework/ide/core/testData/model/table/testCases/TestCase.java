@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
@@ -108,5 +109,11 @@ public class TestCase extends AModelElement {
     @Override
     public boolean isPresent() {
         return true;
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        return ModelType.TEST_CASE;
     }
 }
