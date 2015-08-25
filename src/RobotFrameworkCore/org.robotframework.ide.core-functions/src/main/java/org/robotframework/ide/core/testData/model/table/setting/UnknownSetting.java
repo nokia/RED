@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
@@ -36,5 +37,11 @@ public class UnknownSetting extends AModelElement {
 
     public void addTrash(final RobotToken trash) {
         trashs.add(trash);
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        return ModelType.SETTINGS_UNKNOWN;
     }
 }

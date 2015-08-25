@@ -4,7 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class RobotExecutableRow extends AModelElement {
@@ -41,5 +44,20 @@ public class RobotExecutableRow extends AModelElement {
     @Override
     public boolean isPresent() {
         return true;
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        ModelType type = ModelType.UNKNOWN;
+
+        List<IRobotTokenType> types = getAction().getTypes();
+        if (types.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
+            type = ModelType.TEST_CASE_EXECUTABLE_ROW;
+        } else if (types.contains(RobotTokenType.KEYWORD_ACTION_NAME)) {
+            type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        }
+
+        return type;
     }
 }
