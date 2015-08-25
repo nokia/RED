@@ -185,10 +185,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // '|' pipe separator
                             if (remainingData > 0) {
                                 rt = processLineElement(line, processingState,
-                                        parsingOutput,
-                                        new FilePosition(lineNumber,
-                                                lastColumnProcessed),
-                                        text.substring(lastColumnProcessed,
+                                        parsingOutput, new FilePosition(
+                                                lineNumber,
+                                                lastColumnProcessed,
+                                                currentOffset), text.substring(
+                                                lastColumnProcessed,
                                                 startColumn),
                                         robotFile.getName(), isNewLine);
                                 rt.setStartOffset(currentOffset);
@@ -211,9 +212,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                         .remove(ParsingState.KEYWORD_DECLARATION);
                             }
 
-                            rt = processLineElement(line, processingState,
-                                    parsingOutput, new FilePosition(lineNumber,
-                                            lastColumnProcessed),
+                            rt = processLineElement(
+                                    line,
+                                    processingState,
+                                    parsingOutput,
+                                    new FilePosition(lineNumber,
+                                            lastColumnProcessed, currentOffset),
                                     text.substring(lastColumnProcessed),
                                     robotFile.getName(), isNewLine);
                             rt.setStartOffset(currentOffset);
