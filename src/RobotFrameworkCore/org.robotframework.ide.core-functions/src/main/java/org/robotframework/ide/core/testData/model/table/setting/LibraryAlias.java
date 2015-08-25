@@ -1,6 +1,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
@@ -33,5 +34,11 @@ public class LibraryAlias extends AModelElement {
     @Override
     public boolean isPresent() {
         return (libraryAliasDeclaration != null);
+    }
+
+
+    @Override
+    public ModelType getModelType() {
+        return ModelType.LIBRARY_IMPORT_ALIAS_SETTING;
     }
 }

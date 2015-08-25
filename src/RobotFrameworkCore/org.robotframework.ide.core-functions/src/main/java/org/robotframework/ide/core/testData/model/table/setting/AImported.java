@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
@@ -52,5 +53,20 @@ public abstract class AImported extends AModelElement {
 
     public Type getType() {
         return type;
+    }
+
+
+    public ModelType getModelType() {
+        ModelType modelType = ModelType.UNKNOWN;
+
+        if (type == Type.LIBRARY) {
+            modelType = ModelType.LIBRARY_IMPORT_SETTING;
+        } else if (type == Type.RESOURCE) {
+            modelType = ModelType.RESOURCE_IMPORT_SETTING;
+        } else if (type == Type.VARIABLES) {
+            modelType = ModelType.VARIABLES_IMPORT_SETTING;
+        }
+
+        return modelType;
     }
 }
