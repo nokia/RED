@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -59,5 +60,11 @@ public class RobotExecutableRow extends AModelElement {
         }
 
         return type;
+    }
+
+
+    @Override
+    public FilePosition getPosition() {
+        return getAction().getFilePosition();
     }
 }

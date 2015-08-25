@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.testData.model;
 
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+
+
 public class FilePosition {
 
     private final int line;
@@ -35,4 +38,9 @@ public class FilePosition {
                 line, column, offset);
     }
 
+
+    public static FilePosition createNotSet() {
+        int NOT_SET = IRobotLineElement.NOT_SET;
+        return new FilePosition(NOT_SET, NOT_SET, NOT_SET);
+    }
 }

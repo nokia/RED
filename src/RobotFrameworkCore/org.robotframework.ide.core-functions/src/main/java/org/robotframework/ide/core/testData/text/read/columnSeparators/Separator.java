@@ -4,15 +4,14 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 
 
 public class Separator implements IRobotLineElement {
 
-    private int lineNumber = NOT_SET;
-    private int startColumn = NOT_SET;
-    private int startOffset = NOT_SET;
+    private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
@@ -37,40 +36,46 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public int getLineNumber() {
-        return lineNumber;
+        return fp.getLine();
     }
 
 
     public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
+        fp = new FilePosition(lineNumber, fp.getColumn(), fp.getOffset());
     }
 
 
     @Override
     public int getStartColumn() {
-        return startColumn;
+        return fp.getColumn();
     }
 
 
     public void setStartColumn(int startColumn) {
-        this.startColumn = startColumn;
-    }
-
-
-    public void setStartOffset(int startOffset) {
-        this.startOffset = startOffset;
-    }
-
-
-    @Override
-    public int getStartOffset() {
-        return startOffset;
+        fp = new FilePosition(fp.getLine(), startColumn, fp.getOffset());
     }
 
 
     @Override
     public int getEndColumn() {
-        return startColumn + text.length();
+        int endColumn = NOT_SET;
+
+        if (fp.getColumn() != NOT_SET) {
+            endColumn = fp.getColumn() + text.length();
+        }
+
+        return endColumn;
+    }
+
+
+    public void setStartOffset(int startOffset) {
+        fp = new FilePosition(fp.getLine(), fp.getColumn(), startOffset);
+    }
+
+
+    @Override
+    public int getStartOffset() {
+        return fp.getOffset();
     }
 
 
@@ -112,7 +117,13 @@ public class Separator implements IRobotLineElement {
     @Override
     public String toString() {
         return String
-                .format("Separator [lineNumber=%s, startColumn=%s, startOffset=%s, text=%s, type=%s]",
-                        lineNumber, startColumn, startOffset, text, type);
+                .format("Separator [filePos=%s, startColumn=%s, startOffset=%s, text=%s, type=%s]",
+                        fp, text, type);
+    }
+
+
+    @Override
+    public FilePosition getFilePosition() {
+        return fp;
     }
 }

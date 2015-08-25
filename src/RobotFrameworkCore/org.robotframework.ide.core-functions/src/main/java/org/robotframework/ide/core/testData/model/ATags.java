@@ -47,4 +47,10 @@ public abstract class ATags extends AModelElement {
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
+
+
+    @Override
+    public FilePosition getPosition() {
+        return declaration.getFilePosition();
+    }
 }
