@@ -16,6 +16,7 @@ public class VariablesFileImportReference {
     private VariablesImport importDeclaration;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private File variablesFile;
+    @SuppressWarnings("rawtypes")
     private List<AVariableImported> variables = new LinkedList<>();
 
 
@@ -40,6 +41,7 @@ public class VariablesFileImportReference {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public List<AVariableImported> getVariables() {
         return variables;
     }
@@ -55,6 +57,7 @@ public class VariablesFileImportReference {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public void map(final Map<?, ?> varsRead) {
         Set<?> variablesNames = varsRead.keySet();
         for (Object varName : variablesNames) {
@@ -82,8 +85,9 @@ public class VariablesFileImportReference {
     }
 
 
-    private Map<String, Object> convert(Map m) {
+    private Map<String, Object> convert(@SuppressWarnings("rawtypes") Map m) {
         Map<String, Object> map = new LinkedHashMap<>();
+        @SuppressWarnings("rawtypes")
         Set keySet = m.keySet();
         for (Object key : keySet) {
             map.put("" + key, m.get(key));

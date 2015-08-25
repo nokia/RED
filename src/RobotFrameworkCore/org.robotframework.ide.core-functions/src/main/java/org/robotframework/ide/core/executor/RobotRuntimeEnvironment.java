@@ -753,6 +753,7 @@ public class RobotRuntimeEnvironment {
                 && Objects.equals(version, other.version);
     }
 
+    @SuppressWarnings("serial")
     public static class RobotEnvironmentException extends Exception {
 
         public RobotEnvironmentException(final String message) {
@@ -766,6 +767,7 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    @SuppressWarnings("serial")
     public static class PythonInstallationDirectory extends File {
 
         private final SuiteExecutor interpreter;
