@@ -4,11 +4,13 @@ public class FilePosition {
 
     private final int line;
     private final int column;
+    private final int offset;
 
 
-    public FilePosition(int line, int column) {
+    public FilePosition(int line, int column, int offset) {
         this.line = line;
         this.column = column;
+        this.offset = offset;
     }
 
 
@@ -22,9 +24,15 @@ public class FilePosition {
     }
 
 
+    public int getOffset() {
+        return offset;
+    }
+
+
     @Override
     public String toString() {
-        return String.format("FilePosition [line=%s, column=%s]", line, column);
+        return String.format("FilePosition [line=%s, column=%s, offset=%s]",
+                line, column, offset);
     }
 
 }
