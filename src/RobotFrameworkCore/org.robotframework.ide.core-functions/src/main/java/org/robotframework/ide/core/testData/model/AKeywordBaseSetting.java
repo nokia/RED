@@ -58,4 +58,10 @@ public abstract class AKeywordBaseSetting extends AModelElement {
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
+
+
+    @Override
+    public FilePosition getPosition() {
+        return getDeclaration().getFilePosition();
+    }
 }
