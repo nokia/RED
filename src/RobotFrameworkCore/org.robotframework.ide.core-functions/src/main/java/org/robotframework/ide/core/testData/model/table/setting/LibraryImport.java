@@ -41,4 +41,22 @@ public class LibraryImport extends AImported {
     public boolean isPresent() {
         return true; // TODO: check if correct imported
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            RobotToken pathOrName = getPathOrName();
+            if (pathOrName != null) {
+                tokens.add(pathOrName);
+            }
+            tokens.addAll(getArguments());
+            tokens.addAll(getAlias().getElementTokens());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

@@ -28,6 +28,23 @@ public class VariablesImport extends AImported {
 
     @Override
     public boolean isPresent() {
-        return true; // TODO: check if correct imported
+        return (getDeclaration() != null);
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            RobotToken pathOrName = getPathOrName();
+            if (pathOrName != null) {
+                tokens.add(pathOrName);
+            }
+            tokens.addAll(getArguments());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
     }
 }

@@ -82,4 +82,17 @@ public class TableHeader extends AModelElement {
         }
         return pos;
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getTableHeader());
+            tokens.addAll(getColumnNames());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

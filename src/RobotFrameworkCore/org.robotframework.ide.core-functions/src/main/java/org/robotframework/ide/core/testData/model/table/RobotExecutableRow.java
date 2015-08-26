@@ -67,4 +67,14 @@ public class RobotExecutableRow extends AModelElement {
     public FilePosition getBeginPosition() {
         return getAction().getFilePosition();
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        tokens.add(getAction());
+        tokens.addAll(getArguments());
+
+        return tokens;
+    }
 }

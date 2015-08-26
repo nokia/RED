@@ -74,4 +74,20 @@ public class TestTemplate extends AModelElement {
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            if (getKeywordName() != null) {
+                tokens.add(getKeywordName());
+            }
+            tokens.addAll(getUnexpectedTrashArguments());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }
