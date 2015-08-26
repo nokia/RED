@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
@@ -109,7 +111,7 @@ public class UserKeyword extends AModelElement {
 
     @Override
     public boolean isPresent() {
-        return true;
+        return (getKeywordName() != null);
     }
 
 
@@ -122,5 +124,48 @@ public class UserKeyword extends AModelElement {
     @Override
     public FilePosition getBeginPosition() {
         return getKeywordName().getFilePosition();
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            if (getKeywordName() != null) {
+                tokens.add(getKeywordName());
+            }
+
+            for (KeywordDocumentation doc : documentation) {
+                tokens.addAll(doc.getElementTokens());
+            }
+
+            for (KeywordArguments arguments : keywordArguments) {
+                tokens.addAll(arguments.getElementTokens());
+            }
+
+            for (RobotExecutableRow row : keywordContext) {
+                tokens.addAll(row.getElementTokens());
+            }
+
+            for (KeywordReturn returns : keywordReturns) {
+                tokens.addAll(returns.getElementTokens());
+            }
+
+            for (KeywordTags tag : tags) {
+                tokens.addAll(tag.getElementTokens());
+            }
+
+            for (KeywordTeardown teardown : teardowns) {
+                tokens.addAll(teardown.getElementTokens());
+            }
+
+            for (KeywordTimeout timeout : timeouts) {
+                tokens.addAll(timeout.getElementTokens());
+            }
+
+            Collections.sort(tokens, new RobotTokenPositionComparator());
+        }
+
+        return tokens;
     }
 }

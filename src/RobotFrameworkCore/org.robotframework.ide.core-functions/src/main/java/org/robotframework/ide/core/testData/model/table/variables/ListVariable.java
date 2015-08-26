@@ -28,6 +28,19 @@ public class ListVariable extends AVariable {
 
     @Override
     public boolean isPresent() {
-        return true;
+        return (getDeclaration() != null);
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            tokens.addAll(getItems());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
     }
 }

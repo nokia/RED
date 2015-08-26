@@ -30,4 +30,20 @@ public class UnknownVariable extends AVariable {
     public boolean isPresent() {
         return true;
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            if (getDeclaration() != null) {
+                tokens.add(getDeclaration());
+            }
+
+            tokens.addAll(getItems());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

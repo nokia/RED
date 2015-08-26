@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.testCases;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
@@ -109,7 +111,7 @@ public class TestCase extends AModelElement {
 
     @Override
     public boolean isPresent() {
-        return true;
+        return (getTestName() != null);
     }
 
 
@@ -122,5 +124,48 @@ public class TestCase extends AModelElement {
     @Override
     public FilePosition getBeginPosition() {
         return getTestName().getFilePosition();
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            if (getTestName() != null) {
+                tokens.add(getTestName());
+            }
+
+            for (TestDocumentation doc : documentation) {
+                tokens.addAll(doc.getElementTokens());
+            }
+
+            for (TestCaseSetup setup : setups) {
+                tokens.addAll(setup.getElementTokens());
+            }
+
+            for (TestCaseTags tag : tags) {
+                tokens.addAll(tag.getElementTokens());
+            }
+
+            for (TestCaseTeardown teardown : teardowns) {
+                tokens.addAll(teardown.getElementTokens());
+            }
+
+            for (TestCaseTemplate template : templates) {
+                tokens.addAll(template.getElementTokens());
+            }
+
+            for (RobotExecutableRow row : testContext) {
+                tokens.addAll(row.getElementTokens());
+            }
+
+            for (TestCaseTimeout timeout : timeouts) {
+                tokens.addAll(timeout.getElementTokens());
+            }
+
+            Collections.sort(tokens, new RobotTokenPositionComparator());
+        }
+
+        return tokens;
     }
 }
