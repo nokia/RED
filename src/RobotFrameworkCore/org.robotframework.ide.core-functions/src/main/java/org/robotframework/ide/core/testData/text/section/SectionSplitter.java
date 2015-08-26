@@ -7,6 +7,8 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 
 
 public class SectionSplitter {
@@ -19,11 +21,27 @@ public class SectionSplitter {
     private List<AModelElement> dumpSettings(final RobotFile model) {
         List<AModelElement> dump = new LinkedList<>();
 
-        List<AModelElement> temp = dumpSettingsAsNew(model.getSettingTable());
+        SettingTable settingTable = model.getSettingTable();
+        List<AModelElement> temp = dumpSettingsAsNew(settingTable);
         Collections.sort(temp, new ModelElementComparator(
                 new SettingTableElementsPriorities()));
 
+        correctMetadataPosition(temp, settingTable);
+        correctImportPosition(temp, settingTable);
         return dump;
+    }
+
+
+    private void correctImportPosition(List<AModelElement> temp,
+            SettingTable settingTable) {
+        List<AImported> imports = settingTable.getImports();
+
+    }
+
+
+    private void correctMetadataPosition(List<AModelElement> temp,
+            SettingTable settingTable) {
+        List<Metadata> metadatas = settingTable.getMetadatas();
     }
 
 

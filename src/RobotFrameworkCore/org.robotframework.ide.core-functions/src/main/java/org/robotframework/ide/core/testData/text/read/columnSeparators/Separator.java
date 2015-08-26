@@ -116,9 +116,8 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public String toString() {
-        return String
-                .format("Separator [filePos=%s, startColumn=%s, startOffset=%s, text=%s, type=%s]",
-                        fp, text, type);
+        return String.format("Separator [filePos=%s, text=%s, type=%s]", fp,
+                text, type);
     }
 
 
