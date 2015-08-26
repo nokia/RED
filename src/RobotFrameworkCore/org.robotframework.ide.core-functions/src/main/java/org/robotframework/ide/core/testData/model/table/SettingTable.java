@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<AImported> getImports() {
-        return imports;
+        return Collections.unmodifiableList(imports);
     }
 
 
@@ -54,7 +55,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<SuiteDocumentation> getDocumentation() {
-        return documentations;
+        return Collections.unmodifiableList(documentations);
     }
 
 
@@ -64,7 +65,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<Metadata> getMetadatas() {
-        return metadatas;
+        return Collections.unmodifiableList(metadatas);
     }
 
 
@@ -74,7 +75,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<SuiteSetup> getSuiteSetups() {
-        return suiteSetups;
+        return Collections.unmodifiableList(suiteSetups);
     }
 
 
@@ -84,7 +85,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<SuiteTeardown> getSuiteTeardowns() {
-        return suiteTeardowns;
+        return Collections.unmodifiableList(suiteTeardowns);
     }
 
 
@@ -94,7 +95,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<ForceTags> getForceTags() {
-        return forceTags;
+        return Collections.unmodifiableList(forceTags);
     }
 
 
@@ -104,7 +105,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<DefaultTags> getDefaultTags() {
-        return defaultTags;
+        return Collections.unmodifiableList(defaultTags);
     }
 
 
@@ -114,7 +115,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<TestSetup> getTestSetups() {
-        return testSetups;
+        return Collections.unmodifiableList(testSetups);
     }
 
 
@@ -124,7 +125,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<TestTeardown> getTestTeardowns() {
-        return testTeardowns;
+        return Collections.unmodifiableList(testTeardowns);
     }
 
 
@@ -134,7 +135,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<TestTemplate> getTestTemplates() {
-        return testTemplates;
+        return Collections.unmodifiableList(testTemplates);
     }
 
 
@@ -144,7 +145,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<TestTimeout> getTestTimeouts() {
-        return testTimeouts;
+        return Collections.unmodifiableList(testTimeouts);
     }
 
 
@@ -154,7 +155,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public List<UnknownSetting> getUnknownSettings() {
-        return unknownSettings;
+        return Collections.unmodifiableList(unknownSettings);
     }
 
 

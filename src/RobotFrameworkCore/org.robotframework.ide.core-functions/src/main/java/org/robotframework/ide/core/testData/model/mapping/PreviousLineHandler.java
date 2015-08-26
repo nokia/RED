@@ -36,10 +36,11 @@ public class PreviousLineHandler {
 
         if (isNewLine) {
             if (currentToken.getTypes().contains(
-                    RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                    RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                    || isCommentContinue(currentToken, storedStack)) {
+                ParsingState currentState = utility
+                        .getCurrentStatus(parsingStates);
                 if (isSomethingToContinue(model, currentLine)) {
-                    ParsingState currentState = utility
-                            .getCurrentStatus(parsingStates);
                     if (utility.isTheFirstColumn(currentLine, currentToken)) {
                         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
                             if (containsAnySetting(model)) {
@@ -74,6 +75,21 @@ public class PreviousLineHandler {
         }
 
         return continueType;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isCommentContinue(RobotToken currentToken,
+            Stack<ParsingState> storedStack) {
+        boolean result = false;
+
+        if (currentToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            if (!storedStack.isEmpty()) {
+                result = storedStack.get(storedStack.size() - 1) == ParsingState.COMMENT;
+            }
+        }
+
+        return result;
     }
 
 

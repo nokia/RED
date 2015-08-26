@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class KeywordArguments extends AModelElement {
 
 
     public List<RobotToken> getArguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
 
@@ -43,7 +44,7 @@ public class KeywordArguments extends AModelElement {
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 

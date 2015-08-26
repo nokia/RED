@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class DictionaryVariable extends AVariable {
 
 
     public List<DictionaryKeyValuePair> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
 

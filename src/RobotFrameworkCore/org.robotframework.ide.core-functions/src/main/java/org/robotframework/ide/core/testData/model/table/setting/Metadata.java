@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,12 +39,12 @@ public class Metadata extends AModelElement {
 
 
     public List<RobotToken> getValues() {
-        return values;
+        return Collections.unmodifiableList(values);
     }
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 

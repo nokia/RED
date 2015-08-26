@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class UnknownSetting extends AModelElement {
 
 
     public List<RobotToken> getTrashs() {
-        return trashs;
+        return Collections.unmodifiableList(trashs);
     }
 
 
