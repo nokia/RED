@@ -142,7 +142,7 @@ public class ElementsUtility {
                 result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
                         .getStartColumn() == 0);
             } else {
-                result = true;
+                result = (robotToken.getStartColumn() == 0);
             }
         }
 
