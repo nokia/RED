@@ -9,7 +9,6 @@ import java.nio.file.StandardCopyOption;
 
 import org.robotframework.ide.core.testData.IRobotFileDumper;
 import org.robotframework.ide.core.testData.model.RobotFile;
-import org.robotframework.ide.core.testData.text.section.SectionSplitter;
 
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
@@ -35,8 +34,6 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
     public StringBuilder dump(final RobotFile model) {
         StringBuilder str = new StringBuilder();
-        SectionSplitter splitter = new SectionSplitter();
-        splitter.getSections(model);
 
         return str;
     }
