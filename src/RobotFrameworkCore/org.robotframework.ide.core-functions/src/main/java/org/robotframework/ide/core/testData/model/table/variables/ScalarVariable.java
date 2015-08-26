@@ -28,7 +28,7 @@ public class ScalarVariable extends AVariable {
 
     @Override
     public boolean isPresent() {
-        return true;
+        return (getDeclaration() != null);
     }
 
 
@@ -41,5 +41,18 @@ public class ScalarVariable extends AVariable {
         }
 
         return type;
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            tokens.addAll(getValues());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
     }
 }

@@ -64,4 +64,20 @@ public abstract class AKeywordBaseSetting extends AModelElement {
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            if (getKeywordName() != null) {
+                tokens.add(getKeywordName());
+            }
+            tokens.addAll(getArguments());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

@@ -53,4 +53,17 @@ public abstract class ATags extends AModelElement {
     public FilePosition getBeginPosition() {
         return declaration.getFilePosition();
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            tokens.addAll(getTags());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

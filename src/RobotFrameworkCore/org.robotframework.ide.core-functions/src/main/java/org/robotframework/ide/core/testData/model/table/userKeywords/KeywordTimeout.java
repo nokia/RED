@@ -74,4 +74,17 @@ public class KeywordTimeout extends AModelElement {
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            tokens.addAll(getMessage());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
 }

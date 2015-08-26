@@ -1,5 +1,8 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
@@ -47,5 +50,19 @@ public class LibraryAlias extends AModelElement {
     @Override
     public FilePosition getBeginPosition() {
         return getLibraryAliasDeclaration().getFilePosition();
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getLibraryAliasDeclaration());
+            if (getLibraryAlias() != null) {
+                tokens.add(getLibraryAlias());
+            }
+        }
+
+        return tokens;
     }
 }
