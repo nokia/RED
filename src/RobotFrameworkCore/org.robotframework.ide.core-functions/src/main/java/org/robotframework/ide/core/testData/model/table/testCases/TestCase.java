@@ -45,7 +45,7 @@ public class TestCase extends AModelElement {
 
 
     public List<RobotExecutableRow> getTestExecutionRows() {
-        return testContext;
+        return Collections.unmodifiableList(testContext);
     }
 
 
@@ -55,7 +55,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestDocumentation> getDocumentation() {
-        return documentation;
+        return Collections.unmodifiableList(documentation);
     }
 
 
@@ -65,7 +65,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestCaseTags> getTags() {
-        return tags;
+        return Collections.unmodifiableList(tags);
     }
 
 
@@ -75,7 +75,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestCaseSetup> getSetups() {
-        return setups;
+        return Collections.unmodifiableList(setups);
     }
 
 
@@ -85,7 +85,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestCaseTeardown> getTeardowns() {
-        return teardowns;
+        return Collections.unmodifiableList(teardowns);
     }
 
 
@@ -95,7 +95,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestCaseTemplate> getTemplates() {
-        return templates;
+        return Collections.unmodifiableList(templates);
     }
 
 
@@ -105,7 +105,7 @@ public class TestCase extends AModelElement {
 
 
     public List<TestCaseTimeout> getTimeouts() {
-        return timeouts;
+        return Collections.unmodifiableList(timeouts);
     }
 
 

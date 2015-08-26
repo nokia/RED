@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class RobotFile {
 
 
     public List<RobotLine> getFileContent() {
-        return fileContent;
+        return Collections.unmodifiableList(fileContent);
     }
 
 

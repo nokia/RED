@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public abstract class AKeywordBaseSetting extends AModelElement {
 
 
     public List<RobotToken> getArguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
 
@@ -51,7 +52,7 @@ public abstract class AKeywordBaseSetting extends AModelElement {
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 

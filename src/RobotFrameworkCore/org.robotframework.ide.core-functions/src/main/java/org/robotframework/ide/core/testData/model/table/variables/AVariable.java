@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public abstract class AVariable extends AModelElement implements
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 
