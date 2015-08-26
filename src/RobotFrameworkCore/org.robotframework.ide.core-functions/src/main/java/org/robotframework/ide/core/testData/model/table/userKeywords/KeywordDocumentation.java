@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,12 +28,12 @@ public class KeywordDocumentation extends AModelElement {
 
 
     public List<RobotToken> getDocumentationText() {
-        return text;
+        return Collections.unmodifiableList(text);
     }
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 

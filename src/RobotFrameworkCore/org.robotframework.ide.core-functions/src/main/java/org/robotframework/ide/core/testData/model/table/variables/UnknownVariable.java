@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class UnknownVariable extends AVariable {
 
 
     public List<RobotToken> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
 

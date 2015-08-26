@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class VariablesImport extends AImported {
 
 
     public List<RobotToken> getArguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
 

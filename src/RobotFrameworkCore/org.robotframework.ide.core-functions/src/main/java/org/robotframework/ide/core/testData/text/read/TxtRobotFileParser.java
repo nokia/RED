@@ -397,10 +397,15 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 .computeLineContinue(processingState, isNewLine,
                         robotFileOutput.getFileModel(), currentLine, robotToken);
 
+        boolean processThisElement = true;
         if (previousLineHandler.isSomethingToDo(lineContinueType)) {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
-        } else {
+
+            processThisElement = (processingState.size() > 1);
+        }
+
+        if (processThisElement) {
             ParsingState newStatus = utility.getStatus(robotToken);
             if (robotToken != null) {
                 if (!text.equals(robotToken.getText().toString())) {
@@ -501,10 +506,16 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 }
             } else {
                 ParsingState state = utility.getCurrentStatus(processingState);
-                for (RobotToken rt : robotTokens) {
-                    if (isTypeForState(state, rt)) {
-                        correct = rt;
-                        break;
+
+                RobotToken comment = findCommentToken(robotTokens, text);
+                if (comment != null) {
+                    correct = comment;
+                } else {
+                    for (RobotToken rt : robotTokens) {
+                        if (isTypeForState(state, rt)) {
+                            correct = rt;
+                            break;
+                        }
                     }
                 }
 
@@ -518,6 +529,24 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return correct;
+    }
+
+
+    private RobotToken findCommentToken(List<RobotToken> robotTokens,
+            String text) {
+        RobotToken comment = null;
+        for (RobotToken rt : robotTokens) {
+            List<IRobotTokenType> types = rt.getTypes();
+            if (types.contains(RobotTokenType.START_HASH_COMMENT)
+                    || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+                if (text.equals(rt.getRaw().toString())) {
+                    comment = rt;
+                    break;
+                }
+            }
+        }
+
+        return comment;
     }
 
 

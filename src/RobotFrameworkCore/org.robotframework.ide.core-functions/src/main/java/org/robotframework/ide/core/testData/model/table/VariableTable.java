@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class VariableTable extends ARobotSectionTable {
 
 
     public List<IVariableHolder> getVariables() {
-        return variables;
+        return Collections.unmodifiableList(variables);
     }
 
 

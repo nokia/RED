@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public abstract class ARobotSectionTable implements IOptional {
 
 
     public List<TableHeader> getHeaders() {
-        return headers;
+        return Collections.unmodifiableList(headers);
     }
 
 

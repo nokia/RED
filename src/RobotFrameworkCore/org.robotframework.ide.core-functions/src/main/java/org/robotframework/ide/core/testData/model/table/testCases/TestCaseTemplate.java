@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.testCases;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class TestCaseTemplate extends AModelElement {
 
 
     public List<RobotToken> getUnexpectedTrashArguments() {
-        return unexpectedTrashArguments;
+        return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
 
@@ -55,7 +56,7 @@ public class TestCaseTemplate extends AModelElement {
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 
