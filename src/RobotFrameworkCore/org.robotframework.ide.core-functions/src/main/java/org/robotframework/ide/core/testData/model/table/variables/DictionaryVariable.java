@@ -29,7 +29,7 @@ public class DictionaryVariable extends AVariable {
 
     @Override
     public boolean isPresent() {
-        return true;
+        return (getDeclaration() != null);
     }
 
     public static class DictionaryKeyValuePair {
@@ -76,5 +76,22 @@ public class DictionaryVariable extends AVariable {
             this.raw = raw;
         }
 
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            for (DictionaryKeyValuePair p : items) {
+                if (p.getRaw() != null) {
+                    tokens.add(p.getRaw());
+                }
+            }
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
     }
 }

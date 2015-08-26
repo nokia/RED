@@ -59,7 +59,7 @@ public class Metadata extends AModelElement {
 
     @Override
     public boolean isPresent() {
-        return true; // TODO: check if correct declaration and etc
+        return (getDeclaration() != null);
     }
 
 
@@ -72,5 +72,21 @@ public class Metadata extends AModelElement {
     @Override
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
+    }
+
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        List<RobotToken> tokens = new LinkedList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            if (getKey() != null) {
+                tokens.add(getKey());
+            }
+            tokens.addAll(getValues());
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
     }
 }
