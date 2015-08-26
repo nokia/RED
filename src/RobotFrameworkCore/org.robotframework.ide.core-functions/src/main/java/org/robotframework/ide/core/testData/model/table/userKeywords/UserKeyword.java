@@ -45,7 +45,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<RobotExecutableRow> getKeywordExecutionRows() {
-        return keywordContext;
+        return Collections.unmodifiableList(keywordContext);
     }
 
 
@@ -55,7 +55,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordDocumentation> getDocumentation() {
-        return documentation;
+        return Collections.unmodifiableList(documentation);
     }
 
 
@@ -65,7 +65,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordTags> getTags() {
-        return tags;
+        return Collections.unmodifiableList(tags);
     }
 
 
@@ -75,7 +75,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordArguments> getArguments() {
-        return keywordArguments;
+        return Collections.unmodifiableList(keywordArguments);
     }
 
 
@@ -85,7 +85,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordReturn> getReturns() {
-        return keywordReturns;
+        return Collections.unmodifiableList(keywordReturns);
     }
 
 
@@ -95,7 +95,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordTeardown> getTeardowns() {
-        return teardowns;
+        return Collections.unmodifiableList(teardowns);
     }
 
 
@@ -105,7 +105,7 @@ public class UserKeyword extends AModelElement {
 
 
     public List<KeywordTimeout> getTimeouts() {
-        return timeouts;
+        return Collections.unmodifiableList(timeouts);
     }
 
 

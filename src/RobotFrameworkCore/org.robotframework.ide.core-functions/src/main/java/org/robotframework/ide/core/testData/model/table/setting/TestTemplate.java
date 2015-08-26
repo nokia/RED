@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class TestTemplate extends AModelElement {
 
 
     public List<RobotToken> getUnexpectedTrashArguments() {
-        return unexpectedTrashArguments;
+        return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
 

@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public abstract class ATags extends AModelElement {
 
 
     public List<RobotToken> getTags() {
-        return tags;
+        return Collections.unmodifiableList(tags);
     }
 
 
@@ -40,7 +41,7 @@ public abstract class ATags extends AModelElement {
 
 
     public List<RobotToken> getComment() {
-        return comment;
+        return Collections.unmodifiableList(comment);
     }
 
 

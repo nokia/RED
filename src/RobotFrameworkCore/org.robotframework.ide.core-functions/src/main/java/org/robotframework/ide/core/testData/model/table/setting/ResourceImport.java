@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ResourceImport extends AImported {
 
 
     public List<RobotToken> getUnexpectedTrashArguments() {
-        return unexpectedTrashArguments;
+        return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
 

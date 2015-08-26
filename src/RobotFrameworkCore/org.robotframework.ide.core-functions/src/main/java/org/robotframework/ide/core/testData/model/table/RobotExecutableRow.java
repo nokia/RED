@@ -1,5 +1,6 @@
 package org.robotframework.ide.core.testData.model.table;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class RobotExecutableRow extends AModelElement {
 
 
     public List<RobotToken> getArguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
 
