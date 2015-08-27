@@ -32,6 +32,7 @@ public class RobotLaunchConfiguration {
     private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
+    private static final String TEST_CASES_ATTRIBUTE = "Test cases";
 
     private final ILaunchConfiguration configuration;
     
@@ -55,6 +56,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName("");
         robotConfig.setSuitePaths(new ArrayList<String>());
+        robotConfig.setTestCasesNames(new ArrayList<String>());
         robotConfig.setIsIncludeTagsEnabled(false);
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
@@ -66,22 +68,24 @@ public class RobotLaunchConfiguration {
         final IProject project = resources.get(0).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-
         robotConfig.setExecutor(interpreter);
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName(project.getName());
+        
         robotConfig.setSuitePaths(newArrayList(Lists.transform(resources, new Function<IResource, String>() {
             @Override
             public String apply(final IResource resource) {
                 return resource.getProjectRelativePath().toPortableString();
             }
         })));
+        robotConfig.setTestCasesNames(new ArrayList<String>());
+        
         robotConfig.setIsIncludeTagsEnabled(false);
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
     }
-
+    
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
         this.configuration = config;
     }
@@ -116,6 +120,13 @@ public class RobotLaunchConfiguration {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
             launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, names);
+        }
+    }
+    
+    public void setTestCasesNames(final List<String> names) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(TEST_CASES_ATTRIBUTE, names);
         }
     }
     
@@ -161,6 +172,10 @@ public class RobotLaunchConfiguration {
 
     public List<String> getSuitePaths() throws CoreException {
         return configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
+    }
+    
+    public List<String> getTestCasesNames() throws CoreException {
+        return configuration.getAttribute(TEST_CASES_ATTRIBUTE, new ArrayList<String>());
     }
     
     public boolean isIncludeTagsEnabled() throws CoreException {
