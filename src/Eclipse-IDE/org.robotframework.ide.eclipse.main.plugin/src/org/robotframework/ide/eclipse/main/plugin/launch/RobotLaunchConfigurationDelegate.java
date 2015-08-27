@@ -153,7 +153,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             isConfigurationRunning.set(false);
         }
     }
-
+    
     public void doLaunch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException, IOException {
         // FIXME : use monitor for progress reporting and cancellation
@@ -169,6 +169,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
 
         final List<String> suites = getSuitesToRun(suiteResources);
+        final List<String> testCases = robotConfig.getTestCasesNames();
         final String userArguments = robotConfig.getExecutorArguments();
         List<String> includedTags = newArrayList();
         if(robotConfig.isIncludeTagsEnabled()) {
@@ -184,8 +185,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final List<String> variableFilesPath = robotProject.getVariableFiles();
         
         final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, pythonpath,
-                variableFilesPath, project.getLocation().toFile(), suites, userArguments, includedTags, excludedTags,
-                isDebugging);
+                variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,
+                excludedTags, isDebugging);
         final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
@@ -280,9 +281,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     private List<IResource> getSuiteResources(final RobotLaunchConfiguration robotConfig, final IProject project)
             throws CoreException {
         final List<String> suitePaths = robotConfig.getSuitePaths();
-        if (suitePaths.isEmpty()) {
-            throw newCoreException("There are no suites selected in launch configuration", null);
-        }
+
         final List<IResource> suiteResources = Lists.transform(suitePaths, new Function<String, IResource>() {
             @Override
             public IResource apply(final String suitePath) {
@@ -318,12 +317,13 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final List<String> suiteNames = new ArrayList<String>();
 
         for (final IResource suite : suites) {
-            suiteNames.add(createSuiteName(suite.getFullPath().removeFileExtension()));
+            suiteNames.add(createSuiteName(suite));
         }
         return suiteNames;
     }
 
-    private String createSuiteName(final IPath path) {
+    public static String createSuiteName(final IResource suite) {
+        final IPath path = suite.getFullPath().removeFileExtension();
         final List<String> upperCased = Lists.transform(Arrays.asList(path.segments()), new Function<String, String>() {
             @Override
             public String apply(final String segment) {

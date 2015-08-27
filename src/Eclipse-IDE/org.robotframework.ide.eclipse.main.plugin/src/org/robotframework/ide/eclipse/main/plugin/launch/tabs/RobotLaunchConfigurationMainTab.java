@@ -2,9 +2,11 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -17,10 +19,9 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.StructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
@@ -47,6 +48,9 @@ import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchElementsTreeViewer.SuiteLaunchElement;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchElementsTreeViewer.TestCaseLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -54,7 +58,6 @@ import org.robotframework.red.viewers.Selections;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 /**
  * @author mmarzec
@@ -65,7 +68,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private Combo comboExecutorName;
     private Text argumentsText;
     private Text projectText;
-    private ListViewer viewer;
+    private LaunchElementsTreeViewer launchElementsTreeViewer;
     
     private Button includeTagsBtn;
     private Button excludeTagsBtn;
@@ -88,21 +91,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             final String projectName = robotConfig.getProjectName();
 
             final List<String> executorNames = getSuiteExecutorNames();
-            final List<IPath> suites = Lists.transform(robotConfig.getSuitePaths(), new Function<String, IPath>() {
-                @Override
-                public IPath apply(final String pathStr) {
-                    return Path.fromPortableString(pathStr);
-                }
-            });
-
             comboExecutorName.setItems(executorNames.toArray(new String[0]));
             comboExecutorName.select(executorNames.indexOf(robotConfig.getExecutor().name()));
 
             projectText.setText(projectName);
             argumentsText.setText(robotConfig.getExecutorArguments());
-            viewer.setInput(newArrayList(suites));
-            viewer.refresh();
             
+            launchElementsTreeViewer.initLaunchElements(projectName, robotConfig.getSuitePaths(),
+                    robotConfig.getTestCasesNames());
+
             clearTags();
             includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
             for (String tag : robotConfig.getIncludedTags()) {
@@ -112,7 +109,6 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             for (String tag : robotConfig.getExcludedTags()) {
                 createTag(excludedTagsScrolledComposite, excludedTagsComposite, excludedTags, tag);
             }
-
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
@@ -136,12 +132,10 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         }
         robotConfig.setProjectName(projectText.getText());
         robotConfig.setExecutorArguments(argumentsText.getText());
-        robotConfig.setSuitePaths(Lists.transform(getSuites(), new Function<IPath, String>() {
-            @Override
-            public String apply(final IPath path) {
-                return path.toPortableString();
-            }
-        }));
+        
+        robotConfig.setSuitePaths(launchElementsTreeViewer.extractCheckedSuitesPaths());
+        robotConfig.setTestCasesNames(launchElementsTreeViewer.extractCheckedTestCasesNames());
+        
         robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
         robotConfig.setIncludedTags(includedTags);
         robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
@@ -178,8 +172,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             final List<String> suitePaths = robotConfig.getSuitePaths();
 
             if (suitePaths.isEmpty()) {
-                setErrorMessage("There are no suites specified");
-                return false;
+                setWarningMessage("There are no suites specified");
             }
 
             final List<String> problematic = newArrayList();
@@ -225,17 +218,13 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         super.dispose();
     }
     
-    @SuppressWarnings("unchecked")
-    private List<IPath> getSuites() {
-        return (List<IPath>) viewer.getInput();
-    }
-    
     @Override
     public void createControl(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
         createExecutorGroup(composite);
+        createTagsGroup(composite);
         createProjectGroup(composite);
         createTestSuitesGroup(composite);
 
@@ -246,7 +235,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Group executorGroup = new Group(topControl, SWT.NONE);
         executorGroup.setText("Executor");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
-        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(executorGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(2, 1).applyTo(executorGroup);
 
         comboExecutorName = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.addModifyListener(new ModifyListener() {
@@ -255,19 +244,26 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
-        GridDataFactory.fillDefaults().span(3, 1).applyTo(comboExecutorName);
+        GridDataFactory.fillDefaults().applyTo(comboExecutorName);
 
         final Label lblArgs = new Label(executorGroup, SWT.NONE);
         lblArgs.setText("Arguments:");
 
         argumentsText = new Text(executorGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).hint(450, SWT.DEFAULT).span(2, 1).applyTo(argumentsText);
+        GridDataFactory.fillDefaults().grab(true, false).hint(450, SWT.DEFAULT).applyTo(argumentsText);
         argumentsText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
+    }
+    
+    private void createTagsGroup(final Composite topControl) {
+        final Group executorGroup = new Group(topControl, SWT.NONE);
+        executorGroup.setText("Tags");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(2, 1).applyTo(executorGroup);
         
         includeTagsBtn = new Button(executorGroup, SWT.CHECK);
         includeTagsBtn.setText("Only run tests with these tags:");
@@ -302,7 +298,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Group projectGroup = new Group(composite, SWT.NONE);
         projectGroup.setText("Project");
         GridDataFactory.fillDefaults().applyTo(projectGroup);
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(projectGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(2, 1).applyTo(projectGroup);
 
         projectText = new Text(projectGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectText);
@@ -351,20 +347,16 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Group projectGroup = new Group(composite, SWT.NONE);
         projectGroup.setText("Test Suite(s)");
         GridDataFactory.fillDefaults().applyTo(projectGroup);
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(projectGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(2, 1).applyTo(projectGroup);
 
-        viewer = new ListViewer(projectGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).span(1, 3).hint(SWT.DEFAULT, 100).applyTo(viewer.getList());
-        viewer.setContentProvider(new StructuredContentProvider() {
+        launchElementsTreeViewer = new LaunchElementsTreeViewer();
+        launchElementsTreeViewer.createCheckboxTreeViewer(projectGroup);
+        launchElementsTreeViewer.getViewer().addCheckStateListener(new ICheckStateListener() {
+            
             @Override
-            public Object[] getElements(final Object inputElement) {
-                return ((List<?>) inputElement).toArray();
-            }
-        });
-        viewer.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(final Object element) {
-                return ((IPath) element).toString();
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                launchElementsTreeViewer.updateCheckState(event.getElement(), event.getChecked());
+                updateLaunchConfigurationDialog();
             }
         });
 
@@ -388,14 +380,19 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 });
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
                 if (dialog.open() == Window.OK) {
-                    final List<IPath> suites = getSuites();
                     for (final Object obj : dialog.getResult()) {
                         final IPath pathToAdd = ((IResource) obj).getProjectRelativePath();
-                        if (!suites.contains(pathToAdd)) {
-                            suites.add(pathToAdd);
+                        final String suiteName = RobotLaunchConfigurationDelegate.createSuiteName(((IResource) obj));
+                        SuiteLaunchElement suiteElement = new SuiteLaunchElement(pathToAdd.toPortableString(),
+                                suiteName, new ArrayList<TestCaseLaunchElement>());
+                        if (obj instanceof IFile) {
+                            launchElementsTreeViewer.createTestCasesLaunchElements((IFile) obj, suiteName, suiteElement,
+                                    null);
+                        } else {
+                            suiteElement.setIsFolder(true);
                         }
+                        launchElementsTreeViewer.addSuiteElement(suiteElement);
                     }
-                    viewer.setInput(suites);
                     updateLaunchConfigurationDialog();
                 }
             }
@@ -407,12 +404,15 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         removeSuite.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final List<IPath> suites = getSuites();
-                final List<IPath> selectedElements = Selections.getElements(
-                        (IStructuredSelection) viewer.getSelection(), IPath.class);
-                suites.removeAll(selectedElements);
-                viewer.setInput(suites);
-                updateLaunchConfigurationDialog();
+                final List<SuiteLaunchElement> selectedElements = Selections.getElements(
+                        (IStructuredSelection) launchElementsTreeViewer.getViewer().getSelection(), SuiteLaunchElement.class);
+                if (!selectedElements.isEmpty()) {
+                    launchElementsTreeViewer.getTreeViewerInput().removeAll(selectedElements);
+                    launchElementsTreeViewer.getViewer().setInput(
+                            launchElementsTreeViewer.getTreeViewerInput().toArray(
+                                    new SuiteLaunchElement[launchElementsTreeViewer.getTreeViewerInput().size()]));
+                    updateLaunchConfigurationDialog();
+                }
             }
         });
     }

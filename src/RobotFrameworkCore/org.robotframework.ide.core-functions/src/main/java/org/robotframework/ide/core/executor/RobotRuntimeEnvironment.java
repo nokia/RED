@@ -595,12 +595,11 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public RunCommandLine createCommandLineCall(final SuiteExecutor executor,
-            final List<String> classpath, final List<String> pythonpath,
-            final List<String> variableFilesPath, final File projectLocation,
-            final List<String> suites, final String userArguments,
-            final List<String> includedTags, final List<String> excludedTags,
-            final boolean isDebugging) throws IOException {
+    public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
+            final List<String> pythonpath, final List<String> variableFilesPath, final File projectLocation,
+            final List<String> suites, final List<String> testCases, final String userArguments,
+            final List<String> includedTags, final List<String> excludedTags, final boolean isDebugging)
+            throws IOException {
 
         final String debugInfo = isDebugging ? "True" : "False";
         final int port = findFreePort();
@@ -615,8 +614,12 @@ public class RobotRuntimeEnvironment {
                 + port + ":" + debugInfo);
 
         for (final String suite : suites) {
-            cmdLine.add("--suite");
+            cmdLine.add("-s");
             cmdLine.add(suite);
+        }
+        for (final String testCase : testCases) {
+            cmdLine.add("-t");
+            cmdLine.add(testCase.trim());
         }
         if (!userArguments.trim().isEmpty()) {
             cmdLine.addAll(ArgumentsConverter
