@@ -50,6 +50,10 @@ public class RedImages {
     public static ImageDescriptor getRobotSettingImage() {
         return RedPlugin.getImageDescriptor("resources/gear.png");
     }
+    
+    public static ImageDescriptor getRobotFileImage() {
+        return RedPlugin.getImageDescriptor("resources/robot_file.png");
+    }
 
     public static ImageDescriptor getTestCaseImage() {
         return RedPlugin.getImageDescriptor("resources/case.png");
