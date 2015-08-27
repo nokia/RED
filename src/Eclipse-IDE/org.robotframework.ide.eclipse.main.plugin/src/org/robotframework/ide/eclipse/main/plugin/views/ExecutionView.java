@@ -92,7 +92,7 @@ public class ExecutionView {
     private List<ExecutionStatus> executionViewerInput = new ArrayList<>();
 
     private LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
-
+    
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
@@ -105,13 +105,13 @@ public class ExecutionView {
         final Label passImageLabel = new Label(labelsComposite, SWT.NONE);
         passImageLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
         passCounterLabel = new Label(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(70, 1).applyTo(passCounterLabel);
+        GridDataFactory.fillDefaults().hint(70, 15).applyTo(passCounterLabel);
         passCounterLabel.setText("Passed: 0");
 
         final Label failImageLabel = new Label(labelsComposite, SWT.NONE);
         failImageLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
         failCounterLabel = new Label(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(70, 1).applyTo(passCounterLabel);
+        GridDataFactory.fillDefaults().hint(70, 15).applyTo(failCounterLabel);
         failCounterLabel.setText("Failed: 0");
 
         executionViewer = new TreeViewer(parent);
@@ -332,49 +332,55 @@ public class ExecutionView {
     private void handleTestStartEvent(final ExecutionElement executionElement) {
         final ExecutionStatus newTestExecutionStatus = new ExecutionStatus(executionElement.getName(), Status.RUNNING,
                 executionElement.getType(), new ArrayList<ExecutionStatus>());
-        final ExecutionStatus lastSuite = suitesStack.getLast();
-        newTestExecutionStatus.setParent(lastSuite);
-        newTestExecutionStatus.setSource(lastSuite.getSource());
-        lastSuite.addChildren(newTestExecutionStatus);
-        executionViewer.reveal(newTestExecutionStatus);
+        if (!suitesStack.isEmpty()) {
+            final ExecutionStatus lastSuite = suitesStack.getLast();
+            newTestExecutionStatus.setParent(lastSuite);
+            newTestExecutionStatus.setSource(lastSuite.getSource());
+            lastSuite.addChildren(newTestExecutionStatus);
+            executionViewer.reveal(newTestExecutionStatus);
+        }
     }
     
     private void handleSuiteEndEvent(final ExecutionElement executionElement) {
-        final ExecutionStatus lastSuite = suitesStack.getLast();
-        final int elapsedTime = executionElement.getElapsedTime();
-        lastSuite.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
-        final Status status = getStatus(executionElement);
-        lastSuite.setStatus(status);
-        if (suitesStack.size() > 1) {
-            suitesStack.removeLast();
-            if (status == Status.PASS) {
-                executionViewer.collapseToLevel(lastSuite, TreeViewer.ALL_LEVELS);
+        if (!suitesStack.isEmpty()) {
+            final ExecutionStatus lastSuite = suitesStack.getLast();
+            final int elapsedTime = executionElement.getElapsedTime();
+            lastSuite.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
+            final Status status = getStatus(executionElement);
+            lastSuite.setStatus(status);
+            if (suitesStack.size() > 1) {
+                suitesStack.removeLast();
+                if (status == Status.PASS) {
+                    executionViewer.collapseToLevel(lastSuite, TreeViewer.ALL_LEVELS);
+                }
             }
         }
     }
     
     private void handleTestEndEvent(final ExecutionElement executionElement) {
-        final ExecutionStatus lastSuite = suitesStack.getLast();
-        final List<ExecutionStatus> lastSuiteChildren = lastSuite.getChildren();
-        final Status status = getStatus(executionElement);
-        final int elapsedTime = executionElement.getElapsedTime();
-        for (ExecutionStatus executionStatus : lastSuiteChildren) {
-            if (executionStatus.getName().equals(executionElement.getName())) {
-                executionStatus.setStatus(status);
-                final String message = executionElement.getMessage();
-                if (message != null && !message.equals("")) {
-                    executionStatus.setMessage(message);
+        if (!suitesStack.isEmpty()) {
+            final ExecutionStatus lastSuite = suitesStack.getLast();
+            final List<ExecutionStatus> lastSuiteChildren = lastSuite.getChildren();
+            final Status status = getStatus(executionElement);
+            final int elapsedTime = executionElement.getElapsedTime();
+            for (ExecutionStatus executionStatus : lastSuiteChildren) {
+                if (executionStatus.getName().equals(executionElement.getName())) {
+                    executionStatus.setStatus(status);
+                    final String message = executionElement.getMessage();
+                    if (message != null && !message.equals("")) {
+                        executionStatus.setMessage(message);
+                    }
+                    executionStatus.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
+                    executionViewer.reveal(executionStatus);
+                    break;
                 }
-                executionStatus.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
-                executionViewer.reveal(executionStatus);
-                break;
             }
-        }
 
-        if (status == Status.PASS) {
-            passCounter++;
-        } else {
-            failCounter++;
+            if (status == Status.PASS) {
+                passCounter++;
+            } else {
+                failCounter++;
+            }
         }
     }
     
