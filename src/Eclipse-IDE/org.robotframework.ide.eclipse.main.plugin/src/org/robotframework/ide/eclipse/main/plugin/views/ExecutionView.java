@@ -58,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewContent
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
+import org.robotframework.ide.eclipse.main.plugin.execution.RerunFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.graphics.ImagesManager;
@@ -88,6 +89,8 @@ public class ExecutionView {
     private StyledText messageText;
     
     private ShowFailedOnlyAction showFailedAction;
+    
+    private RerunFailedOnlyAction rerunFailedOnlyAction;
 
     private List<ExecutionStatus> executionViewerInput = new ArrayList<>();
 
@@ -162,6 +165,8 @@ public class ExecutionView {
             handleSuiteEndEvent(executionElement);
         } else if (isTestEndEvent(executionElement)) {
             handleTestEndEvent(executionElement);
+        } else if (isOutputFileEvent(executionElement)) {
+            handleOutputFileEvent(executionElement);
         }
 
         refreshViewer();
@@ -176,6 +181,7 @@ public class ExecutionView {
         failCounter = 0;
         executionViewContentProvider.setFailedFilterEnabled(false);
         showFailedAction.setChecked(false);
+        rerunFailedOnlyAction.setOutputFilePath(null);
         executionViewer.refresh();
     }
 
@@ -294,6 +300,10 @@ public class ExecutionView {
         rerunAction.setText("Rerun Tests");
         rerunAction.setImageDescriptor(RedImages.getRelaunchImage());
         toolBarManager.add(rerunAction);
+        rerunFailedOnlyAction = new RerunFailedOnlyAction();
+        rerunFailedOnlyAction.setText("Rerun Failed Tests Only");
+        rerunFailedOnlyAction.setImageDescriptor(RedImages.getRelaunchFailedImage());
+        toolBarManager.add(rerunFailedOnlyAction);
     }
     
     private boolean isSuiteStartEvent(final ExecutionElement executionElement) {
@@ -310,6 +320,10 @@ public class ExecutionView {
     
     private boolean isTestEndEvent(final ExecutionElement executionElement) {
         return executionElement.getStatus() != null && executionElement.getType() == ExecutionElementType.TEST;
+    }
+    
+    private boolean isOutputFileEvent(final ExecutionElement executionElement) {
+        return executionElement.getType() == ExecutionElementType.OUTPUT_FILE;
     }
     
     private void handleSuiteStartEvent(final ExecutionElement executionElement) {
@@ -382,6 +396,10 @@ public class ExecutionView {
                 failCounter++;
             }
         }
+    }
+    
+    private void handleOutputFileEvent(final ExecutionElement executionElement) {
+        rerunFailedOnlyAction.setOutputFilePath(executionElement.getName());
     }
     
     private Status getStatus(final ExecutionElement executionElement) {
