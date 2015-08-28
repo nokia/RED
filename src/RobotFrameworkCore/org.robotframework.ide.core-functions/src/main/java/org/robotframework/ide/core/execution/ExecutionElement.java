@@ -7,7 +7,8 @@ public class ExecutionElement {
     
     public enum ExecutionElementType {
         SUITE,
-        TEST
+        TEST,
+        OUTPUT_FILE
     }
 
     private String name;

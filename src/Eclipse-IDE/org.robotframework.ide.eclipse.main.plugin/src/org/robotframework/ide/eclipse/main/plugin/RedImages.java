@@ -143,6 +143,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/relaunch.png");
     }
     
+    public static ImageDescriptor getRelaunchFailedImage() {
+        return RedPlugin.getImageDescriptor("resources/relaunchf.png");
+    }
+    
     public static ImageDescriptor getFailuresImage() {
         return RedPlugin.getImageDescriptor("resources/failures.png");
     }

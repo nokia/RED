@@ -18,8 +18,10 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -30,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.Selections;
 
 public class LaunchElementsTreeViewer {
 
@@ -38,18 +41,20 @@ public class LaunchElementsTreeViewer {
     private List<SuiteLaunchElement> treeViewerInput = newArrayList();
 
     public CheckboxTreeViewer createCheckboxTreeViewer(final Composite parent) {
-        treeViewer = new CheckboxTreeViewer(parent);
+        treeViewer = new CheckboxTreeViewer(parent, SWT.MULTI | SWT.BORDER | SWT.CHECK);
         GridDataFactory.fillDefaults()
                 .grab(true, false)
-                .span(1, 3)
+                .span(1, 4)
                 .hint(SWT.DEFAULT, 130)
                 .applyTo(treeViewer.getTree());
 
         treeViewer.setCheckStateProvider(new CheckStateProvider());
         treeViewer.setLabelProvider(new CheckboxTreeViewerLabelProvider());
         treeViewer.setContentProvider(new CheckboxTreeViewerContentProvider());
-
+        
         treeViewer.setInput(treeViewerInput.toArray(new SuiteLaunchElement[treeViewerInput.size()]));
+        
+        ViewersConfigurator.enableDeselectionPossibility(treeViewer);
 
         return treeViewer;
     }
@@ -128,10 +133,31 @@ public class LaunchElementsTreeViewer {
         }
     }
 
-    public void setSuiteElementChecked(final SuiteLaunchElement element) {
-        treeViewer.setChecked(element, true);
-        for (TestCaseLaunchElement testCaseElement : element.getChildren()) {
-            treeViewer.setChecked(testCaseElement, true);
+    public void setLaunchElementsChecked(final boolean isChecked) {
+        if (treeViewer.getTree().getSelectionCount() > 0) {
+            List<SuiteLaunchElement> selectedSuites = Selections.getElements((TreeSelection) treeViewer.getSelection(),
+                    SuiteLaunchElement.class);
+            setSuitesChecked(selectedSuites, isChecked);
+            List<TestCaseLaunchElement> selectedTestCases = Selections.getElements(
+                    (TreeSelection) treeViewer.getSelection(), TestCaseLaunchElement.class);
+            for (TestCaseLaunchElement testCaseLaunchElement : selectedTestCases) {
+                if (!testCaseLaunchElement.getParent().isChecked()) {
+                    testCaseLaunchElement.getParent().setChecked(isChecked);
+                }
+                testCaseLaunchElement.setChecked(isChecked);
+            }
+        } else {
+            setSuitesChecked(treeViewerInput, isChecked);
+        }
+        treeViewer.refresh();
+    }
+
+    private void setSuitesChecked(List<SuiteLaunchElement> suiteList, final boolean isChecked) {
+        for (SuiteLaunchElement suiteLaunchElement : suiteList) {
+            suiteLaunchElement.setChecked(isChecked);
+            for (TestCaseLaunchElement testCaseElement : suiteLaunchElement.getChildren()) {
+                testCaseElement.setChecked(isChecked);
+            }
         }
     }
 

@@ -25,6 +25,8 @@ public class ExecutionElementsParser implements ILineHandler {
     private static final String START_TEST_EVENT = "start_test";
 
     private static final String END_TEST_EVENT = "end_test";
+    
+    private static final String OUTPUT_FILE_EVENT = "output_file";
 
     private final ObjectMapper mapper;
 
@@ -82,6 +84,11 @@ public class ExecutionElementsParser implements ILineHandler {
                 endTestElement.setMessage((String)endTestDetails.get("message"));
                 endTestElement.setStatus((String)endTestDetails.get("status"));
                 executionHandler.processExecutionElement(endTestElement);
+                break;
+            case OUTPUT_FILE_EVENT:
+                final List<Object> outputFileList = (List<Object>) eventMap.get(OUTPUT_FILE_EVENT);
+                ExecutionElement outputFilePathElement = new ExecutionElement((String) outputFileList.get(0), ExecutionElementType.OUTPUT_FILE);
+                executionHandler.processExecutionElement(outputFilePathElement);
                 break;
             default:
                 break;

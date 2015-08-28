@@ -415,6 +415,28 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 }
             }
         });
+        final Button selectAll = new Button(projectGroup, SWT.PUSH);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(selectAll);
+        selectAll.setText("Select All");
+        selectAll.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                launchElementsTreeViewer.setLaunchElementsChecked(true);
+                updateLaunchConfigurationDialog();
+            }
+        });
+        final Button deselectAll = new Button(projectGroup, SWT.PUSH);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(deselectAll);
+        deselectAll.setText("Deselect All");
+        deselectAll.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                launchElementsTreeViewer.setLaunchElementsChecked(false);
+                updateLaunchConfigurationDialog();
+            }
+        });
     }
     
     private void initScrolledComposite(final ScrolledComposite scrolledComposite, final Composite tagsComposite, final List<String> tags) {
