@@ -321,7 +321,7 @@ class TestRunnerAgent:
         self._send_socket("log_file", path)
 
     def output_file(self, path):
-        pass
+        self._send_socket("output_file", path)
 
     def report_file(self, path):
         self._send_socket("report_file", path)

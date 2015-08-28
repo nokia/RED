@@ -218,4 +218,11 @@ public class RobotLaunchConfiguration {
             return false;
         }
     }
+    
+    public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
+            final String outputFilePath) throws CoreException {
+        launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "-R" + " " + outputFilePath);
+        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
+        launchCopy.setAttribute(TEST_CASES_ATTRIBUTE, new ArrayList<String>());
+    }
 }
