@@ -3,7 +3,6 @@ package org.robotframework.ide.core.testData.model.mapping;
 import java.util.List;
 import java.util.Stack;
 
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
@@ -31,7 +30,7 @@ public class PreviousLineHandler {
 
     public LineContinueType computeLineContinue(
             final Stack<ParsingState> parsingStates, boolean isNewLine,
-            final RobotFile model, final RobotLine currentLine,
+            final IRobotFile model, final RobotLine currentLine,
             final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
@@ -95,7 +94,7 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected boolean isSomethingToContinue(final RobotFile model,
+    protected boolean isSomethingToContinue(final IRobotFile model,
             final RobotLine currentLine) {
         boolean result = false;
         List<RobotLine> fileContent = model.getFileContent();

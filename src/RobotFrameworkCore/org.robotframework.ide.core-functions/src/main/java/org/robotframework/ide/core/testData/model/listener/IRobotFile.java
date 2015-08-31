@@ -13,4 +13,7 @@ public interface IRobotFile extends ITablesExclusion, ITablesInclusion,
 
     void addNewLine(RobotLine line);
 
+
+    boolean containsAnyRobotSection();
+
 }
