@@ -2,6 +2,10 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+
 public class RobotCasesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Test Cases";
@@ -24,5 +28,14 @@ public class RobotCasesSection extends RobotSuiteFileSection {
     @Override
     public List<RobotCase> getChildren() {
         return (List<RobotCase>) super.getChildren();
+    }
+    
+    @Override
+    public void link(ARobotSectionTable table) {
+        TestCaseTable testCaseTable = (TestCaseTable) table;
+        for (final TestCase testCase : testCaseTable.getTestCases()) {
+            RobotCase newTestCase = new RobotCase(this, testCase.getTestName().getText().toString(), "");
+            elements.add(newTestCase);
+        }
     }
 }
