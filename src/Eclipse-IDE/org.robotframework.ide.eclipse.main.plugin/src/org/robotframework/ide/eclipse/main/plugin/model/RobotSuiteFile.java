@@ -2,7 +2,8 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,13 +20,20 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.FileSectionsEmiter;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.testData.RobotFileDumper;
+import org.robotframework.ide.core.testData.RobotParser;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -36,6 +44,8 @@ public class RobotSuiteFile implements RobotElement {
     private final RobotElement parent;
 
     private final IFile file;
+
+    private RobotFileOutput fileOutput;
 
     private List<RobotElement> sections = null;
 
@@ -70,9 +80,8 @@ public class RobotSuiteFile implements RobotElement {
 
     public List<RobotElement> getSections() {
         if (sections == null) {
-            sections = new ArrayList<>();
-            try {
-                createParser().parseRobotFileSections(this);
+                fileOutput = parseModel();
+                link(fileOutput.getFileModel());
 
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
@@ -84,20 +93,54 @@ public class RobotSuiteFile implements RobotElement {
                         service.addPartListener(listener);
                     }
                 });
-            } catch (final IOException e) {
-                throw new RuntimeException("Unable to read sections");
-            }
+            
         }
         return sections;
     }
+    
+    private void link(final IRobotFile model) {
+        sections = new ArrayList<>();
+        if (model.getKeywordTable().isPresent()) {
+            final RobotKeywordsSection section = new RobotKeywordsSection(this);
+            section.link(model.getKeywordTable());
+            sections.add(section);
+        }
+        if (model.getTestCaseTable().isPresent()) {
+            final RobotCasesSection section = new RobotCasesSection(this);
+            section.link(model.getTestCaseTable());
+            sections.add(section);
+        }
+        if (model.getSettingTable().isPresent()) {
+            final RobotSettingsSection section = new RobotSettingsSection(this);
+            section.link(model.getSettingTable());
+            sections.add(section);
+        }
+        if (model.getVariableTable().isPresent()) {
+            final RobotVariablesSection section = new RobotVariablesSection(this);
+            section.link(model.getVariableTable());
+            sections.add(section);
+        }
+    }
+    
+    private RobotFileOutput parseModel() {
+        final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
+        final RobotFileOutput robotFileOutput = new RobotParser(new RobotProjectHolder(runtimeEnvironment))
+                .parse(file.getLocation().toFile()).get(0);
+        if (robotFileOutput.getStatus() == Status.FAILED) {
+            throw new RuntimeException("Unable to read suite file model");
+        } else {
+            return robotFileOutput;
+        }
+    }
 
     private IEclipseContext getContext() {
-        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
     void dispose() {
         ContextInjectionFactory.uninject(listener, getContext().getActiveLeaf());
         sections = null;
+        fileOutput = null;
         listener = null;
     }
 
@@ -107,6 +150,7 @@ public class RobotSuiteFile implements RobotElement {
 
     protected void refreshOnFileChange() {
         sections = null;
+        fileOutput = null;
         getSections();
     }
 
@@ -181,7 +225,11 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public void commitChanges(final IProgressMonitor monitor) throws CoreException {
-        file.setContents(new FileSectionsEmiter(this).emit(), true, true, monitor);
+        // FIXME : this should be done using RobotFileDumper, but it is lacking API for dumping to
+        // string
+        final StringBuilder content = new RobotFileDumper().dump(fileOutput);
+        final InputStream stream = new ByteArrayInputStream(content.toString().getBytes(Charsets.UTF_8));
+        file.setContents(stream, true, true, monitor);
     }
 
     public Optional<RobotElement> findSection(final Class<? extends RobotElement> sectionClass) {
