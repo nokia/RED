@@ -10,5 +10,5 @@ public interface IRobotFileParser {
     boolean canParseFile(final File file);
 
 
-    RobotFileOutput parse(final File robotFile);
+    void parse(final RobotFileOutput output, final File robotFile);
 }
