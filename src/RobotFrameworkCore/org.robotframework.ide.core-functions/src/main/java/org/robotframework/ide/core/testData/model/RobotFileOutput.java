@@ -6,13 +6,14 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 
 
 public class RobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
     private File processedFile;
-    private RobotFile fileModel;
+    private IRobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private List<ResourceImportReference> resourceReferences = new LinkedList<>();
     private List<VariablesFileImportReference> variablesReferenced = new LinkedList<>();
@@ -41,7 +42,7 @@ public class RobotFileOutput {
     }
 
 
-    public RobotFile getFileModel() {
+    public IRobotFile getFileModel() {
         return fileModel;
     }
 
@@ -56,7 +57,7 @@ public class RobotFileOutput {
     }
 
 
-    public void setFileModel(RobotFile fileModel) {
+    public void setFileModel(IRobotFile fileModel) {
         this.fileModel = fileModel;
     }
 

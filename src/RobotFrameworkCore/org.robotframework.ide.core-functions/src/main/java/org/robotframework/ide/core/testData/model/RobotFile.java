@@ -134,6 +134,7 @@ public class RobotFile implements IRobotFile {
     }
 
 
+    @Override
     public boolean containsAnyRobotSection() {
         return (settingTable.isPresent() || variableTable.isPresent()
                 || testCaseTable.isPresent() || keywordTable.isPresent());

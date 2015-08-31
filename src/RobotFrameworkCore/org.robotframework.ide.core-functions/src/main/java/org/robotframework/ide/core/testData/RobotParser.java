@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 
@@ -63,7 +64,7 @@ public class RobotParser {
 
                 if (parserToUse != null) {
                     RobotFileOutput robotFile = new RobotFileOutput();
-                    RobotFile rf = new RobotFile();
+                    IRobotFile rf = new RobotFile();
                     robotFile.setFileModel(rf);
 
                     output.add(robotFile);
