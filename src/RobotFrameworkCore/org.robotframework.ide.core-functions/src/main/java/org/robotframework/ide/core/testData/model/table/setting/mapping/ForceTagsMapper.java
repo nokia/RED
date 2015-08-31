@@ -1,10 +1,10 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
@@ -34,10 +34,9 @@ public class ForceTagsMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<ForceTags> suiteForceTags = robotFileOutput.getFileModel()
-                .getSettingTable().getForceTags();
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         ForceTags forceTags = new ForceTags(rt);
-        suiteForceTags.add(forceTags);
+        setting.addForceTags(forceTags);
         processingState.push(ParsingState.SETTING_FORCE_TAGS);
         return rt;
     }
