@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
@@ -15,7 +16,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class RobotFile {
+public class RobotFile implements IRobotFile {
 
     private SettingTable settingTable = new SettingTable();
     private VariableTable variableTable = new VariableTable();
@@ -25,71 +26,85 @@ public class RobotFile {
     private final List<RobotLine> fileContent = new LinkedList<>();
 
 
+    @Override
     public List<RobotLine> getFileContent() {
         return Collections.unmodifiableList(fileContent);
     }
 
 
+    @Override
     public void addNewLine(final RobotLine line) {
         this.fileContent.add(line);
     }
 
 
+    @Override
     public SettingTable getSettingTable() {
         return settingTable;
     }
 
 
+    @Override
     public boolean includeSettingTableSection() {
         return includeTableSection(RobotTokenType.SETTINGS_TABLE_HEADER);
     }
 
 
+    @Override
     public void excludeSettingTableSection() {
         settingTable = new SettingTable();
     }
 
 
+    @Override
     public VariableTable getVariableTable() {
         return variableTable;
     }
 
 
+    @Override
     public boolean includeVariableTableSection() {
         return includeTableSection(RobotTokenType.VARIABLES_TABLE_HEADER);
     }
 
 
+    @Override
     public void excludeVariableTableSection() {
         variableTable = new VariableTable();
     }
 
 
+    @Override
     public TestCaseTable getTestCaseTable() {
         return testCaseTable;
     }
 
 
+    @Override
     public boolean includeTestCaseTableSection() {
         return includeTableSection(RobotTokenType.TEST_CASES_TABLE_HEADER);
     }
 
 
+    @Override
     public void excludeTestCaseTableSection() {
         testCaseTable = new TestCaseTable();
     }
 
 
+    @Override
     public KeywordTable getKeywordTable() {
         return keywordTable;
     }
 
 
+    @Override
     public boolean includeKeywordTableSection() {
         return includeTableSection(RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
 
 
+    @Override
     public void excludeKeywordTableSection() {
         keywordTable = new KeywordTable();
     }
