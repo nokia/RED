@@ -1,10 +1,10 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping.suite;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
@@ -34,10 +34,9 @@ public class SuiteTeardownMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
-                .getSettingTable().getSuiteTeardowns();
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         SuiteTeardown teardown = new SuiteTeardown(rt);
-        suiteTeardowns.add(teardown);
+        setting.addSuiteTeardown(teardown);
         processingState.push(ParsingState.SETTING_SUITE_TEARDOWN);
 
         return rt;

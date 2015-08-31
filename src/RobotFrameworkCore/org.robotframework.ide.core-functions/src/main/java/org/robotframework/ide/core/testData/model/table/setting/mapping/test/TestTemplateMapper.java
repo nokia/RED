@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -34,10 +33,9 @@ public class TestTemplateMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
-                .getSettingTable().getTestTemplates();
         TestTemplate template = new TestTemplate(rt);
-        testTemplates.add(template);
+        robotFileOutput.getFileModel().getSettingTable()
+                .addTestTemplate(template);
         processingState.push(ParsingState.SETTING_TEST_TEMPLATE);
 
         return rt;

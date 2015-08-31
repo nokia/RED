@@ -1,10 +1,10 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping.suite;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteSetup;
@@ -34,10 +34,9 @@ public class SuiteSetupMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
-                .getSettingTable().getSuiteSetups();
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         SuiteSetup setup = new SuiteSetup(rt);
-        suiteSetups.add(setup);
+        setting.addSuiteSetup(setup);
         processingState.push(ParsingState.SETTING_SUITE_SETUP);
 
         return rt;
