@@ -1,10 +1,10 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
@@ -34,10 +34,9 @@ public class DefaultTagsMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<DefaultTags> suiteDefaultTags = robotFileOutput.getFileModel()
-                .getSettingTable().getDefaultTags();
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         DefaultTags defaultTags = new DefaultTags(rt);
-        suiteDefaultTags.add(defaultTags);
+        setting.addDefaultTags(defaultTags);
         processingState.push(ParsingState.SETTING_DEFAULT_TAGS);
 
         return rt;
