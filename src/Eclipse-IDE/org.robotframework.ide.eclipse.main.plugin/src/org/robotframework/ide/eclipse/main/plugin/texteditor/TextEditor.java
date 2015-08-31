@@ -144,6 +144,8 @@ public class TextEditor {
 	
 	private int breakpointLine = 0; 
 	
+	private ResourceMarkerAnnotationModel markerAnnotationModel;
+	
 	private CompositeRuler compositeRuler;
 
     private TextEditorTextHover textHover;
@@ -198,7 +200,7 @@ public class TextEditor {
 		final AnnotationType occurrencesMarkAnnotationType = new AnnotationType("org.robotframework.ide.texteditor.occurrencesMark", null);
 		
 		final DefaultMarkerAnnotationAccess markerAnnotationAccess = new DefaultMarkerAnnotationAccess();
-		final ResourceMarkerAnnotationModel markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
+		markerAnnotationModel = new ResourceMarkerAnnotationModel(editedFile);
 		
 		compositeRuler = new CompositeRuler(1);
 		compositeRuler.setModel(markerAnnotationModel);
@@ -291,11 +293,13 @@ public class TextEditor {
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'z')) {
 					if(undoManager.undoable()) {
 						undoManager.undo();
+						dirtyProviderService.setDirtyState(true);
 					}
 				}
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'y')) {
 					if(undoManager.redoable()) {
 						undoManager.redo();
+						dirtyProviderService.setDirtyState(true);
 					}
 				}
 				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 's') && editorPart.isDirty()) {
@@ -395,8 +399,9 @@ public class TextEditor {
             e.printStackTrace();
         }
 		
+        updateMarkersPositions();
 	}
-
+	
 	@Focus
 	public void onFocus() {
         viewer.getTextWidget().setFocus();
@@ -529,6 +534,16 @@ public class TextEditor {
 			e.printStackTrace();
 		}
 	}
+	
+	private void updateMarkersPositions() {
+        try {
+            if (markerAnnotationModel != null) {
+                markerAnnotationModel.updateMarkers(viewer.getDocument());
+            }
+        } catch (CoreException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	private AnnotationPreference createErrorAnnotationPreference(final AnnotationType type) {
 		final AnnotationPreference annotationPreference = new AnnotationPreference();
