@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment.tableTest
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
@@ -21,7 +21,7 @@ public class TestCaseSettingTimeoutCommentMapper implements IHashCommentMapper {
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
+            ITablesGetter fileModel) {
         List<TestCase> testCases = fileModel.getTestCaseTable().getTestCases();
         TestCase testCase = testCases.get(testCases.size() - 1);
 
