@@ -47,7 +47,8 @@ public class RobotProjectHolder {
 
 
     public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
-        return (robotOutput != null && shouldBeLoaded(robotOutput));
+        return (robotOutput != null && shouldBeLoaded(robotOutput
+                .getProcessedFile()));
     }
 
 
