@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -34,10 +33,9 @@ public class TestTimeoutMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<TestTimeout> testTimeouts = robotFileOutput.getFileModel()
-                .getSettingTable().getTestTimeouts();
         TestTimeout timeout = new TestTimeout(rt);
-        testTimeouts.add(timeout);
+        robotFileOutput.getFileModel().getSettingTable()
+                .addTestTimeout(timeout);
         processingState.push(ParsingState.SETTING_TEST_TIMEOUT);
 
         return rt;

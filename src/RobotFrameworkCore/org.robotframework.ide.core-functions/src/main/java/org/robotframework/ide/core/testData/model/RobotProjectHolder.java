@@ -25,7 +25,16 @@ public class RobotProjectHolder {
 
 
     public void addModelFile(final RobotFileOutput model) {
+        if (containsFile(model)) {
+            removeModelFile(model);
+        }
+
         readableProjectFiles.add(model);
+    }
+
+
+    public void removeModelFile(final RobotFileOutput model) {
+        readableProjectFiles.remove(model);
     }
 
 
@@ -38,7 +47,13 @@ public class RobotProjectHolder {
 
 
     public boolean shouldBeLoaded(final File file) {
-        return !containsFile(file);
+        RobotFileOutput foundFile = findFileByName(file);
+        return !containsFile(foundFile);
+    }
+
+
+    public boolean containsFile(final RobotFileOutput outputFile) {
+        return containsFile(outputFile.getProcessedFile());
     }
 
 

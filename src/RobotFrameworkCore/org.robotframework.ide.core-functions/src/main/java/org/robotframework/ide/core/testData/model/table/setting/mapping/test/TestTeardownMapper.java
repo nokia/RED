@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.testData.model.table.setting.mapping.test;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -34,10 +33,9 @@ public class TestTeardownMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        List<TestTeardown> testTeardowns = robotFileOutput.getFileModel()
-                .getSettingTable().getTestTeardowns();
         TestTeardown teardown = new TestTeardown(rt);
-        testTeardowns.add(teardown);
+        robotFileOutput.getFileModel().getSettingTable()
+                .addTestTeardown(teardown);
         processingState.push(ParsingState.SETTING_TEST_TEARDOWN);
 
         return rt;
