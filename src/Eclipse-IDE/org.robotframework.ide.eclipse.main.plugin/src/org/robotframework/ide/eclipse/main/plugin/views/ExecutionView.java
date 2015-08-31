@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
@@ -121,12 +120,9 @@ public class ExecutionView {
         executionViewer.getTree().setHeaderVisible(false);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(executionViewer.getTree());
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(executionViewer.getTree());
-        ViewerColumnsFactory.newColumn("Status")
-                .labelsProvidedBy(new ExecutionViewLabelProvider())
-                .withMinWidth(400)
-                .createFor(executionViewer);
         executionViewContentProvider = new ExecutionViewContentProvider();
         executionViewer.setContentProvider(executionViewContentProvider);
+        executionViewer.setLabelProvider(new ExecutionViewLabelProvider());
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
