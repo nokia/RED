@@ -24,17 +24,17 @@ public class RobotProjectHolder {
     }
 
 
-    public void addModelFile(final RobotFileOutput model) {
-        if (containsFile(model)) {
-            removeModelFile(model);
+    public void addModelFile(final RobotFileOutput robotOutput) {
+        if (shouldBeLoaded(robotOutput)) {
+            removeModelFile(robotOutput);
         }
 
-        readableProjectFiles.add(model);
+        readableProjectFiles.add(robotOutput);
     }
 
 
-    public void removeModelFile(final RobotFileOutput model) {
-        readableProjectFiles.remove(model);
+    public void removeModelFile(final RobotFileOutput robotOutput) {
+        readableProjectFiles.remove(robotOutput);
     }
 
 
@@ -46,21 +46,16 @@ public class RobotProjectHolder {
     }
 
 
+    public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
+        return (robotOutput != null && shouldBeLoaded(robotOutput));
+    }
+
+
     public boolean shouldBeLoaded(final File file) {
         RobotFileOutput foundFile = findFileByName(file);
-        return !containsFile(foundFile)
+        return (foundFile == null)
                 || (file.lastModified() != foundFile
                         .getLastModificationEpochTime());
-    }
-
-
-    public boolean containsFile(final RobotFileOutput outputFile) {
-        return containsFile(outputFile.getProcessedFile());
-    }
-
-
-    public boolean containsFile(final File file) {
-        return (findFileByName(file) != null);
     }
 
 
