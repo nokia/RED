@@ -1,9 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.execution;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.core.execution.ExecutionElement.ExecutionElementType;
@@ -12,14 +12,24 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
 import org.robotframework.red.graphics.ImagesManager;
 
-public class ExecutionViewLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+public class ExecutionViewLabelProvider extends StyledCellLabelProvider {
 
     public ExecutionViewLabelProvider() {
     }
 
     @Override
-    public StyledString getStyledText(final Object element) {
+    public void update(ViewerCell cell) {
+        
+        final StyledString label = getStyledString(cell.getElement());
+        cell.setText(label.getString());
+        cell.setStyleRanges(label.getStyleRanges());
+        
+        cell.setImage(getImage(cell.getElement()));
+        
+        super.update(cell);
+    }
 
+    private StyledString getStyledString(final Object element) {
         String elapsedTime = "";
         final String time = ((ExecutionStatus) element).getElapsedTime();
         if (time != null) {
@@ -33,12 +43,10 @@ public class ExecutionViewLabelProvider extends ColumnLabelProvider implements I
                 textStyle.foreground = RedTheme.getEclipseDecorationColor();
             }
         });
-
         return label;
     }
-
-    @Override
-    public Image getImage(final Object element) {
+    
+    private Image getImage(final Object element) {
         final ExecutionStatus status = (ExecutionStatus) element;
 
         if (status.getType() == ExecutionElementType.SUITE) {
@@ -57,5 +65,5 @@ public class ExecutionViewLabelProvider extends ColumnLabelProvider implements I
             return ImagesManager.getImage(RedImages.getTestFailImage());
         }
     }
-
+    
 }
