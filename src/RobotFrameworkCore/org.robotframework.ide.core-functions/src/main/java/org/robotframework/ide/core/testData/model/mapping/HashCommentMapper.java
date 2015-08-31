@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.TableHeaderCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.VariablesDeclarationCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.tableSetting.SettingDefaultTagsCommentMapper;
@@ -99,7 +99,7 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
-        RobotFile fileModel = robotFileOutput.getFileModel();
+        ITablesGetter fileModel = robotFileOutput.getFileModel();
         IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
         if (commentHolder != ParsingState.TRASH || commentMapper != null) {
             commentMapper.map(rt, commentHolder, fileModel);

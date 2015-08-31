@@ -14,10 +14,10 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.IRobotFileParser;
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler.LineContinueType;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -420,7 +420,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
 
             boolean useMapper = true;
-            RobotFile fileModel = robotFileOutput.getFileModel();
+            ITablesGetter fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
                     TableHeader header = new TableHeader(robotToken);

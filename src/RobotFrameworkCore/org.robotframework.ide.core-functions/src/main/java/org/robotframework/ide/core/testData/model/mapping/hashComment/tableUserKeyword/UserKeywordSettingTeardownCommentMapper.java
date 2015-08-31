@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment.tableUser
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTeardown;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
@@ -22,7 +22,7 @@ public class UserKeywordSettingTeardownCommentMapper implements
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
+            ITablesGetter fileModel) {
         List<UserKeyword> keywords = fileModel.getKeywordTable().getKeywords();
         UserKeyword keyword = keywords.get(keywords.size() - 1);
 

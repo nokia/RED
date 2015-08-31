@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment;
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
@@ -28,7 +28,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
+            ITablesGetter fileModel) {
         List<IVariableHolder> variables = fileModel.getVariableTable()
                 .getVariables();
         if (variables.isEmpty()) {
