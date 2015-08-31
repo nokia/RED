@@ -112,11 +112,10 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public RobotFileOutput parse(final File robotFile) {
-        RobotFileOutput parsingOutput = new RobotFileOutput();
+    public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
-            parsingOutput = parse(robotFile, new InputStreamReader(
+            parse(parsingOutput, robotFile, new InputStreamReader(
                     new FileInputStream(robotFile), Charset.forName("UTF-8")));
         } catch (FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
@@ -140,18 +139,13 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         parsingOutput.setProcessedFile(robotFile);
-
-        return parsingOutput;
     }
 
 
-    private RobotFileOutput parse(final File robotFile, final Reader reader) {
+    private RobotFileOutput parse(final RobotFileOutput parsingOutput,
+            final File robotFile, final Reader reader) {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
-
-        RobotFileOutput parsingOutput = new RobotFileOutput();
-        RobotFile rf = new RobotFile();
-        parsingOutput.setFileModel(rf);
 
         BufferedReader lineReader = new BufferedReader(reader);
         int lineNumber = 1;
@@ -247,7 +241,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 if (!line.getLineElements().isEmpty()) {
                     previousLineHandler.flushNew(processingState);
                 }
-                rf.addNewLine(line);
+                parsingOutput.getFileModel().addNewLine(line);
                 utility.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }

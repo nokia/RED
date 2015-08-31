@@ -7,6 +7,7 @@ import java.util.List;
 import org.robotframework.ide.core.testData.importer.ResourceImporter;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesImporter;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
@@ -61,9 +62,14 @@ public class RobotParser {
                 }
 
                 if (parserToUse != null) {
-                    RobotFileOutput robotFile = parserToUse.parse(fileOrDir);
+                    RobotFileOutput robotFile = new RobotFileOutput();
+                    RobotFile rf = new RobotFile();
+                    robotFile.setFileModel(rf);
+
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);
+
+                    parserToUse.parse(robotFile, fileOrDir);
                     if (robotFile.getStatus() == Status.PASSED) {
                         if (shouldEagerImport) {
                             // eager get resources example
