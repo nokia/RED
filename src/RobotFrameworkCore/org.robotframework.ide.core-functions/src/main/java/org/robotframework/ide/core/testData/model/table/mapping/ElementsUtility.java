@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
@@ -174,7 +174,7 @@ public class ElementsUtility {
             final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
         List<TableHeader> tableKnownHeaders = new LinkedList<>();
-        RobotFile fileModel = robotFileOutput.getFileModel();
+        ITablesGetter fileModel = robotFileOutput.getFileModel();
         if (tableHeaderState == ParsingState.SETTING_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getSettingTable().getHeaders();
         } else if (tableHeaderState == ParsingState.VARIABLE_TABLE_HEADER) {

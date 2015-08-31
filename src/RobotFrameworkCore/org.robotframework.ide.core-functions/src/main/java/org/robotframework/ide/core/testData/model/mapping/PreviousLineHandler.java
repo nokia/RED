@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -133,25 +134,25 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected boolean containsAnySetting(final RobotFile file) {
+    protected boolean containsAnySetting(final IRobotFile file) {
         return !file.getSettingTable().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyVariables(final RobotFile file) {
+    protected boolean containsAnyVariables(final IRobotFile file) {
         return !file.getVariableTable().getVariables().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyTestCases(final RobotFile file) {
+    protected boolean containsAnyTestCases(final IRobotFile file) {
         return !file.getTestCaseTable().getTestCases().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyKeywords(final RobotFile file) {
+    protected boolean containsAnyKeywords(final IRobotFile file) {
         return !file.getKeywordTable().getKeywords().isEmpty();
     }
 
