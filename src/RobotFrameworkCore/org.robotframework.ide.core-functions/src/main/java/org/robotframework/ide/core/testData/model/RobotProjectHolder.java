@@ -48,7 +48,9 @@ public class RobotProjectHolder {
 
     public boolean shouldBeLoaded(final File file) {
         RobotFileOutput foundFile = findFileByName(file);
-        return !containsFile(foundFile);
+        return !containsFile(foundFile)
+                || (file.lastModified() != foundFile
+                        .getLastModificationEpochTime());
     }
 
 
