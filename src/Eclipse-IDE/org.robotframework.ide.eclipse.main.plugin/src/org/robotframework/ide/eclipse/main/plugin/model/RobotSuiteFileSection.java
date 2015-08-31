@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotSuiteFileSection implements RobotElement {
@@ -17,6 +18,10 @@ public class RobotSuiteFileSection implements RobotElement {
     RobotSuiteFileSection(final RobotSuiteFile parent, final String name) {
         this.parent = parent;
         this.name = name;
+    }
+
+    public void link(final ARobotSectionTable table) {
+
     }
 
     @Override

@@ -9,9 +9,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotParser;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -44,7 +44,7 @@ public class RobotSuiteFileValidator {
         validate(fileOutput.getFileModel(), monitor);
     }
 
-    private void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
+    private void validate(final IRobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
         validateKeywordTable(fileModel.getKeywordTable(), monitor);
     }
 

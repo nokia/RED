@@ -7,6 +7,13 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
+import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
+import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
+import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotVariable implements RobotElement, Serializable {
@@ -49,6 +56,20 @@ public class RobotVariable implements RobotElement, Serializable {
         public abstract String getMark();
 
         public abstract ImageDescriptor getImage();
+
+        public static Type fromVarType(final VariableType varType) {
+            switch (varType) {
+                case DICTIONARY:
+                    return DICTIONARY;
+                case LIST:
+                    return Type.LIST;
+                case SCALAR:
+                case SCALAR_AS_LIST:
+                    return Type.SCALAR;
+                default:
+                    return null;
+            }
+        }
     }
 
     public static boolean isVariable(final String expression) {
@@ -73,6 +94,41 @@ public class RobotVariable implements RobotElement, Serializable {
         this.name = name;
         this.value = value;
         this.comment = comment;
+    }
+
+    RobotVariable(final RobotVariablesSection parent) {
+        this.parent = parent;
+    }
+
+    public void link(final IVariableHolder variableHolder) {
+        this.type = Type.fromVarType(variableHolder.getType());
+        this.name = variableHolder.getName();
+        if(variableHolder.getType() == VariableType.SCALAR) {
+            this.value = ((ScalarVariable) variableHolder).getValues().get(0).getText().toString();
+        } else if(variableHolder.getType() == VariableType.LIST || variableHolder.getType() == VariableType.SCALAR_AS_LIST) {
+            StringBuilder builder = new StringBuilder();
+            for (RobotToken token : ((ListVariable) variableHolder).getItems()) {
+                builder.append(token.getText());
+                builder.append("  ");
+            }
+            this.value = builder.toString();
+        } else if(variableHolder.getType() == VariableType.DICTIONARY) {
+            StringBuilder builder = new StringBuilder();
+            for (DictionaryKeyValuePair pair : ((DictionaryVariable) variableHolder).getItems()) {
+                builder.append(pair.getKey().getText());
+                builder.append("=");
+                builder.append(pair.getValue().getText());
+                builder.append("  ");
+            }
+            this.value = builder.toString();
+        }
+        
+        StringBuilder builder = new StringBuilder();
+        for (RobotToken token : variableHolder.getComment()) {
+            builder.append(token.getText());
+            builder.append(" ");
+        }
+        this.comment = builder.toString();
     }
 
     @Override
