@@ -14,17 +14,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -119,11 +118,7 @@ public class ImportLibraryComposite {
         leftViewer = new TableViewer(librariesComposite);
         leftViewer.setContentProvider(new LibrariesToImportContentProvider());
         GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(leftViewer.getControl());
-        ViewerColumnsFactory.newColumn("")
-                .shouldGrabAllTheSpaceLeft(true)
-                .withWidth(200)
-                .labelsProvidedBy(new LibrariesLabelProvider())
-                .createFor(leftViewer);
+        leftViewer.setLabelProvider(new LibrariesLabelProvider());
         leftViewer.addDoubleClickListener(new IDoubleClickListener() {
 
             @Override
@@ -152,11 +147,7 @@ public class ImportLibraryComposite {
         rightViewer = new TableViewer(librariesComposite);
         rightViewer.setContentProvider(new LibrariesAlreadyImportedContentProvider());
         GridDataFactory.fillDefaults().span(1, 2).grab(true, true).hint(220, 250).applyTo(rightViewer.getControl());
-        ViewerColumnsFactory.newColumn("")
-                .shouldGrabAllTheSpaceLeft(true)
-                .withWidth(200)
-                .labelsProvidedBy(new LibrariesLabelProvider())
-                .createFor(rightViewer);
+        rightViewer.setLabelProvider(new LibrariesLabelProvider());
         rightViewer.addDoubleClickListener(new IDoubleClickListener() {
 
             @Override
@@ -580,19 +571,24 @@ public class ImportLibraryComposite {
         return dialog;
     }
 
-    private static class LibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
-
+    private static class LibrariesLabelProvider extends StyledCellLabelProvider {
+        
         @Override
+        public void update(final ViewerCell cell) {
+            
+            final StyledString label = getStyledText(cell.getElement());
+            cell.setText(label.getString());
+            cell.setStyleRanges(label.getStyleRanges());
+            
+            cell.setImage(getImage(cell.getElement()));
+            
+            super.update(cell);
+        }
+
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getBookImage());
         }
 
-        @Override
-        public String getText(final Object element) {
-            return ((LibrarySpecification) element).getName();
-        }
-
-        @Override
         public StyledString getStyledText(final Object element) {
             final LibrarySpecification spec = (LibrarySpecification) element;
             final StyledString text = new StyledString(spec.getName());
