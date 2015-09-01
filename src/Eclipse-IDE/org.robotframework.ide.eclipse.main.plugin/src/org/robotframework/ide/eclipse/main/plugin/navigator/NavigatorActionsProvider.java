@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -13,8 +14,10 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.DeleteRobotElementAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.OpenAction;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction;
 
 public class NavigatorActionsProvider extends CommonActionProvider {
 
@@ -22,6 +25,8 @@ public class NavigatorActionsProvider extends CommonActionProvider {
 
     private OpenAction openAction;
     private DeleteRobotElementAction deleteAction;
+    private RunTestCaseAction runTestCaseAction;
+    private RunTestCaseAction debugTestCaseAction;
 
     private ISelectionChangedListener listener;
 
@@ -36,6 +41,11 @@ public class NavigatorActionsProvider extends CommonActionProvider {
             selectionProvider.addSelectionChangedListener(listener);
 
             openAction = new OpenAction(workbenchSite.getPage(), selectionProvider);
+            runTestCaseAction = new RunTestCaseAction(workbenchSite.getPage(), selectionProvider, ILaunchManager.RUN_MODE);
+            runTestCaseAction.setImageDescriptor(RedImages.getRunImage());
+            debugTestCaseAction = new RunTestCaseAction(workbenchSite.getPage(), selectionProvider, ILaunchManager.DEBUG_MODE);
+            debugTestCaseAction.setImageDescriptor(RedImages.getDebugImage());
+            
             deleteAction = new DeleteRobotElementAction(workbenchSite.getPage(), selectionProvider);
         }
     }
@@ -45,6 +55,8 @@ public class NavigatorActionsProvider extends CommonActionProvider {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 openAction.updateEnablement((IStructuredSelection) event.getSelection());
+                runTestCaseAction.updateEnablement((IStructuredSelection) event.getSelection());
+                debugTestCaseAction.updateEnablement((IStructuredSelection) event.getSelection());
                 deleteAction.updateEnablement((IStructuredSelection) event.getSelection());
             }
         };
@@ -65,6 +77,8 @@ public class NavigatorActionsProvider extends CommonActionProvider {
     @Override
     public void fillContextMenu(final IMenuManager menu) {
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, openAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, runTestCaseAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, debugTestCaseAction);
         menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, deleteAction);
     }
 }
