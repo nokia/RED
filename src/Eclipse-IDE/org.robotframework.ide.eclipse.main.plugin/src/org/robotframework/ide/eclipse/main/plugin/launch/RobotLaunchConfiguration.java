@@ -13,6 +13,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -224,5 +225,19 @@ public class RobotLaunchConfiguration {
         launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "-R" + " " + outputFilePath);
         launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
         launchCopy.setAttribute(TEST_CASES_ATTRIBUTE, new ArrayList<String>());
+    }
+    
+    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCases(
+            final List<IResource> resources, final List<String> testCasesNames) throws CoreException {
+
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String configurationName = manager.generateLaunchConfigurationName("New Configuration");
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID).newInstance(
+                null, configurationName);
+        fillDefaults(configuration, resources);
+
+        configuration.setAttribute(TEST_CASES_ATTRIBUTE, testCasesNames);
+
+        return configuration;
     }
 }

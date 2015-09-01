@@ -40,7 +40,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
@@ -331,8 +330,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 if (variableFile == null) {
                     variableFile = new ReferencedVariableFile();
                 }
-                variableFile.setPath(ImportSettingFilePathResolver.createFileRelativePath(new Path(pathText.getText()),
-                        editorInput.getRobotProject().getProject().getLocation()).toPortableString());
+                variableFile.setPath(new Path(pathText.getText()).toPortableString());
                 variableFile.setArguments(argumentsEditor.getArguments());
             }
 

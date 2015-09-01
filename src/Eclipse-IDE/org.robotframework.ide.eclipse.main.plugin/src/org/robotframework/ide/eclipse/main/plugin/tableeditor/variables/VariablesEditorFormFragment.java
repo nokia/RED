@@ -200,7 +200,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setText("Edit Variable");
         section.setExpanded(false);
-        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
         Sections.switchGridCellGrabbingOnExpansion(section);
         Sections.installMaximazingPossibility(section);
         

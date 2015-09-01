@@ -18,7 +18,7 @@ public class ExecutionViewLabelProvider extends StyledCellLabelProvider {
     }
 
     @Override
-    public void update(ViewerCell cell) {
+    public void update(final ViewerCell cell) {
         
         final StyledString label = getStyledString(cell.getElement());
         cell.setText(label.getString());
