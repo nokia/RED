@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -93,14 +92,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer.getTable().setEnabled(false);
 
         viewer.setContentProvider(new VariableFilesContentProvider());
-
-        ViewerColumnsFactory.newColumn("")
-                .withWidth(100)
-                .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(100)
-                .labelsProvidedBy(new VariableFilesLabelProvider(fileDialogStartingPath))
-                .createFor(viewer);
-
+        viewer.setLabelProvider(new VariableFilesLabelProvider(fileDialogStartingPath));
         final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
 
             @Override

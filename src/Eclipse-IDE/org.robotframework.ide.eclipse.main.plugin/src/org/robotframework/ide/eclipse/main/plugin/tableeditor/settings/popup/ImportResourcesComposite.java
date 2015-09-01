@@ -15,17 +15,16 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -94,10 +93,8 @@ public class ImportResourcesComposite {
 
         resourcesViewer = new TableViewer(resourcesComposite);
         resourcesViewer.setContentProvider(new ImportResourcesContentProvider());
+        resourcesViewer.setLabelProvider(new ResourcesLabelProvider());
         GridDataFactory.fillDefaults().grab(true, true).hint(220, 250).applyTo(resourcesViewer.getControl());
-        ViewerColumnsFactory.newColumn("").shouldGrabAllTheSpaceLeft(true).withWidth(200)
-                .labelsProvidedBy(new ResourcesLabelProvider())
-                .createFor(resourcesViewer);
         
         final Composite addResourceButtons = formToolkit.createComposite(resourcesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addResourceButtons);
@@ -293,18 +290,24 @@ public class ImportResourcesComposite {
         }
     }
     
-    private static class ResourcesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+    private static class ResourcesLabelProvider extends StyledCellLabelProvider {
+        
         @Override
+        public void update(final ViewerCell cell) {
+            
+            final StyledString label = getStyledText(cell.getElement());
+            cell.setText(label.getString());
+            cell.setStyleRanges(label.getStyleRanges());
+            
+            cell.setImage(getImage(cell.getElement()));
+            
+            super.update(cell);
+        }
+
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getResourceImage());
         }
 
-        @Override
-        public String getText(final Object element) {
-            return ((IPath) element).toOSString();
-        }
-
-        @Override
         public StyledString getStyledText(final Object element) {
             final IPath path = (IPath) element;
             final StyledString text = new StyledString(path.lastSegment());

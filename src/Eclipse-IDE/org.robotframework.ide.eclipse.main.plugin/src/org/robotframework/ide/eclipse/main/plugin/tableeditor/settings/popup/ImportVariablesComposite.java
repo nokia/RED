@@ -13,17 +13,16 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -101,13 +100,9 @@ public class ImportVariablesComposite {
 
         variablesViewer = new TableViewer(variablesComposite);
         variablesViewer.setContentProvider(new ImportVariablesContentProvider());
+        variablesViewer.setLabelProvider(new VariablesLabelProvider());
         GridDataFactory.fillDefaults().grab(true, true).hint(220, 250).applyTo(variablesViewer.getControl());
-        ViewerColumnsFactory.newColumn("")
-                .shouldGrabAllTheSpaceLeft(true)
-                .withWidth(200)
-                .labelsProvidedBy(new VariablesLabelProvider())
-                .createFor(variablesViewer);
-
+        
         final Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addVariablesButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addVariablesButtons);
@@ -350,19 +345,24 @@ public class ImportVariablesComposite {
                 initialSetting.getArguments())));
     }
 
-    private static class VariablesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
-
+    private static class VariablesLabelProvider extends StyledCellLabelProvider {
+        
         @Override
+        public void update(final ViewerCell cell) {
+            
+            final StyledString label = getStyledText(cell.getElement());
+            cell.setText(label.getString());
+            cell.setStyleRanges(label.getStyleRanges());
+            
+            cell.setImage(getImage(cell.getElement()));
+            
+            super.update(cell);
+        }
+
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
         }
 
-        @Override
-        public String getText(final Object element) {
-            return "";
-        }
-
-        @Override
         public StyledString getStyledText(final Object element) {
             final ImportedVariablesFile importedVariable = (ImportedVariablesFile) element;
             final List<String> args = importedVariable.getArgs();
