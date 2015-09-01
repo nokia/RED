@@ -25,11 +25,15 @@ public class RobotProjectHolder {
 
 
     public void addModelFile(final RobotFileOutput robotOutput) {
-        if (shouldBeLoaded(robotOutput)) {
-            removeModelFile(robotOutput);
-        }
+        if (robotOutput != null) {
+            File processedFile = robotOutput.getProcessedFile();
+            if (processedFile != null) {
+                RobotFileOutput file = findFileByName(processedFile);
+                removeModelFile(file);
+            }
 
-        readableProjectFiles.add(robotOutput);
+            readableProjectFiles.add(robotOutput);
+        }
     }
 
 

@@ -3,6 +3,7 @@ package org.robotframework.ide.core.testData.model;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -24,6 +25,18 @@ public class RobotFile implements IRobotFile {
     private KeywordTable keywordTable = new KeywordTable();
 
     private final List<RobotLine> fileContent = new LinkedList<>();
+    private final UUID uuid;
+
+
+    public RobotFile() {
+        this.uuid = UUID.randomUUID();
+    }
+
+
+    @Override
+    public UUID getUUID() {
+        return uuid;
+    }
 
 
     @Override
