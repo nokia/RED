@@ -1,6 +1,7 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class RobotFileOutput {
 
 
     public List<BuildMessage> getBuildingMessages() {
-        return buildingMessages;
+        return Collections.unmodifiableList(buildingMessages);
     }
 
 
@@ -69,7 +70,7 @@ public class RobotFileOutput {
 
 
     public List<ResourceImportReference> getResourceImportReferences() {
-        return resourceReferences;
+        return Collections.unmodifiableList(resourceReferences);
     }
 
 
@@ -80,7 +81,7 @@ public class RobotFileOutput {
 
 
     public List<VariablesFileImportReference> getVariablesImportReferences() {
-        return variablesReferenced;
+        return Collections.unmodifiableList(variablesReferenced);
     }
 
     public static class BuildMessage {
