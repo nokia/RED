@@ -1,6 +1,8 @@
 package org.robotframework.ide.core.testData.importer;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +37,10 @@ public class VariablesImporter {
                     File directory = robotFile.getProcessedFile()
                             .getAbsoluteFile().getParentFile();
                     if (directory.exists()) {
-                        path = new StringBuilder(directory.getAbsolutePath())
-                                .append(File.separatorChar).append(path)
-                                .toString();
+                        Path joinPath = Paths.get(directory.getAbsolutePath())
+                                .resolveSibling(path);
+                        path = joinPath.toAbsolutePath().toFile()
+                                .getAbsolutePath();
                     }
                     Map<?, ?> variablesFromFile = robotRunEnv
                             .getVariablesFromFile(path, varFileArguments);
