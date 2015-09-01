@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
+import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -29,14 +30,14 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
     @Override
     public void map(RobotToken rt, ParsingState currentState,
             ITablesGetter fileModel) {
-        List<IVariableHolder> variables = fileModel.getVariableTable()
-                .getVariables();
-        if (variables.isEmpty()) {
+        VariableTable variableTable = fileModel.getVariableTable();
+        if (variableTable.isEmpty()) {
             ListVariable var = new ListVariable(null,
                     createArtifactalListVariable(rt));
             var.addCommentPart(rt);
-            variables.add(var);
+            variableTable.addVariable(var);
         } else {
+            List<IVariableHolder> variables = variableTable.getVariables();
             IVariableHolder var = variables.get(variables.size() - 1);
             if (var.getDeclaration().getLineNumber() == rt.getLineNumber()) {
                 var.addCommentPart(rt);
@@ -44,7 +45,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
                 ListVariable newVar = new ListVariable(null,
                         createArtifactalListVariable(rt));
                 newVar.addCommentPart(rt);
-                variables.add(newVar);
+                variableTable.addVariable(newVar);
             }
         }
 
