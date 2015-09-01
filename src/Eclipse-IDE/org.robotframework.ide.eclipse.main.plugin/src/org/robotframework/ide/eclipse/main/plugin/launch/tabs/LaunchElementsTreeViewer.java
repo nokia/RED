@@ -300,6 +300,7 @@ public class LaunchElementsTreeViewer {
                 cell.setText(((TestCaseLaunchElement) element).getName());
                 cell.setImage(ImagesManager.getImage(RedImages.getTestCaseImage()));
             }
+            super.update(cell);
         }
     }
 

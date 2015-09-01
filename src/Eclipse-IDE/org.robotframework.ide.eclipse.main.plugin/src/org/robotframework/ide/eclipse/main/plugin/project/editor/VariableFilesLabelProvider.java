@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -16,7 +17,7 @@ import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 
-class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
+class VariableFilesLabelProvider extends StyledCellLabelProvider {
     
     private String projectPath;
     
@@ -25,6 +26,17 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
     }
 
     @Override
+    public void update(final ViewerCell cell) {
+        
+        final StyledString label = getStyledText(cell.getElement());
+        cell.setText(label.getString());
+        cell.setStyleRanges(label.getStyleRanges());
+        
+        cell.setImage(getImage(cell.getElement()));
+        
+        super.update(cell);
+    }
+
     public StyledString getStyledText(final Object element) {
         final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
 
@@ -47,7 +59,6 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
 
     }
 
-    @Override
     public Image getImage(final Object element) {
         return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
     }
