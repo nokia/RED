@@ -8,10 +8,21 @@ public class RobotLine {
 
     private int lineNumber = -1;
     private List<IRobotLineElement> lineElements = new LinkedList<>();
+    private String uuid;
 
 
     public RobotLine(int lineNumber) {
         this.lineNumber = lineNumber;
+    }
+
+
+    public void setFileUUID(String uuid) {
+        this.uuid = uuid;
+    }
+
+
+    public String getFileUUID() {
+        return uuid;
     }
 
 

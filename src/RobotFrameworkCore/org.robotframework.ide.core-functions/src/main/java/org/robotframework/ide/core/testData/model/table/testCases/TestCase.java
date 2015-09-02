@@ -40,6 +40,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTestExecutionRow(final RobotExecutableRow executionRow) {
+        executionRow.setFileUUID(getFileUUID());
         this.testContext.add(executionRow);
     }
 
@@ -60,6 +61,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTag(final TestCaseTags tag) {
+        tag.setFileUUID(getFileUUID());
         tags.add(tag);
     }
 
@@ -70,6 +72,7 @@ public class TestCase extends AModelElement {
 
 
     public void addSetup(final TestCaseSetup setup) {
+        setup.setFileUUID(getFileUUID());
         setups.add(setup);
     }
 
@@ -80,6 +83,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTeardown(final TestCaseTeardown teardown) {
+        teardown.setFileUUID(getFileUUID());
         teardowns.add(teardown);
     }
 
@@ -90,6 +94,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTemplate(final TestCaseTemplate template) {
+        template.setFileUUID(getFileUUID());
         templates.add(template);
     }
 
@@ -100,6 +105,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTimeout(final TestCaseTimeout timeout) {
+        timeout.setFileUUID(getFileUUID());
         timeouts.add(timeout);
     }
 
