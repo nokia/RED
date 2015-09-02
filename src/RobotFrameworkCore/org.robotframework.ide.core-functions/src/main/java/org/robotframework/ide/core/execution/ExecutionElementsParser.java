@@ -57,37 +57,33 @@ public class ExecutionElementsParser implements ILineHandler {
         switch (eventType) {
             case START_SUITE_EVENT:
                 final List<Object> startSuiteList = (List<Object>) eventMap.get(START_SUITE_EVENT);
-                ExecutionElement startSuiteElement = new ExecutionElement((String) startSuiteList.get(0), ExecutionElementType.SUITE);
                 final Map<String, String> startSuiteDetails = (Map<String, String>) startSuiteList.get(1);
-                startSuiteElement.setSource(startSuiteDetails.get("source"));
+                final ExecutionElement startSuiteElement = createStartSuiteExecutionElement(
+                        (String) startSuiteList.get(0), startSuiteDetails.get("source"));
                 executionHandler.processExecutionElement(startSuiteElement);
                 break;
             case END_SUITE_EVENT:
                 final List<Object> endSuiteList = (List<Object>) eventMap.get(END_SUITE_EVENT);
-                ExecutionElement endSuiteElement = new ExecutionElement((String) endSuiteList.get(0), ExecutionElementType.SUITE);
                 final Map<String, Object> endSuiteDetails = (Map<String, Object>) endSuiteList.get(1);
-                endSuiteElement.setElapsedTime((Integer)endSuiteDetails.get("elapsedtime"));
-                endSuiteElement.setMessage((String)endSuiteDetails.get("message"));
-                endSuiteElement.setStatus((String)endSuiteDetails.get("status"));
+                final ExecutionElement endSuiteElement = createEndSuiteExecutionElement((String) endSuiteList.get(0),
+                        endSuiteDetails);
                 executionHandler.processExecutionElement(endSuiteElement);
                 break;
             case START_TEST_EVENT:
                 final List<Object> testList = (List<Object>) eventMap.get(START_TEST_EVENT);
-                ExecutionElement startTestElement = new ExecutionElement((String)testList.get(0), ExecutionElementType.TEST);
+                final ExecutionElement startTestElement = createStartTestExecutionElement((String)testList.get(0));
                 executionHandler.processExecutionElement(startTestElement);
                 break;
             case END_TEST_EVENT:
                 final List<Object> endTestList = (List<Object>) eventMap.get(END_TEST_EVENT);
-                ExecutionElement endTestElement = new ExecutionElement((String) endTestList.get(0), ExecutionElementType.TEST);
                 final Map<String, Object> endTestDetails = (Map<String, Object>) endTestList.get(1);
-                endTestElement.setElapsedTime((Integer)endTestDetails.get("elapsedtime"));
-                endTestElement.setMessage((String)endTestDetails.get("message"));
-                endTestElement.setStatus((String)endTestDetails.get("status"));
+                final ExecutionElement endTestElement = createEndTestExecutionElement((String) endTestList.get(0),
+                        endTestDetails);
                 executionHandler.processExecutionElement(endTestElement);
                 break;
             case OUTPUT_FILE_EVENT:
                 final List<Object> outputFileList = (List<Object>) eventMap.get(OUTPUT_FILE_EVENT);
-                ExecutionElement outputFilePathElement = new ExecutionElement((String) outputFileList.get(0), ExecutionElementType.OUTPUT_FILE);
+                final ExecutionElement outputFilePathElement = createOutputFileExecutionElement((String) outputFileList.get(0));
                 executionHandler.processExecutionElement(outputFilePathElement);
                 break;
             default:
@@ -95,6 +91,43 @@ public class ExecutionElementsParser implements ILineHandler {
         }
     }
 
+    public static ExecutionElement createStartSuiteExecutionElement(final String name, final String source) {
+        final ExecutionElement startElement = createNewExecutionElement(name, ExecutionElementType.SUITE);
+        startElement.setSource(source);
+        return startElement;
+    }
+    
+    public static ExecutionElement createStartTestExecutionElement(final String name) {
+        return createNewExecutionElement(name, ExecutionElementType.TEST);
+    }
+
+    public static ExecutionElement createEndTestExecutionElement(final String name,
+            final Map<?, ?> endTestDetails) {
+        return createEndExecutionElement(name, ExecutionElementType.TEST, endTestDetails);
+    }
+
+    public static ExecutionElement createEndSuiteExecutionElement(final String name,
+            final Map<?, ?> endSuiteDetails) {
+        return createEndExecutionElement(name, ExecutionElementType.SUITE, endSuiteDetails);
+    }
+    
+    public static ExecutionElement createOutputFileExecutionElement(final String name) {
+        return createNewExecutionElement(name, ExecutionElementType.OUTPUT_FILE);
+    }
+
+    private static ExecutionElement createEndExecutionElement(final String name, final ExecutionElementType type,
+            final Map<?, ?> details) {
+        final ExecutionElement endElement = createNewExecutionElement(name, type);
+        endElement.setElapsedTime((Integer) details.get("elapsedtime"));
+        endElement.setMessage((String) details.get("message"));
+        endElement.setStatus((String) details.get("status"));
+        return endElement;
+    }
+    
+    private static ExecutionElement createNewExecutionElement(final String name, final ExecutionElementType type) {
+        return new ExecutionElement(name, type);
+    }
+    
     private String getEventType(final Map<?, ?> eventMap) {
         if (eventMap == null) {
             return null;
@@ -105,5 +138,4 @@ public class ExecutionElementsParser implements ILineHandler {
         }
         return null;
     }
-    
 }

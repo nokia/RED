@@ -146,6 +146,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
         try {
             robotEventBroker.sendClearEventToMessageLogView();
+            robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, monitor);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
@@ -195,7 +196,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         DebugSocketManager socketManager = null;
         
         if (!isDebugging) {
-            robotEventBroker.sendClearEventToExecutionView();
             runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), new ILineHandler() {
                 @Override
                 public void processLine(final String line) {

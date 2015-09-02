@@ -20,7 +20,7 @@ public class RobotPerspective implements IPerspectiveFactory {
         bottom.addView("org.eclipse.ui.console.ConsoleView"); 
         bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
         
-        final IFolderLayout bottomLog = layout.createFolder("bottom", IPageLayout.RIGHT, 0.50f, "bottom");
+        final IFolderLayout bottomLog = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.50f, "bottom");
         bottomLog.addView(MessageLogView.ID);
         bottomLog.addView(ExecutionView.ID);
 
