@@ -5,29 +5,25 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 
-import com.google.common.collect.Range;
-
 public class ProblemsReportingStrategy {
 
     public void handleProblem(final RobotProblem problem, final IFile file, final int line) throws ReportingInterruptedException {
-        handleProblem(problem, file, line, null, new HashMap<String, Object>());
+        handleProblem(problem, file, new ProblemPosition(line), new HashMap<String, Object>());
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final int line,
             final Map<String, Object> additionalAttributes) throws ReportingInterruptedException {
-        handleProblem(problem, file, line, null, additionalAttributes);
+        handleProblem(problem, file, new ProblemPosition(line), additionalAttributes);
     }
 
-    public void handleProblem(final RobotProblem problem, final IFile file, final int line,
-            final Range<Integer> charRange) throws ReportingInterruptedException {
-        handleProblem(problem, file, line, charRange, new HashMap<String, Object>());
+    public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {
+        handleProblem(problem, file, filePosition, new HashMap<String, Object>());
     }
 
-    public void handleProblem(final RobotProblem problem, final IFile file, final int line,
-            final Range<Integer> charRange, final Map<String, Object> additionalAttributes)
-            throws ReportingInterruptedException {
+    public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
+            final Map<String, Object> additionalAttributes) {
         if (problem != null) {
-            problem.createMarker(file, line, charRange, additionalAttributes);
+            problem.createMarker(file, filePosition, additionalAttributes);
         }
     }
 
