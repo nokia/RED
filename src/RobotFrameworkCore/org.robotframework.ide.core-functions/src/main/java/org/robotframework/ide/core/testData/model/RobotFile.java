@@ -3,7 +3,6 @@ package org.robotframework.ide.core.testData.model;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
@@ -18,21 +17,31 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class RobotFile {
 
-    private SettingTable settingTable = new SettingTable();
-    private VariableTable variableTable = new VariableTable();
-    private TestCaseTable testCaseTable = new TestCaseTable();
-    private KeywordTable keywordTable = new KeywordTable();
+    private SettingTable settingTable;
+    private VariableTable variableTable;
+    private TestCaseTable testCaseTable;
+    private KeywordTable keywordTable;
 
     private final List<RobotLine> fileContent = new LinkedList<>();
-    private final UUID uuid;
+    private final String uuid;
 
 
     public RobotFile() {
-        this.uuid = UUID.randomUUID();
+        this.uuid = generateUUID();
+        excludeSettingTableSection();
+        excludeVariableTableSection();
+        excludeTestCaseTableSection();
+        excludeKeywordTableSection();
     }
 
 
-    public UUID getUUID() {
+    private String generateUUID() {
+        return "-" + System.currentTimeMillis() + "-" + System.nanoTime() + "-"
+                + Math.random();
+    }
+
+
+    public String getFileUUID() {
         return uuid;
     }
 
@@ -43,6 +52,7 @@ public class RobotFile {
 
 
     public void addNewLine(final RobotLine line) {
+        line.setFileUUID(getFileUUID());
         this.fileContent.add(line);
     }
 
@@ -58,7 +68,7 @@ public class RobotFile {
 
 
     public void excludeSettingTableSection() {
-        settingTable = new SettingTable();
+        settingTable = new SettingTable(uuid);
     }
 
 
@@ -73,7 +83,7 @@ public class RobotFile {
 
 
     public void excludeVariableTableSection() {
-        variableTable = new VariableTable();
+        variableTable = new VariableTable(uuid);
     }
 
 
@@ -88,7 +98,7 @@ public class RobotFile {
 
 
     public void excludeTestCaseTableSection() {
-        testCaseTable = new TestCaseTable();
+        testCaseTable = new TestCaseTable(uuid);
     }
 
 
@@ -103,7 +113,7 @@ public class RobotFile {
 
 
     public void excludeKeywordTableSection() {
-        keywordTable = new KeywordTable();
+        keywordTable = new KeywordTable(uuid);
     }
 
 
@@ -126,6 +136,7 @@ public class RobotFile {
                 type.getRepresentation().get(0)).append(" ***"));
         tableHeaderToken.setType(type);
         TableHeader header = new TableHeader(tableHeaderToken);
+        header.setFileUUID(getFileUUID());
 
         return header;
     }
