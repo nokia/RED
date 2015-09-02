@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment.tableSett
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.listener.ITablesGetter;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -20,7 +20,7 @@ public class SettingTestSetupCommentMapper implements IHashCommentMapper {
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            ITablesGetter fileModel) {
+            RobotFile fileModel) {
         List<TestSetup> testSetups = fileModel.getSettingTable()
                 .getTestSetups();
         if (!testSetups.isEmpty()) {
