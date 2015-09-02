@@ -179,7 +179,7 @@
        </actionSet>
     </perspectiveExtension>
  </extension>
-   <extension
+ <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="org.eclipse.debug.ui.DebugPerspective">
@@ -189,11 +189,19 @@
                ratio="0.55f"
                id="org.robotframework.ide.MessageLogView">
          </view>
+         <view
+               relative="org.robotframework.ide.MessageLogView"
+               relationship="stack"
+               id="org.robotframework.ide.ExecutionView">
+         </view>
          <viewShortcut
                id="org.robotframework.ide.MessageLogView">
          </viewShortcut>
+         <viewShortcut
+               id="org.robotframework.ide.ExecutionView">
+         </viewShortcut>
       </perspectiveExtension>
-   </extension>
+ </extension>
 
 	<extension
             point="org.eclipse.ui.editors">
