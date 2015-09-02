@@ -16,6 +16,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
@@ -29,6 +30,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -112,7 +114,9 @@ public class RobotFormEditor extends FormEditor {
         try {
             prepareCommandsContext();
 
-            addEditorPart(new CasesEditorPart(), "Test Cases");
+            if (provideSuiteModel().isSuiteFile()) {
+                addEditorPart(new CasesEditorPart(), "Test Cases");
+            }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
@@ -125,7 +129,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private int getPageToActivate() {
-        final int def = 4;
+        final int def = getPageCount() - 1;
         if (getEditorInput() instanceof IFileEditorInput) {
             final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
             final IFile file = fileInput.getFile();
@@ -137,7 +141,7 @@ public class RobotFormEditor extends FormEditor {
                 return def;
             }
             final int activeIndex = section.getInt("activePage");
-            if (activeIndex >= 0 && activeIndex <= 4) {
+            if (activeIndex >= 0 && activeIndex <= def) {
                 return activeIndex;
             }
             return def;
@@ -179,15 +183,34 @@ public class RobotFormEditor extends FormEditor {
     @Override
     public void doSave(final IProgressMonitor monitor) {
         try {
+            boolean shouldClose = false;
+            final RobotSuiteFile currentModel = provideSuiteModel();
+            if (currentModel.isSuiteFile() && !currentModel.findSection(RobotCasesSection.class).isPresent()) {
+                MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+                        "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
+                                + "changes there is no Test Cases section. From now on this file will be recognized as "
+                                + "Resource file.\n\nThe editor will be closed");
+                shouldClose = true;
+            } else if (currentModel.isResourceFile() && currentModel.findSection(RobotCasesSection.class).isPresent()) {
+                MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+                        "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
+                                + "changes there is a Test Cases section defined. From now on this file will be recognized "
+                                + "as Suite file.\n\nThe editor will be closed");
+                shouldClose = true;
+            }
+
             for (final IEditorPart dirtyEditor : getDirtyEditors()) {
                 dirtyEditor.doSave(monitor);
             }
-
-            suiteModel = provideSuiteModel();
+            suiteModel = currentModel;
             suiteModel.commitChanges(monitor);
             suiteModel = null;
 
             updateActivePage();
+
+            if (shouldClose) {
+                close(false);
+            }
         } catch (final CoreException e) {
             monitor.setCanceled(true);
         }

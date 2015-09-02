@@ -15,6 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart.SettingsEditor;
 import org.robotframework.red.graphics.ImagesManager;
@@ -34,7 +35,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         private GeneralSettingsFormFragment generalFragment;
 
-        private MetadataSettingsFormFragment metadataFragment;
+        private Optional<MetadataSettingsFormFragment> metadataFragment;
 
         private ImportSettingsFormFragment importFragment;
 
@@ -63,15 +64,21 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             final RobotSetting setting = (RobotSetting) robotElement;
             if (setting.getGroup() == SettingsGroup.NO_GROUP) {
                 generalFragment.revealSetting(setting);
-                metadataFragment.clearSettingsSelection();
+                if (metadataFragment.isPresent()) {
+                    metadataFragment.get().clearSettingsSelection();
+                }
                 importFragment.clearSettingsSelection();
             } else if (setting.getGroup() == SettingsGroup.METADATA) {
                 generalFragment.clearSettingsSelection();
-                metadataFragment.revealSetting(setting);
+                if (metadataFragment.isPresent()) {
+                    metadataFragment.get().revealSetting(setting);
+                }
                 importFragment.clearSettingsSelection();
             } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
                 generalFragment.clearSettingsSelection();
-                metadataFragment.clearSettingsSelection();
+                if (metadataFragment.isPresent()) {
+                    metadataFragment.get().clearSettingsSelection();
+                }
                 importFragment.revealSetting(setting);
             }
         }
@@ -84,21 +91,40 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             generalFragment = new GeneralSettingsFormFragment();
-            metadataFragment = new MetadataSettingsFormFragment();
+            final MetadataSettingsFormFragment fragment = shouldShowMetadata() ? new MetadataSettingsFormFragment()
+                    : null;
+            metadataFragment = Optional.fromNullable(fragment);
             importFragment = new ImportSettingsFormFragment();
-            return newArrayList(generalFragment, metadataFragment, importFragment);
+
+            if (metadataFragment.isPresent()) {
+                return newArrayList(generalFragment, metadataFragment.get(), importFragment);
+            } else {
+                return newArrayList(generalFragment, importFragment);
+            }
+        }
+
+        private boolean shouldShowMetadata() {
+            final Object model = getContext().get(RobotEditorSources.SUITE_FILE_MODEL);
+            if (model instanceof RobotSuiteFile) {
+                return !((RobotSuiteFile) model).isResourceFile();
+            }
+            return true;
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return new SettingsEditorPageSelectionProvider(generalFragment.getViewer(), metadataFragment.getViewer(),
-                    importFragment.getViewer());
+            if (metadataFragment.isPresent()) {
+                return new SettingsEditorPageSelectionProvider(generalFragment.getViewer(),
+                        metadataFragment.get().getViewer(), importFragment.getViewer());
+            } else {
+                return new SettingsEditorPageSelectionProvider(generalFragment.getViewer(), importFragment.getViewer());
+            }
         }
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            if (metadataFragment.getViewer().getTable().isFocusControl()) {
-                return metadataFragment.getFocusedViewerAccessor();
+            if (metadataFragment.isPresent() && metadataFragment.get().getViewer().getTable().isFocusControl()) {
+                return metadataFragment.get().getFocusedViewerAccessor();
             } else if (importFragment.getViewer().getTable().isFocusControl()) {
                 return importFragment.getFocusedViewerAccessor();
             }

@@ -1,7 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -15,7 +13,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
 
 public class RobotArtifactsValidator {
@@ -74,21 +75,32 @@ public class RobotArtifactsValidator {
 
     private void validateResource(final IResource resource, final IProgressMonitor monitor, final boolean removeMarkers)
             throws CoreException {
-        if (resource.getType() == IResource.FILE && resource.getFileExtension().equals("robot")) {
-            try {
-                if (removeMarkers) {
-                    resource.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-                }
-                new RobotSuiteFileValidator((IFile) resource).validate(monitor);
-            } catch (final IOException e) {
-                throw new CoreException(Status.CANCEL_STATUS);
-            }
-        } else if (resource.getType() == IResource.FILE && resource.getName().equals("red.xml")
-                && resource.getParent() == resource.getProject()) {
-            if (removeMarkers) {
-                resource.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-            }
-            new RobotProjectConfigFileValidator((IFile) resource).validate(monitor);
+        if (resource.getType() != IResource.FILE) {
+            return;
         }
+
+        final IFile file = (IFile) resource;
+        RobotFileValidator validator = null;
+        if (RobotSuiteFileDescriber.isSuiteFile(file)) {
+            validator = new RobotSuiteFileValidator(file);
+        } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
+            validator = new RobotResourceFileValidator(file);
+        } else if (RobotSuiteFileDescriber.isInitializationFile(file)) {
+            validator = new RobotInitFileValidator(file);
+        } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
+            validator = new RobotProjectConfigFileValidator(file);
+        }
+
+        if (validator != null) {
+            if (removeMarkers) {
+                file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+            }
+            validator.validate(monitor);
+        }
+    }
+
+    public interface RobotFileValidator {
+
+        void validate(IProgressMonitor monitor) throws CoreException;
     }
 }

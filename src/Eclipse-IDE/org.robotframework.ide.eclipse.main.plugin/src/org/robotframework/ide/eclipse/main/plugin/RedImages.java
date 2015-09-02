@@ -19,8 +19,16 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
 
-    public static ImageDescriptor getRobotDecoratorImage() {
-        return RedPlugin.getImageDescriptor("resources/robot_dec.png");
+    public static ImageDescriptor getRobotSuiteFolderDecoratorImage() {
+        return RedPlugin.getImageDescriptor("resources/decorator_suite_directory.png");
+    }
+
+    public static ImageDescriptor getRobotResourceDecoratorImage() {
+        return RedPlugin.getImageDescriptor("resources/decorator_resource_file.png");
+    }
+
+    public static ImageDescriptor getRobotInitFileDecoratorImage() {
+        return RedPlugin.getImageDescriptor("resources/decorator_init_file.png");
     }
 
     public static ImageDescriptor getRobotCasesFileSectionImage() {
@@ -52,7 +60,7 @@ public class RedImages {
     }
     
     public static ImageDescriptor getRobotFileImage() {
-        return RedPlugin.getImageDescriptor("resources/robot_file.png");
+        return RedPlugin.getImageDescriptor("resources/file_robot.png");
     }
 
     public static ImageDescriptor getTestCaseImage() {
@@ -120,7 +128,7 @@ public class RedImages {
     }
 
     public static ImageDescriptor getRobotProjectConfigFile() {
-        return RedPlugin.getImageDescriptor("resources/config.png");
+        return RedPlugin.getImageDescriptor("resources/file_redxml.png");
     }
 
     public static ImageDescriptor getFocusSectionImage() {

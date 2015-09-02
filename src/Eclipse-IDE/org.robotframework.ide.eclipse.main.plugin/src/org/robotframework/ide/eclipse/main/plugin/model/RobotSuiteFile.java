@@ -27,10 +27,10 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.listener.IRobotFile;
-import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
@@ -122,19 +122,19 @@ public class RobotSuiteFile implements RobotElement {
         }
     }
     
-    private RobotFileOutput parseModel() {
+    protected RobotFileOutput parseModel() {
         final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
         final RobotFileOutput robotFileOutput = new RobotParser(new RobotProjectHolder(runtimeEnvironment))
                 .parse(file.getLocation().toFile()).get(0);
         if (robotFileOutput.getStatus() == Status.FAILED) {
-            throw new RuntimeException("Unable to read suite file model");
+            throw new RobotFileParsingException("Unable to read suite file model");
         } else {
             return robotFileOutput;
         }
     }
 
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
     void dispose() {
@@ -142,10 +142,6 @@ public class RobotSuiteFile implements RobotElement {
         sections = null;
         fileOutput = null;
         listener = null;
-    }
-
-    protected FileSectionsParser createParser() {
-        return new FileSectionsParser(file);
     }
 
     protected void refreshOnFileChange() {
@@ -159,6 +155,29 @@ public class RobotSuiteFile implements RobotElement {
             refreshOnFileChange();
         }
         return new ArrayList<>();
+    }
+
+    public boolean isSuiteFile() {
+        return RobotSuiteFileDescriber.SUITE_FILE_CONTENT_ID.equals(getContentTypeId());
+    }
+
+    public boolean isResourceFile() {
+        return RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(getContentTypeId());
+    }
+
+    public boolean isInitializationFile() {
+        return RobotSuiteFileDescriber.INIT_FILE_CONTENT_ID.equals(getContentTypeId());
+    }
+
+    protected String getContentTypeId() {
+        if (file != null) {
+            try {
+                return file.getContentDescription().getContentType().getId();
+            } catch (@SuppressWarnings("unused") final CoreException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -303,6 +322,13 @@ public class RobotSuiteFile implements RobotElement {
         return newArrayList();
     }
     
+    private static class RobotFileParsingException extends RuntimeException {
+
+        public RobotFileParsingException(final String message) {
+            super(message);
+        }
+    }
+
     public static class ImportedVariablesFile {
 
         private List<String> args;
