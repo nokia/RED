@@ -29,6 +29,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.core.execution.ExecutionElementsParser;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
@@ -109,6 +110,7 @@ public class RobotDebugEventDispatcher extends Job {
             if (eventType == null) {
                 continue;
             }
+
             switch (eventType) {
                 case "pid":
                     handlePidEvent();
@@ -150,13 +152,16 @@ public class RobotDebugEventDispatcher extends Job {
                 	handleEndTestEvent(eventMap);
                 	break;
                 case "end_suite":
-                    handleEndSuiteEvent();
+                    handleEndSuiteEvent(eventMap);
                     break;
                 case "close":
                     handleCloseEvent();
                     break;
                 case "log_message":
                     handleLogMessageEvent(eventMap);
+                    break;
+                case "output_file":
+                    handleOutputFile(eventMap);
                     break;
                 case "error":
                     break;
@@ -178,6 +183,8 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         currentSuite = new File((String) suiteElements.get("source")).getName();
         executedFile = extractSuiteFile(currentSuite, suiteResources);
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
+                (String) suiteList.get(0), (String) suiteElements.get("source")));
     }
 
     private void handleStartTestEvent(final Map<?, ?> eventMap) {
@@ -185,6 +192,7 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Starting test: " + testElements.get("longname") + '\n';
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement((String) testList.get(0)));
     }
     
     private void handleStartKeywordEvent(final Map<?, ?> eventMap) {
@@ -409,10 +417,15 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Ending test: " + testElements.get("longname") + "\n\n";
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndTestExecutionElement(
+                (String) testList.get(0), testElements));
     }
     
-    private void handleEndSuiteEvent() {
+    private void handleEndSuiteEvent(final Map<?, ?> eventMap) {
+        final List<?> suiteList = (List<?>) eventMap.get("end_suite");
         target.clearStackFrames();
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndSuiteExecutionElement(
+                (String) suiteList.get(0), (Map<?, ?>) suiteList.get(1)));
     }
 
 
@@ -428,6 +441,11 @@ public class RobotDebugEventDispatcher extends Job {
         final String line = messageElements.get("timestamp") + " : " + messageElements.get("level") + " : "
                 + messageElements.get("message") + '\n';
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
+    }
+    
+    private void handleOutputFile(final Map<?, ?> eventMap) {
+        final List<?> outputFileList = (List<?>) eventMap.get("output_file");
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createOutputFileExecutionElement((String) outputFileList.get(0)));
     }
 
     private String getEventType(final Map<?, ?> eventMap) {

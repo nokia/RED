@@ -629,8 +629,21 @@ public class TextEditor {
             public void widgetSelected(final SelectionEvent e) {
                 try {
                     final int line = viewer.getTextWidget().getLineAtOffset(viewer.getTextWidget().getSelection().x);
-                    final RobotLineBreakpoint lineBreakpoint = new RobotLineBreakpoint((IResource) input.getAdapter(IResource.class), line+1);
-                    DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(lineBreakpoint);
+                    //TODO: check in model if the line can have a breakpoint 
+                    final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
+                    boolean hasBreakpoint = false;
+                    for (final IBreakpoint point : breakpointManager.getBreakpoints()) {
+                        if (point.getMarker().getResource().equals(editedFile)
+                                && point.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == (line + 1)) {
+                            hasBreakpoint = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasBreakpoint) {
+                        breakpointManager.addBreakpoint(new RobotLineBreakpoint(
+                                (IResource) input.getAdapter(IResource.class), line + 1));
+                    }
                 } catch (final CoreException e1) {
                     e1.printStackTrace();
                 }
