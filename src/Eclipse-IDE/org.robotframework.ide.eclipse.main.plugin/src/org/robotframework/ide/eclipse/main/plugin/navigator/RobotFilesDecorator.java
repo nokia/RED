@@ -1,13 +1,14 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 
-public class RobotSuitesDecorator implements ILightweightLabelDecorator {
+
+public class RobotFilesDecorator implements ILightweightLabelDecorator {
 
     @Override
     public void addListener(final ILabelProviderListener listener) {
@@ -31,8 +32,10 @@ public class RobotSuitesDecorator implements ILightweightLabelDecorator {
 
     @Override
     public void decorate(final Object element, final IDecoration decoration) {
-        if (element instanceof IFolder && RobotProjectNature.isRobotSuite((IFolder) element)) {
-            decoration.addOverlay(RedImages.getRobotSuiteFolderDecoratorImage());
+        if (element instanceof IFile && RobotSuiteFileDescriber.isResourceFile((IFile) element)) {
+            decoration.addOverlay(RedImages.getRobotResourceDecoratorImage());
+        } else if (element instanceof IFile && RobotSuiteFileDescriber.isInitializationFile((IFile) element)) {
+            decoration.addOverlay(RedImages.getRobotInitFileDecoratorImage());
         }
     }
 

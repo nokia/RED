@@ -11,7 +11,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-public class NewRobotTestSuiteWizard extends BasicNewResourceWizard {
+public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
     private WizardNewFileCreationPage mainPage;
 
@@ -19,18 +19,18 @@ public class NewRobotTestSuiteWizard extends BasicNewResourceWizard {
     public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
         setNeedsProgressMonitor(true);
-        setWindowTitle("New Robot Test Suite");
+        setWindowTitle("New Robot Resource file");
     }
 
     @Override
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotSuiteFileCreationPage("New Robot Test Suite", getSelection());
+        mainPage = new WizardNewFileCreationPage("New Robot Resource file", getSelection());
         mainPage.setFileExtension("robot");
         mainPage.setWizard(this);
-        mainPage.setTitle("Robot Test Suite");
-        mainPage.setDescription("Create new Robot test suite file");
+        mainPage.setTitle("Robot Resource file");
+        mainPage.setDescription("Create new Robot resource file");
 
         this.addPage(mainPage);
     }
@@ -41,7 +41,8 @@ public class NewRobotTestSuiteWizard extends BasicNewResourceWizard {
         selectAndReveal(newFile);
 
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
+        final IEditorDescriptor desc = PlatformUI.getWorkbench()
+                .getEditorRegistry()
                 .getDefaultEditor(newFile.getName());
         try {
             page.openEditor(new FileEditorInput(newFile), desc.getId());
@@ -57,4 +58,5 @@ public class NewRobotTestSuiteWizard extends BasicNewResourceWizard {
             super(msg, cause);
         }
     }
+
 }

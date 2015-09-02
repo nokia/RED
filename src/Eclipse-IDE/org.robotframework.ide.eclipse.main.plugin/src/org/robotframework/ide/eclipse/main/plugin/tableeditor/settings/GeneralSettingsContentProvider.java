@@ -23,8 +23,7 @@ class GeneralSettingsContentProvider implements IStructuredContentProvider {
     public Object[] getElements(final Object inputElement) {
         final RobotSettingsSection section = (RobotSettingsSection) inputElement;
         if (section != null) {
-            final Map<String, RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsMapping(section);
-            return generalSettings.entrySet().toArray();
+            return GeneralSettingsModel.fillSettingsMapping(section).entrySet().toArray();
         }
         return new Object[0];
     }

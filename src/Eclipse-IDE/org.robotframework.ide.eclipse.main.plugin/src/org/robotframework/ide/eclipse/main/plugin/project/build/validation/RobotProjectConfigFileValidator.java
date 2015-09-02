@@ -24,12 +24,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigRead
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 
-public class RobotProjectConfigFileValidator {
+public class RobotProjectConfigFileValidator implements RobotFileValidator {
 
     private final IFile configFile;
 
@@ -37,6 +38,7 @@ public class RobotProjectConfigFileValidator {
         this.configFile = configFile;
     }
 
+    @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
         RobotProjectConfigWithLines config = null;

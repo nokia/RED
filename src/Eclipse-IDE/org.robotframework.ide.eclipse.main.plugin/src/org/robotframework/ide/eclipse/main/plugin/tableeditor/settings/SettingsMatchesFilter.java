@@ -25,7 +25,7 @@ public class SettingsMatchesFilter extends ViewerFilter {
         } else if (element instanceof Entry<?, ?>) {
             final Object elem = ((Entry<?, ?>) element).getValue();
             if (elem instanceof RobotSetting) {
-                return settingMatches((RobotSetting) element);
+                return settingMatches((RobotSetting) elem);
             } else if (elem instanceof RobotDefinitionSetting) {
                 return settingMatches((RobotDefinitionSetting) elem);
             }

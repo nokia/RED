@@ -1,8 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-import org.robotframework.ide.eclipse.main.plugin.FileSectionsParser;
+import org.eclipse.core.runtime.content.IContentDescriber;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
 
@@ -18,8 +21,26 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
-    protected FileSectionsParser createParser() {
-        return new FileSectionsParser(input);
+    protected String getContentTypeId() {
+        if (input != null) {
+            int validationResult;
+            try {
+                validationResult = new RobotSuiteFileDescriber().describe(input, null);
+                if (validationResult == IContentDescriber.VALID) {
+                    return RobotSuiteFileDescriber.SUITE_FILE_CONTENT_ID;
+                } else {
+                    return RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
+                }
+            } catch (final IOException e) {
+                return null;
+            }
+        }
+        return null;
+    }    
+    
+    @Override
+    protected RobotFileOutput parseModel() {
+        throw new RuntimeException("Currently there is no API for parsing anything more than files.");
     }
 
     @Override

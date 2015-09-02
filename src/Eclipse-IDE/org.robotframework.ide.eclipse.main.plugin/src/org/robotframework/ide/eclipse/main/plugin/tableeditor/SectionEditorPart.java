@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -86,18 +85,22 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     private Text filter;
 
+    protected final IEclipseContext getContext() {
+        return context;
+    }
+
     @PostConstruct
     public final void postConstruct(final Composite parent, final IEditorPart editorPart) {
         adjustParentLayout(parent);
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        context = ((IEclipseContext) site.getService(IEclipseContext.class)).getActiveLeaf();
+        context = site.getService(IEclipseContext.class).getActiveLeaf();
         context.set(RobotEditorCommandsStack.class, commandsStack);
         context.set(RedFormToolkit.class, toolkit);
         context.set(IEditorSite.class, site);
         context.set(IDirtyProviderService.class, context.get(IDirtyProviderService.class));
-        
+
         formFragments = createFormFragments();
         injectToFormParts(context, formFragments);
 
@@ -240,7 +243,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract ISelectionProvider getSelectionProvider();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
-        final IContextService service = (IContextService) site.getService(IContextService.class);
+        final IContextService service = site.getService(IContextService.class);
         service.activateContext(getContextId());
     }
 
