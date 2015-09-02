@@ -59,13 +59,14 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
     @Override
     public int describe(final Reader contents, final IContentDescription description) throws IOException {
         final BufferedReader br = new BufferedReader(contents);
-        String line;
-        while ((line = br.readLine()) != null) {
+        String line = br.readLine();
+        while (line != null) {
             if (TestCasesTableHeaderRecognizer.EXPECTED.matcher(line).find()) {
-               return VALID;
-           }
+                return VALID;
+            }
+            line = br.readLine();
         }
-        return INDETERMINATE;
+        return INVALID;
     }
 
 }

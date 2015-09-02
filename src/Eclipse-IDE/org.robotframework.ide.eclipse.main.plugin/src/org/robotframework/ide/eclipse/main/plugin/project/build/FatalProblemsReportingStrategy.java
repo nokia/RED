@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 
-import com.google.common.collect.Range;
-
 public class FatalProblemsReportingStrategy extends ProblemsReportingStrategy {
 
     @Override
@@ -22,17 +20,15 @@ public class FatalProblemsReportingStrategy extends ProblemsReportingStrategy {
     }
 
     @Override
-    public void handleProblem(final RobotProblem problem, final IFile file, final int line,
-            final Range<Integer> charRange) throws ReportingInterruptedException {
-        super.handleProblem(problem, file, line, charRange);
+    public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {
+        super.handleProblem(problem, file, filePosition);
         throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
     }
 
     @Override
-    public void handleProblem(final RobotProblem problem, final IFile file, final int line,
-            final Range<Integer> charRange, final Map<String, Object> additionalAttributes)
-            throws ReportingInterruptedException {
-        super.handleProblem(problem, file, line, charRange, additionalAttributes);
+    public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
+            final Map<String, Object> additionalAttributes) {
+        super.handleProblem(problem, file, filePosition, additionalAttributes);
         throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
     }
 }

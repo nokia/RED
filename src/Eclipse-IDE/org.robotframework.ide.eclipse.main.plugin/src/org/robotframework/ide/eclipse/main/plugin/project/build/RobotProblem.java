@@ -9,8 +9,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
-import com.google.common.collect.Range;
-
 public class RobotProblem {
 
     public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".robotProblem";
@@ -35,21 +33,22 @@ public class RobotProblem {
         return this;
     }
 
-    public void createMarker(final IFile file, final int lineNumber, final Range<Integer> charRange,
+    public void createMarker(final IFile file, final ProblemPosition position,
             final Map<String, Object> additionalAttributes) {
         try {
             final IMarker marker = file.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage());
             marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
-            if (lineNumber >= 0) {
-                marker.setAttribute(IMarker.LOCATION, "line " + lineNumber);
-                marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            if (position.getLine() >= 0) {
+                marker.setAttribute(IMarker.LOCATION, "line " + position.getLine());
+                marker.setAttribute(IMarker.LINE_NUMBER, position.getLine());
             } else {
                 marker.setAttribute(IMarker.LOCATION, "unknown line");
             }
-            if (charRange != null && charRange.hasLowerBound() && charRange.hasUpperBound()) {
-                marker.setAttribute(IMarker.CHAR_START, charRange.lowerEndpoint());
-                marker.setAttribute(IMarker.CHAR_END, charRange.upperEndpoint());
+            if (position.getRange().isPresent() && position.getRange().get().hasLowerBound()
+                    && position.getRange().get().hasUpperBound()) {
+                marker.setAttribute(IMarker.CHAR_START, position.getRange().get().lowerEndpoint());
+                marker.setAttribute(IMarker.CHAR_END, position.getRange().get().upperEndpoint());
             }
 
             marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
