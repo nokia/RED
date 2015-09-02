@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.listener.IRobotFile;
+import org.robotframework.ide.core.testData.model.listener.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
@@ -15,8 +18,10 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class RobotFile {
+public class RobotFile implements IRobotFile {
 
+    private final IRobotFileOutput parentFileOutput;
+    private final IRobotModelObjectCreator modelCreator;
     private SettingTable settingTable;
     private VariableTable variableTable;
     private TestCaseTable testCaseTable;
@@ -26,8 +31,11 @@ public class RobotFile {
     private final String uuid;
 
 
-    public RobotFile() {
+    public RobotFile(final IRobotFileOutput parentFileOutput) {
+        this.parentFileOutput = parentFileOutput;
+        this.modelCreator = parentFileOutput.getObjectCreator();
         this.uuid = generateUUID();
+
         excludeSettingTableSection();
         excludeVariableTableSection();
         excludeTestCaseTableSection();
@@ -36,8 +44,13 @@ public class RobotFile {
 
 
     private String generateUUID() {
-        return "-" + System.currentTimeMillis() + "-" + System.nanoTime() + "-"
-                + Math.random();
+        return "UUID-" + System.currentTimeMillis() + "-" + System.nanoTime()
+                + "-" + Math.random();
+    }
+
+
+    public IRobotFileOutput getContainerOutput() {
+        return parentFileOutput;
     }
 
 
@@ -57,6 +70,7 @@ public class RobotFile {
     }
 
 
+    @Override
     public SettingTable getSettingTable() {
         return settingTable;
     }
@@ -68,10 +82,11 @@ public class RobotFile {
 
 
     public void excludeSettingTableSection() {
-        settingTable = new SettingTable(uuid);
+        settingTable = modelCreator.createSettingTable(getFileUUID());
     }
 
 
+    @Override
     public VariableTable getVariableTable() {
         return variableTable;
     }
@@ -83,10 +98,11 @@ public class RobotFile {
 
 
     public void excludeVariableTableSection() {
-        variableTable = new VariableTable(uuid);
+        variableTable = modelCreator.createVariableTable(getFileUUID());
     }
 
 
+    @Override
     public TestCaseTable getTestCaseTable() {
         return testCaseTable;
     }
@@ -98,10 +114,11 @@ public class RobotFile {
 
 
     public void excludeTestCaseTableSection() {
-        testCaseTable = new TestCaseTable(uuid);
+        testCaseTable = modelCreator.createTestCaseTable(getFileUUID());
     }
 
 
+    @Override
     public KeywordTable getKeywordTable() {
         return keywordTable;
     }
@@ -113,7 +130,7 @@ public class RobotFile {
 
 
     public void excludeKeywordTableSection() {
-        keywordTable = new KeywordTable(uuid);
+        keywordTable = modelCreator.createKeywordTable(getFileUUID());
     }
 
 
@@ -135,7 +152,7 @@ public class RobotFile {
         tableHeaderToken.setText(new StringBuilder("*** ").append(
                 type.getRepresentation().get(0)).append(" ***"));
         tableHeaderToken.setType(type);
-        TableHeader header = new TableHeader(tableHeaderToken);
+        TableHeader header = modelCreator.createTableHeader(tableHeaderToken);
         header.setFileUUID(getFileUUID());
 
         return header;
