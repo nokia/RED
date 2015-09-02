@@ -40,7 +40,7 @@ public class ResourceImporter {
                 }
             }
         }
-        robotFile.setResourceReferences(importedReferences);
+        robotFile.addResourceReferences(importedReferences);
 
         return importedReferences;
     }

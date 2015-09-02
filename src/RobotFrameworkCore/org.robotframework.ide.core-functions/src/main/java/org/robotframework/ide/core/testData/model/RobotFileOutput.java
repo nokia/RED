@@ -7,11 +7,14 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
+import org.robotframework.ide.core.testData.model.listener.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
 
 
-public class RobotFileOutput {
+public class RobotFileOutput implements IRobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
+    private final IRobotModelObjectCreator objectCreator;
     private File processedFile;
     private RobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
@@ -21,17 +24,31 @@ public class RobotFileOutput {
     private Status status = Status.FAILED;
 
 
+    public RobotFileOutput(final IRobotModelObjectCreator objectCreator) {
+        this.objectCreator = objectCreator;
+        this.fileModel = new RobotFile(this);
+    }
+
+
+    @Override
+    public IRobotModelObjectCreator getObjectCreator() {
+        return objectCreator;
+    }
+
+
     public File getProcessedFile() {
         return processedFile;
     }
 
 
+    @Override
     public void setProcessedFile(File processedFile) {
         this.processedFile = processedFile;
         this.lastModificationEpoch = processedFile.lastModified();
     }
 
 
+    @Override
     public void setLastModificationEpochTime(final long lastModificationEpoch) {
         this.lastModificationEpoch = lastModificationEpoch;
     }
@@ -42,6 +59,7 @@ public class RobotFileOutput {
     }
 
 
+    @Override
     public RobotFile getFileModel() {
         return fileModel;
     }
@@ -52,19 +70,23 @@ public class RobotFileOutput {
     }
 
 
+    @Override
     public void addBuildMessage(final BuildMessage msg) {
         buildingMessages.add(msg);
     }
 
 
-    public void setFileModel(RobotFile fileModel) {
-        this.fileModel = fileModel;
+    public void addResourceReferences(
+            final List<ResourceImportReference> references) {
+        for (ResourceImportReference resourceImportReference : references) {
+            addResourceReference(resourceImportReference);
+        }
     }
 
 
-    public void setResourceReferences(
-            final List<ResourceImportReference> references) {
-        this.resourceReferences = references;
+    @Override
+    public void addResourceReference(final ResourceImportReference ref) {
+        resourceReferences.add(ref);
     }
 
 
@@ -73,9 +95,18 @@ public class RobotFileOutput {
     }
 
 
-    public void setVariablesReferenced(
+    public void addVariablesReferenced(
             final List<VariablesFileImportReference> varsImported) {
-        this.variablesReferenced = varsImported;
+        for (VariablesFileImportReference variablesFileImportReference : varsImported) {
+            addVariablesReference(variablesFileImportReference);
+        }
+    }
+
+
+    @Override
+    public void addVariablesReference(
+            final VariablesFileImportReference varImportRef) {
+        variablesReferenced.add(varImportRef);
     }
 
 
@@ -165,6 +196,7 @@ public class RobotFileOutput {
     }
 
 
+    @Override
     public void setStatus(Status status) {
         this.status = status;
     }

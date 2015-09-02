@@ -7,10 +7,11 @@ import java.util.List;
 import org.robotframework.ide.core.testData.importer.ResourceImporter;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesImporter;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.listener.RobotModelObjectCreator;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 
@@ -18,6 +19,7 @@ public class RobotParser {
 
     private boolean shouldEagerImport = false;
     private final RobotProjectHolder robotProject;
+    private final IRobotModelObjectCreator objCreator;
 
     private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
     static {
@@ -26,6 +28,7 @@ public class RobotParser {
 
 
     public RobotParser(final RobotProjectHolder robotProject) {
+        this.objCreator = RobotModelObjectCreator.newInstance();
         this.robotProject = robotProject;
     }
 
@@ -62,9 +65,8 @@ public class RobotParser {
                 }
 
                 if (parserToUse != null) {
-                    RobotFileOutput robotFile = new RobotFileOutput();
-                    RobotFile rf = new RobotFile();
-                    robotFile.setFileModel(rf);
+                    RobotFileOutput robotFile = objCreator
+                            .createRobotFileOutput();
 
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);
@@ -82,7 +84,7 @@ public class RobotParser {
                                 .importVariables(
                                         robotProject.getRobotRuntime(),
                                         robotFile);
-                        robotFile.setVariablesReferenced(varsImported);
+                        robotFile.addVariablesReferenced(varsImported);
                     }
                 }
             }
