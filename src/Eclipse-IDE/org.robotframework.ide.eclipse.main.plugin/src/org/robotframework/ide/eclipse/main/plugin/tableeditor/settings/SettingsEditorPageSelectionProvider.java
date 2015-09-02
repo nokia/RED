@@ -31,9 +31,9 @@ class SettingsEditorPageSelectionProvider implements ISelectionProvider {
     private TableViewer activeViewer;
 
     public SettingsEditorPageSelectionProvider(final TableViewer... viewers) {
-        this.viewers = Arrays.asList(viewers);
+        this.viewers = newArrayList(Iterables.filter(Arrays.asList(viewers), Predicates.notNull()));
 
-        for (final TableViewer viewer : viewers) {
+        for (final TableViewer viewer : this.viewers) {
             addFocusListener(viewer);
         }
     }

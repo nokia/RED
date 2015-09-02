@@ -96,7 +96,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Inject
     private RedFormToolkit toolkit;
 
-    private RowExposingTableViewer viewer;
+    private com.google.common.base.Optional<RowExposingTableViewer> viewer = com.google.common.base.Optional.absent();
 
     private StyledText documentation;
 
@@ -107,7 +107,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private MatchesCollection matches;
 
     TableViewer getViewer() {
-        return viewer;
+        return viewer.orNull();
     }
 
     @Override
@@ -123,11 +123,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
         final Composite panel = createPanel(section);
         createDocumentationControl(panel);
-        createViewer(panel);
+        if (!fileModel.isResourceFile()) {
+            createViewer(panel);
 
-        createColumns();
-        createContextMenu();
-        setInput();
+            createColumns();
+            createContextMenu();
+            setInput();
+        }
     }
 
     private Composite createPanel(final Section section) {
@@ -212,23 +214,24 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createViewer(final Composite panel) {
-        viewer = new RowExposingTableViewer(panel, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        viewer.getTable().setLinesVisible(true);
-        viewer.getTable().setHeaderVisible(true);
-        viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
+        viewer = com.google.common.base.Optional
+                .of(new RowExposingTableViewer(panel, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL));
+        viewer.get().getTable().setLinesVisible(true);
+        viewer.get().getTable().setHeaderVisible(true);
+        viewer.get().getTable().addListener(SWT.MeasureItem, new Listener() {
             @Override
             public void handleEvent(final Event event) {
                 event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
             }
         });
-        viewer.setContentProvider(new GeneralSettingsContentProvider());
-        viewer.setComparer(new SettingElementsComparer());
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
-        Viewers.boundViewerWithContext(viewer, site,
+        viewer.get().setContentProvider(new GeneralSettingsContentProvider());
+        viewer.get().setComparer(new SettingElementsComparer());
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.get().getTable());
+        Viewers.boundViewerWithContext(viewer.get(), site,
                 "org.robotframework.ide.eclipse.tableeditor.settings.general.context");
-        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_IN_CYCLE);
-        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+        CellsActivationStrategy.addActivationStrategy(viewer.get(), RowTabbingStrategy.MOVE_IN_CYCLE);
+        ColumnViewerToolTipSupport.enableFor(viewer.get(), ToolTip.NO_RECREATE);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer.get());
     }
 
     private void createColumns() {
@@ -252,24 +255,25 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     private void createNameColumn(final MatchesProvider matcherProvider) {
         ViewerColumnsFactory.newColumn("Setting").withWidth(100)
-                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider)).createFor(viewer);
+                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider))
+                .createFor(viewer.get());
     }
 
     private void createArgumentColumn(final int index, final MatchesProvider matcherProvider) {
         ViewerColumnsFactory.newColumn("").withWidth(120)
-                .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, index))
-                .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer, index, commandsStack))
+            .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, index))
+            .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer.get(), index, commandsStack))
             .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
+            .createFor(viewer.get());
     }
 
     private void createCommentColumn(final MatchesProvider matcherProvider) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider(matcherProvider))
-            .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer, commandsStack))
+            .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer.get(), commandsStack))
             .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
+            .createFor(viewer.get());
     }
 
     private int calculateLongestArgumentsLength() {
@@ -284,7 +288,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu";
 
         final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
-        final Table control = viewer.getTable();
+        final Table control = viewer.get().getTable();
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
@@ -296,7 +300,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         documentation.setEditable(fileModel.isEditable() && section != null);
         documentation.setText(getDocumentation(section));
 
-        viewer.setInput(section);
+        if (viewer.isPresent()) {
+            viewer.get().setInput(section);
+        }
     }
 
     private String getDocumentation(final RobotSettingsSection section) {
@@ -314,11 +320,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     @Override
     public void setFocus() {
-        viewer.getTable().setFocus();
-
-        // there is some problem with measuring table row height sometimes, so
-        // the table needs to be laid out in its parent
-        viewer.getTable().getParent().layout();
+        if (viewer.isPresent()) {
+            viewer.get().getTable().setFocus();
+            // there is some problem with measuring table row height sometimes, so
+            // the table needs to be laid out in its parent
+            viewer.get().getTable().getParent().layout();
+        }
     }
 
     public void revealSetting(final RobotSetting setting) {
@@ -326,18 +333,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         if ("Documentation".equals(setting.getName())) {
             documentation.forceFocus();
             documentation.selectAll();
-            viewer.setSelection(StructuredSelection.EMPTY);
+            clearSettingsSelection();
         } else {
             final Object entry = getEntryForSetting(setting);
-            if (entry != null) {
-                viewer.setSelection(new StructuredSelection(entry));
+            if (entry != null && viewer.isPresent()) {
+                viewer.get().setSelection(new StructuredSelection(entry));
             }
             setFocus();
         }
     }
 
     private Object getEntryForSetting(final RobotSetting setting) {
-        final TableItem[] items = viewer.getTable().getItems();
+        final TableItem[] items = viewer.get().getTable().getItems();
         for (final TableItem item : items) {
             if (item.getData() instanceof Entry<?, ?>) {
                 final Object value = ((Entry<?, ?>) item.getData()).getValue();
@@ -350,10 +357,15 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     public void clearSettingsSelection() {
-        viewer.setSelection(StructuredSelection.EMPTY);
+        if (viewer.isPresent()) {
+            viewer.get().setSelection(StructuredSelection.EMPTY);
+        }
     }
 
     public FocusedViewerAccessor getFocusedViewerAccessor() {
+        if (!viewer.isPresent()) {
+            return null;
+        }
         final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
             @Override
             public void addColumn(final ColumnViewer viewer) {
@@ -386,7 +398,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
                 }
             }
         };
-        return new FocusedViewerAccessor(columnsManagingStrategy, viewer);
+        return new FocusedViewerAccessor(columnsManagingStrategy, viewer.get());
     }
 
     @Override
@@ -395,8 +407,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             return null;
         } else {
             final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-            final List<RobotElement> generalSettings = GeneralSettingsModel
-                    .findGeneralSettingsList((RobotSettingsSection) viewer.getInput());
+            final List<RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsList(
+                    viewer.isPresent() ? (RobotSettingsSection) viewer.get().getInput() : null);
             final RobotSettingsSection settingsSection = getSection();
             if (settingsSection != null) {
                 final RobotSetting setting = settingsSection.getSetting("Documentation");
@@ -416,18 +428,25 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
         this.matches = matches;
 
-        try {
-            viewer.getTable().setRedraw(false);
-            if (matches == null) {
-                clearDocumentationMatches();
-                viewer.setFilters(new ViewerFilter[0]);
-            } else {
-                setDocumentationMatches(matches);
-                viewer.setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
-            }
-        } finally {
-            viewer.getTable().setRedraw(true);
+        if (matches == null) {
+            clearDocumentationMatches();
+        } else {
+            setDocumentationMatches(matches);
         }
+
+        if (viewer.isPresent()) {
+            try {
+                viewer.get().getTable().setRedraw(false);
+                if (matches == null) {
+                    viewer.get().setFilters(new ViewerFilter[0]);
+                } else {
+                    viewer.get().setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
+                }
+            } finally {
+                viewer.get().getTable().setRedraw(true);
+            }
+        }
+
     }
 
     private void setDocumentationMatches(final MatchesCollection settingsMatches) {
@@ -487,7 +506,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && setting.getGroup() == SettingsGroup.NO_GROUP) {
-            viewer.refresh();
+            if (viewer.isPresent()) {
+                viewer.get().refresh();
+            }
             setDirty();
         }
     }
@@ -497,7 +518,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section == getSection()) {
-            viewer.refresh();
+            if (viewer.isPresent()) {
+                viewer.get().refresh();
+            }
             setDirty();
         }
     }
@@ -508,14 +531,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             try {
-                viewer.getTable().setRedraw(false);
-                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+                ViewerCell focusCell = null;
+                if (viewer.isPresent()) {
+                    viewer.get().getTable().setRedraw(false);
+                    focusCell = viewer.get().getColumnViewerEditor().getFocusCell();
+                }
                 setInput();
                 if (focusCell != null) {
-                    viewer.setFocusCell(focusCell.getColumnIndex());
+                    viewer.get().setFocusCell(focusCell.getColumnIndex());
                 }
             } finally {
-                viewer.getTable().setRedraw(true);
+                if (viewer.isPresent()) {
+                    viewer.get().getTable().setRedraw(true);
+                }
             }
         }
     }

@@ -27,6 +27,15 @@
       </wizard>
       <wizard
             category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotResourceWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            hasPages="true"
+            icon="resources/new_robot_res_file.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotResource"
+            name="Robot Resource file">
+      </wizard>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
             class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuiteWizard"
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             hasPages="true"
@@ -34,6 +43,31 @@
             id="org.robotframework.ide.eclipse.wizards.newRobotCase"
             name="Robot Test Suite">
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="robot,txt"
+            id="org.robotframework.red.robotfile"
+            name="Robot file"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            describer="org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber"
+            file-extensions="robot,txt"
+            id="org.robotframework.red.robotsuitefile"
+            name="Robot suite file"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-names="__init__.robot,__init__.txt"
+            id="org.robotframework.red.robotsuiteinitfile"
+            name="Robot suite initialization file"
+            priority="high">
+      </content-type>
    </extension>
    <extension
          id="robotNature"
@@ -54,7 +88,7 @@
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="resources/robot_dec.png"
+            icon="resources/decorator_suite_folder.png"
             id="org.robotframework.ide.eclipse.main.plugin.robotNature.img"
             natureId="org.robotframework.ide.eclipse.main.plugin.robotNature">
       </image>
@@ -81,18 +115,34 @@
        point="org.eclipse.ui.decorators">
     <decorator
           class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotSuitesDecorator"
-          icon="resources/robot_dec.png"
+          icon="resources/decorator_suite_folder.png"
           id="org.robotframework.ide.eclipse.main.plugin.robotSuiteDecorator"
           label="Robot Test Suites"
           lightweight="true"
           location="TOP_RIGHT"
           state="true">
        <description>
-          This decorator adds icon to Robot test suites
+          This decorator adds icon to Robot test suites folders
        </description>
        <enablement>
           <objectClass
                 name="org.eclipse.core.resources.IFolder">
+          </objectClass>
+       </enablement>
+    </decorator>
+    <decorator
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotFilesDecorator"
+          id="org.robotframework.red.decorator.resource"
+          label="Robot Files"
+          lightweight="true"
+          location="TOP_RIGHT"
+          state="true">
+       <description>
+          This decorator adds icon to Robot resource files and suite initialization files
+       </description>
+       <enablement>
+          <objectClass
+                name="org.eclipse.core.resources.IFile">
           </objectClass>
        </enablement>
     </decorator>
@@ -116,6 +166,9 @@
        </newWizardShortcut>
        <newWizardShortcut
              id="org.robotframework.ide.eclipse.wizards.newRobotSuite">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotResource">
        </newWizardShortcut>
        <newWizardShortcut
              id="org.robotframework.ide.eclipse.wizards.newRobotCase">
@@ -146,16 +199,24 @@
         <editor
               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor"
               default="true"
-              extensions="txt,robot"
-              icon="resources/robot_file.png"
+              icon="resources/file_robot.png"
               id="org.robotframework.ide.tableditor"
               name="Robot Table Editor">
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.robotfile">
+           </contentTypeBinding>
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.robotsuitefile">
+           </contentTypeBinding>
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.robotsuiteinitfile">
+           </contentTypeBinding>
         </editor>
         <editor
               class="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor"
               default="true"
               filenames="red.xml"
-              icon="resources/config.png"
+              icon="resources/file_redxml.png"
               id="org.robotframework.ide.project.editor"
               name="RED Project Editor">
         </editor>
@@ -233,9 +294,24 @@
         <contextualLaunch>
             <enablement>
                 <with variable="selection">
-                   <count
-                         value="+">
-                   </count>
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <or>
+                         <instanceof
+                               value="org.eclipse.core.resources.IContainer">
+                         </instanceof>
+                         <and>
+                            <instanceof
+                                  value="org.eclipse.core.resources.IFile">
+                            </instanceof>
+                            <test
+                                  property="org.eclipse.core.resources.contentTypeId"
+                                  value="org.robotframework.red.robotsuitefile">
+                            </test>
+                         </and>
+                      </or>
+                   </iterate>
                 </with>
             </enablement>
         </contextualLaunch>
@@ -259,7 +335,7 @@
        point="org.eclipse.ui.navigator.navigatorContent">
     <navigatorContent
           contentProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorContentProvider"
-          icon="resources/robot_file.png"
+          icon="resources/file_robot.png"
           id="org.robotframework.content.testFileContent"
           labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider"
           name="Robot Elements">
@@ -395,6 +471,17 @@
     <commonWizard
           type="new"
           wizardId="org.robotframework.ide.eclipse.wizards.newRobotProject">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotResource">
        <enablement>
           <with
                 variable="activeWorkbenchWindow.activePerspective">
