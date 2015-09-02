@@ -21,4 +21,10 @@ public interface IVariableHolder {
 
 
     RobotToken getDeclaration();
+
+
+    String getFileUUID();
+
+
+    void setFileUUID(final String uuid);
 }

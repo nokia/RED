@@ -11,8 +11,21 @@ public abstract class ARobotSectionTable implements IOptional {
 
     private List<TableHeader> headers = new LinkedList<>();
 
+    private String uuid;
+
+
+    protected ARobotSectionTable(final String uuid) {
+        this.uuid = uuid;
+    }
+
+
+    public String getUUID() {
+        return uuid;
+    }
+
 
     public void addHeader(final TableHeader header) {
+        header.setFileUUID(getUUID());
         headers.add(header);
     }
 

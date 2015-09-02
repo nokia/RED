@@ -40,6 +40,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addKeywordExecutionRow(final RobotExecutableRow executionRow) {
+        executionRow.setFileUUID(getFileUUID());
         this.keywordContext.add(executionRow);
     }
 
@@ -50,6 +51,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addDocumentation(final KeywordDocumentation doc) {
+        doc.setFileUUID(getFileUUID());
         this.documentation.add(doc);
     }
 
@@ -60,6 +62,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTag(final KeywordTags tag) {
+        tag.setFileUUID(getFileUUID());
         tags.add(tag);
     }
 
@@ -70,6 +73,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addArguments(final KeywordArguments arguments) {
+        arguments.setFileUUID(getFileUUID());
         keywordArguments.add(arguments);
     }
 
@@ -80,6 +84,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addReturn(final KeywordReturn keywordReturn) {
+        keywordReturn.setFileUUID(getFileUUID());
         keywordReturns.add(keywordReturn);
     }
 
@@ -90,6 +95,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTeardown(final KeywordTeardown teardown) {
+        teardown.setFileUUID(getFileUUID());
         teardowns.add(teardown);
     }
 
@@ -100,6 +106,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTimeout(final KeywordTimeout timeout) {
+        timeout.setFileUUID(getFileUUID());
         timeouts.add(timeout);
     }
 
