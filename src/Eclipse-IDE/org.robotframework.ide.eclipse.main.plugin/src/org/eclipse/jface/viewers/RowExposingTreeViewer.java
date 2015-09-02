@@ -79,6 +79,9 @@ public class RowExposingTreeViewer extends TreeViewer {
     }
 
     public void setTopItem(final Object topItem) {
-        getTree().setTopItem((TreeItem) findItem(topItem));
+        final TreeItem topTreeItem = (TreeItem) findItem(topItem);
+        if (topTreeItem != null) {
+            getTree().setTopItem(topTreeItem);
+        }
     }
 }

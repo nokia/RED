@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -315,7 +316,8 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
             try {
                 viewer.getTree().setRedraw(false);
-                final Object topItem = viewer.getTree().getTopItem().getData();
+                final TreeItem topTreeItem = viewer.getTree().getTopItem();
+                final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
                 final Object[] expandedElements = viewer.getExpandedElements();
                 final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
                 viewer.setInput(getSection());
@@ -323,7 +325,9 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
                 if (focusCell != null) {
                     viewer.setFocusCell(focusCell.getColumnIndex());
                 }
-                viewer.setTopItem(topItem);
+                if (topItem != null) {
+                    viewer.setTopItem(topItem);
+                }
             } finally {
                 viewer.getTree().setRedraw(true);
             }

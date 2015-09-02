@@ -1,6 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -17,9 +16,10 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
-public class RobotSuiteFileValidator {
+public class RobotSuiteFileValidator implements RobotFileValidator {
 
     private final IFile file;
 
@@ -27,8 +27,9 @@ public class RobotSuiteFileValidator {
         this.file = file;
     }
 
-    public void validate(final IProgressMonitor monitor) throws CoreException, IOException {
-        RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
+    @Override
+    public void validate(final IProgressMonitor monitor) throws CoreException {
+        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
         //TODO: Handle null runtime Environment
         final RobotParser parser = new RobotParser(new RobotProjectHolder(runtimeEnvironment));
@@ -66,6 +67,8 @@ public class RobotSuiteFileValidator {
                         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
                         marker.setAttribute(IMarker.LOCATION, "line " + kw1Token.getLineNumber());
                         marker.setAttribute(IMarker.LINE_NUMBER, kw1Token.getLineNumber());
+                        marker.setAttribute(IMarker.CHAR_START, kw1Token.getStartOffset());
+                        marker.setAttribute(IMarker.CHAR_END, kw1Token.getStartOffset() + kw1Name.length());
                     }
                 }
             }
