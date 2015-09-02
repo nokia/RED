@@ -148,7 +148,7 @@ class KeywordRule implements IRule {
 		final List<String> newList = new ArrayList<>();
 		boolean hasChar = false;
 		for (final String keyword : list) {
-			if(keyword.length() >= position && keyword.charAt(position-1) == c) {
+			if(keyword.length() >= position && keyword.substring(position-1, position).equalsIgnoreCase(String.valueOf(c))) {
 				newList.add(keyword);
 				hasChar = true;
 			}

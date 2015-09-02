@@ -1,5 +1,6 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.utils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -26,23 +27,26 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
 
     private TextEditorHoverManager hoverManager;
 
-    public TextEditorTextHover(Map<String, ContentAssistKeywordContext> keywordMap) {
-        this.keywordMap = keywordMap;
+    public TextEditorTextHover(final Map<String, ContentAssistKeywordContext> keywordMap) {
+        this.keywordMap = new HashMap<>();
+        for (final String keywordName : keywordMap.keySet()) {
+            this.keywordMap.put(keywordName.toLowerCase(), keywordMap.get(keywordName));
+        }
         hoverManager = new TextEditorHoverManager();
     }
     
     @Override
-    public IRegion getHoverRegion(ITextViewer viewer, int offset) {
+    public IRegion getHoverRegion(final ITextViewer viewer, final int offset) {
 
         return hoverManager.findHoveredText(viewer, offset);
     }
 
     @Override
-    public Object getHoverInfo2(ITextViewer viewer, IRegion hoverRegion) {
+    public Object getHoverInfo2(final ITextViewer viewer, final IRegion hoverRegion) {
 
         try {
-            String hoveredText = viewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
-            ContentAssistKeywordContext keywordContext = keywordMap.get(hoveredText);
+            final String hoveredText = viewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
+            final ContentAssistKeywordContext keywordContext = keywordMap.get(hoveredText.toLowerCase());
             if (keywordContext != null) {
                 return keywordContext.getDescription();
             }
@@ -55,7 +59,7 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
     }
     
     @Override
-    public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
+    public String getHoverInfo(final ITextViewer textViewer, final IRegion hoverRegion) {
         return null;
     }
 
@@ -64,13 +68,13 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
         return new IInformationControlCreator() {
 
             @Override
-            public IInformationControl createInformationControl(Shell parent) {
+            public IInformationControl createInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent);
             }
         };
     }
 
-    public void setDebugVariables(Map<String, Object> debugVariables) {
+    public void setDebugVariables(final Map<String, Object> debugVariables) {
         this.debugVariables = debugVariables;
     }
 
