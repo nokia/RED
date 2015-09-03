@@ -12,15 +12,15 @@ import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.RobotFileValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 
-public abstract class RobotFileCommonValidator implements RobotFileValidator {
+public abstract class RobotFileValidator implements ModelUnitValidator {
 
     protected final IFile file;
 
     protected final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    public RobotFileCommonValidator(final IFile file) {
+    public RobotFileValidator(final IFile file) {
         this.file = file;
     }
 
@@ -49,6 +49,9 @@ public abstract class RobotFileCommonValidator implements RobotFileValidator {
      * @throws CoreException
      */
     protected void validate(final IRobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        new KeywordTableValidator(file).validateKeywordTable(fileModel.getKeywordTable(), monitor);
+        new TestCasesTableValidator(file).validate(fileModel.getTestCaseTable(), monitor);
+        new GeneralSettingsTableValidator(file).validate(fileModel.getSettingTable(), monitor);
+        new KeywordTableValidator(file).validate(fileModel.getKeywordTable(), monitor);
+        new VariablesTableValidator(file).validate(fileModel.getVariableTable(), monitor);
     }
 }

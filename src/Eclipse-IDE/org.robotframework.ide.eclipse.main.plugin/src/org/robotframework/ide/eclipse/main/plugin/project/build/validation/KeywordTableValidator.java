@@ -23,7 +23,10 @@ class KeywordTableValidator {
         this.file = file;
     }
 
-    void validateKeywordTable(final KeywordTable keywordTable, final IProgressMonitor monitor) throws CoreException {
+    void validate(final KeywordTable keywordTable, final IProgressMonitor monitor) throws CoreException {
+        if (!keywordTable.isPresent()) {
+            return;
+        }
         checkIfUniqueKeywordsAreDefined(keywordTable);
     }
 
