@@ -16,6 +16,10 @@ import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+
 public class RobotVariable implements RobotElement, Serializable {
 
     public enum Type {
@@ -104,31 +108,38 @@ public class RobotVariable implements RobotElement, Serializable {
         this.type = Type.fromVarType(variableHolder.getType());
         this.name = variableHolder.getName();
         if(variableHolder.getType() == VariableType.SCALAR) {
-            this.value = ((ScalarVariable) variableHolder).getValues().get(0).getText().toString();
+
+            final List<RobotToken> values = ((ScalarVariable) variableHolder).getValues();
+            this.value = values.isEmpty() ? "" : values.get(0).getText().toString();
         } else if(variableHolder.getType() == VariableType.LIST || variableHolder.getType() == VariableType.SCALAR_AS_LIST) {
-            StringBuilder builder = new StringBuilder();
-            for (RobotToken token : ((ListVariable) variableHolder).getItems()) {
-                builder.append(token.getText());
-                builder.append("  ");
-            }
-            this.value = builder.toString();
+
+            final List<RobotToken> tokens = ((ListVariable) variableHolder).getItems();
+            this.value = Joiner.on("  ").join(Iterables.transform(tokens, tokenToString()));
         } else if(variableHolder.getType() == VariableType.DICTIONARY) {
-            StringBuilder builder = new StringBuilder();
-            for (DictionaryKeyValuePair pair : ((DictionaryVariable) variableHolder).getItems()) {
-                builder.append(pair.getKey().getText());
-                builder.append("=");
-                builder.append(pair.getValue().getText());
-                builder.append("  ");
+
+            final List<DictionaryKeyValuePair> dictionaryPairs = ((DictionaryVariable) variableHolder).getItems();
+            this.value = Joiner.on("  ").join(Iterables.transform(dictionaryPairs, pairToString()));
+        }
+        this.comment = Joiner.on("  ").join(Iterables.transform(variableHolder.getComment(), tokenToString()));
+    }
+
+    private static Function<DictionaryKeyValuePair, String> pairToString() {
+        return new Function<DictionaryKeyValuePair, String>() {
+            @Override
+            public String apply(final DictionaryKeyValuePair pair) {
+                return pair.getKey().getText().toString() + "=" + pair.getValue().getText().toString();
             }
-            this.value = builder.toString();
-        }
-        
-        StringBuilder builder = new StringBuilder();
-        for (RobotToken token : variableHolder.getComment()) {
-            builder.append(token.getText());
-            builder.append(" ");
-        }
-        this.comment = builder.toString();
+        };
+    }
+
+    private static Function<RobotToken, String> tokenToString() {
+        return new Function<RobotToken, String>() {
+
+            @Override
+            public String apply(final RobotToken token) {
+                return token.getText().toString();
+            }
+        };
     }
 
     @Override
