@@ -37,7 +37,9 @@ public class KeywordDocumentationMapper extends
 
         UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        KeywordDocumentation doc = new KeywordDocumentation(rt);
+        KeywordDocumentation doc = robotFileOutput.getObjectCreator()
+                .createKeywordDocumentation(rt);
+        doc.setFileUUID(keyword.getFileUUID());
         keyword.addDocumentation(doc);
         processingState
                 .push(ParsingState.KEYWORD_SETTING_DOCUMENTATION_DECLARATION);

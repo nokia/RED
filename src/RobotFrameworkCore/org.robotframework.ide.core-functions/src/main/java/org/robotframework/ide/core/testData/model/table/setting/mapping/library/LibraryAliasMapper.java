@@ -74,7 +74,7 @@ public class LibraryAliasMapper implements IParsingMapper {
                 // was not catch by previous library declaration logic
             }
 
-            libraryFixer.applyFixes(lib, rt, processingState);
+            libraryFixer.applyFixes(robotFileOutput, lib, rt, processingState);
             // FIXME: fixer apply we have Library OperatingSystem WITH NAME x |
             // y
             // (two aliases)

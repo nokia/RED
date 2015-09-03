@@ -36,7 +36,9 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestCaseTimeout timeout = new TestCaseTimeout(rt);
+        TestCaseTimeout timeout = robotFileOutput.getObjectCreator()
+                .createTestCaseTimeout(rt);
+        timeout.setFileUUID(testCase.getFileUUID());
         testCase.addTimeout(timeout);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT);

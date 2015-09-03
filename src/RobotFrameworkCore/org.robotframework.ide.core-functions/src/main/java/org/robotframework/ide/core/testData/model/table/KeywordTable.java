@@ -17,7 +17,7 @@ public class KeywordTable extends ARobotSectionTable {
 
 
     public void addKeyword(final UserKeyword keyword) {
-        keyword.setFileUUID(getUUID());
+        keyword.setFileUUID(getFileUUID());
         userKeywords.add(keyword);
     }
 

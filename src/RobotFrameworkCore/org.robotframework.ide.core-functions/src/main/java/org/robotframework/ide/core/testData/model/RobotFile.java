@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.core.testData.model.listener.IRobotFileOutput;
-import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;

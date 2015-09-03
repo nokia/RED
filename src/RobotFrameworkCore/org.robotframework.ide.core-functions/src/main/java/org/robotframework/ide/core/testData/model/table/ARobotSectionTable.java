@@ -19,13 +19,13 @@ public abstract class ARobotSectionTable implements IOptional {
     }
 
 
-    public String getUUID() {
+    public String getFileUUID() {
         return uuid;
     }
 
 
     public void addHeader(final TableHeader header) {
-        header.setFileUUID(getUUID());
+        header.setFileUUID(getFileUUID());
         headers.add(header);
     }
 

@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
@@ -33,8 +34,12 @@ public class TestSetupMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_SETUP_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        robotFileOutput.getFileModel().getSettingTable()
-                .addTestSetup(new TestSetup(rt));
+        SettingTable settingTable = robotFileOutput.getFileModel()
+                .getSettingTable();
+        TestSetup setup = robotFileOutput.getObjectCreator()
+                .createTestSetup(rt);
+        setup.setFileUUID(settingTable.getFileUUID());
+        settingTable.addTestSetup(setup);
         processingState.push(ParsingState.SETTING_TEST_SETUP);
 
         return rt;

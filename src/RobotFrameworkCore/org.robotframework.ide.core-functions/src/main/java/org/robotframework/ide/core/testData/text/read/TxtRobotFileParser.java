@@ -115,8 +115,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
-            parse(parsingOutput, robotFile, new InputStreamReader(
-                    new FileInputStream(robotFile), Charset.forName("UTF-8")));
+            FileInputStream fis = new FileInputStream(robotFile);
+            parse(parsingOutput, robotFile,
+                    new InputStreamReader(fis, Charset.forName("UTF-8")));
         } catch (FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
@@ -155,7 +156,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean isNewLine = false;
         try {
             while((currentLineText = lineReader.readLine()) != null) {
-                RobotLine line = new RobotLine(lineNumber);
+                RobotLine line = parsingOutput.getObjectCreator()
+                        .createRobotLine(lineNumber);
                 StringBuilder text = new StringBuilder(currentLineText);
                 int lastColumnProcessed = 0;
                 // get separator for this line
@@ -308,7 +310,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             LibraryImport lib = findNearestLibraryImport(robotFileOutput);
 
-            libraryFixer.applyFixes(lib, null, processingState);
+            libraryFixer
+                    .applyFixes(robotFileOutput, lib, null, processingState);
         } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
             LibraryImport lib = findNearestLibraryImport(robotFileOutput);
 
@@ -322,7 +325,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         argumentPossibleAlias.getLineNumber())) {
                     argumentPossibleAlias
                             .setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-                    LibraryAlias alias = new LibraryAlias(argumentPossibleAlias);
+                    LibraryAlias alias = robotFileOutput.getObjectCreator()
+                            .createLibraryAlias(argumentPossibleAlias);
+                    alias.setFileUUID(lib.getFileUUID());
                     RobotToken aliasValue = arguments.get(argumentsSize - 1);
                     aliasValue
                             .setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
@@ -423,7 +428,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
             RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
-                    TableHeader header = new TableHeader(robotToken);
+                    TableHeader header = robotFileOutput.getObjectCreator()
+                            .createTableHeader(robotToken);
                     ARobotSectionTable table = null;
                     if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
                         table = fileModel.getSettingTable();

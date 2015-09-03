@@ -8,7 +8,7 @@ import java.util.List;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.listener.IRobotFileOutput;
-import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 
 
 public class RobotFileOutput implements IRobotFileOutput {

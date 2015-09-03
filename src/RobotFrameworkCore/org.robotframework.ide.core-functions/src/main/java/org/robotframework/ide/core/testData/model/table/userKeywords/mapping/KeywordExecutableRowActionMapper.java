@@ -39,8 +39,10 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         types.add(0, RobotTokenType.KEYWORD_ACTION_NAME);
         types.add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
 
-        RobotExecutableRow row = new RobotExecutableRow();
+        RobotExecutableRow row = robotFileOutput.getObjectCreator()
+                .createRobotExecutableRow();
         row.setAction(rt);
+        row.setFileUUID(keyword.getFileUUID());
         keyword.addKeywordExecutionRow(row);
 
         processingState.push(ParsingState.KEYWORD_INSIDE_ACTION);

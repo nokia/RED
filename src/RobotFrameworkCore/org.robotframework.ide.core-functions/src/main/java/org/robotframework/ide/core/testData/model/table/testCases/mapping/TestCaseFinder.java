@@ -29,7 +29,8 @@ public class TestCaseFinder {
         TestCase testCase;
         List<TestCase> lastHeaderTestCases = filterByTestCasesAfterLastHeader(testCaseTable);
         if (lastHeaderTestCases.isEmpty()) {
-            testCase = createArtificialTestCase(testCaseTable);
+            testCase = createArtificialTestCase(robotFileOutput, testCaseTable);
+            testCase.setFileUUID(testCaseTable.getFileUUID());
             testCaseTable.addTest(testCase);
         } else {
             testCase = lastHeaderTestCases.get(lastHeaderTestCases.size() - 1);
@@ -39,7 +40,8 @@ public class TestCaseFinder {
     }
 
 
-    private TestCase createArtificialTestCase(TestCaseTable testCaseTable) {
+    private TestCase createArtificialTestCase(RobotFileOutput robotFileOutput,
+            TestCaseTable testCaseTable) {
         TestCase testCase;
         List<TableHeader> headers = testCaseTable.getHeaders();
         TableHeader tableHeader = headers.get(headers.size() - 1);
@@ -51,7 +53,8 @@ public class TestCaseFinder {
         artificialNameToken.setStartColumn(0);
         artificialNameToken.setType(RobotTokenType.TEST_CASE_NAME);
 
-        testCase = new TestCase(artificialNameToken);
+        testCase = robotFileOutput.getObjectCreator().createTestCase(
+                artificialNameToken);
         return testCase;
     }
 

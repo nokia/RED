@@ -41,7 +41,9 @@ public class UserKeywordNameMapper implements IParsingMapper {
 
         KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
-        UserKeyword keyword = new UserKeyword(rt);
+        UserKeyword keyword = robotFileOutput.getObjectCreator()
+                .createUserKeyword(rt);
+        keyword.setFileUUID(keywordTable.getFileUUID());
         keywordTable.addKeyword(keyword);
         processingState.push(ParsingState.KEYWORD_DECLARATION);
 
