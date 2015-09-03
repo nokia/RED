@@ -1,5 +1,9 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -8,29 +12,36 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 import com.google.common.collect.Range;
 
-class KeywordTableValidator {
+class KeywordTableValidator implements ModelUnitValidator {
 
     private final IFile file;
 
+    private final KeywordTable keywordTable;
+
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    KeywordTableValidator(final IFile file) {
+    KeywordTableValidator(final IFile file, final KeywordTable keywordTable) {
         this.file = file;
+        this.keywordTable = keywordTable;
     }
 
-    void validate(final KeywordTable keywordTable, final IProgressMonitor monitor) throws CoreException {
+    @Override
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         if (!keywordTable.isPresent()) {
             return;
         }
-        checkIfUniqueKeywordsAreDefined(keywordTable);
+        reportDuplicatedKewords(keywordTable);
     }
 
-    private void checkIfUniqueKeywordsAreDefined(final KeywordTable keywordTable) {
+    private void reportDuplicatedKewords(final KeywordTable keywordTable) {
+        final Set<String> duplicatedNames = newHashSet();
+
         for (final UserKeyword kw1 : keywordTable.getKeywords()) {
             for (final UserKeyword kw2 : keywordTable.getKeywords()) {
                 if (kw1 != kw2) {
@@ -39,13 +50,22 @@ class KeywordTableValidator {
                     final String kw2Name = kw2.getKeywordName().getText().toString();
 
                     if (kw1Name.equalsIgnoreCase(kw2Name)) {
-                        final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
-                                .formatMessageWith(kw1Name);
-                        final ProblemPosition position = new ProblemPosition(kw1Token.getLineNumber(),
-                                Range.closed(kw1Token.getStartOffset(), kw1Token.getStartOffset() + kw1Name.length()));
-                        reporter.handleProblem(problem, file, position);
+                        duplicatedNames.add(kw1Name.toLowerCase());
                     }
                 }
+            }
+        }
+
+        for (final UserKeyword keyword : keywordTable.getKeywords()) {
+            final RobotToken keywordName = keyword.getKeywordName();
+            final String name = keywordName.getText().toString();
+
+            if (duplicatedNames.contains(name.toLowerCase())) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
+                        .formatMessageWith(name);
+                final ProblemPosition position = new ProblemPosition(keywordName.getLineNumber(),
+                        Range.closed(keywordName.getStartOffset(), keywordName.getStartOffset() + name.length()));
+                reporter.handleProblem(problem, file, position);
             }
         }
     }
