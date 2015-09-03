@@ -41,7 +41,9 @@ public class TestCaseNameMapper implements IParsingMapper {
 
         TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
-        TestCase testCase = new TestCase(rt);
+        TestCase testCase = robotFileOutput.getObjectCreator().createTestCase(
+                rt);
+        testCase.setFileUUID(testCaseTable.getFileUUID());
         testCaseTable.addTest(testCase);
         processingState.push(ParsingState.TEST_CASE_DECLARATION);
 

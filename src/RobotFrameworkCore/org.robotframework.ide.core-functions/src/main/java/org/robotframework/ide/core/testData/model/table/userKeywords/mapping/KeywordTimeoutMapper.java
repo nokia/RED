@@ -36,7 +36,9 @@ public class KeywordTimeoutMapper extends AKeywordSettingDeclarationMapper {
 
         UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        KeywordTimeout timeout = new KeywordTimeout(rt);
+        KeywordTimeout timeout = robotFileOutput.getObjectCreator()
+                .createKeywordTimeout(rt);
+        timeout.setFileUUID(keyword.getFileUUID());
         keyword.addTimeout(timeout);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TIMEOUT);

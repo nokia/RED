@@ -36,7 +36,9 @@ public class MetadataMapper implements IParsingMapper {
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        Metadata metadata = new Metadata(rt);
+        Metadata metadata = robotFileOutput.getObjectCreator().createMetadata(
+                rt);
+        metadata.setFileUUID(settings.getFileUUID());
         settings.addMetadata(metadata);
         processingState.push(ParsingState.SETTING_METADATA);
 

@@ -35,7 +35,9 @@ public class TestCaseTemplateMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestCaseTemplate template = new TestCaseTemplate(rt);
+        TestCaseTemplate template = robotFileOutput.getObjectCreator()
+                .createTestCaseTemplate(rt);
+        template.setFileUUID(testCase.getFileUUID());
         testCase.addTemplate(template);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE);

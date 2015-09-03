@@ -2,6 +2,7 @@ package org.robotframework.ide.core.testData.model.table.setting.mapping.library
 
 import java.util.Stack;
 
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -15,8 +16,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class LibraryAliasFixer {
 
-    public void applyFixes(final LibraryImport lib,
-            final RobotToken additionalToken,
+    public void applyFixes(final RobotFileOutput robotFileOutput,
+            final LibraryImport lib, final RobotToken additionalToken,
             final Stack<ParsingState> processingState) {
         LibraryAlias alias = lib.getAlias();
         if (additionalToken == null) {
@@ -28,7 +29,8 @@ public class LibraryAliasFixer {
                     RobotToken aliasToken = alias.getLibraryAliasDeclaration();
                     aliasToken.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     lib.getArguments().add(aliasToken);
-                    lib.setAlias(new LibraryAlias(null));
+                    lib.setAlias(robotFileOutput.getObjectCreator()
+                            .createLibraryAlias(null));
                     removeLibraryAliasState(processingState);
                 }
             }
@@ -47,7 +49,9 @@ public class LibraryAliasFixer {
                             .setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     lib.addArgument(aliasDeclared);
                     libraryAlias.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-                    LibraryAlias correctedAlias = new LibraryAlias(libraryAlias);
+                    LibraryAlias correctedAlias = robotFileOutput
+                            .getObjectCreator()
+                            .createLibraryAlias(libraryAlias);
                     additionalToken
                             .setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
                     correctedAlias.setLibraryAlias(additionalToken);

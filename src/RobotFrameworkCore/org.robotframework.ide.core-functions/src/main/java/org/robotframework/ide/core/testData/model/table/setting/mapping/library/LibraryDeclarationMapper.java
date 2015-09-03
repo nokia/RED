@@ -36,7 +36,9 @@ public class LibraryDeclarationMapper implements IParsingMapper {
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        LibraryImport library = new LibraryImport(rt);
+        LibraryImport library = robotFileOutput.getObjectCreator()
+                .createLibraryImport(rt);
+        library.setFileUUID(settings.getFileUUID());
         settings.addImported(library);
         processingState.push(ParsingState.SETTING_LIBRARY_IMPORT);
 

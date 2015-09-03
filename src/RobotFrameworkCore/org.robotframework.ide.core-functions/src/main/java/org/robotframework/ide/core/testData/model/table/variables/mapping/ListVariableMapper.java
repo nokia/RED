@@ -36,8 +36,9 @@ public class ListVariableMapper implements IParsingMapper {
         rt.setText(new StringBuilder(text));
         rt.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
 
-        ListVariable var = new ListVariable(
-                varHelper.extractVariableName(text), rt);
+        ListVariable var = robotFileOutput.getObjectCreator()
+                .createListVariable(varHelper.extractVariableName(text), rt);
+        var.setFileUUID(varTable.getFileUUID());
         varTable.addVariable(var);
 
         processingState.push(ParsingState.LIST_VARIABLE_DECLARATION);
