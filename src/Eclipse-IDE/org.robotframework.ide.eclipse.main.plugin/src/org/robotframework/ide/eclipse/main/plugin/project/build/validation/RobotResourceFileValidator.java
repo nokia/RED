@@ -21,7 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 
 import com.google.common.collect.Range;
 
-public class RobotResourceFileValidator extends RobotFileCommonValidator {
+public class RobotResourceFileValidator extends RobotFileValidator {
 
     public RobotResourceFileValidator(final IFile file) {
         super(file);

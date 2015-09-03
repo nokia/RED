@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFile
 
 import com.google.common.collect.Range;
 
-public class RobotSuiteFileValidator extends RobotFileCommonValidator {
+public class RobotSuiteFileValidator extends RobotFileValidator {
 
     public RobotSuiteFileValidator(final IFile file) {
         super(file);

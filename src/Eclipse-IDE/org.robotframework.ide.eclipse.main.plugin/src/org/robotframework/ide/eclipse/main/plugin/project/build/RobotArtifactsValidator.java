@@ -80,7 +80,7 @@ public class RobotArtifactsValidator {
         }
 
         final IFile file = (IFile) resource;
-        RobotFileValidator validator = null;
+        ModelUnitValidator validator = null;
         if (RobotSuiteFileDescriber.isSuiteFile(file)) {
             validator = new RobotSuiteFileValidator(file);
         } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
@@ -99,7 +99,7 @@ public class RobotArtifactsValidator {
         }
     }
 
-    public interface RobotFileValidator {
+    public interface ModelUnitValidator {
 
         void validate(IProgressMonitor monitor) throws CoreException;
     }
