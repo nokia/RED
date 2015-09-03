@@ -4,6 +4,10 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
+import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+
 public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Keywords";
@@ -40,5 +44,15 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
     @Override
     public List<RobotKeywordDefinition> getChildren() {
         return (List<RobotKeywordDefinition>) super.getChildren();
+    }
+
+    @Override
+    public void link(final ARobotSectionTable table) {
+        final KeywordTable keywordsTable = (KeywordTable) table;
+        for (final UserKeyword keyword : keywordsTable.getKeywords()) {
+            final RobotKeywordDefinition definition = new RobotKeywordDefinition(this,
+                    keyword.getKeywordName().getText().toString(), "");
+            elements.add(definition);
+        }
     }
 }
