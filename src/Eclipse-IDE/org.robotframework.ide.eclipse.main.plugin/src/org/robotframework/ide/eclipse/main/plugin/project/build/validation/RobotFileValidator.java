@@ -49,9 +49,9 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      * @throws CoreException
      */
     protected void validate(final IRobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        new TestCasesTableValidator(file).validate(fileModel.getTestCaseTable(), monitor);
-        new GeneralSettingsTableValidator(file).validate(fileModel.getSettingTable(), monitor);
-        new KeywordTableValidator(file).validate(fileModel.getKeywordTable(), monitor);
-        new VariablesTableValidator(file).validate(fileModel.getVariableTable(), monitor);
+        new TestCasesTableValidator(file, fileModel.getTestCaseTable()).validate(monitor);
+        new GeneralSettingsTableValidator(file, fileModel.getSettingTable()).validate(monitor);
+        new KeywordTableValidator(file, fileModel.getKeywordTable()).validate(monitor);
+        new VariablesTableValidator(file, fileModel.getVariableTable()).validate(monitor);
     }
 }

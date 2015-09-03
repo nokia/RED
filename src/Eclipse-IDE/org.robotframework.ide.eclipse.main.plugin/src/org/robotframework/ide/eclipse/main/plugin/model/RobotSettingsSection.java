@@ -5,10 +5,25 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
+import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
+import org.robotframework.ide.core.testData.model.ATags;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
+import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.Metadata;
+import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
+import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
+import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class RobotSettingsSection extends RobotSuiteFileSection implements IRobotCodeHoldingElement {
 
@@ -92,5 +107,99 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             }
         }
         return paths;
+    }
+
+    @Override
+    public void link(final ARobotSectionTable table) {
+        final SettingTable settingsTable = (SettingTable) table;
+        
+        for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
+            final String name = metadataSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(Iterables.transform(metadataSetting.getValues(), tokenToString()));
+            elements.add(new RobotSetting(this, SettingsGroup.METADATA, name, args, ""));
+        }
+        for (final AImported importSetting : settingsTable.getImports()) {
+            if (importSetting instanceof LibraryImport) {
+
+                final LibraryImport libraryImport = (LibraryImport) importSetting;
+
+                final String name = libraryImport.getDeclaration().getText().toString();
+                final List<String> args = newArrayList(libraryImport.getPathOrName().getText().toString());
+                args.addAll(Lists.transform(libraryImport.getArguments(), tokenToString()));
+
+                elements.add(new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, ""));
+            } else if (importSetting instanceof ResourceImport) {
+
+                final ResourceImport resourceImport = (ResourceImport) importSetting;
+
+                final String name = resourceImport.getDeclaration().getText().toString();
+                final List<String> args = newArrayList(resourceImport.getPathOrName().getText().toString());
+
+                elements.add(new RobotSetting(this, SettingsGroup.RESOURCES, name, args, ""));
+            } else if (importSetting instanceof VariablesImport) {
+
+                final VariablesImport variablesImport = (VariablesImport) importSetting;
+
+                final String name = variablesImport.getDeclaration().getText().toString();
+                final List<String> args = newArrayList(variablesImport.getPathOrName().getText().toString());
+                args.addAll(Lists.transform(variablesImport.getArguments(), tokenToString()));
+
+                elements.add(new RobotSetting(this, SettingsGroup.VARIABLES, name, args, ""));
+            }
+        }
+        for (final SuiteDocumentation documentationSetting : settingsTable.getDocumentation()) {
+            final String name = documentationSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(documentationSetting.getDocumentationText(), tokenToString()));
+            elements.add(new RobotSetting(this, name, args, ""));
+        }
+        for (final AKeywordBaseSetting keywordSetting : getKeywordBasedSettings(settingsTable)) {
+            final String name = keywordSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(keywordSetting.getKeywordName().getText().toString());
+            args.addAll(Lists.transform(keywordSetting.getArguments(), tokenToString()));
+            elements.add(new RobotSetting(this, name, args, ""));
+        }
+        for (final ATags tagSetting : getTagsSettings(settingsTable)) {
+            final String name = tagSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(Lists.transform(tagSetting.getTags(), tokenToString()));
+            elements.add(new RobotSetting(this, name, args, ""));
+        }
+        for (final TestTemplate templateSetting : settingsTable.getTestTemplates()) {
+            final String name = templateSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(templateSetting.getKeywordName().getText().toString());
+            elements.add(new RobotSetting(this, name, args, ""));
+        }
+        for (final TestTimeout timeoutSetting : settingsTable.getTestTimeouts()) {
+            final String name = timeoutSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(timeoutSetting.getTimeout().getText().toString());
+            args.addAll(Lists.transform(timeoutSetting.getMessageArguments(), tokenToString()));
+            elements.add(new RobotSetting(this, name, args, ""));
+        }
+    }
+
+    private static List<? extends AKeywordBaseSetting> getKeywordBasedSettings(final SettingTable settingTable) {
+        final List<AKeywordBaseSetting> elements = newArrayList();
+        elements.addAll(settingTable.getSuiteSetups());
+        elements.addAll(settingTable.getSuiteTeardowns());
+        elements.addAll(settingTable.getTestSetups());
+        elements.addAll(settingTable.getTestTeardowns());
+        return elements;
+    }
+
+    private static List<? extends ATags> getTagsSettings(final SettingTable settingTable) {
+        final List<ATags> elements = newArrayList();
+        elements.addAll(settingTable.getForceTags());
+        elements.addAll(settingTable.getDefaultTags());
+        return elements;
+    }
+
+    private static Function<RobotToken, String> tokenToString() {
+        return new Function<RobotToken, String>() {
+
+            @Override
+            public String apply(final RobotToken token) {
+                return token.getText().toString();
+            }
+        };
     }
 }

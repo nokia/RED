@@ -5,18 +5,23 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 
-class TestCasesTableValidator {
+class TestCasesTableValidator implements ModelUnitValidator {
 
     private final IFile file;
 
+    private final TestCaseTable testCaseTable;
+
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    TestCasesTableValidator(final IFile file) {
+    TestCasesTableValidator(final IFile file, final TestCaseTable testCaseTable) {
         this.file = file;
+        this.testCaseTable = testCaseTable;
     }
 
-    void validate(final TestCaseTable testCaseTable, final IProgressMonitor monitor) throws CoreException {
+    @Override
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         if (!testCaseTable.isPresent()) {
             return;
         }
