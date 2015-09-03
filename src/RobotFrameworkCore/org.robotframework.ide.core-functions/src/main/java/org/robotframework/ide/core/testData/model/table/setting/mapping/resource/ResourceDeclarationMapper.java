@@ -36,7 +36,9 @@ public class ResourceDeclarationMapper implements IParsingMapper {
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        ResourceImport resource = new ResourceImport(rt);
+        ResourceImport resource = robotFileOutput.getObjectCreator()
+                .createResourceImport(rt);
+        resource.setFileUUID(settings.getFileUUID());
         settings.addImported(resource);
         processingState.push(ParsingState.SETTING_RESOURCE_IMPORT);
 

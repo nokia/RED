@@ -35,7 +35,9 @@ public class KeywordTeardownMapper extends AKeywordSettingDeclarationMapper {
 
         UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        KeywordTeardown teardown = new KeywordTeardown(rt);
+        KeywordTeardown teardown = robotFileOutput.getObjectCreator()
+                .createKeywordTeardown(rt);
+        teardown.setFileUUID(keyword.getFileUUID());
         keyword.addTeardown(teardown);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TEARDOWN);

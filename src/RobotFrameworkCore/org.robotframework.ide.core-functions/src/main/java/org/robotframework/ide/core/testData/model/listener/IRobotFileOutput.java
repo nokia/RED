@@ -7,6 +7,7 @@ import org.robotframework.ide.core.testData.importer.VariablesFileImportReferenc
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
+import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 
 
 public interface IRobotFileOutput {

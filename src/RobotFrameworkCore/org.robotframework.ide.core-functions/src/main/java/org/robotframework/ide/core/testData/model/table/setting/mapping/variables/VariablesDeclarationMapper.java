@@ -36,7 +36,9 @@ public class VariablesDeclarationMapper implements IParsingMapper {
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        VariablesImport variables = new VariablesImport(rt);
+        VariablesImport variables = robotFileOutput.getObjectCreator()
+                .createVariablesImport(rt);
+        variables.setFileUUID(settings.getFileUUID());
         settings.addImported(variables);
         processingState.push(ParsingState.SETTING_VARIABLE_IMPORT);
 

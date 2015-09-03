@@ -29,7 +29,7 @@ public class KeywordFinder {
         UserKeyword keyword;
         List<UserKeyword> lastHeaderKeyword = filterByKeywordAfterLastHeader(keywordTable);
         if (lastHeaderKeyword.isEmpty()) {
-            keyword = createArtificialKeyword(keywordTable);
+            keyword = createArtificialKeyword(robotFileOutput, keywordTable);
             keywordTable.addKeyword(keyword);
         } else {
             keyword = lastHeaderKeyword.get(lastHeaderKeyword.size() - 1);
@@ -39,7 +39,8 @@ public class KeywordFinder {
     }
 
 
-    private UserKeyword createArtificialKeyword(KeywordTable keywordTable) {
+    private UserKeyword createArtificialKeyword(
+            RobotFileOutput robotFileOutput, KeywordTable keywordTable) {
         UserKeyword keyword;
         List<TableHeader> headers = keywordTable.getHeaders();
         TableHeader tableHeader = headers.get(headers.size() - 1);
@@ -51,7 +52,10 @@ public class KeywordFinder {
         artificialNameToken.setStartColumn(0);
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
 
-        keyword = new UserKeyword(artificialNameToken);
+        keyword = robotFileOutput.getObjectCreator().createUserKeyword(
+                artificialNameToken);
+        keyword.setFileUUID(keywordTable.getFileUUID());
+
         return keyword;
     }
 

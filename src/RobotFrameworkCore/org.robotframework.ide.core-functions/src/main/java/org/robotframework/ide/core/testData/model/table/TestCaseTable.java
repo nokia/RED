@@ -18,7 +18,7 @@ public class TestCaseTable extends ARobotSectionTable {
 
 
     public void addTest(final TestCase testCase) {
-        testCase.setFileUUID(getUUID());
+        testCase.setFileUUID(getFileUUID());
         testCases.add(testCase);
     }
 

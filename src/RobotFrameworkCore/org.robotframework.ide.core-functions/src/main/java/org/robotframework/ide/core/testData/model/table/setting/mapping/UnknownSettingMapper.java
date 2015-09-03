@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
@@ -36,9 +37,11 @@ public class UnknownSettingMapper implements IParsingMapper {
         rt.setStartColumn(fp.getColumn());
         rt.setText(new StringBuilder(text));
 
-        UnknownSetting unknownSetting = new UnknownSetting(rt);
-        robotFileOutput.getFileModel().getSettingTable()
-                .addUnknownSetting(unknownSetting);
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        UnknownSetting unknownSetting = robotFileOutput.getObjectCreator()
+                .createUnknownSetting(rt);
+        unknownSetting.setFileUUID(setting.getFileUUID());
+        setting.addUnknownSetting(unknownSetting);
 
         processingState.push(ParsingState.SETTING_UNKNOWN);
 

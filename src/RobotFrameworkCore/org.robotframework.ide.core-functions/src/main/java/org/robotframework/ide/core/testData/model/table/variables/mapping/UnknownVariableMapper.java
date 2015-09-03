@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.variables.UnknownVariable;
@@ -37,10 +38,12 @@ public class UnknownVariableMapper implements IParsingMapper {
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 
-        UnknownVariable varUnknown = new UnknownVariable(
-                rt.getRaw().toString(), rt);
-        robotFileOutput.getFileModel().getVariableTable()
-                .addVariable(varUnknown);
+        VariableTable varTable = robotFileOutput.getFileModel()
+                .getVariableTable();
+        UnknownVariable varUnknown = robotFileOutput.getObjectCreator()
+                .createUnknownVariable(rt.getRaw().toString(), rt);
+        varUnknown.setFileUUID(varTable.getFileUUID());
+        varTable.addVariable(varUnknown);
 
         processingState.push(ParsingState.VARIABLE_UNKNOWN);
 
