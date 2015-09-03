@@ -34,7 +34,9 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestDocumentation doc = new TestDocumentation(rt);
+        TestDocumentation doc = robotFileOutput.getObjectCreator()
+                .createTestDocumentation(rt);
+        doc.setFileUUID(testCase.getFileUUID());
         testCase.addDocumentation(doc);
 
         processingState

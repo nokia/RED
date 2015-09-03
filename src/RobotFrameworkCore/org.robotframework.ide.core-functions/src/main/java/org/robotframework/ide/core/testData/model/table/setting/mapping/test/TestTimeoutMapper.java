@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
@@ -33,9 +34,11 @@ public class TestTimeoutMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        TestTimeout timeout = new TestTimeout(rt);
-        robotFileOutput.getFileModel().getSettingTable()
-                .addTestTimeout(timeout);
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        TestTimeout timeout = robotFileOutput.getObjectCreator()
+                .createTestTimeout(rt);
+        timeout.setFileUUID(setting.getFileUUID());
+        setting.addTestTimeout(timeout);
         processingState.push(ParsingState.SETTING_TEST_TIMEOUT);
 
         return rt;

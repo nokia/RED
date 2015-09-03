@@ -10,8 +10,8 @@ import org.robotframework.ide.core.testData.importer.VariablesImporter;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
-import org.robotframework.ide.core.testData.model.listener.IRobotModelObjectCreator;
-import org.robotframework.ide.core.testData.model.listener.RobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.objectCreator.RobotModelObjectCreator;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 

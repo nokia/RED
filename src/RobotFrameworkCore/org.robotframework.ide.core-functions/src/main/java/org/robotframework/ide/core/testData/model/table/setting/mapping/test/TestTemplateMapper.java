@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
@@ -33,9 +34,11 @@ public class TestTemplateMapper implements IParsingMapper {
         rt.setType(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
         rt.setText(new StringBuilder(text));
 
-        TestTemplate template = new TestTemplate(rt);
-        robotFileOutput.getFileModel().getSettingTable()
-                .addTestTemplate(template);
+        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        TestTemplate template = robotFileOutput.getObjectCreator()
+                .createTestTemplate(rt);
+        template.setFileUUID(setting.getFileUUID());
+        setting.addTestTemplate(template);
         processingState.push(ParsingState.SETTING_TEST_TEMPLATE);
 
         return rt;
