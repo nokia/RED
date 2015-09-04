@@ -115,7 +115,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
             final String name = metadataSetting.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(Iterables.transform(metadataSetting.getValues(), tokenToString()));
+            final List<String> args = newArrayList(metadataSetting.getKey().getText().toString());
+            args.addAll(Lists.transform(metadataSetting.getValues(), tokenToString()));
             elements.add(new RobotSetting(this, SettingsGroup.METADATA, name, args, ""));
         }
         for (final AImported importSetting : settingsTable.getImports()) {
