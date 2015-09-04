@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-public class RobotSuiteFileSection implements RobotElement {
+public abstract class RobotSuiteFileSection implements RobotElement {
 
     private final String name;
 
@@ -20,9 +20,7 @@ public class RobotSuiteFileSection implements RobotElement {
         this.name = name;
     }
 
-    public void link(final ARobotSectionTable table) {
-
-    }
+    public abstract void link(final ARobotSectionTable table);
 
     @Override
     public boolean equals(final Object obj) {
