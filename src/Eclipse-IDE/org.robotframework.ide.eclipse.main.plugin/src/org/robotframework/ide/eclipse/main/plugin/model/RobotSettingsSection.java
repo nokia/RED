@@ -17,10 +17,8 @@ import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentati
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -116,7 +114,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
             final String name = metadataSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(metadataSetting.getKey().getText().toString());
-            args.addAll(Lists.transform(metadataSetting.getValues(), tokenToString()));
+            args.addAll(Lists.transform(metadataSetting.getValues(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, SettingsGroup.METADATA, name, args, ""));
         }
         for (final AImported importSetting : settingsTable.getImports()) {
@@ -126,7 +124,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
                 final String name = libraryImport.getDeclaration().getText().toString();
                 final List<String> args = newArrayList(libraryImport.getPathOrName().getText().toString());
-                args.addAll(Lists.transform(libraryImport.getArguments(), tokenToString()));
+                args.addAll(Lists.transform(libraryImport.getArguments(), TokenFunctions.tokenToString()));
 
                 elements.add(new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, ""));
             } else if (importSetting instanceof ResourceImport) {
@@ -143,7 +141,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
                 final String name = variablesImport.getDeclaration().getText().toString();
                 final List<String> args = newArrayList(variablesImport.getPathOrName().getText().toString());
-                args.addAll(Lists.transform(variablesImport.getArguments(), tokenToString()));
+                args.addAll(Lists.transform(variablesImport.getArguments(), TokenFunctions.tokenToString()));
 
                 elements.add(new RobotSetting(this, SettingsGroup.VARIABLES, name, args, ""));
             }
@@ -151,18 +149,19 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final SuiteDocumentation documentationSetting : settingsTable.getDocumentation()) {
             final String name = documentationSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
-                    Lists.transform(documentationSetting.getDocumentationText(), tokenToString()));
+                    Lists.transform(documentationSetting.getDocumentationText(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
         for (final AKeywordBaseSetting keywordSetting : getKeywordBasedSettings(settingsTable)) {
             final String name = keywordSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(keywordSetting.getKeywordName().getText().toString());
-            args.addAll(Lists.transform(keywordSetting.getArguments(), tokenToString()));
+            args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
         for (final ATags tagSetting : getTagsSettings(settingsTable)) {
             final String name = tagSetting.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(Lists.transform(tagSetting.getTags(), tokenToString()));
+            final List<String> args = newArrayList(
+                    Lists.transform(tagSetting.getTags(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
         for (final TestTemplate templateSetting : settingsTable.getTestTemplates()) {
@@ -173,7 +172,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final TestTimeout timeoutSetting : settingsTable.getTestTimeouts()) {
             final String name = timeoutSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(timeoutSetting.getTimeout().getText().toString());
-            args.addAll(Lists.transform(timeoutSetting.getMessageArguments(), tokenToString()));
+            args.addAll(Lists.transform(timeoutSetting.getMessageArguments(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
     }
@@ -192,15 +191,5 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         elements.addAll(settingTable.getForceTags());
         elements.addAll(settingTable.getDefaultTags());
         return elements;
-    }
-
-    private static Function<RobotToken, String> tokenToString() {
-        return new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return token.getText().toString();
-            }
-        };
     }
 }

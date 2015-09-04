@@ -1,7 +1,16 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
+import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+
+import com.google.common.collect.Lists;
 
 public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
@@ -13,6 +22,25 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     
     RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final String comment) {
         super(parent, name, comment);
+    }
+
+    public void link(final UserKeyword keyword) {
+        for (final RobotExecutableRow execRow : keyword.getKeywordExecutionRows()) {
+            final String callName = execRow.getAction().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
+            createKeywordCall(callName, args, "");
+        }
+        for (final KeywordArguments argument : keyword.getArguments()) {
+            final String argName = argument.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(argument.getArguments(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(argName), args, "");
+        }
+    }
+
+    private static String omitSquareBrackets(final String nameInBrackets) {
+        return nameInBrackets.substring(1, nameInBrackets.length() - 1);
     }
 
     @Override
