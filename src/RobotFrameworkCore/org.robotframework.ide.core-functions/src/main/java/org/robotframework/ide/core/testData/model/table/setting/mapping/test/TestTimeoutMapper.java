@@ -37,7 +37,6 @@ public class TestTimeoutMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         TestTimeout timeout = robotFileOutput.getObjectCreator()
                 .createTestTimeout(rt);
-        timeout.setFileUUID(setting.getFileUUID());
         setting.addTestTimeout(timeout);
         processingState.push(ParsingState.SETTING_TEST_TIMEOUT);
 

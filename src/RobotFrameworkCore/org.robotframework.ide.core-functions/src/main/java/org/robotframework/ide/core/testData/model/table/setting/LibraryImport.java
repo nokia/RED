@@ -24,7 +24,6 @@ public class LibraryImport extends AImported {
 
 
     public void setAlias(LibraryAlias alias) {
-        alias.setFileUUID(getFileUUID());
         this.alias = alias;
     }
 

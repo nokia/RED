@@ -37,7 +37,6 @@ public class SuiteTeardownMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         SuiteTeardown teardown = robotFileOutput.getObjectCreator()
                 .createSuiteTeardown(rt);
-        teardown.setFileUUID(setting.getFileUUID());
         setting.addSuiteTeardown(teardown);
         processingState.push(ParsingState.SETTING_SUITE_TEARDOWN);
 

@@ -38,7 +38,6 @@ public class SettingDocumentationMapper implements IParsingMapper {
                 .getSettingTable();
         SuiteDocumentation doc = robotFileOutput.getObjectCreator()
                 .createSuiteDocumentation(rt);
-        doc.setFileUUID(settings.getFileUUID());
         settings.addDocumentation(doc);
         processingState.push(ParsingState.SETTING_DOCUMENTATION);
 

@@ -38,7 +38,6 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         TestCaseTimeout timeout = robotFileOutput.getObjectCreator()
                 .createTestCaseTimeout(rt);
-        timeout.setFileUUID(testCase.getFileUUID());
         testCase.addTimeout(timeout);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT);

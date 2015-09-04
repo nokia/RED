@@ -36,7 +36,6 @@ public class TestCaseSetupMapper extends ATestCaseSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         TestCaseSetup setup = robotFileOutput.getObjectCreator()
                 .createTestCaseSetup(rt);
-        setup.setFileUUID(testCase.getFileUUID());
         testCase.addSetup(setup);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_SETUP);

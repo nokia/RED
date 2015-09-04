@@ -40,7 +40,6 @@ public class UnknownSettingMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         UnknownSetting unknownSetting = robotFileOutput.getObjectCreator()
                 .createUnknownSetting(rt);
-        unknownSetting.setFileUUID(setting.getFileUUID());
         setting.addUnknownSetting(unknownSetting);
 
         processingState.push(ParsingState.SETTING_UNKNOWN);

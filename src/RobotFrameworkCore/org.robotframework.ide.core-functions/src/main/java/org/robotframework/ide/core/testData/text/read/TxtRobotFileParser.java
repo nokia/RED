@@ -327,7 +327,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             .setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
                     LibraryAlias alias = robotFileOutput.getObjectCreator()
                             .createLibraryAlias(argumentPossibleAlias);
-                    alias.setFileUUID(lib.getFileUUID());
                     RobotToken aliasValue = arguments.get(argumentsSize - 1);
                     aliasValue
                             .setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);

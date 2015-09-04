@@ -36,7 +36,6 @@ public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         KeywordArguments arguments = robotFileOutput.getObjectCreator()
                 .createKeywordArguments(rt);
-        arguments.setFileUUID(keyword.getFileUUID());
         keyword.addArguments(arguments);
 
         processingState.push(ParsingState.KEYWORD_SETTING_ARGUMENTS);

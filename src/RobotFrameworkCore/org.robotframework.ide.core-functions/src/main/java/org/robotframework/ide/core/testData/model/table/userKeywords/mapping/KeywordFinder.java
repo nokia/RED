@@ -54,7 +54,6 @@ public class KeywordFinder {
 
         keyword = robotFileOutput.getObjectCreator().createUserKeyword(
                 artificialNameToken);
-        keyword.setFileUUID(keywordTable.getFileUUID());
 
         return keyword;
     }

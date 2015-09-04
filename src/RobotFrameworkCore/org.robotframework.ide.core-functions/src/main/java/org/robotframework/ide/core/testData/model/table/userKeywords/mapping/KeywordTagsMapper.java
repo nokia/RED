@@ -36,7 +36,6 @@ public class KeywordTagsMapper extends AKeywordSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         KeywordTags tags = robotFileOutput.getObjectCreator()
                 .createKeywordTags(rt);
-        tags.setFileUUID(keyword.getFileUUID());
         keyword.addTag(tags);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TAGS);

@@ -34,11 +34,6 @@ public class SettingTable extends ARobotSectionTable {
     private final List<UnknownSetting> unknownSettings = new LinkedList<>();
 
 
-    public SettingTable(String uuid) {
-        super(uuid);
-    }
-
-
     public boolean isEmpty() {
         return imports.isEmpty() && documentations.isEmpty()
                 && metadatas.isEmpty() && suiteSetups.isEmpty()
@@ -55,7 +50,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addImported(final AImported imported) {
-        imported.setFileUUID(getFileUUID());
         imports.add(imported);
     }
 
@@ -66,7 +60,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addDocumentation(final SuiteDocumentation doc) {
-        doc.setFileUUID(getFileUUID());
         documentations.add(doc);
     }
 
@@ -77,7 +70,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addMetadata(final Metadata metadata) {
-        metadata.setFileUUID(getFileUUID());
         metadatas.add(metadata);
     }
 
@@ -88,7 +80,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addSuiteSetup(final SuiteSetup suiteSetup) {
-        suiteSetup.setFileUUID(getFileUUID());
         suiteSetups.add(suiteSetup);
     }
 
@@ -99,7 +90,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addSuiteTeardown(final SuiteTeardown suiteTeardown) {
-        suiteTeardown.setFileUUID(getFileUUID());
         suiteTeardowns.add(suiteTeardown);
     }
 
@@ -110,7 +100,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addForceTags(final ForceTags tags) {
-        tags.setFileUUID(getFileUUID());
         forceTags.add(tags);
     }
 
@@ -121,7 +110,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addDefaultTags(final DefaultTags tags) {
-        tags.setFileUUID(getFileUUID());
         defaultTags.add(tags);
     }
 
@@ -132,7 +120,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestSetup(final TestSetup testSetup) {
-        testSetup.setFileUUID(getFileUUID());
         testSetups.add(testSetup);
     }
 
@@ -143,7 +130,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTeardown(final TestTeardown testTeardown) {
-        testTeardown.setFileUUID(getFileUUID());
         testTeardowns.add(testTeardown);
     }
 
@@ -154,7 +140,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTemplate(final TestTemplate testTemplate) {
-        testTemplate.setFileUUID(getFileUUID());
         testTemplates.add(testTemplate);
     }
 
@@ -165,7 +150,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTimeout(final TestTimeout testTimeout) {
-        testTimeout.setFileUUID(getFileUUID());
         testTimeouts.add(testTimeout);
     }
 
@@ -176,7 +160,6 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addUnknownSetting(final UnknownSetting unknownSetting) {
-        unknownSetting.setFileUUID(getFileUUID());
         unknownSettings.add(unknownSetting);
     }
 }

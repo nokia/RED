@@ -37,7 +37,6 @@ public class DefaultTagsMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         DefaultTags defaultTags = robotFileOutput.getObjectCreator()
                 .createDefaultTags(rt);
-        defaultTags.setFileUUID(setting.getFileUUID());
         setting.addDefaultTags(defaultTags);
         processingState.push(ParsingState.SETTING_DEFAULT_TAGS);
 
