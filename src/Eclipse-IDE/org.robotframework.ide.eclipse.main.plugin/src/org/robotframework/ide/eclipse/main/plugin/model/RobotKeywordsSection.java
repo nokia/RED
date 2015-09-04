@@ -52,6 +52,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         for (final UserKeyword keyword : keywordsTable.getKeywords()) {
             final RobotKeywordDefinition definition = new RobotKeywordDefinition(this,
                     keyword.getKeywordName().getText().toString(), "");
+            definition.link(keyword);
             elements.add(definition);
         }
     }
