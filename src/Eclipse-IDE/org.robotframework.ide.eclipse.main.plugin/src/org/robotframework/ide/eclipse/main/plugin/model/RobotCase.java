@@ -7,6 +7,12 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseSetup;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTags;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTeardown;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTemplate;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
+import org.robotframework.ide.core.testData.model.table.testCases.TestDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.collect.Lists;
@@ -31,6 +37,45 @@ public class RobotCase extends RobotCodeHoldingElement {
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
             createKeywordCall(callName, args, "");
         }
+        // settings
+        for (final TestDocumentation documentation : testCase.getDocumentation()) {
+            final String name = documentation.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final TestCaseTags tags : testCase.getTags()) {
+            final String name = tags.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final TestCaseSetup setup : testCase.getSetups()) {
+            final String name = setup.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(setup.getKeywordName().getText().toString());
+            args.addAll(Lists.transform(setup.getArguments(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final TestCaseTemplate template : testCase.getTemplates()) {
+            final String name = template.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(template.getKeywordName().getText().toString());
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final TestCaseTimeout timeout : testCase.getTimeouts()) {
+            final String name = timeout.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(timeout.getTimeout().getText().toString());
+            args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
+            final String name = teardown.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(teardown.getKeywordName().getText().toString());
+            args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+    }
+
+    private static String omitSquareBrackets(final String nameInBrackets) {
+        return nameInBrackets.substring(1, nameInBrackets.length() - 1);
     }
 
     @Override
