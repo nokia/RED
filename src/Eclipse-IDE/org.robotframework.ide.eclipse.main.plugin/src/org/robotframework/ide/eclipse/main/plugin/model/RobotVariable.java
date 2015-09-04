@@ -16,7 +16,6 @@ import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
@@ -114,32 +113,14 @@ public class RobotVariable implements RobotElement, Serializable {
         } else if(variableHolder.getType() == VariableType.LIST || variableHolder.getType() == VariableType.SCALAR_AS_LIST) {
 
             final List<RobotToken> tokens = ((ListVariable) variableHolder).getItems();
-            this.value = Joiner.on("  ").join(Iterables.transform(tokens, tokenToString()));
+            this.value = Joiner.on("  ").join(Iterables.transform(tokens, TokenFunctions.tokenToString()));
         } else if(variableHolder.getType() == VariableType.DICTIONARY) {
 
             final List<DictionaryKeyValuePair> dictionaryPairs = ((DictionaryVariable) variableHolder).getItems();
-            this.value = Joiner.on("  ").join(Iterables.transform(dictionaryPairs, pairToString()));
+            this.value = Joiner.on("  ").join(Iterables.transform(dictionaryPairs, TokenFunctions.pairToString()));
         }
-        this.comment = Joiner.on("  ").join(Iterables.transform(variableHolder.getComment(), tokenToString()));
-    }
-
-    private static Function<DictionaryKeyValuePair, String> pairToString() {
-        return new Function<DictionaryKeyValuePair, String>() {
-            @Override
-            public String apply(final DictionaryKeyValuePair pair) {
-                return pair.getKey().getText().toString() + "=" + pair.getValue().getText().toString();
-            }
-        };
-    }
-
-    private static Function<RobotToken, String> tokenToString() {
-        return new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return token.getText().toString();
-            }
-        };
+        this.comment = Joiner.on("  ")
+                .join(Iterables.transform(variableHolder.getComment(), TokenFunctions.tokenToString()));
     }
 
     @Override
