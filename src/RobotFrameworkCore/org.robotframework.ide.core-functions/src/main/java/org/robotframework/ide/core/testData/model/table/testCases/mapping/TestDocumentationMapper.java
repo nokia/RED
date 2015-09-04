@@ -36,7 +36,6 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         TestDocumentation doc = robotFileOutput.getObjectCreator()
                 .createTestDocumentation(rt);
-        doc.setFileUUID(testCase.getFileUUID());
         testCase.addDocumentation(doc);
 
         processingState

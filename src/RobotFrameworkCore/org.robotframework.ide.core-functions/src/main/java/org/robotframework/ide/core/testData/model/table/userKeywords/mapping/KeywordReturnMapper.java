@@ -36,7 +36,6 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         KeywordReturn returned = robotFileOutput.getObjectCreator()
                 .createKeywordReturn(rt);
-        returned.setFileUUID(keyword.getFileUUID());
         keyword.addReturn(returned);
 
         processingState.push(ParsingState.KEYWORD_SETTING_RETURN);

@@ -39,7 +39,6 @@ public class DictionaryVariableMapper implements IParsingMapper {
         DictionaryVariable var = robotFileOutput.getObjectCreator()
                 .createDictionaryVariable(varHelper.extractVariableName(text),
                         rt);
-        var.setFileUUID(varTable.getFileUUID());
         varTable.addVariable(var);
 
         processingState.push(ParsingState.DICTIONARY_VARIABLE_DECLARATION);

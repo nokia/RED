@@ -28,13 +28,11 @@ public class RobotFile implements IRobotFile {
     private KeywordTable keywordTable;
 
     private final List<RobotLine> fileContent = new LinkedList<>();
-    private final String uuid;
 
 
     public RobotFile(final IRobotFileOutput parentFileOutput) {
         this.parentFileOutput = parentFileOutput;
         this.modelCreator = parentFileOutput.getObjectCreator();
-        this.uuid = generateUUID();
 
         excludeSettingTableSection();
         excludeVariableTableSection();
@@ -43,19 +41,8 @@ public class RobotFile implements IRobotFile {
     }
 
 
-    private String generateUUID() {
-        return "UUID-" + System.currentTimeMillis() + "-" + System.nanoTime()
-                + "-" + Math.random();
-    }
-
-
     public IRobotFileOutput getContainerOutput() {
         return parentFileOutput;
-    }
-
-
-    public String getFileUUID() {
-        return uuid;
     }
 
 
@@ -65,7 +52,6 @@ public class RobotFile implements IRobotFile {
 
 
     public void addNewLine(final RobotLine line) {
-        line.setFileUUID(getFileUUID());
         this.fileContent.add(line);
     }
 
@@ -82,7 +68,7 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeSettingTableSection() {
-        settingTable = modelCreator.createSettingTable(getFileUUID());
+        settingTable = modelCreator.createSettingTable();
     }
 
 
@@ -98,7 +84,7 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeVariableTableSection() {
-        variableTable = modelCreator.createVariableTable(getFileUUID());
+        variableTable = modelCreator.createVariableTable();
     }
 
 
@@ -114,7 +100,7 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeTestCaseTableSection() {
-        testCaseTable = modelCreator.createTestCaseTable(getFileUUID());
+        testCaseTable = modelCreator.createTestCaseTable();
     }
 
 
@@ -130,7 +116,7 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeKeywordTableSection() {
-        keywordTable = modelCreator.createKeywordTable(getFileUUID());
+        keywordTable = modelCreator.createKeywordTable();
     }
 
 
@@ -153,7 +139,6 @@ public class RobotFile implements IRobotFile {
                 type.getRepresentation().get(0)).append(" ***"));
         tableHeaderToken.setType(type);
         TableHeader header = modelCreator.createTableHeader(tableHeaderToken);
-        header.setFileUUID(getFileUUID());
 
         return header;
     }
