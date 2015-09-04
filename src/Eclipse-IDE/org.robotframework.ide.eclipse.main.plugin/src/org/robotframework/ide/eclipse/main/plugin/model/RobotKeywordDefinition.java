@@ -7,6 +7,11 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordDocumentation;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordReturn;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTags;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTeardown;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTimeout;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -16,6 +21,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     public static final String ARGUMENTS = "Arguments";
     public static final String DOCUMENTATION = "Documentation";
+    public static final String TAGS = "Tags";
     public static final String TIMEOUT = "Timeout";
     public static final String TEARDOWN = "Teardown";
     public static final String RETURN = "Return";
@@ -25,17 +31,48 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     public void link(final UserKeyword keyword) {
+        // body
         for (final RobotExecutableRow execRow : keyword.getKeywordExecutionRows()) {
-            final String callName = execRow.getAction().getText().toString();
+            final String name = execRow.getAction().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
-            createKeywordCall(callName, args, "");
+            createKeywordCall(name, args, "");
         }
+        // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
-            final String argName = argument.getDeclaration().getText().toString();
+            final String name = argument.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(argument.getArguments(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(argName), args, "");
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final KeywordDocumentation documentation : keyword.getDocumentation()) {
+            final String name = documentation.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final KeywordTags tags : keyword.getTags()) {
+            final String name = tags.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final KeywordTimeout timeout : keyword.getTimeouts()) {
+            final String name = timeout.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(timeout.getTimeout().getText().toString());
+            args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final KeywordTeardown teardown : keyword.getTeardowns()) {
+            final String name = teardown.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(teardown.getKeywordName().getText().toString());
+            args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
+        }
+        for (final KeywordReturn returnSetting : keyword.getReturns()) {
+            final String name = returnSetting.getDeclaration().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
+            createDefinitionSetting(omitSquareBrackets(name), args, "");
         }
     }
 
@@ -75,6 +112,14 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     public RobotDefinitionSetting getDocumentationSetting() {
         return findSetting(DOCUMENTATION);
+    }
+
+    public boolean hasTags() {
+        return getTagsSetting() != null;
+    }
+
+    public RobotDefinitionSetting getTagsSetting() {
+        return findSetting(TAGS);
     }
 
     public boolean hasTeardownValue() {
