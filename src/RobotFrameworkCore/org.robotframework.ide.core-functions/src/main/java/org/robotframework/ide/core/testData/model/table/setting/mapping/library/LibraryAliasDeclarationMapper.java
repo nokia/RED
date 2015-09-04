@@ -39,7 +39,6 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
         LibraryImport lib = getNearestLibraryImport(robotFileOutput);
         LibraryAlias alias = robotFileOutput.getObjectCreator()
                 .createLibraryAlias(rt);
-        alias.setFileUUID(lib.getFileUUID());
         lib.setAlias(alias);
 
         processingState.push(ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);

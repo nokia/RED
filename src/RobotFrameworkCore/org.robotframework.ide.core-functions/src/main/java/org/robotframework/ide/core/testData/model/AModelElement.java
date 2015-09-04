@@ -15,18 +15,6 @@ public abstract class AModelElement implements IOptional {
 
     public abstract List<RobotToken> getElementTokens();
 
-    private String uuid;
-
-
-    public String getFileUUID() {
-        return uuid;
-    }
-
-
-    public void setFileUUID(final String uuid) {
-        this.uuid = uuid;
-    }
-
 
     public FilePosition getEndPosition() {
         FilePosition pos = FilePosition.createNotSet();

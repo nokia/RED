@@ -37,7 +37,6 @@ public class SuiteSetupMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         SuiteSetup setup = robotFileOutput.getObjectCreator().createSuiteSetup(
                 rt);
-        setup.setFileUUID(setting.getFileUUID());
         setting.addSuiteSetup(setup);
         processingState.push(ParsingState.SETTING_SUITE_SETUP);
 

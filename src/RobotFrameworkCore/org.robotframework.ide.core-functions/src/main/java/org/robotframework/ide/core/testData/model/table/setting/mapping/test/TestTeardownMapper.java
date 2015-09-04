@@ -37,7 +37,6 @@ public class TestTeardownMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         TestTeardown teardown = robotFileOutput.getObjectCreator()
                 .createTestTeardown(rt);
-        teardown.setFileUUID(teardown.getFileUUID());
         setting.addTestTeardown(teardown);
         processingState.push(ParsingState.SETTING_TEST_TEARDOWN);
 

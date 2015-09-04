@@ -264,26 +264,26 @@ public class RobotModelObjectCreator implements IRobotModelObjectCreator {
 
 
     @Override
-    public KeywordTable createKeywordTable(final String uuid) {
-        return new KeywordTable(uuid);
+    public KeywordTable createKeywordTable() {
+        return new KeywordTable();
     }
 
 
     @Override
-    public TestCaseTable createTestCaseTable(final String uuid) {
-        return new TestCaseTable(uuid);
+    public TestCaseTable createTestCaseTable() {
+        return new TestCaseTable();
     }
 
 
     @Override
-    public VariableTable createVariableTable(final String uuid) {
-        return new VariableTable(uuid);
+    public VariableTable createVariableTable() {
+        return new VariableTable();
     }
 
 
     @Override
-    public SettingTable createSettingTable(final String uuid) {
-        return new SettingTable(uuid);
+    public SettingTable createSettingTable() {
+        return new SettingTable();
     }
 
 

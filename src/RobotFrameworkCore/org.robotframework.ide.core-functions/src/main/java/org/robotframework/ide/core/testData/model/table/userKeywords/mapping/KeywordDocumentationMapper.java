@@ -39,7 +39,6 @@ public class KeywordDocumentationMapper extends
                 processingState, robotFileOutput, rt, fp);
         KeywordDocumentation doc = robotFileOutput.getObjectCreator()
                 .createKeywordDocumentation(rt);
-        doc.setFileUUID(keyword.getFileUUID());
         keyword.addDocumentation(doc);
         processingState
                 .push(ParsingState.KEYWORD_SETTING_DOCUMENTATION_DECLARATION);

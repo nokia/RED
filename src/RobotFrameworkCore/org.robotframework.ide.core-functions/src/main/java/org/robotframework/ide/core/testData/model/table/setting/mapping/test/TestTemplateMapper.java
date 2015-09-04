@@ -37,7 +37,6 @@ public class TestTemplateMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         TestTemplate template = robotFileOutput.getObjectCreator()
                 .createTestTemplate(rt);
-        template.setFileUUID(setting.getFileUUID());
         setting.addTestTemplate(template);
         processingState.push(ParsingState.SETTING_TEST_TEMPLATE);
 

@@ -35,7 +35,6 @@ public class TestCaseTagsMapper extends ATestCaseSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         TestCaseTags tags = robotFileOutput.getObjectCreator()
                 .createTestCaseTags(rt);
-        tags.setFileUUID(testCase.getFileUUID());
         testCase.addTag(tags);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TAGS);

@@ -37,7 +37,6 @@ public class TestCaseTemplateMapper extends ATestCaseSettingDeclarationMapper {
                 processingState, robotFileOutput, rt, fp);
         TestCaseTemplate template = robotFileOutput.getObjectCreator()
                 .createTestCaseTemplate(rt);
-        template.setFileUUID(testCase.getFileUUID());
         testCase.addTemplate(template);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE);

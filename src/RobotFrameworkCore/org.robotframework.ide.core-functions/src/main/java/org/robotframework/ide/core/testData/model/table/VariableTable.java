@@ -19,18 +19,12 @@ public class VariableTable extends ARobotSectionTable {
     private List<IVariableHolder> variables = new LinkedList<>();
 
 
-    public VariableTable(String uuid) {
-        super(uuid);
-    }
-
-
     public List<IVariableHolder> getVariables() {
         return Collections.unmodifiableList(variables);
     }
 
 
     public void addVariable(final IVariableHolder variable) {
-        variable.setFileUUID(getFileUUID());
         variables.add(variable);
     }
 
@@ -45,7 +39,6 @@ public class VariableTable extends ARobotSectionTable {
             scalar.addValue(t);
         }
 
-        scalar.setFileUUID(getFileUUID());
         variables.add(index, scalar);
     }
 
@@ -60,7 +53,6 @@ public class VariableTable extends ARobotSectionTable {
             list.addItem(t);
         }
 
-        list.setFileUUID(getFileUUID());
         variables.add(index, list);
     }
 
@@ -82,7 +74,6 @@ public class VariableTable extends ARobotSectionTable {
             dict.put(null, keyT, valueT);
         }
 
-        dict.setFileUUID(getFileUUID());
         variables.add(index, dict);
     }
 
