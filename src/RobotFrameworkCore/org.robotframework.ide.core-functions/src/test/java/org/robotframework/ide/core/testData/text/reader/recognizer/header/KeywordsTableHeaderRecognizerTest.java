@@ -528,13 +528,13 @@ public class KeywordsTableHeaderRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?[*]+[\\s]*("
+                "[ ]?([*][\\s]*)+[\\s]*("
                         + ATokenRecognizer.createUpperLowerCaseWord("User")
                         + "[\\s]+)?("
                         + ATokenRecognizer.createUpperLowerCaseWord("Keywords")
                         + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Keyword")
-                        + ")[\\s]*[*]*");
+                        + ")([\\s]*[*])*");
     }
 
 

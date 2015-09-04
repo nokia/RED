@@ -405,13 +405,13 @@ public class SettingsTableHeaderRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?[*]+[\\s]*("
+                "[ ]?([*][\\s]*)+[\\s]*("
                         + ATokenRecognizer.createUpperLowerCaseWord("Settings")
                         + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Setting")
                         + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
-                        + ")[\\s]*[*]*");
+                        + ")([\\s]*[*])*");
     }
 
 

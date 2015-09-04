@@ -286,13 +286,13 @@ public class TestCasesTableHeaderRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?[*]+[\\s]*"
+                "[ ]?([*][\\s]*)+[\\s]*"
                         + ATokenRecognizer.createUpperLowerCaseWord("Test")
                         + "[\\s]+("
                         + ATokenRecognizer.createUpperLowerCaseWord("Cases")
                         + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Case")
-                        + ")[\\s]*[*]*");
+                        + ")([\\s]*[*])*");
     }
 
 

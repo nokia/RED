@@ -285,11 +285,11 @@ public class VariablesTableHeaderRecognizerTest {
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?[*]+[\\s]*("
+                "[ ]?([*][\\s]*)+[\\s]*("
                         + ATokenRecognizer
                                 .createUpperLowerCaseWord("Variables") + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Variable")
-                        + ")[\\s]*[*]*");
+                        + ")([\\s]*[*])*");
     }
 
 
