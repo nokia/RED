@@ -8,10 +8,11 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class TestCasesTableHeaderRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?[*]+[\\s]*"
-            + createUpperLowerCaseWord("Test") + "[\\s]+("
-            + createUpperLowerCaseWord("Cases") + "|"
-            + createUpperLowerCaseWord("Case") + ")[\\s]*[*]*");
+    public static final Pattern EXPECTED = Pattern
+            .compile("[ ]?([*][\\s]*)+[\\s]*"
+                    + createUpperLowerCaseWord("Test") + "[\\s]+("
+                    + createUpperLowerCaseWord("Cases") + "|"
+                    + createUpperLowerCaseWord("Case") + ")([\\s]*[*])*");
 
 
     public TestCasesTableHeaderRecognizer() {
