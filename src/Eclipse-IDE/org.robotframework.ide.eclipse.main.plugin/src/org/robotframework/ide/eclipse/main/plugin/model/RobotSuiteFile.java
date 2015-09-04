@@ -67,7 +67,7 @@ public class RobotSuiteFile implements RobotElement {
         } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
             section = new RobotKeywordsSection(this);
         } else {
-            section = new RobotSuiteFileSection(this, name);
+            throw new IllegalStateException("Unrecognized section '" + name + "' cannot be created");
         }
 
         if (getSections().contains(section)) {

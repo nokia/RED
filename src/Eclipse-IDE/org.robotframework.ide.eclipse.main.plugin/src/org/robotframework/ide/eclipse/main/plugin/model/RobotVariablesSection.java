@@ -52,12 +52,6 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         
         return robotVariable;
     }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<RobotVariable> getChildren() {
-        return (List<RobotVariable>) super.getChildren();
-    }
     
     @Override
     public void link(final ARobotSectionTable table) {
@@ -69,15 +63,21 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
             elements.add(variable);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<RobotVariable> getChildren() {
+        return (List<RobotVariable>) super.getChildren();
+    }
     
-    private List<String> createList(String value) {
+    private List<String> createList(final String value) {
         final String[] values = value.split("(\\s{2,}|\t)"); 
         return Arrays.asList(values);
     }
     
-    private Map<String, String> createDict(String value) {
+    private Map<String, String> createDict(final String value) {
         String[] keyValuePair;
-        Map<String, String> map = new HashMap<String, String>();
+        final Map<String, String> map = new HashMap<String, String>();
         final String[] values = value.split("(\\s{2,}|\t)"); 
         for (int i = 0; i < values.length; i++) {
             if (!values[i].equals("") && values[i].contains("=")) {
