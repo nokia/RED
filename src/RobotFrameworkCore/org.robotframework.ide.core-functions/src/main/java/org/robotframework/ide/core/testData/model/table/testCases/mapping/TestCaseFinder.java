@@ -30,7 +30,6 @@ public class TestCaseFinder {
         List<TestCase> lastHeaderTestCases = filterByTestCasesAfterLastHeader(testCaseTable);
         if (lastHeaderTestCases.isEmpty()) {
             testCase = createArtificialTestCase(robotFileOutput, testCaseTable);
-            testCase.setFileUUID(testCaseTable.getFileUUID());
             testCaseTable.addTest(testCase);
         } else {
             testCase = lastHeaderTestCases.get(lastHeaderTestCases.size() - 1);

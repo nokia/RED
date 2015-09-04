@@ -38,7 +38,6 @@ public class ScalarVariableMapper implements IParsingMapper {
 
         ScalarVariable var = robotFileOutput.getObjectCreator()
                 .createScalarVariable(varHelper.extractVariableName(text), rt);
-        var.setFileUUID(varTable.getFileUUID());
         varTable.addVariable(var);
 
         processingState.push(ParsingState.SCALAR_VARIABLE_DECLARATION);

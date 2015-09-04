@@ -20,16 +20,16 @@ public interface IRobotModelObjectCreator extends
     RobotFileOutput createRobotFileOutput();
 
 
-    SettingTable createSettingTable(final String uuid);
+    SettingTable createSettingTable();
 
 
-    VariableTable createVariableTable(final String uuid);
+    VariableTable createVariableTable();
 
 
-    TestCaseTable createTestCaseTable(final String uuid);
+    TestCaseTable createTestCaseTable();
 
 
-    KeywordTable createKeywordTable(final String uuid);
+    KeywordTable createKeywordTable();
 
 
     TableHeader createTableHeader(final RobotToken tableHeaderToken);

@@ -37,7 +37,7 @@ public class MetadataValueMapper implements IParsingMapper {
                 .getSettingTable();
         List<Metadata> metadatas = settings.getMetadatas();
         if (!metadatas.isEmpty()) {
-            metadatas.get(metadatas.size() - 1).setKey(rt);
+            metadatas.get(metadatas.size() - 1).addValue(rt);
         } else {
             // FIXME: some error
         }

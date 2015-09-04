@@ -37,7 +37,6 @@ public class ForceTagsMapper implements IParsingMapper {
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         ForceTags forceTags = robotFileOutput.getObjectCreator()
                 .createForceTags(rt);
-        forceTags.setFileUUID(setting.getFileUUID());
         setting.addForceTags(forceTags);
         processingState.push(ParsingState.SETTING_FORCE_TAGS);
         return rt;

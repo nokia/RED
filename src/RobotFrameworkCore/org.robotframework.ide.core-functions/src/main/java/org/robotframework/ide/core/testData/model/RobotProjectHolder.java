@@ -6,12 +6,21 @@ import java.util.List;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
+import org.robotframework.ide.core.testData.model.listener.IRobotProjectHolder;
 
 
-public class RobotProjectHolder {
+public class RobotProjectHolder implements IRobotProjectHolder {
 
-    private RobotRuntimeEnvironment robotRuntime;
+    private final RobotRuntimeEnvironment robotRuntime;
     private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
+
+
+    public static RobotProjectHolder create(
+            final RobotRuntimeEnvironment robotRuntime) {
+        RobotProjectHolder rph = new RobotProjectHolder(robotRuntime);
+
+        return rph;
+    }
 
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
@@ -19,11 +28,13 @@ public class RobotProjectHolder {
     }
 
 
+    @Override
     public RobotRuntimeEnvironment getRobotRuntime() {
         return robotRuntime;
     }
 
 
+    @Override
     public void addModelFile(final RobotFileOutput robotOutput) {
         if (robotOutput != null) {
             File processedFile = robotOutput.getProcessedFile();
@@ -37,25 +48,35 @@ public class RobotProjectHolder {
     }
 
 
+    @Override
     public void removeModelFile(final RobotFileOutput robotOutput) {
         readableProjectFiles.remove(robotOutput);
     }
 
 
+    @Override
     public void addImportedResources(
             final List<ResourceImportReference> referenced) {
         for (ResourceImportReference ref : referenced) {
-            readableProjectFiles.add(ref.getReference());
+            addImportedResource(ref);
         }
     }
 
 
+    @Override
+    public void addImportedResource(final ResourceImportReference referenced) {
+        readableProjectFiles.add(referenced.getReference());
+    }
+
+
+    @Override
     public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
         return (robotOutput != null && shouldBeLoaded(robotOutput
                 .getProcessedFile()));
     }
 
 
+    @Override
     public boolean shouldBeLoaded(final File file) {
         RobotFileOutput foundFile = findFileByName(file);
         return (foundFile == null)
@@ -64,6 +85,7 @@ public class RobotProjectHolder {
     }
 
 
+    @Override
     public RobotFileOutput findFileByName(final File file) {
         RobotFileOutput found = null;
         List<Integer> findFile = findFile(new SearchByName(file));

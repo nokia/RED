@@ -42,7 +42,6 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         RobotExecutableRow row = robotFileOutput.getObjectCreator()
                 .createRobotExecutableRow();
         row.setAction(rt);
-        row.setFileUUID(testCase.getFileUUID());
         testCase.addTestExecutionRow(row);
 
         processingState.push(ParsingState.TEST_CASE_INSIDE_ACTION);
