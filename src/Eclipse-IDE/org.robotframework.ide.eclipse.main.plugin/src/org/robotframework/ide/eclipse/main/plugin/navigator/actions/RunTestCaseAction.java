@@ -10,10 +10,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -21,18 +23,12 @@ import org.robotframework.red.viewers.Selections;
 
 public class RunTestCaseAction extends Action implements IEnablementUpdatingAction {
 
-    private final IWorkbenchPage page;
-
     private final ISelectionProvider selectionProvider;
 
-    private String mode;
+    private final Mode mode;
 
-    public RunTestCaseAction(final IWorkbenchPage page, final ISelectionProvider selectionProvider, final String mode) {
-        super("Run");
-        if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-            setText("Debug");
-        }
-        this.page = page;
+    public RunTestCaseAction(final ISelectionProvider selectionProvider, final Mode mode) {
+        super(mode.getActionName(), mode.getImage());
         this.selectionProvider = selectionProvider;
         this.mode = mode;
     }
@@ -50,7 +46,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
 
                 final List<IResource> suiteFiles = new ArrayList<IResource>();
                 final List<String> testCasesNames = new ArrayList<String>();
-                for (RobotCase robotCase : selectedTestCases) {
+                for (final RobotCase robotCase : selectedTestCases) {
                     final IResource suiteFile = robotCase.getSuiteFile().getFile();
                     if (!suiteFiles.contains(suiteFile)) {
                         suiteFiles.add(suiteFile);
@@ -60,7 +56,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                 }
 
                 RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(suiteFiles, testCasesNames)
-                        .launch(mode, monitor);
+                        .launch(mode.nameInLaunchManager(), monitor);
 
                 return Status.OK_STATUS;
             }
@@ -74,4 +70,32 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
         setEnabled(!Selections.getElements(selection, RobotCase.class).isEmpty());
     }
 
+    public static enum Mode {
+        RUN("Run", ILaunchManager.RUN_MODE, IDebugUIConstants.IMG_ACT_RUN),
+        DEBUG("Debug", ILaunchManager.DEBUG_MODE, IDebugUIConstants.IMG_ACT_DEBUG);
+        
+        private final String actionName;
+
+        private final String launchMgrName;
+
+        private final String imageConst;
+
+        private Mode(final String actionName, final String launchMgrName, final String imageConst) {
+            this.actionName = actionName;
+            this.launchMgrName = launchMgrName;
+            this.imageConst = imageConst;
+        }
+
+        public String getActionName() {
+            return actionName;
+        }
+
+        public String nameInLaunchManager() {
+            return launchMgrName;
+        }
+
+        public ImageDescriptor getImage() {
+            return DebugUITools.getImageDescriptor(imageConst);
+        }
+    }
 }

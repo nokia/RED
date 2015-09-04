@@ -1,7 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+
+import com.google.common.collect.Lists;
 
 public class RobotCase extends RobotCodeHoldingElement {
 
@@ -14,6 +22,15 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     RobotCase(final RobotCasesSection parent, final String name, final String comment) {
         super(parent, name, comment);
+    }
+
+    public void link(final TestCase testCase) {
+        for (final RobotExecutableRow execRow : testCase.getTestExecutionRows()) {
+            final String callName = execRow.getAction().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
+            createKeywordCall(callName, args, "");
+        }
     }
 
     @Override
