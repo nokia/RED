@@ -21,6 +21,7 @@ class KeywordSettingsModel {
 
     static Map<String, RobotElement> buildKeywordSettingsMapping(final RobotKeywordDefinition def) {
         final Map<String, RobotElement> settings = new LinkedHashMap<>();
+        settings.put(RobotKeywordDefinition.TAGS, def == null ? null : def.getTagsSetting());
         settings.put(RobotKeywordDefinition.TIMEOUT, def == null ? null : def.getTimeoutSetting());
         settings.put(RobotKeywordDefinition.TEARDOWN, def == null ? null : def.getTeardownSetting());
         settings.put(RobotKeywordDefinition.RETURN, def == null ? null : def.getReturnValueSetting());
