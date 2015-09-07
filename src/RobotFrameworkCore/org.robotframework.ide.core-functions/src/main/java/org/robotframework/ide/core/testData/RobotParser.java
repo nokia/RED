@@ -9,7 +9,7 @@ import org.robotframework.ide.core.testData.importer.VariablesFileImportReferenc
 import org.robotframework.ide.core.testData.importer.VariablesImporter;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
-import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.listener.IRobotProjectHolder;
 import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 import org.robotframework.ide.core.testData.model.objectCreator.RobotModelObjectCreator;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
@@ -18,7 +18,7 @@ import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 public class RobotParser {
 
     private boolean shouldEagerImport = false;
-    private final RobotProjectHolder robotProject;
+    private final IRobotProjectHolder robotProject;
     private final IRobotModelObjectCreator objCreator;
 
     private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
@@ -27,7 +27,7 @@ public class RobotParser {
     }
 
 
-    public RobotParser(final RobotProjectHolder robotProject) {
+    public RobotParser(final IRobotProjectHolder robotProject) {
         this.objCreator = RobotModelObjectCreator.newInstance();
         this.robotProject = robotProject;
     }
