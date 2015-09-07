@@ -15,14 +15,6 @@ public class RobotProjectHolder implements IRobotProjectHolder {
     private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
 
 
-    public static RobotProjectHolder create(
-            final RobotRuntimeEnvironment robotRuntime) {
-        RobotProjectHolder rph = new RobotProjectHolder(robotRuntime);
-
-        return rph;
-    }
-
-
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
         this.robotRuntime = robotRuntime;
     }
