@@ -29,6 +29,7 @@ public class RobotPerspective implements IPerspectiveFactory {
 
         layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
         layout.addShowViewShortcut(MessageLogView.ID);
+        layout.addShowViewShortcut(ExecutionView.ID);
 
         layout.addShowInPart("org.eclipse.ui.navigator.ProjectExplorer");
 	}
