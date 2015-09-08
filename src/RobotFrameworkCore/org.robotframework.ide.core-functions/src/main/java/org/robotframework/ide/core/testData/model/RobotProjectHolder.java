@@ -8,10 +8,10 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 
 
-public class RobotProjectHolder implements IRobotProjectHolder {
+public class RobotProjectHolder {
 
     private final RobotRuntimeEnvironment robotRuntime;
-    private final List<IRobotFileOutput> readableProjectFiles = new LinkedList<>();
+    private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
 
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
@@ -19,18 +19,16 @@ public class RobotProjectHolder implements IRobotProjectHolder {
     }
 
 
-    @Override
     public RobotRuntimeEnvironment getRobotRuntime() {
         return robotRuntime;
     }
 
 
-    @Override
-    public void addModelFile(final IRobotFileOutput robotOutput) {
+    public void addModelFile(final RobotFileOutput robotOutput) {
         if (robotOutput != null) {
             File processedFile = robotOutput.getProcessedFile();
             if (processedFile != null) {
-                IRobotFileOutput file = findFileByName(processedFile);
+                RobotFileOutput file = findFileByName(processedFile);
                 removeModelFile(file);
             }
 
@@ -39,13 +37,11 @@ public class RobotProjectHolder implements IRobotProjectHolder {
     }
 
 
-    @Override
-    public void removeModelFile(final IRobotFileOutput robotOutput) {
+    public void removeModelFile(final RobotFileOutput robotOutput) {
         readableProjectFiles.remove(robotOutput);
     }
 
 
-    @Override
     public void addImportedResources(
             final List<ResourceImportReference> referenced) {
         for (ResourceImportReference ref : referenced) {
@@ -54,31 +50,27 @@ public class RobotProjectHolder implements IRobotProjectHolder {
     }
 
 
-    @Override
     public void addImportedResource(final ResourceImportReference referenced) {
         readableProjectFiles.add(referenced.getReference());
     }
 
 
-    @Override
-    public boolean shouldBeLoaded(final IRobotFileOutput robotOutput) {
+    public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
         return (robotOutput != null && shouldBeLoaded(robotOutput
                 .getProcessedFile()));
     }
 
 
-    @Override
     public boolean shouldBeLoaded(final File file) {
-        IRobotFileOutput foundFile = findFileByName(file);
+        RobotFileOutput foundFile = findFileByName(file);
         return (foundFile == null)
                 || (file.lastModified() != foundFile
                         .getLastModificationEpochTime());
     }
 
 
-    @Override
-    public IRobotFileOutput findFileByName(final File file) {
-        IRobotFileOutput found = null;
+    public RobotFileOutput findFileByName(final File file) {
+        RobotFileOutput found = null;
         List<Integer> findFile = findFile(new SearchByName(file));
         if (!findFile.isEmpty()) {
             found = readableProjectFiles.get(findFile.get(0));
@@ -92,7 +84,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
         List<Integer> foundFiles = new LinkedList<>();
         int size = readableProjectFiles.size();
         for (int i = 0; i < size; i++) {
-            IRobotFileOutput robotFile = readableProjectFiles.get(i);
+            RobotFileOutput robotFile = readableProjectFiles.get(i);
             if (criteria.matchCriteria(robotFile)) {
                 foundFiles.add(i);
                 break;
@@ -113,7 +105,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
         @Override
-        public boolean matchCriteria(IRobotFileOutput robotFile) {
+        public boolean matchCriteria(RobotFileOutput robotFile) {
             return (robotFile.getProcessedFile().getAbsolutePath()
                     .equals(toFound.getAbsolutePath()));
         }
@@ -121,6 +113,6 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
     protected interface ISearchCriteria {
 
-        boolean matchCriteria(final IRobotFileOutput robotFile);
+        boolean matchCriteria(final RobotFileOutput robotFile);
     }
 }

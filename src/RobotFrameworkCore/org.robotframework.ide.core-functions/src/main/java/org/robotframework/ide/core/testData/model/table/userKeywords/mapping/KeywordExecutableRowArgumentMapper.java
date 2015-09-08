@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -31,7 +31,7 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(
                 currentLine, processingState, robotFileOutput, rt, fp);
@@ -50,7 +50,7 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

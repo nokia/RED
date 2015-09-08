@@ -5,20 +5,164 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
-import org.robotframework.ide.core.testData.model.IRobotFile;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
+import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
+import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class ElementsUtility {
+
+    public boolean isNewExecutableSection(final ALineSeparator separator,
+            final RobotLine line) {
+        boolean result = false;
+        if (separator.getProducedType() == SeparatorType.PIPE) {
+            List<IRobotLineElement> lineElements = line.getLineElements();
+            if (lineElements.size() == 1) {
+                result = lineElements.get(0).getTypes()
+                        .contains(SeparatorType.PIPE);
+            }
+        } else {
+            result = line.getLineElements().isEmpty();
+        }
+        return result;
+    }
+
+
+    public LibraryImport findNearestLibraryImport(
+            final RobotFileOutput robotFileOutput) {
+        AImported imported = getNearestImport(robotFileOutput);
+        LibraryImport lib;
+        if (imported instanceof LibraryImport) {
+            lib = (LibraryImport) imported;
+        } else {
+            lib = null;
+
+            // FIXME: sth wrong - declaration of library not inside setting
+            // and
+            // was not catch by previous library declaration logic
+        }
+        return lib;
+    }
+
+
+    public RobotToken computeCorrectRobotToken(RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            String text, boolean isNewLine, List<RobotToken> robotTokens) {
+        RobotToken correct = null;
+        if (robotTokens.size() > 1) {
+            List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
+            if (!headersPossible.isEmpty()) {
+                if (headersPossible.size() == 1) {
+                    correct = headersPossible.get(0);
+                } else {
+                    // FIXME: error
+                }
+            } else {
+                ParsingState state = getCurrentStatus(processingState);
+
+                RobotToken comment = findCommentToken(robotTokens, text);
+                if (comment != null) {
+                    correct = comment;
+                } else {
+                    for (RobotToken rt : robotTokens) {
+                        if (isTypeForState(state, rt)) {
+                            correct = rt;
+                            break;
+                        }
+                    }
+                }
+
+                if (correct == null) {
+                    // FIXME: error no matching tokens to state
+                    throw new IllegalStateException("Some problem to fix.");
+                }
+            }
+        } else {
+            correct = robotTokens.get(0);
+        }
+
+        return correct;
+    }
+
+
+    public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
+        RobotTokenType robotType = RobotTokenType.UNKNOWN;
+        boolean result = false;
+
+        List<RobotTokenType> typesForState = new LinkedList<>();
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE
+                || state == ParsingState.TEST_CASE_DECLARATION) {
+            typesForState = robotType.getTypesForTestCasesTable();
+        } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForSettingsTable();
+        } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
+            typesForState = robotType.getTypesForVariablesTable();
+        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE
+                || state == ParsingState.KEYWORD_DECLARATION) {
+            typesForState = robotType.getTypesForKeywordsTable();
+        }
+
+        List<IRobotTokenType> types = rt.getTypes();
+        for (IRobotTokenType type : types) {
+            if (typesForState.contains(type)) {
+                result = true;
+                break;
+            }
+        }
+
+        if (!result)
+            if (state == ParsingState.TEST_CASE_DECLARATION
+                    || state == ParsingState.KEYWORD_DECLARATION
+                    || state == ParsingState.UNKNOWN) {
+                result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
+                        .contains(RobotTokenType.COMMENT_CONTINUE));
+
+            }
+
+        return result;
+    }
+
+
+    public RobotToken findCommentToken(List<RobotToken> robotTokens, String text) {
+        RobotToken comment = null;
+        for (RobotToken rt : robotTokens) {
+            List<IRobotTokenType> types = rt.getTypes();
+            if (types.contains(RobotTokenType.START_HASH_COMMENT)
+                    || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+                if (text.equals(rt.getRaw().toString())) {
+                    comment = rt;
+                    break;
+                }
+            }
+        }
+
+        return comment;
+    }
+
+
+    public List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
+        List<RobotToken> found = new LinkedList<>();
+        for (RobotToken t : tokens) {
+            if (isTableHeader(t)) {
+                found.add(t);
+            }
+        }
+
+        return found;
+    }
+
 
     public boolean isComment(final RobotLine line) {
         boolean result = false;
@@ -71,7 +215,7 @@ public class ElementsUtility {
     }
 
 
-    public AImported getNearestImport(final IRobotFileOutput robotFileOutput) {
+    public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
         AImported result;
         List<AImported> imports = robotFileOutput.getFileModel()
                 .getSettingTable().getImports();
@@ -171,10 +315,10 @@ public class ElementsUtility {
 
 
     public List<TableHeader> getKnownHeadersForTable(
-            final IRobotFileOutput robotFileOutput,
+            final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
         List<TableHeader> tableKnownHeaders = new LinkedList<>();
-        IRobotFile fileModel = robotFileOutput.getFileModel();
+        RobotFile fileModel = robotFileOutput.getFileModel();
         if (tableHeaderState == ParsingState.SETTING_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getSettingTable().getHeaders();
         } else if (tableHeaderState == ParsingState.VARIABLE_TABLE_HEADER) {

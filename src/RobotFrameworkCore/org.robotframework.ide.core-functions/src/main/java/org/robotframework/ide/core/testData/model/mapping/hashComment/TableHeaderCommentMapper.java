@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment;
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.IRobotFile;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
@@ -29,7 +29,7 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            IRobotFile fileModel) {
+            RobotFile fileModel) {
         ARobotSectionTable table = null;
         if (currentState == ParsingState.SETTING_TABLE_HEADER) {
             table = fileModel.getSettingTable();

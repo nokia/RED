@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.text.write.TxtRobotFileDumper;
 
@@ -33,7 +32,7 @@ public class RobotFileDumper {
     }
 
 
-    public StringBuilder dump(final IRobotFileOutput output) {
+    public StringBuilder dump(final RobotFileOutput output) {
         return new TxtRobotFileDumper().dump(output.getFileModel());
     }
 }

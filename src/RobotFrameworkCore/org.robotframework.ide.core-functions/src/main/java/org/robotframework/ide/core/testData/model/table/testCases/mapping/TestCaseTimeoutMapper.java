@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,7 +24,7 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
@@ -36,8 +36,7 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestCaseTimeout timeout = robotFileOutput.getObjectCreator()
-                .createTestCaseTimeout(rt);
+        TestCaseTimeout timeout = new TestCaseTimeout(rt);
         testCase.addTimeout(timeout);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT);
