@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.setting.mapping;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -29,14 +29,13 @@ public class ForceTagsMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setType(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
         rt.setText(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        ForceTags forceTags = robotFileOutput.getObjectCreator()
-                .createForceTags(rt);
+        ForceTags forceTags = new ForceTags(rt);
         setting.addForceTags(forceTags);
         processingState.push(ParsingState.SETTING_FORCE_TAGS);
         return rt;
@@ -44,7 +43,7 @@ public class ForceTagsMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

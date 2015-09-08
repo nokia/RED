@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -31,7 +31,7 @@ public class TestCaseNameMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
@@ -41,8 +41,7 @@ public class TestCaseNameMapper implements IParsingMapper {
 
         TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
-        TestCase testCase = robotFileOutput.getObjectCreator().createTestCase(
-                rt);
+        TestCase testCase = new TestCase(rt);
         testCaseTable.addTest(testCase);
         processingState.push(ParsingState.TEST_CASE_DECLARATION);
 
@@ -51,7 +50,7 @@ public class TestCaseNameMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

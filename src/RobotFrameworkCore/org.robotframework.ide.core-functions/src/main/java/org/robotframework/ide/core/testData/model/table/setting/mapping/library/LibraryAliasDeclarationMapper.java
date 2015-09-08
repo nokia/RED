@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
@@ -31,14 +31,13 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
         rt.setText(new StringBuilder(text));
 
         LibraryImport lib = getNearestLibraryImport(robotFileOutput);
-        LibraryAlias alias = robotFileOutput.getObjectCreator()
-                .createLibraryAlias(rt);
+        LibraryAlias alias = new LibraryAlias(rt);
         lib.setAlias(alias);
 
         processingState.push(ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);
@@ -48,7 +47,7 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected LibraryImport getNearestLibraryImport(
-            final IRobotFileOutput robotFileOutput) {
+            final RobotFileOutput robotFileOutput) {
         LibraryImport library = null;
         List<AImported> imports = robotFileOutput.getFileModel()
                 .getSettingTable().getImports();
@@ -69,7 +68,7 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result;

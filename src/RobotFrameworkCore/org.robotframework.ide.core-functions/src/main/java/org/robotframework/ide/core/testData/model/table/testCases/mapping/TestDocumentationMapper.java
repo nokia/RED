@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestDocumentation;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,7 +24,7 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
@@ -34,8 +34,7 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestDocumentation doc = robotFileOutput.getObjectCreator()
-                .createTestDocumentation(rt);
+        TestDocumentation doc = new TestDocumentation(rt);
         testCase.addDocumentation(doc);
 
         processingState
