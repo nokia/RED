@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.model.IRobotFile;
 import org.robotframework.ide.core.testData.model.IRobotFileOutput;
@@ -16,18 +17,22 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 
 public abstract class RobotFileValidator implements ModelUnitValidator {
 
+    protected final ValidationContext validationContext;
+
     protected final IFile file;
 
     protected final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    public RobotFileValidator(final IFile file) {
+    public RobotFileValidator(final ValidationContext context, final IFile file) {
+        this.validationContext = context;
         this.file = file;
     }
 
     @Override
     public final void validate(final IProgressMonitor monitor) throws CoreException {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-        final RobotParser parser = new RobotParser(new RobotProjectHolder(project.getRuntimeEnvironment()));
+        final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
+        final RobotParser parser = new RobotParser(new RobotProjectHolder(runtimeEnvironment));
 
         final List<IRobotFileOutput> parserOut = parser.parse(file.getLocation().toFile());
         if (!parserOut.isEmpty()) {
@@ -52,6 +57,6 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         new TestCasesTableValidator(file, fileModel.getTestCaseTable()).validate(monitor);
         new GeneralSettingsTableValidator(file, fileModel.getSettingTable()).validate(monitor);
         new KeywordTableValidator(file, fileModel.getKeywordTable()).validate(monitor);
-        new VariablesTableValidator(file, fileModel.getVariableTable()).validate(monitor);
+        new VariablesTableValidator(validationContext, file, fileModel.getVariableTable()).validate(monitor);
     }
 }

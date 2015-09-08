@@ -13,11 +13,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
+
+import com.google.common.base.Optional;
 
 public class RobotArtifactsValidator {
 
@@ -80,23 +84,35 @@ public class RobotArtifactsValidator {
         }
 
         final IFile file = (IFile) resource;
-        ModelUnitValidator validator = null;
-        if (RobotSuiteFileDescriber.isSuiteFile(file)) {
-            validator = new RobotSuiteFileValidator(file);
-        } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
-            validator = new RobotResourceFileValidator(file);
-        } else if (RobotSuiteFileDescriber.isInitializationFile(file)) {
-            validator = new RobotInitFileValidator(file);
-        } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
-            validator = new RobotProjectConfigFileValidator(file);
-        }
 
-        if (validator != null) {
+        final ValidationContext validationContext = prepareValidationContext(file);
+        final Optional<? extends ModelUnitValidator> validator = createProperValidator(validationContext, file);
+
+        if (validator.isPresent()) {
             if (removeMarkers) {
                 file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
             }
-            validator.validate(monitor);
+            validator.get().validate(monitor);
         }
+    }
+
+    private ValidationContext prepareValidationContext(final IFile file) {
+        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
+        return new ValidationContext(project.getRuntimeEnvironment());
+    }
+
+    private Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext validationContext,
+            final IFile file) {
+        if (RobotSuiteFileDescriber.isSuiteFile(file)) {
+            return Optional.of(new RobotSuiteFileValidator(validationContext, file));
+        } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
+            return Optional.of(new RobotResourceFileValidator(validationContext, file));
+        } else if (RobotSuiteFileDescriber.isInitializationFile(file)) {
+            return Optional.of(new RobotInitFileValidator(validationContext, file));
+        } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
+            return Optional.of(new RobotProjectConfigFileValidator(validationContext, file));
+        }
+        return Optional.absent();
     }
 
     public interface ModelUnitValidator {
