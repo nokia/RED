@@ -6,9 +6,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.RobotParser;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFile;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
-import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -29,13 +29,13 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         final RobotParser parser = new RobotParser(new RobotProjectHolder(project.getRuntimeEnvironment()));
 
-        final List<RobotFileOutput> parserOut = parser.parse(file.getLocation().toFile());
+        final List<IRobotFileOutput> parserOut = parser.parse(file.getLocation().toFile());
         if (!parserOut.isEmpty()) {
             validate(parserOut.get(0), monitor);
         }
     }
 
-    private void validate(final RobotFileOutput fileOutput, final IProgressMonitor monitor) throws CoreException {
+    private void validate(final IRobotFileOutput fileOutput, final IProgressMonitor monitor) throws CoreException {
         // TODO : check output status and parsing messages
         validate(fileOutput.getFileModel(), monitor);
     }
