@@ -1,8 +1,10 @@
 package org.robotframework.ide.eclipse.main.plugin.perspectives;
 
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.console.IConsoleConstants;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 
@@ -17,7 +19,7 @@ public class RobotPerspective implements IPerspectiveFactory {
         topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
         
         final IFolderLayout bottom = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.65f ,editorArea);
-        bottom.addView("org.eclipse.ui.console.ConsoleView"); 
+        bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
         
         final IFolderLayout bottomLog = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.50f, "bottom");
@@ -27,7 +29,7 @@ public class RobotPerspective implements IPerspectiveFactory {
         final IFolderLayout topRight = layout.createFolder("topRight", IPageLayout.RIGHT, 0.75f, editorArea);
         topRight.addView(IPageLayout.ID_OUTLINE);
 
-        layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
+        layout.addPerspectiveShortcut(IDebugUIConstants.ID_DEBUG_PERSPECTIVE);
         layout.addShowViewShortcut(MessageLogView.ID);
         layout.addShowViewShortcut(ExecutionView.ID);
 
