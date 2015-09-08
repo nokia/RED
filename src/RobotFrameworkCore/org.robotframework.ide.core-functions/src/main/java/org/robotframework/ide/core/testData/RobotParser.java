@@ -7,19 +7,16 @@ import java.util.List;
 import org.robotframework.ide.core.testData.importer.ResourceImporter;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesImporter;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
-import org.robotframework.ide.core.testData.model.IRobotProjectHolder;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
-import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
-import org.robotframework.ide.core.testData.model.objectCreator.RobotModelObjectCreator;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 
 public class RobotParser {
 
     private boolean shouldEagerImport = false;
-    private final IRobotProjectHolder robotProject;
-    private final IRobotModelObjectCreator objCreator;
+    private final RobotProjectHolder robotProject;
 
     private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
     static {
@@ -27,20 +24,19 @@ public class RobotParser {
     }
 
 
-    public RobotParser(final IRobotProjectHolder robotProject) {
-        this.objCreator = RobotModelObjectCreator.newInstance(robotProject);
+    public RobotParser(final RobotProjectHolder robotProject) {
         this.robotProject = robotProject;
     }
 
 
-    public List<IRobotFileOutput> parse(final File fileOrDir) {
-        List<IRobotFileOutput> output = new LinkedList<>();
+    public List<RobotFileOutput> parse(final File fileOrDir) {
+        List<RobotFileOutput> output = new LinkedList<>();
         parse(fileOrDir, output);
         return output;
     }
 
 
-    private void parse(final File fileOrDir, final List<IRobotFileOutput> output) {
+    private void parse(final File fileOrDir, final List<RobotFileOutput> output) {
         if (fileOrDir != null) {
             boolean isDir = fileOrDir.isDirectory();
             if (isDir) {
@@ -65,8 +61,7 @@ public class RobotParser {
                 }
 
                 if (parserToUse != null) {
-                    IRobotFileOutput robotFile = objCreator
-                            .createRobotFileOutput();
+                    RobotFileOutput robotFile = new RobotFileOutput();
 
                     output.add(robotFile);
                     robotProject.addModelFile(robotFile);

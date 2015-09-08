@@ -14,8 +14,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.IRobotFileParser;
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFile;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
@@ -28,9 +28,6 @@ import org.robotframework.ide.core.testData.model.table.mapping.SettingsMapperPr
 import org.robotframework.ide.core.testData.model.table.mapping.TestCaseMapperProvider;
 import org.robotframework.ide.core.testData.model.table.mapping.UserKeywordMapperProvider;
 import org.robotframework.ide.core.testData.model.table.mapping.VariablesDeclarationMapperProvider;
-import org.robotframework.ide.core.testData.model.table.setting.AImported;
-import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
-import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
@@ -42,7 +39,6 @@ import org.robotframework.ide.core.testData.model.table.variables.mapping.Unknow
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
-import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -51,7 +47,6 @@ import org.robotframework.ide.core.testData.text.read.recognizer.SettingsRecogni
 import org.robotframework.ide.core.testData.text.read.recognizer.TestCaseRecognizersProvider;
 import org.robotframework.ide.core.testData.text.read.recognizer.UserKeywordRecognizersProvider;
 import org.robotframework.ide.core.testData.text.read.recognizer.VariablesDeclarationRecognizersProvider;
-import org.robotframework.ide.core.testData.text.read.recognizer.settings.LibraryAliasRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -70,7 +65,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     public TxtRobotFileParser() {
         this.utility = new ElementsUtility();
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
-        this.libraryFixer = new LibraryAliasFixer();
+        this.libraryFixer = new LibraryAliasFixer(utility);
         this.previousLineHandler = new PreviousLineHandler();
 
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
@@ -112,7 +107,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public void parse(final IRobotFileOutput parsingOutput, final File robotFile) {
+    public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
             FileInputStream fis = new FileInputStream(robotFile);
@@ -143,7 +138,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     }
 
 
-    private IRobotFileOutput parse(final IRobotFileOutput parsingOutput,
+    private RobotFileOutput parse(final RobotFileOutput parsingOutput,
             final File robotFile, final Reader reader) {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
@@ -156,8 +151,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean isNewLine = false;
         try {
             while((currentLineText = lineReader.readLine()) != null) {
-                RobotLine line = parsingOutput.getObjectCreator()
-                        .createRobotLine(lineNumber);
+                RobotLine line = new RobotLine(lineNumber);
                 StringBuilder text = new StringBuilder(currentLineText);
                 int lastColumnProcessed = 0;
                 // get separator for this line
@@ -201,7 +195,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                     .getEndColumn();
                         } else {
                             // last element in line
-                            if (isNewExecutableSection(separator, line)) {
+                            if (utility.isNewExecutableSection(separator, line)) {
                                 processingState
                                         .remove(ParsingState.TEST_CASE_DECLARATION);
                                 processingState
@@ -229,7 +223,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 currentOffset++;
                 lineNumber++;
                 lastColumnProcessed = 0;
-                checkAndFixLine(parsingOutput, processingState);
+                libraryFixer.checkAndFixLine(parsingOutput, processingState);
                 /**
                  * special for case
                  * 
@@ -286,108 +280,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected boolean isNewExecutableSection(final ALineSeparator separator,
-            final RobotLine line) {
-        boolean result = false;
-        if (separator.getProducedType() == SeparatorType.PIPE) {
-            List<IRobotLineElement> lineElements = line.getLineElements();
-            if (lineElements.size() == 1) {
-                result = lineElements.get(0).getTypes()
-                        .contains(SeparatorType.PIPE);
-            }
-        } else {
-            result = line.getLineElements().isEmpty();
-        }
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected void checkAndFixLine(final IRobotFileOutput robotFileOutput,
-            final Stack<ParsingState> processingState) {
-        ParsingState state = utility
-                .findNearestNotCommentState(processingState);
-        if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
-            LibraryImport lib = findNearestLibraryImport(robotFileOutput);
-
-            libraryFixer
-                    .applyFixes(robotFileOutput, lib, null, processingState);
-        } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-            LibraryImport lib = findNearestLibraryImport(robotFileOutput);
-
-            List<RobotToken> arguments = lib.getArguments();
-            int argumentsSize = arguments.size();
-            if (argumentsSize >= 2) {
-                RobotToken argumentPossibleAlias = arguments
-                        .get(argumentsSize - 2);
-                ATokenRecognizer rec = new LibraryAliasRecognizer();
-                if (rec.hasNext(argumentPossibleAlias.getText(),
-                        argumentPossibleAlias.getLineNumber())) {
-                    argumentPossibleAlias
-                            .setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-                    LibraryAlias alias = robotFileOutput.getObjectCreator()
-                            .createLibraryAlias(argumentPossibleAlias);
-                    RobotToken aliasValue = arguments.get(argumentsSize - 1);
-                    aliasValue
-                            .setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
-                    alias.setLibraryAlias(aliasValue);
-
-                    lib.setAlias(alias);
-                    arguments.remove(argumentsSize - 1);
-                    arguments.remove(argumentsSize - 2);
-                    replaceArgumentsByAliasDeclaration(processingState);
-                }
-            }
-        }
-    }
-
-
-    private void replaceArgumentsByAliasDeclaration(
-            final Stack<ParsingState> processingState) {
-        int removedArguments = 0;
-        for (int i = processingState.size() - 1; i >= 0; i--) {
-            ParsingState state = processingState.get(i);
-            if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-                if (removedArguments == 0) {
-                    // it is value
-                    processingState.set(i,
-                            ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE);
-                    removedArguments++;
-                } else if (removedArguments == 1) {
-                    // it is alias
-                    processingState.set(i,
-                            ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);
-                    break;
-                }
-            }
-        }
-    }
-
-
-    private LibraryImport findNearestLibraryImport(
-            final IRobotFileOutput robotFileOutput) {
-        AImported imported = utility.getNearestImport(robotFileOutput);
-        LibraryImport lib;
-        if (imported instanceof LibraryImport) {
-            lib = (LibraryImport) imported;
-        } else {
-            lib = null;
-
-            // FIXME: sth wrong - declaration of library not inside setting
-            // and
-            // was not catch by previous library declaration logic
-        }
-        return lib;
-    }
-
-
-    @VisibleForTesting
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
-            final IRobotFileOutput robotFileOutput, final FilePosition fp,
+            final RobotFileOutput robotFileOutput, final FilePosition fp,
             String text, String fileName, boolean isNewLine) {
         List<RobotToken> robotTokens = recognize(fp, text);
-        RobotToken robotToken = computeCorrectRobotToken(currentLine,
+        RobotToken robotToken = utility.computeCorrectRobotToken(currentLine,
                 processingState, robotFileOutput, fp, text, isNewLine,
                 robotTokens);
 
@@ -426,11 +324,10 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
 
             boolean useMapper = true;
-            IRobotFile fileModel = robotFileOutput.getFileModel();
+            RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
-                    TableHeader header = robotFileOutput.getObjectCreator()
-                            .createTableHeader(robotToken);
+                    TableHeader header = new TableHeader(robotToken);
                     ARobotSectionTable table = null;
                     if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
                         table = fileModel.getSettingTable();
@@ -488,119 +385,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return robotToken;
-    }
-
-
-    @VisibleForTesting
-    protected RobotToken computeCorrectRobotToken(RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final IRobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, boolean isNewLine, List<RobotToken> robotTokens) {
-        RobotToken correct = null;
-        if (robotTokens.size() > 1) {
-            List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
-            if (!headersPossible.isEmpty()) {
-                if (headersPossible.size() == 1) {
-                    correct = headersPossible.get(0);
-                } else {
-                    // FIXME: error
-                }
-            } else {
-                ParsingState state = utility.getCurrentStatus(processingState);
-
-                RobotToken comment = findCommentToken(robotTokens, text);
-                if (comment != null) {
-                    correct = comment;
-                } else {
-                    for (RobotToken rt : robotTokens) {
-                        if (isTypeForState(state, rt)) {
-                            correct = rt;
-                            break;
-                        }
-                    }
-                }
-
-                if (correct == null) {
-                    // FIXME: error no matching tokens to state
-                    throw new IllegalStateException("Some problem to fix.");
-                }
-            }
-        } else {
-            correct = robotTokens.get(0);
-        }
-
-        return correct;
-    }
-
-
-    private RobotToken findCommentToken(List<RobotToken> robotTokens,
-            String text) {
-        RobotToken comment = null;
-        for (RobotToken rt : robotTokens) {
-            List<IRobotTokenType> types = rt.getTypes();
-            if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                    || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-                if (text.equals(rt.getRaw().toString())) {
-                    comment = rt;
-                    break;
-                }
-            }
-        }
-
-        return comment;
-    }
-
-
-    @VisibleForTesting
-    protected List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
-        List<RobotToken> found = new LinkedList<>();
-        for (RobotToken t : tokens) {
-            if (utility.isTableHeader(t)) {
-                found.add(t);
-            }
-        }
-
-        return found;
-    }
-
-
-    @VisibleForTesting
-    protected boolean isTypeForState(final ParsingState state,
-            final RobotToken rt) {
-        RobotTokenType robotType = RobotTokenType.UNKNOWN;
-        boolean result = false;
-
-        List<RobotTokenType> typesForState = new LinkedList<>();
-        if (state == ParsingState.TEST_CASE_TABLE_INSIDE
-                || state == ParsingState.TEST_CASE_DECLARATION) {
-            typesForState = robotType.getTypesForTestCasesTable();
-        } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
-            typesForState = robotType.getTypesForSettingsTable();
-        } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
-            typesForState = robotType.getTypesForVariablesTable();
-        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE
-                || state == ParsingState.KEYWORD_DECLARATION) {
-            typesForState = robotType.getTypesForKeywordsTable();
-        }
-
-        List<IRobotTokenType> types = rt.getTypes();
-        for (IRobotTokenType type : types) {
-            if (typesForState.contains(type)) {
-                result = true;
-                break;
-            }
-        }
-
-        if (!result)
-            if (state == ParsingState.TEST_CASE_DECLARATION
-                    || state == ParsingState.KEYWORD_DECLARATION
-                    || state == ParsingState.UNKNOWN) {
-                result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
-                        .contains(RobotTokenType.COMMENT_CONTINUE));
-
-            }
-
-        return result;
     }
 
 

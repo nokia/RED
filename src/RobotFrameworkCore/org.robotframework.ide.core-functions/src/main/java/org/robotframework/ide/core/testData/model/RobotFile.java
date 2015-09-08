@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
@@ -16,10 +15,9 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class RobotFile implements IRobotFile {
+public class RobotFile {
 
-    private final IRobotFileOutput parentFileOutput;
-    private final IRobotModelObjectCreator modelCreator;
+    private final RobotFileOutput parentFileOutput;
     private SettingTable settingTable;
     private VariableTable variableTable;
     private TestCaseTable testCaseTable;
@@ -28,9 +26,8 @@ public class RobotFile implements IRobotFile {
     private final List<RobotLine> fileContent = new LinkedList<>();
 
 
-    public RobotFile(final IRobotFileOutput parentFileOutput) {
+    public RobotFile(final RobotFileOutput parentFileOutput) {
         this.parentFileOutput = parentFileOutput;
-        this.modelCreator = parentFileOutput.getObjectCreator();
 
         excludeSettingTableSection();
         excludeVariableTableSection();
@@ -39,24 +36,21 @@ public class RobotFile implements IRobotFile {
     }
 
 
-    public IRobotFileOutput getContainerOutput() {
+    public RobotFileOutput getContainerOutput() {
         return parentFileOutput;
     }
 
 
-    @Override
     public List<RobotLine> getFileContent() {
         return Collections.unmodifiableList(fileContent);
     }
 
 
-    @Override
     public void addNewLine(final RobotLine line) {
         this.fileContent.add(line);
     }
 
 
-    @Override
     public SettingTable getSettingTable() {
         return settingTable;
     }
@@ -68,11 +62,10 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeSettingTableSection() {
-        settingTable = modelCreator.createSettingTable();
+        settingTable = new SettingTable();
     }
 
 
-    @Override
     public VariableTable getVariableTable() {
         return variableTable;
     }
@@ -84,11 +77,10 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeVariableTableSection() {
-        variableTable = modelCreator.createVariableTable();
+        variableTable = new VariableTable();
     }
 
 
-    @Override
     public TestCaseTable getTestCaseTable() {
         return testCaseTable;
     }
@@ -100,11 +92,10 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeTestCaseTableSection() {
-        testCaseTable = modelCreator.createTestCaseTable();
+        testCaseTable = new TestCaseTable();
     }
 
 
-    @Override
     public KeywordTable getKeywordTable() {
         return keywordTable;
     }
@@ -116,7 +107,7 @@ public class RobotFile implements IRobotFile {
 
 
     public void excludeKeywordTableSection() {
-        keywordTable = modelCreator.createKeywordTable();
+        keywordTable = new KeywordTable();
     }
 
 
@@ -138,7 +129,7 @@ public class RobotFile implements IRobotFile {
         tableHeaderToken.setText(new StringBuilder("*** ").append(
                 type.getRepresentation().get(0)).append(" ***"));
         tableHeaderToken.setType(type);
-        TableHeader header = modelCreator.createTableHeader(tableHeaderToken);
+        TableHeader header = new TableHeader(tableHeaderToken);
 
         return header;
     }

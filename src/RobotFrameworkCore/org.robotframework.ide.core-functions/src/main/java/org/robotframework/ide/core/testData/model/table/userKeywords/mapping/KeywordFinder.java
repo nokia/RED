@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
@@ -22,7 +22,7 @@ public class KeywordFinder {
 
     public UserKeyword findOrCreateNearestKeyword(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
         KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
 
@@ -40,7 +40,7 @@ public class KeywordFinder {
 
 
     private UserKeyword createArtificialKeyword(
-            IRobotFileOutput robotFileOutput, KeywordTable keywordTable) {
+            RobotFileOutput robotFileOutput, KeywordTable keywordTable) {
         UserKeyword keyword;
         List<TableHeader> headers = keywordTable.getHeaders();
         TableHeader tableHeader = headers.get(headers.size() - 1);
@@ -52,8 +52,7 @@ public class KeywordFinder {
         artificialNameToken.setStartColumn(0);
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
 
-        keyword = robotFileOutput.getObjectCreator().createUserKeyword(
-                artificialNameToken);
+        keyword = new UserKeyword(artificialNameToken);
 
         return keyword;
     }

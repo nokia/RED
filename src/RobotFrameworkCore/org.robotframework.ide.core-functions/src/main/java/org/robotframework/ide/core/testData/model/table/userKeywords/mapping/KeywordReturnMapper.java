@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordReturn;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,7 +24,7 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_SETTING_RETURN);
@@ -34,8 +34,7 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
 
         UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        KeywordReturn returned = robotFileOutput.getObjectCreator()
-                .createKeywordReturn(rt);
+        KeywordReturn returned = new KeywordReturn(rt);
         keyword.addReturn(returned);
 
         processingState.push(ParsingState.KEYWORD_SETTING_RETURN);

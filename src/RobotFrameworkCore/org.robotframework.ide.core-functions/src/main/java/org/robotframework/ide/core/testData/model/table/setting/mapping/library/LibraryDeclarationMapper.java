@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.setting.mapping.library
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -29,15 +29,14 @@ public class LibraryDeclarationMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_DECLARATION);
         rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        LibraryImport library = robotFileOutput.getObjectCreator()
-                .createLibraryImport(rt);
+        LibraryImport library = new LibraryImport(rt);
         settings.addImported(library);
         processingState.push(ParsingState.SETTING_LIBRARY_IMPORT);
 
@@ -46,7 +45,7 @@ public class LibraryDeclarationMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.setting.mapping.library
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
@@ -22,14 +22,14 @@ public class LibraryAliasMapper implements IParsingMapper {
 
     public LibraryAliasMapper() {
         this.utility = new ElementsUtility();
-        this.libraryFixer = new LibraryAliasFixer();
+        this.libraryFixer = new LibraryAliasFixer(utility);
     }
 
 
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
         rt.setText(new StringBuilder(text));
@@ -53,7 +53,7 @@ public class LibraryAliasMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result;
