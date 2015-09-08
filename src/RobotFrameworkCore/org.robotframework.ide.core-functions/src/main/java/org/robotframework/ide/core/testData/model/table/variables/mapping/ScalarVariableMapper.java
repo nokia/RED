@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.variables.mapping;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -29,7 +29,7 @@ public class ScalarVariableMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
@@ -47,7 +47,7 @@ public class ScalarVariableMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

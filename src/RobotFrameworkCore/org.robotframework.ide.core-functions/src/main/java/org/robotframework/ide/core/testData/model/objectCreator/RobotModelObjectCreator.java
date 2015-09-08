@@ -1,6 +1,9 @@
 package org.robotframework.ide.core.testData.model.objectCreator;
 
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotProjectHolder;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.RobotModelEventDispatcher;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
@@ -45,6 +48,9 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
 public class RobotModelObjectCreator implements IRobotModelObjectCreator {
+
+    private final IRobotProjectHolder project;
+
 
     @Override
     public RobotExecutableRow createRobotExecutableRow() {
@@ -294,18 +300,20 @@ public class RobotModelObjectCreator implements IRobotModelObjectCreator {
 
 
     @Override
-    public RobotFileOutput createRobotFileOutput() {
-        RobotFileOutput rfo = new RobotFileOutput(this);
-
+    public IRobotFileOutput createRobotFileOutput() {
+        IRobotFileOutput rfo = RobotModelEventDispatcher.getInstance(project)
+                .listener(new RobotFileOutput(this));
         return rfo;
     }
 
 
-    public static RobotModelObjectCreator newInstance() {
-        return new RobotModelObjectCreator();
+    public static RobotModelObjectCreator newInstance(
+            final IRobotProjectHolder project) {
+        return new RobotModelObjectCreator(project);
     }
 
 
-    private RobotModelObjectCreator() {
+    private RobotModelObjectCreator(final IRobotProjectHolder project) {
+        this.project = project;
     }
 }

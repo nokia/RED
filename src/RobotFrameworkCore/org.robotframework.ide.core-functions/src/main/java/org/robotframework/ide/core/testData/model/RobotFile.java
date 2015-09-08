@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.listener.IRobotFile;
-import org.robotframework.ide.core.testData.model.listener.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
@@ -46,11 +44,13 @@ public class RobotFile implements IRobotFile {
     }
 
 
+    @Override
     public List<RobotLine> getFileContent() {
         return Collections.unmodifiableList(fileContent);
     }
 
 
+    @Override
     public void addNewLine(final RobotLine line) {
         this.fileContent.add(line);
     }
