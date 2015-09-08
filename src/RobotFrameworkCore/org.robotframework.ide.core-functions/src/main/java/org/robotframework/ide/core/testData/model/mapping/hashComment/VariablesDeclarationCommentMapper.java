@@ -1,10 +1,13 @@
 package org.robotframework.ide.core.testData.model.mapping.hashComment;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
+import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -39,7 +42,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         } else {
             List<IVariableHolder> variables = variableTable.getVariables();
             IVariableHolder var = variables.get(variables.size() - 1);
-            if (var.getDeclaration().getLineNumber() == rt.getLineNumber()) {
+            if (isInTheSameLine(rt, var)) {
                 var.addCommentPart(rt);
             } else {
                 ListVariable newVar = new ListVariable(null,
@@ -48,7 +51,28 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
                 variableTable.addVariable(newVar);
             }
         }
+    }
 
+
+    @VisibleForTesting
+    protected boolean isInTheSameLine(final RobotToken rt,
+            final IVariableHolder var) {
+        boolean result = false;
+
+        if (var instanceof AVariable) {
+            AVariable aVar = (AVariable) var;
+            List<RobotToken> tokens = aVar.getElementTokens();
+            Collections.sort(tokens, new RobotTokenPositionComparator());
+            int size = tokens.size();
+            for (int i = size - 1; i >= 0; i--) {
+                if (tokens.get(i).getLineNumber() == rt.getLineNumber()) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
 
