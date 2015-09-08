@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
@@ -28,7 +29,7 @@ class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {
-        if (element instanceof RobotVariable) {
+        if (element instanceof RobotVariable && ((RobotVariable) element).getType() != Type.UNKNOWN) {
             final DisposeNeededStyler variableStyler = addDisposeNeededStyler(withForeground(200, 200, 200));
 
             final RobotVariable variable = (RobotVariable) element;
@@ -37,6 +38,8 @@ class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
             label.append(variable.getName());
             label.append(variable.getSuffix(), variableStyler);
             return highlightMatches(label);
+        } else if (element instanceof RobotVariable) {
+            return highlightMatches(new StyledString(((RobotVariable) element).getName()));
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getStyledText();
         }
