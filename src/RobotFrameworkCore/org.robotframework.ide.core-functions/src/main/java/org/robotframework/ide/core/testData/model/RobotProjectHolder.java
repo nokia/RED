@@ -6,13 +6,12 @@ import java.util.List;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
-import org.robotframework.ide.core.testData.model.listener.IRobotProjectHolder;
 
 
 public class RobotProjectHolder implements IRobotProjectHolder {
 
     private final RobotRuntimeEnvironment robotRuntime;
-    private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
+    private final List<IRobotFileOutput> readableProjectFiles = new LinkedList<>();
 
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
@@ -27,11 +26,11 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
     @Override
-    public void addModelFile(final RobotFileOutput robotOutput) {
+    public void addModelFile(final IRobotFileOutput robotOutput) {
         if (robotOutput != null) {
             File processedFile = robotOutput.getProcessedFile();
             if (processedFile != null) {
-                RobotFileOutput file = findFileByName(processedFile);
+                IRobotFileOutput file = findFileByName(processedFile);
                 removeModelFile(file);
             }
 
@@ -41,7 +40,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
     @Override
-    public void removeModelFile(final RobotFileOutput robotOutput) {
+    public void removeModelFile(final IRobotFileOutput robotOutput) {
         readableProjectFiles.remove(robotOutput);
     }
 
@@ -62,7 +61,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
     @Override
-    public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
+    public boolean shouldBeLoaded(final IRobotFileOutput robotOutput) {
         return (robotOutput != null && shouldBeLoaded(robotOutput
                 .getProcessedFile()));
     }
@@ -70,7 +69,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
     @Override
     public boolean shouldBeLoaded(final File file) {
-        RobotFileOutput foundFile = findFileByName(file);
+        IRobotFileOutput foundFile = findFileByName(file);
         return (foundFile == null)
                 || (file.lastModified() != foundFile
                         .getLastModificationEpochTime());
@@ -78,8 +77,8 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
     @Override
-    public RobotFileOutput findFileByName(final File file) {
-        RobotFileOutput found = null;
+    public IRobotFileOutput findFileByName(final File file) {
+        IRobotFileOutput found = null;
         List<Integer> findFile = findFile(new SearchByName(file));
         if (!findFile.isEmpty()) {
             found = readableProjectFiles.get(findFile.get(0));
@@ -93,7 +92,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
         List<Integer> foundFiles = new LinkedList<>();
         int size = readableProjectFiles.size();
         for (int i = 0; i < size; i++) {
-            RobotFileOutput robotFile = readableProjectFiles.get(i);
+            IRobotFileOutput robotFile = readableProjectFiles.get(i);
             if (criteria.matchCriteria(robotFile)) {
                 foundFiles.add(i);
                 break;
@@ -114,7 +113,7 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
 
         @Override
-        public boolean matchCriteria(RobotFileOutput robotFile) {
+        public boolean matchCriteria(IRobotFileOutput robotFile) {
             return (robotFile.getProcessedFile().getAbsolutePath()
                     .equals(toFound.getAbsolutePath()));
         }
@@ -122,6 +121,6 @@ public class RobotProjectHolder implements IRobotProjectHolder {
 
     protected interface ISearchCriteria {
 
-        boolean matchCriteria(final RobotFileOutput robotFile);
+        boolean matchCriteria(final IRobotFileOutput robotFile);
     }
 }

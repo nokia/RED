@@ -14,8 +14,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.IRobotFileParser;
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.RobotFile;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFile;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
@@ -112,7 +112,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
+    public void parse(final IRobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
             FileInputStream fis = new FileInputStream(robotFile);
@@ -143,7 +143,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     }
 
 
-    private RobotFileOutput parse(final RobotFileOutput parsingOutput,
+    private IRobotFileOutput parse(final IRobotFileOutput parsingOutput,
             final File robotFile, final Reader reader) {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
@@ -303,7 +303,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected void checkAndFixLine(final RobotFileOutput robotFileOutput,
+    protected void checkAndFixLine(final IRobotFileOutput robotFileOutput,
             final Stack<ParsingState> processingState) {
         ParsingState state = utility
                 .findNearestNotCommentState(processingState);
@@ -365,7 +365,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     private LibraryImport findNearestLibraryImport(
-            final RobotFileOutput robotFileOutput) {
+            final IRobotFileOutput robotFileOutput) {
         AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
         if (imported instanceof LibraryImport) {
@@ -384,7 +384,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     @VisibleForTesting
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            final IRobotFileOutput robotFileOutput, final FilePosition fp,
             String text, String fileName, boolean isNewLine) {
         List<RobotToken> robotTokens = recognize(fp, text);
         RobotToken robotToken = computeCorrectRobotToken(currentLine,
@@ -400,7 +400,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
 
-            processThisElement = (processingState.size() > 1);
+            processThisElement = (processingState.size() > 1)
+                    && !robotToken.getTypes().contains(
+                            RobotTokenType.PREVIOUS_LINE_CONTINUE);
         }
 
         if (processThisElement) {
@@ -424,7 +426,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
 
             boolean useMapper = true;
-            RobotFile fileModel = robotFileOutput.getFileModel();
+            IRobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
                     TableHeader header = robotFileOutput.getObjectCreator()
@@ -492,7 +494,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     @VisibleForTesting
     protected RobotToken computeCorrectRobotToken(RobotLine currentLine,
             final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            final IRobotFileOutput robotFileOutput, final FilePosition fp,
             String text, boolean isNewLine, List<RobotToken> robotTokens) {
         RobotToken correct = null;
         if (robotTokens.size() > 1) {

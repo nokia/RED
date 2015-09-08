@@ -1,11 +1,11 @@
-package org.robotframework.ide.core.testData.model.listener;
+package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
 import java.util.List;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.listener.IRobotProjectHolderListenable;
 
 
 public interface IRobotProjectHolder extends IRobotProjectHolderListenable {
@@ -16,12 +16,12 @@ public interface IRobotProjectHolder extends IRobotProjectHolderListenable {
     RobotRuntimeEnvironment getRobotRuntime();
 
 
-    RobotFileOutput findFileByName(final File file);
+    IRobotFileOutput findFileByName(final File file);
 
 
     boolean shouldBeLoaded(final File file);
 
 
-    boolean shouldBeLoaded(final RobotFileOutput robotOutput);
+    boolean shouldBeLoaded(final IRobotFileOutput robotOutput);
 
 }

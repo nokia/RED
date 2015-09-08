@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.AImported.Type;
@@ -22,7 +22,7 @@ public class VariablesImporter {
 
     public List<VariablesFileImportReference> importVariables(
             final RobotRuntimeEnvironment robotRunEnv,
-            final RobotFileOutput robotFile) {
+            final IRobotFileOutput robotFile) {
         List<VariablesFileImportReference> varsImported = new LinkedList<>();
         SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {
