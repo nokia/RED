@@ -15,7 +15,7 @@ public class RobotFileOutput implements IRobotFileOutput {
     public static final long FILE_NOT_EXIST_EPOCH = 0;
     private final IRobotModelObjectCreator objectCreator;
     private File processedFile;
-    private RobotFile fileModel;
+    private IRobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private List<ResourceImportReference> resourceReferences = new LinkedList<>();
     private List<VariablesFileImportReference> variablesReferenced = new LinkedList<>();
@@ -59,7 +59,7 @@ public class RobotFileOutput implements IRobotFileOutput {
 
 
     @Override
-    public RobotFile getFileModel() {
+    public IRobotFile getFileModel() {
         return fileModel;
     }
 

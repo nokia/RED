@@ -28,4 +28,7 @@ public interface IRobotFile {
 
     List<RobotLine> getFileContent();
 
+
+    boolean containsAnyRobotSection();
+
 }
