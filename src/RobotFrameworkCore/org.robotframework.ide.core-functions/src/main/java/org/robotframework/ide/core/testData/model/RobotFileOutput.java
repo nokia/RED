@@ -7,15 +7,13 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
-import org.robotframework.ide.core.testData.model.objectCreator.IRobotModelObjectCreator;
 
 
-public class RobotFileOutput implements IRobotFileOutput {
+public class RobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
-    private final IRobotModelObjectCreator objectCreator;
     private File processedFile;
-    private IRobotFile fileModel;
+    private RobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private List<ResourceImportReference> resourceReferences = new LinkedList<>();
     private List<VariablesFileImportReference> variablesReferenced = new LinkedList<>();
@@ -23,15 +21,8 @@ public class RobotFileOutput implements IRobotFileOutput {
     private Status status = Status.FAILED;
 
 
-    public RobotFileOutput(final IRobotModelObjectCreator objectCreator) {
-        this.objectCreator = objectCreator;
+    public RobotFileOutput() {
         this.fileModel = new RobotFile(this);
-    }
-
-
-    @Override
-    public IRobotModelObjectCreator getObjectCreator() {
-        return objectCreator;
     }
 
 
@@ -40,14 +31,12 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
     public void setProcessedFile(File processedFile) {
         this.processedFile = processedFile;
         this.lastModificationEpoch = processedFile.lastModified();
     }
 
 
-    @Override
     public void setLastModificationEpochTime(final long lastModificationEpoch) {
         this.lastModificationEpoch = lastModificationEpoch;
     }
@@ -58,8 +47,7 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
-    public IRobotFile getFileModel() {
+    public RobotFile getFileModel() {
         return fileModel;
     }
 
@@ -69,7 +57,6 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
     public void addBuildMessage(final BuildMessage msg) {
         buildingMessages.add(msg);
     }
@@ -83,7 +70,6 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
     public void addResourceReference(final ResourceImportReference ref) {
         resourceReferences.add(ref);
     }
@@ -102,7 +88,6 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
     public void addVariablesReference(
             final VariablesFileImportReference varImportRef) {
         variablesReferenced.add(varImportRef);
@@ -195,7 +180,6 @@ public class RobotFileOutput implements IRobotFileOutput {
     }
 
 
-    @Override
     public void setStatus(Status status) {
         this.status = status;
     }

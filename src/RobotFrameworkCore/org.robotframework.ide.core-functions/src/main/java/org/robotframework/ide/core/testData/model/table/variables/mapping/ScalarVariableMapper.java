@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.variables.mapping;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
@@ -29,15 +29,15 @@ public class ScalarVariableMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
         rt.setText(new StringBuilder(text));
         rt.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
 
-        ScalarVariable var = robotFileOutput.getObjectCreator()
-                .createScalarVariable(varHelper.extractVariableName(text), rt);
+        ScalarVariable var = new ScalarVariable(
+                varHelper.extractVariableName(text), rt);
         varTable.addVariable(var);
 
         processingState.push(ParsingState.SCALAR_VARIABLE_DECLARATION);
@@ -47,7 +47,7 @@ public class ScalarVariableMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

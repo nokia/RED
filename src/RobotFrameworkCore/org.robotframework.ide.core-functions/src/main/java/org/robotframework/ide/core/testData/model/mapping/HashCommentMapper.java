@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.IRobotFile;
-import org.robotframework.ide.core.testData.model.IRobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.TableHeaderCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.VariablesDeclarationCommentMapper;
 import org.robotframework.ide.core.testData.model.mapping.hashComment.tableSetting.SettingDefaultTagsCommentMapper;
@@ -88,7 +88,7 @@ public class HashCommentMapper implements IParsingMapper {
     @Override
     public RobotToken map(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
+            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         boolean addToStack = false;
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -99,7 +99,7 @@ public class HashCommentMapper implements IParsingMapper {
         }
 
         ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
-        IRobotFile fileModel = robotFileOutput.getFileModel();
+        RobotFile fileModel = robotFileOutput.getFileModel();
         IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
         if (commentHolder != ParsingState.TRASH || commentMapper != null) {
             commentMapper.map(rt, commentHolder, fileModel);
@@ -128,7 +128,7 @@ public class HashCommentMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

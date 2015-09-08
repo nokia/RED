@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.mapping.hashComment.tableSett
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.IRobotFile;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -19,7 +19,7 @@ public class SettingDefaultTagsCommentMapper implements IHashCommentMapper {
 
     @Override
     public void map(RobotToken rt, ParsingState currentState,
-            IRobotFile fileModel) {
+            RobotFile fileModel) {
         List<DefaultTags> suiteDefaultTags = fileModel.getSettingTable()
                 .getDefaultTags();
         if (!suiteDefaultTags.isEmpty()) {
