@@ -23,10 +23,11 @@ import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotFileDumper;
 import org.robotframework.ide.core.testData.RobotParser;
+import org.robotframework.ide.core.testData.model.IRobotFile;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
-import org.robotframework.ide.core.testData.model.listener.IRobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -45,7 +46,7 @@ public class RobotSuiteFile implements RobotElement {
 
     private final IFile file;
 
-    private RobotFileOutput fileOutput;
+    private IRobotFileOutput fileOutput;
 
     private List<RobotElement> sections = null;
 
@@ -122,9 +123,9 @@ public class RobotSuiteFile implements RobotElement {
         }
     }
     
-    protected RobotFileOutput parseModel() {
+    protected IRobotFileOutput parseModel() {
         final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
-        final RobotFileOutput robotFileOutput = new RobotParser(new RobotProjectHolder(runtimeEnvironment))
+        final IRobotFileOutput robotFileOutput = new RobotParser(new RobotProjectHolder(runtimeEnvironment))
                 .parse(file.getLocation().toFile()).get(0);
         if (robotFileOutput.getStatus() == Status.FAILED) {
             throw new RobotFileParsingException("Unable to read suite file model");
