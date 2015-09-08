@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.table.testCases.mapping;
 import java.util.List;
 import java.util.Stack;
 
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -28,7 +28,7 @@ public abstract class ATestCaseSettingDeclarationMapper implements
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
+    public boolean checkIfCanBeMapped(IRobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;

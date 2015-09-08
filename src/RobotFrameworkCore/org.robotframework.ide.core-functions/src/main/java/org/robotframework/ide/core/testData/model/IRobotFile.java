@@ -1,9 +1,12 @@
-package org.robotframework.ide.core.testData.model.listener;
+package org.robotframework.ide.core.testData.model;
+
+import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
+import org.robotframework.ide.core.testData.text.read.RobotLine;
 
 
 public interface IRobotFile {
@@ -18,5 +21,11 @@ public interface IRobotFile {
 
 
     KeywordTable getKeywordTable();
+
+
+    void addNewLine(final RobotLine line);
+
+
+    List<RobotLine> getFileContent();
 
 }
