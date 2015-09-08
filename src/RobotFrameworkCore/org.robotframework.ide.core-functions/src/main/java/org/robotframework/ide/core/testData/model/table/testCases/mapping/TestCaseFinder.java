@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
@@ -22,7 +22,7 @@ public class TestCaseFinder {
 
     public TestCase findOrCreateNearestTestCase(RobotLine currentLine,
             Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
+            IRobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
         TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
 
@@ -39,7 +39,7 @@ public class TestCaseFinder {
     }
 
 
-    private TestCase createArtificialTestCase(RobotFileOutput robotFileOutput,
+    private TestCase createArtificialTestCase(IRobotFileOutput robotFileOutput,
             TestCaseTable testCaseTable) {
         TestCase testCase;
         List<TableHeader> headers = testCaseTable.getHeaders();

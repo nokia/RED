@@ -8,13 +8,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.robotframework.ide.core.testData.IRobotFileDumper;
-import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.IRobotFile;
 
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
 
     @Override
-    public void dump(final File destFile, final RobotFile model)
+    public void dump(final File destFile, final IRobotFile model)
             throws Exception {
         Path tempFile = Files.createTempFile(
                 destFile.getName() + System.currentTimeMillis(), "txt_temp");
@@ -32,7 +32,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
     }
 
 
-    public StringBuilder dump(final RobotFile model) {
+    public StringBuilder dump(final IRobotFile model) {
         StringBuilder str = new StringBuilder();
 
         return str;

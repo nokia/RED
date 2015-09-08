@@ -1,6 +1,6 @@
 package org.robotframework.ide.core.testData.model.objectCreator;
 
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
@@ -17,7 +17,7 @@ public interface IRobotModelObjectCreator extends
         ITestCaseTableRobotModelObjectCreator,
         IKeywordTableRobotModelObjectCreator {
 
-    RobotFileOutput createRobotFileOutput();
+    IRobotFileOutput createRobotFileOutput();
 
 
     SettingTable createSettingTable();

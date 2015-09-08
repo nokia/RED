@@ -2,7 +2,7 @@ package org.robotframework.ide.core.testData.model.table.setting.mapping.library
 
 import java.util.Stack;
 
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -16,7 +16,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class LibraryAliasFixer {
 
-    public void applyFixes(final RobotFileOutput robotFileOutput,
+    public void applyFixes(final IRobotFileOutput robotFileOutput,
             final LibraryImport lib, final RobotToken additionalToken,
             final Stack<ParsingState> processingState) {
         LibraryAlias alias = lib.getAlias();

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.RobotParser;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.IRobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
@@ -16,7 +16,7 @@ import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 public class ResourceImporter {
 
     public List<ResourceImportReference> importResources(
-            final RobotParser parser, final RobotFileOutput robotFile) {
+            final RobotParser parser, final IRobotFileOutput robotFile) {
         List<ResourceImportReference> importedReferences = new LinkedList<>();
 
         SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -27,7 +27,7 @@ public class ResourceImporter {
                 if (type == Type.RESOURCE) {
                     File toImport = new File(imported.getPathOrName().getText()
                             .toString());
-                    List<RobotFileOutput> parsed = parser.parse(toImport);
+                    List<IRobotFileOutput> parsed = parser.parse(toImport);
                     if (parsed.isEmpty()) {
                         robotFile.addBuildMessage(BuildMessage
                                 .createErrorMessage(

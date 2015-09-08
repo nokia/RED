@@ -3,7 +3,7 @@ package org.robotframework.ide.core.testData.model.mapping;
 import java.util.List;
 import java.util.Stack;
 
-import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.IRobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -30,7 +30,7 @@ public class PreviousLineHandler {
 
     public LineContinueType computeLineContinue(
             final Stack<ParsingState> parsingStates, boolean isNewLine,
-            final RobotFile model, final RobotLine currentLine,
+            final IRobotFile model, final RobotLine currentLine,
             final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
@@ -94,7 +94,7 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected boolean isSomethingToContinue(final RobotFile model,
+    protected boolean isSomethingToContinue(final IRobotFile model,
             final RobotLine currentLine) {
         boolean result = false;
         List<RobotLine> fileContent = model.getFileContent();
@@ -133,25 +133,25 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected boolean containsAnySetting(final RobotFile file) {
+    protected boolean containsAnySetting(final IRobotFile file) {
         return !file.getSettingTable().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyVariables(final RobotFile file) {
+    protected boolean containsAnyVariables(final IRobotFile file) {
         return !file.getVariableTable().getVariables().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyTestCases(final RobotFile file) {
+    protected boolean containsAnyTestCases(final IRobotFile file) {
         return !file.getTestCaseTable().getTestCases().isEmpty();
     }
 
 
     @VisibleForTesting
-    protected boolean containsAnyKeywords(final RobotFile file) {
+    protected boolean containsAnyKeywords(final IRobotFile file) {
         return !file.getKeywordTable().getKeywords().isEmpty();
     }
 
