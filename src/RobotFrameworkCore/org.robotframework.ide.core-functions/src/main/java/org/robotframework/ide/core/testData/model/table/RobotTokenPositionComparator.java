@@ -11,5 +11,4 @@ public class RobotTokenPositionComparator implements Comparator<RobotToken> {
     public int compare(RobotToken o1, RobotToken o2) {
         return o1.getFilePosition().compare(o2.getFilePosition());
     }
-
 }
