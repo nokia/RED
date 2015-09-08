@@ -32,9 +32,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBui
 
 public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
+    private final ValidationContext validationContext;
+
     private final IFile configFile;
 
-    public RobotProjectConfigFileValidator(final IFile configFile) {
+    public RobotProjectConfigFileValidator(final ValidationContext validationContext, final IFile configFile) {
+        this.validationContext = validationContext;
         this.configFile = configFile;
     }
 

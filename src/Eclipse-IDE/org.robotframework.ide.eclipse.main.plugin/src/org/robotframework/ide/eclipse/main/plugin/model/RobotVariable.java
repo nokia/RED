@@ -1,8 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -21,74 +21,13 @@ import com.google.common.collect.Iterables;
 
 public class RobotVariable implements RobotElement, Serializable {
 
-    public enum Type {
-        SCALAR {
-            @Override
-            public String getMark() {
-                return "$";
-            }
-
-            @Override
-            public ImageDescriptor getImage() {
-                return RedImages.getRobotScalarVariableImage();
-            }
-        },
-        LIST {
-            @Override
-            public String getMark() {
-                return "@";
-            }
-
-            @Override
-            public ImageDescriptor getImage() {
-                return RedImages.getRobotListVariableImage();
-            }
-        },
-        DICTIONARY {
-            @Override
-            public String getMark() {
-                return "&";
-            }
-
-            @Override
-            public ImageDescriptor getImage() {
-                return RedImages.getRobotDictionaryVariableImage();
-            }
-        };
-
-        public abstract String getMark();
-
-        public abstract ImageDescriptor getImage();
-
-        public static Type fromVarType(final VariableType varType) {
-            switch (varType) {
-                case DICTIONARY:
-                    return DICTIONARY;
-                case LIST:
-                    return Type.LIST;
-                case SCALAR:
-                case SCALAR_AS_LIST:
-                    return Type.SCALAR;
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public static boolean isVariable(final String expression) {
-        for (final Type type : EnumSet.allOf(Type.class)) {
-            if (expression.startsWith(type.getMark() + "{") && expression.endsWith("}") ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private transient RobotVariablesSection parent;
     private String name;
     private Type type;
     private String value;
     private String comment;
+
+    private IVariableHolder holder;
 
     RobotVariable(final RobotVariablesSection section, final Type type, final String name,
             final String value, final String comment) {
@@ -104,33 +43,35 @@ public class RobotVariable implements RobotElement, Serializable {
     }
 
     public void link(final IVariableHolder variableHolder) {
+        this.holder = variableHolder;
         this.type = Type.fromVarType(variableHolder.getType());
         this.name = variableHolder.getName();
         if(variableHolder.getType() == VariableType.SCALAR) {
 
             final List<RobotToken> values = ((ScalarVariable) variableHolder).getValues();
             this.value = values.isEmpty() ? "" : values.get(0).getText().toString();
-        } else if(variableHolder.getType() == VariableType.LIST || variableHolder.getType() == VariableType.SCALAR_AS_LIST) {
+        } else if (variableHolder.getType() == VariableType.LIST) {
 
             final List<RobotToken> tokens = ((ListVariable) variableHolder).getItems();
-            this.value = Joiner.on("  ").join(Iterables.transform(tokens, TokenFunctions.tokenToString()));
+            this.value = Joiner.on(" | ").join(Iterables.transform(tokens, TokenFunctions.tokenToString()));
+        } else if (variableHolder.getType() == VariableType.SCALAR_AS_LIST) {
+
+            final List<RobotToken> tokens = ((ScalarVariable) variableHolder).getValues();
+            this.value = Joiner.on(" | ").join(Iterables.transform(tokens, TokenFunctions.tokenToString()));
         } else if(variableHolder.getType() == VariableType.DICTIONARY) {
 
             final List<DictionaryKeyValuePair> dictionaryPairs = ((DictionaryVariable) variableHolder).getItems();
-            this.value = Joiner.on("  ").join(Iterables.transform(dictionaryPairs, TokenFunctions.pairToString()));
+            this.value = Joiner.on(" | ").join(Iterables.transform(dictionaryPairs, TokenFunctions.pairToString()));
+        } else {
+            this.value = "";
         }
-        this.comment = Joiner.on("  ")
+        this.comment = Joiner.on(" | ")
                 .join(Iterables.transform(variableHolder.getComment(), TokenFunctions.tokenToString()));
     }
 
     @Override
     public String toString() {
         return getPrefix() + name + getSuffix() + "= " + value + "# " + comment;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -158,16 +99,7 @@ public class RobotVariable implements RobotElement, Serializable {
 
     @Override
     public List<RobotElement> getChildren() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
-    }
-
-    public String getValue() {
-        return value;
+        return newArrayList();
     }
 
     public String getPrefix() {
@@ -178,16 +110,38 @@ public class RobotVariable implements RobotElement, Serializable {
         return "}";
     }
 
-    public void setComment(final String comment) {
-        this.comment = comment;
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(final Type type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public void setValue(final String value) {
         this.value = value;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     @Override
@@ -195,11 +149,41 @@ public class RobotVariable implements RobotElement, Serializable {
         return parent.getSuiteFile();
     }
 
-    public Type getType() {
-        return type;
-    }
+    public enum Type {
+        SCALAR("$", RedImages.getRobotScalarVariableImage()),
+        LIST("@",RedImages.getRobotListVariableImage()),
+        DICTIONARY("&", RedImages.getRobotDictionaryVariableImage()),
+        UNKNOWN("?", RedImages.getRobotUknownVariableImage());
 
-    public void setType(final Type type) {
-        this.type = type;
+        public static Type fromVarType(final VariableType varType) {
+            switch (varType) {
+                case DICTIONARY:
+                    return Type.DICTIONARY;
+                case LIST:
+                    return Type.LIST;
+                case SCALAR:
+                case SCALAR_AS_LIST:
+                    return Type.SCALAR;
+                default:
+                    return Type.UNKNOWN;
+            }
+        }
+
+        private String mark;
+
+        private ImageDescriptor image;
+
+        private Type(final String mark, final ImageDescriptor image) {
+            this.mark = mark;
+            this.image = image;
+        }
+
+        public String getMark() {
+            return mark;
+        }
+
+        public ImageDescriptor getImage() {
+            return image;
+        }
     }
 }

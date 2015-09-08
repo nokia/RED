@@ -43,6 +43,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/variable.png");
     }
 
+    public static ImageDescriptor getRobotUknownVariableImage() {
+        return RedPlugin.getImageDescriptor("resources/variable_unknown.png");
+    }
+
     public static ImageDescriptor getRobotScalarVariableImage() {
         return RedPlugin.getImageDescriptor("resources/variable_scalar.png");
     }

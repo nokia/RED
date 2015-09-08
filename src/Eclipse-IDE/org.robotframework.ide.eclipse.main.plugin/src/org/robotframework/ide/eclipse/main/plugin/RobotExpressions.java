@@ -4,16 +4,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
-
 import com.google.common.collect.Range;
 
 public class RobotExpressions {
-
-    public static boolean isListVariable(final String expression) {
-        return expression.startsWith(Type.LIST.getMark() + "{") && expression.endsWith("}");
-    }
-
 
     public static List<Range<Integer>> getVariablesPositions(final String expression) {
         final List<Range<Integer>> ranges = newArrayList();

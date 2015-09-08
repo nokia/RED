@@ -16,8 +16,8 @@ import com.google.common.collect.Range;
 
 public class RobotSuiteFileValidator extends RobotFileValidator {
 
-    public RobotSuiteFileValidator(final IFile file) {
-        super(file);
+    public RobotSuiteFileValidator(final ValidationContext context, final IFile file) {
+        super(context, file);
     }
 
     @Override
