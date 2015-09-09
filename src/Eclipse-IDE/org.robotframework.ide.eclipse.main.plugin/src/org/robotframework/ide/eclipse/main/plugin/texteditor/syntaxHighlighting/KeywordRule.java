@@ -17,7 +17,7 @@ import org.eclipse.jface.text.rules.Token;
  * @author mmarzec
  *
  */
-class KeywordRule implements IRule {
+public class KeywordRule implements IRule {
 	
     private List<String> keywords = new ArrayList<>();
     private List<String> tempKeywords = new ArrayList<>();
@@ -30,7 +30,7 @@ class KeywordRule implements IRule {
 	
 	private int columnConstraint = -1;
 	
-    KeywordRule(final IToken token, final List<String> keywords) {
+    public KeywordRule(final IToken token, final List<String> keywords) {
 	    this.token = token;
 		this.keywords = keywords;
 	}
@@ -48,11 +48,7 @@ class KeywordRule implements IRule {
 		    if(isInKeyword((char) c, 1, tempKeywords)) {
     			if(keywordDetected(scanner)) {
     				final int nextCharAfterKeyword = scanner.read();
-    				int secondNextCharAfterKeyword = ICharacterScanner.EOF;
-    				if(nextCharAfterKeyword != ICharacterScanner.EOF && nextCharAfterKeyword != '\t') {
-    				    secondNextCharAfterKeyword = scanner.read();
-    				    scanner.unread();
-    				}
+    				final int secondNextCharAfterKeyword = extractSecondNextCharAfterKeyword(scanner, nextCharAfterKeyword);
     				scanner.unread();
                     if (isSeparator((char) nextCharAfterKeyword) && isSeparator((char) secondNextCharAfterKeyword)
                             && (isSeparator(prevCharBeforeKeyword) || columnConstraint == 0)) {
@@ -75,7 +71,7 @@ class KeywordRule implements IRule {
 	    columnConstraint = column;
 	}
 	
-	private boolean isColumnConstraintCompliant(final int column, final char charBeforeKeyword) {
+	protected boolean isColumnConstraintCompliant(final int column, final char charBeforeKeyword) {
 	    
 	    if (columnConstraint > -1) {
 	        if(columnConstraint == (column - 1)) {
@@ -87,6 +83,15 @@ class KeywordRule implements IRule {
 	        }
 	    }
 	    return false;
+	}
+	
+	protected int extractSecondNextCharAfterKeyword(final ICharacterScanner scanner, final int nextCharAfterKeyword) {
+	    int secondNextCharAfterKeyword = ICharacterScanner.EOF;
+        if(nextCharAfterKeyword != ICharacterScanner.EOF && nextCharAfterKeyword != '\t') {
+            secondNextCharAfterKeyword = scanner.read();
+            scanner.unread();
+        }
+        return secondNextCharAfterKeyword;
 	}
 	
 	private boolean keywordDetected(final ICharacterScanner scanner) {
