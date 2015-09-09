@@ -35,7 +35,6 @@ public class RulesGenerator {
     private IToken settingsToken;
     private IToken keywordToken;
     
-    private WordRule asteriskWordRule;
     private WordRule testCasesSectionWordsRule;
     private WordRule keywordsSectionWordsRule;
     
@@ -52,10 +51,10 @@ public class RulesGenerator {
     
     private List<IRule> commonRules = newArrayList();
     
-    public RulesGenerator(final Display display, final List<String> keywordList) {
+    public RulesGenerator(final Display display, final List<String> keywordList, final List<String> sectionHeadersList) {
         createTokens(display);
         
-        createSectionsRules();
+        createSectionsRules(sectionHeadersList);
         createSettingsWordsRule();
         createKeywordRule(keywordList);
         createCommentRule();
@@ -102,7 +101,6 @@ public class RulesGenerator {
     
     public IRule[] getDefaultRules() {
         List<IRule> rules = newArrayList();
-        rules.add(asteriskWordRule);
         rules.add(commentRule);
 
         return rules.toArray(new IRule[rules.size()]);
@@ -119,7 +117,6 @@ public class RulesGenerator {
         commonRules.add(dictionaryRule);
         
         commonRules.add(commentRule);
-        commonRules.add(asteriskWordRule);
     }
     
     private void createTokens(final Display display) {
@@ -142,15 +139,11 @@ public class RulesGenerator {
         keywordToken = new Token(new TextAttribute(userColor, null, SWT.BOLD));
     }
     
-    private void createSectionsRules() {
-        settingsSectionRule = new SingleLineRule("Settings", "***", sectionToken);
-        testCasesSectionRule = new SingleLineRule("Test Cases", "***", sectionToken);
-        keywordsSectionRule = new SingleLineRule("Keywords", "***", sectionToken);
-        variablesSectionRule = new SingleLineRule("Variables", "***", sectionToken);
-        
-        asteriskWordRule = setupWordRule();
-        asteriskWordRule.addWord("***", sectionToken);
-        asteriskWordRule.setColumnConstraint(0);
+    private void createSectionsRules(final List<String> sectionHeadersList) {
+        settingsSectionRule = new SectionRule(sectionToken, sectionHeadersList.subList(0, 1));
+        variablesSectionRule = new SectionRule(sectionToken, sectionHeadersList.subList(1, 2));
+        testCasesSectionRule = new SectionRule(sectionToken, sectionHeadersList.subList(2, 3));
+        keywordsSectionRule = new SectionRule(sectionToken, sectionHeadersList.subList(3, 4));
     }
     
     private void createSettingsWordsRule() {

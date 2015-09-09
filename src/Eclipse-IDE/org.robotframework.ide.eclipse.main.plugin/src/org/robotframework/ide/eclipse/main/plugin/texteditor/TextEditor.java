@@ -254,19 +254,21 @@ public class TextEditor {
 		
 		final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(editedFile);
         final Map<String, ContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
+        //final List<RedVariableProposal> variableProposals = new RedVariableProposals(suiteFile).getVariableProposals(variablesSortedByNames());
         
         textHover = new TextEditorTextHover(keywordMap);
         indentLineAutoEditStrategy = new TextEditorIndentLineAutoEditStrategy();
         final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover, indentLineAutoEditStrategy);
         viewer.configure(svc);
         
-        createPartitioner(document);
+        TextEditorPartitionScanner partitionScanner = new TextEditorPartitionScanner(suiteFile);
+        createPartitioner(document, partitionScanner);
         
 		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap);
 		contentAssistant.install(viewer);
 		
 		final List<String> keywordList = new ArrayList<String>(keywordMap.keySet());
-		final PresentationReconciler reconciler = this.createPresentationReconciler(keywordList);
+		final PresentationReconciler reconciler = this.createPresentationReconciler(keywordList, partitionScanner.getHeadersList());
 		reconciler.install(viewer);
 		
 		occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer, editedFile);
@@ -705,8 +707,8 @@ public class TextEditor {
 		return menu;
 	}
 	
-	private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap) {
-		final ContentAssistant contentAssistant = new ContentAssistant();
+    private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap) {
+	final ContentAssistant contentAssistant = new ContentAssistant();
 		contentAssistant.enableColoredLabels(true);
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
@@ -728,17 +730,17 @@ public class TextEditor {
 		return contentAssistant;
 	}
 	
-	private void createPartitioner(final IDocument document) {
-        IDocumentPartitioner partitioner = new FastPartitioner(new TextEditorPartitionScanner(), new String[] {
+	private void createPartitioner(final IDocument document, final TextEditorPartitionScanner partitionScanner) {
+        IDocumentPartitioner partitioner = new FastPartitioner(partitionScanner, new String[] {IDocument.DEFAULT_CONTENT_TYPE,
                 TextEditorPartitionScanner.TEST_CASES_SECTION, TextEditorPartitionScanner.KEYWORDS_SECTION,
                 TextEditorPartitionScanner.SETTINGS_SECTION, TextEditorPartitionScanner.VARIABLES_SECTION });
         partitioner.connect(document);
 	    document.setDocumentPartitioner(partitioner);
 	}
 	
-    private PresentationReconciler createPresentationReconciler(final List<String> keywordList) {
+    private PresentationReconciler createPresentationReconciler(final List<String> keywordList, final List<String> sectionHeadersList) {
         final PresentationReconciler reconciler = new PresentationReconciler();
-        rulesGenerator = new RulesGenerator(viewer.getTextWidget().getDisplay(), keywordList);
+        rulesGenerator = new RulesGenerator(viewer.getTextWidget().getDisplay(), keywordList, sectionHeadersList);
         setupPresentationReconciler(reconciler, TextEditorPartitionScanner.TEST_CASES_SECTION, new TextEditorScanner(
                 rulesGenerator.getTestCasesSectionRules()));
         setupPresentationReconciler(reconciler, TextEditorPartitionScanner.KEYWORDS_SECTION, new TextEditorScanner(
