@@ -20,6 +20,8 @@ public class Separator implements IRobotLineElement {
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
+    private boolean isDirty = false;
+    private boolean wasFirstInit = false;
 
     public static enum SeparatorType implements IRobotTokenType {
         TABULATOR_OR_DOUBLE_SPACE("\t", "  "), PIPE("| ", " | ", "\t|", "|\t",
@@ -91,6 +93,11 @@ public class Separator implements IRobotLineElement {
 
 
     public void setText(StringBuilder text) {
+        if (wasFirstInit) {
+            isDirty = true;
+        } else {
+            wasFirstInit = true;
+        }
         this.text = text;
     }
 
@@ -129,5 +136,11 @@ public class Separator implements IRobotLineElement {
     @Override
     public FilePosition getFilePosition() {
         return fp;
+    }
+
+
+    @Override
+    public boolean isDirty() {
+        return isDirty;
     }
 }
