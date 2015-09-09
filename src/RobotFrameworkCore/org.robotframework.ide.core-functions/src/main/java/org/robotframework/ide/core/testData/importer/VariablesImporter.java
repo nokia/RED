@@ -40,7 +40,7 @@ public class VariablesImporter {
                     List<String> varFileArguments = convertTokensToArguments(varImport);
 
                     File directory = robotFile.getProcessedFile()
-                            .getAbsoluteFile().getParentFile();
+                            .getAbsoluteFile();
                     if (directory.exists()) {
                         Path joinPath = Paths.get(directory.getAbsolutePath())
                                 .resolveSibling(path);
@@ -54,6 +54,8 @@ public class VariablesImporter {
                     varImportRef.setVariablesFile(new File(path)
                             .getAbsoluteFile());
                     varImportRef.map(variablesFromFile);
+
+                    varsImported.add(varImportRef);
                 }
             }
         }

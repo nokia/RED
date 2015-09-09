@@ -37,4 +37,7 @@ public interface IRobotLineElement {
 
 
     List<IRobotTokenType> getTypes();
+
+
+    boolean isDirty();
 }
