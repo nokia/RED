@@ -12,12 +12,14 @@ public abstract class AVariableImported<T> {
 
     private final String name;
     private final VariableType type;
+    private final String robotRepresentation;
     private T value;
 
 
     public AVariableImported(final String name, final VariableType type) {
         this.name = name;
         this.type = type;
+        this.robotRepresentation = type.getIdentificator() + '{' + name + '}';
     }
 
 
@@ -41,9 +43,15 @@ public abstract class AVariableImported<T> {
     }
 
 
+    public String getRobotRepresentation() {
+        return robotRepresentation;
+    }
+
+
     @Override
     public String toString() {
-        return String.format(this.getClass() + " [name=%s, type=%s, value=%s]",
-                name, type, value);
+        return String.format(this.getClass()
+                + " [name=%s, type=%s, value=%s, robotName=%]", name, type,
+                value, robotRepresentation);
     }
 }

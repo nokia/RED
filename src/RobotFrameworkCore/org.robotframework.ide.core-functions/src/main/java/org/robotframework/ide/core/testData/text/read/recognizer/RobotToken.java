@@ -19,6 +19,8 @@ public class RobotToken implements IRobotLineElement {
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
     private List<IRobotTokenType> types = new LinkedList<>();
+    private boolean isDirty = false;
+    private boolean wasFirstInit = false;
 
 
     public RobotToken() {
@@ -78,6 +80,11 @@ public class RobotToken implements IRobotLineElement {
 
 
     public void setText(StringBuilder text) {
+        if (wasFirstInit) {
+            isDirty = true;
+        } else {
+            wasFirstInit = true;
+        }
         this.text = text;
     }
 
@@ -107,13 +114,20 @@ public class RobotToken implements IRobotLineElement {
 
     @Override
     public String toString() {
-        return String.format("RobotToken [filePosition=%s, text=%s, types=%s]",
-                fp, text, types);
+        return String.format(
+                "RobotToken [filePosition=%s, text=%s, types=%s, isDirty=%s]",
+                fp, text, types, isDirty);
     }
 
 
     @Override
     public FilePosition getFilePosition() {
         return fp;
+    }
+
+
+    @Override
+    public boolean isDirty() {
+        return isDirty;
     }
 }
