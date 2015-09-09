@@ -32,6 +32,7 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -303,12 +304,21 @@ public class RobotSuiteFile implements RobotElement {
         }
         return newArrayList();
     }
-
+    
     public List<IPath> getResourcesPaths() {
         final Optional<RobotElement> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
             final RobotSettingsSection settings = (RobotSettingsSection) optionalSettings.get();
             return settings.getResourcesPaths();
+        }
+        return newArrayList();
+    }
+    
+    public List<RobotVariable> getUserDefinedVariables() {
+        final Optional<RobotElement> optionalVariables = findSection(RobotVariablesSection.class);
+        if (optionalVariables.isPresent()) {
+            final RobotVariablesSection variables = (RobotVariablesSection) optionalVariables.get();
+            return variables.getChildren();
         }
         return newArrayList();
     }
@@ -325,6 +335,23 @@ public class RobotSuiteFile implements RobotElement {
             return alreadyImported;
         }
         return newArrayList();
+    }
+    
+    public List<String> getSectionHeaders() {
+        final RobotFile file = fileOutput.getFileModel();
+        final List<String> headersList = new ArrayList<>();
+        headersList.add(extractHeader(file.getSettingTable().getHeaders(), "*** Settings ***"));
+        headersList.add(extractHeader(file.getVariableTable().getHeaders(), "*** Variables ***"));
+        headersList.add(extractHeader(file.getTestCaseTable().getHeaders(), "*** Test Cases ***"));
+        headersList.add(extractHeader(file.getKeywordTable().getHeaders(), "*** Keywords ***"));
+        return headersList;
+    }
+
+    private String extractHeader(final List<TableHeader> modelHeaders, final String defaultHeader) {
+        if (!modelHeaders.isEmpty()) {
+            return modelHeaders.get(0).getTableHeader().getText().toString();
+        }
+        return defaultHeader;
     }
     
     private static class RobotFileParsingException extends RuntimeException {
@@ -363,5 +390,5 @@ public class RobotSuiteFile implements RobotElement {
         public int hashCode() {
             return args.hashCode();
         }
-    }
+    }  
 }
