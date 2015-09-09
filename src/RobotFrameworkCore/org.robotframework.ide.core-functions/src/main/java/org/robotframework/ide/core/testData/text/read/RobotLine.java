@@ -45,5 +45,4 @@ public class RobotLine {
         return String.format("RobotLine [lineNumber=%s, lineElements=%s]",
                 lineNumber, lineElements);
     }
-
 }
