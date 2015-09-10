@@ -45,8 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 /**
  * This is slighlty modified version of
- * org.eclipse.jface.fieldassist.ContentProposalAdapter.ContentProposalAdapter.
- * 
+ * org.eclipse.jface.fieldassist.ContentProposalAdapter
  * Copy&Pasted with minor changes regarding look & feel.
  */
 public class RedContentProposalAdapter {
