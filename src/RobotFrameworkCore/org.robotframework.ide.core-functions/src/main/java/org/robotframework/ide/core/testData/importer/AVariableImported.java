@@ -5,13 +5,21 @@
  */
 package org.robotframework.ide.core.testData.importer;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public abstract class AVariableImported<T> {
+public abstract class AVariableImported<T> implements IVariableHolder {
 
     private final String name;
     private final VariableType type;
+    private final List<RobotToken> comment = new LinkedList<>();
+    private final VariableScope scope = VariableScope.TEST_SUITE;
     private final String robotRepresentation;
     private T value;
 
@@ -19,7 +27,12 @@ public abstract class AVariableImported<T> {
     public AVariableImported(final String name, final VariableType type) {
         this.name = name;
         this.type = type;
-        this.robotRepresentation = type.getIdentificator() + '{' + name + '}';
+        if (!this.name.startsWith(type.getIdentificator())) {
+            this.robotRepresentation = type.getIdentificator() + '{' + name
+                    + '}';
+        } else {
+            this.robotRepresentation = name;
+        }
     }
 
 
@@ -48,10 +61,33 @@ public abstract class AVariableImported<T> {
     }
 
 
+    public VariableScope getScope() {
+        return scope;
+    }
+
+
     @Override
     public String toString() {
         return String.format(this.getClass()
-                + " [name=%s, type=%s, value=%s, robotName=%]", name, type,
+                + " [name=%s, type=%s, value=%s, robotName=%s]", name, type,
                 value, robotRepresentation);
+    }
+
+
+    @Override
+    public List<RobotToken> getComment() {
+        return comment;
+    }
+
+
+    @Override
+    public void addCommentPart(RobotToken rt) {
+        // nothing to do
+    }
+
+
+    @Override
+    public RobotToken getDeclaration() {
+        return null;
     }
 }

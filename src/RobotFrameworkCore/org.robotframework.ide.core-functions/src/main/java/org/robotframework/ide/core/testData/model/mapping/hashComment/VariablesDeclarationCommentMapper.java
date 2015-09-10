@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.mapping.IHashCommentMapper;
 import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -41,7 +42,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         VariableTable variableTable = fileModel.getVariableTable();
         if (variableTable.isEmpty()) {
             ListVariable var = new ListVariable(null,
-                    createArtifactalListVariable(rt));
+                    createArtifactalListVariable(rt), VariableScope.TEST_SUITE);
             var.addCommentPart(rt);
             variableTable.addVariable(var);
         } else {
@@ -51,7 +52,8 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
                 var.addCommentPart(rt);
             } else {
                 ListVariable newVar = new ListVariable(null,
-                        createArtifactalListVariable(rt));
+                        createArtifactalListVariable(rt),
+                        VariableScope.TEST_SUITE);
                 newVar.addCommentPart(rt);
                 variableTable.addVariable(newVar);
             }

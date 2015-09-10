@@ -17,8 +17,8 @@ public class ListVariable extends AVariable {
     private final List<RobotToken> items = new LinkedList<>();
 
 
-    public ListVariable(String name, RobotToken declaration) {
-        super(VariableType.LIST, name, declaration);
+    public ListVariable(String name, RobotToken declaration, VariableScope scope) {
+        super(VariableType.LIST, name, declaration, scope);
     }
 
 

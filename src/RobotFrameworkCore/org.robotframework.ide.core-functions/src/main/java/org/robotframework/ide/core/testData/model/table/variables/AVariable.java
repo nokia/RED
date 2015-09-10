@@ -20,21 +20,28 @@ public abstract class AVariable extends AModelElement implements
         IVariableHolder {
 
     protected VariableType type;
+    protected VariableScope scope = VariableScope.LOCAL;
     private final RobotToken declaration;
     private final String name;
     private final List<RobotToken> comment = new LinkedList<>();
 
 
     protected AVariable(final VariableType type, final String name,
-            final RobotToken declaration) {
+            final RobotToken declaration, final VariableScope scope) {
         this.type = type;
         this.name = name;
         this.declaration = declaration;
+        this.scope = scope;
     }
 
 
     public VariableType getType() {
         return type;
+    }
+
+
+    public VariableScope getScope() {
+        return scope;
     }
 
 
@@ -55,6 +62,25 @@ public abstract class AVariable extends AModelElement implements
 
     public RobotToken getDeclaration() {
         return declaration;
+    }
+
+    public enum VariableScope {
+        /**
+         * 
+         */
+        GLOBAL,
+        /**
+         * 
+         */
+        TEST_SUITE,
+        /**
+         * 
+         */
+        TEST_CASE,
+        /**
+         * 
+         */
+        LOCAL;
     }
 
     public enum VariableType {

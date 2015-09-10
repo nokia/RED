@@ -17,8 +17,9 @@ public class DictionaryVariable extends AVariable {
     private final List<DictionaryKeyValuePair> items = new LinkedList<>();
 
 
-    public DictionaryVariable(String name, RobotToken declaration) {
-        super(VariableType.DICTIONARY, name, declaration);
+    public DictionaryVariable(String name, RobotToken declaration,
+            VariableScope scope) {
+        super(VariableType.DICTIONARY, name, declaration, scope);
     }
 
 

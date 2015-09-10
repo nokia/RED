@@ -12,6 +12,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -42,7 +43,8 @@ public class ListVariableMapper implements IParsingMapper {
         rt.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
 
         ListVariable var = new ListVariable(
-                varHelper.extractVariableName(text), rt);
+                varHelper.extractVariableName(text), rt,
+                VariableScope.TEST_SUITE);
         varTable.addVariable(var);
 
         processingState.push(ParsingState.LIST_VARIABLE_DECLARATION);
