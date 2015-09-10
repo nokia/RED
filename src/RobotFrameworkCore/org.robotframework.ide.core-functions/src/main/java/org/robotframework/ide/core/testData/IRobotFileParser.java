@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData;
 
 import java.io.File;
+import java.io.InputStream;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 
@@ -16,4 +17,8 @@ public interface IRobotFileParser {
 
 
     void parse(final RobotFileOutput output, final File robotFile);
+
+
+    void parse(final RobotFileOutput output, final InputStream inputStream,
+            final File robotFile);
 }
