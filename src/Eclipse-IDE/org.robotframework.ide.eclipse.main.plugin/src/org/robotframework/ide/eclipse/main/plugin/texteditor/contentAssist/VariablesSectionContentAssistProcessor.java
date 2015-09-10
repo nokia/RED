@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -14,6 +14,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 
 public class VariablesSectionContentAssistProcessor implements IContentAssistProcessor {
 
@@ -36,7 +37,7 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
                 return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
             } else {
                 currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
-                final Map<String, String> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
+                final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
                         TextEditorContentAssist.getVariables(), currentWord);
                 if (!filteredProposals.isEmpty()) {
                     return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.variables;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,10 @@ public class VariablesBuilder {
             final Map<String, String> varsMap = (Map<String, String>) runtimeEnvironment.getVariablesFromFile(
                     referencedVariableFile.getPath(), referencedVariableFile.getArguments());
             if (varsMap != null && !varsMap.isEmpty()) {
-                referencedVariableFile.setVariables(varsMap);
+                final List<String> list = new ArrayList<>();
+                list.addAll(varsMap.keySet());
+                referencedVariableFile.setVariables(list);
+                //TODO: this modification should be saved to red.xml
             }
             monitor.worked(1);
         }

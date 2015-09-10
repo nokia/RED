@@ -351,7 +351,8 @@ public class RobotProjectConfig {
         @XmlAttribute
         private List<String> arguments;
 
-        private Map<String, String> variables;
+        @XmlAttribute
+        private List<String> variables;
 
         public String getName() {
             return name;
@@ -377,11 +378,11 @@ public class RobotProjectConfig {
             this.arguments = arguments;
         }
 
-        public Map<String, String> getVariables() {
+        public List<String> getVariables() {
             return variables;
         }
 
-        public void setVariables(Map<String, String> variables) {
+        public void setVariables(List<String> variables) {
             this.variables = variables;
         }
         
