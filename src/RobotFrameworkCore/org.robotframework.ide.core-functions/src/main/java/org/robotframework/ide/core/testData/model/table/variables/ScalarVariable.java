@@ -17,8 +17,9 @@ public class ScalarVariable extends AVariable {
     private final List<RobotToken> values = new LinkedList<>();
 
 
-    public ScalarVariable(String name, RobotToken declaration) {
-        super(VariableType.SCALAR, name, declaration);
+    public ScalarVariable(String name, RobotToken declaration,
+            VariableScope scope) {
+        super(VariableType.SCALAR, name, declaration, scope);
     }
 
 

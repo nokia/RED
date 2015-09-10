@@ -543,6 +543,50 @@ public class RobotRuntimeEnvironment {
     }
 
 
+    public Map<?, ?> getGlobalVariables() {
+        Map<?, ?> variables = new LinkedHashMap<>();
+
+        if (hasRobotInstalled()) {
+            File scriptFile = null;
+            try {
+                scriptFile = copyResourceFile("GlobalVarsImporter.py");
+            } catch (IOException e1) {
+
+            }
+
+            if (scriptFile != null) {
+                final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
+                final List<String> cmdLine = Arrays.asList(cmd,
+                        scriptFile.getAbsolutePath());
+
+                final StringBuilder result = new StringBuilder();
+                final ILineHandler linesHandler = new ILineHandler(){
+
+                    @Override
+                    public void processLine(final String line) {
+                        result.append(line);
+                    }
+                };
+
+                String resultVars = "";
+                try {
+                    runExternalProcess(cmdLine, linesHandler);
+                    resultVars = result.toString().trim().replaceAll("'", "\"");
+                    if (mapper == null) {
+                        mapper = new ObjectMapper();
+                    }
+                    variables = mapper.readValue(resultVars, Map.class);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Command line output " + resultVars);
+                }
+            }
+
+        }
+        return variables;
+    }
+
+
     public Map<?, ?> getVariablesFromFile(final String path,
             final List<String> args) {
         Map<?, ?> variables = new LinkedHashMap<>();
@@ -600,10 +644,12 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public RunCommandLine createCommandLineCall(final SuiteExecutor executor, final List<String> classpath,
-            final List<String> pythonpath, final List<String> variableFilesPath, final File projectLocation,
-            final List<String> suites, final List<String> testCases, final String userArguments,
-            final List<String> includedTags, final List<String> excludedTags, final boolean isDebugging)
+    public RunCommandLine createCommandLineCall(final SuiteExecutor executor,
+            final List<String> classpath, final List<String> pythonpath,
+            final List<String> variableFilesPath, final File projectLocation,
+            final List<String> suites, final List<String> testCases,
+            final String userArguments, final List<String> includedTags,
+            final List<String> excludedTags, final boolean isDebugging)
             throws IOException {
 
         final String debugInfo = isDebugging ? "True" : "False";
