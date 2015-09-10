@@ -27,7 +27,12 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
     public ARobotInternalVariable(final String name, final VariableType type) {
         this.name = name;
         this.type = type;
-        this.robotRepresentation = type.getIdentificator() + '{' + name + '}';
+        if (!this.name.startsWith(type.getIdentificator())) {
+            this.robotRepresentation = type.getIdentificator() + '{' + name
+                    + '}';
+        } else {
+            this.robotRepresentation = name;
+        }
     }
 
 
