@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.AImported.Type;
@@ -27,6 +28,7 @@ public class VariablesImporter {
 
     public List<VariablesFileImportReference> importVariables(
             final RobotRuntimeEnvironment robotRunEnv,
+            final RobotProjectHolder robotProject,
             final RobotFileOutput robotFile) {
         List<VariablesFileImportReference> varsImported = new LinkedList<>();
         SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -47,13 +49,23 @@ public class VariablesImporter {
                         path = joinPath.toAbsolutePath().toFile()
                                 .getAbsolutePath();
                     }
-                    Map<?, ?> variablesFromFile = robotRunEnv
-                            .getVariablesFromFile(path, varFileArguments);
-                    VariablesFileImportReference varImportRef = new VariablesFileImportReference(
-                            varImport);
-                    varImportRef.setVariablesFile(new File(path)
-                            .getAbsoluteFile());
-                    varImportRef.map(variablesFromFile);
+
+                    File varFile = new File(path);
+                    VariablesFileImportReference varImportRef = findInProjectVariablesImport(
+                            robotProject, varImport, varFile.toPath()
+                                    .normalize().toFile());
+
+                    if (varImportRef == null) {
+                        Map<?, ?> variablesFromFile = robotRunEnv
+                                .getVariablesFromFile(path, varFileArguments);
+                        varImportRef = new VariablesFileImportReference(
+                                varImport);
+                        varImportRef
+                                .setVariablesFile(varFile.getAbsoluteFile());
+                        varImportRef.map(variablesFromFile);
+                    } else {
+                        varImportRef = varImportRef.copy(varImport);
+                    }
 
                     varsImported.add(varImportRef);
                 }
@@ -61,6 +73,89 @@ public class VariablesImporter {
         }
 
         return varsImported;
+    }
+
+
+    private VariablesFileImportReference findInProjectVariablesImport(
+            final RobotProjectHolder robotProject,
+            final VariablesImport varImport, final File varFile) {
+
+        List<RobotFileOutput> filesWhichImportingVariables = robotProject
+                .findFilesWithImportedVariableFile(varFile);
+        VariablesFileImportReference varImportRef = null;
+        for (RobotFileOutput rfo : filesWhichImportingVariables) {
+            VariablesFileImportReference variableFile = findVariableFileByPath(
+                    rfo, varFile);
+            if (variableFile != null) {
+                if (checkIfImportDeclarationAreTheSame(varImport,
+                        variableFile.getImportDeclaration())) {
+                    if (varFile.lastModified() == varFile.lastModified()) {
+                        varImportRef = variableFile;
+                        break;
+                    }
+                }
+            }
+        }
+        return varImportRef;
+    }
+
+
+    @VisibleForTesting
+    protected VariablesFileImportReference findVariableFileByPath(
+            final RobotFileOutput rfo, final File varFile) {
+        VariablesFileImportReference varFileImportReference = null;
+        List<VariablesFileImportReference> variablesImportReferences = rfo
+                .getVariablesImportReferences();
+        for (VariablesFileImportReference varFileImport : variablesImportReferences) {
+            if (varFileImport.getVariablesFile().getAbsolutePath()
+                    .equals(varFile.getAbsolutePath())) {
+                varFileImportReference = varFileImport;
+                break;
+            }
+        }
+
+        return varFileImportReference;
+    }
+
+
+    @VisibleForTesting
+    protected boolean checkIfImportDeclarationAreTheSame(
+            final VariablesImport varImportCurrent,
+            final VariablesImport alreadyExecuted) {
+        boolean result = false;
+        if (varImportCurrent != null && alreadyExecuted != null) {
+            List<RobotToken> argsCurrent = varImportCurrent.getArguments();
+            List<RobotToken> argsPrevious = alreadyExecuted.getArguments();
+            if (argsCurrent.size() == argsPrevious.size()) {
+                result = true;
+                int size = argsCurrent.size();
+                for (int i = 0; i < size; i++) {
+                    RobotToken argCurrent = argsCurrent.get(i);
+                    String argumentTextCurrent = argCurrent.getText()
+                            .toString();
+                    RobotToken argPrevious = argsPrevious.get(i);
+                    String argumentTextPrevious = argPrevious.getText()
+                            .toString();
+                    if (argumentTextCurrent != null
+                            && argumentTextPrevious != null) {
+                        if (!argumentTextCurrent.equals(argumentTextPrevious)) {
+                            result = false;
+                        }
+                    } else if (argumentTextCurrent == null
+                            && argumentTextPrevious == null) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+
+                    if (!result) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
 

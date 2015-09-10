@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.core.testData.robotImported.DictionaryRobotInternalVariable;
 import org.robotframework.ide.core.testData.robotImported.ListRobotInternalVariable;
@@ -61,8 +62,8 @@ public class RobotProjectHolder {
             Object varValue = varsRead.get(varName);
             ARobotInternalVariable<?> var;
             if (varValue instanceof List) {
-                ListRobotInternalVariable listVar = new ListRobotInternalVariable(""
-                        + varName);
+                ListRobotInternalVariable listVar = new ListRobotInternalVariable(
+                        "" + varName);
                 listVar.setValue((List) varValue);
                 var = listVar;
             } else if (varValue instanceof Map) {
@@ -71,8 +72,8 @@ public class RobotProjectHolder {
                 dictVar.setValue(convert((Map) varValue));
                 var = dictVar;
             } else {
-                ScalarRobotInternalVariable scalarVar = new ScalarRobotInternalVariable(""
-                        + varName);
+                ScalarRobotInternalVariable scalarVar = new ScalarRobotInternalVariable(
+                        "" + varName);
                 scalarVar.setValue("" + varValue);
                 var = scalarVar;
             }
@@ -141,6 +142,47 @@ public class RobotProjectHolder {
     }
 
 
+    public List<RobotFileOutput> findFilesWithImportedVariableFile(
+            final File variableFile) {
+        List<RobotFileOutput> found = new LinkedList<>();
+        List<Integer> foundFiles = findFile(new SearchByVariablesImport(
+                variableFile));
+        for (Integer fileId : foundFiles) {
+            found.add(readableProjectFiles.get(fileId));
+        }
+
+        return found;
+    }
+
+    private class SearchByVariablesImport implements ISearchCriteria {
+
+        private final File toFound;
+
+
+        public SearchByVariablesImport(final File toFound) {
+            this.toFound = toFound;
+        }
+
+
+        @Override
+        public boolean matchCriteria(RobotFileOutput robotFile) {
+            boolean matchResult = false;
+            List<VariablesFileImportReference> varImports = robotFile
+                    .getVariablesImportReferences();
+            for (VariablesFileImportReference variablesFileImportReference : varImports) {
+                if (variablesFileImportReference.getVariablesFile()
+                        .getAbsolutePath().equals(toFound.getAbsolutePath())) {
+                    matchResult = true;
+                    break;
+                }
+            }
+
+            return matchResult;
+        }
+
+    }
+
+
     public RobotFileOutput findFileByName(final File file) {
         RobotFileOutput found = null;
         List<Integer> findFile = findFile(new SearchByName(file));
@@ -149,21 +191,6 @@ public class RobotProjectHolder {
         }
 
         return found;
-    }
-
-
-    protected List<Integer> findFile(final ISearchCriteria criteria) {
-        List<Integer> foundFiles = new LinkedList<>();
-        int size = readableProjectFiles.size();
-        for (int i = 0; i < size; i++) {
-            RobotFileOutput robotFile = readableProjectFiles.get(i);
-            if (criteria.matchCriteria(robotFile)) {
-                foundFiles.add(i);
-                break;
-            }
-        }
-
-        return foundFiles;
     }
 
     private class SearchByName implements ISearchCriteria {
@@ -181,6 +208,21 @@ public class RobotProjectHolder {
             return (robotFile.getProcessedFile().getAbsolutePath()
                     .equals(toFound.getAbsolutePath()));
         }
+    }
+
+
+    protected List<Integer> findFile(final ISearchCriteria criteria) {
+        List<Integer> foundFiles = new LinkedList<>();
+        int size = readableProjectFiles.size();
+        for (int i = 0; i < size; i++) {
+            RobotFileOutput robotFile = readableProjectFiles.get(i);
+            if (criteria.matchCriteria(robotFile)) {
+                foundFiles.add(i);
+                break;
+            }
+        }
+
+        return foundFiles;
     }
 
     protected interface ISearchCriteria {

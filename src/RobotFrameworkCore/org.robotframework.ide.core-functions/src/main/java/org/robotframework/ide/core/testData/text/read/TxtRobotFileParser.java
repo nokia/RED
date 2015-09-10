@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -112,12 +113,37 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
+    public void parse(final RobotFileOutput parsingOutput,
+            final InputStream inputStream, final File robotFile) {
+        boolean wasProcessingError = false;
+        try {
+            parse(parsingOutput, robotFile, new InputStreamReader(inputStream,
+                    Charset.forName("UTF-8")));
+        } catch (Exception e) {
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile
+                            + ".\nStack:" + e, "File " + robotFile));
+            // FIXME: stack trace adding
+            e.printStackTrace();
+            wasProcessingError = true;
+        }
+
+        if (wasProcessingError || parsingOutput.getStatus() == Status.FAILED) {
+            parsingOutput.setStatus(Status.FAILED);
+        } else {
+            parsingOutput.setStatus(Status.PASSED);
+        }
+
+        parsingOutput.setProcessedFile(robotFile);
+    }
+
+
+    @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
             FileInputStream fis = new FileInputStream(robotFile);
-            parse(parsingOutput, robotFile,
-                    new InputStreamReader(fis, Charset.forName("UTF-8")));
+            parse(parsingOutput, fis, robotFile);
         } catch (FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
