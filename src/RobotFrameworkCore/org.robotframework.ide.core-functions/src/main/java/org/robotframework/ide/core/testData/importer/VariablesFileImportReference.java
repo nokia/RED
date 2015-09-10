@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.importer;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class VariablesFileImportReference {
 
     @SuppressWarnings("rawtypes")
     public List<AVariableImported> getVariables() {
-        return variables;
+        return Collections.unmodifiableList(variables);
     }
 
 
@@ -99,5 +100,16 @@ public class VariablesFileImportReference {
         }
 
         return map;
+    }
+
+
+    public VariablesFileImportReference copy(
+            final VariablesImport importDeclaration) {
+        VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(
+                importDeclaration);
+        newVarImportRef.setVariablesFile(variablesFile.getAbsoluteFile());
+        newVarImportRef.variables.addAll(variables);
+
+        return newVarImportRef;
     }
 }
