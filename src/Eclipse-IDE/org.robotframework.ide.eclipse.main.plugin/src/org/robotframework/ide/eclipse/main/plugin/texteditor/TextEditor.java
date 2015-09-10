@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor;
 
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -106,6 +107,8 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -114,6 +117,7 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.Defau
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssist;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.VariablesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.handlers.SaveAsHandler;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.syntaxHighlighting.RulesGenerator;
@@ -254,7 +258,7 @@ public class TextEditor {
 		
 		final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(editedFile);
         final Map<String, ContentAssistKeywordContext> keywordMap = provideContentAssistantKeywordsMapping(suiteFile);
-        //final List<RedVariableProposal> variableProposals = new RedVariableProposals(suiteFile).getVariableProposals(variablesSortedByNames());
+        final List<RedVariableProposal> variableProposals = new RedVariableProposals(suiteFile).getVariableProposals(variablesSortedByTypesAndNames());
         
         textHover = new TextEditorTextHover(keywordMap);
         indentLineAutoEditStrategy = new TextEditorIndentLineAutoEditStrategy();
@@ -264,7 +268,7 @@ public class TextEditor {
         TextEditorPartitionScanner partitionScanner = new TextEditorPartitionScanner(suiteFile);
         createPartitioner(document, partitionScanner);
         
-		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap);
+		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap, variableProposals);
 		contentAssistant.install(viewer);
 		
 		final List<String> keywordList = new ArrayList<String>(keywordMap.keySet());
@@ -707,14 +711,16 @@ public class TextEditor {
 		return menu;
 	}
 	
-    private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap) {
-	final ContentAssistant contentAssistant = new ContentAssistant();
+    private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap,
+            final List<RedVariableProposal> variableProposals) {
+        final ContentAssistant contentAssistant = new ContentAssistant();
 		contentAssistant.enableColoredLabels(true);
 		contentAssistant.enableAutoInsert(true);
 		contentAssistant.enablePrefixCompletion(true);
 		contentAssistant.enableAutoActivation(true);
 		contentAssistant.setEmptyMessage("No proposals");
 		contentAssistant.setShowEmptyList(true);
+		TextEditorContentAssist.setVariables(variableProposals);
 		contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(keywordMap), TextEditorPartitionScanner.TEST_CASES_SECTION);
 		contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(keywordMap), TextEditorPartitionScanner.KEYWORDS_SECTION);
 		contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(), TextEditorPartitionScanner.SETTINGS_SECTION);

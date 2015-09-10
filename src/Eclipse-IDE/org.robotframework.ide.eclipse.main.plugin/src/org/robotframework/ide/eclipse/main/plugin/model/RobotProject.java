@@ -17,6 +17,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.testData.RobotParser;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -39,9 +41,25 @@ public class RobotProject extends RobotContainer {
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
     private RobotProjectConfig configuration;
+    
+    private RobotProjectHolder projectHolder;
+    private RobotParser robotParser;
 
     RobotProject(final IProject project) {
         super(null, project);
+    }
+    
+    public void link(final RobotProjectHolder projectHolder) {
+        this.projectHolder = projectHolder;
+        robotParser = new RobotParser(projectHolder);
+    }
+    
+    public RobotProjectHolder getRobotProjectHolder() {
+        return projectHolder;
+    }
+    
+    public RobotParser getRobotParser() {
+        return robotParser;
     }
 
     public IProject getProject() {

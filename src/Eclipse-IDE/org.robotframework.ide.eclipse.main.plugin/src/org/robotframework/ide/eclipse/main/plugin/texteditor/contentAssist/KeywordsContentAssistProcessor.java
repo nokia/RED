@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -16,6 +17,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -61,7 +63,7 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                 
                 if (TextEditorContentAssist.shouldShowVariablesProposals(currentWord)) {
                     currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
-                    final Map<String, String> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
+                    final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
                             TextEditorContentAssist.getVariables(), currentWord);
                     if (!filteredProposals.isEmpty()) {
                         return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
