@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.UnknownVariable;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -46,7 +47,7 @@ public class UnknownVariableMapper implements IParsingMapper {
         VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
         UnknownVariable varUnknown = new UnknownVariable(
-                rt.getRaw().toString(), rt);
+                rt.getRaw().toString(), rt, VariableScope.TEST_SUITE);
         varTable.addVariable(varUnknown);
 
         processingState.push(ParsingState.VARIABLE_UNKNOWN);

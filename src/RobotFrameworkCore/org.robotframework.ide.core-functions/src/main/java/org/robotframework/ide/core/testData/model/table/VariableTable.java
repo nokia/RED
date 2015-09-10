@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
@@ -36,7 +37,8 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createScalarVariable(final int index, final String name,
             final List<String> values, final String comment) {
-        ScalarVariable scalar = new ScalarVariable(name, null);
+        ScalarVariable scalar = new ScalarVariable(name, null,
+                VariableScope.TEST_SUITE);
         for (String v : values) {
             RobotToken t = new RobotToken();
             t.setText(new StringBuilder(v));
@@ -50,7 +52,8 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createListVariable(final int index, final String name,
             final List<String> values, final String comment) {
-        ListVariable list = new ListVariable(name, null);
+        ListVariable list = new ListVariable(name, null,
+                VariableScope.TEST_SUITE);
         for (String v : values) {
             RobotToken t = new RobotToken();
             t.setText(new StringBuilder(v));
@@ -64,7 +67,8 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createDictionaryVariable(final int index, final String name,
             final Map<String, String> items, final String comment) {
-        DictionaryVariable dict = new DictionaryVariable(name, null);
+        DictionaryVariable dict = new DictionaryVariable(name, null,
+                VariableScope.TEST_SUITE);
         Set<String> keySet = items.keySet();
         for (String key : keySet) {
             RobotToken keyT = new RobotToken();
