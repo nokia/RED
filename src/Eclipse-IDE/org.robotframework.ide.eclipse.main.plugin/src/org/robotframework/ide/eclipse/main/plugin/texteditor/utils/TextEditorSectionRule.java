@@ -10,11 +10,6 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 
 public class TextEditorSectionRule extends MultiLineRule {
 
-    /**
-     * Comparator that orders <code>char[]</code> in decreasing array lengths.
-     *
-     * @since 3.1
-     */
     private static class DecreasingCharArrayLengthComparator implements Comparator {
 
         public int compare(Object o1, Object o2) {
@@ -22,25 +17,10 @@ public class TextEditorSectionRule extends MultiLineRule {
         }
     }
 
-    /**
-     * Line delimiter comparator which orders according to decreasing delimiter length.
-     * 
-     * @since 3.1
-     */
     private Comparator fLineDelimiterComparator = new DecreasingCharArrayLengthComparator();
 
-    /**
-     * Cached line delimiters.
-     * 
-     * @since 3.1
-     */
     private char[][] fLineDelimiters;
 
-    /**
-     * Cached sorted {@linkplain #fLineDelimiters}.
-     * 
-     * @since 3.1
-     */
     private char[][] fSortedLineDelimiters;
 
     private List<String> headersList;

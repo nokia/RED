@@ -21,6 +21,7 @@ import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class TextEditorContentAssist {
@@ -74,26 +75,7 @@ public class TextEditorContentAssist {
         testCasesSectionWords.add("[Timeout]");
     }
     
-    private static Map<String, String> variables = new HashMap<String, String>();
-    static {
-        variables.put("${/}", "\\");
-        variables.put("${:}", ";");
-        variables.put("${DEBUG_FILE}", null);
-        variables.put("${EMPTY}", "");
-        variables.put("${EXECDIR}", null);
-        variables.put("${False}", "False");
-        variables.put("${LOG_FILE}", null);
-        variables.put("${LOG_LEVEL}", "INFO");
-        variables.put("${None}", "None");
-        variables.put("${OUTPUT_DIR}", null);
-        variables.put("${REPORT_FILE}", null);
-        variables.put("${SPACE}", " ");
-        variables.put("${TEMPDIR}", null);
-        variables.put("${True}", "True");
-        variables.put("${\n}", null);
-        variables.put("${null}", "None");
-        variables.put("@{EMPTY}", "()");
-    }
+    private static List<RedVariableProposal> variableProposals = newArrayList();
     
     private TextEditorContentAssist() {
         
@@ -159,7 +141,7 @@ public class TextEditorContentAssist {
         return completionProposals;
     }
     
-    public static ICompletionProposal[] buildVariablesProposals(final Map<String, String> proposals,
+    public static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
             final String replacedWord, final int offset) {
 
         if (proposals.size() == 0) {
@@ -168,16 +150,21 @@ public class TextEditorContentAssist {
 
         final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
         int index = 0;
-        for (Iterator<String> i = proposals.keySet().iterator(); i.hasNext();) {
-            final String proposal = (String) i.next();
-            final String variableValue = proposals.get(proposal);
-            String info = null;
-            if(variableValue != null) {
-                info = "Value: " + variableValue;
+        for (RedVariableProposal proposal : proposals) {
+            final String variableName = proposal.getName();
+            String info = "Source: " + proposal.getSource() + "\n";
+            
+            final String variableValue = proposal.getValue();
+            if(variableValue != null && !variableValue.equals("")) {
+                info += "Value: " + variableValue + "\n";
+            }
+            final String variableComment = proposal.getComment();
+            if(variableComment != null && !variableComment.equals("")) {
+                info += "Comment: " + variableComment;
             }
             
-            completionProposals[index] = new CompletionProposal(proposal, offset,
-                    replacedWord.length(), proposal.length(), variableImage, proposal, null, info);
+            completionProposals[index] = new TextEditorCompletionProposal(variableName, offset,
+                    replacedWord.length(), variableName.length(), variableImage, variableName, null, info, null);
             index++;
         }
 
@@ -206,16 +193,15 @@ public class TextEditorContentAssist {
         return keywordProposals;
     }
     
-    public static Map<String, String> filterVariablesProposals(final Map<String, String> variablesMap,
+    public static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
             final String filter) {
-        Map<String, String> variablesProposals = new LinkedHashMap<>();
-        for (Iterator<String> i = variablesMap.keySet().iterator(); i.hasNext();) {
-            String variable = (String) i.next();
-            if (variable.toLowerCase().contains(filter.toLowerCase())) {
-                variablesProposals.put(variable, variablesMap.get(variable));
+        List<RedVariableProposal> filteredProposals = newArrayList();
+        for (RedVariableProposal variable : variables) {
+            if (variable.getName().toLowerCase().contains(filter.toLowerCase())) {
+                filteredProposals.add(variable);
             }
         }
-        return variablesProposals;
+        return filteredProposals;
     }
     
     public static String readEnteredWord(final int offset, final IDocument document) throws BadLocationException {
@@ -288,8 +274,11 @@ public class TextEditorContentAssist {
         return testCasesSectionWords;
     }
 
-    public static Map<String, String> getVariables() {
-        return variables;
+    public static List<RedVariableProposal> getVariables() {
+        return variableProposals;
     }
 
+    public static void setVariables(List<RedVariableProposal> proposals) {
+        variableProposals = proposals;
+    }
 }

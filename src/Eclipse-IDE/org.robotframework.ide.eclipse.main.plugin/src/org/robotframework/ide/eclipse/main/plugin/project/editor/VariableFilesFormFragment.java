@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -134,15 +136,25 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(),
-                        fileDialogStartingPath, null, toolkit);
+                final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(), null, toolkit);
                 if (dialog.open() == Window.OK) {
                     final ReferencedVariableFile variableFile = dialog.getVariableFile();
                     if (variableFile != null) {
                         final String name = new File(variableFile.getPath()).getName();
                         variableFile.setName(name);
+                        
+                        @SuppressWarnings("unchecked")
+                        final Map<String, Object> varsMap = (Map<String, Object>) editorInput.getRobotProject()
+                                .getRuntimeEnvironment()
+                                .getVariablesFromFile(variableFile.getPath(), variableFile.getArguments());
+                        if (varsMap != null && !varsMap.isEmpty()) {
+                            final List<String> list = new ArrayList<>();
+                            list.addAll(varsMap.keySet());
+                            variableFile.setVariables(list);
+                        }
+                        
                         editorInput.getProjectConfiguration().addReferencedVariableFile(variableFile);
-
+                        
                         dirtyProviderService.setDirtyState(true);
                         viewer.refresh();
                     }
@@ -175,7 +187,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                     if (!selection.isEmpty()) {
                         final ReferencedVariableFile variableFile = (ReferencedVariableFile) selection.getFirstElement();
                         final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(),
-                                fileDialogStartingPath, variableFile, toolkit);
+                                variableFile, toolkit);
                         if (dialog.open() == Window.OK) {
                             final String name = new File(variableFile.getPath()).getName();
                             variableFile.setName(name);
@@ -227,14 +239,11 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
         private Text pathText;
 
-        private final String startingPath;
-
         private ImportSettingFileArgumentsEditor argumentsEditor;
 
-        protected VariableFileDialog(final Shell parentShell, final String startingPath,
-                final ReferencedVariableFile variableFile, final RedFormToolkit toolkit) {
+        protected VariableFileDialog(final Shell parentShell, final ReferencedVariableFile variableFile,
+                final RedFormToolkit toolkit) {
             super(parentShell);
-            this.startingPath = startingPath;
             this.variableFile = variableFile;
             this.toolkit = toolkit;
         }
@@ -266,7 +275,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
                     final FileDialog dialog = new FileDialog(dialogComposite.getShell(), SWT.OPEN);
-                    dialog.setFilterPath(startingPath);
                     dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
