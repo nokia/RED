@@ -12,6 +12,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -42,7 +43,8 @@ public class DictionaryVariableMapper implements IParsingMapper {
         rt.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
 
         DictionaryVariable var = new DictionaryVariable(
-                varHelper.extractVariableName(text), rt);
+                varHelper.extractVariableName(text), rt,
+                VariableScope.TEST_SUITE);
         varTable.addVariable(var);
 
         processingState.push(ParsingState.DICTIONARY_VARIABLE_DECLARATION);

@@ -17,8 +17,9 @@ public class UnknownVariable extends AVariable {
     private final List<RobotToken> items = new LinkedList<>();
 
 
-    public UnknownVariable(String name, RobotToken declaration) {
-        super(VariableType.INVALID, name, declaration);
+    public UnknownVariable(String name, RobotToken declaration,
+            VariableScope scope) {
+        super(VariableType.INVALID, name, declaration, scope);
     }
 
 

@@ -6,26 +6,93 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
+import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
+import org.robotframework.ide.core.testData.robotImported.DictionaryRobotInternalVariable;
+import org.robotframework.ide.core.testData.robotImported.ListRobotInternalVariable;
+import org.robotframework.ide.core.testData.robotImported.ScalarRobotInternalVariable;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 public class RobotProjectHolder {
 
     private final RobotRuntimeEnvironment robotRuntime;
     private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
+    private final List<ARobotInternalVariable<?>> globalVariables = new LinkedList<>();
 
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
         this.robotRuntime = robotRuntime;
+        initGlobalVariables();
     }
 
 
     public RobotRuntimeEnvironment getRobotRuntime() {
         return robotRuntime;
+    }
+
+
+    public List<ARobotInternalVariable<?>> getGlobalVariables() {
+
+        return globalVariables;
+    }
+
+
+    @VisibleForTesting
+    protected void initGlobalVariables() {
+        Map<?, ?> variables = robotRuntime.getGlobalVariables();
+        globalVariables.addAll(map(variables));
+    }
+
+
+    @SuppressWarnings("rawtypes")
+    private List<ARobotInternalVariable<?>> map(final Map<?, ?> varsRead) {
+        List<ARobotInternalVariable<?>> variables = new LinkedList<>();
+        Set<?> variablesNames = varsRead.keySet();
+        for (Object varName : variablesNames) {
+            Object varValue = varsRead.get(varName);
+            ARobotInternalVariable<?> var;
+            if (varValue instanceof List) {
+                ListRobotInternalVariable listVar = new ListRobotInternalVariable(""
+                        + varName);
+                listVar.setValue((List) varValue);
+                var = listVar;
+            } else if (varValue instanceof Map) {
+                DictionaryRobotInternalVariable dictVar = new DictionaryRobotInternalVariable(
+                        "" + varName);
+                dictVar.setValue(convert((Map) varValue));
+                var = dictVar;
+            } else {
+                ScalarRobotInternalVariable scalarVar = new ScalarRobotInternalVariable(""
+                        + varName);
+                scalarVar.setValue("" + varValue);
+                var = scalarVar;
+            }
+
+            variables.add(var);
+        }
+
+        return variables;
+    }
+
+
+    private Map<String, Object> convert(@SuppressWarnings("rawtypes") Map m) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        @SuppressWarnings("rawtypes")
+        Set keySet = m.keySet();
+        for (Object key : keySet) {
+            map.put("" + key, m.get(key));
+        }
+
+        return map;
     }
 
 
