@@ -44,8 +44,10 @@ import org.eclipse.ui.forms.widgets.FormText;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 /**
- * This is slighlty modified version of ContentProposalAdapter. Copy&Pasted with
- * minot changes regarding look & feel.
+ * This is slighlty modified version of
+ * org.eclipse.jface.fieldassist.ContentProposalAdapter.ContentProposalAdapter.
+ * 
+ * Copy&Pasted with minor changes regarding look & feel.
  */
 public class RedContentProposalAdapter {
 
