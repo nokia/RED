@@ -10,7 +10,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
@@ -28,15 +30,19 @@ import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotFileDumper;
 import org.robotframework.ide.core.testData.RobotParser;
+import org.robotframework.ide.core.testData.importer.AVariableImported;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
@@ -52,7 +58,7 @@ public class RobotSuiteFile implements RobotElement {
     private final IFile file;
 
     private RobotFileOutput fileOutput;
-
+    
     private List<RobotElement> sections = null;
 
     private RobotEditorClosedListener listener;
@@ -129,9 +135,12 @@ public class RobotSuiteFile implements RobotElement {
     }
     
     protected RobotFileOutput parseModel() {
-        final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
-        final RobotFileOutput robotFileOutput = new RobotParser(new RobotProjectHolder(runtimeEnvironment))
-                .parse(file.getLocation().toFile()).get(0);
+        final RobotProject robotProject = getProject();
+        if (robotProject.getRobotProjectHolder() == null) {
+            final RobotProjectHolder robotProjectHolder = new RobotProjectHolder(robotProject.getRuntimeEnvironment());
+            robotProject.link(robotProjectHolder);
+        }
+        final RobotFileOutput robotFileOutput = robotProject.getRobotParser().parse(file.getLocation().toFile()).get(0);
         if (robotFileOutput.getStatus() == Status.FAILED) {
             throw new RobotFileParsingException("Unable to read suite file model");
         } else {
@@ -321,6 +330,26 @@ public class RobotSuiteFile implements RobotElement {
             return variables.getChildren();
         }
         return newArrayList();
+    }
+    
+    public Map<AVariableImported, String> getVariablesFromImportedFiles() {
+        final Map<AVariableImported, String> importedVariablesMap = new HashMap<>();
+        final List<VariablesFileImportReference> fileList = fileOutput.getVariablesImportReferences();
+        for (VariablesFileImportReference variablesFileImportReference : fileList) {
+            final List<AVariableImported> variablesList = variablesFileImportReference.getVariables();
+            for (AVariableImported aVariableImported : variablesList) {
+                importedVariablesMap.put(aVariableImported, variablesFileImportReference.getVariablesFile().getPath());
+            }
+        }
+        return importedVariablesMap;
+    }
+    
+    public List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
+        return getProject().getRobotProjectConfig().getReferencedVariableFiles();
+    }
+    
+    public List<ARobotInternalVariable<?>> getGlobalVariables() {
+        return getProject().getRobotProjectHolder().getGlobalVariables();
     }
     
     public List<ImportedVariablesFile> getImportedVariables() {
