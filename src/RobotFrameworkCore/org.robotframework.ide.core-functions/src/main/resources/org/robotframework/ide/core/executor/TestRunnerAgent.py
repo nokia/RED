@@ -33,6 +33,14 @@
 #   Licensed under the Apache License, Version 2.0
 #      http://www.apache.org/licenses/LICENSE-2.0
 
+#
+# Modified by Mateusz Marzec under NSN copyrights
+# Copyright 2015 Nokia Solutions and Networks
+# * Licensed under the Apache License, Version 2.0,
+# * see license.txt file for details.
+#
+
+
 '''A Robot Framework listener that sends information to a socket
 
 This uses a custom streamhandler module, preferring json but sending either
