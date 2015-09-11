@@ -7,10 +7,11 @@ package org.robotframework.ide.core.testData.model.table.setting;
 
 import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestSetup extends AKeywordBaseSetting {
+public class TestSetup extends AKeywordBaseSetting<SettingTable> {
 
     public TestSetup(final RobotToken declaration) {
         super(declaration);

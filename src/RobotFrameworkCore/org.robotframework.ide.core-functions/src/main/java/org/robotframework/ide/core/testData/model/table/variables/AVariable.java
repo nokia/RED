@@ -12,11 +12,12 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public abstract class AVariable extends AModelElement implements
+public abstract class AVariable extends AModelElement<VariableTable> implements
         IVariableHolder {
 
     protected VariableType type;

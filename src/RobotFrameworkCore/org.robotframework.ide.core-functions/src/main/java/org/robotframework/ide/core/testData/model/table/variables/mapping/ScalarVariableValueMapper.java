@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -43,7 +44,7 @@ public class ScalarVariableValueMapper implements IParsingMapper {
 
         VariableTable variableTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        List<IVariableHolder> variables = variableTable.getVariables();
+        List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
             IVariableHolder var = variables.get(variables.size() - 1);
             ((ScalarVariable) var).addValue(rt);

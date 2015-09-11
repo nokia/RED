@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestCaseTemplate extends AModelElement {
+public class TestCaseTemplate extends AModelElement<TestCase> {
 
     private final RobotToken declaration;
     private RobotToken keywordName;

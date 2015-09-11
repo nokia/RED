@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class LibraryAlias extends AModelElement {
+public class LibraryAlias extends AModelElement<LibraryImport> {
 
     private final RobotToken libraryAliasDeclaration;
     private RobotToken libraryAlias;

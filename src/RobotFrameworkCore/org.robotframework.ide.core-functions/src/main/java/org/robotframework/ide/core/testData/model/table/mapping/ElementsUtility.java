@@ -426,9 +426,9 @@ public class ElementsUtility {
 
 
     public boolean checkIfHasAlreadyKeywordName(
-            List<? extends AKeywordBaseSetting> keywordBases) {
+            List<? extends AKeywordBaseSetting<?>> keywordBases) {
         boolean result = false;
-        for (AKeywordBaseSetting setting : keywordBases) {
+        for (AKeywordBaseSetting<?> setting : keywordBases) {
             result = (setting.getKeywordName() != null);
             result = result || !setting.getArguments().isEmpty();
             if (result) {
