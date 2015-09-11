@@ -551,7 +551,7 @@ public class RobotRuntimeEnvironment {
             try {
                 scriptFile = copyResourceFile("GlobalVarsImporter.py");
             } catch (IOException e1) {
-
+                e1.printStackTrace();
             }
 
             if (scriptFile != null) {
