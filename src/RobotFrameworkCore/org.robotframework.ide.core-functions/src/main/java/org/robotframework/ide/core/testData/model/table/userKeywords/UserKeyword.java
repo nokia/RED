@@ -12,12 +12,13 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class UserKeyword extends AModelElement {
+public class UserKeyword extends AModelElement<KeywordTable> {
 
     private RobotToken keywordName;
     private final List<KeywordDocumentation> documentation = new LinkedList<>();
@@ -26,7 +27,7 @@ public class UserKeyword extends AModelElement {
     private final List<KeywordReturn> keywordReturns = new LinkedList<>();
     private final List<KeywordTeardown> teardowns = new LinkedList<>();
     private final List<KeywordTimeout> timeouts = new LinkedList<>();
-    private final List<RobotExecutableRow> keywordContext = new LinkedList<>();
+    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new LinkedList<>();
 
 
     public UserKeyword(final RobotToken keywordName) {
@@ -44,17 +45,20 @@ public class UserKeyword extends AModelElement {
     }
 
 
-    public void addKeywordExecutionRow(final RobotExecutableRow executionRow) {
+    public void addKeywordExecutionRow(
+            final RobotExecutableRow<UserKeyword> executionRow) {
+        executionRow.setParent(this);
         this.keywordContext.add(executionRow);
     }
 
 
-    public List<RobotExecutableRow> getKeywordExecutionRows() {
+    public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
         return Collections.unmodifiableList(keywordContext);
     }
 
 
     public void addDocumentation(final KeywordDocumentation doc) {
+        doc.setParent(this);
         this.documentation.add(doc);
     }
 
@@ -65,6 +69,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTag(final KeywordTags tag) {
+        tag.setParent(this);
         tags.add(tag);
     }
 
@@ -75,6 +80,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addArguments(final KeywordArguments arguments) {
+        arguments.setParent(this);
         keywordArguments.add(arguments);
     }
 
@@ -85,6 +91,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addReturn(final KeywordReturn keywordReturn) {
+        keywordReturn.setParent(this);
         keywordReturns.add(keywordReturn);
     }
 
@@ -95,6 +102,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTeardown(final KeywordTeardown teardown) {
+        teardown.setParent(this);
         teardowns.add(teardown);
     }
 
@@ -105,6 +113,7 @@ public class UserKeyword extends AModelElement {
 
 
     public void addTimeout(final KeywordTimeout timeout) {
+        timeout.setParent(this);
         timeouts.add(timeout);
     }
 
@@ -148,7 +157,7 @@ public class UserKeyword extends AModelElement {
                 tokens.addAll(arguments.getElementTokens());
             }
 
-            for (RobotExecutableRow row : keywordContext) {
+            for (RobotExecutableRow<UserKeyword> row : keywordContext) {
                 tokens.addAll(row.getElementTokens());
             }
 

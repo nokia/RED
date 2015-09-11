@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestDocumentation extends AModelElement {
+public class TestDocumentation extends AModelElement<TestCase> {
 
     private final RobotToken declaration;
     private final List<RobotToken> text = new LinkedList<>();

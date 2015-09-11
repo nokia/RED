@@ -12,10 +12,11 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class UnknownSetting extends AModelElement {
+public class UnknownSetting extends AModelElement<SettingTable> {
 
     private final RobotToken declaration;
     private final List<RobotToken> trashs = new LinkedList<>();

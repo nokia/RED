@@ -12,7 +12,7 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public abstract class AKeywordBaseSetting extends AModelElement {
+public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
 
     private final RobotToken declaration;
     private RobotToken keywordName;

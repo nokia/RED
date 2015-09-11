@@ -43,9 +43,9 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
 
-        List<RobotExecutableRow> keywordExecutionRows = keyword
+        List<RobotExecutableRow<UserKeyword>> keywordExecutionRows = keyword
                 .getKeywordExecutionRows();
-        RobotExecutableRow robotExecutableRow = keywordExecutionRows
+        RobotExecutableRow<UserKeyword> robotExecutableRow = keywordExecutionRows
                 .get(keywordExecutionRows.size() - 1);
         robotExecutableRow.addArgument(rt);
 
