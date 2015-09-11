@@ -108,7 +108,7 @@ public class VariablesFileImportReference {
         VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(
                 importDeclaration);
         newVarImportRef.setVariablesFile(variablesFile.getAbsoluteFile());
-        newVarImportRef.variables.addAll(variables);
+        newVarImportRef.variables = variables;
 
         return newVarImportRef;
     }

@@ -14,10 +14,11 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
+import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestCase extends AModelElement {
+public class TestCase extends AModelElement<TestCaseTable> {
 
     private RobotToken testName;
     private final List<TestDocumentation> documentation = new LinkedList<>();
@@ -26,7 +27,7 @@ public class TestCase extends AModelElement {
     private final List<TestCaseTeardown> teardowns = new LinkedList<>();
     private final List<TestCaseTemplate> templates = new LinkedList<>();
     private final List<TestCaseTimeout> timeouts = new LinkedList<>();
-    private final List<RobotExecutableRow> testContext = new LinkedList<>();
+    private final List<RobotExecutableRow<TestCase>> testContext = new LinkedList<>();
 
 
     public TestCase(final RobotToken testName) {
@@ -44,17 +45,20 @@ public class TestCase extends AModelElement {
     }
 
 
-    public void addTestExecutionRow(final RobotExecutableRow executionRow) {
+    public void addTestExecutionRow(
+            final RobotExecutableRow<TestCase> executionRow) {
+        executionRow.setParent(this);
         this.testContext.add(executionRow);
     }
 
 
-    public List<RobotExecutableRow> getTestExecutionRows() {
+    public List<RobotExecutableRow<TestCase>> getTestExecutionRows() {
         return Collections.unmodifiableList(testContext);
     }
 
 
     public void addDocumentation(final TestDocumentation doc) {
+        doc.setParent(this);
         this.documentation.add(doc);
     }
 
@@ -65,6 +69,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTag(final TestCaseTags tag) {
+        tag.setParent(this);
         tags.add(tag);
     }
 
@@ -75,6 +80,7 @@ public class TestCase extends AModelElement {
 
 
     public void addSetup(final TestCaseSetup setup) {
+        setup.setParent(this);
         setups.add(setup);
     }
 
@@ -85,6 +91,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTeardown(final TestCaseTeardown teardown) {
+        teardown.setParent(this);
         teardowns.add(teardown);
     }
 
@@ -95,6 +102,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTemplate(final TestCaseTemplate template) {
+        template.setParent(this);
         templates.add(template);
     }
 
@@ -105,6 +113,7 @@ public class TestCase extends AModelElement {
 
 
     public void addTimeout(final TestCaseTimeout timeout) {
+        timeout.setParent(this);
         timeouts.add(timeout);
     }
 
@@ -160,7 +169,7 @@ public class TestCase extends AModelElement {
                 tokens.addAll(template.getElementTokens());
             }
 
-            for (RobotExecutableRow row : testContext) {
+            for (RobotExecutableRow<TestCase> row : testContext) {
                 tokens.addAll(row.getElementTokens());
             }
 

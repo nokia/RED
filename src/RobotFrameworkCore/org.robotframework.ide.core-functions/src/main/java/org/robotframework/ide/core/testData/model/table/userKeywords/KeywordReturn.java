@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class KeywordReturn extends AModelElement {
+public class KeywordReturn extends AModelElement<UserKeyword> {
 
     private final RobotToken declaration;
     private final List<RobotToken> values = new LinkedList<>();

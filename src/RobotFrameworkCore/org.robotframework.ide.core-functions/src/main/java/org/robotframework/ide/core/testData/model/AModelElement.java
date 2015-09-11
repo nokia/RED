@@ -10,7 +10,10 @@ import java.util.List;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public abstract class AModelElement implements IOptional {
+public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
+
+    private T parent;
+
 
     public abstract ModelType getModelType();
 
@@ -19,6 +22,16 @@ public abstract class AModelElement implements IOptional {
 
 
     public abstract List<RobotToken> getElementTokens();
+
+
+    public void setParent(T parent) {
+        this.parent = parent;
+    }
+
+
+    public T getParent() {
+        return parent;
+    }
 
 
     public FilePosition getEndPosition() {

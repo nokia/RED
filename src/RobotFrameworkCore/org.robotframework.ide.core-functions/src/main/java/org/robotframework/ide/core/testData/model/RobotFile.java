@@ -20,7 +20,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class RobotFile {
+public class RobotFile implements IChildElement<RobotFileOutput> {
 
     private final RobotFileOutput parentFileOutput;
     private SettingTable settingTable;
@@ -41,7 +41,7 @@ public class RobotFile {
     }
 
 
-    public RobotFileOutput getContainerOutput() {
+    public RobotFileOutput getParent() {
         return parentFileOutput;
     }
 
@@ -67,7 +67,7 @@ public class RobotFile {
 
 
     public void excludeSettingTableSection() {
-        settingTable = new SettingTable();
+        settingTable = new SettingTable(this);
     }
 
 
@@ -82,7 +82,7 @@ public class RobotFile {
 
 
     public void excludeVariableTableSection() {
-        variableTable = new VariableTable();
+        variableTable = new VariableTable(this);
     }
 
 
@@ -97,7 +97,7 @@ public class RobotFile {
 
 
     public void excludeTestCaseTableSection() {
-        testCaseTable = new TestCaseTable();
+        testCaseTable = new TestCaseTable(this);
     }
 
 
@@ -112,7 +112,7 @@ public class RobotFile {
 
 
     public void excludeKeywordTableSection() {
-        keywordTable = new KeywordTable();
+        keywordTable = new KeywordTable(this);
     }
 
 

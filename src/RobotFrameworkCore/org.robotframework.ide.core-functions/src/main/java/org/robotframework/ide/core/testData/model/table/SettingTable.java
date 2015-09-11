@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
@@ -39,6 +40,11 @@ public class SettingTable extends ARobotSectionTable {
     private final List<UnknownSetting> unknownSettings = new LinkedList<>();
 
 
+    public SettingTable(final RobotFile parent) {
+        super(parent);
+    }
+
+
     public boolean isEmpty() {
         return imports.isEmpty() && documentations.isEmpty()
                 && metadatas.isEmpty() && suiteSetups.isEmpty()
@@ -55,6 +61,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addImported(final AImported imported) {
+        imported.setParent(this);
         imports.add(imported);
     }
 
@@ -65,6 +72,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addDocumentation(final SuiteDocumentation doc) {
+        doc.setParent(this);
         documentations.add(doc);
     }
 
@@ -75,6 +83,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addMetadata(final Metadata metadata) {
+        metadata.setParent(this);
         metadatas.add(metadata);
     }
 
@@ -85,6 +94,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addSuiteSetup(final SuiteSetup suiteSetup) {
+        suiteSetup.setParent(this);
         suiteSetups.add(suiteSetup);
     }
 
@@ -95,6 +105,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addSuiteTeardown(final SuiteTeardown suiteTeardown) {
+        suiteTeardown.setParent(this);
         suiteTeardowns.add(suiteTeardown);
     }
 
@@ -105,6 +116,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addForceTags(final ForceTags tags) {
+        tags.setParent(this);
         forceTags.add(tags);
     }
 
@@ -115,6 +127,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addDefaultTags(final DefaultTags tags) {
+        tags.setParent(this);
         defaultTags.add(tags);
     }
 
@@ -125,6 +138,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestSetup(final TestSetup testSetup) {
+        testSetup.setParent(this);
         testSetups.add(testSetup);
     }
 
@@ -135,6 +149,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTeardown(final TestTeardown testTeardown) {
+        testTeardown.setParent(this);
         testTeardowns.add(testTeardown);
     }
 
@@ -145,6 +160,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTemplate(final TestTemplate testTemplate) {
+        testTemplate.setParent(this);
         testTemplates.add(testTemplate);
     }
 
@@ -155,6 +171,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addTestTimeout(final TestTimeout testTimeout) {
+        testTimeout.setParent(this);
         testTimeouts.add(testTimeout);
     }
 
@@ -165,6 +182,7 @@ public class SettingTable extends ARobotSectionTable {
 
 
     public void addUnknownSetting(final UnknownSetting unknownSetting) {
+        unknownSetting.setParent(this);
         unknownSettings.add(unknownSetting);
     }
 }

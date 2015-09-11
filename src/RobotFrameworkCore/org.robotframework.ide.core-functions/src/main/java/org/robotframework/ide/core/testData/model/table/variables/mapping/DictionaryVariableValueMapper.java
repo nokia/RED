@@ -16,6 +16,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.NamedSpecial;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.Special;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -50,7 +51,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
         VariableTable variableTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        List<IVariableHolder> variables = variableTable.getVariables();
+        List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
             IVariableHolder var = variables.get(variables.size() - 1);
             KeyValuePair keyValPair = splitKeyNameFromValue(rt);

@@ -136,6 +136,7 @@ public class VariablesImporter {
                     RobotToken argPrevious = argsPrevious.get(i);
                     String argumentTextPrevious = argPrevious.getText()
                             .toString();
+                    // TODO: add resolve in case parameter is variable
                     if (argumentTextCurrent != null
                             && argumentTextPrevious != null) {
                         if (!argumentTextCurrent.equals(argumentTextPrevious)) {

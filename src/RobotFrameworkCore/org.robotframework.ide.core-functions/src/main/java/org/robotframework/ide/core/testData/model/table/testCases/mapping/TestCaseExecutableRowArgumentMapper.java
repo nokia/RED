@@ -43,9 +43,9 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
 
-        List<RobotExecutableRow> testExecutionRows = testCase
+        List<RobotExecutableRow<TestCase>> testExecutionRows = testCase
                 .getTestExecutionRows();
-        RobotExecutableRow robotExecutableRow = testExecutionRows
+        RobotExecutableRow<TestCase> robotExecutableRow = testExecutionRows
                 .get(testExecutionRows.size() - 1);
         robotExecutableRow.addArgument(rt);
 

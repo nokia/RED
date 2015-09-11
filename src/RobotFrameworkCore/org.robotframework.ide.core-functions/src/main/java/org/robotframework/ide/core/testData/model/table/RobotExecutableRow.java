@@ -17,7 +17,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class RobotExecutableRow extends AModelElement {
+public class RobotExecutableRow<T> extends AModelElement<T> {
 
     private RobotToken action;
     private final List<RobotToken> arguments = new LinkedList<>();

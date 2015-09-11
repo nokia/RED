@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 
 
@@ -17,7 +18,13 @@ public class KeywordTable extends ARobotSectionTable {
     private final List<UserKeyword> userKeywords = new LinkedList<>();
 
 
+    public KeywordTable(final RobotFile parent) {
+        super(parent);
+    }
+
+
     public void addKeyword(final UserKeyword keyword) {
+        keyword.setParent(this);
         userKeywords.add(keyword);
     }
 

@@ -46,7 +46,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
             var.addCommentPart(rt);
             variableTable.addVariable(var);
         } else {
-            List<IVariableHolder> variables = variableTable.getVariables();
+            List<AVariable> variables = variableTable.getVariables();
             IVariableHolder var = variables.get(variables.size() - 1);
             if (isInTheSameLine(rt, var)) {
                 var.addCommentPart(rt);
