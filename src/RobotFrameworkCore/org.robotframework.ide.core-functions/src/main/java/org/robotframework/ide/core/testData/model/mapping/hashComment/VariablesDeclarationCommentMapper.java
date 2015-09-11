@@ -27,7 +27,9 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
     @Override
     public boolean isApplicable(ParsingState state) {
-        return (state == ParsingState.SCALAR_VARIABLE_DECLARATION
+        return (state == ParsingState.VARIABLE_UNKNOWN
+                || state == ParsingState.VARIABLE_UNKNOWN_VALUE
+                || state == ParsingState.SCALAR_VARIABLE_DECLARATION
                 || state == ParsingState.SCALAR_VARIABLE_VALUE
                 || state == ParsingState.LIST_VARIABLE_DECLARATION
                 || state == ParsingState.LIST_VARIABLE_VALUE
