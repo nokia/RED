@@ -182,7 +182,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean isNewLine = false;
         try {
             while((currentLineText = lineReader.readLine()) != null) {
-                RobotLine line = new RobotLine(lineNumber);
+                RobotLine line = new RobotLine(lineNumber,
+                        parsingOutput.getFileModel());
                 StringBuilder text = new StringBuilder(currentLineText);
                 int lastColumnProcessed = 0;
                 // get separator for this line

@@ -29,6 +29,7 @@ public class LibraryImport extends AImported {
 
 
     public void setAlias(LibraryAlias alias) {
+        alias.setParent(this);
         this.alias = alias;
     }
 

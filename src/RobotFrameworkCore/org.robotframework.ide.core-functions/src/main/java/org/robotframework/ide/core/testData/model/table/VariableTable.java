@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -22,15 +23,21 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class VariableTable extends ARobotSectionTable {
 
-    private List<IVariableHolder> variables = new LinkedList<>();
+    private List<AVariable> variables = new LinkedList<>();
 
 
-    public List<IVariableHolder> getVariables() {
+    public VariableTable(final RobotFile parent) {
+        super(parent);
+    }
+
+
+    public List<AVariable> getVariables() {
         return Collections.unmodifiableList(variables);
     }
 
 
-    public void addVariable(final IVariableHolder variable) {
+    public void addVariable(final AVariable variable) {
+        variable.setParent(this);
         variables.add(variable);
     }
 
@@ -46,6 +53,7 @@ public class VariableTable extends ARobotSectionTable {
             scalar.addValue(t);
         }
 
+        scalar.setParent(this);
         variables.add(index, scalar);
     }
 
@@ -61,6 +69,7 @@ public class VariableTable extends ARobotSectionTable {
             list.addItem(t);
         }
 
+        list.setParent(this);
         variables.add(index, list);
     }
 
@@ -83,6 +92,7 @@ public class VariableTable extends ARobotSectionTable {
             dict.put(null, keyT, valueT);
         }
 
+        dict.setParent(this);
         variables.add(index, dict);
     }
 

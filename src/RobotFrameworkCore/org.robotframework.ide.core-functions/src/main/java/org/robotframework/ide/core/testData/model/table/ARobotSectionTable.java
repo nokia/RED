@@ -9,15 +9,31 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.IChildElement;
 import org.robotframework.ide.core.testData.model.IOptional;
+import org.robotframework.ide.core.testData.model.RobotFile;
 
 
-public abstract class ARobotSectionTable implements IOptional {
+public abstract class ARobotSectionTable implements IOptional,
+        IChildElement<RobotFile> {
 
+    private RobotFile parent;
     private List<TableHeader> headers = new LinkedList<>();
 
 
+    public ARobotSectionTable(final RobotFile parent) {
+        this.parent = parent;
+    }
+
+
+    @Override
+    public RobotFile getParent() {
+        return parent;
+    }
+
+
     public void addHeader(final TableHeader header) {
+        header.setParent(this);
         headers.add(header);
     }
 

@@ -12,7 +12,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.UnknownVariable;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -38,14 +38,14 @@ public class UnknownVariableValueMapper implements IParsingMapper {
         rt.setText(new StringBuilder(text));
         rt.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        List<IVariableHolder> variables = robotFileOutput.getFileModel()
+        List<AVariable> variables = robotFileOutput.getFileModel()
                 .getVariableTable().getVariables();
         if (!variables.isEmpty()) {
             UnknownVariable var = (UnknownVariable) variables.get(variables
                     .size() - 1);
             var.addItem(rt);
         } else {
-            // FIXME: internall error
+            // FIXME: internal error
         }
 
         processingState.push(ParsingState.VARIABLE_UNKNOWN_VALUE);

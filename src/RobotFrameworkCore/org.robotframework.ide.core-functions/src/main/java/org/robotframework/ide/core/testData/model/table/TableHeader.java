@@ -17,7 +17,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
-public class TableHeader extends AModelElement {
+public class TableHeader extends AModelElement<ARobotSectionTable> {
 
     private final RobotToken tableHeader;
     private List<RobotToken> columnNames = new LinkedList<>();

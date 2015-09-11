@@ -10,7 +10,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestCaseTags extends ATags {
+public class TestCaseTags extends ATags<TestCase> {
 
     public TestCaseTags(RobotToken declaration) {
         super(declaration);

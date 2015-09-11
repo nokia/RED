@@ -10,7 +10,7 @@ import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class KeywordTeardown extends AKeywordBaseSetting {
+public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
 
     public KeywordTeardown(RobotToken declaration) {
         super(declaration);
