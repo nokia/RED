@@ -37,7 +37,7 @@ public class RobotFileDumper {
     }
 
 
-    public StringBuilder dump(final RobotFileOutput output) {
+    public String dump(final RobotFileOutput output) {
         return new TxtRobotFileDumper().dump(output.getFileModel());
     }
 }
