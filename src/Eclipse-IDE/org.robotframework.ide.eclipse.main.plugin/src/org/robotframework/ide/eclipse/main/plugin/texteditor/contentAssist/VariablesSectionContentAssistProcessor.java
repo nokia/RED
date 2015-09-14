@@ -19,8 +19,11 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 public class VariablesSectionContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
+    
+    private TextEditorContentAssist textEditorContentAssist;
 
-    public VariablesSectionContentAssistProcessor() {
+    public VariablesSectionContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
+        this.textEditorContentAssist = textEditorContentAssist;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
             } else {
                 currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
                 final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
-                        TextEditorContentAssist.getVariables(), currentWord);
+                        textEditorContentAssist.getVariables(), currentWord);
                 if (!filteredProposals.isEmpty()) {
                     return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
                             - currentWord.length());

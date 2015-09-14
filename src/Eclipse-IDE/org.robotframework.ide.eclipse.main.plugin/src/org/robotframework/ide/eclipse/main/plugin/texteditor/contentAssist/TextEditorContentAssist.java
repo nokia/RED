@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -75,10 +74,14 @@ public class TextEditorContentAssist {
         testCasesSectionWords.add("[Timeout]");
     }
     
-    private static List<RedVariableProposal> variableProposals = newArrayList();
+    private List<RedVariableProposal> variableProposals = newArrayList();
     
-    private TextEditorContentAssist() {
-        
+    private Map<String, ContentAssistKeywordContext> keywordMap;
+    
+    public TextEditorContentAssist(final List<RedVariableProposal> variableProposals,
+            final Map<String, ContentAssistKeywordContext> keywordMap) {
+        this.variableProposals = variableProposals;
+        this.keywordMap = keywordMap;
     }
     
     public static ICompletionProposal[] buildSectionProposals(final String replacedWord,
@@ -247,7 +250,7 @@ public class TextEditorContentAssist {
         while (currentOffset > 0 && document.getChar(currentOffset) != '\n') {
             currentChar = document.getChar(currentOffset);
             prevChar = document.getChar(currentOffset - 1);
-            if (Character.isWhitespace(currentChar) && Character.isWhitespace(prevChar)) {
+            if ((Character.isWhitespace(currentChar) && Character.isWhitespace(prevChar)) || currentChar == '\t') {
                 break;
             }
             currentWord = currentChar + currentWord;
@@ -274,11 +277,12 @@ public class TextEditorContentAssist {
         return testCasesSectionWords;
     }
 
-    public static List<RedVariableProposal> getVariables() {
+    public List<RedVariableProposal> getVariables() {
         return variableProposals;
     }
 
-    public static void setVariables(List<RedVariableProposal> proposals) {
-        variableProposals = proposals;
+    public Map<String, ContentAssistKeywordContext> getKeywordMap() {
+        return keywordMap;
     }
+
 }

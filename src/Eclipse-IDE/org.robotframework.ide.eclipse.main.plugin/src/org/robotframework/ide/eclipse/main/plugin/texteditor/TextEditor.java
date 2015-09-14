@@ -714,27 +714,33 @@ public class TextEditor {
     private ContentAssistant createContentAssistant(final Map<String, ContentAssistKeywordContext> keywordMap,
             final List<RedVariableProposal> variableProposals) {
         final ContentAssistant contentAssistant = new ContentAssistant();
-		contentAssistant.enableColoredLabels(true);
-		contentAssistant.enableAutoInsert(true);
-		contentAssistant.enablePrefixCompletion(true);
-		contentAssistant.enableAutoActivation(true);
-		contentAssistant.setEmptyMessage("No proposals");
-		contentAssistant.setShowEmptyList(true);
-		TextEditorContentAssist.setVariables(variableProposals);
-		contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(keywordMap), TextEditorPartitionScanner.TEST_CASES_SECTION);
-		contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(keywordMap), TextEditorPartitionScanner.KEYWORDS_SECTION);
-		contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(), TextEditorPartitionScanner.SETTINGS_SECTION);
-		contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(), TextEditorPartitionScanner.VARIABLES_SECTION);
-		contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
-		contentAssistant.setContextInformationPopupOrientation(ContentAssistant.CONTEXT_INFO_BELOW);
-		contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
+        contentAssistant.enableColoredLabels(true);
+        contentAssistant.enableAutoInsert(true);
+        contentAssistant.enablePrefixCompletion(true);
+        contentAssistant.enableAutoActivation(true);
+        contentAssistant.setEmptyMessage("No proposals");
+        contentAssistant.setShowEmptyList(true);
+        final TextEditorContentAssist textEditorContentAssist = new TextEditorContentAssist(variableProposals,
+                keywordMap);
+        contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
+                TextEditorPartitionScanner.TEST_CASES_SECTION);
+        contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(textEditorContentAssist),
+                TextEditorPartitionScanner.KEYWORDS_SECTION);
+        contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(),
+                TextEditorPartitionScanner.SETTINGS_SECTION);
+        contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
+                TextEditorPartitionScanner.VARIABLES_SECTION);
+        contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+        contentAssistant.setContextInformationPopupOrientation(ContentAssistant.CONTEXT_INFO_BELOW);
+        contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
+
             @Override
             protected IInformationControl doCreateInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent, true);
             }
         });
-		return contentAssistant;
-	}
+        return contentAssistant;
+    }
 	
 	private void createPartitioner(final IDocument document, final TextEditorPartitionScanner partitionScanner) {
         IDocumentPartitioner partitioner = new FastPartitioner(partitionScanner, new String[] {IDocument.DEFAULT_CONTENT_TYPE,
