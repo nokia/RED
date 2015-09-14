@@ -26,7 +26,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         BufferedWriter writer = new BufferedWriter(new FileWriter(
                 tempFile.toFile()));
 
-        writer.write(dump(model).toString());
+        writer.write(dump(model));
 
         writer.flush();
         writer.close();
@@ -37,10 +37,10 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
     }
 
 
-    public StringBuilder dump(final RobotFile model) {
+    public String dump(final RobotFile model) {
         StringBuilder str = new StringBuilder();
 
-        return str;
+        return str.toString();
     }
 
 
