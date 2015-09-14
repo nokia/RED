@@ -36,6 +36,7 @@ public class ResourceImportPathMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_RESOURCE_FILE_NAME);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
         AImported imported = utility.getNearestImport(robotFileOutput);
         ResourceImport resource;
         if (imported instanceof ResourceImport) {

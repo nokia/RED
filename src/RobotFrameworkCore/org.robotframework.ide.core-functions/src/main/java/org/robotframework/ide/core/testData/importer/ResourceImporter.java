@@ -6,6 +6,8 @@
 package org.robotframework.ide.core.testData.importer;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,8 +32,19 @@ public class ResourceImporter {
             for (AImported imported : imports) {
                 Type type = imported.getType();
                 if (type == Type.RESOURCE) {
-                    File toImport = new File(imported.getPathOrName().getText()
-                            .toString());
+                    String path = imported.getPathOrName().getRaw().toString();
+
+                    File currentFile = robotFile.getProcessedFile()
+                            .getAbsoluteFile();
+                    if (currentFile.exists()) {
+                        Path joinPath = Paths
+                                .get(currentFile.getAbsolutePath())
+                                .resolveSibling(path);
+                        path = joinPath.toAbsolutePath().toFile()
+                                .getAbsolutePath();
+                    }
+
+                    File toImport = new File(path);
                     List<RobotFileOutput> parsed = parser.parse(toImport);
                     if (parsed.isEmpty()) {
                         robotFile.addBuildMessage(BuildMessage
