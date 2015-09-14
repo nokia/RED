@@ -41,10 +41,10 @@ public class VariablesImporter {
                     String path = varImport.getPathOrName().getRaw().toString();
                     List<String> varFileArguments = convertTokensToArguments(varImport);
 
-                    File directory = robotFile.getProcessedFile()
+                    File currentRobotFile = robotFile.getProcessedFile()
                             .getAbsoluteFile();
-                    if (directory.exists()) {
-                        Path joinPath = Paths.get(directory.getAbsolutePath())
+                    if (currentRobotFile.exists()) {
+                        Path joinPath = Paths.get(currentRobotFile.getAbsolutePath())
                                 .resolveSibling(path);
                         path = joinPath.toAbsolutePath().toFile()
                                 .getAbsolutePath();
