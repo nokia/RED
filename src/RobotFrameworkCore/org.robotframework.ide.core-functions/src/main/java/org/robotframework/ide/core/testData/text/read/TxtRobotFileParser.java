@@ -43,6 +43,7 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.Key
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
+import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
@@ -174,7 +175,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
 
-        BufferedReader lineReader = new BufferedReader(reader);
+        LineReader lineHolder = new LineReader(reader);
+        BufferedReader lineReader = new BufferedReader(lineHolder);
         int lineNumber = 1;
         int currentOffset = 0;
         String currentLineText = null;
@@ -252,7 +254,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     }
                 }
 
-                currentOffset++;
+                List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
+                currentOffset += getEndOfLineLength(endOfLine);
                 lineNumber++;
                 lastColumnProcessed = 0;
                 libraryFixer.checkAndFixLine(parsingOutput, processingState);
@@ -308,6 +311,21 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+
+    @VisibleForTesting
+    protected int getEndOfLineLength(final List<Constant> eols) {
+        int size = 0;
+        for (Constant c : eols) {
+            if (c != Constant.EOF) {
+                size++;
+            } else {
+                break;
+            }
+        }
+
+        return size;
     }
 
 

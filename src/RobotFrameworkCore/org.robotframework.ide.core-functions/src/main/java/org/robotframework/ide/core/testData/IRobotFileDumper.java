@@ -16,4 +16,7 @@ public interface IRobotFileDumper {
 
 
     void dump(final File robotFile, final RobotFile model) throws Exception;
+
+
+    String dump(final RobotFile model);
 }
