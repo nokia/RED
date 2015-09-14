@@ -30,11 +30,11 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
     private String lastError = null;
 
     private TextEditorContextValidator validator = new TextEditorContextValidator(this);
+    
+    private TextEditorContentAssist textEditorContentAssist;
 
-    private Map<String, ContentAssistKeywordContext> keywordMap;
-
-    public KeywordsContentAssistProcessor(final Map<String, ContentAssistKeywordContext> keywordMap) {
-        this.keywordMap = keywordMap;
+    public KeywordsContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
+        this.textEditorContentAssist = textEditorContentAssist;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                 if (TextEditorContentAssist.shouldShowVariablesProposals(currentWord)) {
                     currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
                     final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
-                            TextEditorContentAssist.getVariables(), currentWord);
+                            textEditorContentAssist.getVariables(), currentWord);
                     if (!filteredProposals.isEmpty()) {
                         return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
                                 - currentWord.length());
@@ -74,7 +74,7 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                 }
                 
                 final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
-                        keywordMap, currentWord);
+                        textEditorContentAssist.getKeywordMap(), currentWord);
                 ICompletionProposal[] proposals = null;
                 if (keywordProposals.size() > 0) {
                     proposals = TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord, offset
