@@ -31,10 +31,10 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
 
     private TextEditorContextValidator validator = new TextEditorContextValidator(this);
 
-    private Map<String, ContentAssistKeywordContext> keywordMap;
+    private TextEditorContentAssist textEditorContentAssist;
 
-    public TestCasesSectionContentAssistProcessor(final Map<String, ContentAssistKeywordContext> keywordMap) {
-        this.keywordMap = keywordMap;
+    public TestCasesSectionContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
+        this.textEditorContentAssist = textEditorContentAssist;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
                 if (TextEditorContentAssist.shouldShowVariablesProposals(currentWord)) {
                     currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
                     final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
-                            TextEditorContentAssist.getVariables(), currentWord);
+                            textEditorContentAssist.getVariables(), currentWord);
                     if (!filteredProposals.isEmpty()) {
                         return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
                                 - currentWord.length());
@@ -74,7 +74,7 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
                 }
                 
                 final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
-                        keywordMap, currentWord);
+                        textEditorContentAssist.getKeywordMap(), currentWord);
                 ICompletionProposal[] proposals = null;
                 if (keywordProposals.size() > 0) {
                     proposals = TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord, offset
