@@ -11,13 +11,8 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 
 public class RobotSourceLookupParticipant extends AbstractSourceLookupParticipant {
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.internal.core.sourcelookup.ISourceLookupParticipant#getSourceName(java.
-     * lang.Object)
-     */
-    public String getSourceName(Object object) throws CoreException {
+    @Override
+    public String getSourceName(final Object object) throws CoreException {
         if (object instanceof RobotStackFrame) {
             return ((RobotStackFrame) object).getSourceName();
         }

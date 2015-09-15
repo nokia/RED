@@ -207,7 +207,7 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeyword = (String) startList.get(0);
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
-        final List<?> args = (List<?>) startElements.get("args");
+        final List<String> args = (List<String>) startElements.get("args");
         
         String executedSuite = "";
         IFile currentFile = null;
@@ -226,7 +226,7 @@ public class RobotDebugEventDispatcher extends Job {
 
         // TODO: check keywords in currentFrames and search keywords only after
         // parent keywords
-        final int keywordLine = new KeywordFinder().getKeywordLine(currentFile, currentKeyword, (List<String>) args,
+        final int keywordLine = new KeywordFinder().getKeywordLine(currentFile, currentKeyword, args,
                 currentExecutionLinesInFile.get(currentFile.getName()));
         if (keywordLine >= 0) {
             List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
@@ -256,7 +256,7 @@ public class RobotDebugEventDispatcher extends Job {
                     }
                     if (!executedBreakpointsLines.contains(breakpointLineNum)
                             && new KeywordFinder().isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
-                                    currentKeyword, (List<String>) args, keywordLine)) {
+                                    currentKeyword, args, keywordLine)) {
 
                         boolean hasHitCount = false;
                         final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
