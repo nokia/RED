@@ -33,7 +33,7 @@ public class RobotResourceFileValidator extends RobotFileValidator {
     }
 
     @Override
-    protected void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
+    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
         validateIfThereAreNoForbiddenSettings(fileModel.getSettingTable());
 
         super.validate(fileModel, monitor);
@@ -72,7 +72,7 @@ public class RobotResourceFileValidator extends RobotFileValidator {
         }
     }
 
-    private void reportProblem(final String declarationName, final AModelElement element) {
+    private void reportProblem(final String declarationName, final AModelElement<?> element) {
         final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNSUPPORTED_SETTING)
                 .formatMessageWith(declarationName, "resource");
         final ProblemPosition position = new ProblemPosition(element.getBeginPosition().getLine(),
