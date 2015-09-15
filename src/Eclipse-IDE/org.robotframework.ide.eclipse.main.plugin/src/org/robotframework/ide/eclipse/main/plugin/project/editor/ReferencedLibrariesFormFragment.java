@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -80,8 +81,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     public void initialize(final Composite parent) {
         currentProject = editorInput.getRobotProject();
         
-        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
-                | Section.DESCRIPTION | Section.TWISTIE);
+        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
+                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
         section.setText("Referenced libraries");
         section.setDescription("In this section referenced libraries can be specified. Those libraries will "
                 + "be available for all suites within project.");

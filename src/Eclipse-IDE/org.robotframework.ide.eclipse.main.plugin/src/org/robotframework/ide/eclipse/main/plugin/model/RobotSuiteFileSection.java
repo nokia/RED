@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -20,12 +21,16 @@ public abstract class RobotSuiteFileSection implements RobotElement {
     private final RobotElement parent;
     protected final List<RobotElement> elements = new ArrayList<>();
 
+    protected ARobotSectionTable sectionTable;
+
     RobotSuiteFileSection(final RobotSuiteFile parent, final String name) {
         this.parent = parent;
         this.name = name;
     }
 
-    public abstract void link(final ARobotSectionTable table);
+    public void link(final ARobotSectionTable table) {
+        this.sectionTable = table;
+    }
 
     @Override
     public boolean equals(final Object obj) {
@@ -77,4 +82,10 @@ public abstract class RobotSuiteFileSection implements RobotElement {
     public RobotSuiteFile getSuiteFile() {
         return (RobotSuiteFile) this.getParent();
     }
+
+    public Position getPosition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    // public abstract Position getPosition();
 }

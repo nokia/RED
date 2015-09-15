@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -16,19 +16,20 @@ public class CreateFreshVariableCommand extends EditorCommand {
     private final RobotVariablesSection variablesSection;
     private final int index;
     private final boolean notifySync;
-    private final Type variableType;
 
-    public CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final boolean notifySynchronously) {
-        this(variablesSection, -1, notifySynchronously, Type.SCALAR);
+    private final VariableType variableType;
+
+    public CreateFreshVariableCommand(final RobotVariablesSection variablesSection) {
+        this(variablesSection, -1, true, VariableType.SCALAR);
     }
 
     public CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final int index,
-            final Type variableType) {
+            final VariableType variableType) {
         this(variablesSection, index, false, variableType);
     }
 
     private CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final int index,
-            final boolean notifySynchronously, final Type variableType) {
+            final boolean notifySynchronously, final VariableType variableType) {
         this.variablesSection = variablesSection;
         this.index = index;
         this.notifySync = notifySynchronously;
@@ -40,9 +41,9 @@ public class CreateFreshVariableCommand extends EditorCommand {
         final String name = NamesGenerator.generateUniqueName(variablesSection, DEFAULT_NAME, false);
 
         if (index == -1) {
-            variablesSection.createVariable(variableType, name, "", "");
+            variablesSection.createVariable(variableType, name);
         } else {
-            variablesSection.createVariable(index, variableType, name, "", "");
+            variablesSection.createVariable(index, variableType, name);
         }
 
         if (notifySync) {

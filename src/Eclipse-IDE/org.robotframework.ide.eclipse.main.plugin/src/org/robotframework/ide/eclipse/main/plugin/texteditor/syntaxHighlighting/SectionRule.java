@@ -14,10 +14,12 @@ public class SectionRule extends KeywordRule {
         super(token, keywords);
     }
 
+    @Override
     protected boolean isColumnConstraintCompliant(final int column, final char charBeforeKeyword) {
         return true;
     }
 
+    @Override
     protected int extractSecondNextCharAfterKeyword(final ICharacterScanner scanner, final int nextCharAfterKeyword) {
         return ICharacterScanner.EOF;
     }

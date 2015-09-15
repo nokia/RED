@@ -64,7 +64,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         }
 
         @Override
-        public Optional<RobotElement> provideSection(final RobotSuiteFile suite) {
+        public Optional<? extends RobotSuiteFileSection> provideSection(final RobotSuiteFile suite) {
             return suite.findSection(RobotKeywordsSection.class);
         }
 

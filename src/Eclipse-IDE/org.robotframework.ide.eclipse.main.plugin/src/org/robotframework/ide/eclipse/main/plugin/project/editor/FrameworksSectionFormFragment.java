@@ -43,6 +43,7 @@ import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
@@ -88,7 +89,8 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR
                 | Section.DESCRIPTION);
         section.setText("Robot framework");
         section.setDescription("In this section Robot framework location can be specified. The selected framework will"

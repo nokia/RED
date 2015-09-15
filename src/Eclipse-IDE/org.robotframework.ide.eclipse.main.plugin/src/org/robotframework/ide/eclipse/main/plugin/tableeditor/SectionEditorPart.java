@@ -57,15 +57,19 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Optional;
+
 public abstract class SectionEditorPart implements ISectionEditorPart {
+
+    private static final String SECTION_EDITOR_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.tables.context";
 
     private final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
 
@@ -249,6 +253,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
         final IContextService service = site.getService(IContextService.class);
+        service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
         service.activateContext(getContextId());
     }
 
@@ -270,7 +275,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             return;
         }
 
-        final com.google.common.base.Optional<RobotElement> section = provideSection(fileModel);
+        final Optional<? extends RobotSuiteFileSection> section = provideSection(fileModel);
         form.removeMessageHyperlinkListener(createSectionLinkListener);
         if (section.isPresent()) {
             form.setMessage(null, 0);

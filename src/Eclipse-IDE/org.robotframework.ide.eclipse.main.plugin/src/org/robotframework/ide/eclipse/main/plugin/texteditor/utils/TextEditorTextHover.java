@@ -26,11 +26,11 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.Conte
  */
 public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
-    private Map<String, ContentAssistKeywordContext> keywordMap;
+    private final Map<String, ContentAssistKeywordContext> keywordMap;
 
     private Map<String, Object> debugVariables;
 
-    private TextEditorHoverManager hoverManager;
+    private final TextEditorHoverManager hoverManager;
 
     public TextEditorTextHover(final Map<String, ContentAssistKeywordContext> keywordMap) {
         this.keywordMap = new HashMap<>();
@@ -43,7 +43,7 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
     @Override
     public IRegion getHoverRegion(final ITextViewer viewer, final int offset) {
 
-        return hoverManager.findHoveredText(viewer, offset);
+        return hoverManager.findHoveredText(viewer.getDocument(), offset);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class TextEditorTextHover implements ITextHover, ITextHoverExtension, ITe
             if (debugVariables != null) {
                 return hoverManager.extractDebugVariableHoverInfo(debugVariables, hoveredText);
             }
-        } catch (BadLocationException e) {
+        } catch (final BadLocationException e) {
         }
         return null;
     }

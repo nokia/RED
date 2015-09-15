@@ -37,7 +37,9 @@ public class RobotCasesSection extends RobotSuiteFileSection {
     
     @Override
     public void link(final ARobotSectionTable table) {
-        final TestCaseTable testCaseTable = (TestCaseTable) table;
+        super.link(table);
+
+        final TestCaseTable testCaseTable = (TestCaseTable) sectionTable;
         for (final TestCase testCase : testCaseTable.getTestCases()) {
             final RobotCase newTestCase = new RobotCase(this, testCase.getTestName().getText().toString(), "");
             newTestCase.link(testCase);

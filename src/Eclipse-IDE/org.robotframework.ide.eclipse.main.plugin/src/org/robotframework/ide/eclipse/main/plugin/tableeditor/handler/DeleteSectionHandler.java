@@ -14,7 +14,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSectionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
@@ -39,7 +38,8 @@ public class DeleteSectionHandler extends DIHandler<E4DeleteSection> {
 
             if (activeEditor instanceof ISectionEditorPart) {
                 final ISectionEditorPart part = (ISectionEditorPart) activeEditor;
-                final Optional<RobotElement> section = part.provideSection(editor.provideSuiteModel());
+                final Optional<? extends RobotSuiteFileSection> section = part
+                        .provideSection(editor.provideSuiteModel());
                 if (section.isPresent()) {
                     final List<RobotSuiteFileSection> sectionsToRemove = Arrays
                             .asList((RobotSuiteFileSection) section.get());

@@ -26,11 +26,11 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -60,7 +60,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 	}
 
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
 	@Override
@@ -142,6 +142,15 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenFileChangesExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
+            viewer.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(
+            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+        if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh();
         }
     }

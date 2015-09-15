@@ -53,7 +53,9 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     @Override
     public void link(final ARobotSectionTable table) {
-        final KeywordTable keywordsTable = (KeywordTable) table;
+        super.link(table);
+
+        final KeywordTable keywordsTable = (KeywordTable) sectionTable;
         for (final UserKeyword keyword : keywordsTable.getKeywords()) {
             final RobotKeywordDefinition definition = new RobotKeywordDefinition(this,
                     keyword.getKeywordName().getText().toString(), "");

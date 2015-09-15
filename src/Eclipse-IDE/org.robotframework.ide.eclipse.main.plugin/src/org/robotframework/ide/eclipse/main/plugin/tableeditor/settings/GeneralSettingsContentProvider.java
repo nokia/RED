@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import java.util.Map;
-
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 class GeneralSettingsContentProvider implements IStructuredContentProvider {
