@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
 
@@ -33,9 +31,7 @@ public class KeywordFinder {
 
         boolean result = false;
         int lineNum = 1;
-        Scanner scanner = null;
-        try (InputStream is = editedFile.getContents()) {
-            scanner = new Scanner(is).useDelimiter("\\n");
+        try (Scanner scanner = new Scanner(editedFile.getContents()).useDelimiter("\\n")) {
             while (scanner.hasNext()) {
                 final String line = scanner.next();
                 if (line.contains(keyword)) {
@@ -52,12 +48,8 @@ public class KeywordFinder {
                 }
                 lineNum++;
             }
-        } catch (CoreException | IOException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
-        }
-
-        if (scanner != null) {
-            scanner.close();
         }
 
         return result;
@@ -71,9 +63,7 @@ public class KeywordFinder {
 
         int result = -1;
         int lineNum = 1;
-        Scanner scanner = null;
-        try (InputStream is = editedFile.getContents()) {
-            scanner = new Scanner(is).useDelimiter("\\n");
+        try (Scanner scanner = new Scanner(editedFile.getContents()).useDelimiter("\\n")) {
             while (scanner.hasNext()) {
                 final String line = scanner.next();
                 if (line.contains(keyword)) {
@@ -90,12 +80,8 @@ public class KeywordFinder {
                 }
                 lineNum++;
             }
-        } catch (CoreException | IOException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
-        }
-
-        if (scanner != null) {
-            scanner.close();
         }
 
         return result;
