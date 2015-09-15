@@ -12,7 +12,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -358,7 +357,7 @@ public class RobotProjectConfig {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -366,7 +365,7 @@ public class RobotProjectConfig {
             return path;
         }
 
-        public void setPath(String path) {
+        public void setPath(final String path) {
             this.path = path;
         }
 
@@ -374,7 +373,7 @@ public class RobotProjectConfig {
             return arguments;
         }
 
-        public void setArguments(List<String> arguments) {
+        public void setArguments(final List<String> arguments) {
             this.arguments = arguments;
         }
 
@@ -382,7 +381,7 @@ public class RobotProjectConfig {
             return variables;
         }
 
-        public void setVariables(List<String> variables) {
+        public void setVariables(final List<String> variables) {
             this.variables = variables;
         }
         
