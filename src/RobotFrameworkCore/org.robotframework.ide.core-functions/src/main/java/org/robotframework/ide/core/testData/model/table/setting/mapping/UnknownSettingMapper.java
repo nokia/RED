@@ -41,6 +41,7 @@ public class UnknownSettingMapper implements IParsingMapper {
         types.add(0, RobotTokenType.SETTING_UNKNOWN);
         rt.setStartColumn(fp.getColumn());
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         UnknownSetting unknownSetting = new UnknownSetting(rt);

@@ -36,6 +36,8 @@ public class VariablesArgumentsMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_VARIABLES_ARGUMENT);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
+
         AImported imported = utility.getNearestImport(robotFileOutput);
         VariablesImport vars;
         if (imported instanceof VariablesImport) {

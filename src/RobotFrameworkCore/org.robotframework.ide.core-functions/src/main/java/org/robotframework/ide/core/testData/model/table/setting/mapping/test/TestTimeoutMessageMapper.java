@@ -39,6 +39,7 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();

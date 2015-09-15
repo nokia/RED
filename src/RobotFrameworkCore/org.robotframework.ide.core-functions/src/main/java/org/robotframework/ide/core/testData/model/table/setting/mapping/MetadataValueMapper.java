@@ -37,6 +37,7 @@ public class MetadataValueMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_METADATA_VALUE);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();

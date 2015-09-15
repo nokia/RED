@@ -37,6 +37,7 @@ public class SettingDocumentationTextMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_DOCUMENTATION_TEXT);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
