@@ -62,6 +62,7 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewerUndoManager;
 import org.eclipse.jface.text.WhitespaceCharacterPainter;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
@@ -265,7 +266,7 @@ public class TextEditor {
         final TextEditorSourceViewerConfiguration svc = new TextEditorSourceViewerConfiguration(textHover, indentLineAutoEditStrategy);
         viewer.configure(svc);
         
-        TextEditorPartitionScanner partitionScanner = new TextEditorPartitionScanner(suiteFile);
+        final TextEditorPartitionScanner partitionScanner = new TextEditorPartitionScanner(suiteFile);
         createPartitioner(document, partitionScanner);
         
 		final ContentAssistant contentAssistant = this.createContentAssistant(keywordMap, variableProposals);
@@ -275,7 +276,7 @@ public class TextEditor {
 		final PresentationReconciler reconciler = this.createPresentationReconciler(keywordList, partitionScanner.getHeadersList());
 		reconciler.install(viewer);
 		
-		occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer, editedFile);
+        occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer.getDocument(), editedFile);
 		
 		activateFindReplaceAction(parent, editorPart);
 		
@@ -381,7 +382,7 @@ public class TextEditor {
         viewer.getTextWidget().addCaretListener(new CaretListener() {
 
             @Override
-            public void caretMoved(CaretEvent event) {
+            public void caretMoved(final CaretEvent event) {
                 statusLineManager.updatePosition(event.caretOffset);
             }
         });
@@ -482,7 +483,7 @@ public class TextEditor {
                     viewer.getTextWidget().setSelection(resultRegion.getOffset(),
                             resultRegion.getOffset() + resultRegion.getLength());
                 }
-            } catch (BadLocationException e) {
+            } catch (final BadLocationException e) {
                 e.printStackTrace();
             }
         }
@@ -504,7 +505,7 @@ public class TextEditor {
         final FindReplaceAction findAction = new FindReplaceAction(
                 ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedTextEditorMessages"), null,
                 parent.getShell(), viewer.getFindReplaceTarget());
-        final IHandlerService hs = (IHandlerService) editorPart.getSite().getService(IHandlerService.class);
+        final IHandlerService hs = editorPart.getSite().getService(IHandlerService.class);
         final IHandler findReplaceHandler = new AbstractHandler() {
 
             @Override
@@ -519,31 +520,15 @@ public class TextEditor {
     }
 	
 	private String extractTextFromFile() {
-		Scanner scanner = null;
         final StringBuilder text = new StringBuilder("");
-        try (InputStream is = editedFile.getContents()) {
-            scanner = new Scanner(is).useDelimiter("\\n");
+        try (Scanner scanner = new Scanner(editedFile.getContents()).useDelimiter("\\n")) {
             while (scanner.hasNext()) {
                 text.append(scanner.next() + "\n");
             }
-        } catch (CoreException | IOException e) {
+        } catch (final CoreException e) {
             throw new TextEditorInitializationException("Unable to get file content", e);
         }
-        if (scanner != null) {
-            scanner.close();
-        }
 		return text.toString();
-	}
-	
-	private void deleteMarkersFromFile() {
-		try {
-			final IMarker[] markers = editedFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ONE);
-			for (int i = 0; i < markers.length; i++) {
-				markers[i].delete();
-			}
-		} catch (final CoreException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	private void updateMarkersPositions() {
@@ -551,7 +536,7 @@ public class TextEditor {
             if (markerAnnotationModel != null) {
                 markerAnnotationModel.updateMarkers(viewer.getDocument());
             }
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
         }
     }
@@ -653,7 +638,7 @@ public class TextEditor {
 
                     if (!hasBreakpoint) {
                         breakpointManager.addBreakpoint(new RobotLineBreakpoint(
-                                (IResource) input.getAdapter(IResource.class), line + 1));
+                                input.getAdapter(IResource.class), line + 1));
                     }
                 } catch (final CoreException e1) {
                     e1.printStackTrace();
@@ -731,7 +716,7 @@ public class TextEditor {
         contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
                 TextEditorPartitionScanner.VARIABLES_SECTION);
         contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
-        contentAssistant.setContextInformationPopupOrientation(ContentAssistant.CONTEXT_INFO_BELOW);
+        contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
         contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
 
             @Override
@@ -743,7 +728,7 @@ public class TextEditor {
     }
 	
 	private void createPartitioner(final IDocument document, final TextEditorPartitionScanner partitionScanner) {
-        IDocumentPartitioner partitioner = new FastPartitioner(partitionScanner, new String[] {IDocument.DEFAULT_CONTENT_TYPE,
+        final IDocumentPartitioner partitioner = new FastPartitioner(partitionScanner, new String[] {IDocument.DEFAULT_CONTENT_TYPE,
                 TextEditorPartitionScanner.TEST_CASES_SECTION, TextEditorPartitionScanner.KEYWORDS_SECTION,
                 TextEditorPartitionScanner.SETTINGS_SECTION, TextEditorPartitionScanner.VARIABLES_SECTION });
         partitioner.connect(document);

@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -73,8 +74,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
-                | Section.DESCRIPTION | Section.TWISTIE);
+        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
+                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
         section.setText("Variable files");
         section.setDescription("In this section variable files can be specified. Those variables will "
                 + "be available for all suites within project and will be accessible without importing.");
@@ -233,7 +234,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private static class VariableFileDialog extends Dialog {
 
-        private RedFormToolkit toolkit;
+        private final RedFormToolkit toolkit;
 
         private ReferencedVariableFile variableFile;
 
@@ -283,17 +284,17 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 }
             });
 
-            final Section section = toolkit.createSection(dialogComposite, Section.EXPANDED | Section.TITLE_BAR
-                    | Section.TWISTIE);
+            final Section section = toolkit.createSection(dialogComposite,
+                    ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
             section.setText("Add Arguments");
             section.addExpansionListener(new IExpansionListener() {
 
                 @Override
-                public void expansionStateChanging(ExpansionEvent e) {
+                public void expansionStateChanging(final ExpansionEvent e) {
                 }
 
                 @Override
-                public void expansionStateChanged(ExpansionEvent e) {
+                public void expansionStateChanged(final ExpansionEvent e) {
                     if (e.getState()) {
                         dialogComposite.getShell().setSize(dialogComposite.getShell().getSize().x, 300);
                     } else {
@@ -308,7 +309,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
             GridLayoutFactory.fillDefaults().applyTo(sectionInternal);
             section.setClient(sectionInternal);
 
-            List<String> arguments = newArrayList();
+            final List<String> arguments = newArrayList();
             if (variableFile != null) {
                 pathText.setText(new Path(variableFile.getPath()).toOSString());
                 final List<String> args = variableFile.getArguments();

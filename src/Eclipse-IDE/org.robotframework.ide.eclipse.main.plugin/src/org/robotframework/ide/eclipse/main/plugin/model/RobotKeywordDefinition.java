@@ -10,6 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordDocumentation;
@@ -30,14 +32,17 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     public static final String TIMEOUT = "Timeout";
     public static final String TEARDOWN = "Teardown";
     public static final String RETURN = "Return";
+
+    private UserKeyword keyword;
     
     RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final String comment) {
         super(parent, name, comment);
     }
 
     public void link(final UserKeyword keyword) {
+        this.keyword = keyword;
         // body
-        for (final RobotExecutableRow execRow : keyword.getKeywordExecutionRows()) {
+        for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
             final String name = execRow.getAction().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
@@ -150,5 +155,13 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             }
         }
         return null;
+    }
+
+    @Override
+    public Position getPosition() {
+        final FilePosition begin = keyword.getBeginPosition();
+        final FilePosition end = keyword.getEndPosition();
+
+        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset() + 1);
     }
 }

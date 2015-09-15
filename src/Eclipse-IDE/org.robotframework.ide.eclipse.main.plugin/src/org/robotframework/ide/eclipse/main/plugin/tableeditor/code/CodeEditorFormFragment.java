@@ -319,23 +319,36 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            try {
-                viewer.getTree().setRedraw(false);
-                final TreeItem topTreeItem = viewer.getTree().getTopItem();
-                final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
-                final Object[] expandedElements = viewer.getExpandedElements();
-                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
-                viewer.setInput(getSection());
-                viewer.setExpandedElements(expandedElements);
-                if (focusCell != null) {
-                    viewer.setFocusCell(focusCell.getColumnIndex());
-                }
-                if (topItem != null) {
-                    viewer.setTopItem(topItem);
-                }
-            } finally {
-                viewer.getTree().setRedraw(true);
+            refreshEverything();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(
+            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshEverything();
+        }
+    }
+
+    private void refreshEverything() {
+        try {
+            viewer.getTree().setRedraw(false);
+            final TreeItem topTreeItem = viewer.getTree().getTopItem();
+            final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
+            final Object[] expandedElements = viewer.getExpandedElements();
+            final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+            viewer.setInput(getSection());
+            viewer.setExpandedElements(expandedElements);
+            if (focusCell != null) {
+                viewer.setFocusCell(focusCell.getColumnIndex());
             }
+            if (topItem != null) {
+                viewer.setTopItem(topItem);
+            }
+        } finally {
+            viewer.getTree().setRedraw(true);
         }
     }
 }

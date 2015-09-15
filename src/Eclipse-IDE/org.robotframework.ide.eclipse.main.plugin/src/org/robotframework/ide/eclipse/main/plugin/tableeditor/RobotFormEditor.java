@@ -19,21 +19,28 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -48,8 +55,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper;
 
 public class RobotFormEditor extends FormEditor {
 
@@ -80,9 +87,9 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void prepareEclipseContext() {
-        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class)
-                .getActiveLeaf();
+        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class).getActiveLeaf();
         eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
+
             @Override
             public Object compute(final IEclipseContext context, final String contextKey) {
                 return provideSuiteModel();
@@ -103,8 +110,8 @@ public class RobotFormEditor extends FormEditor {
                 isEditable = !storage.isReadOnly();
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
             } else {
-                throw new IllegalRobotEditorInputException("Unable to open editor: unrecognized input of class: "
-                        + input.getClass().getName());
+                throw new IllegalRobotEditorInputException(
+                        "Unable to open editor: unrecognized input of class: " + input.getClass().getName());
             }
         }
         super.setInput(input);
@@ -125,7 +132,7 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
-            addEditorPart(new TextEditorWrapper(), "Source", null);
+            addEditorPart(new SuiteSourceEditor(), "Source_temp", null);
 
             setActivePage(getPageToActivate());
         } catch (final PartInitException e) {
@@ -158,7 +165,7 @@ public class RobotFormEditor extends FormEditor {
         if (getEditorInput() instanceof IFileEditorInput) {
             final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
             final IFile file = fileInput.getFile();
-            
+
             final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
             final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
             IDialogSettings section = dialogSettings.getSection(sectionName);
@@ -175,9 +182,13 @@ public class RobotFormEditor extends FormEditor {
 
     private void addEditorPart(final EditorPart editorPart, final String partName, final Image image)
             throws PartInitException {
+        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class).getActiveLeaf();
+        ContextInjectionFactory.inject(editorPart, eclipseContext);
+
         final int newVariablesPart = addPage(editorPart, getEditorInput());
         setPageImage(newVariablesPart, image);
         setPageText(newVariablesPart, partName);
+
     }
 
     private void prepareCommandsContext() {
@@ -187,37 +198,33 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
-        try {
-            boolean shouldClose = false;
-            final RobotSuiteFile currentModel = provideSuiteModel();
-            if (currentModel.isSuiteFile() && !currentModel.findSection(RobotCasesSection.class).isPresent()) {
-                MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
-                        "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
-                                + "changes there is no Test Cases section. From now on this file will be recognized as "
-                                + "Resource file.\n\nThe editor will be closed");
-                shouldClose = true;
-            } else if (currentModel.isResourceFile() && currentModel.findSection(RobotCasesSection.class).isPresent()) {
-                MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
-                        "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
-                                + "changes there is a Test Cases section defined. From now on this file will be recognized "
-                                + "as Suite file.\n\nThe editor will be closed");
-                shouldClose = true;
-            }
+        boolean shouldClose = false;
+        final RobotSuiteFile currentModel = provideSuiteModel();
+        if (currentModel.isSuiteFile() && !currentModel.findSection(RobotCasesSection.class).isPresent()) {
+            MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+                    "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
+                            + "changes there is no Test Cases section. From now on this file will be recognized as "
+                            + "Resource file.\n\nThe editor will be reopened");
+            shouldClose = true;
+        } else if (currentModel.isResourceFile() && currentModel.findSection(RobotCasesSection.class).isPresent()) {
+            MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+                    "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
+                            + "changes there is a Test Cases section defined. From now on this file will be recognized "
+                            + "as Suite file.\n\nThe editor will be reopened");
+            shouldClose = true;
+        }
 
-            for (final IEditorPart dirtyEditor : getDirtyEditors()) {
-                dirtyEditor.doSave(monitor);
-            }
-            suiteModel = currentModel;
-            suiteModel.commitChanges(monitor);
-            suiteModel = null;
+        if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
+            updateSourceFromModel();
+        }
+        for (final IEditorPart dirtyEditor : getDirtyEditors()) {
+            dirtyEditor.doSave(monitor);
+        }
 
-            updateActivePage();
+        updateActivePage();
 
-            if (shouldClose) {
-                close(false);
-            }
-        } catch (final CoreException e) {
-            monitor.setCanceled(true);
+        if (shouldClose) {
+            reopenEditor();
         }
     }
 
@@ -230,6 +237,23 @@ public class RobotFormEditor extends FormEditor {
             }
         }
         return dirtyEditors;
+    }
+
+    private void reopenEditor() {
+        close(false);
+        getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
+                final IWorkbenchPage page = RobotFormEditor.this.getSite().getPage();
+                try {
+                    page.openEditor(new FileEditorInput(suiteModel.getFile()), desc.getId());
+                } catch (final PartInitException e) {
+                    throw new IllegalStateException("Unable to reopen editor", e);
+                }
+            }
+        });
     }
 
     @Override
@@ -250,6 +274,10 @@ public class RobotFormEditor extends FormEditor {
 
         final IEclipseContext context = getSite().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
+
+        for (int i = 0; i < getPageCount(); i++) {
+            ContextInjectionFactory.uninject(getEditor(i), context);
+        }
     }
 
     public FocusedViewerAccessor getFocusedViewerAccessor() {
@@ -258,6 +286,90 @@ public class RobotFormEditor extends FormEditor {
             return ((ISectionEditorPart) activeEditor).getFocusedViewerAccessor();
         }
         return null;
+    }
+
+    public RobotSuiteFile provideSuiteModel() {
+        if (suiteModel != null) {
+            return suiteModel;
+        }
+        if (getEditorInput() instanceof FileEditorInput) {
+            suiteModel = RedPlugin.getModelManager().createSuiteFile(((FileEditorInput) getEditorInput()).getFile());
+        } else {
+            final IStorage storage = getEditorInput().getAdapter(IStorage.class);
+            try {
+                suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
+            } catch (final CoreException e) {
+                throw new RuntimeException("Unable to provide model for given input", e);
+            }
+        }
+        return suiteModel;
+    }
+
+    public SuiteSourceEditor getSourceEditor() {
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart instanceof SuiteSourceEditor) {
+                return (SuiteSourceEditor) editorPart;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected void pageChange(final int newPageIndex) {
+        super.pageChange(newPageIndex);
+
+        updateActivePage();
+        saveActivePage(newPageIndex);
+    }
+
+    private void updateActivePage() {
+        if (getActiveEditor() instanceof ISectionEditorPart) {
+            final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
+            page.updateOnActivation();
+        } else if (getActiveEditor() instanceof SuiteSourceEditor) {
+            updateSourceFromModel();
+        }
+    }
+
+    private void updateSourceFromModel() {
+        final SuiteSourceEditor editor = getSourceEditor();
+        final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+        final RobotFile model = provideSuiteModel().getLinkedElement();
+        // document.set(model.toString());
+    }
+
+    public void activateSourcePage() {
+        if (getActiveEditor() instanceof SuiteSourceEditor) {
+            return;
+        }
+        setActiveEditor(getSourceEditor());
+    }
+
+    public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {
+        int index = -1;
+
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart part = (IEditorPart) pages.get(i);
+            if (part instanceof ISectionEditorPart && ((ISectionEditorPart) part).isPartFor(section)) {
+                index = i;
+                break;
+            }
+        }
+        if (index >= 0) {
+            setActivePage(index);
+            return (ISectionEditorPart) pages.get(index);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
+        if (adapter == IContentOutlinePage.class) {
+            return new RobotOutlinePage(suiteModel);
+        }
+        return super.getAdapter(adapter);
     }
 
     @Inject
@@ -279,75 +391,14 @@ public class RobotFormEditor extends FormEditor {
         }
     }
 
-    public RobotSuiteFile provideSuiteModel() {
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(@UIEventTopic(RobotModelEvents.RECONCILE) final IDocument document) {
         if (suiteModel != null) {
-            return suiteModel;
+            suiteModel.reparseEverything(document.get());
         }
-        if (getEditorInput() instanceof FileEditorInput) {
-            suiteModel = RedPlugin.getModelManager().createSuiteFile(
-                    ((FileEditorInput) getEditorInput()).getFile());
-        } else {
-            final IStorage storage = getEditorInput().getAdapter(IStorage.class);
-            try {
-                suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
-            } catch (final CoreException e) {
-                throw new RuntimeException("Unable to provide model for given input", e);
-            }
-        }
-        return suiteModel;
-    }
-
-    @Override
-    protected void pageChange(final int newPageIndex) {
-        super.pageChange(newPageIndex);
-        updateActivePage();
-        saveActivePage(newPageIndex);
-    }
-
-    private void updateActivePage() {
-        if (getActiveEditor() instanceof ISectionEditorPart) {
-            final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
-            page.updateOnActivation();
-        }
-    }
-
-    public void activateSourcePage() {
-        if (getActiveEditor() instanceof TextEditorWrapper) {
-            return;
-        }
-
-        for (int i = 0; i < getPageCount(); i++) {
-            final IEditorPart editor = getEditor(i);
-            if (editor instanceof TextEditorWrapper) {
-                setActiveEditor(editor);
-                break;
-            }
-        }
-    }
-
-    public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {
-        int index = -1;
-
-        for (int i = 0; i < getPageCount(); i++) {
-            final IEditorPart part = (IEditorPart) pages.get(i);
-            if (part instanceof ISectionEditorPart && ((ISectionEditorPart) part).isPartFor(section)) {
-                index = i;
-                break;
-            }
-        }
-        if (index >= 0) {
-            setActivePage(index);
-            return (ISectionEditorPart) pages.get(index);
-        }
-        return null;
-    }
-
-    @Override
-    public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
-        if (adapter == IContentOutlinePage.class) {
-            return new RobotOutlinePage(suiteModel);
-        }
-        return super.getAdapter(adapter);
+        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker.post(RobotModelEvents.RECONCILATION_DONE, suiteModel);
     }
 
     @Inject

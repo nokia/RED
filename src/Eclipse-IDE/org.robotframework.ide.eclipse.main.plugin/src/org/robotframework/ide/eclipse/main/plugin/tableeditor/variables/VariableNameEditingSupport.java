@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -35,9 +36,12 @@ class VariableNameEditingSupport extends RobotElementEditingSupport {
 
     @Override
     protected Object getValue(final Object element) {
-        if (element instanceof RobotVariable) {
+        if (element instanceof RobotVariable && ((RobotVariable) element).getType() != VariableType.INVALID) {
             final RobotVariable variable = (RobotVariable) element;
             return variable.getPrefix() + variable.getName() + variable.getSuffix();
+        } else if (element instanceof RobotVariable) {
+            final RobotVariable variable = (RobotVariable) element;
+            return variable.getName();
         }
         return "";
     }

@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -63,8 +64,8 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = toolkit.createSection(parent, Section.EXPANDED | Section.TITLE_BAR
-                | Section.DESCRIPTION | Section.TWISTIE);
+        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
+                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
         section.setText("Remote library locations");
         section.setDescription("In this section locations of servers for Remote library can be specified. "
                 + "Those addresses will be available for all suites within project.");

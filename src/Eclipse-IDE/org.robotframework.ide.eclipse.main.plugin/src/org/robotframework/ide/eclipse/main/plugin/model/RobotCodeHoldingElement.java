@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.Serializable;
 import java.util.List;
 
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 
 public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
@@ -87,6 +88,8 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     public List<RobotKeywordCall> getChildren() {
         return calls;
     }
+
+    public abstract Position getPosition();
 
     @Override
     public RobotSuiteFile getSuiteFile() {
