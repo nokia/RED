@@ -106,8 +106,8 @@ public class RobotArtifactsValidator {
         return new ValidationContext(project.getRuntimeEnvironment());
     }
 
-    private Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext validationContext,
-            final IFile file) {
+    public static Optional<? extends ModelUnitValidator> createProperValidator(
+            final ValidationContext validationContext, final IFile file) {
         if (RobotSuiteFileDescriber.isSuiteFile(file)) {
             return Optional.of(new RobotSuiteFileValidator(validationContext, file));
         } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
