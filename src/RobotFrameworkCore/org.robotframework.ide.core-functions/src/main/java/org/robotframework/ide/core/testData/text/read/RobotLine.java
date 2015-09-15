@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.IChildElement;
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 
 
 public class RobotLine implements IChildElement<RobotFile> {
@@ -17,6 +18,11 @@ public class RobotLine implements IChildElement<RobotFile> {
     private final RobotFile parent;
     private int lineNumber = -1;
     private List<IRobotLineElement> lineElements = new LinkedList<>();
+
+    private IRobotLineElement eol = EndOfLineBuilder.newInstance()
+            .setEndOfLines(null).setLineNumber(IRobotLineElement.NOT_SET)
+            .setStartColumn(IRobotLineElement.NOT_SET)
+            .setStartOffset(IRobotLineElement.NOT_SET).buildEOL();
 
 
     public RobotLine(int lineNumber, final RobotFile parent) {
@@ -50,9 +56,24 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
 
+    public IRobotLineElement getEndOfLine() {
+        return this.eol;
+    }
+
+
+    public void setEndOfLine(final List<Constant> endOfLine, int currentOffset,
+            int currentColumn) {
+        this.eol = EndOfLineBuilder.newInstance().setEndOfLines(endOfLine)
+                .setStartColumn(currentColumn).setStartOffset(currentOffset)
+                .setLineNumber(lineNumber).buildEOL();
+    }
+
+
     @Override
     public String toString() {
-        return String.format("RobotLine [lineNumber=%s, lineElements=%s]",
-                lineNumber, lineElements);
+        return String.format(
+                "RobotLine [lineNumber=%s, lineElements=%s, endOfLine=%s]",
+                lineNumber, lineElements, eol);
     }
+
 }

@@ -255,6 +255,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 }
 
                 List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
+                line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
                 currentOffset += getEndOfLineLength(endOfLine);
                 lineNumber++;
                 lastColumnProcessed = 0;
