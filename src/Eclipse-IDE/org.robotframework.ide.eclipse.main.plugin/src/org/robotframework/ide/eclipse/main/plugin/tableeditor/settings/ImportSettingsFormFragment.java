@@ -200,7 +200,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private RobotSettingsSection getSection() {
-        return (RobotSettingsSection) fileModel.findSection(RobotSettingsSection.class).orNull();
+        return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
     @Override
@@ -349,17 +349,30 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            try {
-                viewer.getTable().setRedraw(false);
-                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
-                viewer.setInput(getSection());
-                viewer.refresh();
-                if (focusCell != null) {
-                    viewer.setFocusCell(focusCell.getColumnIndex());
-                }
-            } finally {
-                viewer.getTable().setRedraw(true);
+            refreshEverything();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(
+            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshEverything();
+        }
+    }
+
+    private void refreshEverything() {
+        try {
+            viewer.getTable().setRedraw(false);
+            final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+            viewer.setInput(getSection());
+            viewer.refresh();
+            if (focusCell != null) {
+                viewer.setFocusCell(focusCell.getColumnIndex());
             }
+        } finally {
+            viewer.getTable().setRedraw(true);
         }
     }
 

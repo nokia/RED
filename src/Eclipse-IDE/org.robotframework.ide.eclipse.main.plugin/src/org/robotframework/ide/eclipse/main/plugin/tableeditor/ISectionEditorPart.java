@@ -15,7 +15,7 @@ public interface ISectionEditorPart {
 
     void updateOnActivation();
 
-    com.google.common.base.Optional<RobotElement> provideSection(RobotSuiteFile suiteModel);
+    com.google.common.base.Optional<? extends RobotSuiteFileSection> provideSection(RobotSuiteFile suiteModel);
 
     boolean isPartFor(RobotSuiteFileSection section);
 

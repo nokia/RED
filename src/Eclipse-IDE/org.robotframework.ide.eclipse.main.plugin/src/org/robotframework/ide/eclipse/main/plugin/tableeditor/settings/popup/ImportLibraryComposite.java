@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -92,9 +93,9 @@ public class ImportLibraryComposite {
 
     private ISelectionChangedListener rightViewerSelectionChangedListener;
 
-    private RobotProject robotProject;
+    private final RobotProject robotProject;
     
-    private IEventBroker eventBroker;
+    private final IEventBroker eventBroker;
 
     public ImportLibraryComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
             final FormToolkit formToolkit, final Shell shell) {
@@ -103,7 +104,7 @@ public class ImportLibraryComposite {
         this.fileModel = fileModel;
         this.shell = shell;
         robotProject = fileModel.getProject();
-        eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {
@@ -136,7 +137,7 @@ public class ImportLibraryComposite {
             }
         });
 
-        Composite moveBtnsComposite = formToolkit.createComposite(librariesComposite);
+        final Composite moveBtnsComposite = formToolkit.createComposite(librariesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(moveBtnsComposite);
 
         final Button toImported = formToolkit.createButton(moveBtnsComposite, ">>", SWT.PUSH);
@@ -165,7 +166,7 @@ public class ImportLibraryComposite {
             }
         });
 
-        Composite newLibBtnsComposite = formToolkit.createComposite(librariesComposite);
+        final Composite newLibBtnsComposite = formToolkit.createComposite(librariesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(newLibBtnsComposite);
 
         final Button addNewLibBtn = formToolkit.createButton(newLibBtnsComposite, "Add Library", SWT.PUSH);
@@ -276,8 +277,8 @@ public class ImportLibraryComposite {
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    IPath path = new Path(chosenFilePath);
-                    String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(path);
+                    final IPath path = new Path(chosenFilePath);
+                    final String nameWithoutExtension = ImportSettingFilePathResolver.createFileNameWithoutExtension(path);
                     addNewLibraryToProjectConfiguration(
                             ImportSettingFilePathResolver.createFileParentRelativePath(path,
                                     robotProject.getProject().getLocation()), nameWithoutExtension);
@@ -300,7 +301,7 @@ public class ImportLibraryComposite {
         if (!isLibraryAvailable(nameWithoutExtension)) {
             final List<LibrarySpecification> specs = newArrayList();
             final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
-            for (LibrarySpecification librarySpecification : referencedLibraries) {
+            for (final LibrarySpecification librarySpecification : referencedLibraries) {
                 if (librarySpecification.getName().equals(nameWithoutExtension)) {
                     specs.add(librarySpecification);
                     break;
@@ -314,14 +315,14 @@ public class ImportLibraryComposite {
         }
     }
     
-    private boolean isLibraryAvailable(String libName) {
+    private boolean isLibraryAvailable(final String libName) {
         final Settings libs = (Settings) rightViewer.getInput();
-        for(LibrarySpecification spec : libs.getImportedLibraries()) {
+        for(final LibrarySpecification spec : libs.getImportedLibraries()) {
             if(spec.getName().equals(libName)) {
                 return true;
             }
         }
-        for(LibrarySpecification spec : libs.getLibrariesToImport()) {
+        for(final LibrarySpecification spec : libs.getLibrariesToImport()) {
             if(spec.getName().equals(libName)) {
                 return true;
             }
@@ -386,7 +387,7 @@ public class ImportLibraryComposite {
             final String nameWithoutExtension) {
         final RobotProjectConfig config = robotProject.getRobotProjectConfig();
         final List<ReferencedLibrary> libs = config.getLibraries();
-        for (ReferencedLibrary referencedLibrary : libs) {
+        for (final ReferencedLibrary referencedLibrary : libs) {
             if (referencedLibrary.getName().equals(nameWithoutExtension)
                     && referencedLibrary.getPath().equals(oldPath.toPortableString())) {
                 referencedLibrary.setPath(newPath);
@@ -405,11 +406,10 @@ public class ImportLibraryComposite {
             public void widgetSelected(final SelectionEvent e) {
                 final LibrarySpecification spec = Selections.getSingleElement(
                         (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
-                final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
-                final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
+                final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
                 List<String> libArgs = newArrayList();
                 RobotSetting setting = null;
-                final List<RobotKeywordCall> settings = settingsSection.getImportSettings();
+                final List<RobotKeywordCall> settings = section.get().getImportSettings();
                 for (final RobotElement element : settings) {
                     setting = (RobotSetting) element;
                     if (setting.getGroup() == SettingsGroup.LIBRARIES) {
@@ -441,8 +441,7 @@ public class ImportLibraryComposite {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
 
-        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
-        final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
+        final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
         for (final LibrarySpecification spec : specs) {
             final ArrayList<String> args = newArrayList(spec.getName());
             if (spec.isRemote()) {
@@ -452,7 +451,7 @@ public class ImportLibraryComposite {
                 }
                 args.add(host);
             }
-            commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Library", args));
+            commandsStack.execute(new CreateFreshGeneralSettingCommand(section.get(), "Library", args));
         }
 
         leftViewer.refresh();
@@ -467,9 +466,8 @@ public class ImportLibraryComposite {
         libs.getImportedLibraries().removeAll(specs);
         libs.getLibrariesToImport().addAll(specs);
 
-        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
-        final RobotSettingsSection settingsSection = (RobotSettingsSection) section.get();
-        final List<RobotSetting> settingsToRemove = getSettingsToRemove(settingsSection, specs);
+        final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
+        final List<RobotSetting> settingsToRemove = getSettingsToRemove(section.get(), specs);
         commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
 
         leftViewer.refresh();
@@ -553,10 +551,10 @@ public class ImportLibraryComposite {
         final List<LibrarySpecification> libSpecs = libs.getImportedLibraries();
         if (!initialSetting.getArguments().isEmpty()) {
             final String name = initialSetting.getArguments().get(0);
-            for (LibrarySpecification librarySpecification : libSpecs) {
+            for (final LibrarySpecification librarySpecification : libSpecs) {
                 if (librarySpecification.getName().equals(name)) {
-                    rightViewer.setSelection(Selections.createStructuredSelection(librarySpecification));
-                    break;
+                    rightViewer.setSelection(new StructuredSelection(librarySpecification));
+                    return;
                 }
             }
         }

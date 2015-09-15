@@ -609,22 +609,28 @@
           parentId="org.eclipse.ui.contexts.window">
     </context>
     <context
+          description="Context active in each page with tables of Table editor"
+          id="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          name="Context for tables pages"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
+    <context
           description="Context for Variables section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.variables.context"
           name="Variables Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
     </context>
     <context
           description="Context for Test Cases section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.cases.context"
           name="Test Cases Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
     </context>
     <context
           description="Context for Settings section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.settings.context"
           name="Settings Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
     </context>
     <context
           description="Context for Settings General section editor page"
@@ -648,6 +654,12 @@
           description="Context for Keywords section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.keywords.context"
           name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context active in source page of Table editor"
+          id="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          name="Context for source page"
           parentId="org.robotframework.ide.eclipse.tableeditor.context">
     </context>
  </extension>
@@ -1788,7 +1800,7 @@
        point="org.eclipse.ui.bindings">
     <key
           commandId="org.robotframework.ide.eclipse.insertNew"
-          contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+N">
        <parameter
@@ -1810,7 +1822,7 @@
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.findElementUsages"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+G">
        <parameter
@@ -1820,37 +1832,37 @@
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.cutRow"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+X">
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.copyRow"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+C">
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.pasteRow"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+V">
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.deleteRow"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+DEL">
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.insertCell"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+I">
     </key>
     <key
           commandId="org.robotframework.ide.eclipse.deleteCell"
-          contextId="org.robotframework.ide.eclipse.tableeditor.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+D">
     </key>
@@ -2612,6 +2624,38 @@
        </menu>
     </menuContribution>
  </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextRulerContext?after=debug">
+         <command
+               commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler"
+            commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+   </extension>
  <extension
        point="org.eclipse.core.expressions.propertyTesters">
     <propertyTester
@@ -2886,6 +2930,19 @@
              </test>
           </with>
        </and>
+    </definition>
+    <definition
+          id="org.robotframework.sourcePartIsActive">
+       <with
+             variable="activeContexts">
+          <iterate
+                ifEmpty="false"
+                operator="or">
+             <equals
+                   value="org.robotframework.ide.eclipse.tableeditor.sources.context">
+             </equals>
+          </iterate>
+       </with>
     </definition>
     <definition
           id="org.robotframework.canDeleteSectionUsingToolbar">

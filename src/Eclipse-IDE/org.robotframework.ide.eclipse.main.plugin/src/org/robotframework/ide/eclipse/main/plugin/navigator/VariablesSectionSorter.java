@@ -10,8 +10,8 @@ import java.util.EnumSet;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 
 public class VariablesSectionSorter extends ViewerSorter {
 
@@ -25,8 +25,8 @@ public class VariablesSectionSorter extends ViewerSorter {
 
     @Override
     public int category(final Object element) {
-        final Type variableType = ((RobotVariable) element).getType();
-        return EnumSet.allOf(Type.class).size() - variableType.ordinal() - 1;
+        final VariableType variableType = ((RobotVariable) element).getType();
+        return EnumSet.allOf(VariableType.class).size() - variableType.ordinal() - 1;
     }
 
     @Override

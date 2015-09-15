@@ -24,7 +24,7 @@ public class SetVariableCommentCommand extends EditorCommand {
         if (variable.getComment().equals(newComment)) {
             return;
         }
-        variable.setComment(newComment);
+        // variable.setComment(newComment);
 
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the cell

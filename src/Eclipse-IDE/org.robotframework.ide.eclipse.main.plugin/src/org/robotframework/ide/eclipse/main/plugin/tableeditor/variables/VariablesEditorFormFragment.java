@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
-import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -166,7 +165,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @Override
             public RobotElement createNew() {
                 final RobotVariablesSection section = (RobotVariablesSection) getViewer().getInput();
-                commandsStack.execute(new CreateFreshVariableCommand(section, true));
+                commandsStack.execute(new CreateFreshVariableCommand(section));
 
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
@@ -184,7 +183,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private RobotVariablesSection getSection() {
-        return (RobotVariablesSection) fileModel.findSection(RobotVariablesSection.class).orNull();
+        return fileModel.findSection(RobotVariablesSection.class).orNull();
     }
 
     void revealVariable(final RobotVariable robotVariable) {
@@ -196,11 +195,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
     
-    @Persist
-    public void onSave() {
-        // nothing to do now
-    }
-
     private Section createValueEditSection(final Composite parent) {
         final Section section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         section.setText("Edit Variable");
@@ -341,20 +335,33 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            try {
-                viewer.getTable().setRedraw(false);
-                final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
-                viewer.setInput(getSection());
-                viewer.refresh();
-                if (focusCell != null) {
-                    viewer.setFocusCell(focusCell.getColumnIndex());
-                }
-            } finally {
-                viewer.getTable().setRedraw(true);
-            }
+            refreshEverything();
         }
     }
-    
+
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(
+            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshEverything();
+        }
+    }
+
+    private void refreshEverything() {
+        try {
+            viewer.getTable().setRedraw(false);
+            final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
+            viewer.setInput(getSection());
+            viewer.refresh();
+            if (focusCell != null) {
+                viewer.setFocusCell(focusCell.getColumnIndex());
+            }
+        } finally {
+            viewer.getTable().setRedraw(true);
+        }
+    }
+
     @Inject
     @Optional
     private void moveCollectionElementUp(

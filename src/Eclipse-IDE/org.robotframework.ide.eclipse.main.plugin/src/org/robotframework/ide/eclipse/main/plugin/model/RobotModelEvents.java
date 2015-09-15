@@ -123,4 +123,7 @@ public class RobotModelEvents {
 
     public static final String SUITE_MODEL_DISPOSED = "robot/model/disposed";
 
+    public static final String RECONCILE = "robot/model/reconsilation";
+
+    public static final String RECONCILATION_DONE = "robot/model/reconcilation_done";
 }

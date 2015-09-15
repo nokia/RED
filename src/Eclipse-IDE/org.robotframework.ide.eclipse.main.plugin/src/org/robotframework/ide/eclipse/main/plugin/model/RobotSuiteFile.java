@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -27,12 +24,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.core.testData.RobotFileDumper;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.RobotFileOutput.Status;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
@@ -43,10 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class RobotSuiteFile implements RobotElement {
@@ -89,21 +83,37 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<RobotElement> getSections() {
-        if (sections == null) {
-                fileOutput = parseModel();
-                link(fileOutput.getFileModel());
+        return getSections(new ParsingStrategy() {
 
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                                .getPartService();
-                        listener = new RobotEditorClosedListener();
-                        ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
-                        service.addPartListener(listener);
+            @Override
+            public RobotFileOutput parse() {
+                final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
+                return new RobotParser(new RobotProjectHolder(runtimeEnvironment)).parse(file.getLocation().toFile())
+                        .get(0);
+            }
+        });
+    }
+
+    public List<RobotElement> getSections(final ParsingStrategy parsingStrategy) {
+        if (sections == null) {
+            fileOutput = parseModel(parsingStrategy);
+            link(fileOutput.getFileModel());
+
+            Display.getDefault().syncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (listener != null) {
+                        ContextInjectionFactory.uninject(listener, getContext().getActiveLeaf());
                     }
-                });
-            
+
+                    final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
+                    listener = new RobotEditorClosedListener();
+                    ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
+                    service.addPartListener(listener);
+                }
+            });
+
         }
         return sections;
     }
@@ -132,18 +142,13 @@ public class RobotSuiteFile implements RobotElement {
         }
     }
     
-    protected RobotFileOutput parseModel() {
+    protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
         final RobotProject robotProject = getProject();
         if (robotProject.getRobotProjectHolder() == null) {
             final RobotProjectHolder robotProjectHolder = new RobotProjectHolder(robotProject.getRuntimeEnvironment());
             robotProject.link(robotProjectHolder);
         }
-        final RobotFileOutput robotFileOutput = robotProject.getRobotParser().parse(file.getLocation().toFile()).get(0);
-        if (robotFileOutput.getStatus() == Status.FAILED) {
-            throw new RobotFileParsingException("Unable to read suite file model");
-        } else {
-            return robotFileOutput;
-        }
+        return parsingStrategy.parse();
     }
 
     private IEclipseContext getContext() {
@@ -157,11 +162,27 @@ public class RobotSuiteFile implements RobotElement {
         listener = null;
     }
 
+    public void reparseEverything(final String newContent) {
+        sections = null;
+        fileOutput = null;
+
+        getSections(new ParsingStrategy() {
+
+            @Override
+            public RobotFileOutput parse() {
+                final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
+                return new RobotParser(new RobotProjectHolder(runtimeEnvironment)).parseEditorContent(newContent,
+                        file.getLocation().toFile());
+            }
+        });
+    }
+
     protected void refreshOnFileChange() {
         sections = null;
         fileOutput = null;
         getSections();
     }
+
 
     List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
         if ((delta.getFlags() & IResourceDelta.MARKERS) != IResourceDelta.MARKERS) {
@@ -186,7 +207,7 @@ public class RobotSuiteFile implements RobotElement {
         if (file != null) {
             try {
                 return file.getContentDescription().getContentType().getId();
-            } catch (@SuppressWarnings("unused") final CoreException e) {
+            } catch (final CoreException e) {
                 return null;
             }
         }
@@ -238,6 +259,10 @@ public class RobotSuiteFile implements RobotElement {
         return file;
     }
 
+    public RobotFile getLinkedElement() {
+        return fileOutput == null ? null : fileOutput.getFileModel();
+    }
+
     @Override
     public List<RobotElement> getChildren() {
         return sections == null ? Lists.<RobotElement> newArrayList() : sections;
@@ -256,28 +281,21 @@ public class RobotSuiteFile implements RobotElement {
         return RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
     }
 
-    public void commitChanges(final IProgressMonitor monitor) throws CoreException {
-        // FIXME : this should be done using RobotFileDumper, but it is lacking API for dumping to
-        // string
-        final String content = new RobotFileDumper().dump(fileOutput);
-        final InputStream stream = new ByteArrayInputStream(content.toString().getBytes(Charsets.UTF_8));
-        file.setContents(stream, true, true, monitor);
-    }
-
-    public Optional<RobotElement> findSection(final Class<? extends RobotElement> sectionClass) {
-        return Iterables.tryFind(getSections(), new Predicate<RobotElement>() {
-            @Override
-            public boolean apply(final RobotElement element) {
-                return sectionClass.isInstance(element);
+    @SuppressWarnings("unchecked")
+    public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {
+        for (final RobotElement elem : getSections()) {
+            if (sectionClass.isInstance(elem)) {
+                return (Optional<T>) Optional.of(elem);
             }
-        });
+        }
+        return Optional.absent();
     }
 
     public List<LibrarySpecification> getImportedLibraries() {
-        final Optional<RobotElement> section = findSection(RobotSettingsSection.class);
+        final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
         final List<String> alreadyImported = newArrayList();
         if (section.isPresent()) {
-            final List<RobotKeywordCall> importSettings = ((RobotSettingsSection) section.get()).getImportSettings();
+            final List<RobotKeywordCall> importSettings = section.get().getImportSettings();
             for (final RobotKeywordCall element : importSettings) {
                 final RobotSetting setting = (RobotSetting) element;
                 if (SettingsGroup.LIBRARIES == setting.getGroup()) {
@@ -304,38 +322,35 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
-        final Optional<RobotElement> optionalKeywords = findSection(RobotKeywordsSection.class);
+        final Optional<RobotKeywordsSection> optionalKeywords = findSection(RobotKeywordsSection.class);
         if (optionalKeywords.isPresent()) {
-            final RobotKeywordsSection keywords = (RobotKeywordsSection) optionalKeywords.get();
-            return keywords.getUserDefinedKeywords();
+            return optionalKeywords.get().getUserDefinedKeywords();
         }
         return newArrayList();
     }
     
     public List<IPath> getResourcesPaths() {
-        final Optional<RobotElement> optionalSettings = findSection(RobotSettingsSection.class);
+        final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
-            final RobotSettingsSection settings = (RobotSettingsSection) optionalSettings.get();
-            return settings.getResourcesPaths();
+            return optionalSettings.get().getResourcesPaths();
         }
         return newArrayList();
     }
     
     public List<RobotVariable> getUserDefinedVariables() {
-        final Optional<RobotElement> optionalVariables = findSection(RobotVariablesSection.class);
+        final Optional<RobotVariablesSection> optionalVariables = findSection(RobotVariablesSection.class);
         if (optionalVariables.isPresent()) {
-            final RobotVariablesSection variables = (RobotVariablesSection) optionalVariables.get();
-            return variables.getChildren();
+            return optionalVariables.get().getChildren();
         }
         return newArrayList();
     }
     
-    public Map<AVariableImported, String> getVariablesFromImportedFiles() {
-        final Map<AVariableImported, String> importedVariablesMap = new HashMap<>();
+    public Map<AVariableImported<?>, String> getVariablesFromImportedFiles() {
+        final Map<AVariableImported<?>, String> importedVariablesMap = new HashMap<>();
         final List<VariablesFileImportReference> fileList = fileOutput.getVariablesImportReferences();
         for (final VariablesFileImportReference variablesFileImportReference : fileList) {
-            final List<AVariableImported> variablesList = variablesFileImportReference.getVariables();
-            for (final AVariableImported aVariableImported : variablesList) {
+            final List<AVariableImported<?>> variablesList = variablesFileImportReference.getVariables();
+            for (final AVariableImported<?> aVariableImported : variablesList) {
                 importedVariablesMap.put(aVariableImported, variablesFileImportReference.getVariablesFile().getPath());
             }
         }
@@ -351,11 +366,10 @@ public class RobotSuiteFile implements RobotElement {
     }
     
     public List<ImportedVariablesFile> getImportedVariables() {
-        final Optional<RobotElement> section = findSection(RobotSettingsSection.class);
+        final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
         final List<ImportedVariablesFile> alreadyImported = newArrayList();
         if (section.isPresent()) {
-            final List<RobotKeywordCall> importSettings = ((RobotSettingsSection) section.get()).getVariablesSettings();
-            for (final RobotElement element : importSettings) {
+            for (final RobotElement element : section.get().getVariablesSettings()) {
                 final RobotSetting setting = (RobotSetting) element;
                 alreadyImported.add(new ImportedVariablesFile(setting.getArguments()));
             }
@@ -381,13 +395,6 @@ public class RobotSuiteFile implements RobotElement {
         return defaultHeader;
     }
     
-    private static class RobotFileParsingException extends RuntimeException {
-
-        public RobotFileParsingException(final String message) {
-            super(message);
-        }
-    }
-
     public static class ImportedVariablesFile {
 
         private List<String> args;
@@ -417,5 +424,10 @@ public class RobotSuiteFile implements RobotElement {
         public int hashCode() {
             return args.hashCode();
         }
-    }  
+    }
+
+    interface ParsingStrategy {
+
+        RobotFileOutput parse();
+    }
 }

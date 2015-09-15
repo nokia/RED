@@ -16,6 +16,13 @@ import org.eclipse.ui.contexts.IContextService;
 
 public class Viewers {
 
+    /**
+     * Takes care of given context activation and deactivation on viewer focus changes.
+     * 
+     * @param viewer
+     * @param site
+     * @param contextId
+     */
     public static void boundViewerWithContext(final ColumnViewer viewer, final IWorkbenchSite site,
             final String contextId) {
         viewer.getControl().addFocusListener(new ContextActivatingFocusListener(contextId, site));
@@ -98,7 +105,7 @@ public class Viewers {
         }
 
         private IContextService getContextService(final IWorkbenchSite site) {
-            return (IContextService) site.getService(IContextService.class);
+            return site.getService(IContextService.class);
         }
     }
 }

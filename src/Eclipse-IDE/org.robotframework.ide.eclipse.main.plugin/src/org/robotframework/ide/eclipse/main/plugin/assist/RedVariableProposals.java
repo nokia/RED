@@ -5,7 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 
 public class RedVariableProposals {
     
-    private List<RedVariableProposal> builtInVariableProposals;
+    private final List<RedVariableProposal> builtInVariableProposals;
     
     private final RobotSuiteFile suiteFile;
 
@@ -26,7 +25,7 @@ public class RedVariableProposals {
         this.suiteFile = suiteFile;
         
         builtInVariableProposals = new ArrayList<>();
-        for (ARobotInternalVariable<?> robotInternalVariable : suiteFile.getGlobalVariables()) {
+        for (final ARobotInternalVariable<?> robotInternalVariable : suiteFile.getGlobalVariables()) {
             builtInVariableProposals.add(RedVariableProposal.createBuiltIn(robotInternalVariable.getName(),
                     robotInternalVariable.getValue().toString()));
         }
@@ -49,19 +48,19 @@ public class RedVariableProposals {
 
         final List<RedVariableProposal> proposals = newArrayList();
 
-        for (RobotVariable variable : suiteFile.getUserDefinedVariables()) {
+        for (final RobotVariable variable : suiteFile.getUserDefinedVariables()) {
             proposals.add(RedVariableProposal.create(variable));
         }
 
-        Map<AVariableImported, String> variablesMap = suiteFile.getVariablesFromImportedFiles();
-        for (AVariableImported variable : variablesMap.keySet()) {
+        final Map<AVariableImported<?>, String> variablesMap = suiteFile.getVariablesFromImportedFiles();
+        for (final AVariableImported<?> variable : variablesMap.keySet()) {
             proposals.add(RedVariableProposal.create(variable, variablesMap.get(variable)));
         }
 
-        for (ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
+        for (final ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
             final List<String> refVariablesList = referencedVariableFile.getVariables();
             if (variablesMap != null && !variablesMap.isEmpty()) {
-                for (String variable : refVariablesList) {
+                for (final String variable : refVariablesList) {
                     proposals.add(RedVariableProposal.create(variable, referencedVariableFile.getPath()));
                 }
             }

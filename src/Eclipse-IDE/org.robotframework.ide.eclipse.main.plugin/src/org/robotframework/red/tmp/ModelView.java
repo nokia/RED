@@ -5,21 +5,29 @@
  */
 package org.robotframework.red.tmp;
 
+import java.util.Collection;
+
 import javax.annotation.PostConstruct;
 
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.graphics.FontsManager;
-import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 public class ModelView {
 
@@ -32,9 +40,6 @@ public class ModelView {
         layout.marginWidth = 2;
         parent.setLayout(layout);
         
-        final Label label = new Label(parent, SWT.NONE);
-        label.setText("Images: 0 Fonts: 0 Colors: 0");
-
         final TreeViewer viewer = new TreeViewer(parent);
         viewer.getTree().setHeaderVisible(true);
         viewer.setContentProvider(new ModelContentProvider());
@@ -61,9 +66,6 @@ public class ModelView {
                     parent.getDisplay().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            label.setText("Images: " + ImagesManager.size() + " Fonts: " + FontsManager.size()
-                                    + " Colors: " + ColorsManager.size());
-
                             viewer.setInput(RedPlugin.getModelManager().getModel());
                             viewer.expandAll();
 
@@ -84,5 +86,83 @@ public class ModelView {
     @Focus
     public void onFocus() {
 
+    }
+
+    private static class ContextContentProvider implements IStructuredContentProvider {
+
+        @Override
+        public void dispose() {
+            // nothing to do
+        }
+
+        @Override
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+            // nothing to do
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+            return filter(service.getActiveContextIds()).toArray();
+        }
+
+        private Collection<String> filter(final Collection<String> activeContextIds) {
+            return Collections2.filter(activeContextIds, new Predicate<String>() {
+                @Override
+                public boolean apply(final String contextId) {
+                    return contextId.startsWith("org.robot");
+                }
+            });
+        }
+    }
+
+    private static class ContextLabelProvider extends ColumnLabelProvider {
+
+        @Override
+        public String getText(final Object element) {
+            return element.toString();
+        }
+    }
+
+    private static class ModelContentProvider implements ITreeContentProvider {
+
+        @Override
+        public void dispose() {
+            // nothing to do
+        }
+
+        @Override
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+            // nothing to do
+        }
+
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            return ((RobotElement) inputElement).getChildren().toArray();
+        }
+
+        @Override
+        public Object[] getChildren(final Object parentElement) {
+            return ((RobotElement) parentElement).getChildren().toArray();
+        }
+
+        @Override
+        public Object getParent(final Object element) {
+            return ((RobotElement) element).getParent();
+        }
+
+        @Override
+        public boolean hasChildren(final Object element) {
+            return true;
+        }
+    }
+
+    private class ModelLabelProvider extends ColumnLabelProvider {
+
+        @Override
+        public String getText(final Object element) {
+            return ((RobotElement) element).getName();
+        }
     }
 }

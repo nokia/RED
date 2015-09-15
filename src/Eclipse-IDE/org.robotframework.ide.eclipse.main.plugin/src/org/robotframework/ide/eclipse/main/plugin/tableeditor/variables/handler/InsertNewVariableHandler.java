@@ -10,8 +10,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
@@ -37,7 +37,7 @@ public class InsertNewVariableHandler extends DIParameterizedHandler<E4InsertNew
             final RobotVariablesSection variablesSection = selectedVariable.getParent();
             final int index = variablesSection.getChildren().indexOf(selectedVariable);
             
-            stack.execute(new CreateFreshVariableCommand(variablesSection, index, Type.valueOf(place)));
+            stack.execute(new CreateFreshVariableCommand(variablesSection, index, VariableType.valueOf(place)));
             return null;
         }
     }

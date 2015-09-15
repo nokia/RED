@@ -24,7 +24,7 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
 
     @Override
-    public Optional<RobotElement> provideSection(final RobotSuiteFile suiteModel) {
+    public Optional<? extends RobotSuiteFileSection> provideSection(final RobotSuiteFile suiteModel) {
         return getComponent().provideSection(suiteModel);
     }
 

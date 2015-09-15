@@ -27,6 +27,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -96,9 +97,9 @@ public class ExecutionView {
     
     private RerunFailedOnlyAction rerunFailedOnlyAction;
 
-    private List<ExecutionStatus> executionViewerInput = new ArrayList<>();
+    private final List<ExecutionStatus> executionViewerInput = new ArrayList<>();
 
-    private LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
+    private final LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
     
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
@@ -366,7 +367,7 @@ public class ExecutionView {
             if (suitesStack.size() > 1) {
                 suitesStack.removeLast();
                 if (status == Status.PASS) {
-                    executionViewer.collapseToLevel(lastSuite, TreeViewer.ALL_LEVELS);
+                    executionViewer.collapseToLevel(lastSuite, AbstractTreeViewer.ALL_LEVELS);
                 }
             }
         }
@@ -378,7 +379,7 @@ public class ExecutionView {
             final List<ExecutionStatus> lastSuiteChildren = lastSuite.getChildren();
             final Status status = getStatus(executionElement);
             final int elapsedTime = executionElement.getElapsedTime();
-            for (ExecutionStatus executionStatus : lastSuiteChildren) {
+            for (final ExecutionStatus executionStatus : lastSuiteChildren) {
                 if (executionStatus.getName().equals(executionElement.getName())) {
                     executionStatus.setStatus(status);
                     final String message = executionElement.getMessage();

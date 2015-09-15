@@ -5,9 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable.Type;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetVariableNameCommand extends EditorCommand {
@@ -22,50 +29,72 @@ public class SetVariableNameCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (newName.equals(variable.getPrefix() + variable.getName() + variable.getSuffix())) {
+        if (variable.getType() == VariableType.INVALID && newName.equals(variable.getName())) {
+            return;
+        } else if (newName.equals(variable.getPrefix() + variable.getName() + variable.getSuffix())) {
             return;
         }
 
-        // it has to be send, not posted
-        // otherwise it is not possible to traverse between cells, because the cell
-        // is traversed and then main thread has to handle incoming posted event which
-        // closes currently active cell editor
-        if (newName.startsWith(Type.LIST.getMark())) {
-            if (variable.getType() != Type.LIST) {
-                variable.setType(Type.LIST);
+        boolean typeWasChanged;
+        if (newName.startsWith(VariableType.SCALAR.getIdentificator() + "{") && newName.endsWith("}")) {
 
-                eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
-            }
-            variable.setName(getNameWithoutMarks());
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
-        } else if (newName.startsWith(Type.SCALAR.getMark())) {
-            if (variable.getType() != Type.SCALAR) {
-                variable.setType(Type.SCALAR);
+            typeWasChanged = setTypeIfNeeded(VariableType.SCALAR, VariableType.SCALAR_AS_LIST);
+            setName(newName);
+        } else if (newName.startsWith(VariableType.DICTIONARY.getIdentificator() + "{") && newName.endsWith("}")) {
 
-                eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
-            }
-            variable.setName(getNameWithoutMarks());
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
-        } else if (newName.startsWith(Type.DICTIONARY.getMark())) {
-            if (variable.getType() != Type.DICTIONARY) {
-                variable.setType(Type.DICTIONARY);
+            typeWasChanged = setTypeIfNeeded(VariableType.DICTIONARY);
+            setName(newName);
+        } else if (newName.startsWith(VariableType.LIST.getIdentificator() + "{") && newName.endsWith("}")) {
 
-                eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
-            }
-            variable.setName(getNameWithoutMarks());
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
+            typeWasChanged = setTypeIfNeeded(VariableType.LIST);
+            setName(newName);
         } else {
-            variable.setName(newName);
 
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
+            typeWasChanged = setTypeIfNeeded(VariableType.INVALID);
+            setName(newName);
         }
+
+        final List<RobotVariable> children = variable.getSuiteFile()
+                .findSection(RobotVariablesSection.class)
+                .get()
+                .getChildren();
+        RobotVariable newVariable = null;
+        for (final RobotVariable var : children) {
+            if (var.getName().equals(getNewNameWithoutMarks(newName))) {
+                newVariable = var;
+                break;
+            }
+        }
+        if (typeWasChanged) {
+            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, newVariable);
+        }
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, newVariable);
     }
 
-    private String getNameWithoutMarks() {
-        String nameWithoutMark = newName.substring(1);
-        nameWithoutMark = nameWithoutMark.startsWith("{") ? nameWithoutMark.substring(1) : nameWithoutMark;
-        nameWithoutMark = nameWithoutMark.endsWith("}") ? nameWithoutMark
-                .substring(0, nameWithoutMark.length() - 1) : nameWithoutMark;
-        return nameWithoutMark;
+    private void setName(final String rawName) {
+        final IVariableHolder linkedVariable = variable.getLinkedElement();
+        
+        final RobotToken declaration = linkedVariable.getDeclaration();
+        final int offset = declaration.getStartOffset();
+        final int length = declaration.getText().length();
+
+        // DocumentUpdater.replace(document, offset, length, rawName);
+        // variable.getSuiteFile().reparseEverything(document.get());
+    }
+
+    private boolean setTypeIfNeeded(final VariableType... type) {
+        if (!newArrayList(type).contains(variable.getType())) {
+            // final IVariableHolder linkedVariable = variable.getLinkedElement();
+            // final RobotToken declaration = linkedVariable.getDeclaration();
+            // linkedVariable.setType(type.toVariableType());
+            // variable.setType(type);
+
+            return true;
+        }
+        return false;
+    }
+
+    private String getNewNameWithoutMarks(final String name) {
+        return name.substring(2, name.length() - 1);
     }
 }
