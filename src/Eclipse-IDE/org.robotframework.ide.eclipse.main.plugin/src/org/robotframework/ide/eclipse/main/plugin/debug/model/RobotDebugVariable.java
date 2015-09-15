@@ -15,11 +15,11 @@ import org.eclipse.debug.core.model.IVariable;
  */
 public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
-    private String name;
+    private final String name;
 
     private RobotDebugValue debugValue;
 
-    private RobotDebugVariable parent;
+    private final RobotDebugVariable parent;
 
     private boolean isValueModificationEnabled = true;
 
@@ -33,97 +33,67 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @param value
      *            variable value
      */
-    public RobotDebugVariable(RobotDebugTarget target, String name, Object value, RobotDebugVariable parent) {
+    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value, final RobotDebugVariable parent) {
         super(target);
         this.name = name;
         this.parent = parent;
         debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IVariable#getValue()
-     */
+    @Override
     public IValue getValue() throws DebugException {
         return debugValue;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IVariable#getName()
-     */
+    @Override
     public String getName() throws DebugException {
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IVariable#getReferenceTypeName()
-     */
+    @Override
     public String getReferenceTypeName() throws DebugException {
         return "RobotVariable";
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IVariable#hasValueChanged()
-     */
+    @Override
     public boolean hasValueChanged() throws DebugException {
         return hasValueChanged;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String)
-     */
-    public void setValue(String expression) throws DebugException {
+    @Override
+    public void setValue(final String expression) throws DebugException {
         debugValue.setValue(expression);
         hasValueChanged = true;
         fireEvent(new DebugEvent(this, DebugEvent.CHANGE, DebugEvent.CLIENT_REQUEST));
         ((RobotDebugTarget) this.getDebugTarget()).sendChangeRequest(expression, name, parent);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.debug.core.model.IValue)
-     */
-    public void setValue(IValue value) throws DebugException {
+    @Override
+    public void setValue(final IValue value) throws DebugException {
         debugValue.setValue(value.getValueString());
         hasValueChanged = true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValueModification#supportsValueModification()
-     */
+    @Override
     public boolean supportsValueModification() {
         return isValueModificationEnabled;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValueModification#verifyValue(java.lang.String)
-     */
-    public boolean verifyValue(String expression) throws DebugException {
+    @Override
+    public boolean verifyValue(final String expression) throws DebugException {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.core.model.IValueModification#verifyValue(org.eclipse.debug.core.model.
-     * IValue)
-     */
-    public boolean verifyValue(IValue value) throws DebugException {
+    @Override
+    public boolean verifyValue(final IValue value) throws DebugException {
         return true;
     }
 
-    public void setHasValueChanged(boolean valueChanged) {
+    public void setHasValueChanged(final boolean valueChanged) {
         hasValueChanged = valueChanged;
     }
 
-    public void setRobotDebugValue(RobotDebugValue value) {
+    public void setRobotDebugValue(final RobotDebugValue value) {
         this.debugValue = value;
     }
 
@@ -135,7 +105,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return isValueModificationEnabled;
     }
 
-    public void setValueModificationEnabled(boolean isValueModificationEnabled) {
+    public void setValueModificationEnabled(final boolean isValueModificationEnabled) {
         this.isValueModificationEnabled = isValueModificationEnabled;
     }
 
