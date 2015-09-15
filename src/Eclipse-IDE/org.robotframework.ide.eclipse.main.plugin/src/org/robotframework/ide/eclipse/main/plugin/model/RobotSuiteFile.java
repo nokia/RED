@@ -27,9 +27,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotFileDumper;
-import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -41,8 +39,8 @@ import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
@@ -261,7 +259,7 @@ public class RobotSuiteFile implements RobotElement {
     public void commitChanges(final IProgressMonitor monitor) throws CoreException {
         // FIXME : this should be done using RobotFileDumper, but it is lacking API for dumping to
         // string
-        final StringBuilder content = new RobotFileDumper().dump(fileOutput);
+        final String content = new RobotFileDumper().dump(fileOutput);
         final InputStream stream = new ByteArrayInputStream(content.toString().getBytes(Charsets.UTF_8));
         file.setContents(stream, true, true, monitor);
     }
@@ -335,9 +333,9 @@ public class RobotSuiteFile implements RobotElement {
     public Map<AVariableImported, String> getVariablesFromImportedFiles() {
         final Map<AVariableImported, String> importedVariablesMap = new HashMap<>();
         final List<VariablesFileImportReference> fileList = fileOutput.getVariablesImportReferences();
-        for (VariablesFileImportReference variablesFileImportReference : fileList) {
+        for (final VariablesFileImportReference variablesFileImportReference : fileList) {
             final List<AVariableImported> variablesList = variablesFileImportReference.getVariables();
-            for (AVariableImported aVariableImported : variablesList) {
+            for (final AVariableImported aVariableImported : variablesList) {
                 importedVariablesMap.put(aVariableImported, variablesFileImportReference.getVariablesFile().getPath());
             }
         }
