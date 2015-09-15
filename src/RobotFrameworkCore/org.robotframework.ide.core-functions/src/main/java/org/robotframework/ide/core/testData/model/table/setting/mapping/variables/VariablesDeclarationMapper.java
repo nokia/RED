@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting.mapping.variables;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -13,6 +14,7 @@ import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -38,7 +40,7 @@ public class VariablesDeclarationMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_VARIABLES_DECLARATION);
         rt.setText(new StringBuilder(text));
-
+        rt.setRaw(new StringBuilder(text));
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
         VariablesImport variables = new VariablesImport(rt);
@@ -54,8 +56,9 @@ public class VariablesDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes()
-                .contains(RobotTokenType.SETTING_VARIABLES_DECLARATION)) {
+        List<IRobotTokenType> types = rt.getTypes();
+        if (types.size() == 1
+                && types.get(0) == RobotTokenType.SETTING_VARIABLES_DECLARATION) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;

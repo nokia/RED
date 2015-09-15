@@ -37,6 +37,7 @@ public class SuiteSetupKeywordArgumentMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();

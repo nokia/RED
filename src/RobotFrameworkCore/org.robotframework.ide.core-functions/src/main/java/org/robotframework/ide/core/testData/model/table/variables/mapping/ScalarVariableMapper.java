@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.variables.mapping;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -14,6 +15,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -40,6 +42,7 @@ public class ScalarVariableMapper implements IParsingMapper {
         VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
         rt.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
 
         ScalarVariable var = new ScalarVariable(
@@ -58,7 +61,9 @@ public class ScalarVariableMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)) {
+        List<IRobotTokenType> types = rt.getTypes();
+        if (types.size() == 1
+                && types.get(0) == RobotTokenType.VARIABLES_SCALAR_DECLARATION) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (varHelper.isIncludedInVariableTable(currentLine,
                         processingState)) {

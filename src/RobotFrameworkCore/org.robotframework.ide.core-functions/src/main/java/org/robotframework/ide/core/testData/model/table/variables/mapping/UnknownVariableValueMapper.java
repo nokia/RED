@@ -36,6 +36,7 @@ public class UnknownVariableValueMapper implements IParsingMapper {
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
         rt.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
         List<AVariable> variables = robotFileOutput.getFileModel()

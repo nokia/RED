@@ -80,11 +80,13 @@ public class RobotToken implements IRobotLineElement {
 
 
     public void setText(StringBuilder text) {
-        if (wasFirstInit) {
-            isDirty = true;
-        } else {
-            wasFirstInit = true;
+        if ((text != null && !text.toString().equals(this.text.toString()))
+                || (this.text != null && text == null)) {
+            if (wasFirstInit) {
+                isDirty = true;
+            }
         }
+        wasFirstInit = true;
         this.text = text;
     }
 
