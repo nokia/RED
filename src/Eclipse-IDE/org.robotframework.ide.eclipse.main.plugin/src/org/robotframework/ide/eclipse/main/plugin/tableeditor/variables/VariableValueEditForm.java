@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
@@ -48,7 +49,7 @@ public class VariableValueEditForm {
     
     private static final String COLLECTION_SEPARATOR_REGEX = "(\\s{2,}|\t)"; // two or more spaces or tab
 
-    private IEventBroker eventBroker;
+    private final IEventBroker eventBroker;
 
     private Text valueTxt;
     
@@ -66,9 +67,9 @@ public class VariableValueEditForm {
 
     private Table table;
 
-    private RedFormToolkit toolkit;
+    private final RedFormToolkit toolkit;
 
-    private Section section;
+    private final Section section;
 
     private RobotVariable variable;
     
@@ -77,7 +78,7 @@ public class VariableValueEditForm {
     ModifyListener valueTxtModifyListener = new ModifyListener() {
 
         @Override
-        public void modifyText(ModifyEvent e) {
+        public void modifyText(final ModifyEvent e) {
             variableChangedInSection();
         }
     };
@@ -88,13 +89,13 @@ public class VariableValueEditForm {
         this.eventBroker = eventBroker;
     }
 
-    public Composite createVariableValueEditForm(RobotVariable variable) {
+    public Composite createVariableValueEditForm(final RobotVariable variable) {
         this.variable = variable;
-        this.isList = variable.getType() == RobotVariable.Type.LIST;
-        this.isDictionary = variable.getType() == RobotVariable.Type.DICTIONARY;
-        this.isScalar = variable.getType() == RobotVariable.Type.SCALAR;
+        this.isList = variable.getType() == VariableType.LIST;
+        this.isDictionary = variable.getType() == VariableType.DICTIONARY;
+        this.isScalar = variable.getType() == VariableType.SCALAR;
 
-        Composite form = toolkit.createComposite(section);
+        final Composite form = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(form);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 2).applyTo(form);
 
@@ -109,7 +110,7 @@ public class VariableValueEditForm {
         nameTxt.setEnabled(false);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(nameTxt);
 
-        Label valueLbl = toolkit.createLabel(composite, "");
+        final Label valueLbl = toolkit.createLabel(composite, "");
         if (isScalar) {
             valueLbl.setText("Scalar:");
         } else if (isList) {
@@ -365,7 +366,7 @@ public class VariableValueEditForm {
             }
         }
         isEditedInForm = true;
-        variable.setValue(resultValue);
+        // variable.setValue(resultValue);
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);   //notify main variables table that value is changed in section
     }
     
@@ -374,13 +375,13 @@ public class VariableValueEditForm {
             final String[] values = variable.getValue().split(COLLECTION_SEPARATOR_REGEX);
 
             collectionElements = new ArrayList<RobotCollectionElement>();
-            if (variable.getType() == RobotVariable.Type.DICTIONARY && tableViewer != null) {
+            if (variable.getType() == VariableType.DICTIONARY && tableViewer != null) {
                 createInputForDictionary(collectionElements, values);
                 tableViewer.setInput(collectionElements);
-            } else if (variable.getType() == RobotVariable.Type.LIST && tableViewer != null) {
+            } else if (variable.getType() == VariableType.LIST && tableViewer != null) {
                 createInputForList(collectionElements, values);
                 tableViewer.setInput(collectionElements);
-            } else if(variable.getType() == RobotVariable.Type.SCALAR && valueTxt != null) { 
+            } else if (variable.getType() == VariableType.SCALAR && valueTxt != null) {
                     valueTxt.removeModifyListener(valueTxtModifyListener);
                     valueTxt.setText(variable.getValue());
                     valueTxt.addModifyListener(valueTxtModifyListener);
@@ -389,7 +390,7 @@ public class VariableValueEditForm {
         isEditedInForm = false;
     }
     
-    public void variableNameChanged(String name) {
+    public void variableNameChanged(final String name) {
         if (nameTxt != null) {
             nameTxt.setText(name);
         }

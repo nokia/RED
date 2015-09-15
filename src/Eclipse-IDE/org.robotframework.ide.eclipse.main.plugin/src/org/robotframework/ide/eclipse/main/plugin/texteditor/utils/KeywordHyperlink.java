@@ -23,11 +23,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
  */
 public class KeywordHyperlink implements IHyperlink {
 
-    private IRegion hyperlinkRegion;
+    private final IRegion hyperlinkRegion;
 
-    private IRegion result;
+    private final IRegion result;
 
-    private ITextViewer viewer;
+    private final ITextViewer viewer;
 
     public KeywordHyperlink(final ITextViewer viewer, final IRegion hyperlinkRegion, final IRegion result) {
         this.hyperlinkRegion = hyperlinkRegion;
@@ -59,7 +59,7 @@ public class KeywordHyperlink implements IHyperlink {
             viewer.getTextWidget().setTopIndex(topIndexPosition);
             viewer.getTextWidget().setSelection(result.getOffset(), result.getOffset() + result.getLength());
 
-        } catch (BadLocationException e) {
+        } catch (final BadLocationException e) {
             e.printStackTrace();
         }
 
@@ -73,11 +73,11 @@ public class KeywordHyperlink implements IHyperlink {
             public void run() {
                 // TODO: get file location from model
                 final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("testProject");
-                IEditorInput input = new FileEditorInput(project.getFile("suiteFolder/resource1.robot"));
+                final IEditorInput input = new FileEditorInput(project.getFile("suiteFolder/resource1.robot"));
 
                 try {
                     workbench.getActiveWorkbenchWindow().getActivePage().openEditor(input, RobotFormEditor.ID);
-                } catch (PartInitException e) {
+                } catch (final PartInitException e) {
                     e.printStackTrace();
                 }
             }

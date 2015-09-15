@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class TextEditorOccurrenceMarksManager {
@@ -28,14 +28,14 @@ public class TextEditorOccurrenceMarksManager {
 
     private final IFile editedFile;
 
-    private final SourceViewer viewer;
+    private final IDocument document;
 
     private FindReplaceDocumentAdapter findAdapter;
 
     private boolean isMarkVisible;
 
-    public TextEditorOccurrenceMarksManager(final SourceViewer viewer, final IFile editedFile) {
-        this.viewer = viewer;
+    public TextEditorOccurrenceMarksManager(final IDocument document, final IFile editedFile) {
+        this.document = document;
         this.editedFile = editedFile;
     }
 
@@ -44,9 +44,9 @@ public class TextEditorOccurrenceMarksManager {
         removeOldOccurrenceMarks();
 
         try {
-            final IRegion selectedRegion = new TextEditorHoverManager().findHoveredText(viewer, offset);
-            final String selectedText = viewer.getDocument().get(selectedRegion.getOffset(), selectedRegion.getLength());
-            findAdapter = new FindReplaceDocumentAdapter(viewer.getDocument());
+            final IRegion selectedRegion = new TextEditorHoverManager().findHoveredText(document, offset);
+            final String selectedText = document.get(selectedRegion.getOffset(), selectedRegion.getLength());
+            findAdapter = new FindReplaceDocumentAdapter(document);
 
             final List<IRegion> occurencesRegions = findOccurencesRegions(selectedText);
             final WorkspaceJob wsJob = new WorkspaceJob("Creating occurences markers") {

@@ -89,7 +89,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         }
 
         @Override
-        public Optional<RobotElement> provideSection(final RobotSuiteFile suiteModel) {
+        public Optional<? extends RobotSuiteFileSection> provideSection(final RobotSuiteFile suiteModel) {
             return suiteModel.findSection(RobotSettingsSection.class);
         }
 

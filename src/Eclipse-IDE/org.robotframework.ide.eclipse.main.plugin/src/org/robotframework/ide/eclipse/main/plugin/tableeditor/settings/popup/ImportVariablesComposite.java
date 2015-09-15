@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -62,8 +63,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSet
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Optional;
-
 public class ImportVariablesComposite {
 
     private static IProject currentProject;
@@ -87,8 +86,7 @@ public class ImportVariablesComposite {
         this.shell = shell;
 
         currentProject = fileModel.getProject().getProject();
-        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
-        this.settingsSection = (RobotSettingsSection) section.get();
+        this.settingsSection = fileModel.findSection(RobotSettingsSection.class).get();
     }
 
     public Composite createImportVariablesComposite(final Composite parent) {
@@ -346,8 +344,9 @@ public class ImportVariablesComposite {
     }
 
     protected void setInitialSelection(final RobotSetting initialSetting) {
-        variablesViewer.setSelection(Selections.createStructuredSelection(new ImportedVariablesFile(
-                initialSetting.getArguments())));
+        final ImportedVariablesFile selectedImport = new ImportedVariablesFile(
+                initialSetting.getArguments());
+        variablesViewer.setSelection(new StructuredSelection(selectedImport));
     }
 
     private static class VariablesLabelProvider extends StyledCellLabelProvider {
@@ -358,7 +357,7 @@ public class ImportVariablesComposite {
             final StyledString label = getStyledText(cell.getElement());
             cell.setText(label.getString());
             cell.setStyleRanges(label.getStyleRanges());
-            
+
             cell.setImage(getImage(cell.getElement()));
             
             super.update(cell);

@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -49,7 +50,6 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -61,8 +61,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 
 public class ImportResourcesComposite {
@@ -82,8 +80,7 @@ public class ImportResourcesComposite {
         this.shell = shell;
         
         currentProject = fileModel.getProject().getProject();
-        final Optional<RobotElement> section = fileModel.findSection(RobotSettingsSection.class);
-        this.settingsSection = (RobotSettingsSection) section.get();
+        this.settingsSection = fileModel.findSection(RobotSettingsSection.class).get();
     }
     
     public Composite createImportResourcesComposite(final Composite parent) {
@@ -290,8 +287,8 @@ public class ImportResourcesComposite {
     
     protected void setInitialSelection(final RobotSetting initialSetting) {
         if (!initialSetting.getArguments().isEmpty()) {
-            resourcesViewer.setSelection(Selections.createStructuredSelection(new Path(initialSetting.getArguments()
-                    .get(0))));
+            final Path selectedArgument = new Path(initialSetting.getArguments().get(0));
+            resourcesViewer.setSelection(new StructuredSelection(selectedArgument));
         }
     }
     

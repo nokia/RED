@@ -320,7 +320,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private RobotSettingsSection getSection() {
-        return (RobotSettingsSection) fileModel.findSection(RobotSettingsSection.class).orNull();
+        return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
     @Override
@@ -535,20 +535,33 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            try {
-                ViewerCell focusCell = null;
-                if (viewer.isPresent()) {
-                    viewer.get().getTable().setRedraw(false);
-                    focusCell = viewer.get().getColumnViewerEditor().getFocusCell();
-                }
-                setInput();
-                if (focusCell != null) {
-                    viewer.get().setFocusCell(focusCell.getColumnIndex());
-                }
-            } finally {
-                if (viewer.isPresent()) {
-                    viewer.get().getTable().setRedraw(true);
-                }
+            refreshEverything();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenReconcilationWasDone(
+            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshEverything();
+        }
+    }
+
+    private void refreshEverything() {
+        try {
+            ViewerCell focusCell = null;
+            if (viewer.isPresent()) {
+                viewer.get().getTable().setRedraw(false);
+                focusCell = viewer.get().getColumnViewerEditor().getFocusCell();
+            }
+            setInput();
+            if (focusCell != null) {
+                viewer.get().setFocusCell(focusCell.getColumnIndex());
+            }
+        } finally {
+            if (viewer.isPresent()) {
+                viewer.get().getTable().setRedraw(true);
             }
         }
     }

@@ -24,8 +24,14 @@ public class SetVariableValueCommand extends EditorCommand {
         if (variable.getValue().equals(newValue)) {
             return;
         }
-        variable.setValue(newValue);
-        
+        // variable.setValue(newValue);
+        // final Position position = variable.getPositionOfValue();
+        // try {
+        // document.replace(position.getOffset(), position.getLength(), newValue);
+        // } catch (final BadLocationException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the cell
         // is traversed and then main thread has to handle incoming posted event which

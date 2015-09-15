@@ -44,7 +44,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }    
     
     @Override
-    protected RobotFileOutput parseModel() {
+    protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
         throw new RuntimeException("Currently there is no API for parsing anything more than files.");
     }
 

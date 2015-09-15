@@ -5,15 +5,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 public class RedVariableProposal {
 
-    private String name;
+    private final String name;
 
-    private String source;
+    private final String source;
 
-    private String value;
+    private final String value;
 
-    private String comment;
+    private final String comment;
 
-    private VariableType type;
+    private final VariableType type;
 
     private RedVariableProposal(final String name, final String source, final String value, final String comment,
             final VariableType type) {
@@ -30,7 +30,7 @@ public class RedVariableProposal {
                 VariableType.LOCAL);
     }
 
-    static RedVariableProposal create(final AVariableImported variable, final String filePath) {
+    static RedVariableProposal create(final AVariableImported<?> variable, final String filePath) {
         return new RedVariableProposal(variable.getName(), filePath, variable.getValue().toString(), "",
                 VariableType.IMPORTED);
     }

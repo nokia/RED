@@ -114,7 +114,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     @Override
     public void link(final ARobotSectionTable table) {
-        final SettingTable settingsTable = (SettingTable) table;
+        super.link(table);
+
+        final SettingTable settingsTable = (SettingTable) sectionTable;
         
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
             final String name = metadataSetting.getDeclaration().getText().toString();
@@ -157,13 +159,13 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                     Lists.transform(documentationSetting.getDocumentationText(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
-        for (final AKeywordBaseSetting keywordSetting : getKeywordBasedSettings(settingsTable)) {
+        for (final AKeywordBaseSetting<?> keywordSetting : getKeywordBasedSettings(settingsTable)) {
             final String name = keywordSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(keywordSetting.getKeywordName().getText().toString());
             args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
-        for (final ATags tagSetting : getTagsSettings(settingsTable)) {
+        for (final ATags<?> tagSetting : getTagsSettings(settingsTable)) {
             final String name = tagSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(tagSetting.getTags(), TokenFunctions.tokenToString()));
@@ -182,8 +184,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         }
     }
 
-    private static List<? extends AKeywordBaseSetting> getKeywordBasedSettings(final SettingTable settingTable) {
-        final List<AKeywordBaseSetting> elements = newArrayList();
+    private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
+        final List<AKeywordBaseSetting<?>> elements = newArrayList();
         elements.addAll(settingTable.getSuiteSetups());
         elements.addAll(settingTable.getSuiteTeardowns());
         elements.addAll(settingTable.getTestSetups());
@@ -191,8 +193,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return elements;
     }
 
-    private static List<? extends ATags> getTagsSettings(final SettingTable settingTable) {
-        final List<ATags> elements = newArrayList();
+    private static List<? extends ATags<?>> getTagsSettings(final SettingTable settingTable) {
+        final List<ATags<?>> elements = newArrayList();
         elements.addAll(settingTable.getForceTags());
         elements.addAll(settingTable.getDefaultTags());
         return elements;
