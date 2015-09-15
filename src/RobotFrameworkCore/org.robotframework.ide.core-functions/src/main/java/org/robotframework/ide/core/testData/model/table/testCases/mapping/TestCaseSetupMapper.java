@@ -36,6 +36,7 @@ public class TestCaseSetupMapper extends ATestCaseSettingDeclarationMapper {
         types.add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
 
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting.mapping.library;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -13,6 +14,7 @@ import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -38,6 +40,7 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_DECLARATION);
         rt.setText(new StringBuilder(text));
+        rt.setText(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
@@ -54,7 +57,9 @@ public class LibraryDeclarationMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_DECLARATION)) {
+        List<IRobotTokenType> types = rt.getTypes();
+        if (types.size() == 1
+                && types.get(0) == RobotTokenType.SETTING_LIBRARY_DECLARATION) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;

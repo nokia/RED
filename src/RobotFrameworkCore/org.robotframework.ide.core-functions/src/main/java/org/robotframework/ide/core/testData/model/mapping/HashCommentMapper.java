@@ -96,6 +96,7 @@ public class HashCommentMapper implements IParsingMapper {
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         boolean addToStack = false;
+        rt.setRaw(new StringBuilder(text));
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             rt.setType(RobotTokenType.START_HASH_COMMENT);
             addToStack = true;

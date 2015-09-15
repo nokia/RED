@@ -41,6 +41,7 @@ public class KeywordArgumentsValueMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_ARGUMENT);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();

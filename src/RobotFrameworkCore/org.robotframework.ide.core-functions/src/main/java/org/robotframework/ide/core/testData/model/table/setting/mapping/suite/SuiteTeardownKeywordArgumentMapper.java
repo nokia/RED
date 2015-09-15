@@ -37,6 +37,7 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();

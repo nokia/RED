@@ -40,6 +40,7 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TAGS);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
