@@ -359,8 +359,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 if (!text.equals(robotToken.getText().toString())) {
                     // FIXME: add information that type is incorrect missing
                     // separator
-                    robotToken.getTypes().add(0, RobotTokenType.UNKNOWN);
-                    robotToken.setText(new StringBuilder(text));
+                    RobotToken newRobotToken = new RobotToken();
+                    newRobotToken.setText(new StringBuilder(text));
+                    newRobotToken.setRaw(new StringBuilder(text));
+                    newRobotToken.setType(RobotTokenType.UNKNOWN);
+                    newRobotToken.getTypes().addAll(robotToken.getTypes());
+                    robotToken = newRobotToken;
                     newStatus = ParsingState.UNKNOWN;
                 }
             } else {
@@ -368,6 +372,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 robotToken.setLineNumber(fp.getLine());
                 robotToken.setStartColumn(fp.getColumn());
                 robotToken.setText(new StringBuilder(text));
+                robotToken.setRaw(new StringBuilder(text));
                 robotToken.setType(RobotTokenType.UNKNOWN);
 
                 newStatus = ParsingState.UNKNOWN;
