@@ -26,7 +26,7 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     }
 
     @Override
-    protected void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
+    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
         validateFileName(fileModel, monitor);
 
         super.validate(fileModel, monitor);
