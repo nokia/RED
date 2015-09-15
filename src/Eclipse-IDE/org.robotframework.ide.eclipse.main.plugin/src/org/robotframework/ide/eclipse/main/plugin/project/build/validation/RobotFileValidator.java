@@ -45,9 +45,10 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         }
     }
 
-    private void validate(final RobotFileOutput fileOutput, final IProgressMonitor monitor) throws CoreException {
+    private void validate(final RobotFileOutput robotFileOutput, final IProgressMonitor monitor)
+            throws CoreException {
         // TODO : check output status and parsing messages
-        validate(fileOutput.getFileModel(), monitor);
+        validate(robotFileOutput.getFileModel(), monitor);
     }
 
     /**
@@ -58,7 +59,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      * @param monitor
      * @throws CoreException
      */
-    protected void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
+    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
         new TestCasesTableValidator(file, fileModel.getTestCaseTable()).validate(monitor);
         new GeneralSettingsTableValidator(file, fileModel.getSettingTable()).validate(monitor);
         new KeywordTableValidator(file, fileModel.getKeywordTable()).validate(monitor);
