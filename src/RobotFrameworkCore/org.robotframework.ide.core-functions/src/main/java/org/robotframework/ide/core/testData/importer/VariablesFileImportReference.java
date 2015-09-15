@@ -19,11 +19,10 @@ import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 public class VariablesFileImportReference {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
-    private VariablesImport importDeclaration;
+    private final VariablesImport importDeclaration;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private File variablesFile;
-    @SuppressWarnings("rawtypes")
-    private List<AVariableImported> variables = new LinkedList<>();
+    private List<AVariableImported<?>> variables = new LinkedList<>();
 
 
     public VariablesFileImportReference(final VariablesImport importDeclaration) {
@@ -47,8 +46,7 @@ public class VariablesFileImportReference {
     }
 
 
-    @SuppressWarnings("rawtypes")
-    public List<AVariableImported> getVariables() {
+    public List<AVariableImported<?>> getVariables() {
         return Collections.unmodifiableList(variables);
     }
 
@@ -63,24 +61,23 @@ public class VariablesFileImportReference {
     }
 
 
-    @SuppressWarnings("rawtypes")
     public void map(final Map<?, ?> varsRead) {
-        Set<?> variablesNames = varsRead.keySet();
-        for (Object varName : variablesNames) {
-            Object varValue = varsRead.get(varName);
-            AVariableImported var;
+        final Set<?> variablesNames = varsRead.keySet();
+        for (final Object varName : variablesNames) {
+            final Object varValue = varsRead.get(varName);
+            AVariableImported<?> var;
             if (varValue instanceof List) {
-                ListVariableImported listVar = new ListVariableImported(""
+                final ListVariableImported listVar = new ListVariableImported(""
                         + varName);
-                listVar.setValue((List) varValue);
+                listVar.setValue((List<?>) varValue);
                 var = listVar;
             } else if (varValue instanceof Map) {
-                DictionaryVariableImported dictVar = new DictionaryVariableImported(
+                final DictionaryVariableImported dictVar = new DictionaryVariableImported(
                         "" + varName);
-                dictVar.setValue(convert((Map) varValue));
+                dictVar.setValue(convert((Map<?, ?>) varValue));
                 var = dictVar;
             } else {
-                ScalarVariableImported scalarVar = new ScalarVariableImported(
+                final ScalarVariableImported scalarVar = new ScalarVariableImported(
                         "" + varName);
                 scalarVar.setValue("" + varValue);
                 var = scalarVar;
@@ -90,22 +87,17 @@ public class VariablesFileImportReference {
         }
     }
 
-
-    private Map<String, Object> convert(@SuppressWarnings("rawtypes") Map m) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        @SuppressWarnings("rawtypes")
-        Set keySet = m.keySet();
-        for (Object key : keySet) {
-            map.put("" + key, m.get(key));
+    private Map<String, Object> convert(final Map<?, ?> m) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+        for (final Object key : m.keySet()) {
+            map.put((String) key, m.get(key));
         }
-
         return map;
     }
 
-
     public VariablesFileImportReference copy(
             final VariablesImport importDeclaration) {
-        VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(
+        final VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(
                 importDeclaration);
         newVarImportRef.setVariablesFile(variablesFile.getAbsoluteFile());
         newVarImportRef.variables = variables;
