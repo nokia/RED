@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
@@ -44,17 +41,13 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         return getDebugTarget().getLaunch();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IDebugElement.class) {
             return this;
         }
         return super.getAdapter(adapter);
-    }
-
-    protected void abort(final String message, final Throwable e) throws DebugException {
-        throw new DebugException(new Status(IStatus.ERROR, "org.robotframework.ide.eclipse.main.plugin",
-                "abort message"));
     }
 
     /**
