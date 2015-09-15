@@ -38,6 +38,7 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();

@@ -36,6 +36,8 @@ public class VariablesImportPathMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_VARIABLES_FILE_NAME);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
+
         AImported imported = utility.getNearestImport(robotFileOutput);
         VariablesImport vars;
         if (imported instanceof VariablesImport) {

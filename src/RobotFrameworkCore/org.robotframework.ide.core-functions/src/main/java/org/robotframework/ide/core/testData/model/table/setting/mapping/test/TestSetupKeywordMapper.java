@@ -37,6 +37,7 @@ public class TestSetupKeywordMapper implements IParsingMapper {
             String text) {
         rt.setType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME);
         rt.setText(new StringBuilder(text));
+        rt.setRaw(new StringBuilder(text));
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
