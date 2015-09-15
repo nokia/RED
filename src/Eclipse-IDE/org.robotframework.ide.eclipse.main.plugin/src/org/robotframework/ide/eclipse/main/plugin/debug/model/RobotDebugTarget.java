@@ -33,10 +33,10 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 /**
@@ -107,7 +107,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     .getInputStream()))).readLine() == null) {
                 try {
                     Thread.sleep(500);  //wait for TestRunnerAgent
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
                 retryCounter++;
@@ -118,7 +118,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             serverSocket = socketManager.getServerSocket();
         	eventSocket = socketManager.getEventSocket();
         	eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
@@ -132,113 +132,64 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
-     */
     @Override
     public IProcess getProcess() {
         return process;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
-     */
     @Override
     public IThread[] getThreads() throws DebugException {
         return threads;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
-     */
     @Override
     public boolean hasThreads() throws DebugException {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugTarget#getName()
-     */
     @Override
     public String getName() throws DebugException {
         if (name == null) {
             name = "Robot Test";
-
         }
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
-     */
     @Override
     public IDebugTarget getDebugTarget() {
         return this;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
-     */
     @Override
     public ILaunch getLaunch() {
         return launch;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
-     */
     @Override
     public boolean canDisconnect() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
-     */
     @Override
     public boolean isDisconnected() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
-     */
     @Override
     public void disconnect() throws DebugException {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-     */
     @Override
     public boolean canTerminate() {
         return getProcess().canTerminate();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-     */
     @Override
     public boolean isTerminated() {
         return getProcess().isTerminated();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#terminate()
-     */
     @Override
     public void terminate() throws DebugException {
         if (eventSocket != null) {
@@ -249,46 +200,26 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         robotEventBroker.sendClearAllEventToTextEditor();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-     */
     @Override
     public boolean canSuspend() {
         return !isTerminated() && !isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-     */
     @Override
     public boolean isSuspended() {
         return isSuspended;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-     */
     @Override
     public void suspend() throws DebugException {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-     */
     @Override
     public boolean canResume() {
         return !isTerminated() && isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-     */
     @Override
     public void resume() throws DebugException {
         thread.setStepping(false);
@@ -361,22 +292,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.
-     * IBreakpoint)
-     */
     @Override
     public void breakpointAdded(final IBreakpoint breakpoint) {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model
-     * .IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
-     */
     @Override
     public void breakpointRemoved(final IBreakpoint breakpoint, final IMarkerDelta delta) {
         if (supportsBreakpoint(breakpoint)) {
@@ -384,12 +304,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model
-     * .IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
-     */
     @Override
     public void breakpointChanged(final IBreakpoint breakpoint, final IMarkerDelta delta) {
         if (supportsBreakpoint(breakpoint)) {
@@ -404,12 +318,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse.debug.core.model
-     * .IBreakpoint)
-     */
     @Override
     public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
         if (breakpoint.getModelIdentifier().equals(RobotDebugElement.DEBUG_MODEL_ID)) {
@@ -418,19 +326,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval()
-     */
     @Override
     public boolean supportsStorageRetrieval() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long, long)
-     */
     @Override
     public IMemoryBlock getMemoryBlock(final long startAddress, final long length) throws DebugException {
         return null;

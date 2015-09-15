@@ -45,10 +45,11 @@ public class RobotLineBreakpoint extends LineBreakpoint {
      */
     public RobotLineBreakpoint(final IResource resource, final int lineNumber) throws CoreException {
 
-        IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+        final IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
-            public void run(IProgressMonitor monitor) throws CoreException {
-                IMarker marker = resource.createMarker("org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker");
+            @Override
+            public void run(final IProgressMonitor monitor) throws CoreException {
+                final IMarker marker = resource.createMarker("org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker");
                 setMarker(marker);
                 marker.setAttribute(IBreakpoint.ID, getModelIdentifier());
                 marker.setAttribute(IBreakpoint.ENABLED, Boolean.TRUE);
@@ -61,10 +62,7 @@ public class RobotLineBreakpoint extends LineBreakpoint {
         run(getMarkerRule(resource), runnable);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IBreakpoint#getModelIdentifier()
-     */
+    @Override
     public String getModelIdentifier() {
         return RobotDebugElement.DEBUG_MODEL_ID;
     }
