@@ -36,14 +36,11 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @param target
      * 
      */
-    public RobotThread(RobotDebugTarget target) {
+    public RobotThread(final RobotDebugTarget target) {
         super(target);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#getStackFrames()
-     */
+    @Override
     public IStackFrame[] getStackFrames() throws DebugException {
         if (isSuspended()) {
             return ((RobotDebugTarget) getDebugTarget()).getStackFrames();
@@ -52,46 +49,31 @@ public class RobotThread extends RobotDebugElement implements IThread {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
-     */
+    @Override
     public boolean hasStackFrames() throws DebugException {
         return isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#getPriority()
-     */
+    @Override
     public int getPriority() throws DebugException {
         return 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
-     */
+    @Override
     public IStackFrame getTopStackFrame() throws DebugException {
-        IStackFrame[] frames = getStackFrames();
+        final IStackFrame[] frames = getStackFrames();
         if (frames.length > 0) {
             return frames[0];
         }
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#getName()
-     */
+    @Override
     public String getName() throws DebugException {
         return "Thread [main]";
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
-     */
+    @Override
     public IBreakpoint[] getBreakpoints() {
         if (breakpoints == null) {
             return new IBreakpoint[0];
@@ -105,128 +87,83 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @param breakpoints
      *            the breakpoints this thread is suspended at, or <code>null</code> if none
      */
-    public void setBreakpoints(IBreakpoint[] breakpoints) {
+    public void setBreakpoints(final IBreakpoint[] breakpoints) {
         this.breakpoints = breakpoints;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-     */
+    @Override
     public boolean canResume() {
         return isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-     */
+    @Override
     public boolean canSuspend() {
         return !isSuspended() && !isTerminated();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-     */
+    @Override
     public boolean isSuspended() {
         return getDebugTarget().isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-     */
+    @Override
     public void resume() throws DebugException {
         getDebugTarget().resume();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-     */
+    @Override
     public void suspend() throws DebugException {
         getDebugTarget().suspend();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#canStepInto()
-     */
+    @Override
     public boolean canStepInto() {
         return isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#canStepOver()
-     */
+    @Override
     public boolean canStepOver() {
         return isSuspended();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#canStepReturn()
-     */
+    @Override
     public boolean canStepReturn() {
         return isSuspended() && ((RobotDebugTarget) getDebugTarget()).getCurrentFrames().size() > 1;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#isStepping()
-     */
+    @Override
     public boolean isStepping() {
         return isStepping;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#stepInto()
-     */
+    @Override
     public void stepInto() throws DebugException {
         ((RobotDebugTarget) getDebugTarget()).step();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#stepOver()
-     */
+    @Override
     public void stepOver() throws DebugException {
         isSteppingOver = true;
         ((RobotDebugTarget) getDebugTarget()).stepOver();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IStep#stepReturn()
-     */
+    @Override
     public void stepReturn() throws DebugException {
         isSteppingReturn = true;
         ((RobotDebugTarget) getDebugTarget()).stepReturn();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-     */
+    @Override
     public boolean canTerminate() {
         return !isTerminated();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-     */
+    @Override
     public boolean isTerminated() {
         return getDebugTarget().isTerminated();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.ITerminate#terminate()
-     */
+    @Override
     public void terminate() throws DebugException {
         getDebugTarget().terminate();
     }
@@ -237,11 +174,11 @@ public class RobotThread extends RobotDebugElement implements IThread {
      * @param stepping
      *            whether stepping
      */
-    protected void setStepping(boolean stepping) {
+    protected void setStepping(final boolean stepping) {
         isStepping = stepping;
     }
     
-    public void setSteppingOver(boolean stepping) {
+    public void setSteppingOver(final boolean stepping) {
         isSteppingOver = stepping;
     }
     
@@ -249,7 +186,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
         return isSteppingOver;
     }
     
-    public void setSteppingReturn(boolean stepping) {
+    public void setSteppingReturn(final boolean stepping) {
         isSteppingReturn = stepping;
     }
     

@@ -17,60 +17,45 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
 
     private String value;
     
-    private IVariable[] nestedVariables;
+    private final IVariable[] nestedVariables;
     
-    public RobotDebugValue(RobotDebugTarget target, String value, IVariable[] nestedVariables) {
+    public RobotDebugValue(final RobotDebugTarget target, final String value, final IVariable[] nestedVariables) {
         super(target);
         this.value = value;
         this.nestedVariables = nestedVariables;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValue#getReferenceTypeName()
-     */
+    @Override
     public String getReferenceTypeName() throws DebugException {
         try {
             Integer.parseInt(value);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             return "text";
         }
         return "integer";
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValue#getValueString()
-     */
+    @Override
     public String getValueString() throws DebugException {
         return value;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValue#isAllocated()
-     */
+    @Override
     public boolean isAllocated() throws DebugException {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValue#getVariables()
-     */
+    @Override
     public IVariable[] getVariables() throws DebugException {
         return nestedVariables;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.core.model.IValue#hasVariables()
-     */
+    @Override
     public boolean hasVariables() throws DebugException {
         return nestedVariables.length > 0;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
