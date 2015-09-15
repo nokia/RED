@@ -11,9 +11,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 
 public class RobotSourceLookupDirector extends AbstractSourceLookupDirector {
 
-    /* (non-Javadoc)
-     * @see org.eclipse.debug.internal.core.sourcelookup.ISourceLookupDirector#initializeParticipants()
-     */
+    @Override
     public void initializeParticipants() {
         addParticipants(new ISourceLookupParticipant[]{new RobotSourceLookupParticipant()});
         
