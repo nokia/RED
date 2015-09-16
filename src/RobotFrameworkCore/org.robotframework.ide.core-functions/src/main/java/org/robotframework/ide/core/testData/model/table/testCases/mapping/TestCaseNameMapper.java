@@ -60,7 +60,7 @@ public class TestCaseNameMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         if (utility.isTheFirstColumn(currentLine, rt)) {
-            if (isIncludedInKeywordTable(currentLine, processingState)) {
+            if (isIncludedInTestCaseTable(currentLine, processingState)) {
                 result = true;
             } else {
                 // FIXME: it is in wrong place means no keyword table
@@ -76,15 +76,9 @@ public class TestCaseNameMapper implements IParsingMapper {
 
 
     @VisibleForTesting
-    protected boolean isIncludedInKeywordTable(final RobotLine line,
+    protected boolean isIncludedInTestCaseTable(final RobotLine line,
             final Stack<ParsingState> processingState) {
-        boolean result;
-        if (!processingState.isEmpty()) {
-            result = (processingState.get(processingState.size() - 1) == ParsingState.TEST_CASE_TABLE_INSIDE);
-        } else {
-            result = false;
-        }
 
-        return result;
+        return processingState.contains(ParsingState.TEST_CASE_TABLE_INSIDE);
     }
 }
