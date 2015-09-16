@@ -79,13 +79,7 @@ public class UserKeywordNameMapper implements IParsingMapper {
     @VisibleForTesting
     protected boolean isIncludedInKeywordTable(final RobotLine line,
             final Stack<ParsingState> processingState) {
-        boolean result;
-        if (!processingState.isEmpty()) {
-            result = (processingState.get(processingState.size() - 1) == ParsingState.KEYWORD_TABLE_INSIDE);
-        } else {
-            result = false;
-        }
 
-        return result;
+        return processingState.contains(ParsingState.KEYWORD_TABLE_INSIDE);
     }
 }
