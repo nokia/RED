@@ -11,9 +11,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -23,7 +26,6 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -47,6 +49,14 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     public SuiteSourceReconcilingStrategy(final SuiteSourceEditor editor) {
         this.editor = editor;
+    }
+
+    private RobotSuiteFile getSuiteModel() {
+        return editor.getFileModel();
+    }
+
+    private SuiteSourceEditorFoldingSupport getFoldingSupport() {
+        return editor.getFoldingSupport();
     }
 
     @Override
@@ -75,40 +85,23 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void reconcile() {
-        requestReconcilation();
-        waitForGuiThread();
+        reparseModel();
         updateFoldingStructure();
         revalidate();
     }
 
-    private void requestReconcilation() {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                // this will send request to RobotFormEditor to update the model and reparse
-                // everything
-                PlatformUI.getWorkbench().getService(IEventBroker.class).send(RobotModelEvents.RECONCILE, document);
-            }
-        });
-    }
-
-    private void waitForGuiThread() {
-        // this causes reconcilation thread to wait for GUI thread (so that we will be sure that
-        // reparsing was done already
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                // nothing to do
-            }
-        });
+    private void reparseModel() {
+        final RobotSuiteFile suiteModel = getSuiteModel();
+        suiteModel.reparseEverything(document.get());
+        PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.RECONCILATION_DONE, suiteModel);
     }
 
     private void updateFoldingStructure() {
-        final List<Position> positions = calculateFoldingPositions(editor.getFileModel());
+        final List<Position> positions = calculateFoldingPositions(getSuiteModel());
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                editor.getFoldingSupport().updateFoldingStructure(positions);
+                getFoldingSupport().updateFoldingStructure(positions);
             }
         });
     }
@@ -155,26 +148,28 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void revalidate() {
-        final IFile file = getFile();
+        final IFile file = getSuiteModel().getFile();
         final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
                 .createProperValidator(prepareValidationContext(), file);
 
         if (validator.isPresent()) {
-            try {
-                file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-                ((RobotFileValidator) validator.get()).validate(editor.getFileModel().getLinkedElement(),
-                        new NullProgressMonitor());
-            } catch (final CoreException e) {
-                RedPlugin.logError("Problem occured during file validation", e);
-            }
+            final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
+
+                @Override
+                public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                    file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+                    ((RobotFileValidator) validator.get()).validate(getSuiteModel().getLinkedElement(),
+                            new NullProgressMonitor());
+
+                    return Status.OK_STATUS;
+                }
+            };
+            wsJob.setSystem(true);
+            wsJob.schedule();
         }
     }
 
-    private IFile getFile() {
-        return editor.getFileModel().getFile();
-    }
-
     private ValidationContext prepareValidationContext() {
-        return new ValidationContext(editor.getFileModel().getProject().getRuntimeEnvironment());
+        return new ValidationContext(getSuiteModel().getProject().getRuntimeEnvironment());
     }
 }
