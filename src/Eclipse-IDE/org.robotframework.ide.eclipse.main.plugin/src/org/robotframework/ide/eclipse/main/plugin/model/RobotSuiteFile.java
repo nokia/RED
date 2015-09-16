@@ -24,13 +24,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -84,12 +81,9 @@ public class RobotSuiteFile implements RobotElement {
 
     public List<RobotElement> getSections() {
         return getSections(new ParsingStrategy() {
-
             @Override
             public RobotFileOutput parse() {
-                final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
-                return new RobotParser(new RobotProjectHolder(runtimeEnvironment)).parse(file.getLocation().toFile())
-                        .get(0);
+                return getProject().getRobotParser().parse(file.getLocation().toFile()).get(0);
             }
         });
     }
@@ -143,11 +137,6 @@ public class RobotSuiteFile implements RobotElement {
     }
     
     protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
-        final RobotProject robotProject = getProject();
-        if (robotProject.getRobotProjectHolder() == null) {
-            final RobotProjectHolder robotProjectHolder = new RobotProjectHolder(robotProject.getRuntimeEnvironment());
-            robotProject.link(robotProjectHolder);
-        }
         return parsingStrategy.parse();
     }
 
@@ -167,12 +156,9 @@ public class RobotSuiteFile implements RobotElement {
         fileOutput = null;
 
         getSections(new ParsingStrategy() {
-
             @Override
             public RobotFileOutput parse() {
-                final RobotRuntimeEnvironment runtimeEnvironment = getProject().getRuntimeEnvironment();
-                return new RobotParser(new RobotProjectHolder(runtimeEnvironment)).parseEditorContent(newContent,
-                        file.getLocation().toFile());
+                return getProject().getRobotParser().parseEditorContent(newContent, file.getLocation().toFile());
             }
         });
     }

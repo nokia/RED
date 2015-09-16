@@ -12,10 +12,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.swt.custom.CaretEvent;
+import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -26,6 +30,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.texteditor.GotoLineAction;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
@@ -35,23 +43,13 @@ public class SuiteSourceEditor extends TextEditor {
 
     private static final String SOURCE_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.sources.context";
 
-    private SuiteSourceEditorFoldingSupport foldingSupport;
-
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     protected RobotSuiteFile fileModel;
 
-    private IFile editedFile;
+    private SuiteSourceEditorFoldingSupport foldingSupport;
 
     private TextEditorOccurrenceMarksManager occurrenceMarksManager;
-
-    RobotSuiteFile getFileModel() {
-        return fileModel;
-    }
-
-    SuiteSourceEditorFoldingSupport getFoldingSupport() {
-        return foldingSupport;
-    }
 
     @Override
     protected void initializeEditor() {
@@ -59,6 +57,15 @@ public class SuiteSourceEditor extends TextEditor {
 
         setSourceViewerConfiguration(new SuiteSourceEditorConfiguration(this));
         setDocumentProvider(new SuiteSourceDocumentProvider());
+    }
+
+    @Override
+    protected void createActions() {
+        super.createActions();
+
+        final GotoLineAction action = new GotoLineAction(this);
+        action.setActionDefinitionId(ITextEditorActionConstants.GOTO_LINE);
+        setAction(ITextEditorActionConstants.GOTO_LINE, action);
     }
 
     @Override
@@ -71,14 +78,31 @@ public class SuiteSourceEditor extends TextEditor {
         super.createPartControl(parent);
         final ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
 
-        final ProjectionSupport projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(),
-                getSharedColors());
-        projectionSupport.install();
+        installProjectionAndFolding(viewer);
+        installOccurencesMarking(viewer);
+        installBreakpointTogglingOnDoubleClick();
+        installStatusBarUpdater(viewer);
 
+        activateContext();
+    }
+
+    @Override
+    protected ISourceViewer createSourceViewer(final Composite parent, final IVerticalRuler ruler, final int styles) {
+        final ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
+                styles);
+        // ensure decoration support has been created and configured.
+        getSourceViewerDecorationSupport(viewer);
+        return viewer;
+    }
+
+    private void installProjectionAndFolding(final ProjectionViewer viewer) {
         // turn projection mode on
+        new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors()).install();
         viewer.doOperation(ProjectionViewer.TOGGLE);
-
         foldingSupport = new SuiteSourceEditorFoldingSupport(viewer.getProjectionAnnotationModel());
+    }
+
+    private void installOccurencesMarking(final ProjectionViewer viewer) {
         occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer.getDocument(), fileModel.getFile());
         viewer.getTextWidget().addModifyListener(new ModifyListener() {
 
@@ -87,7 +111,6 @@ public class SuiteSourceEditor extends TextEditor {
                 occurrenceMarksManager.removeOldOccurrenceMarks();
             }
         });
-
         viewer.getTextWidget().addMouseListener(new MouseAdapter() {
 
             @Override
@@ -98,11 +121,32 @@ public class SuiteSourceEditor extends TextEditor {
                 }
             }
         });
+    }
 
-        installBreakpointTogglingOnDoubleClick();
+    private void installStatusBarUpdater(final ProjectionViewer viewer) {
+        viewer.getTextWidget().addCaretListener(new CaretListener() {
 
-        final IContextService service = getSite().getService(IContextService.class);
-        service.activateContext(SOURCE_PART_CONTEXT_ID);
+            @Override
+            public void caretMoved(final CaretEvent event) {
+                updateLineLocationStatusBar(event.caretOffset);
+            }
+        });
+    }
+
+    private void updateLineLocationStatusBar(final int caretPostion) {
+        try {
+            final IDocument document = getDocument();
+            int lineNumber = document.getLineOfOffset(caretPostion);
+            final int columnNumber = caretPostion - document.getLineOffset(lineNumber) + 1;
+            lineNumber++;
+
+            final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+                    .getStatusLineManager()
+                    .find(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+            find.setText(lineNumber + ":" + columnNumber);
+        } catch (final BadLocationException e) {
+            RedPlugin.logError("Unable to get position in source editor in order to update status bar", e);
+        }
     }
 
     private void installBreakpointTogglingOnDoubleClick() {
@@ -115,7 +159,7 @@ public class SuiteSourceEditor extends TextEditor {
                     final int line = computeBreakpointLineNumber(event.y);
                     ToggleBreakpointHandler.E4ToggleBreakpointHandler.toggle(file, line);
                 } catch (final CoreException e) {
-                    throw new IllegalStateException("Cannot toggle breakpoint", e);
+                    RedPlugin.logError("Unable to toggle breakpoint", e);
                 }
             }
         });
@@ -136,14 +180,16 @@ public class SuiteSourceEditor extends TextEditor {
         }
     }
 
-    @Override
-    protected ISourceViewer createSourceViewer(final Composite parent, final IVerticalRuler ruler, final int styles) {
-        final ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
-                styles);
-        // ensure decoration support has been created and configured.
-        getSourceViewerDecorationSupport(viewer);
+    private void activateContext() {
+        final IContextService service = getSite().getService(IContextService.class);
+        service.activateContext(SOURCE_PART_CONTEXT_ID);
+    }
 
-        return viewer;
+    @Override
+    public void setFocus() {
+        super.setFocus();
+
+        getSourceViewer().getTextWidget().setCaretOffset(0);
     }
 
     @Override
@@ -154,6 +200,18 @@ public class SuiteSourceEditor extends TextEditor {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    private IDocument getDocument() {
+        return getDocumentProvider().getDocument(getEditorInput());
+    }
+
+    RobotSuiteFile getFileModel() {
+        return fileModel;
+    }
+
+    SuiteSourceEditorFoldingSupport getFoldingSupport() {
+        return foldingSupport;
     }
 
     /**
