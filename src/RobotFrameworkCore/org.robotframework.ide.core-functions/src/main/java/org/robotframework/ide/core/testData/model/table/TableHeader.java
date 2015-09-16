@@ -101,4 +101,12 @@ public class TableHeader extends AModelElement<ARobotSectionTable> {
 
         return tokens;
     }
+
+
+    @Override
+    public String toString() {
+        return String.format(
+                "TableHeader [tableHeader=%s, columnNames=%s, comment=%s]",
+                tableHeader, columnNames, comment);
+    }
 }
