@@ -15,22 +15,6 @@ import org.robotframework.ide.core.testData.model.ModelType;
 
 public class TableHeaderComparator implements Comparator<TableHeader> {
 
-    private enum CompareResult {
-        LESS(-1), EQUAL(0), GREATER(1);
-
-        private int value;
-
-
-        private CompareResult(final int value) {
-            this.value = value;
-        }
-
-
-        public int getValue() {
-            return value;
-        }
-    }
-
     private Map<ModelType, Integer> position = new LinkedHashMap<>();
 
 
@@ -45,7 +29,7 @@ public class TableHeaderComparator implements Comparator<TableHeader> {
 
     @Override
     public int compare(TableHeader header1, TableHeader header2) {
-        int result = CompareResult.EQUAL.getValue();
+        int result = ECompareResult.EQUAL.getValue();
         FilePosition header1FilePos = header1.getBeginPosition();
         FilePosition header2FilePos = header2.getBeginPosition();
 
@@ -53,9 +37,9 @@ public class TableHeaderComparator implements Comparator<TableHeader> {
             result = Integer.compare(position.get(header1.getModelType()),
                     position.get(header2.getModelType()));
         } else if (header1FilePos.isNotSet()) {
-            result = CompareResult.LESS.getValue();
+            result = ECompareResult.LESS.getValue();
         } else if (header2FilePos.isNotSet()) {
-            result = CompareResult.GREATER.getValue();
+            result = ECompareResult.GREATER.getValue();
         } else {
             result = header1FilePos.compare(header2FilePos);
         }
