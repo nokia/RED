@@ -55,6 +55,11 @@ public class FilePosition {
     }
 
 
+    public boolean isNotSet() {
+        return (getLine() == NOT_SET && getColumn() == NOT_SET && getOffset() == NOT_SET);
+    }
+
+
     public boolean isBefore(FilePosition other) {
         return (compare(other) == LESS_THAN);
     }
