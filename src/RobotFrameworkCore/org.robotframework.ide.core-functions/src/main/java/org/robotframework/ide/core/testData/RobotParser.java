@@ -106,6 +106,12 @@ public class RobotParser {
                     importExternal(robotFile);
                     robotProject.addModelFile(robotFile);
                 }
+            } else {
+                RobotFileOutput fileByName = robotProject
+                        .findFileByName(fileOrDir);
+                if (fileByName != null) {
+                    output.add(fileByName);
+                }
             }
         }
     }
