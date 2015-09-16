@@ -207,6 +207,7 @@
             point="org.eclipse.ui.editors">
         <editor
               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor"
+              contributorClass="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor"
               default="true"
               icon="resources/file_robot.png"
               id="org.robotframework.ide.tableditor"

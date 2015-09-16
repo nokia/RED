@@ -19,7 +19,6 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -389,16 +388,6 @@ public class RobotFormEditor extends FormEditor {
                 close(true);
             }
         }
-    }
-
-    @Inject
-    @Optional
-    private void whenReconcilationWasDone(@UIEventTopic(RobotModelEvents.RECONCILE) final IDocument document) {
-        if (suiteModel != null) {
-            suiteModel.reparseEverything(document.get());
-        }
-        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
-        eventBroker.post(RobotModelEvents.RECONCILATION_DONE, suiteModel);
     }
 
     @Inject

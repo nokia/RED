@@ -38,28 +38,25 @@ import com.google.common.collect.Iterables;
 
 public class RobotProject extends RobotContainer {
 
+    private RobotProjectHolder projectHolder;
+
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
     private RobotProjectConfig configuration;
-    
-    private RobotProjectHolder projectHolder;
-    private RobotParser robotParser;
 
     RobotProject(final IProject project) {
         super(null, project);
     }
     
-    public void link(final RobotProjectHolder projectHolder) {
-        this.projectHolder = projectHolder;
-        robotParser = new RobotParser(projectHolder);
-    }
-    
-    public RobotProjectHolder getRobotProjectHolder() {
+    public synchronized RobotProjectHolder getRobotProjectHolder() {
+        if (projectHolder == null) {
+            projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
+        }
         return projectHolder;
     }
     
     public RobotParser getRobotParser() {
-        return robotParser;
+        return new RobotParser(getRobotProjectHolder());
     }
 
     public IProject getProject() {
@@ -179,6 +176,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized void clear() {
+        projectHolder = null;
         configuration = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
@@ -250,7 +248,7 @@ public class RobotProject extends RobotContainer {
         return false;
     }
     
-    public synchronized String getPythonLibraryPath(String libName) {
+    public synchronized String getPythonLibraryPath(final String libName) {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
@@ -265,10 +263,10 @@ public class RobotProject extends RobotContainer {
     public synchronized List<String> getVariableFiles() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
-            List<String> list = newArrayList();
+            final List<String> list = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
                 String path = variableFile.getPath();
-                List<String> args = variableFile.getArguments();
+                final List<String> args = variableFile.getArguments();
                 if (args != null && !args.isEmpty()) {
                     path = path + ":" + Joiner.on(":").join(args);
                 }
