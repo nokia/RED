@@ -57,7 +57,7 @@ public class SuiteTeardownMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         List<IRobotTokenType> types = rt.getTypes();
-        if (types.size() == 0
+        if (types.size() == 1
                 && types.get(0) == RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION) {
             if (utility.isTheFirstColumn(currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
