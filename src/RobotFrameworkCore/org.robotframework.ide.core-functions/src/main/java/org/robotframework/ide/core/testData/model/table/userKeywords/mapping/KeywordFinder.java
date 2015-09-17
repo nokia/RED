@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -36,6 +37,7 @@ public class KeywordFinder {
         if (lastHeaderKeyword.isEmpty()) {
             keyword = createArtificialKeyword(robotFileOutput, keywordTable);
             keywordTable.addKeyword(keyword);
+            currentLine.addLineElementAt(0, keyword.getKeywordName());
         } else {
             keyword = lastHeaderKeyword.get(lastHeaderKeyword.size() - 1);
         }
@@ -55,6 +57,11 @@ public class KeywordFinder {
         artificialNameToken.setRaw(new StringBuilder());
         artificialNameToken.setText(new StringBuilder());
         artificialNameToken.setStartColumn(0);
+        RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
+                .get(tableHeader.getTableHeader().getLineNumber() - 1);
+        IRobotLineElement endOfLine = robotLine.getEndOfLine();
+        artificialNameToken.setStartOffset(endOfLine.getStartOffset()
+                + endOfLine.getRaw().length());
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
 
         keyword = new UserKeyword(artificialNameToken);

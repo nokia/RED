@@ -51,6 +51,11 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
 
+    public void addLineElementAt(int position, IRobotLineElement lineElement) {
+        this.lineElements.add(position, lineElement);
+    }
+
+
     public int getLineNumber() {
         return lineNumber;
     }

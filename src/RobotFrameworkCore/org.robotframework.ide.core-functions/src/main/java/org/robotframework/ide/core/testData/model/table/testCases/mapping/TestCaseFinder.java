@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -36,6 +37,7 @@ public class TestCaseFinder {
         if (lastHeaderTestCases.isEmpty()) {
             testCase = createArtificialTestCase(robotFileOutput, testCaseTable);
             testCaseTable.addTest(testCase);
+            currentLine.addLineElementAt(0, testCase.getTestName());
         } else {
             testCase = lastHeaderTestCases.get(lastHeaderTestCases.size() - 1);
         }
@@ -55,6 +57,11 @@ public class TestCaseFinder {
         artificialNameToken.setRaw(new StringBuilder());
         artificialNameToken.setText(new StringBuilder());
         artificialNameToken.setStartColumn(0);
+        RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
+                .get(tableHeader.getTableHeader().getLineNumber() - 1);
+        IRobotLineElement endOfLine = robotLine.getEndOfLine();
+        artificialNameToken.setStartOffset(endOfLine.getStartOffset()
+                + endOfLine.getRaw().length());
         artificialNameToken.setType(RobotTokenType.TEST_CASE_NAME);
 
         testCase = new TestCase(artificialNameToken);
