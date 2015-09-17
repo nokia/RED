@@ -31,6 +31,7 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -87,6 +88,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private final RobotDebugVariablesManager robotVariablesManager;
     
     private final RobotDebugValueManager robotDebugValueManager;
+    
+    private RobotParser robotParser;
 
     public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
             final RobotPartListener partListener, final RobotEventBroker robotEventBroker,
@@ -280,6 +283,9 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void terminated() {
         isSuspended = false;
+        if(robotParser != null && robotParser.isEagerImport()) {
+            robotParser.setEagerImport(false);
+        }
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
        
@@ -358,9 +364,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         if (!hasStackFramesCreated) {
 
-            int previousStackFramesSize = 0;
+            int numberOfStackTracesToCopy = 0;
             if (stackFrames != null) {
-                previousStackFramesSize = stackFrames.length;
+                if(stackFrames.length < currentFrames.size()) {
+                    numberOfStackTracesToCopy = stackFrames.length;
+                } else {
+                    numberOfStackTracesToCopy = currentFrames.size() - 1;
+                }
             }
 
             final IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
@@ -368,12 +378,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             for (final String key : currentFrames.keySet()) {
                 final KeywordContext keywordContext = currentFrames.get(key);
                 //only the highest level of StackFrames is created, lower levels are copied from previous StackFrames
-                if (id >= currentFrames.size() || previousStackFramesSize == 0) {
+                if (id >= numberOfStackTracesToCopy) {
                     newStackFrames[currentFrames.size() - id] = new RobotStackFrame(thread,
                             keywordContext.getFileName(), key, keywordContext.getLineNumber(),
                             keywordContext.getVariables(), id);
                 } else {
-                    newStackFrames[currentFrames.size() - id] = stackFrames[previousStackFramesSize - id];
+                    newStackFrames[currentFrames.size() - id] = stackFrames[numberOfStackTracesToCopy - id];
                 }
                 id++;
             }
@@ -504,6 +514,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public RobotDebugValueManager getRobotDebugValueManager() {
         return robotDebugValueManager;
+    }
+
+    public void setRobotParser(final RobotParser robotParser) {
+        this.robotParser = robotParser;
     }
 
 }

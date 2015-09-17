@@ -34,6 +34,14 @@ public class RobotProjectHolder {
         this.robotRuntime = robotRuntime;
         initGlobalVariables();
     }
+    
+    /**
+     * Design for test.
+     */
+    @VisibleForTesting
+    public RobotProjectHolder() {
+        this.robotRuntime = null;
+    }
 
 
     public RobotRuntimeEnvironment getRobotRuntime() {
