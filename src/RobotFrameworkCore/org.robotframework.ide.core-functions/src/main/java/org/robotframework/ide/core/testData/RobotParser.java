@@ -109,7 +109,9 @@ public class RobotParser {
             } else {
                 RobotFileOutput fileByName = robotProject
                         .findFileByName(fileOrDir);
+
                 if (fileByName != null) {
+                    importExternal(fileByName);
                     output.add(fileByName);
                 }
             }
@@ -148,5 +150,10 @@ public class RobotParser {
 
     public void setEagerImport(final boolean shouldEagerImport) {
         this.shouldEagerImport = shouldEagerImport;
+    }
+
+
+    public boolean isEagerImport() {
+        return shouldEagerImport;
     }
 }
