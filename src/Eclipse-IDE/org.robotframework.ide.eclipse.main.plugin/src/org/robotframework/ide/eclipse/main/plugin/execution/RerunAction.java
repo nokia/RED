@@ -34,7 +34,7 @@ public class RerunAction extends Action implements IWorkbenchAction {
 
                 @Override
                 public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                    final ILaunchConfiguration launchConfig = launches[0].getLaunchConfiguration();
+                    final ILaunchConfiguration launchConfig = launches[launches.length-1].getLaunchConfiguration();
                     if (launchConfig != null) {
                         launchConfig.launch(ILaunchManager.RUN_MODE, monitor);
                     }
