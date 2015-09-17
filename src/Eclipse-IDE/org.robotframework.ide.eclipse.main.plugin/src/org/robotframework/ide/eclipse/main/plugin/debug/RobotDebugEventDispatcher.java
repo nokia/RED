@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,12 +33,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.execution.ExecutionElementsParser;
+import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext;
+import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
+import org.robotframework.ide.core.testData.RobotParser;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordFinder;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Joiner;
 
@@ -68,17 +70,16 @@ public class RobotDebugEventDispatcher extends Job {
 
     private KeywordContext currentKeywordContext = new KeywordContext();
 
-    private final Map<String, List<Integer>> currentExecutionLinesInFile;
-
-    private final Map<String, List<Integer>> executedBreakpointsInFile;
-
     private final Map<IBreakpoint, Integer> breakpointHitCounts;
 
-    private final Map<String, String> currentResourceFiles;
+    private String currentResourceFile;
 
     private boolean isStopping;
     
-    public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteResources, final RobotEventBroker robotEventBroker) {
+    private RobotDebugExecutionContext executionContext;
+    
+    public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteResources,
+            final RobotEventBroker robotEventBroker) {
         super("Robot Event Dispatcher");
         setSystem(true);
 
@@ -86,10 +87,8 @@ public class RobotDebugEventDispatcher extends Job {
         this.suiteResources = suiteResources;
         this.robotEventBroker = robotEventBroker;
 
-        currentExecutionLinesInFile = new LinkedHashMap<>();
-        executedBreakpointsInFile = new LinkedHashMap<>();
-        currentResourceFiles = new LinkedHashMap<>();
         breakpointHitCounts = new LinkedHashMap<>();
+        executionContext = new RobotDebugExecutionContext();
     }
 
     @Override
@@ -154,8 +153,8 @@ public class RobotDebugEventDispatcher extends Job {
                     handleEndKeywordEvent(eventMap);
                     break;
                 case "end_test":
-                	handleEndTestEvent(eventMap);
-                	break;
+                    handleEndTestEvent(eventMap);
+                    break;
                 case "end_suite":
                     handleEndSuiteEvent(eventMap);
                     break;
@@ -188,6 +187,17 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         currentSuite = new File((String) suiteElements.get("source")).getName();
         executedFile = extractSuiteFile(currentSuite, suiteResources);
+        
+        if (executedFile != null) {
+            final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(executedFile);
+            RobotParser robotParser = robotSuiteFile.getProject().getRobotParser();
+            if (!robotParser.isEagerImport()) {
+                robotParser.setEagerImport(true);
+                target.setRobotParser(robotParser);
+            }
+            executionContext.startSuite(robotParser.parse(executedFile.getLocation().toFile()).get(0));
+        }
+
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
                 (String) suiteList.get(0), (String) suiteElements.get("source")));
     }
@@ -196,8 +206,12 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> testList = (List<?>) eventMap.get("start_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Starting test: " + testElements.get("longname") + '\n';
+        final String testCaseName = (String) testList.get(0);
+        
+        executionContext.startTest(testCaseName);
+        
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement((String) testList.get(0)));
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
     }
     
     private void handleStartKeywordEvent(final Map<?, ?> eventMap) {
@@ -209,32 +223,15 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
         final List<String> args = (List<String>) startElements.get("args");
         
-        String executedSuite = "";
-        IFile currentFile = null;
-        if (!currentResourceFiles.isEmpty()) {
-            final String resource = (String) currentResourceFiles.values().toArray()[currentResourceFiles.size() - 1];
-            currentFile = executedFile.getProject().getFile(resource);
-            if (!currentFile.exists()) {
-                currentFile = executedFile.getProject().getFile(
-                        executedFile.getParent().getName() + "/" + resource);
-            }
-            executedSuite = resource;
-        } else {
-            currentFile = executedFile;
-            executedSuite = currentSuite;
-        }
-
-        // TODO: check keywords in currentFrames and search keywords only after
-        // parent keywords
-        final int keywordLine = new KeywordFinder().getKeywordLine(currentFile, currentKeyword, args,
-                currentExecutionLinesInFile.get(currentFile.getName()));
-        if (keywordLine >= 0) {
-            List<Integer> executionLines = currentExecutionLinesInFile.get(currentFile.getName());
-            if (executionLines == null) {
-                executionLines = new ArrayList<Integer>();
-                currentExecutionLinesInFile.put(currentFile.getName(), executionLines);
-            }
-            executionLines.add(keywordLine);
+        executionContext.startKeyword(currentKeyword, "", args);
+        
+        String executedSuite = currentSuite;
+        
+        final KeywordPosition keywordPosition = executionContext.findKeywordPosition();
+        final int keywordLine = keywordPosition.getLineNumber();
+        currentResourceFile = keywordPosition.getFilePath();
+        if(currentResourceFile != null) {
+            executedSuite = new File(currentResourceFile).getName();
         }
 
         boolean isBreakpoint = false;
@@ -248,16 +245,7 @@ public class RobotDebugEventDispatcher extends Job {
                 if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
                     final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                             IMarker.LINE_NUMBER);
-
-                    List<Integer> executedBreakpointsLines = executedBreakpointsInFile.get(currentFile.getName());
-                    if (executedBreakpointsLines == null) {
-                        executedBreakpointsLines = new ArrayList<Integer>();
-                        executedBreakpointsInFile.put(currentFile.getName(), executedBreakpointsLines);
-                    }
-                    if (!executedBreakpointsLines.contains(breakpointLineNum)
-                            && new KeywordFinder().isKeywordInBreakpointLine(currentBreakpoint, breakpointLineNum,
-                                    currentKeyword, args, keywordLine)) {
-
+                    if(keywordLine == breakpointLineNum) {
                         boolean hasHitCount = false;
                         final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
                                 RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
@@ -276,7 +264,6 @@ public class RobotDebugEventDispatcher extends Job {
                         }
 
                         if (hasHitCount) {
-                            executedBreakpointsLines.add(breakpointLineNum);
                             breakpointCondition = currentBreakpoint.getMarker().getAttribute(
                                     RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                             isBreakpoint = true;
@@ -290,7 +277,7 @@ public class RobotDebugEventDispatcher extends Job {
         }
 
         if (isBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
-                && !target.hasStepReturn())) {
+                && !target.hasStepReturn() && keywordLine >= 0)) {
 
             if (target.getRobotThread().isStepping()) {
                 target.getRobotThread().setSteppingOver(false);
@@ -305,20 +292,6 @@ public class RobotDebugEventDispatcher extends Job {
         currentKeywordContext = new KeywordContext(null, executedSuite, keywordLine);
         target.getPartListener().setKeywordContext(currentKeywordContext);
         target.getCurrentFrames().put(currentKeyword, currentKeywordContext);
-
-        // first keyword with resource name is in old file, so until second keyword
-        // there is a need to switch between files
-        final String[] keywordNameParts = currentKeyword.split("\\.");
-        if (keywordNameParts.length > 1 && !keywordNameParts[0].equals("BuiltIn")) {
-            // next keyword from here will be in another file
-            final String resourceName = keywordNameParts[0];
-
-            // TODO: get somehow name with extension of resource file
-            final String resourceFileName = findResourceName(resourceName);
-            if (!resourceFileName.equals("")) {
-                currentResourceFiles.put(currentKeyword, resourceFileName);
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -405,15 +378,11 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> endList = (List<?>) eventMap.get("end_keyword");
         final String keyword = (String) endList.get(0);
         target.getCurrentFrames().remove(keyword);
+        
+        executionContext.endKeyword();
 
-        final String[] endKeywordNameParts = keyword.split("\\.");
-        if (endKeywordNameParts.length > 1 && !endKeywordNameParts[0].equals("BuiltIn")) {
-            final String resourceFileName = currentResourceFiles.get(keyword);
-            currentExecutionLinesInFile.remove(resourceFileName);
-            executedBreakpointsInFile.remove(resourceFileName);
-            robotEventBroker.sendClearEventToTextEditor(resourceFileName);
-
-            currentResourceFiles.remove(keyword);
+        if (currentResourceFile != null) {
+            robotEventBroker.sendClearEventToTextEditor(currentResourceFile);
         }
     }
 
@@ -421,6 +390,9 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> testList = (List<?>) eventMap.get("end_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Ending test: " + testElements.get("longname") + "\n\n";
+        
+        executionContext.endTest();
+        
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndTestExecutionElement(
                 (String) testList.get(0), testElements));
@@ -462,28 +434,6 @@ public class RobotDebugEventDispatcher extends Job {
             return (String) keySet.iterator().next();
         }
         return null;
-    }
-
-    private String findResourceName(final String resourceName) {
-        final IProject project = executedFile.getProject();
-        final String txtFile = resourceName + ".txt";
-        final String robotFile = resourceName + ".robot";
-        if (project.getFile(robotFile).exists()) {
-            return robotFile;
-        } else if (project.getFile(txtFile).exists()) {
-            return txtFile;
-        }
-
-        final IContainer parent = executedFile.getParent();
-        if (parent != null && parent.getType() == IResource.FOLDER) {
-            if (project.getFile(parent.getName() + "/" + robotFile).exists()) {
-                return robotFile;
-            } else if (project.getFile(parent.getName() + "/" + txtFile).exists()) {
-                return txtFile;
-            }
-        }
-
-        return "";
     }
     
     private IFile extractSuiteFile(final String suiteName, final List<IResource> resources) {

@@ -18,10 +18,11 @@ import com.google.common.io.Files;
 public class RobotDebugExecutionContext {
     
     private RobotFile currentModel;
-    private LinkedList<KeywordContext> currentKeywords;
     private TestCase currentTestCase;
     private List<UserKeyword> userKeywords;
     private List<ResourceImportReference> resourceImportReferences;
+    
+    private LinkedList<KeywordContext> currentKeywords;
     
     private int testCaseExecutionRowCounter = 0;
     
@@ -64,8 +65,7 @@ public class RobotDebugExecutionContext {
         KeywordContext parentKeywordContext = null;
         RobotExecutableRow<?> executionRow = null;
         if (currentKeywords.size() == 1) { // keyword directly from test case
-            executionRow = currentTestCase.getTestExecutionRows().get(testCaseExecutionRowCounter);
-            testCaseExecutionRowCounter++;
+            executionRow = findTestCaseExecutionRow();
         } else { // keyword from Keywords section or resource file
             parentKeywordContext = currentKeywords.get(currentKeywords.size() - 2);
             // search in keywords from Keywords section
@@ -74,9 +74,7 @@ public class RobotDebugExecutionContext {
                 if (parentKeywordContext.getUserKeyword() == null) {
                     parentKeywordContext.setUserKeyword(userKeyword);
                 }
-                executionRow = userKeyword.getKeywordExecutionRows().get(
-                        parentKeywordContext.getKeywordExecutionRowCounter());
-                parentKeywordContext.incrementKeywordExecutionRowCounter();
+                executionRow = findKeywordExecutionRow(userKeyword, parentKeywordContext);
             } else {
                 // search in resources from Settings section
                 ResourceImportReference resourceImportReference = findResource(parentKeywordContext);
@@ -95,9 +93,7 @@ public class RobotDebugExecutionContext {
                         if (parentKeywordContext.getUserKeyword() == null) {
                             parentKeywordContext.setUserKeyword(userResourceKeyword);
                         }
-                        executionRow = userResourceKeyword.getKeywordExecutionRows().get(
-                                parentKeywordContext.getKeywordExecutionRowCounter());
-                        parentKeywordContext.incrementKeywordExecutionRowCounter();
+                        executionRow = findKeywordExecutionRow(userResourceKeyword, parentKeywordContext);
                     }
                 }
             }
@@ -190,7 +186,35 @@ public class RobotDebugExecutionContext {
         return null;
     }
     
-    private class KeywordContext {
+    private RobotExecutableRow<TestCase> findTestCaseExecutionRow() {
+        final List<RobotExecutableRow<TestCase>> executableRows = currentTestCase.getTestExecutionRows();
+        if (testCaseExecutionRowCounter < executableRows.size()) {
+            final RobotExecutableRow<TestCase> executableRow = executableRows.get(testCaseExecutionRowCounter);
+            testCaseExecutionRowCounter++;
+            if (executableRow.isExecutable()) {
+                return executableRow;
+            } else {
+                return findTestCaseExecutionRow();
+            }
+        }
+        return null;
+    }
+    
+    private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword, final KeywordContext parentKeywordContext) {
+        final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getKeywordExecutionRows();
+        if (parentKeywordContext.getKeywordExecutionRowCounter() < executableRows.size()) {
+            final RobotExecutableRow<UserKeyword> executableRow = executableRows.get(parentKeywordContext.getKeywordExecutionRowCounter());
+            parentKeywordContext.incrementKeywordExecutionRowCounter();
+            if (executableRow.isExecutable()) {
+                return executableRow;
+            } else {
+                return findKeywordExecutionRow(userKeyword, parentKeywordContext);
+            }
+        }
+        return null;
+    }
+    
+    private static class KeywordContext {
 
         private String name;
 

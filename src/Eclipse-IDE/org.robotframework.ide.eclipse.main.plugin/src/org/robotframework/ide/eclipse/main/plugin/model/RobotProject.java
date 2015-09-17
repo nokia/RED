@@ -39,7 +39,8 @@ import com.google.common.collect.Iterables;
 public class RobotProject extends RobotContainer {
 
     private RobotProjectHolder projectHolder;
-
+    private RobotParser parser;
+    
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
     private RobotProjectConfig configuration;
@@ -55,8 +56,11 @@ public class RobotProject extends RobotContainer {
         return projectHolder;
     }
     
-    public RobotParser getRobotParser() {
-        return new RobotParser(getRobotProjectHolder());
+    public synchronized RobotParser getRobotParser() {
+        if(parser == null) {
+            parser = new RobotParser(getRobotProjectHolder());
+        }
+        return parser;
     }
 
     public IProject getProject() {
