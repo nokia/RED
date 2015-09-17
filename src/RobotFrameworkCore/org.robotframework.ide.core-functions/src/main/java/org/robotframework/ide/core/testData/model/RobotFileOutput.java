@@ -110,11 +110,8 @@ public class RobotFileOutput {
             }
 
             if (isSameFile) {
-                if (reference.getReference().getLastModificationEpochTime() != ref
-                        .getReference().getLastModificationEpochTime()) {
-                    positionToSet = i;
-                    break;
-                }
+                positionToSet = i;
+                break;
             }
         }
 
