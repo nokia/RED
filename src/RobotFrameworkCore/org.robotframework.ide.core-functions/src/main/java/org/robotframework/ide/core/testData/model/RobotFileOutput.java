@@ -6,6 +6,8 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +78,47 @@ public class RobotFileOutput {
 
 
     public void addResourceReference(final ResourceImportReference ref) {
-        resourceReferences.add(ref);
+        int positionToSet = findResourceReferencePositionToReplace(ref);
+
+        if (positionToSet == -1) {
+            resourceReferences.add(ref);
+        } else {
+            resourceReferences.set(positionToSet, ref);
+        }
+    }
+
+
+    private int findResourceReferencePositionToReplace(
+            final ResourceImportReference ref) {
+        int positionToSet = -1;
+
+        int numberOfReferences = resourceReferences.size();
+        for (int i = 0; i < numberOfReferences; i++) {
+            ResourceImportReference reference = resourceReferences.get(i);
+            File file = reference.getReference().getProcessedFile();
+            File thisFile = ref.getReference().getProcessedFile();
+            boolean isSameFile = false;
+            try {
+                if (Files.isSameFile(file.toPath(), thisFile.toPath())) {
+                    isSameFile = true;
+                }
+            } catch (IOException e) {
+                if (file.toPath().normalize().toAbsolutePath()
+                        .equals(thisFile.toPath().normalize().toAbsolutePath())) {
+                    isSameFile = true;
+                }
+            }
+
+            if (isSameFile) {
+                if (reference.getReference().getLastModificationEpochTime() != ref
+                        .getReference().getLastModificationEpochTime()) {
+                    positionToSet = i;
+                    break;
+                }
+            }
+        }
+
+        return positionToSet;
     }
 
 
