@@ -76,7 +76,7 @@ public class RobotDebugEventDispatcher extends Job {
 
     private boolean isStopping;
     
-    private RobotDebugExecutionContext executionContext;
+    private final RobotDebugExecutionContext executionContext;
     
     public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteResources,
             final RobotEventBroker robotEventBroker) {
@@ -190,11 +190,7 @@ public class RobotDebugEventDispatcher extends Job {
         
         if (executedFile != null) {
             final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(executedFile);
-            RobotParser robotParser = robotSuiteFile.getProject().getRobotParser();
-            if (!robotParser.isEagerImport()) {
-                robotParser.setEagerImport(true);
-                target.setRobotParser(robotParser);
-            }
+            final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
             executionContext.startSuite(robotParser.parse(executedFile.getLocation().toFile()).get(0));
         }
 
