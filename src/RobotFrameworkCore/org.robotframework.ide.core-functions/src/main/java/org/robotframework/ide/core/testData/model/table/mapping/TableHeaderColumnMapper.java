@@ -66,7 +66,9 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
+        ParsingState currentState = utility.getCurrentStatus(processingState);
         if (!processingState.isEmpty()
+                && !utility.isTableInsideStateInHierarchy(currentState)
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 && isNotExistLineContinueAfterHeader(currentLine)) {
             ParsingState state = processingState.peek();
