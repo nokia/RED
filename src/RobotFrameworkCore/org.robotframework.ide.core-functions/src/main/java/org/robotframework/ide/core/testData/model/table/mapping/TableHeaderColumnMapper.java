@@ -47,9 +47,11 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         }
         ParsingState tableHeaderState = utility
                 .getNearestTableHeaderState(processingState);
+        @SuppressWarnings("rawtypes")
         List<TableHeader> headersForTable = utility.getKnownHeadersForTable(
                 robotFileOutput, tableHeaderState);
         if (!headersForTable.isEmpty()) {
+            @SuppressWarnings("rawtypes")
             TableHeader lastHeader = headersForTable
                     .get(headersForTable.size() - 1);
             lastHeader.addColumnName(rt);
