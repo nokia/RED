@@ -21,17 +21,16 @@ public class RobotModelTestProvider {
         return new RobotModelTestProvider();
     }
     
-    public static RobotFile getModelFile(String filename) throws URISyntaxException {
-        RobotProjectHolder robotProject = new RobotProjectHolder();
-        RobotParser parser = new RobotParser(robotProject);
-        parser.setEagerImport(true);
+    public static RobotFile getModelFile(final String filename) throws URISyntaxException {
+        final RobotProjectHolder robotProject = new RobotProjectHolder();
+        final RobotParser parser = RobotParser.createEager(robotProject);
         
-        Path p = Paths.get(getInstance().getClass()
+        final Path p = Paths.get(getInstance().getClass()
                 .getResource(filename)
                 .toURI());
         
-        List<RobotFileOutput> parse = parser.parse(p.toFile());
-        RobotFileOutput robotFileOutput = parse.get(0);
+        final List<RobotFileOutput> parse = parser.parse(p.toFile());
+        final RobotFileOutput robotFileOutput = parse.get(0);
         return robotFileOutput.getFileModel();        
     }
 }
