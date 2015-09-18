@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
@@ -29,20 +30,42 @@ public class TestCaseFinder {
     public TestCase findOrCreateNearestTestCase(RobotLine currentLine,
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
-        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
-                .getTestCaseTable();
+        RobotFile fileModel = robotFileOutput.getFileModel();
+        TestCaseTable testCaseTable = fileModel.getTestCaseTable();
 
         TestCase testCase;
         List<TestCase> lastHeaderTestCases = filterByTestCasesAfterLastHeader(testCaseTable);
         if (lastHeaderTestCases.isEmpty()) {
             testCase = createArtificialTestCase(robotFileOutput, testCaseTable);
             testCaseTable.addTest(testCase);
-            currentLine.addLineElementAt(0, testCase.getTestName());
+
+            RobotLine lineToModify = findRobotLineInModel(fileModel, testCase,
+                    currentLine);
+            lineToModify.addLineElementAt(0, testCase.getTestName());
         } else {
             testCase = lastHeaderTestCases.get(lastHeaderTestCases.size() - 1);
         }
 
         return testCase;
+    }
+
+
+    private RobotLine findRobotLineInModel(RobotFile fileModel,
+            TestCase testCase, RobotLine currentLine) {
+        RobotLine foundLine = currentLine;
+        if (currentLine.getLineNumber() != testCase.getBeginPosition()
+                .getLine()) {
+            List<RobotLine> fileContent = fileModel.getFileContent();
+            for (RobotLine line : fileContent) {
+                if (testCase.getBeginPosition().getLine() == line
+                        .getLineNumber()) {
+                    foundLine = line;
+                    break;
+                }
+            }
+        }
+
+        return foundLine;
     }
 
 

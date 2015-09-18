@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
@@ -29,20 +30,42 @@ public class KeywordFinder {
     public UserKeyword findOrCreateNearestKeyword(RobotLine currentLine,
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
-        KeywordTable keywordTable = robotFileOutput.getFileModel()
-                .getKeywordTable();
+        RobotFile fileModel = robotFileOutput.getFileModel();
+        KeywordTable keywordTable = fileModel.getKeywordTable();
 
         UserKeyword keyword;
         List<UserKeyword> lastHeaderKeyword = filterByKeywordAfterLastHeader(keywordTable);
         if (lastHeaderKeyword.isEmpty()) {
             keyword = createArtificialKeyword(robotFileOutput, keywordTable);
             keywordTable.addKeyword(keyword);
-            currentLine.addLineElementAt(0, keyword.getKeywordName());
+
+            RobotLine lineToModification = findRobotLineInModel(fileModel,
+                    keyword, currentLine);
+            lineToModification.addLineElementAt(0, keyword.getKeywordName());
         } else {
             keyword = lastHeaderKeyword.get(lastHeaderKeyword.size() - 1);
         }
 
         return keyword;
+    }
+
+
+    private RobotLine findRobotLineInModel(RobotFile fileModel,
+            UserKeyword userKeyword, RobotLine currentLine) {
+        RobotLine foundLine = currentLine;
+        if (foundLine.getLineNumber() != userKeyword.getBeginPosition()
+                .getLine()) {
+            List<RobotLine> fileContent = fileModel.getFileContent();
+            for (RobotLine line : fileContent) {
+                if (userKeyword.getBeginPosition().getLine() == line
+                        .getLineNumber()) {
+                    foundLine = line;
+                    break;
+                }
+            }
+        }
+
+        return foundLine;
     }
 
 
