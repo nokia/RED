@@ -45,13 +45,13 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 buildJob.join();
 
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL) {
-                    RedPlugin.getModelManager().getModel().createRobotProject(project).clear();
+                    RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
                         return new IProject[0];
                     }
                 }
-                RedPlugin.getModelManager().getModel().createRobotProject(project).clear();
+                RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
                 project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
                 if (!monitor.isCanceled()) {
@@ -73,7 +73,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
         getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-        RedPlugin.getModelManager().getModel().createRobotProject(getProject()).clear();
+        RedPlugin.getModelManager().getModel().createRobotProject(getProject()).clearConfiguration();
 
         LibspecsFolder.get(getProject()).removeNonSpecResources();
     }

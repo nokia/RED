@@ -44,7 +44,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             redProjectEditorInput = new RedProjectEditorInput(!file.isReadOnly(),
                     new RobotProjectConfigReader().readConfiguration(file), file.getProject());
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
@@ -65,7 +65,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
     @Override
     protected void createPages() {
         try {
-            context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class)).getActiveLeaf();
+            context = getEditorSite().getService(IEclipseContext.class).getActiveLeaf();
             context.set(RedProjectEditorInput.class, redProjectEditorInput);
             context.set(IEditorSite.class, getEditorSite());
             context.set(RedProjectEditor.class, this);
@@ -85,7 +85,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             dirtyEditor.doSave(monitor);
         }
         final RobotProject project = redProjectEditorInput.getRobotProject();
-        project.clear();
+        project.clearAll();
         new RobotProjectConfigWriter().writeConfiguration(redProjectEditorInput.getProjectConfiguration(), project);
     }
 
