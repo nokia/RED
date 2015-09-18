@@ -437,6 +437,11 @@ public enum ParsingState {
     }
 
 
+    public ParsingState getPreviousState() {
+        return previousState;
+    }
+
+
     public static List<ParsingState> getSettingsStates() {
         if (settingsStatuses.isEmpty()) {
             for (ParsingState s : ParsingState.values()) {
