@@ -49,7 +49,9 @@ public class KeywordFinder {
     private UserKeyword createArtificialKeyword(
             RobotFileOutput robotFileOutput, KeywordTable keywordTable) {
         UserKeyword keyword;
+        @SuppressWarnings("rawtypes")
         List<TableHeader> headers = keywordTable.getHeaders();
+        @SuppressWarnings("rawtypes")
         TableHeader tableHeader = headers.get(headers.size() - 1);
         RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
@@ -75,9 +77,11 @@ public class KeywordFinder {
             final KeywordTable keywordTable) {
         List<UserKeyword> keywords = new LinkedList<>();
 
+        @SuppressWarnings("rawtypes")
         List<TableHeader> headers = keywordTable.getHeaders();
         if (!headers.isEmpty()) {
             List<UserKeyword> keywordsAvail = keywordTable.getKeywords();
+            @SuppressWarnings("rawtypes")
             TableHeader tableHeader = headers.get(headers.size() - 1);
             int tableHeaderLineNumber = tableHeader.getTableHeader()
                     .getLineNumber();

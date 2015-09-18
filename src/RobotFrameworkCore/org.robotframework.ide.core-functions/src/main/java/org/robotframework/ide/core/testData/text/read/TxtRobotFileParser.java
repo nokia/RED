@@ -391,6 +391,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
             RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
+                    @SuppressWarnings("rawtypes")
                     TableHeader header = new TableHeader(robotToken);
                     ARobotSectionTable table = null;
                     if (newStatus == ParsingState.SETTING_TABLE_HEADER) {

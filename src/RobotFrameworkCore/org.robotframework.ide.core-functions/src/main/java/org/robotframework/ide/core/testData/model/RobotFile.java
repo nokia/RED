@@ -129,6 +129,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
 
+    @SuppressWarnings("rawtypes")
     private TableHeader createHeader(final RobotTokenType type) {
         RobotToken tableHeaderToken = new RobotToken();
         tableHeaderToken.setText(new StringBuilder("*** ").append(

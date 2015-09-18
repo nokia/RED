@@ -49,7 +49,9 @@ public class TestCaseFinder {
     private TestCase createArtificialTestCase(RobotFileOutput robotFileOutput,
             TestCaseTable testCaseTable) {
         TestCase testCase;
+        @SuppressWarnings("rawtypes")
         List<TableHeader> headers = testCaseTable.getHeaders();
+        @SuppressWarnings("rawtypes")
         TableHeader tableHeader = headers.get(headers.size() - 1);
         RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
@@ -74,9 +76,11 @@ public class TestCaseFinder {
             final TestCaseTable testCaseTable) {
         List<TestCase> testCases = new LinkedList<>();
 
+        @SuppressWarnings("rawtypes")
         List<TableHeader> headers = testCaseTable.getHeaders();
         if (!headers.isEmpty()) {
             List<TestCase> testCasesAvail = testCaseTable.getTestCases();
+            @SuppressWarnings("rawtypes")
             TableHeader tableHeader = headers.get(headers.size() - 1);
             int tableHeaderLineNumber = tableHeader.getTableHeader()
                     .getLineNumber();
