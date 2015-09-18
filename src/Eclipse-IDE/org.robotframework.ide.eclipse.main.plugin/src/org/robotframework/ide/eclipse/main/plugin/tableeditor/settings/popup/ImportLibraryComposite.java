@@ -292,7 +292,7 @@ public class ImportLibraryComposite {
     private void addNewLibraryToProjectConfiguration(final IPath path, final String nameWithoutExtension) {
         final RobotProjectConfig config = robotProject.getRobotProjectConfig();
         config.addReferencedLibraryInPython(nameWithoutExtension, path);
-        robotProject.clear();
+        robotProject.clearConfiguration();
         new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
@@ -394,7 +394,7 @@ public class ImportLibraryComposite {
                 break;
             }
         }
-        robotProject.clear();
+        robotProject.clearConfiguration();
         new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
