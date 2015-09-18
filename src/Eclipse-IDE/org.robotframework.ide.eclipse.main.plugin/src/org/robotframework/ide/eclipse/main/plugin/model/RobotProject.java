@@ -39,7 +39,6 @@ import com.google.common.collect.Iterables;
 public class RobotProject extends RobotContainer {
 
     private RobotProjectHolder projectHolder;
-    private RobotParser parser;
     
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
@@ -180,8 +179,15 @@ public class RobotProject extends RobotContainer {
         return configuration;
     }
 
-    public synchronized void clear() {
+    /**
+     * Clearing should be done when user changed his/hers execution environment (python+robot)
+     */
+    public synchronized void clearAll() {
         projectHolder = null;
+        clearConfiguration();
+    }
+
+    public synchronized void clearConfiguration() {
         configuration = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
