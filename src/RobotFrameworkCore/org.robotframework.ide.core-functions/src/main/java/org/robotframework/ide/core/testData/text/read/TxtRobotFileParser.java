@@ -207,7 +207,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // {$a} | {$b} in this case we check if {$a} was
                             // before
                             // '|' pipe separator
-                            if (remainingData > 0) {
+                            if (remainingData > 0
+                                    || isOnlySeparatorInLine(textLength,
+                                            currentSeparator)) {
                                 rt = processLineElement(line, processingState,
                                         parsingOutput, new FilePosition(
                                                 lineNumber,
@@ -312,6 +314,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+
+    private boolean isOnlySeparatorInLine(int textLength,
+            Separator currentSeparator) {
+        return currentSeparator.getText().length() == textLength;
     }
 
 

@@ -354,6 +354,26 @@ public class ElementsUtility {
     }
 
 
+    public boolean isTableInsideStateInHierarchy(ParsingState state) {
+        boolean result = false;
+        if (!isTableInsideState(state)) {
+            ParsingState parent = null;
+            while((parent = state.getPreviousState()) != null) {
+                if (isTableInsideState(parent)) {
+                    result = true;
+                    break;
+                } else {
+                    state = parent;
+                }
+            }
+        } else {
+            result = true;
+        }
+
+        return result;
+    }
+
+
     public boolean isTableState(ParsingState state) {
         return state == ParsingState.TEST_CASE_TABLE_HEADER
                 || state == ParsingState.SETTING_TABLE_HEADER
