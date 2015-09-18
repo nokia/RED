@@ -31,7 +31,6 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -89,8 +88,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private final RobotDebugValueManager robotDebugValueManager;
     
-    private RobotParser robotParser;
-
     public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
             final RobotPartListener partListener, final RobotEventBroker robotEventBroker,
             final DebugSocketManager socketManager) throws CoreException {
@@ -283,9 +280,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void terminated() {
         isSuspended = false;
-        if(robotParser != null && robotParser.isEagerImport()) {
-            robotParser.setEagerImport(false);
-        }
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
        
@@ -515,9 +509,4 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     public RobotDebugValueManager getRobotDebugValueManager() {
         return robotDebugValueManager;
     }
-
-    public void setRobotParser(final RobotParser robotParser) {
-        this.robotParser = robotParser;
-    }
-
 }

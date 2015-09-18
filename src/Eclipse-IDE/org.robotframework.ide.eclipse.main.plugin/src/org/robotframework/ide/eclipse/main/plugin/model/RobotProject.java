@@ -55,12 +55,13 @@ public class RobotProject extends RobotContainer {
         }
         return projectHolder;
     }
+
+    public RobotParser getEagerRobotParser() {
+        return RobotParser.createEager(getRobotProjectHolder());
+    }
     
-    public synchronized RobotParser getRobotParser() {
-        if(parser == null) {
-            parser = new RobotParser(getRobotProjectHolder());
-        }
-        return parser;
+    public RobotParser getRobotParser() {
+        return RobotParser.create(getRobotProjectHolder());
     }
 
     public IProject getProject() {
