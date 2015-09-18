@@ -17,13 +17,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -49,8 +44,6 @@ public class RobotSuiteFile implements RobotElement {
     private RobotFileOutput fileOutput;
     
     private List<RobotElement> sections = null;
-
-    private RobotEditorClosedListener listener;
 
     RobotSuiteFile(final RobotElement parent, final IFile file) {
         this.parent = parent;
@@ -92,22 +85,6 @@ public class RobotSuiteFile implements RobotElement {
         if (sections == null) {
             fileOutput = parseModel(parsingStrategy);
             link(fileOutput.getFileModel());
-
-            Display.getDefault().syncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (listener != null) {
-                        ContextInjectionFactory.uninject(listener, getContext().getActiveLeaf());
-                    }
-
-                    final IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
-                    listener = new RobotEditorClosedListener();
-                    ContextInjectionFactory.inject(listener, getContext().getActiveLeaf());
-                    service.addPartListener(listener);
-                }
-            });
-
         }
         return sections;
     }
@@ -140,15 +117,9 @@ public class RobotSuiteFile implements RobotElement {
         return parsingStrategy.parse();
     }
 
-    private IEclipseContext getContext() {
-        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
-    }
-
-    void dispose() {
-        ContextInjectionFactory.uninject(listener, getContext().getActiveLeaf());
+    public void dispose() {
         sections = null;
         fileOutput = null;
-        listener = null;
     }
 
     public void reparseEverything(final String newContent) {

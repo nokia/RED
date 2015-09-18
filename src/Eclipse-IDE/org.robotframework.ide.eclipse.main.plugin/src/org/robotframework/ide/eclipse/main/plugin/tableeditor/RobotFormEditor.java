@@ -19,6 +19,7 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -277,6 +278,9 @@ public class RobotFormEditor extends FormEditor {
         for (int i = 0; i < getPageCount(); i++) {
             ContextInjectionFactory.uninject(getEditor(i), context);
         }
+        suiteModel.dispose();
+        PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.SUITE_MODEL_DISPOSED,
+                RobotElementChange.createChangedElement(suiteModel));
     }
 
     public FocusedViewerAccessor getFocusedViewerAccessor() {
