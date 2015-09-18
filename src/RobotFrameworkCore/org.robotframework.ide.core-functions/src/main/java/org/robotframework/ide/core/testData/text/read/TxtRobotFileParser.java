@@ -207,7 +207,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // {$a} | {$b} in this case we check if {$a} was
                             // before
                             // '|' pipe separator
-                            if (remainingData > 0) {
+                            if (remainingData > 0
+                                    || shouldGiveEmptyToProcess(line,
+                                            processingState)) {
                                 rt = processLineElement(line, processingState,
                                         parsingOutput, new FilePosition(
                                                 lineNumber,
@@ -270,7 +272,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                  * ...              argument_x
                  * </pre>
                  */
-                if (!line.getLineElements().isEmpty()) {
+                if (isNotOnlySeparatorOrEmptyLine(line)) {
                     previousLineHandler.flushNew(processingState);
                 }
                 parsingOutput.getFileModel().addNewLine(line);
@@ -312,6 +314,33 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+
+    @VisibleForTesting
+    protected boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
+        boolean anyValuableToken = false;
+        List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        for (IRobotLineElement lineElem : lineElements) {
+            if (lineElem instanceof RobotToken) {
+                anyValuableToken = true;
+                break;
+            }
+        }
+
+        return anyValuableToken;
+    }
+
+
+    @VisibleForTesting
+    protected boolean shouldGiveEmptyToProcess(final RobotLine line,
+            final Stack<ParsingState> processingState) {
+        boolean result = false;
+
+        List<IRobotLineElement> lineElements = line.getLineElements();
+        result = lineElements.size() >= 2;
+
+        return result;
     }
 
 
