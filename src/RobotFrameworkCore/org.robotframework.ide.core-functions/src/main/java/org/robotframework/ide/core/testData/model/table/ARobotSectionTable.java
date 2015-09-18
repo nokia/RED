@@ -18,6 +18,7 @@ public abstract class ARobotSectionTable implements IOptional,
         IChildElement<RobotFile> {
 
     private RobotFile parent;
+    @SuppressWarnings("rawtypes")
     private List<TableHeader> headers = new LinkedList<>();
 
 
@@ -32,12 +33,14 @@ public abstract class ARobotSectionTable implements IOptional,
     }
 
 
-    public void addHeader(final TableHeader header) {
+    @SuppressWarnings("unchecked")
+    public void addHeader(@SuppressWarnings("rawtypes") final TableHeader header) {
         header.setParent(this);
         headers.add(header);
     }
 
 
+    @SuppressWarnings("rawtypes")
     public List<TableHeader> getHeaders() {
         return Collections.unmodifiableList(headers);
     }

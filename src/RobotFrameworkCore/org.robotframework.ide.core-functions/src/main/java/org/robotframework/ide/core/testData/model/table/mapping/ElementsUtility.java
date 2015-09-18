@@ -319,6 +319,7 @@ public class ElementsUtility {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public List<TableHeader> getKnownHeadersForTable(
             final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
