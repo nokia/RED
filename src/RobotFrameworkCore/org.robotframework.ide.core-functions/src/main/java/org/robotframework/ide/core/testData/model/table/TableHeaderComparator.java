@@ -11,6 +11,7 @@ import java.util.Map;
 import org.robotframework.ide.core.testData.model.ModelType;
 
 
+@SuppressWarnings("rawtypes")
 public class TableHeaderComparator extends AModelTypeComparator<TableHeader> {
 
     private final static Map<ModelType, Integer> position = new LinkedHashMap<>();
