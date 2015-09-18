@@ -12,8 +12,9 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.ModelType;
 
 
+@SuppressWarnings("rawtypes")
 public class SettingTableElementsComparator extends
-        AModelTypeComparator<AModelElement<SettingTable>> {
+        AModelTypeComparator<AModelElement> {
 
     private final static Map<ModelType, Integer> position = new LinkedHashMap<>();
     static {
