@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
@@ -72,8 +73,8 @@ public class KeywordFinder {
     private UserKeyword createArtificialKeyword(
             RobotFileOutput robotFileOutput, KeywordTable keywordTable) {
         UserKeyword keyword;
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headers = keywordTable.getHeaders();
+        List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
+                .getHeaders();
         @SuppressWarnings("rawtypes")
         TableHeader tableHeader = headers.get(headers.size() - 1);
         RobotToken artificialNameToken = new RobotToken();
@@ -100,8 +101,8 @@ public class KeywordFinder {
             final KeywordTable keywordTable) {
         List<UserKeyword> keywords = new LinkedList<>();
 
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headers = keywordTable.getHeaders();
+        List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
+                .getHeaders();
         if (!headers.isEmpty()) {
             List<UserKeyword> keywordsAvail = keywordTable.getKeywords();
             @SuppressWarnings("rawtypes")

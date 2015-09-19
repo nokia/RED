@@ -10,6 +10,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -47,9 +48,8 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         }
         ParsingState tableHeaderState = utility
                 .getNearestTableHeaderState(processingState);
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headersForTable = utility.getKnownHeadersForTable(
-                robotFileOutput, tableHeaderState);
+        List<TableHeader<? extends ARobotSectionTable>> headersForTable = utility
+                .getKnownHeadersForTable(robotFileOutput, tableHeaderState);
         if (!headersForTable.isEmpty()) {
             @SuppressWarnings("rawtypes")
             TableHeader lastHeader = headersForTable

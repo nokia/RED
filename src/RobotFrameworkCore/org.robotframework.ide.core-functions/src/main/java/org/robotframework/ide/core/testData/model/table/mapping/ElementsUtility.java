@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
@@ -319,11 +320,10 @@ public class ElementsUtility {
     }
 
 
-    @SuppressWarnings("rawtypes")
-    public List<TableHeader> getKnownHeadersForTable(
+    public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(
             final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
-        List<TableHeader> tableKnownHeaders = new LinkedList<>();
+        List<TableHeader<? extends ARobotSectionTable>> tableKnownHeaders = new LinkedList<>();
         RobotFile fileModel = robotFileOutput.getFileModel();
         if (tableHeaderState == ParsingState.SETTING_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getSettingTable().getHeaders();
