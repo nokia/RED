@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
@@ -72,8 +73,8 @@ public class TestCaseFinder {
     private TestCase createArtificialTestCase(RobotFileOutput robotFileOutput,
             TestCaseTable testCaseTable) {
         TestCase testCase;
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headers = testCaseTable.getHeaders();
+        List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
+                .getHeaders();
         @SuppressWarnings("rawtypes")
         TableHeader tableHeader = headers.get(headers.size() - 1);
         RobotToken artificialNameToken = new RobotToken();
@@ -99,8 +100,8 @@ public class TestCaseFinder {
             final TestCaseTable testCaseTable) {
         List<TestCase> testCases = new LinkedList<>();
 
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headers = testCaseTable.getHeaders();
+        List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
+                .getHeaders();
         if (!headers.isEmpty()) {
             List<TestCase> testCasesAvail = testCaseTable.getTestCases();
             @SuppressWarnings("rawtypes")
