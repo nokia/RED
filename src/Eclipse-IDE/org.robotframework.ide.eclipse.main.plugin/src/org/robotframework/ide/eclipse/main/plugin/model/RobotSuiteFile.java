@@ -23,6 +23,7 @@ import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -345,7 +346,7 @@ public class RobotSuiteFile implements RobotElement {
         return headersList;
     }
 
-    private String extractHeader(final List<TableHeader> modelHeaders, final String defaultHeader) {
+    private String extractHeader(final List<TableHeader<? extends ARobotSectionTable>> modelHeaders, final String defaultHeader) {
         if (!modelHeaders.isEmpty()) {
             return modelHeaders.get(0).getTableHeader().getText().toString();
         }
