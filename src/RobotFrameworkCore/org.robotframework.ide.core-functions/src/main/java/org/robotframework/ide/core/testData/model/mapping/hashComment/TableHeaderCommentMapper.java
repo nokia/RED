@@ -46,8 +46,8 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
             table = fileModel.getTestCaseTable();
         }
 
-        @SuppressWarnings("rawtypes")
-        List<TableHeader> headers = table.getHeaders();
+        List<TableHeader<? extends ARobotSectionTable>> headers = table
+                .getHeaders();
         if (!headers.isEmpty()) {
             @SuppressWarnings("rawtypes")
             TableHeader header = headers.get(headers.size() - 1);
