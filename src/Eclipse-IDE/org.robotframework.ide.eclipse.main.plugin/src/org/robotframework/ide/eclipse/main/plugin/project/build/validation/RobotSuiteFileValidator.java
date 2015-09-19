@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
@@ -42,9 +43,9 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
 
     private ProblemPosition getTestCaseTableHeaderPosition(final TestCaseTable testCaseTable) {
         // TODO : this can be done using some nice API on parser side
-        final List<TableHeader> headers = testCaseTable.getHeaders();
+        final List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable.getHeaders();
         if (!headers.isEmpty()) {
-            final TableHeader header = headers.get(0);
+            final TableHeader<? extends ARobotSectionTable> header = headers.get(0);
             final int line = header.getBeginPosition().getLine();
             final int beginOffset = header.getBeginPosition().getOffset();
             final int endOffset = header.getEndPosition().getOffset();
