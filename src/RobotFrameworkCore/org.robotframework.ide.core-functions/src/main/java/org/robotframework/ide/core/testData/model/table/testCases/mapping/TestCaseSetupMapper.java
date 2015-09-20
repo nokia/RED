@@ -40,9 +40,10 @@ public class TestCaseSetupMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestCaseSetup setup = new TestCaseSetup(rt);
-        testCase.addSetup(setup);
-
+        if (testCase.getSetups().isEmpty()) {
+            TestCaseSetup setup = new TestCaseSetup(rt);
+            testCase.addSetup(setup);
+        }
         processingState.push(ParsingState.TEST_CASE_SETTING_SETUP);
 
         return rt;

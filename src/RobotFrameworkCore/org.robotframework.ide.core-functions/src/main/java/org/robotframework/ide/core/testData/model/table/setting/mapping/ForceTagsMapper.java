@@ -43,8 +43,10 @@ public class ForceTagsMapper implements IParsingMapper {
         rt.setRaw(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        ForceTags forceTags = new ForceTags(rt);
-        setting.addForceTags(forceTags);
+        if (setting.getForceTags().isEmpty()) {
+            ForceTags forceTags = new ForceTags(rt);
+            setting.addForceTags(forceTags);
+        }
         processingState.push(ParsingState.SETTING_FORCE_TAGS);
         return rt;
     }
