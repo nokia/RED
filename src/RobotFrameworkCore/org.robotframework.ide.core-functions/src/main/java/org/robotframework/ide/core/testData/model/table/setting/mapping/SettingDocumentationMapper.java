@@ -44,8 +44,10 @@ public class SettingDocumentationMapper implements IParsingMapper {
 
         SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        SuiteDocumentation doc = new SuiteDocumentation(rt);
-        settings.addDocumentation(doc);
+        if (settings.getDocumentation().isEmpty()) {
+            SuiteDocumentation doc = new SuiteDocumentation(rt);
+            settings.addDocumentation(doc);
+        }
         processingState.push(ParsingState.SETTING_DOCUMENTATION);
 
         return rt;
