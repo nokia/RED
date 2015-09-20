@@ -43,8 +43,10 @@ public class SuiteTeardownMapper implements IParsingMapper {
         rt.setRaw(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        SuiteTeardown teardown = new SuiteTeardown(rt);
-        setting.addSuiteTeardown(teardown);
+        if (setting.getSuiteTeardowns().isEmpty()) {
+            SuiteTeardown teardown = new SuiteTeardown(rt);
+            setting.addSuiteTeardown(teardown);
+        }
         processingState.push(ParsingState.SETTING_SUITE_TEARDOWN);
 
         return rt;

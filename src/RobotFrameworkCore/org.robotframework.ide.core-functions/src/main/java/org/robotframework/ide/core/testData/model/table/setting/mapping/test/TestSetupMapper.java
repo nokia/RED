@@ -44,8 +44,10 @@ public class TestSetupMapper implements IParsingMapper {
 
         SettingTable settingTable = robotFileOutput.getFileModel()
                 .getSettingTable();
-        TestSetup setup = new TestSetup(rt);
-        settingTable.addTestSetup(setup);
+        if (settingTable.getTestSetups().isEmpty()) {
+            TestSetup setup = new TestSetup(rt);
+            settingTable.addTestSetup(setup);
+        }
         processingState.push(ParsingState.SETTING_TEST_SETUP);
 
         return rt;
