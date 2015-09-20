@@ -43,8 +43,10 @@ public class SuiteSetupMapper implements IParsingMapper {
         rt.setRaw(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        SuiteSetup setup = new SuiteSetup(rt);
-        setting.addSuiteSetup(setup);
+        if (setting.getSuiteSetups().isEmpty()) {
+            SuiteSetup setup = new SuiteSetup(rt);
+            setting.addSuiteSetup(setup);
+        }
         processingState.push(ParsingState.SETTING_SUITE_SETUP);
 
         return rt;

@@ -43,8 +43,10 @@ public class TestTeardownMapper implements IParsingMapper {
         rt.setRaw(new StringBuilder(text));
 
         SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        TestTeardown teardown = new TestTeardown(rt);
-        setting.addTestTeardown(teardown);
+        if (setting.getTestTeardowns().isEmpty()) {
+            TestTeardown teardown = new TestTeardown(rt);
+            setting.addTestTeardown(teardown);
+        }
         processingState.push(ParsingState.SETTING_TEST_TEARDOWN);
 
         return rt;

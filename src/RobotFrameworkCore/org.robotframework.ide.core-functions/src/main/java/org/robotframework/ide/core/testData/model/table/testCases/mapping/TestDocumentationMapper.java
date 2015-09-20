@@ -40,9 +40,10 @@ public class TestDocumentationMapper extends ATestCaseSettingDeclarationMapper {
 
         TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        TestDocumentation doc = new TestDocumentation(rt);
-        testCase.addDocumentation(doc);
-
+        if (testCase.getDocumentation().isEmpty()) {
+            TestDocumentation doc = new TestDocumentation(rt);
+            testCase.addDocumentation(doc);
+        }
         processingState
                 .push(ParsingState.TEST_CASE_SETTING_DOCUMENTATION_DECLARATION);
 
