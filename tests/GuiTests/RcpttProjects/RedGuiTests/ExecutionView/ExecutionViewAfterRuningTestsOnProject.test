@@ -1,0 +1,174 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _1lEyQF06EeWeit3EM6sPPA
+Element-Name: ExecutionViewAfterRuningTestsOnProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _yrzhQF1JEeWeit3EM6sPPA
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 9/21/15 11:01 AM
+Testcase-Type: ecl
+Verifications: _-dwU0F3XEeWeit3EM6sPPA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open Execution view and check if it is empty buttons are not selected
+get-tab-folder -index 4 | get-tab-item "Execution View" | click
+
+with [get-view "Execution View"] {
+    get-label "Passed: 0" | get-property caption | equals "Passed: 0" | verify-true
+    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
+    
+    get-tree | get-property itemCount | equals 0 | verify-true
+
+    //buttons
+    with [get-button "Expand All"] {
+        get-property tooltip | equals "Expand All" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 0 | verify-true
+    }
+    with [get-button "Collapse All"] {
+        get-property tooltip | equals "Collapse All" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 1 | verify-true
+    }
+    with [get-button "Show Failures Only"] {
+        get-property tooltip | equals "Show Failures Only" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 2 | verify-true
+    }
+    with [get-button "Rerun Tests"] {
+        get-property tooltip | equals "Rerun Tests" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 3 | verify-true
+    }
+    with [get-button "Rerun Failed Tests Only"] {
+        get-property tooltip | equals "Rerun Failed Tests Only" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 4 | verify-true
+    }
+}
+get-tab-folder -index 4 | get-property "getChildren().length" | equals 5 | verify-true
+get-control Any -index 70 | get-property "getChildren().Control[0].getItemCount()" | equals 5 | verify-true
+
+
+//run test
+with [get-view "Project Explorer" | get-tree] {
+    select ExecutionViewProject | select ExecutionViewProject | double-click
+    select ExecutionViewProject | get-menu "Run As/1 Robot Test" | click
+}
+
+wait 2000
+//check test status
+with [get-view "Execution View"] {
+    get-label "Passed: 16" | get-property caption | equals "Passed: 16" | verify-true
+    get-label "Failed: 9" | get-property caption | equals "Failed: 9" | verify-true
+}
+
+//check that pass cases are not expanded
+with [get-view "Execution View" | get-tree] {
+    get-item "ExecutionViewProject \\(.*\)" | get-property "getExpanded()" | equals true | verify-true
+    get-item "ExecutionViewProject \\(.* s\\)/All Pass Tests \\(.* s\\)" | get-property "getExpanded()" 
+        | equals false | verify-true
+    get-item "ExecutionViewProject \\(.*s\\)/Duplicate Test Case \\(.*\\)" | get-property "getExpanded()" 
+        | equals true | verify-true
+    get-item "ExecutionViewProject \\(.* s\\)/Normal Cases \\(.* s\\)" | get-property "getExpanded()" 
+        | equals true | verify-true
+    get-item "ExecutionViewProject \\(.* s\\)/Stopped Tests \\(.* s\\)" | get-property "getExpanded()" 
+    	| equals true | verify-true
+}
+
+
+//check if tests shows execution time
+with [get-view "Execution View"] {
+    with [get-tree] {
+        get-item "ExecutionViewProject .*" | get-property caption | matches "ExecutionViewProject \(2\.[23]\d\d s\)" 
+            | verify-true
+        get-item "ExecutionViewProject.*/Duplicate Test Case \\(.*\\)" | get-property caption 
+            | matches "Duplicate Test Case \(0.0\d\d s\)" | verify-true
+        get-item "ExecutionViewProject \\(.*\\)/Duplicate Test Case \\(.*s\\)/test 1 \\(.*\\)" 
+            | get-property caption | matches "test 1 \(0.00\d s\)" | verify-true
+    }
+    //check error field
+    get-editbox -after [get-label "Failed: 9"] | get-property text | equals "" | verify-true
+}
+
+
+//-- Checking message field and opening editor after selecting test case ---
+
+//select fail case
+with [get-view "Execution View" | get-tree] {
+	get-item  "ExecutionViewProject \\(.* s\\)/Duplicate Test Case \\(.* s\\)/test 1 \\(.* s\\)"| click
+    select "ExecutionViewProject \\(.* s\\)/Duplicate Test Case \\(.* s\\)/test 1 \\(.* s\\)" | double-click
+}
+get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "No keyword with name 'Convert To Lowercase' found." | verify-true
+
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "duplicate_test_case.robot" | verify-true
+    get-property activePage | equals "duplicate_test_case.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+
+
+//select pass case
+with [get-view "Execution View" | get-tree] {
+    get-item "ExecutionViewProject \\(.* s\\)/Normal Cases \\(.* s\\)/convert to lower case \\(.* s\\)" | click
+    select "ExecutionViewProject \\(.* s\\)/Normal Cases \\(.* s\\)/convert to lower case \\(.* s\\)" 
+        | double-click
+    get-item "ExecutionViewProject \\(.* s\\)/Normal Cases \\(.* s\\)/convert to lower case \\(.* s\\)" | click
+}
+//check editor
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "duplicate_test_case.robot" | verify-true
+    get-property "pages[1]" | equals "normal_cases.robot" | verify-true
+    get-property activePage | equals "normal_cases.robot" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "" | verify-true
+
+//select fail case
+with [get-view "Execution View" | get-tree] {
+    get-item "ExecutionViewProject \\(.* s\\)/Stopped Tests \\(.* s\\)/here is fatal error \\(.*s\\)" | click
+    select "ExecutionViewProject \\(.* s\\)/Stopped Tests \\(.* s\\)/here is fatal error \\(.*s\\)" 
+        | double-click
+    get-item "ExecutionViewProject \\(.* s\\)/Stopped Tests \\(.* s\\)/here is fatal error \\(.*s\\)" | click
+}
+//check editor
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "duplicate_test_case.robot" | verify-true
+    get-property "pages[1]" | equals "normal_cases.robot" | verify-true
+    get-property "pages[2]" | equals "stopped_tests.robot" | verify-true
+    get-property activePage | equals "stopped_tests.robot" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "Big kaboom!!!" 
+    | verify-true
+
+//select not-expanded pass case    
+with [get-view "Execution View" | get-tree] {
+    get-item "ExecutionViewProject \\(.* s\\)/All Pass Tests \\(.* s\\)/pass test \\(.* s\\)" | click
+    select "ExecutionViewProject \\(.* s\\)/All Pass Tests \\(.* s\\)/pass test \\(.* s\\)" | double-click
+    get-item "ExecutionViewProject \\(.* s\\)/All Pass Tests \\(.* s\\)/pass test \\(.* s\\)" | click
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "duplicate_test_case.robot" | verify-true
+    get-property "pages[1]" | equals "normal_cases.robot" | verify-true
+    get-property "pages[2]" | equals "stopped_tests.robot" | verify-true
+    get-property "pages[3]" | equals "all_pass_tests.robot" | verify-true
+    get-property activePage | equals "all_pass_tests.robot" | verify-true
+    get-property tabCount | equals 4 | verify-true
+}
+get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "" | verify-true
+
+
+//make full scren for varification
+with [get-tab-folder -index 5] {
+    double-click
+    get-tab-item "Execution View" | click
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
