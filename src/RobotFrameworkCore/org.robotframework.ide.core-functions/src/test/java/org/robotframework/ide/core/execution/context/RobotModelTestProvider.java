@@ -15,22 +15,20 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 
-
 public class RobotModelTestProvider {
+
     public static RobotModelTestProvider getInstance() {
         return new RobotModelTestProvider();
     }
-    
+
     public static RobotFile getModelFile(final String filename) throws URISyntaxException {
         final RobotProjectHolder robotProject = new RobotProjectHolder();
         final RobotParser parser = RobotParser.createEager(robotProject);
-        
-        final Path p = Paths.get(getInstance().getClass()
-                .getResource(filename)
-                .toURI());
-        
-        final List<RobotFileOutput> parse = parser.parse(p.toFile());
+
+        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
+
+        final List<RobotFileOutput> parse = parser.parse(path.toFile());
         final RobotFileOutput robotFileOutput = parse.get(0);
-        return robotFileOutput.getFileModel();        
+        return robotFileOutput.getFileModel();
     }
 }
