@@ -76,7 +76,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -209,7 +209,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             }, new IExecutionHandler() {
 
                 @Override
-                public void processExecutionElement(ExecutionElement executionElement) {
+                public void processExecutionElement(final ExecutionElement executionElement) {
                     robotEventBroker.sendExecutionEventToExecutionView(executionElement);
                 }
             });
@@ -328,13 +328,20 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     public static String createSuiteName(final IResource suite) {
+        final String actualProjectName = suite.getProject().getLocation().lastSegment();
+
         final IPath path = suite.getFullPath().removeFileExtension();
-        final List<String> upperCased = Lists.transform(Arrays.asList(path.segments()), new Function<String, String>() {
+        final List<String> upperCased = newArrayList(
+                Lists.transform(Arrays.asList(path.segments()), new Function<String, String>() {
             @Override
             public String apply(final String segment) {
                 return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, segment);
             }
-        });
+                }));
+        if (!actualProjectName.equals(upperCased.get(0))) {
+            upperCased.remove(0);
+            upperCased.add(0, actualProjectName);
+        }
         return Joiner.on('.').join(upperCased);
     }
 
