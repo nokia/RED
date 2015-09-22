@@ -74,7 +74,10 @@ public class LaunchElementsTreeViewer {
             for (String suitePath : suites) {
                 final IPath path = Path.fromPortableString(suitePath);
                 final IResource resource = project.findMember(path);
-                final String suiteName = RobotLaunchConfigurationDelegate.createSuiteName(resource);
+                String suiteName = "";
+                if (resource != null) {
+                    suiteName = RobotLaunchConfigurationDelegate.createSuiteName(resource);
+                }
                 SuiteLaunchElement suiteElement = null;
                 if (resource instanceof IFile) {
                     suiteElement = new SuiteLaunchElement(suitePath, suiteName, new ArrayList<TestCaseLaunchElement>());
