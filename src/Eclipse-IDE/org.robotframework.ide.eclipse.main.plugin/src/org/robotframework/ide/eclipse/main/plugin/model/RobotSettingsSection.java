@@ -22,6 +22,7 @@ import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentati
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 import com.google.common.base.Predicate;
@@ -161,7 +162,11 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         }
         for (final AKeywordBaseSetting<?> keywordSetting : getKeywordBasedSettings(settingsTable)) {
             final String name = keywordSetting.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(keywordSetting.getKeywordName().getText().toString());
+            final RobotToken settingKeywordName = keywordSetting.getKeywordName();
+            final List<String> args = newArrayList();
+            if (settingKeywordName != null) {
+                args.add(settingKeywordName.getText().toString());
+            }
             args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
             elements.add(new RobotSetting(this, name, args, ""));
         }
