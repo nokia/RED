@@ -272,7 +272,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void started() {
         fireCreationEvent();
-        installDeferredBreakpoints();
     }
 
     /**
@@ -337,19 +336,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     /**
-     * Install breakpoints that are already registered with the breakpoint
-     * manager.
-     */
-    private void installDeferredBreakpoints() {
-        // IBreakpoint[] breakpoints = DebugPlugin.getDefault()
-        // .getBreakpointManager()
-        // .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
-        // for (int i = 0; i < breakpoints.length; i++) {
-        // breakpointAdded(breakpoints[i]);
-        // }
-    }
-
-    /**
      * Returns the current stack frames in the target.
      * 
      * @return the current stack frames in the target
@@ -372,12 +358,18 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             for (final String key : currentFrames.keySet()) {
                 final KeywordContext keywordContext = currentFrames.get(key);
                 //only the highest level of StackFrames is created, lower levels are copied from previous StackFrames
-                if (id >= numberOfStackTracesToCopy) {
+                if (id > numberOfStackTracesToCopy) {
                     newStackFrames[currentFrames.size() - id] = new RobotStackFrame(thread,
                             keywordContext.getFileName(), key, keywordContext.getLineNumber(),
                             keywordContext.getVariables(), id);
                 } else {
-                    newStackFrames[currentFrames.size() - id] = stackFrames[numberOfStackTracesToCopy - id];
+                    IStackFrame previousStackFrame = null;
+                    if(stackFrames.length < currentFrames.size()) {
+                        previousStackFrame = stackFrames[numberOfStackTracesToCopy - id];
+                    } else {
+                        previousStackFrame = stackFrames[stackFrames.length - id];
+                    }
+                    newStackFrames[currentFrames.size() - id] = previousStackFrame;
                 }
                 id++;
             }

@@ -15,3 +15,9 @@ Keyword3
 	
 Keyword4
 	Log  1234
+	
+LoopKeyword
+	:FOR	${i}	IN	2
+	\	Log	 ${i}
+	\	Log  1234
+	\	Log  1234
