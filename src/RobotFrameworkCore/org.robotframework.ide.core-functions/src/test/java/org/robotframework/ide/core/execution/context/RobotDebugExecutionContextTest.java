@@ -25,8 +25,8 @@ public class RobotDebugExecutionContextTest {
 
     private int[] test2_lines = new int[] { 6, 16, 9, 18, 22, 12, 12, 13, 14, 17, 13, 23, 19 };
 
-    private int[] test3_lines = new int[] { 6, -1, 7, 8, 6, 7, 8, 6, 7, 8, 9, 10, 17, 18, -1, 19, 18, 19, 18, 19, 20,
-            11, 12, 20, -1, 21, 22, 23, 20, 21, 22, 23, 13 };
+    private int[] test3_lines = new int[] { 6, 6, 7, 8, 6, 7, 8, 6, 7, 8, 9, 10, 17, 18, 18, 20, 18, 20, 18, 20, 21,
+            11, 12, 20, 20, 21, 22, 23, 20, 21, 22, 23, 13 };
 
     private int[] test4_lines = new int[] { 4, 21, 23, 26, 28, 7, 12, 26, 28 };
 
@@ -72,7 +72,7 @@ public class RobotDebugExecutionContextTest {
             
         debugExecutionContext.endTest();
     }
-    
+
     @Test
     public void test_MultipleResources() throws URISyntaxException {
         linesCounter = 0;
