@@ -62,7 +62,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     private IDirtyProviderService dirtyProviderService;
 
     @Inject
-    private static RedProjectEditorInput editorInput;
+    private RedProjectEditorInput editorInput;
 
     private TableViewer viewer;
 
