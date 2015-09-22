@@ -49,7 +49,7 @@ public class RobotDebugExecutionContextTest {
             
             debugExecutionContext.startKeyword("resource1.MyLog2", "Keyword", Arrays.asList(""));
             checkKeywordLine1();
-                startBuiltinLogKeyword2();
+                startBuiltInLogKeyword1();
                 startBuiltInLogKeyword1();
                 startMyLogKeyword();
                 startTestKKeyword();
@@ -84,7 +84,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startTest("test a");
             debugExecutionContext.startKeyword("key1", "Keyword", Arrays.asList(""));
             checkKeywordLine2();
-                debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                startBuiltInLogKeyword2();
             debugExecutionContext.endKeyword();
         debugExecutionContext.endTest();
         
@@ -98,18 +98,18 @@ public class RobotDebugExecutionContextTest {
                     checkKeywordLine2();
                         debugExecutionContext.startKeyword("resource3.Keyword3", "Keyword", Arrays.asList(""));
                         checkKeywordLine2();
-                            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
-                            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                            startBuiltInLogKeyword2();
+                            startBuiltInLogKeyword2();
                             debugExecutionContext.startKeyword("Keyword4", "Keyword", Arrays.asList(""));
                             checkKeywordLine2();
-                                debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                                startBuiltInLogKeyword2();
                             debugExecutionContext.endKeyword();
                         debugExecutionContext.endKeyword();
-                        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                        startBuiltInLogKeyword2();
                     debugExecutionContext.endKeyword();
-                    debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                    startBuiltInLogKeyword2();
                 debugExecutionContext.endKeyword();
-                debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
+                startBuiltInLogKeyword2();
             debugExecutionContext.endKeyword();
             
         debugExecutionContext.endTest();
@@ -219,8 +219,8 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine1();debugExecutionContext.endKeyword();
     }
     
-    private void startBuiltinLogKeyword2() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("some info"));checkKeywordLine1();debugExecutionContext.endKeyword();
+    private void startBuiltInLogKeyword2() {
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine2();debugExecutionContext.endKeyword();
     }
     
     private void startBuiltInLogKeyword3() {
@@ -262,7 +262,7 @@ public class RobotDebugExecutionContextTest {
     
     private void startMyLogKeyword() {
         debugExecutionContext.startKeyword("resource2.MyLog", "Keyword", Arrays.asList(""));checkKeywordLine1();
-            startBuiltinLogKeyword2();
+            startBuiltInLogKeyword1();
             startBuiltInLogKeyword1();
             debugExecutionContext.startKeyword("testN", "Keyword", Arrays.asList(""));checkKeywordLine1();
                 startBuiltInLogKeyword1();
