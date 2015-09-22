@@ -58,23 +58,23 @@ public class RobotDebugEventDispatcher extends Job {
 
     private IFile executedFile;
     
+    private final RobotEventBroker robotEventBroker;
+    
     private final List<IResource> suiteResources;
     
-    private final RobotEventBroker robotEventBroker;
+    private final Map<IBreakpoint, Integer> breakpointHitCounts;
 
     private String currentSuite = "";
 
     private String breakpointCondition = "";
+    
+    private String currentResourceFile;
 
     private boolean isBreakpointConditionFulfilled;
 
-    private KeywordContext currentKeywordContext = new KeywordContext();
-
-    private final Map<IBreakpoint, Integer> breakpointHitCounts;
-
-    private String currentResourceFile;
-
     private boolean isStopping;
+    
+    private KeywordContext currentKeywordContext = new KeywordContext();
     
     private final RobotDebugExecutionContext executionContext;
     
@@ -217,63 +217,23 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeyword = (String) startList.get(0);
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
-        final List<String> args = (List<String>) startElements.get("args");
         
-        executionContext.startKeyword(currentKeyword, "", args);
-        
+        executionContext.startKeyword(currentKeyword, (String) startElements.get("type"),
+                (List<String>) startElements.get("args"));
+
         String executedSuite = currentSuite;
         
         final KeywordPosition keywordPosition = executionContext.findKeywordPosition();
-        final int keywordLine = keywordPosition.getLineNumber();
+        final int keywordLineNumber = keywordPosition.getLineNumber();
         currentResourceFile = keywordPosition.getFilePath();
         if(currentResourceFile != null) {
             executedSuite = new File(currentResourceFile).getName();
         }
 
-        boolean isBreakpoint = false;
-        final IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
-                .getBreakpointManager()
-                .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
-        for (int i = 0; i < currentBreakpoints.length; i++) {
-            final IBreakpoint currentBreakpoint = currentBreakpoints[i];
-            final String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
-            try {
-                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
-                    final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
-                            IMarker.LINE_NUMBER);
-                    if(keywordLine == breakpointLineNum) {
-                        boolean hasHitCount = false;
-                        final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
-                                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                        if (breakpointHitCount > 1) {
-                            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
-                                final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
-                                if (currentHitCount == breakpointHitCount) {
-                                    hasHitCount = true;
-                                }
-                                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
-                            } else {
-                                breakpointHitCounts.put(currentBreakpoint, 1);
-                            }
-                        } else {
-                            hasHitCount = true;
-                        }
+        boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuite, keywordLineNumber);
 
-                        if (hasHitCount) {
-                            breakpointCondition = currentBreakpoint.getMarker().getAttribute(
-                                    RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                            isBreakpoint = true;
-                            target.breakpointHit(currentBreakpoint);
-                        }
-                    }
-                }
-            } catch (final CoreException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (isBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
-                && !target.hasStepReturn() && keywordLine >= 0)) {
+        if (hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
+                && !target.hasStepReturn() && keywordLineNumber >= 0)) {
 
             if (target.getRobotThread().isStepping()) {
                 target.getRobotThread().setSteppingOver(false);
@@ -285,7 +245,7 @@ public class RobotDebugEventDispatcher extends Job {
             isStopping = false;
         }
 
-        currentKeywordContext = new KeywordContext(null, executedSuite, keywordLine);
+        currentKeywordContext = new KeywordContext(null, executedSuite, keywordLineNumber);
         target.getPartListener().setKeywordContext(currentKeywordContext);
         target.getCurrentFrames().put(currentKeyword, currentKeywordContext);
     }
@@ -385,10 +345,10 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleEndTestEvent(final Map<?, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("end_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
-        final String line = "Ending test: " + testElements.get("longname") + "\n\n";
         
         executionContext.endTest();
         
+        final String line = "Ending test: " + testElements.get("longname") + "\n\n";
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndTestExecutionElement(
                 (String) testList.get(0), testElements));
@@ -445,6 +405,51 @@ public class RobotDebugEventDispatcher extends Job {
             }
         }
         return null;
+    }
+    
+    private boolean hasBreakpointAtCurrentKeywordPosition(final String executedSuite, final int keywordLineNumber) {
+        boolean hasBreakpoint = false;
+        final IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
+                .getBreakpointManager()
+                .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
+        for (int i = 0; i < currentBreakpoints.length; i++) {
+            final IBreakpoint currentBreakpoint = currentBreakpoints[i];
+            final String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
+            try {
+                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
+                    final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
+                            IMarker.LINE_NUMBER);
+                    if(keywordLineNumber == breakpointLineNum) {
+                        boolean hasHitCount = false;
+                        final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
+                                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                        if (breakpointHitCount > 1) {
+                            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
+                                final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
+                                if (currentHitCount == breakpointHitCount) {
+                                    hasHitCount = true;
+                                }
+                                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
+                            } else {
+                                breakpointHitCounts.put(currentBreakpoint, 1);
+                            }
+                        } else {
+                            hasHitCount = true;
+                        }
+
+                        if (hasHitCount) {
+                            breakpointCondition = currentBreakpoint.getMarker().getAttribute(
+                                    RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                            hasBreakpoint = true;
+                            target.breakpointHit(currentBreakpoint);
+                        }
+                    }
+                }
+            } catch (final CoreException e) {
+                e.printStackTrace();
+            }
+        }
+        return hasBreakpoint;
     }
     
     private static class MissingFileToExecuteException extends RuntimeException {
