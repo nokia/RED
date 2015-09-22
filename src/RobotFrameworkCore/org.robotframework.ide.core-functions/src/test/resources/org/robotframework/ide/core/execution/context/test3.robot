@@ -16,6 +16,7 @@ test a
 testFor
 	Log  1234
 	:FOR	${i}	IN	@{t}
+	#\  Log 1234
 	\	Log	 ${i}
 	Log  1234
 
