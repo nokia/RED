@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yrzhQF1JEeWeit3EM6sPPA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/21/15 11:01 AM
+Save-Time: 9/22/15 9:35 AM
 Testcase-Type: ecl
 Verifications: _-dwU0F3XEeWeit3EM6sPPA
 
@@ -52,7 +52,7 @@ with [get-view "Execution View"] {
     }
 }
 get-tab-folder -index 4 | get-property "getChildren().length" | equals 5 | verify-true
-get-control Any -index 70 | get-property "getChildren().Control[0].getItemCount()" | equals 5 | verify-true
+
 
 
 //run test
