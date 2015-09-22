@@ -26,10 +26,15 @@ public class RobotDebugExecutionContext {
     
     private int testCaseExecutionRowCounter = 0;
     
+    private boolean isForLoopStarted;
+    private LinkedList<RobotExecutableRow<?>> forLoopExecutionRows;
+    private int forLoopExecutionRowsCounter = 0;
+    
     public RobotDebugExecutionContext() {
         currentKeywords = new LinkedList<>();
         userKeywords = new ArrayList<>();
         resourceImportReferences = new ArrayList<>();
+        forLoopExecutionRows = new LinkedList<>();
     }
     
     public void startSuite(final RobotFileOutput robotFileOutput) {
@@ -50,9 +55,10 @@ public class RobotDebugExecutionContext {
     }
 
     public void startKeyword(final String name, final String type, final List<String> arguments) {
-        currentKeywords.add(new KeywordContext(name, type, arguments));
+        currentKeywords.add(new KeywordContext(name));
+        checkKeywordType(type);
     }
-    
+
     public void endKeyword() {
         currentKeywords.removeLast();
     }
@@ -66,48 +72,117 @@ public class RobotDebugExecutionContext {
         RobotExecutableRow<?> executionRow = null;
         if (currentKeywords.size() == 1) { // keyword directly from test case
             executionRow = findTestCaseExecutionRow();
+        } else if (isForLoopStarted) { // keyword inside For loop
+            executionRow = findForLoopExecutionRow();
         } else { // keyword from Keywords section or resource file
             parentKeywordContext = currentKeywords.get(currentKeywords.size() - 2);
-            // search in keywords from Keywords section
-            final UserKeyword userKeyword = findUserKeyword(parentKeywordContext);
-            if (userKeyword != null) {
-                if (parentKeywordContext.getUserKeyword() == null) {
-                    parentKeywordContext.setUserKeyword(userKeyword);
-                }
-                executionRow = findKeywordExecutionRow(userKeyword, parentKeywordContext);
+            executionRow = findUserKeywordExecutionRow(parentKeywordContext);
+        }
+        
+        return createNewKeywordPosition(parentKeywordContext, executionRow);
+    }
+    
+    private KeywordPosition createNewKeywordPosition(final KeywordContext parentKeywordContext,
+            final RobotExecutableRow<?> executionRow) {
+        KeywordPosition keywordPosition = new KeywordPosition();
+        if (parentKeywordContext != null && parentKeywordContext.getResourceImportReference() != null) {
+            keywordPosition.setFilePath(parentKeywordContext.getResourceImportReference()
+                    .getReference()
+                    .getProcessedFile()
+                    .getAbsolutePath());
+        }
+        keywordPosition.setLineNumber(executionRow != null ? executionRow.getAction().getLineNumber() : -1);
+        return keywordPosition;
+    }
+    
+    private RobotExecutableRow<TestCase> findTestCaseExecutionRow() {
+        final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getTestExecutionRows();
+        if (testCaseExecutionRowCounter < executionRows.size()) {
+            final RobotExecutableRow<TestCase> executionRow = executionRows.get(testCaseExecutionRowCounter);
+            testCaseExecutionRowCounter++;
+            
+            if (executionRow.isExecutable()) {
+                return executionRow;
             } else {
-                // search in resources from Settings section
-                ResourceImportReference resourceImportReference = findResource(parentKeywordContext);
-                if (resourceImportReference == null) {
-                    // if keyword is in other keyword in resource file
-                    resourceImportReference = findLastResourceImportReferenceInCurrentKeywords();
+                return findTestCaseExecutionRow();
+            }
+        }
+        return null;
+    }
+    
+    private RobotExecutableRow<?> findForLoopExecutionRow() {
+
+        if (forLoopExecutionRows.isEmpty()) {
+            KeywordContext parentKeywordContext = null;
+            if (currentKeywords.size() - 3 >= 0) {
+                parentKeywordContext = currentKeywords.get(currentKeywords.size() - 3);
+            }
+            final List<RobotExecutableRow<?>> executionRows = new ArrayList<>();
+            int counter = 0;
+            if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null) {
+                executionRows.addAll(parentKeywordContext.getUserKeyword().getKeywordExecutionRows());
+                counter = parentKeywordContext.getKeywordExecutionRowCounter() - 1;
+            } else {
+                executionRows.addAll(currentTestCase.getTestExecutionRows());
+                counter = testCaseExecutionRowCounter - 1;
+            }
+            forLoopExecutionRows.add(executionRows.get(counter));
+            for (int i = counter + 1; i < executionRows.size(); i++) {
+                if (executionRows.get(i).getAction().getText().toString().equals("\\")
+                        && executionRows.get(i).isExecutable()) {
+                    forLoopExecutionRows.add(executionRows.get(i));
+                    if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null)
+                        parentKeywordContext.incrementKeywordExecutionRowCounter();
+                    else
+                        testCaseExecutionRowCounter++;
+                } else if (executionRows.get(i).isExecutable()) {
+                    break;
                 }
-                if (resourceImportReference != null) {
-                    if (parentKeywordContext.getResourceImportReference() == null) {
-                        parentKeywordContext.setResourceImportReference(resourceImportReference);
+            }
+            return null;
+        }
+
+        forLoopExecutionRowsCounter++;
+        if (forLoopExecutionRowsCounter == forLoopExecutionRows.size()) {
+            forLoopExecutionRowsCounter = 0;
+            return forLoopExecutionRows.getFirst();
+        }
+
+        return forLoopExecutionRows.get(forLoopExecutionRowsCounter);
+    }
+    
+    private RobotExecutableRow<UserKeyword> findUserKeywordExecutionRow(final KeywordContext parentKeywordContext) {
+        RobotExecutableRow<UserKeyword> executionRow = null;
+        // search in keywords from Keywords section
+        final UserKeyword userKeyword = findUserKeyword(parentKeywordContext);
+        if (userKeyword != null) {
+            if (parentKeywordContext.getUserKeyword() == null) {
+                parentKeywordContext.setUserKeyword(userKeyword);
+            }
+            executionRow = findKeywordExecutionRow(userKeyword, parentKeywordContext);
+        } else {
+            // search in resources from Settings section
+            ResourceImportReference resourceImportReference = findResource(parentKeywordContext);
+            if (resourceImportReference == null) {
+                // if keyword is in other keyword in resource file
+                resourceImportReference = findLastResourceImportReferenceInCurrentKeywords();
+            }
+            if (resourceImportReference != null) {
+                if (parentKeywordContext.getResourceImportReference() == null) {
+                    parentKeywordContext.setResourceImportReference(resourceImportReference);
+                }
+                final UserKeyword userResourceKeyword = findResourceKeyword(resourceImportReference,
+                        parentKeywordContext); // search in keywords from Keywords section in
+                                               // resource file
+                if (userResourceKeyword != null) {
+                    if (parentKeywordContext.getUserKeyword() == null) {
+                        parentKeywordContext.setUserKeyword(userResourceKeyword);
                     }
-                    final UserKeyword userResourceKeyword = findResourceKeyword(resourceImportReference,
-                            parentKeywordContext); // search in keywords from Keywords section in
-                                                   // resource file
-                    if (userResourceKeyword != null) {
-                        if (parentKeywordContext.getUserKeyword() == null) {
-                            parentKeywordContext.setUserKeyword(userResourceKeyword);
-                        }
-                        executionRow = findKeywordExecutionRow(userResourceKeyword, parentKeywordContext);
-                    }
+                    executionRow = findKeywordExecutionRow(userResourceKeyword, parentKeywordContext);
                 }
             }
         }
-        
-        KeywordPosition keywordLine = new KeywordPosition();
-        if(parentKeywordContext != null && parentKeywordContext.getResourceImportReference() != null) {
-            keywordLine.setFilePath(parentKeywordContext.getResourceImportReference().getReference().getProcessedFile().getAbsolutePath());
-        }
-        keywordLine.setLineNumber(executionRow != null ? executionRow.getAction().getLineNumber() : -1);
-
-        //System.out.println("line:" + executionRow.getAction().getLineNumber());
-
-        return keywordLine;
+        return executionRow;
     }
     
     private UserKeyword findUserKeyword(final KeywordContext keywordContext) {
@@ -186,20 +261,6 @@ public class RobotDebugExecutionContext {
         return null;
     }
     
-    private RobotExecutableRow<TestCase> findTestCaseExecutionRow() {
-        final List<RobotExecutableRow<TestCase>> executableRows = currentTestCase.getTestExecutionRows();
-        if (testCaseExecutionRowCounter < executableRows.size()) {
-            final RobotExecutableRow<TestCase> executableRow = executableRows.get(testCaseExecutionRowCounter);
-            testCaseExecutionRowCounter++;
-            if (executableRow.isExecutable()) {
-                return executableRow;
-            } else {
-                return findTestCaseExecutionRow();
-            }
-        }
-        return null;
-    }
-    
     private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword, final KeywordContext parentKeywordContext) {
         final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getKeywordExecutionRows();
         if (parentKeywordContext.getKeywordExecutionRowCounter() < executableRows.size()) {
@@ -214,13 +275,19 @@ public class RobotDebugExecutionContext {
         return null;
     }
     
+    private void checkKeywordType(final String type) {
+        if(type.equalsIgnoreCase("Test Foritem")) {
+            isForLoopStarted = true;
+        } else if(!type.equalsIgnoreCase("Test Foritem") && isForLoopStarted) {
+            isForLoopStarted = false;
+            forLoopExecutionRows.clear();
+            forLoopExecutionRowsCounter = 0;
+        }
+    }
+    
     private static class KeywordContext {
 
         private String name;
-
-        private String type;
-
-        private List<String> arguments;
         
         private int keywordExeRowCounter = 0;
         
@@ -228,22 +295,12 @@ public class RobotDebugExecutionContext {
         
         private UserKeyword userKeyword;
 
-        public KeywordContext(final String name, final String type, final List<String> arguments) {
+        public KeywordContext(final String name) {
             this.name = name;
-            this.type = type;
-            this.arguments = arguments;
         }
 
         public String getName() {
             return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public List<String> getArguments() {
-            return arguments;
         }
 
         public int getKeywordExecutionRowCounter() {
@@ -292,4 +349,5 @@ public class RobotDebugExecutionContext {
             this.filePath = filePath;
         }
     }
+    
 }
