@@ -128,18 +128,18 @@ public class RobotDebugExecutionContext {
             }
             forLoopExecutionRows.add(executionRows.get(counter));
             for (int i = counter + 1; i < executionRows.size(); i++) {
-                if (executionRows.get(i).getAction().getText().toString().equals("\\")
-                        && executionRows.get(i).isExecutable()) {
-                    forLoopExecutionRows.add(executionRows.get(i));
-                    if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null)
-                        parentKeywordContext.incrementKeywordExecutionRowCounter();
-                    else
-                        testCaseExecutionRowCounter++;
+                if (executionRows.get(i).getAction().getText().toString().equals("\\")) {
+                    if (executionRows.get(i).isExecutable()) {
+                        forLoopExecutionRows.add(executionRows.get(i));
+                    }
+                    incrementExecutionRowCounterInsideForLoop(parentKeywordContext);
                 } else if (executionRows.get(i).isExecutable()) {
                     break;
+                } else {
+                    incrementExecutionRowCounterInsideForLoop(parentKeywordContext);
                 }
             }
-            return null;
+            return forLoopExecutionRows.getFirst();
         }
 
         forLoopExecutionRowsCounter++;
@@ -283,6 +283,13 @@ public class RobotDebugExecutionContext {
             forLoopExecutionRows.clear();
             forLoopExecutionRowsCounter = 0;
         }
+    }
+    
+    private void incrementExecutionRowCounterInsideForLoop(KeywordContext parentKeywordContext) {
+        if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null)
+            parentKeywordContext.incrementKeywordExecutionRowCounter();
+        else
+            testCaseExecutionRowCounter++;
     }
     
     private static class KeywordContext {

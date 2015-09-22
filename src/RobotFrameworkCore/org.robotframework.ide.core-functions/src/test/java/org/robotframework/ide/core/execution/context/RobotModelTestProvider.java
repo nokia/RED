@@ -26,9 +26,8 @@ public class RobotModelTestProvider {
         final RobotParser parser = RobotParser.createEager(robotProject);
 
         final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
-
-        final List<RobotFileOutput> parse = parser.parse(path.toFile());
-        final RobotFileOutput robotFileOutput = parse.get(0);
+        final List<RobotFileOutput> parsedFileList = parser.parse(path.toFile());
+        final RobotFileOutput robotFileOutput = parsedFileList.get(0);
         return robotFileOutput.getFileModel();
     }
 }
