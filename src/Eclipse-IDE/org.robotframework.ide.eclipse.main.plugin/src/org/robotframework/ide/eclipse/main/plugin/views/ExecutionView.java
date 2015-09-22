@@ -181,6 +181,7 @@ public class ExecutionView {
         executionViewerInput.clear();
         passCounter = 0;
         failCounter = 0;
+        messageText.setText("");
         executionViewContentProvider.setFailedFilterEnabled(false);
         showFailedAction.setChecked(false);
         rerunFailedOnlyAction.setOutputFilePath(null);
