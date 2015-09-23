@@ -38,7 +38,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
@@ -55,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.CaseFormat;
@@ -72,6 +76,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     private final RobotEventBroker robotEventBroker;
     
     private final AtomicBoolean isConfigurationRunning = new AtomicBoolean(false);
+    
+    private boolean isExecutionViewInitialized;
     
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
@@ -150,6 +156,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             return;
         }
         try {
+            initExecutionView();
             robotEventBroker.sendClearEventToMessageLogView();
             robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, monitor);
@@ -393,6 +400,32 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                     e1.printStackTrace();
                 }
             }
+        }
+    }
+    
+    private void initExecutionView() {
+        if (!isExecutionViewInitialized) {
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            workbench.getDisplay().syncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    final IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
+                    if (page != null) {
+                        final IViewPart executionViewPart = page.findView(ExecutionView.ID);
+                        if (executionViewPart != null && page.isPartVisible(executionViewPart)) {
+                            return;
+                        }
+                        try {
+                            page.showView(ExecutionView.ID);
+                        } catch (PartInitException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            });
+            isExecutionViewInitialized = true;
         }
     }
 }
