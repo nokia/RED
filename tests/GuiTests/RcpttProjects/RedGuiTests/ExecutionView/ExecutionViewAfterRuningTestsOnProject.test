@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yrzhQF1JEeWeit3EM6sPPA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/22/15 9:35 AM
+Save-Time: 9/23/15 11:48 AM
 Testcase-Type: ecl
 Verifications: _-dwU0F3XEeWeit3EM6sPPA
 
@@ -85,12 +85,12 @@ with [get-view "Execution View" | get-tree] {
 //check if tests shows execution time
 with [get-view "Execution View"] {
     with [get-tree] {
-        get-item "ExecutionViewProject .*" | get-property caption | matches "ExecutionViewProject \(2\.[23]\d\d s\)" 
+        get-item "ExecutionViewProject .*" | get-property caption | equals "ExecutionViewProject \(2\.[23]\d?\d? s\)" 
             | verify-true
         get-item "ExecutionViewProject.*/Duplicate Test Case \\(.*\\)" | get-property caption 
-            | matches "Duplicate Test Case \(0.0\d\d s\)" | verify-true
+            | equals "Duplicate Test Case \(0.\d\d?\d? s\)" | verify-true
         get-item "ExecutionViewProject \\(.*\\)/Duplicate Test Case \\(.*s\\)/test 1 \\(.*\\)" 
-            | get-property caption | matches "test 1 \(0.00\d s\)" | verify-true
+            | get-property caption | equals "test 1 \(0.\d\d?\d? s\)" | verify-true
     }
     //check error field
     get-editbox -after [get-label "Failed: 9"] | get-property text | equals "" | verify-true
