@@ -132,7 +132,7 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
-            addEditorPart(new SuiteSourceEditor(), "Source_temp", null);
+            addEditorPart(new SuiteSourceEditor(), "Source", null);
 
             setActivePage(getPageToActivate());
         } catch (final PartInitException e) {
