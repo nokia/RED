@@ -36,6 +36,7 @@ public class RobotArtifactsBuilder {
     public Job createBuildJob(final boolean rebuildNeeded) {
         if (rebuildNeeded) {
             try {
+                project.refreshLocal(IResource.DEPTH_INFINITE, null);
                 final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
                 for (final IResource resource : libspecsFolder.members()) {
                     if (resource.getType() == IResource.FILE && resource.getName().startsWith("Remote_")) {
