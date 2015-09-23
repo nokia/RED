@@ -76,7 +76,7 @@ public class ExecutionView {
     
     @Inject
     protected IEventBroker eventBroker;
-    
+
     public static final String ID = "org.robotframework.ide.ExecutionView";
 
     private Label passCounterLabel;
@@ -129,7 +129,7 @@ public class ExecutionView {
         executionViewContentProvider = new ExecutionViewContentProvider();
         executionViewer.setContentProvider(executionViewContentProvider);
         executionViewer.setLabelProvider(new ExecutionViewLabelProvider());
-        executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
+        setViewerInput();
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
         final Menu menu = createContextMenu();
@@ -179,13 +179,14 @@ public class ExecutionView {
     private void clearEvent(@UIEventTopic("ExecutionView/ClearEvent") final String s) {
         suitesStack.clear();
         executionViewerInput.clear();
+        setViewerInput();
         passCounter = 0;
         failCounter = 0;
         messageText.setText("");
         executionViewContentProvider.setFailedFilterEnabled(false);
         showFailedAction.setChecked(false);
         rerunFailedOnlyAction.setOutputFilePath(null);
-        executionViewer.refresh();
+        refreshViewer();
     }
 
     private void refreshViewer() {
@@ -335,7 +336,7 @@ public class ExecutionView {
         if (suitesStack.isEmpty()) {
             suitesStack.add(newSuiteExecutionStatus);
             executionViewerInput.add(newSuiteExecutionStatus);
-            executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
+            setViewerInput();
         } else {
             final ExecutionStatus lastSuite = suitesStack.getLast();
             newSuiteExecutionStatus.setParent(lastSuite);
@@ -408,5 +409,9 @@ public class ExecutionView {
     private Status getStatus(final ExecutionElement executionElement) {
         return executionElement.getStatus().equals(ExecutionElementsParser.ROBOT_EXECUTION_PASS_STATUS) ? Status.PASS
                 : Status.FAIL;
+    }
+    
+    private void setViewerInput() {
+        executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
     }
 }
