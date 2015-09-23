@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qkXbIDz_EeWUyZKiCzynFQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/17/15 5:26 PM
+Save-Time: 9/23/15 11:41 AM
 Testcase-Type: ecl
 Verifications: _bkC_ID0WEeWUyZKiCzynFQ,_btCaQETxEeWq-NHkm2i3yA,_73UJYETxEeWq-NHkm2i3yA
 
@@ -19,24 +19,29 @@ Entry-Name: .content
 get-view Outline | get-label "An outline is not available." | get-property caption 
     | equals "An outline is not available." | verify-true
 
-//PE has no children
-get-view "Project Explorer" | get-tree | get-item "RobotProject/TestFile.robot" | get-property childCount | equals 0 
-    | verify-true
+//check that test has empty Test Case section
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/TestFile.robot" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals "Test Cases" 
+        | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[0].getItemCount()" | equals 0 
+        | verify-true
+}
 
 //open editor
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
-//check outline - test name is added
+//check outline - test name is added with empty Test Case section
 with [get-view Outline | get-tree] {
-    get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
-    get-property "getItems().TreeItem[0].getItemCount()" | equals 0 | verify-true
-    get-property "getTopItem().getText()" | equals "TestFile.robot" | verify-true
     get-property "getItemCount()" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItemCount()" | equals 0 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Test Cases" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
 }
 
 //PE has still no children
-get-view "Project Explorer" | get-tree | get-item "RobotProject/TestFile.robot" | get-property childCount | equals 0 
+get-view "Project Explorer" | get-tree | get-item "RobotProject/TestFile.robot" | get-property childCount | equals 1
     | verify-true
     
     
