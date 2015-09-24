@@ -35,8 +35,8 @@ public class RedVariableProposal {
                 VariableType.IMPORTED);
     }
 
-    static RedVariableProposal create(final String variable, final String path) {
-        return new RedVariableProposal(variable, path, "", "", VariableType.IMPORTED);
+    static RedVariableProposal create(final String name, final String value, final String path) {
+        return new RedVariableProposal(name, path, value, "", VariableType.IMPORTED);
     }
 
     static RedVariableProposal createBuiltIn(final String name, final String value) {

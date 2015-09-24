@@ -8,9 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -143,17 +141,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                     if (variableFile != null) {
                         final String name = new File(variableFile.getPath()).getName();
                         variableFile.setName(name);
-                        
-                        @SuppressWarnings("unchecked")
-                        final Map<String, Object> varsMap = (Map<String, Object>) editorInput.getRobotProject()
-                                .getRuntimeEnvironment()
-                                .getVariablesFromFile(variableFile.getPath(), variableFile.getArguments());
-                        if (varsMap != null && !varsMap.isEmpty()) {
-                            final List<String> list = new ArrayList<>();
-                            list.addAll(varsMap.keySet());
-                            variableFile.setVariables(list);
-                        }
-                        
+
                         editorInput.getProjectConfiguration().addReferencedVariableFile(variableFile);
                         
                         dirtyProviderService.setDirtyState(true);

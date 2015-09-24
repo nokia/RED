@@ -316,7 +316,7 @@ public class RobotSuiteFile implements RobotElement {
     }
     
     public List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
-        return getProject().getRobotProjectConfig().getReferencedVariableFiles();
+        return getProject().getVariablesFromReferencedFiles();
     }
     
     public List<ARobotInternalVariable<?>> getGlobalVariables() {
