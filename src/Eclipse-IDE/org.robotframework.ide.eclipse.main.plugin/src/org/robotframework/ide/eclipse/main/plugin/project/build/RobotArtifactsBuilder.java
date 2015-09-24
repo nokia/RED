@@ -106,7 +106,7 @@ public class RobotArtifactsBuilder {
         }
 
         new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(40));
-        new VariablesBuilder().buildVariables(runtimeEnvironment, configuration, subMonitor.newChild(40));
+        new VariablesBuilder().buildVariables(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(40));
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,

@@ -5,23 +5,24 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.variables;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 public class VariablesBuilder {
 
-    public void buildVariables(final RobotRuntimeEnvironment runtimeEnvironment,
+    public void buildVariables(final RobotProject project, final RobotRuntimeEnvironment runtimeEnvironment,
             final RobotProjectConfig configuration, final SubMonitor monitor) {
         monitor.subTask("generating variables from variable files");
 
         final List<ReferencedVariableFile> referencedVariableFiles = configuration.getReferencedVariableFiles();
         if (referencedVariableFiles == null) {
+            project.setReferencedVariableFiles(null);
             monitor.done();
             return;
         }
@@ -33,16 +34,14 @@ public class VariablesBuilder {
             }
             monitor.subTask("generating variables from " + referencedVariableFile.getName() + " file");
             @SuppressWarnings("unchecked")
-            final Map<String, String> varsMap = (Map<String, String>) runtimeEnvironment.getVariablesFromFile(
+            final Map<String, Object> varsMap = (Map<String, Object>) runtimeEnvironment.getVariablesFromFile(
                     referencedVariableFile.getPath(), referencedVariableFile.getArguments());
             if (varsMap != null && !varsMap.isEmpty()) {
-                final List<String> list = new ArrayList<>();
-                list.addAll(varsMap.keySet());
-                referencedVariableFile.setVariables(list);
-                //TODO: this modification should be saved to red.xml
+                referencedVariableFile.setVariables(varsMap);
             }
             monitor.worked(1);
         }
+        project.setReferencedVariableFiles(referencedVariableFiles);
         monitor.done();
     }
 }
