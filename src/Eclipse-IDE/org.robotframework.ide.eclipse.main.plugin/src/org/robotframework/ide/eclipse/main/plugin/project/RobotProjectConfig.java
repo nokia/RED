@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -350,8 +351,7 @@ public class RobotProjectConfig {
         @XmlAttribute
         private List<String> arguments;
 
-        @XmlAttribute
-        private List<String> variables;
+        private Map<String, Object> variables;
 
         public String getName() {
             return name;
@@ -377,11 +377,11 @@ public class RobotProjectConfig {
             this.arguments = arguments;
         }
 
-        public List<String> getVariables() {
+        public Map<String, Object> getVariables() {
             return variables;
         }
 
-        public void setVariables(final List<String> variables) {
+        public void setVariables(final Map<String, Object> variables) {
             this.variables = variables;
         }
         

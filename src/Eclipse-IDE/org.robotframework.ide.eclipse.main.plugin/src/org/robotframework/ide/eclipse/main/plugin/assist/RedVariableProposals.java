@@ -58,10 +58,10 @@ public class RedVariableProposals {
         }
 
         for (final ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
-            final List<String> refVariablesList = referencedVariableFile.getVariables();
-            if (variablesMap != null && !variablesMap.isEmpty()) {
-                for (final String variable : refVariablesList) {
-                    proposals.add(RedVariableProposal.create(variable, referencedVariableFile.getPath()));
+            final Map<String, Object> refVariableMap = referencedVariableFile.getVariables();
+            if (refVariableMap != null && !refVariableMap.isEmpty()) {
+                for (final String variableName : refVariableMap.keySet()) {
+                    proposals.add(RedVariableProposal.create(variableName, String.valueOf(refVariableMap.get(variableName)), referencedVariableFile.getPath()));
                 }
             }
         }

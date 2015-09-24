@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -42,6 +43,8 @@ public class RobotProject extends RobotContainer {
     
     private List<LibrarySpecification> stdLibsSpecs;
     private List<LibrarySpecification> refLibsSpecs;
+    private List<ReferencedVariableFile> referencedVariableFiles;
+    
     private RobotProjectConfig configuration;
 
     RobotProject(final IProject project) {
@@ -287,4 +290,30 @@ public class RobotProject extends RobotContainer {
         }
         return newArrayList();
     }
+    
+    @SuppressWarnings("unchecked")
+    public synchronized List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
+        if(referencedVariableFiles != null) {
+            return referencedVariableFiles;
+        }
+        readProjectConfigurationIfNeeded();
+        if (configuration != null) {
+            referencedVariableFiles = newArrayList();
+            for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
+                final Map<String, Object> varsMap = (Map<String, Object>) getRuntimeEnvironment().getVariablesFromFile(
+                        variableFile.getPath(), variableFile.getArguments());
+                if (varsMap != null && !varsMap.isEmpty()) {
+                    variableFile.setVariables(varsMap);
+                    referencedVariableFiles.add(variableFile);
+                }
+            }
+            return referencedVariableFiles;
+        }
+        return newArrayList();
+    }
+
+    public void setReferencedVariableFiles(List<ReferencedVariableFile> referencedVariableFiles) {
+        this.referencedVariableFiles = referencedVariableFiles;
+    }
+
 }
