@@ -9,7 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
 
 
 public enum VariablesProblem implements IProblemCause {
@@ -18,11 +20,36 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Duplicated variable definition '%s'";
         }
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveVariableFixer(marker.getAttribute("name", null)));
+        }
     },
     INVALID_TYPE {
         @Override
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Unable to recognize variable type";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveVariableFixer(marker.getAttribute("name", null)));
         }
     },
     DICTIONARY_NOT_AVAILABLE {
@@ -60,7 +87,7 @@ public enum VariablesProblem implements IProblemCause {
     }
 
     @Override
-    public List<? extends IMarkerResolution> createFixers() {
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
         return newArrayList();
     }
 

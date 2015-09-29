@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 
 public enum SuiteFileProblem implements IProblemCause {
@@ -26,7 +27,7 @@ public enum SuiteFileProblem implements IProblemCause {
     }
 
     @Override
-    public List<? extends IMarkerResolution> createFixers() {
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
         return newArrayList();
     }
 

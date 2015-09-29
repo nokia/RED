@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugException;
@@ -70,6 +73,19 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     @Override
     public IVariable[] getVariables() throws DebugException {
         return variables;
+    }
+
+    // gets nested variables too
+    public List<IVariable> getAllVariables() throws DebugException {
+        final List<IVariable> vars = newArrayList(variables);
+        for (final IVariable var : variables) {
+            final RobotDebugVariable robotVar = (RobotDebugVariable) var;
+            final RobotDebugValue value = (RobotDebugValue) robotVar.getValue();
+
+            vars.addAll(newArrayList(value.getVariables()));
+        }
+        
+        return vars;
     }
 
     @Override

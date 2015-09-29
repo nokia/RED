@@ -32,6 +32,10 @@ public abstract class RobotSuiteFileSection implements RobotElement {
         this.sectionTable = table;
     }
 
+    public ARobotSectionTable getLinkedElement() {
+        return sectionTable;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj == null) {
@@ -78,6 +82,15 @@ public abstract class RobotSuiteFileSection implements RobotElement {
         return elements;
     }
 
+    public RobotElement findChild(final String name) {
+        for (final RobotElement element : elements) {
+            if (element.getName().equals(name)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
     @Override
     public RobotSuiteFile getSuiteFile() {
         return (RobotSuiteFile) this.getParent();
@@ -87,5 +100,8 @@ public abstract class RobotSuiteFileSection implements RobotElement {
         // TODO Auto-generated method stub
         return null;
     }
-    // public abstract Position getPosition();
+
+    public int getHeaderLine() {
+        return sectionTable.getHeaders().get(0).getTableHeader().getLineNumber();
+    }
 }

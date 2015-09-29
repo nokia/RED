@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveLibraryFromConfigurationFileFixer;
 
@@ -20,7 +21,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList();
         }
 
@@ -37,7 +38,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
@@ -54,7 +55,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
@@ -70,7 +71,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
@@ -86,7 +87,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 
@@ -103,7 +104,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
 

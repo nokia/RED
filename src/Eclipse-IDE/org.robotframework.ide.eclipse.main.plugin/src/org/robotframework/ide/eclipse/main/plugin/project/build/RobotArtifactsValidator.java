@@ -12,14 +12,18 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
@@ -34,6 +38,27 @@ public class RobotArtifactsValidator {
 
     public RobotArtifactsValidator(final IProject project) {
         this.project = project;
+    }
+
+    public static void revalidate(final RobotSuiteFile suiteModel) {
+        final IFile file = suiteModel.getFile();
+        final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
+                .createProperValidator(prepareValidationContext(file), file);
+
+        if (validator.isPresent()) {
+            final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
+
+                @Override
+                public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                    file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+                    ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
+
+                    return Status.OK_STATUS;
+                }
+            };
+            wsJob.setSystem(true);
+            wsJob.schedule();
+        }
     }
 
     public Job createValidationJob(final IResourceDelta delta, final int kind) {
@@ -101,7 +126,7 @@ public class RobotArtifactsValidator {
         }
     }
 
-    private ValidationContext prepareValidationContext(final IFile file) {
+    private static ValidationContext prepareValidationContext(final IFile file) {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         return new ValidationContext(project.getRuntimeEnvironment());
     }

@@ -6,22 +6,54 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createCommentRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createDefinitionRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordCallRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createLocalSettingRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createSectionHeaderRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createVariableRule;
 
 import java.util.List;
 
+import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
+import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.source.DefaultAnnotationHover;
+import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.VariablesSectionContentAssistProcessor;
+import org.robotframework.red.graphics.ColorsManager;
 
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     
@@ -29,6 +61,78 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor) {
         this.editor = editor;
+    }
+
+    @Override
+    public IAnnotationHover getAnnotationHover(final ISourceViewer sourceViewer) {
+        return new DefaultAnnotationHover();
+    }
+
+    @Override
+    public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType) {
+        return new SuiteSourceHoverSupport(editor.getFileModel());
+    }
+
+    @Override
+    public IHyperlinkPresenter getHyperlinkPresenter(final ISourceViewer sourceViewer) {
+        return super.getHyperlinkPresenter(sourceViewer);
+    }
+
+    @Override
+    public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
+        final RobotSuiteFile model = editor.getFileModel();
+        return new IHyperlinkDetector[] { new HyperlinkToVariablesDetector(model),
+                new HyperlinkToKeywordsDetector(model) };
+    }
+
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(final ISourceViewer sourceViewer, final String contentType) {
+        return new IAutoEditStrategy[] { new SuiteSourceIndentLineEditStrategy() };
+    }
+
+    @Override
+    public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
+        final ContentAssistant contentAssistant = new ContentAssistant();
+        contentAssistant.enableColoredLabels(true);
+        contentAssistant.enableAutoInsert(true);
+        contentAssistant.enablePrefixCompletion(true);
+        contentAssistant.enableAutoActivation(true);
+        contentAssistant.setEmptyMessage("No proposals");
+        contentAssistant.setShowEmptyList(true);
+        final TextEditorContentAssist textEditorContentAssist = new SuiteSourceEditorContentAssist(
+                editor.getFileModel());
+        contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(textEditorContentAssist),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(),
+                SuiteSourcePartitionScanner.SETTINGS_SECTION);
+        contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+        contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+        contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
+
+            @Override
+            protected IInformationControl doCreateInformationControl(final Shell parent) {
+                return new DefaultInformationControl(parent, true);
+            }
+        });
+        return contentAssistant;
+    }
+
+    @Override
+    public IQuickAssistAssistant getQuickAssistAssistant(final ISourceViewer sourceViewer) {
+        final IQuickAssistAssistant assistant = new QuickAssistAssistant();
+        assistant.setQuickAssistProcessor(new SuiteSourceQuickAssistProcessor(editor.getFileModel()));
+        assistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
+
+            @Override
+            protected IInformationControl doCreateInformationControl(final Shell parent) {
+                return new DefaultInformationControl(parent, true);
+            }
+        });
+        return assistant;
     }
 
     @Override
@@ -42,32 +146,42 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
         final PresentationReconciler reconciler = new PresentationReconciler();
 
-        DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(
-                new SingleTokenScanner(new TextAttribute(RedTheme.getSectionHeaderColor())));
-        reconciler.setDamager(damagerRepairer, SuiteSourcePartitionScanner.SECTION_HEADER);
-        reconciler.setRepairer(damagerRepairer, SuiteSourcePartitionScanner.SECTION_HEADER);
+        final IToken section = new Token(new TextAttribute(ColorsManager.getColor(255, 0, 0)));
+        final IToken comment = new Token(new TextAttribute(ColorsManager.getColor(192, 192, 192)));
+        final IToken definition = new Token(new TextAttribute(ColorsManager.getColor(0, 0, 0), null, SWT.BOLD));
+        final IToken variable = new Token(new TextAttribute(ColorsManager.getColor(0, 128, 0)));
+        final IToken call = new Token(new TextAttribute(ColorsManager.getColor(0, 128, 192), null, SWT.BOLD));
+        final IToken setting = new Token(new TextAttribute(ColorsManager.getColor(149, 0, 85)));
+        
+        final IRule[] defaultRules = new IRule[] {};
+        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
 
-        damagerRepairer = new DefaultDamagerRepairer(
-                new SingleTokenScanner(new TextAttribute(RedTheme.getCommentsColor())));
-        reconciler.setDamager(damagerRepairer, SuiteSourcePartitionScanner.COMMENT);
-        reconciler.setRepairer(damagerRepairer, SuiteSourcePartitionScanner.COMMENT);
+        final IRule[] testCasesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
+                createDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
+                createCommentRule(comment) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules);
 
-        damagerRepairer = new DefaultDamagerRepairer(
-                new SingleTokenScanner(new TextAttribute(RedTheme.getVariableColor())));
-        reconciler.setDamager(damagerRepairer, SuiteSourcePartitionScanner.SCALAR_VARIABLE);
-        reconciler.setRepairer(damagerRepairer, SuiteSourcePartitionScanner.SCALAR_VARIABLE);
+        final IRule[] keywordsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
+                createDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
+                createCommentRule(comment) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
 
-        damagerRepairer = new DefaultDamagerRepairer(
-                new SingleTokenScanner(new TextAttribute(RedTheme.getVariableColor())));
-        reconciler.setDamager(damagerRepairer, SuiteSourcePartitionScanner.LIST_VARIABLE);
-        reconciler.setRepairer(damagerRepairer, SuiteSourcePartitionScanner.LIST_VARIABLE);
+        final IRule[] settingsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
+                createDefinitionRule(setting), createCommentRule(comment) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
 
-        damagerRepairer = new DefaultDamagerRepairer(
-                new SingleTokenScanner(new TextAttribute(RedTheme.getVariableColor())));
-        reconciler.setDamager(damagerRepairer, SuiteSourcePartitionScanner.DICT_VARIABLE);
-        reconciler.setRepairer(damagerRepairer, SuiteSourcePartitionScanner.DICT_VARIABLE);
+        final IRule[] variablesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
+                createDefinitionRule(variable), createCommentRule(comment) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules);
 
         return reconciler;
+    }
+
+    private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
+            final IRule[] rules) {
+        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(new SingleTokenScanner(rules));
+        reconciler.setDamager(damagerRepairer, contentType);
+        reconciler.setRepairer(damagerRepairer, contentType);
     }
 
     @Override
@@ -80,8 +194,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private static class SingleTokenScanner extends BufferedRuleBasedScanner {
-        public SingleTokenScanner(final TextAttribute attribute) {
-            setDefaultReturnToken(new Token(attribute));
+
+        public SingleTokenScanner(final IRule[] rules) {
+            setRules(rules);
         }
     };
 }
