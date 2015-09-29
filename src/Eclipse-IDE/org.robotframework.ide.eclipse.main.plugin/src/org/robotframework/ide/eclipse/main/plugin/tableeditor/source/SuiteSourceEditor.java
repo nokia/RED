@@ -138,7 +138,7 @@ public class SuiteSourceEditor extends TextEditor {
                     .getStatusLineManager()
                     .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
             final String delimiter = document.getLineDelimiter(1);
-            find.setText(delimiter.equals("\r\n") ? "CR+LF" : "LF");
+            find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
         } catch (final BadLocationException e) {
             RedPlugin.logError("Unable to recognize used line delimiters", e);
         }
