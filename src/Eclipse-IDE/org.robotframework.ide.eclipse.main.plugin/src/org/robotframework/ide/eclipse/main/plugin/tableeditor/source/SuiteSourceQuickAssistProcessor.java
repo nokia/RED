@@ -100,7 +100,8 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor {
                                             @Override
                                             public ICompletionProposal apply(final RedMarkerResolution resolution) {
                                                 return resolution.asContentProposal(marker,
-                                                        invocationContext.getSourceViewer().getDocument(), suiteModel);
+                                                        invocationContext.getSourceViewer().getDocument(), suiteModel)
+                                                        .orNull();
                                             }
                                         }), Predicates.notNull())).toArray(new ICompletionProposal[0]);
                             }

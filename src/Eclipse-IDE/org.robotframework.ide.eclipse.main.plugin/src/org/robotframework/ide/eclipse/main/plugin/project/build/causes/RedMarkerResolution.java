@@ -21,6 +21,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
+import com.google.common.base.Optional;
+
 /**
  * @author Michal Anglart
  *
@@ -45,17 +47,18 @@ public abstract class RedMarkerResolution implements IMarkerResolution {
                 final IDocument document = activatedPage.getDocument();
                 final RobotSuiteFile model = editor.provideSuiteModel();
 
-                final ICompletionProposal asContentProposal = asContentProposal(marker, document, model);
-                asContentProposal.apply(document);
-
-                marker.delete();
+                final Optional<ICompletionProposal> asContentProposal = asContentProposal(marker, document, model);
+                if (asContentProposal.isPresent()) {
+                    asContentProposal.get().apply(document);
+                    marker.delete();
+                }
             }
         } catch (final CoreException e) {
             // oh well, we won't fix this...
         }
     }
 
-    public abstract ICompletionProposal asContentProposal(IMarker marker, IDocument document,
+    public abstract Optional<ICompletionProposal> asContentProposal(IMarker marker, IDocument document,
             RobotSuiteFile suiteModel);
 
 }
