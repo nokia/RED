@@ -40,14 +40,14 @@ public class RemoveVariableFixer extends RedMarkerResolution {
     }
 
     @Override
-    public ICompletionProposal asContentProposal(final IMarker marker, final IDocument document,
+    public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
         if (variableName == null) {
-            return null;
+            return Optional.absent();
         }
         final Optional<RobotVariablesSection> section = suiteModel.findSection(RobotVariablesSection.class);
         if (!section.isPresent()) {
-            return null;
+            return Optional.absent();
         }
         for (final RobotVariable variable : section.get().getChildren()) {
             final Range<Integer> defRange = getRange(marker);
@@ -55,14 +55,14 @@ public class RemoveVariableFixer extends RedMarkerResolution {
                 try {
                     return createProposal(document, variable);
                 } catch (final BadLocationException e) {
-                    return null;
+                    return Optional.absent();
                 }
             }
         }
-        return null;
+        return Optional.absent();
     }
 
-    private CompletionProposal createProposal(final IDocument document, final RobotVariable variable)
+    private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotVariable variable)
             throws BadLocationException {
         final Position position = variable.getPosition();
         final int offset = position.getOffset();
@@ -78,8 +78,9 @@ public class RemoveVariableFixer extends RedMarkerResolution {
             shift++;
         }
 
-        return new CompletionProposal("", offset, length + shift - 1, offset,
+        final ICompletionProposal proposal = new CompletionProposal("", offset, length + shift - 1, offset,
                 ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null);
+        return Optional.of(proposal);
     }
 
     private Range<Integer> getRange(final IMarker marker) {

@@ -90,7 +90,7 @@ public class ImportLibraryFixer extends RedMarkerResolution {
     }
 
     @Override
-    public ICompletionProposal asContentProposal(final IMarker marker, final IDocument document,
+    public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
 
         final Optional<RobotSettingsSection> section = suiteModel.findSection(RobotSettingsSection.class);
@@ -101,16 +101,17 @@ public class ImportLibraryFixer extends RedMarkerResolution {
             try {
                 final IRegion lineInformation = document.getLineInformation(line - 1);
                 final int offset = lineInformation.getOffset() + lineInformation.getLength();
-                return new CompletionProposal(lineToInsert, offset, 0, lineToInsert.length(),
-                        ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null);
+                return Optional
+                        .<ICompletionProposal> of(new CompletionProposal(lineToInsert, offset, 0, lineToInsert.length(),
+                                ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
             } catch (final BadLocationException e) {
-                throw new IllegalStateException("Unable to determine position for new keyword", e);
+                return Optional.absent();
             }
 
         } else {
             final String toInsert = "*** Settings ***" + lineToInsert + lineDelimiter + lineDelimiter;
-            return new CompletionProposal(toInsert, 0, 0, toInsert.length(),
-                    ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null);
+            return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, 0, 0, toInsert.length(),
+                    ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
         }
     }
 
