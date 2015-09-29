@@ -21,7 +21,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "MediumRobotTest/Script.robot" | double-click
 }
 with [get-editor "Script.robot"] {
-    with [get-left-ruler | get-ruler-column AnnotationRulerColumn] {
+    with [get-left-ruler | get-ruler-column AnnotationColumn] {
         double-click-ruler 13
     }
     close
