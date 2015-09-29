@@ -19,7 +19,7 @@ with [get-view "Project Explorer" | get-tree] {
     select ScriptWithResource | double-click
     select "ScriptWithResource/BigScript.robot" | double-click
 }
-with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn] {
+with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
     double-click-ruler 10
     double-click-ruler 16
     double-click-ruler 22
