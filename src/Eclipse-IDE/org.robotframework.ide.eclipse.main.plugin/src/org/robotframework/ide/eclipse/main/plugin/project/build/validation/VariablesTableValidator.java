@@ -7,7 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -18,6 +20,8 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -25,38 +29,38 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 class VariablesTableValidator implements ModelUnitValidator {
 
     private final ValidationContext validationContext;
 
-    private final IFile file;
-
-    private final VariableTable variableTable;
+    private final Optional<RobotVariablesSection> variablesSection;
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    VariablesTableValidator(final ValidationContext validationContext, final IFile file,
-            final VariableTable variableTable) {
+    VariablesTableValidator(final ValidationContext validationContext,
+            final Optional<RobotVariablesSection> variablesSection) {
         this.validationContext = validationContext;
-        this.file = file;
-        this.variableTable = variableTable;
+        this.variablesSection = variablesSection;
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        if (!variableTable.isPresent()) {
+        if (!variablesSection.isPresent()) {
             return;
         }
-        reportVersionSpecificProblems(variableTable, monitor);
+        final RobotSuiteFile suiteModel = variablesSection.get().getSuiteFile();
+        final VariableTable variableTable = (VariableTable) variablesSection.get().getLinkedElement();
+        reportVersionSpecificProblems(suiteModel.getFile(), variableTable, monitor);
 
-        reportUnknownVariableTypes(variableTable);
-        reportDuplicatedVariables(variableTable);
+        reportUnknownVariableTypes(suiteModel.getFile(), variableTable);
+        reportDuplicatedVariables(suiteModel.getFile(), variableTable);
     }
 
-    private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
-            throws CoreException {
+    private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
+            final IProgressMonitor monitor) throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
             final List<? extends ModelUnitValidator> validators = new VersionDependentValidators()
                     .getVariableValidators(variable, validationContext.getVersion());
@@ -72,17 +76,19 @@ class VariablesTableValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportUnknownVariableTypes(final VariableTable variableTable) {
+    private void reportUnknownVariableTypes(final IFile file, final VariableTable variableTable) {
         for (final IVariableHolder variable : variableTable.getVariables()) {
             if (variable.getType() == VariableType.INVALID) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_TYPE)
                         .formatMessageWith(variable.getName());
-                reporter.handleProblem(problem, file, toPosition(variable));
+                final Map<String, Object> attributes = new HashMap<>();
+                attributes.put("name", variable.getName());
+                reporter.handleProblem(problem, file, toPosition(variable), attributes);
             }
         }
     }
 
-    private void reportDuplicatedVariables(final VariableTable variableTable) {
+    private void reportDuplicatedVariables(final IFile file, final VariableTable variableTable) {
         final Set<String> duplicatedNames = newHashSet();
 
         for (final IVariableHolder var1 : variableTable.getVariables()) {
@@ -97,7 +103,9 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(variable.getName())) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
-                reporter.handleProblem(problem, file, toPosition(variable));
+                final Map<String, Object> attributes = new HashMap<>();
+                attributes.put("name", variable.getName());
+                reporter.handleProblem(problem, file, toPosition(variable), attributes);
             }
         }
     }

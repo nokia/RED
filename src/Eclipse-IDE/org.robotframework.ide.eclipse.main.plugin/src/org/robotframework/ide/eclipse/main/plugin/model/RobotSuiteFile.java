@@ -8,9 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
@@ -19,8 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.core.testData.importer.AVariableImported;
-import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -46,7 +42,7 @@ public class RobotSuiteFile implements RobotElement {
     
     private List<RobotElement> sections = null;
 
-    RobotSuiteFile(final RobotElement parent, final IFile file) {
+    public RobotSuiteFile(final RobotElement parent, final IFile file) {
         this.parent = parent;
         this.file = file;
     }
@@ -294,25 +290,13 @@ public class RobotSuiteFile implements RobotElement {
         }
         return newArrayList();
     }
-    
-    public List<RobotVariable> getUserDefinedVariables() {
-        final Optional<RobotVariablesSection> optionalVariables = findSection(RobotVariablesSection.class);
-        if (optionalVariables.isPresent()) {
-            return optionalVariables.get().getChildren();
+
+    public List<IPath> getVariablesPaths() {
+        final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
+        if (optionalSettings.isPresent()) {
+            return optionalSettings.get().getVariablesPaths();
         }
         return newArrayList();
-    }
-    
-    public Map<AVariableImported<?>, String> getVariablesFromImportedFiles() {
-        final Map<AVariableImported<?>, String> importedVariablesMap = new HashMap<>();
-        final List<VariablesFileImportReference> fileList = fileOutput.getVariablesImportReferences();
-        for (final VariablesFileImportReference variablesFileImportReference : fileList) {
-            final List<AVariableImported<?>> variablesList = variablesFileImportReference.getVariables();
-            for (final AVariableImported<?> aVariableImported : variablesList) {
-                importedVariablesMap.put(aVariableImported, variablesFileImportReference.getVariablesFile().getPath());
-            }
-        }
-        return importedVariablesMap;
     }
     
     public List<ReferencedVariableFile> getVariablesFromReferencedFiles() {

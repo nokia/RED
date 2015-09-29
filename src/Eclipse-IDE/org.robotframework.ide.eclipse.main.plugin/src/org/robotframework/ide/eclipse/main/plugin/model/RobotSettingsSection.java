@@ -113,6 +113,19 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return paths;
     }
 
+    public List<IPath> getVariablesPaths() {
+        final List<RobotKeywordCall> variables = getVariablesSettings();
+        final List<IPath> paths = newArrayList();
+        for (final RobotElement element : variables) {
+            final RobotSetting setting = (RobotSetting) element;
+            final List<String> args = setting.getArguments();
+            if (!args.isEmpty()) {
+                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+            }
+        }
+        return paths;
+    }
+
     @Override
     public void link(final ARobotSectionTable table) {
         super.link(table);

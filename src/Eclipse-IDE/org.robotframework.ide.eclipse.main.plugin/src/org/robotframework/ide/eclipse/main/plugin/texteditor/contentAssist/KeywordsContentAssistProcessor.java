@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -25,13 +24,13 @@ import org.robotframework.red.graphics.ImagesManager;
  */
 public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
     
-    private Image settingImage = ImagesManager.getImage(RedImages.getRobotSettingImage());
+    private final Image settingImage = ImagesManager.getImage(RedImages.getRobotSettingImage());
 
     private String lastError = null;
 
-    private TextEditorContextValidator validator = new TextEditorContextValidator(this);
+    private final TextEditorContextValidator validator = new TextEditorContextValidator(this);
     
-    private TextEditorContentAssist textEditorContentAssist;
+    private final TextEditorContentAssist textEditorContentAssist;
 
     public KeywordsContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
         this.textEditorContentAssist = textEditorContentAssist;
@@ -41,7 +40,7 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
         lastError = null;
         final IDocument document = viewer.getDocument();
-        int currentOffset = offset - 1;
+        final int currentOffset = offset - 1;
 
         try {
             String currentWord = "";
@@ -73,12 +72,10 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                     }
                 }
                 
-                final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
-                        textEditorContentAssist.getKeywordMap(), currentWord);
                 ICompletionProposal[] proposals = null;
-                if (keywordProposals.size() > 0) {
-                    proposals = TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord, offset
-                            - currentWord.length());
+                if (textEditorContentAssist.getKeywordMap().size() > 0) {
+                    proposals = TextEditorContentAssist.buildKeywordsProposals(textEditorContentAssist.getKeywordMap(),
+                            currentWord, offset - currentWord.length());
                 }
                 return proposals;
             }

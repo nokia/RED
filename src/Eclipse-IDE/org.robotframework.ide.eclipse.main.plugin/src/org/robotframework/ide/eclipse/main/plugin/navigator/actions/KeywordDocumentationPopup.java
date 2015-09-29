@@ -12,12 +12,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 
-class KeywordDocumentationPopup extends RobotPopupDialog {
+public class KeywordDocumentationPopup extends RobotPopupDialog {
 
     private InputLoadingFormComposite composite;
     private final KeywordSpecification specification;
 
-    KeywordDocumentationPopup(final Shell parent, final KeywordSpecification spec) {
+    public KeywordDocumentationPopup(final Shell parent, final KeywordSpecification spec) {
         super(parent);
         this.specification = spec;
     }

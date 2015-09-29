@@ -21,11 +21,8 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.contexts.IContextService;
@@ -36,8 +33,8 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.utils.TextEditorOccurrenceMarksManager;
 
 public class SuiteSourceEditor extends TextEditor {
 
@@ -48,8 +45,6 @@ public class SuiteSourceEditor extends TextEditor {
     protected RobotSuiteFile fileModel;
 
     private SuiteSourceEditorFoldingSupport foldingSupport;
-
-    private TextEditorOccurrenceMarksManager occurrenceMarksManager;
 
     @Override
     protected void initializeEditor() {
@@ -63,9 +58,9 @@ public class SuiteSourceEditor extends TextEditor {
     protected void createActions() {
         super.createActions();
 
-        final GotoLineAction action = new GotoLineAction(this);
-        action.setActionDefinitionId(ITextEditorActionConstants.GOTO_LINE);
-        setAction(ITextEditorActionConstants.GOTO_LINE, action);
+        final GotoLineAction gotoAction = new GotoLineAction(this);
+        gotoAction.setActionDefinitionId(ITextEditorActionConstants.GOTO_LINE);
+        setAction(ITextEditorActionConstants.GOTO_LINE, gotoAction);
     }
 
     @Override
@@ -79,7 +74,8 @@ public class SuiteSourceEditor extends TextEditor {
         final ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
 
         installProjectionAndFolding(viewer);
-        installOccurencesMarking(viewer);
+        new SuiteSourceCurrentCellHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
+        new SuiteSourceOccurrenceMarksHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
         installBreakpointTogglingOnDoubleClick();
         installStatusBarUpdater(viewer);
 
@@ -95,32 +91,16 @@ public class SuiteSourceEditor extends TextEditor {
         return viewer;
     }
 
+    @Override
+    protected boolean isEditorInputIncludedInContextMenu() {
+        return false;
+    }
+
     private void installProjectionAndFolding(final ProjectionViewer viewer) {
         // turn projection mode on
         new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors()).install();
         viewer.doOperation(ProjectionViewer.TOGGLE);
         foldingSupport = new SuiteSourceEditorFoldingSupport(viewer.getProjectionAnnotationModel());
-    }
-
-    private void installOccurencesMarking(final ProjectionViewer viewer) {
-        occurrenceMarksManager = new TextEditorOccurrenceMarksManager(viewer.getDocument(), fileModel.getFile());
-        viewer.getTextWidget().addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                occurrenceMarksManager.removeOldOccurrenceMarks();
-            }
-        });
-        viewer.getTextWidget().addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseUp(final MouseEvent e) {
-                if (e.button != 3 && e.count == 1) {
-                    final Point point = viewer.getTextWidget().getSelection();
-                    occurrenceMarksManager.showOccurrenceMarks(point.x);
-                }
-            }
-        });
     }
 
     private void installStatusBarUpdater(final ProjectionViewer viewer) {
@@ -129,6 +109,7 @@ public class SuiteSourceEditor extends TextEditor {
             @Override
             public void caretMoved(final CaretEvent event) {
                 updateLineLocationStatusBar(event.caretOffset);
+                updateLineDelimitersStatus();
             }
         });
     }
@@ -146,6 +127,20 @@ public class SuiteSourceEditor extends TextEditor {
             find.setText(lineNumber + ":" + columnNumber);
         } catch (final BadLocationException e) {
             RedPlugin.logError("Unable to get position in source editor in order to update status bar", e);
+        }
+    }
+
+    private void updateLineDelimitersStatus() {
+        try {
+            final IDocument document = getDocument();
+
+            final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+                    .getStatusLineManager()
+                    .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
+            final String delimiter = document.getLineDelimiter(1);
+            find.setText(delimiter.equals("\r\n") ? "CR+LF" : "LF");
+        } catch (final BadLocationException e) {
+            RedPlugin.logError("Unable to recognize used line delimiters", e);
         }
     }
 
@@ -202,7 +197,7 @@ public class SuiteSourceEditor extends TextEditor {
         super.dispose();
     }
 
-    private IDocument getDocument() {
+    public IDocument getDocument() {
         return getDocumentProvider().getDocument(getEditorInput());
     }
 

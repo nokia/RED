@@ -9,14 +9,16 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.AModelElement;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class RobotInitFileValidator extends RobotFileValidator {
@@ -26,20 +28,22 @@ public class RobotInitFileValidator extends RobotFileValidator {
     }
 
     @Override
-    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        validateIfThereAreNoForbiddenSettings(fileModel.getSettingTable());
+    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
+        final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
+        validateIfThereAreNoForbiddenSettings(settingsSection);
 
         super.validate(fileModel, monitor);
     }
 
-    private void validateIfThereAreNoForbiddenSettings(final SettingTable settingTable) {
-        if (!settingTable.isPresent()) {
+    private void validateIfThereAreNoForbiddenSettings(final Optional<RobotSettingsSection> settingsSection) {
+        if (!settingsSection.isPresent()) {
             return;
         }
-        for (final TestTemplate template : settingTable.getTestTemplates()) {
+        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+        for (final TestTemplate template : settingsTable.getTestTemplates()) {
             reportProblem(template.getDeclaration().getText().toString(), template);
         }
-        for (final DefaultTags defaultTag : settingTable.getDefaultTags()) {
+        for (final DefaultTags defaultTag : settingsTable.getDefaultTags()) {
             reportProblem(defaultTag.getDeclaration().getText().toString(), defaultTag);
         }
     }

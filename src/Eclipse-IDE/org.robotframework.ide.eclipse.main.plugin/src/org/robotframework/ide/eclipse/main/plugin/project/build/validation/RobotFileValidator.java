@@ -5,16 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.robotframework.ide.core.testData.RobotParser;
-import org.robotframework.ide.core.testData.model.RobotFile;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 
@@ -33,19 +31,8 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
     @Override
     public final void validate(final IProgressMonitor monitor) throws CoreException {
-        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-        final RobotParser parser = project.getRobotParser();
-
-        final List<RobotFileOutput> parserOut = parser.parse(file.getLocation().toFile());
-        if (!parserOut.isEmpty()) {
-            validate(parserOut.get(0), monitor);
-        }
-    }
-
-    private void validate(final RobotFileOutput robotFileOutput, final IProgressMonitor monitor)
-            throws CoreException {
-        // TODO : check output status and parsing messages
-        validate(robotFileOutput.getFileModel(), monitor);
+        final RobotSuiteFile robotFile = new RobotSuiteFile(null, file);
+        validate(robotFile, monitor);
     }
 
     /**
@@ -56,10 +43,13 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      * @param monitor
      * @throws CoreException
      */
-    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        new TestCasesTableValidator(file, fileModel.getTestCaseTable()).validate(monitor);
-        new GeneralSettingsTableValidator(file, fileModel.getSettingTable()).validate(monitor);
-        new KeywordTableValidator(file, fileModel.getKeywordTable()).validate(monitor);
-        new VariablesTableValidator(validationContext, file, fileModel.getVariableTable()).validate(monitor);
+    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
+        // TODO : check output status and parsing messages
+        new TestCasesTableValidator(fileModel.findSection(RobotCasesSection.class)).validate(monitor);
+        new GeneralSettingsTableValidator(fileModel.findSection(RobotSettingsSection.class)).validate(monitor);
+        new KeywordTableValidator(validationContext, fileModel.findSection(RobotKeywordsSection.class))
+                .validate(monitor);
+        new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class))
+                .validate(monitor);
     }
 }

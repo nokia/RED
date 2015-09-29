@@ -164,4 +164,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
         return new Position(begin.getOffset(), end.getOffset() - begin.getOffset() + 1);
     }
+
+    public Position getDefinitionPosition() {
+        final int begin = keyword.getKeywordName().getStartOffset();
+        final int length = keyword.getKeywordName().getText().length();
+
+        return new Position(begin, length);
+    }
 }

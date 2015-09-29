@@ -43,9 +43,10 @@ public interface IProblemCause {
      * Returns list of objects able to resolve this particular problem. There
      * can be possibly many different fixes applied to the problem.
      * 
+     * @param marker
      * @return
      */
-    List<? extends IMarkerResolution> createFixers();
+    List<? extends IMarkerResolution> createFixers(IMarker marker);
     
     /**
      * Returns category of problem. Multiple different problems may have the

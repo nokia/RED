@@ -10,14 +10,16 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class RobotSuiteFileValidator extends RobotFileValidator {
@@ -27,23 +29,28 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     }
 
     @Override
-    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
+    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
         validateFileName(fileModel, monitor);
 
         super.validate(fileModel, monitor);
     }
 
-    private void validateFileName(final RobotFile fileModel, final IProgressMonitor monitor) {
+    private void validateFileName(final RobotSuiteFile fileModel, final IProgressMonitor monitor) {
         if ("__init__".equals(getSimpleName(file))) {
-            final ProblemPosition position = getTestCaseTableHeaderPosition(fileModel.getTestCaseTable());
+            final ProblemPosition position = getTestCaseTableHeaderPosition(
+                    fileModel.findSection(RobotCasesSection.class));
             reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_IS_NAMED_INIT), file,
                     position);
         }
     }
 
-    private ProblemPosition getTestCaseTableHeaderPosition(final TestCaseTable testCaseTable) {
+    private ProblemPosition getTestCaseTableHeaderPosition(final Optional<RobotCasesSection> section) {
         // TODO : this can be done using some nice API on parser side
-        final List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable.getHeaders();
+        if (!section.isPresent()) {
+            return new ProblemPosition(1);
+        }
+        final TestCaseTable table = (TestCaseTable) section.get().getLinkedElement();
+        final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();
         if (!headers.isEmpty()) {
             final TableHeader<? extends ARobotSectionTable> header = headers.get(0);
             final int line = header.getBeginPosition().getLine();
