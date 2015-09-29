@@ -21,7 +21,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "ScriptWithResource/BigScript.robot" | double-click
 }
 //Select line after failing line
-get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 52
+get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 52
 
 //run test
 with [get-view "Project Explorer" | get-tree] {
