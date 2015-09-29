@@ -1,0 +1,52 @@
+body {
+	font-family: "Arial Unicode MS", "Arial";
+	font-size: 10pt;
+	margin-bottom: 10px;
+}
+
+p {
+	font-size: 10pt;
+}
+
+span.block {
+	font-family: "Courier New";
+}
+span.code {
+	font-family: monospace;
+}
+
+div.code {
+	font-family: monospace;
+    background: #eee;
+    margin: 8px;
+    padding: 6px;
+}
+
+dl.note {
+	margin: 10px;
+	padding-left: 50px;
+	padding-bottom: 30px;
+	background: url('images/note.png') no-repeat;
+}
+dl.note dt {
+	display: block;
+	font-weight: bold;
+}
+dl.note dd {
+	margin-left: 0;
+}
+
+
+dl.warning {
+	margin: 10px;
+	padding-left: 50px;
+	padding-bottom: 30px;
+	background: url('images/warning.png') no-repeat;
+}
+dl.warning dt {
+	display: block;
+	font-weight: bold;
+}
+dl.warning dd {
+	margin-left: 0;
+}
