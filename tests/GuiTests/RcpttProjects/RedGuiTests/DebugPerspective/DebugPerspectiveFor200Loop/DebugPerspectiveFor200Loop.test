@@ -17,7 +17,7 @@ Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" | double-click
 
-get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 8
+get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
 
 get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
     | get-menu "Debug As/1 Robot Test" | click
