@@ -69,13 +69,16 @@ public class RemoveVariableFixer extends RedMarkerResolution {
         final int length = position.getLength();
 
         int shift = 0;
-        int ch = document.getChar(offset + length + shift);
-        while (ch == '\r' || ch == '\n' || ch == ' ') {
-            if (ch == -1) {
-                break;
+
+        if (document.getLength() > length + offset) {
+            int ch = document.getChar(offset + length + shift);
+            while (ch == '\r' || ch == '\n' || ch == ' ') {
+                if (ch == -1) {
+                    break;
+                }
+                ch = document.getChar(offset + length + shift);
+                shift++;
             }
-            ch = document.getChar(offset + length + shift);
-            shift++;
         }
 
         final ICompletionProposal proposal = new CompletionProposal("", offset, length + shift - 1, offset,
