@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 
 public enum GeneralSettingsProblem implements IProblemCause {
@@ -16,6 +17,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The setting '%s' is not supported inside %s file";
+        }
+    },
+    MISSING_LIBRARY_NAME {
+        @Override
+        public String getProblemDescription() {
+            return "Specify name or path of library to import";
+        }
+    },
+    UNRECOGNIZED_LIBRARY {
+        @Override
+        public String getProblemDescription() {
+            return "Unrecognized '%s' library";
         }
     };
 
@@ -30,7 +43,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
     }
 
     @Override
-    public List<? extends IMarkerResolution> createFixers() {
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
         return newArrayList();
     }
 

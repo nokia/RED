@@ -25,14 +25,20 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 
 public class RobotFormEditorActionBarContributor extends MultiPageEditorActionBarContributor {
 
+    public static final String DELIMITERS_INFO_ID = "ChangeDelimiters";
     private final Map<StatusFieldDef, StatusLineContributionItem> statusFields = new LinkedHashMap<>();
 
     public RobotFormEditorActionBarContributor() {
-        final StatusFieldDef def = new StatusFieldDef(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION,
+        final StatusFieldDef linesDef = new StatusFieldDef(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION,
                 ITextEditorActionConstants.GOTO_LINE);
-        final StatusLineContributionItem item = new StatusLineContributionItem(def.category);
-        item.setText("1:1");
-        statusFields.put(def, item);
+        final StatusLineContributionItem positionItem = new StatusLineContributionItem(linesDef.category);
+        positionItem.setText("1:1");
+        statusFields.put(linesDef, positionItem);
+        
+        final StatusFieldDef delimiterDef = new StatusFieldDef(DELIMITERS_INFO_ID, "ConvertDelimiters");
+        final StatusLineContributionItem delimiterItem = new StatusLineContributionItem(delimiterDef.category);
+        delimiterItem.setText("LF");
+        statusFields.put(delimiterDef, delimiterItem);
     }
 
     @Override

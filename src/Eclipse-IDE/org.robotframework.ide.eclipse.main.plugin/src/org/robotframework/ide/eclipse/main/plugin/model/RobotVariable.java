@@ -11,9 +11,12 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Joiner;
@@ -105,6 +108,27 @@ public class RobotVariable implements RobotElement, Serializable {
     @Override
     public RobotSuiteFile getSuiteFile() {
         return parent.getSuiteFile();
+    }
+
+    public Position getPosition() {
+        final int begin = holder.getDeclaration().getStartOffset();
+
+        int maxStart = -1;
+        int end = -1;
+        for (final RobotToken token : ((AVariable) holder).getElementTokens()) {
+            if (token.getStartOffset() > maxStart) {
+                maxStart = token.getStartOffset();
+                end = maxStart + token.getText().length();
+            }
+        }
+        return new Position(begin, end - begin);
+    }
+
+    public Position getDefinitionPosition() {
+        final int begin = holder.getDeclaration().getStartOffset();
+        final int length = holder.getDeclaration().getText().length();
+
+        return new Position(begin, length);
     }
 
     @Override

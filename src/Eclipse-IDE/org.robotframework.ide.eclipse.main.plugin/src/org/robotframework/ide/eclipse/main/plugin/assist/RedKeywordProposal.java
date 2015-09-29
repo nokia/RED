@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -65,6 +66,15 @@ public class RedKeywordProposal {
     }
 
     static RedKeywordProposal create(final RobotKeywordDefinition userKeyword) {
+        return createUserDefinedProposal(userKeyword, "- user defined");
+    }
+
+    static RedKeywordProposal createExternal(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword) {
+        return createUserDefinedProposal(userKeyword, "- " + file.getName());
+    }
+
+    private static RedKeywordProposal createUserDefinedProposal(final RobotKeywordDefinition userKeyword,
+            final String decoration) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
             @Override
             public String provide() {
@@ -77,8 +87,8 @@ public class RedKeywordProposal {
                 return Arrays.asList("not", "yet", "implemented");
             }
         };
-        return new RedKeywordProposal("User Defined", KeywordType.USER_DEFINED, userKeyword.getName(),
-                "- user defined", true, argsProvider, htmlDocuProvider, "to be implemented");
+        return new RedKeywordProposal("User Defined", KeywordType.USER_DEFINED, userKeyword.getName(), decoration, true,
+                argsProvider, htmlDocuProvider, "to be implemented");
     }
 
     public String getSourceName() {

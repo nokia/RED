@@ -3233,6 +3233,10 @@
          markerType="org.robotframework.ide.texteditor.occurrencesMark"
          name="org.robotframework.ide.texteditor.occurrencesMark">
 	  </type>
+   <type
+         markerType="org.robotframework.red.cellHighlighting"
+         name="org.robotframework.red.cellHighlighting">
+   </type>
 	</extension>	
  	<extension
          point="org.eclipse.debug.core.breakpoints">
@@ -3352,20 +3356,53 @@
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
             annotationType="org.robotframework.ide.texteditor.occurrencesMark"
-            includeOnPreferencePage="true"
             colorPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.color"
             colorPreferenceValue="212,212,212"
-            overviewRulerPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.overview"
-            overviewRulerPreferenceValue="true"
-            verticalRulerPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.ruler"
-            verticalRulerPreferenceValue="false"
+            contributesToHeader="false"
             highlightPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.highlight"
             highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="Robot TextEditor Mark Occurrences"
+            overviewRulerPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.overview"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="6"
+            showInNextPrevDropdownToolbarAction="false"
             textPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.text"
             textPreferenceValue="true"
+            verticalRulerPreferenceKey="org.robotframework.ide.texteditor.occurrencesMark.ruler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
+         id="org.robotframework.red.cellHighlighting"
+         name="Robot Source Editor current cell"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="false">
+      </persistent>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.robotframework.red.cellHighlighting"
+            colorPreferenceKey="org.robotframework.red.cellHighlighting.color"
+            colorPreferenceValue="235,235,235"
             contributesToHeader="false"
-            presentationLayer="6"
-            label="Robot TextEditor Mark Occurrences">
+            highlightPreferenceKey="org.robotframework.red.cellHighlighting.highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="Robot Source Editor current cell"
+            overviewRulerPreferenceKey="org.robotframework.red.cellHighlighting.overviewVisibility"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="5"
+            showInNextPrevDropdownToolbarAction="false"
+            textPreferenceKey="org.robotframework.red.cellHighlighting.text"
+            textPreferenceValue="false"
+            verticalRulerPreferenceKey="org.robotframework.red.cellHighlighting.verticalVisibility"
+            verticalRulerPreferenceValue="false">
       </specification>
    </extension>
 

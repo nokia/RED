@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.AModelElement;
-import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
@@ -20,10 +19,13 @@ import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
 import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
 import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class RobotResourceFileValidator extends RobotFileValidator {
@@ -33,41 +35,43 @@ public class RobotResourceFileValidator extends RobotFileValidator {
     }
 
     @Override
-    public void validate(final RobotFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        validateIfThereAreNoForbiddenSettings(fileModel.getSettingTable());
+    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
+        final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
+        validateIfThereAreNoForbiddenSettings(settingsSection);
 
         super.validate(fileModel, monitor);
     }
 
-    private void validateIfThereAreNoForbiddenSettings(final SettingTable settingTable) {
-        if (!settingTable.isPresent()) {
+    private void validateIfThereAreNoForbiddenSettings(final Optional<RobotSettingsSection> settingsSection) {
+        if (!settingsSection.isPresent()) {
             return;
         }
-        for (final SuiteSetup setup : settingTable.getSuiteSetups()) {
+        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+        for (final SuiteSetup setup : settingsTable.getSuiteSetups()) {
             reportProblem(setup.getDeclaration().getText().toString(), setup);
         }
-        for (final SuiteTeardown teardown : settingTable.getSuiteTeardowns()) {
+        for (final SuiteTeardown teardown : settingsTable.getSuiteTeardowns()) {
             reportProblem(teardown.getDeclaration().getText().toString(), teardown);
         }
-        for (final TestSetup testSetup : settingTable.getTestSetups()) {
+        for (final TestSetup testSetup : settingsTable.getTestSetups()) {
             reportProblem(testSetup.getDeclaration().getText().toString(), testSetup);
         }
-        for (final TestTeardown testTeardown : settingTable.getTestTeardowns()) {
+        for (final TestTeardown testTeardown : settingsTable.getTestTeardowns()) {
             reportProblem(testTeardown.getDeclaration().getText().toString(), testTeardown);
         }
-        for (final TestTemplate template : settingTable.getTestTemplates()) {
+        for (final TestTemplate template : settingsTable.getTestTemplates()) {
             reportProblem(template.getDeclaration().getText().toString(), template);
         }
-        for (final TestTimeout testTimeout : settingTable.getTestTimeouts()) {
+        for (final TestTimeout testTimeout : settingsTable.getTestTimeouts()) {
             reportProblem(testTimeout.getDeclaration().getText().toString(), testTimeout);
         }
-        for (final ForceTags forceTag : settingTable.getForceTags()) {
+        for (final ForceTags forceTag : settingsTable.getForceTags()) {
             reportProblem(forceTag.getDeclaration().getText().toString(), forceTag);
         }
-        for (final DefaultTags defaultTag : settingTable.getDefaultTags()) {
+        for (final DefaultTags defaultTag : settingsTable.getDefaultTags()) {
             reportProblem(defaultTag.getDeclaration().getText().toString(), defaultTag);
         }
-        for (final Metadata metadata : settingTable.getMetadatas()) {
+        for (final Metadata metadata : settingsTable.getMetadatas()) {
             reportProblem(metadata.getDeclaration().getText().toString(), metadata);
         }
     }

@@ -32,13 +32,13 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
 
         final IProblemCause problemCause = getCause(marker);
         if (problemCause != null) {
-            resolutions.addAll(problemCause.createFixers());
+            resolutions.addAll(problemCause.createFixers(marker));
         }
         return resolutions.toArray(new IMarkerResolution[0]);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private IProblemCause getCause(final IMarker marker) {
+    public static IProblemCause getCause(final IMarker marker) {
         final String causeEnumClass = marker.getAttribute(RobotProblem.CAUSE_ENUM_CLASS, null);
         final String causeStr = marker.getAttribute(RobotProblem.CAUSE_ATTRIBUTE, null);
         if (causeEnumClass != null && causeStr != null) {

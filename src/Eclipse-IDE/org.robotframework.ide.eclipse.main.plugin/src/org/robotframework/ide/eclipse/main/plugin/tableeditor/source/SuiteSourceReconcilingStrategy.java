@@ -10,13 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -32,10 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -87,7 +77,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     private void reconcile() {
         reparseModel();
         updateFoldingStructure();
-        revalidate();
+        RobotArtifactsValidator.revalidate(getSuiteModel());
     }
 
     private void reparseModel() {
@@ -145,31 +135,5 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
                 return testCase.getPosition();
             }
         };
-    }
-
-    private void revalidate() {
-        final IFile file = getSuiteModel().getFile();
-        final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
-                .createProperValidator(prepareValidationContext(), file);
-
-        if (validator.isPresent()) {
-            final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
-
-                @Override
-                public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                    file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-                    ((RobotFileValidator) validator.get()).validate(getSuiteModel().getLinkedElement(),
-                            new NullProgressMonitor());
-
-                    return Status.OK_STATUS;
-                }
-            };
-            wsJob.setSystem(true);
-            wsJob.schedule();
-        }
-    }
-
-    private ValidationContext prepareValidationContext() {
-        return new ValidationContext(getSuiteModel().getProject().getRuntimeEnvironment());
     }
 }
