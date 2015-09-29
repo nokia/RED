@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7Q8I4F06EeWeit3EM6sPPA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/23/15 9:56 AM
+Save-Time: 9/29/15 3:30 PM
 Testcase-Type: ecl
 Verifications: _d4v7EF3jEeWeit3EM6sPPA
 
@@ -40,9 +40,9 @@ with [get-view "Execution View" | get-tree] {
         | matches "TEST1 \(0\.0\d\d? s\)" | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[3].getText()" 
         | matches "special failing test \(0\.0\d\d? s\)" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Duplicate Test Case \(0\.0\d\d?s\)" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Duplicate Test Case \(0\.0\d\d? s\)" 
         | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "ExecutionViewProject \(0\.0[456]\d? s\)" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "ExecutionViewProject \(0\.\d\d?\d? s\)" | verify-true
 }
 //check if view is expanded
 get-view "Execution View" | get-tree | get-item "ExecutionViewProject .*" | get-property "getExpanded()" 
