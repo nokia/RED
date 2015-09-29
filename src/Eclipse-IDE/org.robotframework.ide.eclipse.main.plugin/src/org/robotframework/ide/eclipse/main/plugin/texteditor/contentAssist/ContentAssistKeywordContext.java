@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 import java.util.Arrays;
 
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -23,7 +22,7 @@ public class ContentAssistKeywordContext {
     }
 
     public String getLibName() {
-        return proposal.getSourceName();
+        return proposal.getLabelDecoration().substring(2);
     }
     
     public String getArguments() {
@@ -41,6 +40,6 @@ public class ContentAssistKeywordContext {
     }
     
     public Image getImage() {
-        return ImagesManager.getImage(RedImages.getKeywordImage());
+        return ImagesManager.getImage(proposal.getImage());
     }
 }

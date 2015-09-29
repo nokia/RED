@@ -9,37 +9,30 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SectionPartitionRule.Section;
 
 public class SuiteSourcePartitionScanner extends RuleBasedPartitionScanner {
 
-    public static final String SECTION_HEADER = "__section_header";
-    public static final String SCALAR_VARIABLE = "__scalar_variable";
-    public static final String LIST_VARIABLE = "__list_variable";
-    public static final String DICT_VARIABLE = "__dict_variable";
-    public static final String COMMENT = "__comment";
+    public final static String TEST_CASES_SECTION = "__test_cases_section";
 
-    public static final String[] LEGAL_CONTENT_TYPES = { SECTION_HEADER, COMMENT, SCALAR_VARIABLE, LIST_VARIABLE,
-            DICT_VARIABLE };
+    public final static String KEYWORDS_SECTION = "__keywords_section";
+
+    public final static String SETTINGS_SECTION = "__settings_section";
+
+    public final static String VARIABLES_SECTION = "__variables_section";
+
+    public static final String[] LEGAL_CONTENT_TYPES = { TEST_CASES_SECTION, KEYWORDS_SECTION, SETTINGS_SECTION,
+            VARIABLES_SECTION };
 
     public SuiteSourcePartitionScanner() {
-        final IToken sectionHeader = new Token(SECTION_HEADER);
-        final IToken scalarToken = new Token(SCALAR_VARIABLE);
-        final IToken listToken = new Token(LIST_VARIABLE);
-        final IToken dictToken = new Token(DICT_VARIABLE);
-        final IToken commentToken = new Token(COMMENT);
-        
-        final List<IPredicateRule> rules = newArrayList();
-        rules.add(new SingleLineRule("***", "***", sectionHeader));
-        rules.add(new EndOfLineRule("#", commentToken));
-        rules.add(new SingleLineRule("${", "}", scalarToken));
-        rules.add(new SingleLineRule("@{", "}", listToken));
-        rules.add(new SingleLineRule("&{", "}", dictToken));
+        final List<SectionPartitionRule> rules = newArrayList(
+                new SectionPartitionRule(Section.TEST_CASES, new Token(TEST_CASES_SECTION)),
+                new SectionPartitionRule(Section.KEYWORDS, new Token(KEYWORDS_SECTION)),
+                new SectionPartitionRule(Section.SETTINGS, new Token(SETTINGS_SECTION)),
+                new SectionPartitionRule(Section.VARIABLES, new Token(VARIABLES_SECTION)));
         
         setPredicateRules(rules.toArray(new IPredicateRule[0]));
     }

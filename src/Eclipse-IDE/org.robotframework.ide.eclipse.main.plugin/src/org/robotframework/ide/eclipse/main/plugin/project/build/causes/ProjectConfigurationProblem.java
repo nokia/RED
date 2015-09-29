@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateConfigurationFileFixer;
@@ -25,7 +26,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers() {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new CreateConfigurationFileFixer());
         }
 
@@ -101,7 +102,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
     }
 
     @Override
-    public List<? extends IMarkerResolution> createFixers() {
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
         return newArrayList();
     }
 

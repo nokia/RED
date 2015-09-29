@@ -6,10 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.views;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,6 +25,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -65,7 +65,13 @@ import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator.TestCaseDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -261,29 +267,48 @@ public class ExecutionView {
     }
     
     private void openExecutionStatusSourceFile(final ExecutionStatus executionStatus) {
-        if (executionStatus != null && executionStatus.getSource() != null) {
-            final IPath sourcePath = new Path(executionStatus.getSource());
-            final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(sourcePath);
-            if (sourceFile != null && sourceFile.exists()) {
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-                try {
-                    final IEditorPart editor = PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow()
-                            .getActivePage()
-                            .openEditor(new FileEditorInput(sourceFile), desc.getId());
-                    if (editor instanceof RobotFormEditor) {
-                        ((RobotFormEditor) editor).activateSourcePage();
+        if (executionStatus == null || executionStatus.getSource() == null) {
+            return;
+        }
+        final IPath sourcePath = new Path(executionStatus.getSource());
+        final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(sourcePath);
+        if (sourceFile == null || !sourceFile.exists()) {
+            return;
+        }
+        new TestCasesDefinitionLocator(sourceFile)
+                .locateTestCaseDefinition(createDetector(sourceFile, executionStatus.getName()));
+    }
+
+    private TestCaseDetector createDetector(final IFile sourceFile, final String caseName) {
+        return new TestCaseDetector() {
+
+            @Override
+            public ContinueDecision testCaseDetected(final RobotSuiteFile file, final RobotCase testCase) {
+                if (testCase.getName().equals(caseName)) {
+                    final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+                    final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
+                    try {
+                        final IEditorPart editor = PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .openEditor(new FileEditorInput(sourceFile), desc.getId());
+                        if (editor instanceof RobotFormEditor) {
+                            final SuiteSourceEditor sourcePage = ((RobotFormEditor) editor).activateSourcePage();
+                            final Position position = testCase.getDefinitionPosition();
+                            sourcePage.getSelectionProvider()
+                                    .setSelection(new TextSelection(position.getOffset(), position.getLength()));
+
+                        }
+                    } catch (final PartInitException e) {
+                        throw new RuntimeException("Unable to open editor for file: " + sourceFile.getName(), e);
                     }
-                    final Map<String, Object> eventMap = new HashMap<>();
-                    eventMap.put("testCaseName", executionStatus.getName());
-                    eventMap.put("fileName", sourceFile.getName());
-                    eventBroker.send("TextEditor/ShowTestCase", eventMap);
-                } catch (final PartInitException e) {
-                    throw new RuntimeException("Unable to open editor for file: " + sourceFile.getName(), e);
+
+                    return ContinueDecision.STOP;
+                } else {
+                    return ContinueDecision.CONTINUE;
                 }
             }
-        }
+        };
     }
     
     private void createToolbarActions(final IToolBarManager toolBarManager) {

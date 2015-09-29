@@ -8,10 +8,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 
@@ -45,17 +47,15 @@ public class RedVariableProposals {
     }
     
     public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator) {
-
         final List<RedVariableProposal> proposals = newArrayList();
 
-        for (final RobotVariable variable : suiteFile.getUserDefinedVariables()) {
-            proposals.add(RedVariableProposal.create(variable));
-        }
-
-        final Map<AVariableImported<?>, String> variablesMap = suiteFile.getVariablesFromImportedFiles();
-        for (final AVariableImported<?> variable : variablesMap.keySet()) {
-            proposals.add(RedVariableProposal.create(variable, variablesMap.get(variable)));
-        }
+        new VariableDefinitionLocator(suiteFile).locateVariableDefinition(new VariableDetector() {
+            @Override
+            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+                proposals.add(RedVariableProposal.create(variable));
+                return ContinueDecision.CONTINUE;
+            }
+        });
 
         for (final ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
             final Map<String, Object> refVariableMap = referencedVariableFile.getVariables();
@@ -68,9 +68,7 @@ public class RedVariableProposals {
         
         proposals.addAll(builtInVariableProposals);
 
-        if (comparator != null) {
-            Collections.sort(proposals, comparator);
-        }
+        Collections.sort(proposals, comparator);
         return proposals;
     }
 }

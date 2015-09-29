@@ -38,6 +38,7 @@ public class TextEditorContentAssist {
     }
     
     private static List<String> settingsSectionWords = new ArrayList<>();
+
     static {
         settingsSectionWords.add("Library");
         settingsSectionWords.add("Resource");
@@ -74,9 +75,9 @@ public class TextEditorContentAssist {
         testCasesSectionWords.add("[Timeout]");
     }
     
-    private List<RedVariableProposal> variableProposals = newArrayList();
+    private final List<RedVariableProposal> variableProposals;
     
-    private Map<String, ContentAssistKeywordContext> keywordMap;
+    private final Map<String, ContentAssistKeywordContext> keywordMap;
     
     public TextEditorContentAssist(final List<RedVariableProposal> variableProposals,
             final Map<String, ContentAssistKeywordContext> keywordMap) {
@@ -89,7 +90,7 @@ public class TextEditorContentAssist {
 
         final ICompletionProposal[] completionProposals = new ICompletionProposal[sections.size()];
         int index = 0;
-        for (String proposal : sections) {
+        for (final String proposal : sections) {
             completionProposals[index] = new CompletionProposal(proposal + SECTION_PROPOSAL_SEPARATOR, offset,
                     replacedWord.length(), proposal.length() + SECTION_PROPOSAL_SEPARATOR.length(), null, proposal, null,
                     null);
@@ -106,7 +107,7 @@ public class TextEditorContentAssist {
         }
         final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
         int index = 0;
-        for (String proposal : proposals) {
+        for (final String proposal : proposals) {
             completionProposals[index] = new CompletionProposal(proposal + PROPOSAL_SEPARATOR, offset,
                     replacedWord.length(), proposal.length() + PROPOSAL_SEPARATOR.length(), image, proposal, null, null);
             index++;
@@ -124,8 +125,8 @@ public class TextEditorContentAssist {
         final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
         String separator = "";
         int index = 0;
-        for (Iterator<String> i = proposals.keySet().iterator(); i.hasNext();) {
-            final String proposal = (String) i.next();
+        for (final Iterator<String> i = proposals.keySet().iterator(); i.hasNext();) {
+            final String proposal = i.next();
             final ContentAssistKeywordContext keywordContext = proposals.get(proposal);
             
             if(!keywordContext.getArguments().equals("[]")) {
@@ -153,7 +154,7 @@ public class TextEditorContentAssist {
 
         final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
         int index = 0;
-        for (RedVariableProposal proposal : proposals) {
+        for (final RedVariableProposal proposal : proposals) {
             final String variableName = proposal.getName();
             String info = "Source: " + proposal.getSource() + "\n";
             
@@ -175,8 +176,8 @@ public class TextEditorContentAssist {
     }
     
     public static List<String> filterProposals(final List<String> allProposals, final String filter) {
-        List<String> filteredProposals = newArrayList();
-        for (String word : allProposals) {
+        final List<String> filteredProposals = newArrayList();
+        for (final String word : allProposals) {
             if (word.toLowerCase().startsWith(filter.toLowerCase())) {
                 filteredProposals.add(word);
             }
@@ -186,9 +187,9 @@ public class TextEditorContentAssist {
     
     public static Map<String, ContentAssistKeywordContext> filterKeywordsProposals(
             final Map<String, ContentAssistKeywordContext> keywordMap, final String filter) {
-        Map<String, ContentAssistKeywordContext> keywordProposals = new LinkedHashMap<>();
-        for (Iterator<String> i = keywordMap.keySet().iterator(); i.hasNext();) {
-            String keyword = (String) i.next();
+        final Map<String, ContentAssistKeywordContext> keywordProposals = new LinkedHashMap<>();
+        for (final Iterator<String> i = keywordMap.keySet().iterator(); i.hasNext();) {
+            final String keyword = i.next();
             if (keyword.toLowerCase().startsWith(filter.toLowerCase())) {
                 keywordProposals.put(keyword, keywordMap.get(keyword));
             }
@@ -198,8 +199,8 @@ public class TextEditorContentAssist {
     
     public static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
             final String filter) {
-        List<RedVariableProposal> filteredProposals = newArrayList();
-        for (RedVariableProposal variable : variables) {
+        final List<RedVariableProposal> filteredProposals = newArrayList();
+        for (final RedVariableProposal variable : variables) {
             if (variable.getName().toLowerCase().contains(filter.toLowerCase())) {
                 filteredProposals.add(variable);
             }

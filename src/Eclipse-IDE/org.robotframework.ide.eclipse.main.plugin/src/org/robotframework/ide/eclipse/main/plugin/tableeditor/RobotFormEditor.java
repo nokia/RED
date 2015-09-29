@@ -52,6 +52,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
@@ -281,6 +282,7 @@ public class RobotFormEditor extends FormEditor {
         suiteModel.dispose();
         PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.SUITE_MODEL_DISPOSED,
                 RobotElementChange.createChangedElement(suiteModel));
+        RobotArtifactsValidator.revalidate(suiteModel);
     }
 
     public FocusedViewerAccessor getFocusedViewerAccessor() {
@@ -342,11 +344,13 @@ public class RobotFormEditor extends FormEditor {
         // document.set(model.toString());
     }
 
-    public void activateSourcePage() {
+    public SuiteSourceEditor activateSourcePage() {
         if (getActiveEditor() instanceof SuiteSourceEditor) {
-            return;
+            return (SuiteSourceEditor) getActiveEditor();
         }
-        setActiveEditor(getSourceEditor());
+        final SuiteSourceEditor editor = getSourceEditor();
+        setActiveEditor(editor);
+        return editor;
     }
 
     public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {

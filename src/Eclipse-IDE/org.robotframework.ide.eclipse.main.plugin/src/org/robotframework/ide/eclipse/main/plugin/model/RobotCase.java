@@ -163,4 +163,11 @@ public class RobotCase extends RobotCodeHoldingElement {
 
         return new Position(begin.getOffset(), end.getOffset() - begin.getOffset() + 1);
     }
+
+    public Position getDefinitionPosition() {
+        final int begin = testCase.getTestName().getStartOffset();
+        final int length = testCase.getTestName().getText().length();
+
+        return new Position(begin, length);
+    }
 }
