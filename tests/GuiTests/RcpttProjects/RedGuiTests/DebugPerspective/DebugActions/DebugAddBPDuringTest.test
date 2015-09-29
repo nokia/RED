@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _fNWisBRGEeWWV9IuysVI_A
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/3/15 3:57 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 9/29/15 6:13 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -19,7 +19,7 @@ with [get-view "Project Explorer" | get-tree] {
     select MediumRobotTest | double-click
     select "MediumRobotTest/Script.robot" | double-click
 }
-with [get-editor "Script.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn] {
+with [get-editor "Script.robot" |get-left-ruler | get-ruler-column AnnotationColumn] {
     double-click-ruler 13
     double-click-ruler 15
 }
@@ -44,7 +44,7 @@ check_if_line_is_highlighted -line 15 -script_name "Script.robot"
 
 
 //set new breakpoint
-get-editor "Script.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn | double-click-ruler 20
+get-editor "Script.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 20
 
 //press Resume
 exec-with-options -disableJobWaiting -command {

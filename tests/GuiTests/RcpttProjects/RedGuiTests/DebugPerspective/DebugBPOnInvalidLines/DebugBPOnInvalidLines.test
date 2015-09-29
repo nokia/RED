@@ -17,7 +17,7 @@ Entry-Name: .content
 
 //select test and set BP on place where have no meaning
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
-with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationRulerColumn] {
+with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
     double-click-ruler 2
     double-click-ruler 20
     double-click-ruler 25
