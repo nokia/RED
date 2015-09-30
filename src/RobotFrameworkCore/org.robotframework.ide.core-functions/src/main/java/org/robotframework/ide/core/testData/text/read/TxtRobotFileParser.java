@@ -238,17 +238,21 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                         .remove(ParsingState.KEYWORD_DECLARATION);
                             }
 
+                            String rawText = text
+                                    .substring(lastColumnProcessed);
+
                             rt = processLineElement(
                                     line,
                                     processingState,
                                     parsingOutput,
                                     new FilePosition(lineNumber,
                                             lastColumnProcessed, currentOffset),
-                                    text.substring(lastColumnProcessed),
-                                    robotFile.getName(), isNewLine);
+                                    rawText, robotFile.getName(), isNewLine);
                             rt.setStartOffset(currentOffset);
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
+
+                            extractPrettyAlignWhitespaces(line, rt, rawText);
 
                             lastColumnProcessed = textLength;
                             isNewLine = false;
@@ -314,6 +318,49 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+
+    @VisibleForTesting
+    protected void extractPrettyAlignWhitespaces(RobotLine line, RobotToken rt,
+            String rawText) {
+        if (rawText.trim().length() > 0) {
+            String correctedString = rawText;
+            if (rawText.startsWith(" ")) {
+                RobotToken prettyLeftAlign = new RobotToken();
+                prettyLeftAlign.setStartOffset(rt.getStartOffset());
+                prettyLeftAlign.setLineNumber(rt.getLineNumber());
+                prettyLeftAlign.setStartColumn(rt.getStartColumn());
+                prettyLeftAlign.setRaw(new StringBuilder(" "));
+                prettyLeftAlign.setText(new StringBuilder(" "));
+                prettyLeftAlign.setType(RobotTokenType.UNKNOWN);
+                line.addLineElementAt(line.getLineElements().size() - 1,
+                        prettyLeftAlign);
+
+                rt.setStartColumn(rt.getStartColumn() + 1);
+                rt.setStartOffset(rt.getStartOffset() + 1);
+                correctedString = rawText.substring(1);
+                rt.setText(new StringBuilder(correctedString));
+                rt.setRaw(new StringBuilder(correctedString));
+            }
+
+            if (rawText.endsWith(" ")) {
+                RobotToken prettyRightAlign = new RobotToken();
+                prettyRightAlign.setStartOffset(rt.getStartOffset()
+                        + rt.getRaw().length() - 1);
+                prettyRightAlign.setLineNumber(rt.getLineNumber());
+                prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
+                prettyRightAlign.setRaw(new StringBuilder(" "));
+                prettyRightAlign.setText(new StringBuilder(" "));
+                prettyRightAlign.setType(RobotTokenType.UNKNOWN);
+                line.addLineElement(prettyRightAlign);
+
+                correctedString = correctedString.substring(0,
+                        correctedString.length() - 1);
+                rt.setText(new StringBuilder(correctedString));
+                rt.setRaw(new StringBuilder(correctedString));
+            }
+        }
     }
 
 
@@ -386,7 +433,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         if (processThisElement) {
             ParsingState newStatus = utility.getStatus(robotToken);
             if (robotToken != null) {
-                if (!text.equals(robotToken.getText().toString())) {
+                if (!text.trim().equals(robotToken.getText().toString().trim())) {
                     // FIXME: add information that type is incorrect missing
                     // separator
                     RobotToken newRobotToken = new RobotToken();
@@ -470,7 +517,24 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
         }
 
+        fixNotSetPositions(robotToken, fp);
+
         return robotToken;
+    }
+
+
+    @VisibleForTesting
+    protected void fixNotSetPositions(final RobotToken token,
+            final FilePosition fp) {
+        if (token.getStartOffset() == IRobotLineElement.NOT_SET) {
+            token.setStartOffset(fp.getOffset());
+        }
+        if (token.getLineNumber() == IRobotLineElement.NOT_SET) {
+            token.setLineNumber(fp.getLine());
+        }
+        if (token.getStartColumn() == IRobotLineElement.NOT_SET) {
+            token.setStartColumn(fp.getColumn());
+        }
     }
 
 
