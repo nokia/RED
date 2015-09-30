@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -72,12 +73,13 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                     }
                 }
                 
-                ICompletionProposal[] proposals = null;
-                if (textEditorContentAssist.getKeywordMap().size() > 0) {
-                    proposals = TextEditorContentAssist.buildKeywordsProposals(textEditorContentAssist.getKeywordMap(),
-                            currentWord, offset - currentWord.length());
+                final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist
+                        .filterKeywordsProposals(textEditorContentAssist.getKeywordMap(), currentWord);
+                if (keywordProposals.isEmpty()) {
+                    return null;
                 }
-                return proposals;
+                return TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord,
+                        offset - currentWord.length());
             }
         } catch (final BadLocationException e) {
             e.printStackTrace();
