@@ -47,7 +47,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         // TODO : check output status and parsing messages
         new TestCasesTableValidator(fileModel.findSection(RobotCasesSection.class)).validate(monitor);
         new GeneralSettingsTableValidator(fileModel.findSection(RobotSettingsSection.class)).validate(monitor);
-        new KeywordTableValidator(validationContext, fileModel.findSection(RobotKeywordsSection.class))
+        new KeywordTableValidator(fileModel.findSection(RobotKeywordsSection.class))
                 .validate(monitor);
         new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class))
                 .validate(monitor);

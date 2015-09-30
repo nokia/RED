@@ -50,8 +50,10 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor {
         if (annotation instanceof MarkerAnnotation) {
             try {
                 final IMarker marker = ((MarkerAnnotation) annotation).getMarker();
-                return RobotProblem.TYPE_ID.equals(marker.getType())
-                        && ProjectsFixesGenerator.getCause(marker).hasResolution();
+                if (RobotProblem.TYPE_ID.equals(marker.getType())) {
+                    final IProblemCause cause = ProjectsFixesGenerator.getCause(marker);
+                    return cause != null && cause.hasResolution();
+                }
             } catch (final CoreException e) {
                 return false;
             }
