@@ -109,7 +109,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
                     final String case1Name = case1.getTestName().getText().toString();
                     final String case2Name = case2.getTestName().getText().toString();
 
-                    if (case1Name.trim().equalsIgnoreCase(case2Name.trim())) {
+                    if (case1Name.equalsIgnoreCase(case2Name)) {
                         duplicatedNames.add(case1Name.toLowerCase());
                     }
                 }
@@ -147,7 +147,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         for (final RobotExecutableRow<?> executable : executables) {
             final RobotToken keywordName = getKeywordNameToken(executable);
-            if (keywordName == null) {
+            if (keywordName == null || keywordName.getText().toString().trim().startsWith("#")) {
                 continue;
             }
             final String name = keywordName.getText().toString();
