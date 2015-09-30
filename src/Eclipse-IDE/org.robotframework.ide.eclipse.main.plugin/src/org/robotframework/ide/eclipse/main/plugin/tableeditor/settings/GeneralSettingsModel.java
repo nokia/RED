@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,12 @@ class GeneralSettingsModel {
                 settings.put("Default Tags", null);
                 return settings;
             }
+        },
+        OF_RESOURCE_FILE {
+            @Override
+            Map<String, RobotElement> createInitialMapping() {
+                return new HashMap<>();
+            }
         };
 
         abstract Map<String, RobotElement> createInitialMapping();
@@ -86,8 +93,7 @@ class GeneralSettingsModel {
             } else if (RobotSuiteFileDescriber.isSuiteFile(file)) {
                 return OF_SUITE_FILE;
             } else {
-                throw new IllegalStateException("There are no general settings for files other "
-                        + "than suite files or initialization files");
+                return OF_RESOURCE_FILE;
             }
         }
     }
