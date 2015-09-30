@@ -19,6 +19,11 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
 
     @Override
+    public String getId() {
+        return getComponent().getId();
+    }
+
+    @Override
     public void updateOnActivation() {
         getComponent().updateOnActivation();
     }

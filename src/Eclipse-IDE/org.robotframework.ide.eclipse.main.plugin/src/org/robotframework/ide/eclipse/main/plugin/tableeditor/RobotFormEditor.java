@@ -135,14 +135,25 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", null);
 
-            setActivePage(getPageToActivate());
+            setActivePart(getPageToActivate());
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to initialize editor", e);
         }
     }
 
-    private int getPageToActivate() {
-        final int def = getPageCount() - 1;
+    private void setActivePart(final String pageIdToActivate) {
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart instanceof ISectionEditorPart
+                    && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
+                setActivePage(i);
+                return;
+            }
+        }
+        setActivePage(getPageCount() - 1);
+    }
+
+    private String getPageToActivate() {
         if (getEditorInput() instanceof IFileEditorInput) {
             final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
             final IFile file = fileInput.getFile();
@@ -151,18 +162,14 @@ public class RobotFormEditor extends FormEditor {
             final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
             final IDialogSettings section = dialogSettings.getSection(sectionName);
             if (section == null) {
-                return def;
+                return null;
             }
-            final int activeIndex = section.getInt("activePage");
-            if (activeIndex >= 0 && activeIndex <= def) {
-                return activeIndex;
-            }
-            return def;
+            return section.get("activePage");
         }
-        return def;
+        return null;
     }
 
-    private void saveActivePage(final int index) {
+    private void saveActivePage(final String activePageClassName) {
         if (getEditorInput() instanceof IFileEditorInput) {
             final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
             final IFile file = fileInput.getFile();
@@ -173,7 +180,7 @@ public class RobotFormEditor extends FormEditor {
             if (section == null) {
                 section = dialogSettings.addNewSection(sectionName);
             }
-            section.put("activePage", index);
+            section.put("activePage", activePageClassName);
         }
     }
 
@@ -199,20 +206,25 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
+        boolean shouldSave = true;
         boolean shouldClose = false;
         final RobotSuiteFile currentModel = provideSuiteModel();
         if (currentModel.isSuiteFile() && !currentModel.findSection(RobotCasesSection.class).isPresent()) {
-            MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+            shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
                     "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
                             + "changes there is no Test Cases section. From now on this file will be recognized as "
-                            + "Resource file.\n\nThe editor will be reopened");
+                            + "Resource file.\n\nClick OK to save and reopen editor or cancel saving");
             shouldClose = true;
         } else if (currentModel.isResourceFile() && currentModel.findSection(RobotCasesSection.class).isPresent()) {
-            MessageDialog.openWarning(getSite().getShell(), "File content mismatch",
+            shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
                     "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
                             + "changes there is a Test Cases section defined. From now on this file will be recognized "
-                            + "as Suite file.\n\nThe editor will be reopened");
+                            + "as Suite file.\n\nClick OK to save and reopen editor or cancel saving");
             shouldClose = true;
+        }
+        if (!shouldSave) {
+            monitor.setCanceled(true);
+            return;
         }
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
@@ -325,7 +337,8 @@ public class RobotFormEditor extends FormEditor {
         super.pageChange(newPageIndex);
 
         updateActivePage();
-        saveActivePage(newPageIndex);
+        final IEditorPart activeEditor = getActiveEditor();
+        saveActivePage(activeEditor instanceof ISectionEditorPart ? ((ISectionEditorPart) activeEditor).getId() : "");
     }
 
     private void updateActivePage() {

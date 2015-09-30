@@ -6,13 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
@@ -29,7 +32,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -52,7 +57,68 @@ class TestCasesTableValidator implements ModelUnitValidator {
         if (!testCaseSection.isPresent()) {
             return;
         }
+        final RobotSuiteFile suiteModel = testCaseSection.get().getSuiteFile();
+        final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
+
+        reportEmptyCases(suiteModel.getFile(), casesTable);
+        reportDuplicatedCases(suiteModel.getFile(), casesTable);
         reportUnkownKeywords(testCaseSection.get().getSuiteFile(), reporter, findExecutableRows());
+    }
+
+    private void reportEmptyCases(final IFile file, final TestCaseTable casesTable) {
+        for (final TestCase testCase : casesTable.getTestCases()) {
+            final RobotToken caseName = testCase.getTestName();
+            final IProblemCause cause = TestCasesProblem.EMPTY_CASE;
+            reportEmptyExecutableRows(file, reporter, caseName, testCase.getTestExecutionRows(), cause);
+        }
+    }
+
+    static void reportEmptyExecutableRows(final IFile file, final ProblemsReportingStrategy reporter,
+            final RobotToken def, final List<? extends RobotExecutableRow<?>> executables,
+            final IProblemCause causeToReport) {
+        if (executables.isEmpty()) {
+            final String name = def.getText().toString();
+
+            final RobotProblem problem = RobotProblem.causedBy(causeToReport).formatMessageWith(name);
+            final ProblemPosition position = new ProblemPosition(def.getLineNumber(),
+                    Range.closed(def.getStartOffset(), def.getStartOffset() + name.length()));
+            final Map<String, Object> arguments = new HashMap<>();
+            arguments.put("name", name);
+            reporter.handleProblem(problem, file, position, arguments);
+        }
+    }
+
+    private void reportDuplicatedCases(final IFile file, final TestCaseTable casesTable) {
+        final Set<String> duplicatedNames = newHashSet();
+
+        for (final TestCase case1 : casesTable.getTestCases()) {
+            for (final TestCase case2 : casesTable.getTestCases()) {
+                if (case1 != case2) {
+                    final String case1Name = case1.getTestName().getText().toString();
+                    final String case2Name = case2.getTestName().getText().toString();
+
+                    if (case1Name.trim().equalsIgnoreCase(case2Name.trim())) {
+                        duplicatedNames.add(case1Name.toLowerCase());
+                    }
+                }
+            }
+        }
+
+        for (final TestCase testCase : casesTable.getTestCases()) {
+            final RobotToken caseName = testCase.getTestName();
+            final String name = caseName.getText().toString();
+
+            if (duplicatedNames.contains(name.toLowerCase())) {
+                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.DUPLICATED_CASE)
+                        .formatMessageWith(name);
+                final ProblemPosition position = new ProblemPosition(caseName.getLineNumber(),
+                        Range.closed(caseName.getStartOffset(), caseName.getStartOffset() + name.length()));
+                final Map<String, Object> additionalArguments = Maps.newHashMap();
+                additionalArguments.put("name", name);
+                reporter.handleProblem(problem, file, position, additionalArguments);
+            }
+        }
+
     }
 
     private List<RobotExecutableRow<?>> findExecutableRows() {

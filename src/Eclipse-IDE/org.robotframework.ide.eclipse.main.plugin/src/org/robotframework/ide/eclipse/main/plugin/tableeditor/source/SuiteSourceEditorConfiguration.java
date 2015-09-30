@@ -24,6 +24,8 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -191,6 +193,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private IReconcilingStrategy getReconcilingStrategy() {
         return new SuiteSourceReconcilingStrategy(editor);
+    }
+
+    @Override
+    public IContentFormatter getContentFormatter(final ISourceViewer sourceViewer) {
+        final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+                getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+        formatter.setMasterStrategy(new SuiteSourceFormattingStrategy());
+        return formatter;
     }
 
     private static class SingleTokenScanner extends BufferedRuleBasedScanner {
