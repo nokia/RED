@@ -8,11 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -25,9 +27,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -38,11 +43,17 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCases
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 class TestCasesTableValidator implements ModelUnitValidator {
+
+    private static final String WHOLE_CELL_VARIABLE_PATTERN = "^[@$&%]\\{[^\\{]+\\} *=? *$";
+
+    private static final String VARIABLE_PATTERN = "[@$&%]\\{[^\\{]+\\}";
+
 
     private final Optional<RobotCasesSection> testCaseSection;
 
@@ -59,14 +70,15 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
         final RobotSuiteFile suiteModel = testCaseSection.get().getSuiteFile();
         final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
+        final List<TestCase> cases = casesTable.getTestCases();
 
-        reportEmptyCases(suiteModel.getFile(), casesTable);
-        reportDuplicatedCases(suiteModel.getFile(), casesTable);
-        reportUnkownKeywords(testCaseSection.get().getSuiteFile(), reporter, findExecutableRows());
+        reportEmptyCases(suiteModel.getFile(), cases);
+        reportDuplicatedCases(suiteModel.getFile(), cases);
+        reportUnkownKeywords(testCaseSection.get().getSuiteFile(), reporter, findExecutableRows(cases));
     }
 
-    private void reportEmptyCases(final IFile file, final TestCaseTable casesTable) {
-        for (final TestCase testCase : casesTable.getTestCases()) {
+    private void reportEmptyCases(final IFile file, final List<TestCase> cases) {
+        for (final TestCase testCase : cases) {
             final RobotToken caseName = testCase.getTestName();
             final IProblemCause cause = TestCasesProblem.EMPTY_CASE;
             reportEmptyExecutableRows(file, reporter, caseName, testCase.getTestExecutionRows(), cause);
@@ -88,11 +100,11 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportDuplicatedCases(final IFile file, final TestCaseTable casesTable) {
+    private void reportDuplicatedCases(final IFile file, final List<TestCase> cases) {
         final Set<String> duplicatedNames = newHashSet();
 
-        for (final TestCase case1 : casesTable.getTestCases()) {
-            for (final TestCase case2 : casesTable.getTestCases()) {
+        for (final TestCase case1 : cases) {
+            for (final TestCase case2 : cases) {
                 if (case1 != case2) {
                     final String case1Name = case1.getTestName().getText().toString();
                     final String case2Name = case2.getTestName().getText().toString();
@@ -104,7 +116,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
         }
 
-        for (final TestCase testCase : casesTable.getTestCases()) {
+        for (final TestCase testCase : cases) {
             final RobotToken caseName = testCase.getTestName();
             final String name = caseName.getText().toString();
 
@@ -121,10 +133,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     }
 
-    private List<RobotExecutableRow<?>> findExecutableRows() {
+    private List<RobotExecutableRow<?>> findExecutableRows(final List<TestCase> cases) {
         final List<RobotExecutableRow<?>> executables = newArrayList();
-        final TestCaseTable testCaseTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
-        for (final TestCase testCase : testCaseTable.getTestCases()) {
+        for (final TestCase testCase : cases) {
             executables.addAll(testCase.getTestExecutionRows());
         }
         return executables;
@@ -181,17 +192,67 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         boolean isFirst = true;
         for (final RobotToken token : candidates) {
-            if (Pattern.matches("^[@$&%]\\{[^\\{]+\\} *=? *$", token.getText().toString())) {
+            if (Pattern.matches(WHOLE_CELL_VARIABLE_PATTERN, token.getText().toString())) {
                 isFirst = false;
                 continue;
             } else if (isFirst && "\\".equals(token.getText().toString().trim())) {
+                // internal of FOR-loop
                 isFirst = false;
                 continue;
             } else if (isFirst && ": FOR".equals(token.getText().toString().trim())) {
+                // FOR-loop definition
                 return null;
             }
             return token;
         }
         return null;
+    }
+
+    private void reportUnknownVariables() {
+        final Set<String> variables = new HashSet<>();
+        new VariableDefinitionLocator(testCaseSection.get().getSuiteFile())
+                .locateVariableDefinition(new VariableDetector() {
+
+                    @Override
+                    public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+                        variables.add(variable.getName());
+                        return ContinueDecision.CONTINUE;
+                    }
+                });
+
+        final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
+        final List<TestCase> cases = casesTable.getTestCases();
+        for (final RobotExecutableRow<?> row : findExecutableRows(cases)) {
+
+        }
+    }
+
+    private static List<RobotToken> getVariablesUsedTokens(final RobotExecutableRow<?> executable) {
+        final List<RobotToken> candidates = newArrayList();
+        candidates.add(executable.getAction());
+        candidates.addAll(executable.getArguments());
+
+        final int index = candidates.indexOf(getKeywordNameToken(executable));
+        return index < candidates.size() - 1 ? newArrayList(candidates.subList(index + 1, candidates.size() - 1))
+                : new ArrayList<RobotToken>();
+    }
+
+    private static List<RobotToken> getVariablesDefiningTokens(final RobotExecutableRow<?> executable) {
+        final List<RobotToken> candidates = newArrayList();
+        candidates.add(executable.getAction());
+        candidates.addAll(executable.getArguments());
+
+        final int index = candidates.indexOf(getKeywordNameToken(executable));
+        return index < candidates.size() - 1 ? newArrayList(candidates.subList(0, index)) : new ArrayList<RobotToken>();
+    }
+
+    @VisibleForTesting static List<String> extractVariables(final String content) {
+        final List<String> variables = newArrayList();
+        final Matcher matcher = Pattern.compile(VARIABLE_PATTERN).matcher(content);
+        
+        while (matcher.find()) {
+            variables.add(matcher.group(0));
+        }
+        return variables;
     }
 }
