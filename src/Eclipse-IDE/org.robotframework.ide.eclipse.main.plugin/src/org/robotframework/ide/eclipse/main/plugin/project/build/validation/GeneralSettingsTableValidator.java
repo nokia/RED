@@ -80,14 +80,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             Range.closed(libToken.getStartOffset(),
                                     libToken.getStartOffset() + libToken.getText().toString().length()));
                     reporter.handleProblem(problem, file, position);
-                }
-                final String name = pathOrName.getText().toString();
-                if (!libNames.contains(name)) {
-                    final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNRECOGNIZED_LIBRARY)
-                            .formatMessageWith(name);
-                    final ProblemPosition position = new ProblemPosition(pathOrName.getLineNumber(),
-                            Range.closed(pathOrName.getStartOffset(), pathOrName.getStartOffset() + name.length()));
-                    reporter.handleProblem(problem, file, position);
+                } else {
+                    final String name = pathOrName.getText().toString();
+                    if (!libNames.contains(name)) {
+                        final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNRECOGNIZED_LIBRARY)
+                                .formatMessageWith(name);
+                        final ProblemPosition position = new ProblemPosition(pathOrName.getLineNumber(),
+                                Range.closed(pathOrName.getStartOffset(), pathOrName.getStartOffset() + name.length()));
+                        reporter.handleProblem(problem, file, position);
+                    }
                 }
             }
         }
