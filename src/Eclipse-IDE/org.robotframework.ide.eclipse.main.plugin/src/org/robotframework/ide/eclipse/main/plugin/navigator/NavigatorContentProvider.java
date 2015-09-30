@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -19,8 +18,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ui.ISources;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -42,11 +39,6 @@ import com.google.common.collect.Multimap;
 public class NavigatorContentProvider implements ITreeContentProvider {
 
     private TreeViewer viewer;
-
-    @Inject
-    @Optional
-    @Named(ISources.ACTIVE_SITE_NAME)
-    private IViewSite site;
 
     public NavigatorContentProvider() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
@@ -142,7 +134,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenFileChangesExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
-            viewer.refresh();
+            viewer.refresh(change.getElement().getSuiteFile().getFile());
         }
     }
 
@@ -151,7 +143,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
-            viewer.refresh();
+            viewer.refresh(fileModel.getFile());
         }
     }
 
@@ -160,7 +152,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenModelIsDisposed(
             @UIEventTopic(RobotModelEvents.SUITE_MODEL_DISPOSED) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
-            viewer.refresh();
+            viewer.refresh(change.getElement().getSuiteFile().getFile());
         }
     }
 
