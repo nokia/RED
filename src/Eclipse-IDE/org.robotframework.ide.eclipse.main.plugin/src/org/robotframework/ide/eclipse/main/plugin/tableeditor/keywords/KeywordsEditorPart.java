@@ -44,6 +44,11 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         }
 
         @Override
+        public String getId() {
+            return "red.keywords";
+        }
+
+        @Override
         protected String getTitle() {
             return "User Keywords";
         }

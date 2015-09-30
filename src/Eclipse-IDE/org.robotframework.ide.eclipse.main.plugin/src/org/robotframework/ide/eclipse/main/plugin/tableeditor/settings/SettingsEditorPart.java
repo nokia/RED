@@ -50,6 +50,11 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         }
 
         @Override
+        public String getId() {
+            return "red.settings";
+        }
+
+        @Override
         protected String getTitle() {
             return "Settings";
         }

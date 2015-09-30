@@ -44,6 +44,11 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         }
 
         @Override
+        public String getId() {
+            return "red.variables";
+        }
+
+        @Override
         protected String getTitle() {
             return "Variables";
         }
