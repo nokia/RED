@@ -407,7 +407,7 @@ public class ExecutionView {
             final Status status = getStatus(executionElement);
             final int elapsedTime = executionElement.getElapsedTime();
             for (final ExecutionStatus executionStatus : lastSuiteChildren) {
-                if (executionStatus.getName().equals(executionElement.getName())) {
+                if (executionStatus.getName().equals(executionElement.getName()) && executionStatus.getStatus() == Status.RUNNING) {
                     executionStatus.setStatus(status);
                     final String message = executionElement.getMessage();
                     if (message != null && !message.equals("")) {
