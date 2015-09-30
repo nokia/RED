@@ -34,13 +34,20 @@ public enum KeywordsProblem implements IProblemCause {
     },
     DUPLICATED_KEYWORD {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public String getProblemDescription() {
+            return "Duplicated keyword definition '%s'";
         }
 
         @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveKeywordFixer(marker.getAttribute("name", null)));
+        }
+    },
+    EMPTY_KEYWORD {
+
+        @Override
         public String getProblemDescription() {
-            return "Duplicated keyword definition '%s'";
+            return "Keyword '%s' is empty";
         }
 
         @Override
