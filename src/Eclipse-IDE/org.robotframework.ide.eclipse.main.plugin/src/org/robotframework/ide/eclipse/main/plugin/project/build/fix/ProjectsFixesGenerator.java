@@ -44,7 +44,7 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
         if (causeEnumClass != null && causeStr != null) {
             try {
                 return (IProblemCause) Enum.valueOf((Class<? extends Enum>) Class.forName(causeEnumClass), causeStr);
-            } catch (final ClassNotFoundException e) {
+            } catch (final ClassNotFoundException | IllegalArgumentException e) {
                 return null;
             }
         }
