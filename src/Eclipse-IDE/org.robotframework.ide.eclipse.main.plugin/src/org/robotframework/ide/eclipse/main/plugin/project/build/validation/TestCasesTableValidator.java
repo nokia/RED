@@ -192,14 +192,17 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         boolean isFirst = true;
         for (final RobotToken token : candidates) {
-            if (Pattern.matches(WHOLE_CELL_VARIABLE_PATTERN, token.getText().toString())) {
+            final String text = token.getText().toString().trim();
+            if (Pattern.matches(WHOLE_CELL_VARIABLE_PATTERN, text)) {
                 isFirst = false;
                 continue;
-            } else if (isFirst && "\\".equals(token.getText().toString().trim())) {
+            }
+            if (isFirst && "\\".equals(text)) {
                 // internal of FOR-loop
                 isFirst = false;
                 continue;
-            } else if (isFirst && ": FOR".equals(token.getText().toString().trim())) {
+            }
+            if (isFirst && ": FOR".equals(text) || ":FOR".equals(text)) {
                 // FOR-loop definition
                 return null;
             }
