@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -42,38 +43,53 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private Set<IRegion> occurencesRegions;
 
+    private Job refreshingJob;
+
     SuiteSourceOccurrenceMarksHighlighter(final IFile editedFile, final IDocument document) {
         this.document = document;
         this.file = editedFile;
         this.findAdapter = new FindReplaceDocumentAdapter(document);
         this.occurencesRegions = newHashSet();
+        this.refreshingJob = null;
     }
 
     void install(final SourceViewer viewer) {
         viewer.getTextWidget().addCaretListener(new CaretListener() {
-
             @Override
             public void caretMoved(final CaretEvent event) {
-                try {
-                    final Optional<IRegion> currentRegion = getCurrentRegion(event.caretOffset);
-                    if (!currentRegion.isPresent()) {
-                        removeOccurencesHighlighting();
-                        occurencesRegions = newHashSet();
-                    } else {
-                        final Set<IRegion> regions = findOccurencesRegions(currentRegion.get());
-                        if (!Objects.equals(occurencesRegions, regions)) {
-                            removeOccurencesHighlighting();
-                            highlightOccurences(currentRegion.get(), regions);
-                            occurencesRegions = regions;
-                        }
-                    }
-                } catch (final BadLocationException e) {
-                    RedPlugin.logError("Unable to create occurences markers", e);
+                if (refreshingJob != null && refreshingJob.getState() == Job.SLEEPING) {
+                    refreshingJob.cancel();
                 }
+                refreshingJob = new Job("") {
 
+                    @Override
+                    protected IStatus run(final IProgressMonitor monitor) {
+                        refreshOccurences(event);
+                        return Status.OK_STATUS;
+                    }
+                };
+                refreshingJob.schedule(50);
             }
-
         });
+    }
+
+    private void refreshOccurences(final CaretEvent event) {
+        try {
+            final Optional<IRegion> currentRegion = getCurrentRegion(event.caretOffset);
+            if (!currentRegion.isPresent()) {
+                removeOccurencesHighlighting();
+                occurencesRegions = newHashSet();
+            } else {
+                final Set<IRegion> regions = findOccurencesRegions(currentRegion.get());
+                if (!Objects.equals(occurencesRegions, regions)) {
+                    removeOccurencesHighlighting();
+                    highlightOccurences(currentRegion.get(), regions);
+                    occurencesRegions = regions;
+                }
+            }
+        } catch (final BadLocationException | InterruptedException e) {
+            RedPlugin.logError("Unable to create occurences markers", e);
+        }
     }
 
     private Optional<IRegion> getCurrentRegion(final int offset) throws BadLocationException {
@@ -110,7 +126,8 @@ class SuiteSourceOccurrenceMarksHighlighter {
         }
     }
 
-    private void highlightOccurences(final IRegion selectedRegion, final Set<IRegion> regions) throws BadLocationException {
+    private void highlightOccurences(final IRegion selectedRegion, final Set<IRegion> regions)
+            throws BadLocationException, InterruptedException {
         final String selectedText = document.get(selectedRegion.getOffset(), selectedRegion.getLength());
         final WorkspaceJob wsJob = new WorkspaceJob("Creating occurences markers") {
 
@@ -124,6 +141,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         };
         wsJob.setSystem(true);
         wsJob.schedule();
+        // wsJob.join();
     }
 
     private void createMarker(final IRegion region, final String selectedText) {
