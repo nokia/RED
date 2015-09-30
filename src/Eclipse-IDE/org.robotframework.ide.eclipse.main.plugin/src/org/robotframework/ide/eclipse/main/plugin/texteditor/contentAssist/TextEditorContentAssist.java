@@ -84,98 +84,80 @@ public class TextEditorContentAssist {
         this.variableProposals = variableProposals;
         this.keywordMap = keywordMap;
     }
+
+    public List<RedVariableProposal> getVariables() {
+        return variableProposals;
+    }
+
+    public Map<String, ContentAssistKeywordContext> getKeywordMap() {
+        return keywordMap;
+    }
     
-    public static ICompletionProposal[] buildSectionProposals(final String replacedWord,
+    static ICompletionProposal[] buildSectionProposals(final String replacedWord,
             final int offset) {
 
-        final ICompletionProposal[] completionProposals = new ICompletionProposal[sections.size()];
-        int index = 0;
+        final List<ICompletionProposal> completionProposals = newArrayList();
         for (final String proposal : sections) {
-            completionProposals[index] = new CompletionProposal(proposal + SECTION_PROPOSAL_SEPARATOR, offset,
-                    replacedWord.length(), proposal.length() + SECTION_PROPOSAL_SEPARATOR.length(), null, proposal, null,
-                    null);
-            index++;
+            completionProposals
+                    .add(new CompletionProposal(proposal + SECTION_PROPOSAL_SEPARATOR, offset, replacedWord.length(),
+                            proposal.length() + SECTION_PROPOSAL_SEPARATOR.length(), null, proposal, null, null));
         }
-        return completionProposals;
+        return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    public static ICompletionProposal[] buildSimpleProposals(final List<String> proposals, final String replacedWord,
+    static ICompletionProposal[] buildSimpleProposals(final List<String> proposals, final String replacedWord,
             final int offset, final Image image) {
 
-        if (proposals.size() == 0) {
-            return new ICompletionProposal[0];
-        }
-        final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
-        int index = 0;
+        final List<ICompletionProposal> completionProposals = newArrayList();
         for (final String proposal : proposals) {
-            completionProposals[index] = new CompletionProposal(proposal + PROPOSAL_SEPARATOR, offset,
-                    replacedWord.length(), proposal.length() + PROPOSAL_SEPARATOR.length(), image, proposal, null, null);
-            index++;
+            completionProposals.add(new CompletionProposal(proposal + PROPOSAL_SEPARATOR, offset, replacedWord.length(),
+                    proposal.length() + PROPOSAL_SEPARATOR.length(), image, proposal, null, null));
         }
-        return completionProposals;
+        return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    public static ICompletionProposal[] buildKeywordsProposals(final Map<String, ContentAssistKeywordContext> proposals,
+    static ICompletionProposal[] buildKeywordsProposals(final Map<String, ContentAssistKeywordContext> proposals,
             final String replacedWord, final int offset) {
 
-        if (proposals.size() == 0) {
-            return new ICompletionProposal[0];
-        }
-
-        final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
+        final List<ICompletionProposal> completionProposals = newArrayList();
         String separator = "";
-        int index = 0;
-        for (final Iterator<String> i = proposals.keySet().iterator(); i.hasNext();) {
-            final String proposal = i.next();
+        for (final String proposal : proposals.keySet()) {
             final ContentAssistKeywordContext keywordContext = proposals.get(proposal);
-            
-            if(!keywordContext.getArguments().equals("[]")) {
-                separator = PROPOSAL_SEPARATOR;
-            } else {
-                separator = "";
-            }
-            completionProposals[index] = new TextEditorCompletionProposal(proposal + separator, offset,
-                    replacedWord.length(), proposal.length() + separator.length(), keywordContext.getImage(),
-                    proposal, new ContextInformation(proposal, keywordContext.getArguments()),
-                    keywordContext.getDescription(), keywordContext.getLibName());
-            index++;
-
+            separator = keywordContext.getArguments().equals("[]") ? "" : PROPOSAL_SEPARATOR;
+            completionProposals.add(new TextEditorCompletionProposal(proposal + separator, offset,
+                    replacedWord.length(), proposal.length() + separator.length(), keywordContext.getImage(), proposal,
+                    new ContextInformation(proposal, keywordContext.getArguments()), keywordContext.getDescription(),
+                    keywordContext.getLibName()));
         }
 
-        return completionProposals;
+        return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    public static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
+    static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
             final String replacedWord, final int offset) {
 
-        if (proposals.size() == 0) {
-            return new ICompletionProposal[0];
-        }
-
-        final ICompletionProposal[] completionProposals = new ICompletionProposal[proposals.size()];
-        int index = 0;
+        final List<ICompletionProposal> completionProposals = newArrayList();
         for (final RedVariableProposal proposal : proposals) {
             final String variableName = proposal.getName();
             String info = "Source: " + proposal.getSource() + "\n";
-            
+
             final String variableValue = proposal.getValue();
-            if(variableValue != null && !variableValue.equals("")) {
+            if (variableValue != null && !variableValue.isEmpty()) {
                 info += "Value: " + variableValue + "\n";
             }
             final String variableComment = proposal.getComment();
-            if(variableComment != null && !variableComment.equals("")) {
+            if (variableComment != null && !variableComment.isEmpty()) {
                 info += "Comment: " + variableComment;
             }
-            
-            completionProposals[index] = new TextEditorCompletionProposal(variableName, offset,
-                    replacedWord.length(), variableName.length(), variableImage, variableName, null, info, null);
-            index++;
+
+            completionProposals.add(new TextEditorCompletionProposal(variableName, offset, replacedWord.length(),
+                    variableName.length(), variableImage, variableName, null, info, null));
         }
 
-        return completionProposals;
+        return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    public static List<String> filterProposals(final List<String> allProposals, final String filter) {
+    static List<String> filterProposals(final List<String> allProposals, final String filter) {
         final List<String> filteredProposals = newArrayList();
         for (final String word : allProposals) {
             if (word.toLowerCase().startsWith(filter.toLowerCase())) {
@@ -185,7 +167,7 @@ public class TextEditorContentAssist {
         return filteredProposals;
     }
     
-    public static Map<String, ContentAssistKeywordContext> filterKeywordsProposals(
+    static Map<String, ContentAssistKeywordContext> filterKeywordsProposals(
             final Map<String, ContentAssistKeywordContext> keywordMap, final String filter) {
         final Map<String, ContentAssistKeywordContext> keywordProposals = new LinkedHashMap<>();
         for (final Iterator<String> i = keywordMap.keySet().iterator(); i.hasNext();) {
@@ -197,7 +179,7 @@ public class TextEditorContentAssist {
         return keywordProposals;
     }
     
-    public static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
+    static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
             final String filter) {
         final List<RedVariableProposal> filteredProposals = newArrayList();
         for (final RedVariableProposal variable : variables) {
@@ -208,7 +190,7 @@ public class TextEditorContentAssist {
         return filteredProposals;
     }
     
-    public static String readEnteredWord(final int offset, final IDocument document) throws BadLocationException {
+    static String readEnteredWord(final int offset, final IDocument document) throws BadLocationException {
         String currentWord = "";
         char currentChar;
         int currentOffset = offset;
@@ -221,7 +203,7 @@ public class TextEditorContentAssist {
         return currentWord;
     }
     
-    public static String readEnteredKeyword(final int offset, final IDocument document) throws BadLocationException {
+    static String readEnteredKeyword(final int offset, final IDocument document) throws BadLocationException {
         String currentWord = "";
         char currentChar, prevChar;
         int currentOffset = offset;
@@ -244,7 +226,7 @@ public class TextEditorContentAssist {
         return currentWord;
     }
     
-    public static String readEnteredVariable(final int offset, final IDocument document) throws BadLocationException {
+    static String readEnteredVariable(final int offset, final IDocument document) throws BadLocationException {
         String currentWord = "";
         char currentChar, prevChar;
         int currentOffset = offset;
@@ -261,29 +243,20 @@ public class TextEditorContentAssist {
         return currentWord;
     }
     
-    public static boolean shouldShowVariablesProposals(final String currentWord) {
+    static boolean shouldShowVariablesProposals(final String currentWord) {
         return currentWord.startsWith("$") || currentWord.startsWith("@") || currentWord.startsWith("&")
                 || currentWord.startsWith("{");
     }
 
-    public static List<String> getSettingsSectionWords() {
+    static List<String> getSettingsSectionWords() {
         return settingsSectionWords;
     }
 
-    public static List<String> getKeywordsSectionWords() {
+    static List<String> getKeywordsSectionWords() {
         return keywordsSectionWords;
     }
 
-    public static List<String> getTestCasesSectionWords() {
+    static List<String> getTestCasesSectionWords() {
         return testCasesSectionWords;
     }
-
-    public List<RedVariableProposal> getVariables() {
-        return variableProposals;
-    }
-
-    public Map<String, ContentAssistKeywordContext> getKeywordMap() {
-        return keywordMap;
-    }
-
 }
