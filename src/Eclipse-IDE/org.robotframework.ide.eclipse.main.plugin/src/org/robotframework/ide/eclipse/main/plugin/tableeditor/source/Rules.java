@@ -240,7 +240,7 @@ public class Rules {
             }
 
             final List<String> splitted = newArrayList(Splitter.on(Pattern.compile(" ( )+")).splitToList(withoutTabs));
-            if (!lineBegin.endsWith("  ")) {
+            if (!lineBegin.endsWith("  ") && !lineBegin.endsWith("\t")) {
                 splitted.remove(splitted.size() - 1);
             }
             if (splitted.size() == 0 && expectedNumberOfVariables == 0) {
