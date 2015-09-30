@@ -13,6 +13,8 @@ public interface ISectionEditorPart {
 
     String SECTION_FILTERING_TOPIC = "red/suite_editor/section/filter/changed";
 
+    String getId();
+
     void updateOnActivation();
 
     com.google.common.base.Optional<? extends RobotSuiteFileSection> provideSection(RobotSuiteFile suiteModel);

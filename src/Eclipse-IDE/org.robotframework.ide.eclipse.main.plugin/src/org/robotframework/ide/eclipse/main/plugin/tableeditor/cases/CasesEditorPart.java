@@ -45,6 +45,11 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         }
 
         @Override
+        public String getId() {
+            return "red.cases";
+        }
+
+        @Override
         protected String getTitle() {
             return "Test Cases";
         }

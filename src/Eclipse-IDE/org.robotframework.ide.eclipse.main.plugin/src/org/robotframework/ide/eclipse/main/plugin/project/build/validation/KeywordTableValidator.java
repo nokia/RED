@@ -33,15 +33,11 @@ import com.google.common.collect.Range;
 
 class KeywordTableValidator implements ModelUnitValidator {
 
-    private final ValidationContext context;
-
     private final Optional<RobotKeywordsSection> keywordSection;
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    KeywordTableValidator(final ValidationContext validationContext,
-            final Optional<RobotKeywordsSection> keywordSection) {
-        this.context = validationContext;
+    KeywordTableValidator(final Optional<RobotKeywordsSection> keywordSection) {
         this.keywordSection = keywordSection;
     }
 
@@ -53,16 +49,17 @@ class KeywordTableValidator implements ModelUnitValidator {
         final RobotSuiteFile suiteModel = keywordSection.get().getSuiteFile();
         final KeywordTable keywordTable = (KeywordTable) keywordSection.get().getLinkedElement();
 
+        reportEmptyKeyword(suiteModel.getFile(), keywordTable);
         reportDuplicatedKewords(suiteModel.getFile(), keywordTable);
         TestCasesTableValidator.reportUnkownKeywords(suiteModel, reporter, findExecutableRows(keywordTable));
     }
 
-    private List<RobotExecutableRow<?>> findExecutableRows(final KeywordTable keywordTable) {
-        final List<RobotExecutableRow<?>> executables = newArrayList();
+    private void reportEmptyKeyword(final IFile file, final KeywordTable keywordTable) {
         for (final UserKeyword keyword : keywordTable.getKeywords()) {
-            executables.addAll(keyword.getKeywordExecutionRows());
+            final RobotToken caseName = keyword.getKeywordName();
+            TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
+                    keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
         }
-        return executables;
     }
 
     private void reportDuplicatedKewords(final IFile file, final KeywordTable keywordTable) {
@@ -71,8 +68,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         for (final UserKeyword kw1 : keywordTable.getKeywords()) {
             for (final UserKeyword kw2 : keywordTable.getKeywords()) {
                 if (kw1 != kw2) {
-                    final RobotToken kw1Token = kw1.getKeywordName();
-                    final String kw1Name = kw1Token.getText().toString();
+                    final String kw1Name = kw1.getKeywordName().getText().toString();
                     final String kw2Name = kw2.getKeywordName().getText().toString();
 
                     if (kw1Name.equalsIgnoreCase(kw2Name)) {
@@ -96,5 +92,13 @@ class KeywordTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, position, additionalArguments);
             }
         }
+    }
+
+    private List<RobotExecutableRow<?>> findExecutableRows(final KeywordTable keywordTable) {
+        final List<RobotExecutableRow<?>> executables = newArrayList();
+        for (final UserKeyword keyword : keywordTable.getKeywords()) {
+            executables.addAll(keyword.getKeywordExecutionRows());
+        }
+        return executables;
     }
 }
