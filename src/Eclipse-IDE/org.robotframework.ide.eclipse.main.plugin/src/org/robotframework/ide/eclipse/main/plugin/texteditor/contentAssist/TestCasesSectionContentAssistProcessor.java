@@ -25,13 +25,13 @@ import org.robotframework.red.graphics.ImagesManager;
  */
 public class TestCasesSectionContentAssistProcessor implements IContentAssistProcessor {
     
-    private Image settingImage = ImagesManager.getImage(RedImages.getRobotSettingImage());
+    private final Image settingImage = ImagesManager.getImage(RedImages.getRobotSettingImage());
 
     private String lastError = null;
 
-    private TextEditorContextValidator validator = new TextEditorContextValidator(this);
+    private final TextEditorContextValidator validator = new TextEditorContextValidator(this);
 
-    private TextEditorContentAssist textEditorContentAssist;
+    private final TextEditorContentAssist textEditorContentAssist;
 
     public TestCasesSectionContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
         this.textEditorContentAssist = textEditorContentAssist;
@@ -41,7 +41,7 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
         lastError = null;
         final IDocument document = viewer.getDocument();
-        int currentOffset = offset - 1;
+        final int currentOffset = offset - 1;
 
         try {
             String currentWord = "";
@@ -75,12 +75,11 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
                 
                 final Map<String, ContentAssistKeywordContext> keywordProposals = TextEditorContentAssist.filterKeywordsProposals(
                         textEditorContentAssist.getKeywordMap(), currentWord);
-                ICompletionProposal[] proposals = null;
-                if (keywordProposals.size() > 0) {
-                    proposals = TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord, offset
-                            - currentWord.length());
+                if (keywordProposals.isEmpty()) {
+                    return null;
                 }
-                return proposals;
+                return TextEditorContentAssist.buildKeywordsProposals(keywordProposals, currentWord,
+                        offset - currentWord.length());
             }
         } catch (final BadLocationException e) {
             e.printStackTrace();
