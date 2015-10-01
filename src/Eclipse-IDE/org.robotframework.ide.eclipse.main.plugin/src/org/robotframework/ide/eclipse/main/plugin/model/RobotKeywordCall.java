@@ -13,6 +13,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -40,6 +41,17 @@ public class RobotKeywordCall implements RobotElement, Serializable {
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getLabel() {
+        RobotToken token;
+        if (linkedElement instanceof RobotExecutableRow<?>) {
+            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+            token = row.buildLineDescription().getFirstAction();
+        } else {
+            token = linkedElement.getElementTokens().get(0);
+        }
+        return token.getText().toString();
     }
 
     public void setName(final String name) {
@@ -110,7 +122,13 @@ public class RobotKeywordCall implements RobotElement, Serializable {
 
     @Override
     public Position getDefinitionPosition() {
-        final RobotToken token = linkedElement.getElementTokens().get(0);
+        final RobotToken token;
+        if (linkedElement instanceof RobotExecutableRow<?>) {
+            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+            token = row.buildLineDescription().getFirstAction();
+        } else {
+            token = linkedElement.getElementTokens().get(0);
+        }
         return new Position(token.getStartOffset(), token.getText().length());
     }
 
