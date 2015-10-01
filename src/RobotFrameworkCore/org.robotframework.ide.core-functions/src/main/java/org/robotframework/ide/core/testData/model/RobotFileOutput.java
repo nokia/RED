@@ -14,6 +14,9 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
+import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.read.RobotLine;
 
 
 public class RobotFileOutput {
@@ -30,6 +33,26 @@ public class RobotFileOutput {
 
     public RobotFileOutput() {
         this.fileModel = new RobotFile(this);
+    }
+
+
+    public String getFileLineSeparator() {
+        String result = "";
+
+        List<RobotLine> fileContent = fileModel.getFileContent();
+        if (!fileContent.isEmpty()) {
+            IRobotLineElement endOfLine = fileContent.get(0).getEndOfLine();
+            List<IRobotTokenType> types = endOfLine.getTypes();
+            if (!types.isEmpty()) {
+                IRobotTokenType eolType = types.get(0);
+                List<String> representation = eolType.getRepresentation();
+                if (!representation.isEmpty()) {
+                    result = representation.get(0);
+                }
+            }
+        }
+
+        return result;
     }
 
 
