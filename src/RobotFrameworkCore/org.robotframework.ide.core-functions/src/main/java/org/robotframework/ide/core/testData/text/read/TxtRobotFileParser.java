@@ -210,17 +210,22 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             if (remainingData > 0
                                     || shouldGiveEmptyToProcess(line,
                                             processingState)) {
+                                String rawText = text.substring(
+                                        lastColumnProcessed, startColumn);
+
                                 rt = processLineElement(line, processingState,
                                         parsingOutput, new FilePosition(
                                                 lineNumber,
                                                 lastColumnProcessed,
-                                                currentOffset), text.substring(
-                                                lastColumnProcessed,
-                                                startColumn),
+                                                currentOffset), rawText,
                                         robotFile.getName(), isNewLine);
+
                                 rt.setStartOffset(currentOffset);
                                 currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
+
+                                extractPrettyAlignWhitespaces(line, rt, rawText);
+
                                 isNewLine = false;
                             }
 
