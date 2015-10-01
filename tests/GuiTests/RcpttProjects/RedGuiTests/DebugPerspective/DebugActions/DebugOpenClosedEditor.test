@@ -37,7 +37,7 @@ try -times 10 -delay 300 -command{
 
    
 //check if line is highlighted    
-check_if_line_is_highlighted -line 13 -script_name "Script.robot"
+check-debug-marker-on-ruler -line 13 -script_name "Script.robot"
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }
