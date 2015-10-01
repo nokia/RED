@@ -358,11 +358,15 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
         if (processThisElement) {
             ParsingState newStatus = utility.getStatus(robotToken);
+            boolean wasRecognizedCorrectly = true;
             if (robotToken != null) {
                 if (!text.trim().equals(robotToken.getText().toString().trim())) {
+                    wasRecognizedCorrectly = false;
                     // FIXME: add information that type is incorrect missing
                     // separator
                     RobotToken newRobotToken = new RobotToken();
+                    newRobotToken.setLineNumber(fp.getLine());
+                    newRobotToken.setStartColumn(fp.getColumn());
                     newRobotToken.setText(new StringBuilder(text));
                     newRobotToken.setRaw(new StringBuilder(text));
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
@@ -385,27 +389,44 @@ public class TxtRobotFileParser implements IRobotFileParser {
             RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (utility.isTheFirstColumn(currentLine, robotToken)) {
-                    @SuppressWarnings("rawtypes")
-                    TableHeader header = new TableHeader(robotToken);
-                    ARobotSectionTable table = null;
-                    if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
-                        table = fileModel.getSettingTable();
-                    } else if (newStatus == ParsingState.VARIABLE_TABLE_HEADER) {
-                        table = fileModel.getVariableTable();
-                    } else if (newStatus == ParsingState.TEST_CASE_TABLE_HEADER) {
-                        table = fileModel.getTestCaseTable();
-                    } else if (newStatus == ParsingState.KEYWORD_TABLE_HEADER) {
-                        table = fileModel.getKeywordTable();
+                    if (wasRecognizedCorrectly) {
+                        @SuppressWarnings("rawtypes")
+                        TableHeader header = new TableHeader(robotToken);
+                        ARobotSectionTable table = null;
+                        if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
+                            table = fileModel.getSettingTable();
+                        } else if (newStatus == ParsingState.VARIABLE_TABLE_HEADER) {
+                            table = fileModel.getVariableTable();
+                        } else if (newStatus == ParsingState.TEST_CASE_TABLE_HEADER) {
+                            table = fileModel.getTestCaseTable();
+                        } else if (newStatus == ParsingState.KEYWORD_TABLE_HEADER) {
+                            table = fileModel.getKeywordTable();
+                        }
+
+                        table.addHeader(header);
+                        processingState.clear();
+                        processingState.push(newStatus);
+
+                        useMapper = false;
+                    } else {
+                        // FIXME: add warning about incorrect table
+                        processingState.clear();
+                        processingState.push(ParsingState.TRASH);
+
+                        useMapper = false;
                     }
-
-                    table.addHeader(header);
-                    processingState.clear();
-                    processingState.push(newStatus);
-
-                    useMapper = false;
                 } else {
                     // FIXME: add warning about wrong place
                 }
+            } else if (utility.isUserTableHeader(robotToken)
+                    && utility.isTheFirstColumn(currentLine, robotToken)) {
+                robotToken.getTypes().add(0,
+                        RobotTokenType.USER_OWN_TABLE_HEADER);
+                // FIXME: add warning about user trash table
+                processingState.clear();
+                processingState.push(ParsingState.TRASH);
+
+                useMapper = false;
             }
 
             robotToken = applyPrettyAlignTokenIfIsValid(currentLine,
