@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -58,6 +59,16 @@ public class ArtificialGroupingRobotElement implements RobotElement {
     @Override
     public ImageDescriptor getImage() {
         return groupedElements.get(0).getImage();
+    }
+
+    @Override
+    public Position getPosition() {
+        return groupedElements.get(0).getPosition();
+    }
+
+    @Override
+    public Position getDefinitionPosition() {
+        return groupedElements.get(0).getDefinitionPosition();
     }
 
     @Override

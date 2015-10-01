@@ -43,46 +43,60 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         this.keyword = keyword;
         // body
         for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
-            final String name = execRow.getAction().getText().toString();
+            final String callName = execRow.getAction().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
-            createKeywordCall(name, args, "");
+            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, "");
+            getChildren().add(call);
+            call.link(execRow);
         }
         // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
             final String name = argument.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(argument.getArguments(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(argument);
+            getChildren().add(setting);
         }
         for (final KeywordDocumentation documentation : keyword.getDocumentation()) {
             final String name = documentation.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(documentation);
+            getChildren().add(setting);
         }
         for (final KeywordTags tags : keyword.getTags()) {
             final String name = tags.getDeclaration().getText().toString();
             final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(tags);
+            getChildren().add(setting);
         }
         for (final KeywordTimeout timeout : keyword.getTimeouts()) {
             final String name = timeout.getDeclaration().getText().toString();
             final List<String> args = newArrayList(timeout.getTimeout().getText().toString());
             args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(timeout);
+            getChildren().add(setting);
         }
         for (final KeywordTeardown teardown : keyword.getTeardowns()) {
             final String name = teardown.getDeclaration().getText().toString();
             final List<String> args = newArrayList(teardown.getKeywordName().getText().toString());
             args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(teardown);
+            getChildren().add(setting);
         }
         for (final KeywordReturn returnSetting : keyword.getReturns()) {
             final String name = returnSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
-            createDefinitionSetting(omitSquareBrackets(name), args, "");
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(returnSetting);
+            getChildren().add(setting);
         }
     }
 
@@ -165,6 +179,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return new Position(begin.getOffset(), end.getOffset() - begin.getOffset() + 1);
     }
 
+    @Override
     public Position getDefinitionPosition() {
         final int begin = keyword.getKeywordName().getStartOffset();
         final int length = keyword.getKeywordName().getText().length();

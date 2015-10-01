@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.Position;
@@ -28,13 +29,12 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         this.comment = comment;
     }
 
-    public RobotKeywordCall createKeywordCall(final String name, final List<String> args, final String comment) {
-        return createKeywordCall(calls.size(), name, args, comment);
+    public RobotKeywordCall createKeywordCall() {
+        return createKeywordCall(calls.size());
     }
 
-    public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
-            final String comment) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, name, args, comment);
+    public RobotKeywordCall createKeywordCall(final int index) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
         getChildren().add(index, call);
         return call;
     }
@@ -89,6 +89,7 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         return calls;
     }
 
+    @Override
     public abstract Position getPosition();
 
     @Override

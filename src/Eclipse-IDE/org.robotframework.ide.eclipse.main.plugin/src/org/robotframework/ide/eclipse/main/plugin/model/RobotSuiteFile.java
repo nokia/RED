@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
@@ -197,6 +198,16 @@ public class RobotSuiteFile implements RobotElement {
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getRobotImage();
+    }
+
+    @Override
+    public Position getPosition() {
+        return new Position(0);
+    }
+
+    @Override
+    public Position getDefinitionPosition() {
+        return new Position(0);
     }
 
     @Override

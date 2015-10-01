@@ -48,7 +48,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         } else if (name.equals(SettingsGroup.VARIABLES.getName())) {
             setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, newArrayList(args), comment);
         } else {
-            setting = new RobotSetting(this, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, newArrayList(args), comment);
         }
         elements.add(setting);
         return setting;
@@ -140,7 +140,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(metadataKey.getText().toString());
             }
             args.addAll(Lists.transform(metadataSetting.getValues(), TokenFunctions.tokenToString()));
-            elements.add(new RobotSetting(this, SettingsGroup.METADATA, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, SettingsGroup.METADATA, name, args, "");
+            setting.link(metadataSetting);
+            elements.add(setting);
         }
         for (final AImported importSetting : settingsTable.getImports()) {
             if (importSetting instanceof LibraryImport) {
@@ -155,7 +157,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 }
                 args.addAll(Lists.transform(libraryImport.getArguments(), TokenFunctions.tokenToString()));
 
-                elements.add(new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, ""));
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, "");
+                setting.link(libraryImport);
+                elements.add(setting);
             } else if (importSetting instanceof ResourceImport) {
 
                 final ResourceImport resourceImport = (ResourceImport) importSetting;
@@ -167,7 +171,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                     args.add(pathOrName.getText().toString());
                 }
 
-                elements.add(new RobotSetting(this, SettingsGroup.RESOURCES, name, args, ""));
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, args, "");
+                setting.link(resourceImport);
+                elements.add(setting);
             } else if (importSetting instanceof VariablesImport) {
 
                 final VariablesImport variablesImport = (VariablesImport) importSetting;
@@ -180,14 +186,18 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 }
                 args.addAll(Lists.transform(variablesImport.getArguments(), TokenFunctions.tokenToString()));
 
-                elements.add(new RobotSetting(this, SettingsGroup.VARIABLES, name, args, ""));
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, args, "");
+                setting.link(variablesImport);
+                elements.add(setting);
             }
         }
         for (final SuiteDocumentation documentationSetting : settingsTable.getDocumentation()) {
             final String name = documentationSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(documentationSetting.getDocumentationText(), TokenFunctions.tokenToString()));
-            elements.add(new RobotSetting(this, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            setting.link(documentationSetting);
+            elements.add(setting);
         }
         for (final AKeywordBaseSetting<?> keywordSetting : getKeywordBasedSettings(settingsTable)) {
             final String name = keywordSetting.getDeclaration().getText().toString();
@@ -197,13 +207,17 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(settingKeywordName.getText().toString());
             }
             args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
-            elements.add(new RobotSetting(this, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            setting.link(keywordSetting);
+            elements.add(setting);
         }
         for (final ATags<?> tagSetting : getTagsSettings(settingsTable)) {
             final String name = tagSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(tagSetting.getTags(), TokenFunctions.tokenToString()));
-            elements.add(new RobotSetting(this, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            setting.link(tagSetting);
+            elements.add(setting);
         }
         for (final TestTemplate templateSetting : settingsTable.getTestTemplates()) {
             final String name = templateSetting.getDeclaration().getText().toString();
@@ -212,7 +226,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             if (templateKeyword != null) {
                 args.add(templateKeyword.getText().toString());
             }
-            elements.add(new RobotSetting(this, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            setting.link(templateSetting);
+            elements.add(setting);
         }
         for (final TestTimeout timeoutSetting : settingsTable.getTestTimeouts()) {
             final String name = timeoutSetting.getDeclaration().getText().toString();
@@ -222,7 +238,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(timeout.getText().toString());
             }
             args.addAll(Lists.transform(timeoutSetting.getMessageArguments(), TokenFunctions.tokenToString()));
-            elements.add(new RobotSetting(this, name, args, ""));
+            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            setting.link(timeoutSetting);
+            elements.add(setting);
         }
     }
 

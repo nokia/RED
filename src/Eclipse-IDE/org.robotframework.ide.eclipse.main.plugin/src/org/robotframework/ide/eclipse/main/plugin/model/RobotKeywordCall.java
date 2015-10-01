@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotKeywordCall implements RobotElement, Serializable {
@@ -19,6 +22,8 @@ public class RobotKeywordCall implements RobotElement, Serializable {
     private List<String> args;
     private String comment;
     private transient IRobotCodeHoldingElement parent;
+    // TODO : fix this stuff for serialization
+    private AModelElement<?> linkedElement;
 
     RobotKeywordCall(final IRobotCodeHoldingElement parent, final String name, final List<String> args,
             final String comment) {
@@ -26,6 +31,10 @@ public class RobotKeywordCall implements RobotElement, Serializable {
         this.name = name;
         this.args = args;
         this.comment = comment;
+    }
+
+    void link(final AModelElement<?> executableRow) {
+        this.linkedElement = executableRow;
     }
 
     @Override
@@ -92,6 +101,17 @@ public class RobotKeywordCall implements RobotElement, Serializable {
             current = current.getParent();
         }
         return (RobotSuiteFileSection) current;
+    }
+
+    @Override
+    public Position getPosition() {
+        return new Position(0);
+    }
+
+    @Override
+    public Position getDefinitionPosition() {
+        final RobotToken token = linkedElement.getElementTokens().get(0);
+        return new Position(token.getStartOffset(), token.getText().length());
     }
 
     @Override

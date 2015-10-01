@@ -387,7 +387,7 @@ public class RobotFormEditor extends FormEditor {
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IContentOutlinePage.class) {
-            return new RobotOutlinePage(suiteModel);
+            return new RobotOutlinePage(this, suiteModel);
         }
         return super.getAdapter(adapter);
     }

@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -30,9 +28,9 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         if (index == -1) {
-            parent.createKeywordCall("", new ArrayList<String>(), "");
+            parent.createKeywordCall();
         } else {
-            parent.createKeywordCall(index, "", new ArrayList<String>(), "");
+            parent.createKeywordCall(index);
         }
 
         if (notifySync) {
