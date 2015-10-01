@@ -41,7 +41,7 @@ public class RobotSuiteFile implements RobotElement {
 
     private RobotFileOutput fileOutput;
     
-    private List<RobotElement> sections = null;
+    private List<RobotSuiteFileSection> sections = null;
 
     public RobotSuiteFile(final RobotElement parent, final IFile file) {
         this.parent = parent;
@@ -63,14 +63,14 @@ public class RobotSuiteFile implements RobotElement {
         }
 
         if (getSections().contains(section)) {
-            return (RobotSuiteFileSection) sections.get(sections.indexOf(section));
+            return sections.get(sections.indexOf(section));
         } else {
             sections.add(section);
             return section;
         }
     }
 
-    public List<RobotElement> getSections() {
+    public List<RobotSuiteFileSection> getSections() {
         return getSections(new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
@@ -79,7 +79,7 @@ public class RobotSuiteFile implements RobotElement {
         });
     }
 
-    public List<RobotElement> getSections(final ParsingStrategy parsingStrategy) {
+    public List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
         if (sections == null) {
             fileOutput = parseModel(parsingStrategy);
             link(fileOutput.getFileModel());
@@ -229,8 +229,8 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     @Override
-    public List<RobotElement> getChildren() {
-        return sections == null ? Lists.<RobotElement> newArrayList() : sections;
+    public List<RobotSuiteFileSection> getChildren() {
+        return sections == null ? Lists.<RobotSuiteFileSection> newArrayList() : sections;
     }
 
     public boolean isEditable() {
@@ -346,6 +346,10 @@ public class RobotSuiteFile implements RobotElement {
             return modelHeaders.get(0).getTableHeader().getText().toString();
         }
         return defaultHeader;
+    }
+
+    public int getLineDelimiterLength() {
+        return 1;
     }
     
     public static class ImportedVariablesFile {

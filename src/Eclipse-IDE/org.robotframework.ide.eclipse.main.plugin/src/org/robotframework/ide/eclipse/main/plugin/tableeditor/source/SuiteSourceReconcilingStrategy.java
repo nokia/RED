@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 
 import com.google.common.base.Function;
@@ -107,8 +108,11 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private Collection<? extends Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
-        // TODO implement this, sections should be foldable too
-        return newArrayList();
+        final List<Position> positions = newArrayList();
+        for (final RobotSuiteFileSection section : model.getChildren()) {
+            positions.addAll(section.getPositions());
+        }
+        return positions;
     }
 
     private List<Position> calculateTestCasesFoldingPositions(final RobotSuiteFile model) {
@@ -131,8 +135,8 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         return new Function<RobotCodeHoldingElement, Position>() {
 
             @Override
-            public Position apply(final RobotCodeHoldingElement testCase) {
-                return testCase.getPosition();
+            public Position apply(final RobotCodeHoldingElement element) {
+                return element.getPosition();
             }
         };
     }
