@@ -19,6 +19,7 @@ import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
@@ -65,7 +66,8 @@ public class ElementsUtility {
     public RobotToken computeCorrectRobotToken(RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, boolean isNewLine, List<RobotToken> robotTokens) {
+            String text, boolean isNewLine, List<RobotToken> robotTokens,
+            String fileName) {
         RobotToken correct = null;
         if (robotTokens.size() > 1) {
             List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
@@ -91,8 +93,21 @@ public class ElementsUtility {
                 }
 
                 if (correct == null) {
-                    // FIXME: error no matching tokens to state
-                    throw new IllegalStateException("Some problem to fix.");
+                    if (ParsingState.getSettingsStates().contains(state)) {
+                        RobotToken newRobotToken = new RobotToken();
+                        newRobotToken.setLineNumber(fp.getLine());
+                        newRobotToken.setStartColumn(fp.getColumn());
+                        newRobotToken.setText(new StringBuilder(text));
+                        newRobotToken.setRaw(new StringBuilder(text));
+                        newRobotToken.setType(RobotTokenType.UNKNOWN);
+                        correct = newRobotToken;
+                    } else {
+                        // FIXME: error no matching tokens to state
+                        throw new IllegalStateException(
+                                "Some problem to fix. Cannot find correct token for text \'"
+                                        + text + "\' and found tokens "
+                                        + robotTokens + " in file " + fileName);
+                    }
                 }
             }
         } else {
@@ -128,7 +143,7 @@ public class ElementsUtility {
             }
         }
 
-        if (!result)
+        if (!result) {
             if (state == ParsingState.TEST_CASE_DECLARATION
                     || state == ParsingState.KEYWORD_DECLARATION
                     || state == ParsingState.UNKNOWN) {
@@ -136,6 +151,7 @@ public class ElementsUtility {
                         .contains(RobotTokenType.COMMENT_CONTINUE));
 
             }
+        }
 
         return result;
     }
@@ -475,5 +491,97 @@ public class ElementsUtility {
         }
 
         return status;
+    }
+
+
+    public void extractPrettyAlignWhitespaces(RobotLine line, RobotToken rt,
+            String rawText) {
+        String correctedString = rawText;
+        if (rawText.startsWith(" ")) {
+            RobotToken prettyLeftAlign = new RobotToken();
+            prettyLeftAlign.setStartOffset(rt.getStartOffset());
+            prettyLeftAlign.setLineNumber(rt.getLineNumber());
+            prettyLeftAlign.setStartColumn(rt.getStartColumn());
+            prettyLeftAlign.setRaw(new StringBuilder(" "));
+            prettyLeftAlign.setText(new StringBuilder(" "));
+            prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+            line.addLineElementAt(line.getLineElements().size() - 1,
+                    prettyLeftAlign);
+
+            rt.setStartColumn(rt.getStartColumn() + 1);
+            rt.setStartOffset(rt.getStartOffset() + 1);
+            correctedString = rawText.substring(1);
+            rt.setText(new StringBuilder(correctedString));
+            rt.setRaw(new StringBuilder(correctedString));
+        }
+
+        if (correctedString.endsWith(" ")) {
+            RobotToken prettyRightAlign = new RobotToken();
+            prettyRightAlign.setStartOffset(rt.getStartOffset()
+                    + rt.getRaw().length() - 1);
+            prettyRightAlign.setLineNumber(rt.getLineNumber());
+            prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
+            prettyRightAlign.setRaw(new StringBuilder(" "));
+            prettyRightAlign.setText(new StringBuilder(" "));
+            prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+            line.addLineElement(prettyRightAlign);
+
+            correctedString = correctedString.substring(0,
+                    correctedString.length() - 1);
+            rt.setText(new StringBuilder(correctedString));
+            rt.setRaw(new StringBuilder(correctedString));
+        }
+    }
+
+
+    public boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
+        boolean anyValuableToken = false;
+        List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        for (IRobotLineElement lineElem : lineElements) {
+            if (lineElem instanceof RobotToken) {
+                anyValuableToken = true;
+                break;
+            }
+        }
+
+        return anyValuableToken;
+    }
+
+
+    public boolean shouldGiveEmptyToProcess(final RobotLine line,
+            final Stack<ParsingState> processingState) {
+        boolean result = false;
+
+        List<IRobotLineElement> lineElements = line.getLineElements();
+        result = lineElements.size() >= 2;
+
+        return result;
+    }
+
+
+    public int getEndOfLineLength(final List<Constant> eols) {
+        int size = 0;
+        for (Constant c : eols) {
+            if (c != Constant.EOF) {
+                size++;
+            } else {
+                break;
+            }
+        }
+
+        return size;
+    }
+
+
+    public void fixNotSetPositions(final RobotToken token, final FilePosition fp) {
+        if (token.getStartOffset() == IRobotLineElement.NOT_SET) {
+            token.setStartOffset(fp.getOffset());
+        }
+        if (token.getLineNumber() == IRobotLineElement.NOT_SET) {
+            token.setLineNumber(fp.getLine());
+        }
+        if (token.getStartColumn() == IRobotLineElement.NOT_SET) {
+            token.setStartColumn(fp.getColumn());
+        }
     }
 }
