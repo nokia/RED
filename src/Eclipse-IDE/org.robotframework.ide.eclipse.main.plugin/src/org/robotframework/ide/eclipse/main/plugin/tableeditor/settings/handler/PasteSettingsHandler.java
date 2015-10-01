@@ -58,7 +58,7 @@ public class PasteSettingsHandler extends DIHandler<E4PasteSettingsHandler> {
                 final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected);
                 commandsStack.execute(new InsertSettingCommand(firstSelected.get().getParent(), index, settings));
             } else {
-                final RobotSettingsSection section = (RobotSettingsSection) fileModel.findSection(
+                final RobotSettingsSection section = fileModel.findSection(
                         RobotSettingsSection.class).orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertSettingCommand(section, settings));

@@ -25,7 +25,7 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         if (definitionsToDelete.isEmpty()) {
             return;
         }
-        final RobotSuiteFileSection keywordsSection = (RobotSuiteFileSection) definitionsToDelete.get(0).getParent();
+        final RobotSuiteFileSection keywordsSection = definitionsToDelete.get(0).getParent();
         keywordsSection.getChildren().removeAll(definitionsToDelete);
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, keywordsSection);

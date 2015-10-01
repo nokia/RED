@@ -26,7 +26,7 @@ public class SetSettingKeywordCallCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         setting.setArgs(args);
-        final RobotSettingsSection settingsSection = (RobotSettingsSection) setting.getParent();
+        final RobotSettingsSection settingsSection = setting.getParent();
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_CHANGED, settingsSection);
     }
 }
