@@ -349,7 +349,7 @@ public class RobotSuiteFile implements RobotElement {
     }
 
     public int getLineDelimiterLength() {
-        return 1;
+        return fileOutput.getFileLineSeparator().length();
     }
     
     public static class ImportedVariablesFile {
