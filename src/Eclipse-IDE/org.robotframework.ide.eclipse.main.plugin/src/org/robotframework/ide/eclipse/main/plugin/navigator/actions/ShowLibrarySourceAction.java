@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
@@ -59,9 +60,9 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final IFile file = LibspecsFolder.get(project).getFile(libName);
             
-            IPath location = extractLibraryLocation(robotProject, spec);
+            final IPath location = extractLibraryLocation(robotProject, spec);
             if(location == null) {
-                throw new CoreException(Status.CANCEL_STATUS);
+                throw new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Empty location path!"));
             }
             
             file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
@@ -83,13 +84,13 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
     }
     
-    private Path extractLibraryLocation(RobotProject robotProject, LibrarySpecification spec) {
+    private Path extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
         if (robotProject.isStandardLibrary(spec)) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
             return standardLibraryPath == null ? null : new Path(standardLibraryPath.getAbsolutePath());
         } else if (robotProject.isReferencedLibrary(spec)) {
-            String pythonLibPath = robotProject.getPythonLibraryPath(spec.getName());
+            final String pythonLibPath = robotProject.getPythonLibraryPath(spec.getName());
             if (new File(pythonLibPath).exists()) {
                 return new Path(pythonLibPath);
             }

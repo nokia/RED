@@ -95,7 +95,18 @@ public class LibspecsFolder {
         // full build is being perfomed or config file has changed
         return kind == IncrementalProjectBuilder.FULL_BUILD
                 || delta.findMember(cfgFile.getProjectRelativePath()) != null
-                || delta.findMember(folder.getProjectRelativePath()) != null;
+                || delta.findMember(folder.getProjectRelativePath()) != null
+                        && libspecFileChanged(delta.findMember(folder.getProjectRelativePath()));
+    }
+
+    private boolean libspecFileChanged(final IResourceDelta changedLibspecFolder) {
+        if (changedLibspecFolder.getKind() == IResourceDelta.ADDED
+                || changedLibspecFolder.getKind() == IResourceDelta.REMOVED) {
+            return true;
+        } else if (changedLibspecFolder.getKind() == IResourceDelta.CHANGED) {
+            return changedLibspecFolder.getAffectedChildren().length > 0;
+        }
+        return false;
     }
 
     public List<IFile> collectSpecsWithDifferentVersion(final List<String> stdLibs, final String version)
