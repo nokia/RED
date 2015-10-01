@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/7/15 10:19 AM
+Save-Time: 10/1/15 6:10 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -277,17 +277,21 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 }
 
 
-proc "check_if_line_is_highlighted" [val line] [val script_name]{
-	repeat [val index] -times  [get-editor $script_name | get-text-viewer | get-property "getLineCount()" -raw | int] -command
-	{
-		if [$index | not-eq [minus $line 1]] {
-	  		get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index  |  assert-empty -message [format "Expected no line highlighting in line: %s!" [plus $index 1 ]]
-	  		
-		}-else{
-			get-editor $script_name |get-text-viewer| get-object |  invoke  getLineBackground $index | invoke toString  | str | equals "Color {198, 219, 174}" 
-			| assert-true -message [format "Background color in line %s is not green!"  [plus $index 1]]
-			}	
+proc "check-debug-marker-on-ruler" [val line] [val script_name]{
+ 	loop [val index 0]{
+	 	try -times 1 -command{
+			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
+			| let [val marker -input]{
+				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
+					recur [$index | plus 1]
+				}
+	
+			}
+ 		}-catch{
+ 			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
+ 		}
 	}
+
 }
 
 proc replace [val input] [val old] [val new]{
