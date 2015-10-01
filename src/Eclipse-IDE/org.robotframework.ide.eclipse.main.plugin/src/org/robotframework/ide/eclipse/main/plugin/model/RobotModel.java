@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 
 public class RobotModel implements RobotElement {
@@ -81,6 +82,16 @@ public class RobotModel implements RobotElement {
     @Override
     public ImageDescriptor getImage() {
         return null;
+    }
+
+    @Override
+    public Position getPosition() {
+        throw new IllegalStateException("Cannot obtain position inside file!");
+    }
+
+    @Override
+    public Position getDefinitionPosition() {
+        throw new IllegalStateException("Cannot obtain position inside file!");
     }
 
     @Override

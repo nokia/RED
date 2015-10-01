@@ -101,6 +101,11 @@ public class SuiteSourceEditor extends TextEditor {
         return false;
     }
 
+    @Override
+    protected void installTabsToSpacesConverter() {
+        // we will install our own edit strategy for tabs converting
+    }
+
     private void installProjectionAndFolding(final ProjectionViewer viewer) {
         // turn projection mode on
         new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors()).install();

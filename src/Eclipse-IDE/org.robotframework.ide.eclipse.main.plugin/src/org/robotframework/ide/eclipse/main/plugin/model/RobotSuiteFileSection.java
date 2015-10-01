@@ -12,6 +12,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public abstract class RobotSuiteFileSection implements RobotElement {
@@ -68,6 +69,18 @@ public abstract class RobotSuiteFileSection implements RobotElement {
     }
 
     @Override
+    public Position getPosition() {
+        // sectionTable.getHeaders().get(0).
+        return new Position(0);
+    }
+
+    @Override
+    public Position getDefinitionPosition() {
+        final RobotToken tableHeader = sectionTable.getHeaders().get(0).getTableHeader();
+        return new Position(tableHeader.getStartOffset(), tableHeader.getText().length());
+    }
+
+    @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), RobotSuiteFileSection.this);
     }
@@ -94,11 +107,6 @@ public abstract class RobotSuiteFileSection implements RobotElement {
     @Override
     public RobotSuiteFile getSuiteFile() {
         return (RobotSuiteFile) this.getParent();
-    }
-
-    public Position getPosition() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public int getHeaderLine() {

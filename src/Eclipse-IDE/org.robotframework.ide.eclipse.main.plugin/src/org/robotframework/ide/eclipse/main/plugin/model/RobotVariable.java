@@ -110,6 +110,7 @@ public class RobotVariable implements RobotElement, Serializable {
         return parent.getSuiteFile();
     }
 
+    @Override
     public Position getPosition() {
         final int begin = holder.getDeclaration().getStartOffset();
 

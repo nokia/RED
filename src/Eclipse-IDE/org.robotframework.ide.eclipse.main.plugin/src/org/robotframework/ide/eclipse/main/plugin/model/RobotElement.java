@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
@@ -62,6 +63,21 @@ public interface RobotElement {
      * @return image descriptor
      */
     ImageDescriptor getImage();
+
+
+    /**
+     * Gets position of the whole element inside the file
+     * 
+     * @return position
+     */
+    Position getPosition();
+
+    /**
+     * Gets position of the defining token (usually name of the element)
+     * 
+     * @return position
+     */
+    Position getDefinitionPosition();
 
     /**
      * Returns open strategy capable of opening and selecting this element in
