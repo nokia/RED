@@ -175,7 +175,8 @@ public class RobotCase extends RobotCodeHoldingElement {
         final FilePosition begin = testCase.getBeginPosition();
         final FilePosition end = testCase.getEndPosition();
 
-        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset() + 1);
+        return new Position(begin.getOffset(),
+                end.getOffset() - begin.getOffset() + getSuiteFile().getLineDelimiterLength());
     }
 
     @Override
