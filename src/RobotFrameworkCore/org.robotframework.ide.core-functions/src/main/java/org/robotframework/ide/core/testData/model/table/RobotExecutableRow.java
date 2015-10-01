@@ -92,7 +92,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
 
-    public ExecutionLineDescriptor build() {
+    public ExecutionLineDescriptor buildLineDescription() {
         ExecutionLineDescriptor execLine = new ExecutionLineDescriptor();
         if (isExecutable()) {
             boolean isAfterTheFirstAction = false;
