@@ -43,6 +43,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_ACTION_NAME);
         types.add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
+        types.remove(RobotTokenType.UNKNOWN);
 
         RobotExecutableRow<TestCase> row = new RobotExecutableRow<TestCase>();
         row.setAction(rt);
