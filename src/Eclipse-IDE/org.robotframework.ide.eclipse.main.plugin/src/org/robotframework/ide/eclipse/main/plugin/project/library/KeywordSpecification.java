@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.common.base.Objects;
+
 @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
 public class KeywordSpecification {
 
@@ -62,5 +64,22 @@ public class KeywordSpecification {
             return new RobotToHtmlConverter().convert(documentation);
         }
         throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (KeywordSpecification.class == obj.getClass()) {
+            final KeywordSpecification that = (KeywordSpecification) obj;
+            return Objects.equal(this.name, that.name) && Objects.equal(this.arguments, that.arguments);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name, arguments);
     }
 }
