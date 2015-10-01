@@ -55,7 +55,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
     @Override
     protected RobotSuiteFileSection getSection() {
-        return (RobotSuiteFileSection) fileModel.findSection(RobotKeywordsSection.class).orNull();
+        return fileModel.findSection(RobotKeywordsSection.class).orNull();
     }
 
     @Override

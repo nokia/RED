@@ -42,7 +42,7 @@ public class InsertNewKeywordHandler extends DIHandler<E4InsertNewKeywordHandler
                 section = ((RobotKeywordCall) selectedElement).getSection();
             } else if (selectedElement instanceof RobotKeywordDefinition) {
                 definition = (RobotKeywordDefinition) selectedElement;
-                section = (RobotSuiteFileSection) definition.getParent();
+                section = definition.getParent();
             }
 
             if (section == null || definition == null) {

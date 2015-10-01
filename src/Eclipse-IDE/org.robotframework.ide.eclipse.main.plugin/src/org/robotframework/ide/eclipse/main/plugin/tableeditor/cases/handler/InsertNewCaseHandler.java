@@ -43,7 +43,7 @@ public class InsertNewCaseHandler extends DIHandler<E4InsertNewCaseHandler> {
                 section = ((RobotKeywordCall) selectedElement).getSection();
             } else if (selectedElement instanceof RobotCase) {
                 testCase = (RobotCase) selectedElement;
-                section = (RobotSuiteFileSection) testCase.getParent();
+                section = testCase.getParent();
             }
 
             if (section == null || testCase == null) {

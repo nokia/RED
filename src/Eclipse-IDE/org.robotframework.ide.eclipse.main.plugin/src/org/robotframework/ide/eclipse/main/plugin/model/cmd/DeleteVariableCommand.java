@@ -25,7 +25,7 @@ public class DeleteVariableCommand extends EditorCommand {
         if (variablesToDelete.isEmpty()) {
             return;
         }
-        final RobotSuiteFileSection variableSection = (RobotSuiteFileSection) variablesToDelete.get(0).getParent();
+        final RobotSuiteFileSection variableSection = variablesToDelete.get(0).getParent();
         variableSection.getChildren().removeAll(variablesToDelete);
 
         eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_REMOVED, variableSection);
