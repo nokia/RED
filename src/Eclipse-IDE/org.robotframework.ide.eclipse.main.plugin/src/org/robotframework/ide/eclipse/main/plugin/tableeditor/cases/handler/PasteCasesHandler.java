@@ -63,9 +63,9 @@ public class PasteCasesHandler extends DIHandler<E4PasteCasesHandler> {
 
             if (targetCase != null) {
                 final int index = targetCase.getParent().getChildren().indexOf(targetCase);
-                commandsStack.execute(new InsertCasesCommand((RobotCasesSection) targetCase.getParent(), index, cases));
+                commandsStack.execute(new InsertCasesCommand(targetCase.getParent(), index, cases));
             } else {
-                final RobotCasesSection section = (RobotCasesSection) fileModel.findSection(RobotCasesSection.class)
+                final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class)
                         .orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertCasesCommand(section, cases));

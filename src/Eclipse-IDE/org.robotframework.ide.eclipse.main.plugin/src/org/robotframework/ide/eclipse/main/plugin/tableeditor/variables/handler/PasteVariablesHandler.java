@@ -60,7 +60,7 @@ public class PasteVariablesHandler extends DIHandler<E4PasteVariablesHandler> {
                 final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected);
                 commandsStack.execute(new InsertVariablesCommand(firstSelected.get().getParent(), index, variables));
             } else {
-                final RobotVariablesSection section = (RobotVariablesSection) fileModel.findSection(
+                final RobotVariablesSection section = fileModel.findSection(
                         RobotVariablesSection.class).orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertVariablesCommand(section, variables));
