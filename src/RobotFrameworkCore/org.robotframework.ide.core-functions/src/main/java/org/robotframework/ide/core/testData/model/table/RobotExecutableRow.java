@@ -90,4 +90,73 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         return (action != null && !action.getTypes().contains(
                 RobotTokenType.START_HASH_COMMENT));
     }
+
+
+    public ExecutionLineDescriptor build() {
+        ExecutionLineDescriptor execLine = new ExecutionLineDescriptor();
+        if (isExecutable()) {
+            boolean isAfterTheFirstAction = false;
+
+            List<RobotToken> elementTokens = getElementTokens();
+            for (RobotToken token : elementTokens) {
+                if (isAfterTheFirstAction) {
+                    execLine.addRestParameter(token);
+                } else {
+                    if (token.isVariableDeclaration()) {
+                        execLine.addAssignment(token);
+                    } else {
+                        execLine.setTheFirstAction(token);
+                        isAfterTheFirstAction = true;
+                    }
+                }
+            }
+        }
+
+        return execLine;
+    }
+
+    public static class ExecutionLineDescriptor {
+
+        private List<RobotToken> assignments = new LinkedList<>();
+        private RobotToken theFirstAction = new RobotToken();
+        private List<RobotToken> restParameters = new LinkedList<>();
+
+
+        private void addAssignment(final RobotToken token) {
+            this.assignments.add(token);
+        }
+
+
+        public List<RobotToken> getAssignments() {
+            return assignments;
+        }
+
+
+        private void setTheFirstAction(final RobotToken token) {
+            this.theFirstAction = token;
+        }
+
+
+        public RobotToken getFirstAction() {
+            return theFirstAction;
+        }
+
+
+        private void addRestParameter(final RobotToken token) {
+            this.restParameters.add(token);
+        }
+
+
+        public List<RobotToken> getParameters() {
+            return restParameters;
+        }
+
+
+        @Override
+        public String toString() {
+            return String
+                    .format("ExecutionLineDescriptor [assignments=%s, theFirstAction=%s, restParameters=%s]",
+                            assignments, theFirstAction, restParameters);
+        }
+    }
 }
