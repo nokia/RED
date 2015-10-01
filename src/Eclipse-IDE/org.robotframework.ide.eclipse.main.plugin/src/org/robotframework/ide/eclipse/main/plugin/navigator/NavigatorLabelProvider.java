@@ -10,6 +10,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -50,6 +51,8 @@ public class NavigatorLabelProvider extends ColumnLabelProvider {
             final RobotSetting groupedElement = (RobotSetting) element;
             return groupedElement.getGroup().getName() == null ? groupedElement.getName() : groupedElement
                     .getNameInGroup();
+        } else if (element instanceof RobotKeywordCall) {
+            return ((RobotKeywordCall) element).getLabel();
         } else if (element instanceof RobotElement) {
             return ((RobotElement) element).getName();
         }
