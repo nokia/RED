@@ -34,13 +34,13 @@ wait 3000
 
 
 //check if it test is paused on line 13
-check_if_line_is_highlighted -line 13 -script_name "Script.robot"
+check-debug-marker-on-ruler -line 13 -script_name "Script.robot"
 
 //resume and check line 15
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }
-check_if_line_is_highlighted -line 15 -script_name "Script.robot"
+check-debug-marker-on-ruler -line 15 -script_name "Script.robot"
 
 
 //set new breakpoint
@@ -51,7 +51,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }
 
-check_if_line_is_highlighted -line 20 -script_name "Script.robot"
+check-debug-marker-on-ruler -line 20 -script_name "Script.robot"
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }
