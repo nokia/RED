@@ -5,13 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -68,9 +72,20 @@ public abstract class RobotSuiteFileSection implements RobotElement {
         return RedImages.getRobotCasesFileSectionImage();
     }
 
+    public List<Position> getPositions() {
+        final List<Position> positions = newArrayList();
+        for (final TableHeader<? extends ARobotSectionTable> header : sectionTable.getHeaders()) {
+            final FilePosition begin = header.getBeginPosition();
+            final FilePosition end = header.getEndPosition();
+
+            positions.add(new Position(begin.getOffset(),
+                    end.getOffset() - begin.getOffset() + getSuiteFile().getLineDelimiterLength()));
+        }
+        return positions;
+    }
+
     @Override
     public Position getPosition() {
-        // sectionTable.getHeaders().get(0).
         return new Position(0);
     }
 
