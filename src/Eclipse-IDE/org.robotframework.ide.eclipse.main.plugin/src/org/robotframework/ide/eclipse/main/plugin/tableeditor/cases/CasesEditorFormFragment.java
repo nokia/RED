@@ -55,7 +55,7 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
 
     @Override
     protected RobotSuiteFileSection getSection() {
-        return (RobotSuiteFileSection) fileModel.findSection(RobotCasesSection.class).orNull();
+        return fileModel.findSection(RobotCasesSection.class).orNull();
     }
 
     @Override

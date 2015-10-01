@@ -63,10 +63,10 @@ public class PasteKeywordsHandler extends DIHandler<E4PasteKeywordsHandler> {
 
             if (targetDef != null) {
                 final int index = targetDef.getParent().getChildren().indexOf(targetDef);
-                commandsStack.execute(new InsertKeywordDefinitionsCommand((RobotKeywordsSection) targetDef.getParent(),
+                commandsStack.execute(new InsertKeywordDefinitionsCommand(targetDef.getParent(),
                         index, definitions));
             } else {
-                final RobotKeywordsSection section = (RobotKeywordsSection) fileModel.findSection(
+                final RobotKeywordsSection section = fileModel.findSection(
                         RobotKeywordsSection.class).orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertKeywordDefinitionsCommand(section, definitions));

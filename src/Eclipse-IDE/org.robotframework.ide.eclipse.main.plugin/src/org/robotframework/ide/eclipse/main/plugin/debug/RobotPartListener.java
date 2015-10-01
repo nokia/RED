@@ -27,7 +27,7 @@ public class RobotPartListener implements IPartListener {
     @Override
     public void partOpened(IWorkbenchPart part) {
         if (part != null) {
-            TextEditorWrapper texteditor = (TextEditorWrapper) part.getAdapter(org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper.class);
+            TextEditorWrapper texteditor = part.getAdapter(org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper.class);
             if (texteditor != null && keywordContext != null) {
                 String editorInputName = texteditor.getEditorInput().getName();
 

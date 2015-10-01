@@ -25,7 +25,7 @@ public class DeleteSettingKeywordCallCommand extends EditorCommand {
         if (settingsToRemove.isEmpty()) {
             return;
         }
-        final RobotSettingsSection settingsSection = (RobotSettingsSection) settingsToRemove.get(0).getParent();
+        final RobotSettingsSection settingsSection = settingsToRemove.get(0).getParent();
         settingsSection.getChildren().removeAll(settingsToRemove);
 
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_REMOVED, settingsSection);

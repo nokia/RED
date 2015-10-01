@@ -25,7 +25,7 @@ public class DeleteCasesCommand extends EditorCommand {
         if (casesToDelete.isEmpty()) {
             return;
         }
-        final RobotSuiteFileSection casesSection = (RobotSuiteFileSection) casesToDelete.get(0).getParent();
+        final RobotSuiteFileSection casesSection = casesToDelete.get(0).getParent();
         casesSection.getChildren().removeAll(casesToDelete);
 
         eventBroker.post(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
