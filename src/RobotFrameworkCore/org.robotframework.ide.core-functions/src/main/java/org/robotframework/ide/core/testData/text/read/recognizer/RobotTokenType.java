@@ -30,6 +30,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    USER_OWN_TABLE_HEADER(TableType.NOT_STRICTLY_BELONGS),
+    /**
+     * 
+     */
     SETTINGS_TABLE_HEADER(TableType.SETTINGS, "Setting", "Settings", "Metadata"),
     /**
      * 

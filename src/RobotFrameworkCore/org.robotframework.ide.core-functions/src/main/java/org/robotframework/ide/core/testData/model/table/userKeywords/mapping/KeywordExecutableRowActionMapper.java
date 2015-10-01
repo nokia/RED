@@ -60,7 +60,8 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result = false;
         ParsingState state = utility.getCurrentStatus(processingState);
-        result = (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION);
+        result = (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION)
+                && !utility.isTheFirstColumn(currentLine, rt);
 
         return result;
     }
