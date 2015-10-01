@@ -23,8 +23,6 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 
 public class KeywordFinder {
 
@@ -96,8 +94,7 @@ public class KeywordFinder {
     }
 
 
-    @VisibleForTesting
-    protected List<UserKeyword> filterByKeywordAfterLastHeader(
+    public List<UserKeyword> filterByKeywordAfterLastHeader(
             final KeywordTable keywordTable) {
         List<UserKeyword> keywords = new LinkedList<>();
 
