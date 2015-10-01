@@ -37,10 +37,14 @@ import org.robotframework.ide.core.testData.model.table.mapping.VariablesDeclara
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseExecutableRowActionMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseExecutableRowArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseFinder;
+import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowActionMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordFinder;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
@@ -338,7 +342,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 prettyLeftAlign.setStartColumn(rt.getStartColumn());
                 prettyLeftAlign.setRaw(new StringBuilder(" "));
                 prettyLeftAlign.setText(new StringBuilder(" "));
-                prettyLeftAlign.setType(RobotTokenType.UNKNOWN);
+                prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElementAt(line.getLineElements().size() - 1,
                         prettyLeftAlign);
 
@@ -357,7 +361,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
                 prettyRightAlign.setRaw(new StringBuilder(" "));
                 prettyRightAlign.setText(new StringBuilder(" "));
-                prettyRightAlign.setType(RobotTokenType.UNKNOWN);
+                prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElement(prettyRightAlign);
 
                 correctedString = correctedString.substring(0,
@@ -487,43 +491,92 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 }
             }
 
+            robotToken = applyPrettyAlignTokenIfIsValid(currentLine,
+                    processingState, robotFileOutput, fp, text, fileName,
+                    robotToken);
+
+            useMapper = useMapper
+                    & !robotToken.getTypes().contains(
+                            RobotTokenType.PRETTY_ALIGN_SPACE);
+
             if (useMapper) {
-                List<IParsingMapper> matchedMappers = new LinkedList<>();
-                for (IParsingMapper mapper : mappers) {
-                    if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
-                            robotToken, text, processingState)) {
-                        matchedMappers.add(mapper);
-                    }
-                }
-
-                // check for unknown setting
-                int size = matchedMappers.size();
-                if (size == 0) {
-                    for (IParsingMapper mapper : unknownTableElementsMapper) {
-                        if (mapper.checkIfCanBeMapped(robotFileOutput,
-                                currentLine, robotToken, text, processingState)) {
-                            matchedMappers.add(mapper);
-                        }
-                    }
-                }
-
-                size = matchedMappers.size();
-                if (size == 1) {
-                    robotToken = matchedMappers.get(0).map(currentLine,
-                            processingState, robotFileOutput, robotToken, fp,
-                            text);
-                } else {
-                    robotFileOutput.addBuildMessage(BuildMessage
-                            .createErrorMessage("Unknown data \'" + text
-                                    + "\' appears in " + fp
-                                    + ", during state: " + processingState,
-                                    fileName));
-                }
+                robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(
+                        currentLine, processingState, robotFileOutput, fp,
+                        text, fileName, robotToken);
             }
         }
 
         fixNotSetPositions(robotToken, fp);
 
+        return robotToken;
+    }
+
+
+    private RobotToken applyPrettyAlignTokenIfIsValid(RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            String text, String fileName, RobotToken robotToken) {
+        if (" ".equals(text)) {
+            boolean isPrettyAlign = false;
+            RobotFile fileModel = robotFileOutput.getFileModel();
+
+            ParsingState currentStatus = utility
+                    .getCurrentStatus(processingState);
+            if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE) {
+                KeywordFinder keywordFinder = new KeywordFinder();
+                List<UserKeyword> keywordsAfterLastHeader = keywordFinder
+                        .filterByKeywordAfterLastHeader(fileModel
+                                .getKeywordTable());
+                isPrettyAlign = !keywordsAfterLastHeader.isEmpty();
+            } else if (currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE) {
+                TestCaseFinder testCaseFinder = new TestCaseFinder();
+                List<TestCase> testCasesAfterLastHeader = testCaseFinder
+                        .filterByTestCasesAfterLastHeader(fileModel
+                                .getTestCaseTable());
+                isPrettyAlign = !testCasesAfterLastHeader.isEmpty();
+            }
+
+            if (isPrettyAlign) {
+                robotToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+            }
+        }
+
+        return robotToken;
+    }
+
+
+    private RobotToken mapToCorrectTokenAndPutInCorrectPlaceInModel(
+            RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp,
+            String text, String fileName, RobotToken robotToken) {
+        List<IParsingMapper> matchedMappers = new LinkedList<>();
+        for (IParsingMapper mapper : mappers) {
+            if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
+                    robotToken, text, processingState)) {
+                matchedMappers.add(mapper);
+            }
+        }
+
+        // check for unknown setting
+        int size = matchedMappers.size();
+        if (size == 0) {
+            for (IParsingMapper mapper : unknownTableElementsMapper) {
+                if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
+                        robotToken, text, processingState)) {
+                    matchedMappers.add(mapper);
+                }
+            }
+        }
+
+        size = matchedMappers.size();
+        if (size == 1) {
+            robotToken = matchedMappers.get(0).map(currentLine,
+                    processingState, robotFileOutput, robotToken, fp, text);
+        } else {
+            robotFileOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown data \'" + text + "\' appears in " + fp
+                            + ", during state: " + processingState, fileName));
+        }
         return robotToken;
     }
 
