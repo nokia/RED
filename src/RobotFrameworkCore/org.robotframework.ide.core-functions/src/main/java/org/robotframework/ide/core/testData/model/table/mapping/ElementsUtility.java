@@ -307,8 +307,6 @@ public class ElementsUtility {
                 IRobotLineElement lastElement = lineElements.get(size - 1);
                 result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
                         .getStartColumn() == 0);
-            } else {
-                result = (robotToken.getStartColumn() == 0);
             }
         }
 
@@ -445,6 +443,21 @@ public class ElementsUtility {
         boolean result = false;
         if (elem instanceof RobotToken) {
             result = isTableHeader((RobotToken) elem);
+        }
+
+        return result;
+    }
+
+
+    public boolean isUserTableHeader(RobotToken t) {
+        boolean result = false;
+
+        StringBuilder raw = t.getRaw();
+        if (raw != null) {
+            String rawText = raw.toString();
+            if (rawText != null) {
+                result = rawText.trim().startsWith("*");
+            }
         }
 
         return result;

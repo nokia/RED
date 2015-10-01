@@ -59,6 +59,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         ParsingState state = utility.getCurrentStatus(processingState);
-        return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION);
+        return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION)
+                && !utility.isTheFirstColumn(currentLine, rt);
     }
 }
