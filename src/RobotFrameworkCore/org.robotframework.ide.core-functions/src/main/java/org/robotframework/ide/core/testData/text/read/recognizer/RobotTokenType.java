@@ -26,6 +26,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    PRETTY_ALIGN_SPACE(TableType.NOT_STRICTLY_BELONGS, " "),
+    /**
+     * 
+     */
     SETTINGS_TABLE_HEADER(TableType.SETTINGS, "Setting", "Settings", "Metadata"),
     /**
      * 
