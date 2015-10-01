@@ -141,7 +141,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         };
         wsJob.setSystem(true);
         wsJob.schedule();
-        // wsJob.join();
+        wsJob.join();
     }
 
     private void createMarker(final IRegion region, final String selectedText) {

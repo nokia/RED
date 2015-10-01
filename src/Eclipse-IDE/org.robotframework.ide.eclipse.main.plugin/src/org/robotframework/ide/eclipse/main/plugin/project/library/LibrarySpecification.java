@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.common.base.Objects;
+
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
 
@@ -135,5 +137,24 @@ public class LibrarySpecification {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (LibrarySpecification.class == obj.getClass()) {
+            final LibrarySpecification that = (LibrarySpecification) obj;
+            return Objects.equal(this.name, that.name) && Objects.equal(this.keywords, that.keywords)
+                    && Objects.equal(this.version, that.version) && this.isReferenced == that.isReferenced
+                    && this.isRemote == that.isRemote;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name, keywords, version, isReferenced, isRemote);
     }
 }

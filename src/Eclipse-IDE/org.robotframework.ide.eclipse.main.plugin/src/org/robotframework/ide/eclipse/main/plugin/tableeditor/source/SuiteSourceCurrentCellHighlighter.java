@@ -60,7 +60,7 @@ class SuiteSourceCurrentCellHighlighter {
                         highlightCell(newRegion.get());
                         currentCell = newRegion.get();
                     }
-                } catch (final BadLocationException e) {
+                } catch (final BadLocationException | InterruptedException e) {
                     RedPlugin.logError("Unable to create cell highlight markers", e);
                 }
 
@@ -76,7 +76,7 @@ class SuiteSourceCurrentCellHighlighter {
         }
     }
 
-    private void highlightCell(final IRegion newRegion) throws BadLocationException {
+    private void highlightCell(final IRegion newRegion) throws BadLocationException, InterruptedException {
         final String cellContent = document.get(newRegion.getOffset(), newRegion.getLength());
         final WorkspaceJob wsJob = new WorkspaceJob("Creating cell highlight marker") {
 
@@ -88,6 +88,7 @@ class SuiteSourceCurrentCellHighlighter {
         };
         wsJob.setSystem(true);
         wsJob.schedule();
+        wsJob.join();
     }
 
     private void createMarker(final IRegion region, final String selectedText) {
