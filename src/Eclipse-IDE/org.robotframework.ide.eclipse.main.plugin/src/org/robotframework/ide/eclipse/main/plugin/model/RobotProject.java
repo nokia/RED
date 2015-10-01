@@ -241,22 +241,20 @@ public class RobotProject extends RobotContainer {
     }
     
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
-        if (stdLibsSpecs != null) {
-            for (final LibrarySpecification librarySpecification : stdLibsSpecs) {
-                if (librarySpecification == spec) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return isLibraryFrom(spec, getStandardLibraries());
     }
     
     public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
-        if (refLibsSpecs != null) {
-            for (final LibrarySpecification librarySpecification : refLibsSpecs) {
-                if (librarySpecification == spec) {
-                    return true;
-                }
+        return isLibraryFrom(spec, getReferencedLibraries());
+    }
+
+    private boolean isLibraryFrom(final LibrarySpecification spec, final List<LibrarySpecification> libs) {
+        if (libs == null) {
+            return false;
+        }
+        for (final LibrarySpecification librarySpecification : libs) {
+            if (librarySpecification == spec) {
+                return true;
             }
         }
         return false;
@@ -312,7 +310,7 @@ public class RobotProject extends RobotContainer {
         return newArrayList();
     }
 
-    public void setReferencedVariableFiles(List<ReferencedVariableFile> referencedVariableFiles) {
+    public void setReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
         this.referencedVariableFiles = referencedVariableFiles;
     }
 
