@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -35,6 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -77,6 +82,15 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
         if (parentElement instanceof RobotSettingsSection) {
             final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
             return groupedChildren(children).toArray();
+        } else if (parentElement instanceof RobotCodeHoldingElement) {
+            final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
+            return newArrayList(Iterables.filter(children, new Predicate<RobotElement>() {
+
+                @Override
+                public boolean apply(final RobotElement element) {
+                    return element.getClass() == RobotKeywordCall.class;
+                }
+            })).toArray();
         } else if (parentElement instanceof RobotElement) {
             return ((RobotElement) parentElement).getChildren().toArray();
         }

@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 
+import com.google.common.base.Strings;
 
 class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
 
@@ -20,6 +21,8 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
         if (command.length == 0 && command.text != null
                 && TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
+        } else if (command.length == 0 && "\t".equals(command.text)) {
+            command.text = Strings.repeat(" ", 4);
         }
     }
 

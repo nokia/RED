@@ -313,5 +313,4 @@ public class RobotProject extends RobotContainer {
     public void setReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
         this.referencedVariableFiles = referencedVariableFiles;
     }
-
 }
