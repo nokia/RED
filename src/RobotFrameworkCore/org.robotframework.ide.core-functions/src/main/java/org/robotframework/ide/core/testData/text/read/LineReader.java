@@ -48,7 +48,11 @@ public class LineReader extends Reader {
         for (int i = 0; i < read; i++) {
             Constant mapped = Constant.get(cbuf[i]);
             if (mapped != null) {
-                eOLs.put(i, mapped);
+                int index = i;
+                if (positionInFile > 0) {
+                    index = positionInFile + index;
+                }
+                eOLs.put(index, mapped);
             }
         }
         if (read > 0) {
