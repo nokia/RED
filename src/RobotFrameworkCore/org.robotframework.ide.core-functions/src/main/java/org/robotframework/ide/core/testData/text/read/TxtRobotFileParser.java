@@ -333,42 +333,40 @@ public class TxtRobotFileParser implements IRobotFileParser {
     @VisibleForTesting
     protected void extractPrettyAlignWhitespaces(RobotLine line, RobotToken rt,
             String rawText) {
-        if (rawText.trim().length() > 0) {
-            String correctedString = rawText;
-            if (rawText.startsWith(" ")) {
-                RobotToken prettyLeftAlign = new RobotToken();
-                prettyLeftAlign.setStartOffset(rt.getStartOffset());
-                prettyLeftAlign.setLineNumber(rt.getLineNumber());
-                prettyLeftAlign.setStartColumn(rt.getStartColumn());
-                prettyLeftAlign.setRaw(new StringBuilder(" "));
-                prettyLeftAlign.setText(new StringBuilder(" "));
-                prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-                line.addLineElementAt(line.getLineElements().size() - 1,
-                        prettyLeftAlign);
+        String correctedString = rawText;
+        if (rawText.startsWith(" ")) {
+            RobotToken prettyLeftAlign = new RobotToken();
+            prettyLeftAlign.setStartOffset(rt.getStartOffset());
+            prettyLeftAlign.setLineNumber(rt.getLineNumber());
+            prettyLeftAlign.setStartColumn(rt.getStartColumn());
+            prettyLeftAlign.setRaw(new StringBuilder(" "));
+            prettyLeftAlign.setText(new StringBuilder(" "));
+            prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+            line.addLineElementAt(line.getLineElements().size() - 1,
+                    prettyLeftAlign);
 
-                rt.setStartColumn(rt.getStartColumn() + 1);
-                rt.setStartOffset(rt.getStartOffset() + 1);
-                correctedString = rawText.substring(1);
-                rt.setText(new StringBuilder(correctedString));
-                rt.setRaw(new StringBuilder(correctedString));
-            }
+            rt.setStartColumn(rt.getStartColumn() + 1);
+            rt.setStartOffset(rt.getStartOffset() + 1);
+            correctedString = rawText.substring(1);
+            rt.setText(new StringBuilder(correctedString));
+            rt.setRaw(new StringBuilder(correctedString));
+        }
 
-            if (rawText.endsWith(" ")) {
-                RobotToken prettyRightAlign = new RobotToken();
-                prettyRightAlign.setStartOffset(rt.getStartOffset()
-                        + rt.getRaw().length() - 1);
-                prettyRightAlign.setLineNumber(rt.getLineNumber());
-                prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
-                prettyRightAlign.setRaw(new StringBuilder(" "));
-                prettyRightAlign.setText(new StringBuilder(" "));
-                prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-                line.addLineElement(prettyRightAlign);
+        if (correctedString.endsWith(" ")) {
+            RobotToken prettyRightAlign = new RobotToken();
+            prettyRightAlign.setStartOffset(rt.getStartOffset()
+                    + rt.getRaw().length() - 1);
+            prettyRightAlign.setLineNumber(rt.getLineNumber());
+            prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
+            prettyRightAlign.setRaw(new StringBuilder(" "));
+            prettyRightAlign.setText(new StringBuilder(" "));
+            prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+            line.addLineElement(prettyRightAlign);
 
-                correctedString = correctedString.substring(0,
-                        correctedString.length() - 1);
-                rt.setText(new StringBuilder(correctedString));
-                rt.setRaw(new StringBuilder(correctedString));
-            }
+            correctedString = correctedString.substring(0,
+                    correctedString.length() - 1);
+            rt.setText(new StringBuilder(correctedString));
+            rt.setRaw(new StringBuilder(correctedString));
         }
     }
 
