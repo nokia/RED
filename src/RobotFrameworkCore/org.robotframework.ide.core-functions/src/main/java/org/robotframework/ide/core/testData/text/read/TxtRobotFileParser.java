@@ -212,7 +212,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // before
                             // '|' pipe separator
                             if (remainingData > 0
-                                    || shouldGiveEmptyToProcess(line,
+                                    || utility.shouldGiveEmptyToProcess(line,
                                             processingState)) {
                                 String rawText = text.substring(
                                         lastColumnProcessed, startColumn);
@@ -228,7 +228,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                 currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
 
-                                extractPrettyAlignWhitespaces(line, rt, rawText);
+                                utility.extractPrettyAlignWhitespaces(line, rt,
+                                        rawText);
 
                                 isNewLine = false;
                             }
@@ -261,7 +262,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
 
-                            extractPrettyAlignWhitespaces(line, rt, rawText);
+                            utility.extractPrettyAlignWhitespaces(line, rt,
+                                    rawText);
 
                             lastColumnProcessed = textLength;
                             isNewLine = false;
@@ -271,7 +273,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
                 List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
                 line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
-                currentOffset += getEndOfLineLength(endOfLine);
+                currentOffset += utility.getEndOfLineLength(endOfLine);
                 lineNumber++;
                 lastColumnProcessed = 0;
                 libraryFixer.checkAndFixLine(parsingOutput, processingState);
@@ -285,7 +287,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                  * ...              argument_x
                  * </pre>
                  */
-                if (isNotOnlySeparatorOrEmptyLine(line)) {
+                if (utility.isNotOnlySeparatorOrEmptyLine(line)) {
                     previousLineHandler.flushNew(processingState);
                 }
                 parsingOutput.getFileModel().addNewLine(line);
@@ -331,89 +333,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected void extractPrettyAlignWhitespaces(RobotLine line, RobotToken rt,
-            String rawText) {
-        String correctedString = rawText;
-        if (rawText.startsWith(" ")) {
-            RobotToken prettyLeftAlign = new RobotToken();
-            prettyLeftAlign.setStartOffset(rt.getStartOffset());
-            prettyLeftAlign.setLineNumber(rt.getLineNumber());
-            prettyLeftAlign.setStartColumn(rt.getStartColumn());
-            prettyLeftAlign.setRaw(new StringBuilder(" "));
-            prettyLeftAlign.setText(new StringBuilder(" "));
-            prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-            line.addLineElementAt(line.getLineElements().size() - 1,
-                    prettyLeftAlign);
-
-            rt.setStartColumn(rt.getStartColumn() + 1);
-            rt.setStartOffset(rt.getStartOffset() + 1);
-            correctedString = rawText.substring(1);
-            rt.setText(new StringBuilder(correctedString));
-            rt.setRaw(new StringBuilder(correctedString));
-        }
-
-        if (correctedString.endsWith(" ")) {
-            RobotToken prettyRightAlign = new RobotToken();
-            prettyRightAlign.setStartOffset(rt.getStartOffset()
-                    + rt.getRaw().length() - 1);
-            prettyRightAlign.setLineNumber(rt.getLineNumber());
-            prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
-            prettyRightAlign.setRaw(new StringBuilder(" "));
-            prettyRightAlign.setText(new StringBuilder(" "));
-            prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-            line.addLineElement(prettyRightAlign);
-
-            correctedString = correctedString.substring(0,
-                    correctedString.length() - 1);
-            rt.setText(new StringBuilder(correctedString));
-            rt.setRaw(new StringBuilder(correctedString));
-        }
-    }
-
-
-    @VisibleForTesting
-    protected boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
-        boolean anyValuableToken = false;
-        List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        for (IRobotLineElement lineElem : lineElements) {
-            if (lineElem instanceof RobotToken) {
-                anyValuableToken = true;
-                break;
-            }
-        }
-
-        return anyValuableToken;
-    }
-
-
-    @VisibleForTesting
-    protected boolean shouldGiveEmptyToProcess(final RobotLine line,
-            final Stack<ParsingState> processingState) {
-        boolean result = false;
-
-        List<IRobotLineElement> lineElements = line.getLineElements();
-        result = lineElements.size() >= 2;
-
-        return result;
-    }
-
-
-    @VisibleForTesting
-    protected int getEndOfLineLength(final List<Constant> eols) {
-        int size = 0;
-        for (Constant c : eols) {
-            if (c != Constant.EOF) {
-                size++;
-            } else {
-                break;
-            }
-        }
-
-        return size;
-    }
-
-
-    @VisibleForTesting
     protected RobotToken processLineElement(RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
@@ -421,7 +340,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         List<RobotToken> robotTokens = recognize(fp, text);
         RobotToken robotToken = utility.computeCorrectRobotToken(currentLine,
                 processingState, robotFileOutput, fp, text, isNewLine,
-                robotTokens);
+                robotTokens, fileName);
 
         LineContinueType lineContinueType = previousLineHandler
                 .computeLineContinue(processingState, isNewLine,
@@ -504,7 +423,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
             }
         }
 
-        fixNotSetPositions(robotToken, fp);
+        utility.fixNotSetPositions(robotToken, fp);
 
         return robotToken;
     }
@@ -576,21 +495,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             + ", during state: " + processingState, fileName));
         }
         return robotToken;
-    }
-
-
-    @VisibleForTesting
-    protected void fixNotSetPositions(final RobotToken token,
-            final FilePosition fp) {
-        if (token.getStartOffset() == IRobotLineElement.NOT_SET) {
-            token.setStartOffset(fp.getOffset());
-        }
-        if (token.getLineNumber() == IRobotLineElement.NOT_SET) {
-            token.setLineNumber(fp.getLine());
-        }
-        if (token.getStartColumn() == IRobotLineElement.NOT_SET) {
-            token.setStartColumn(fp.getColumn());
-        }
     }
 
 
