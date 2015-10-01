@@ -45,7 +45,7 @@ try -times 10 -delay 300 -command{
 }
 
 
-check_if_line_is_highlighted -line 9 -script_name "SimpleLoggingTestCase.robot"
+check-debug-marker-on-ruler -line 9 -script_name "SimpleLoggingTestCase.robot"
 get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
 [concat_str_with_regex [list  "1\\n"]]] 
 
@@ -54,7 +54,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
 }
 wait 200
-check_if_line_is_highlighted -line 10 -script_name "SimpleLoggingTestCase.robot"	
+check-debug-marker-on-ruler -line 10 -script_name "SimpleLoggingTestCase.robot"	
 get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
 [concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"]]]
 
