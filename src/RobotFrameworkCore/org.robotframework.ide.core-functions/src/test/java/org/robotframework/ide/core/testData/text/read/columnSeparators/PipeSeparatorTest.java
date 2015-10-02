@@ -21,6 +21,51 @@ public class PipeSeparatorTest {
 
 
     @Test
+    public void testCaseLine_withMultipleSpaceInFirstColumn() {
+        String theFirstSeparator = "|";
+        String theSecondSeparator = "    | ";
+        String action = "${dict} =";
+        String lastSeparator = "  |   ";
+        String text = theFirstSeparator + theSecondSeparator + action
+                + lastSeparator;
+        separator = new PipeSeparator(0, text);
+
+        assertThat(separator.hasNext()).isTrue();
+        Separator sep = separator.next();
+        assertThat(sep).isNotNull();
+        assertThat(sep.getLineNumber()).isEqualTo(0);
+        assertThat(sep.getStartColumn()).isEqualTo(0);
+        assertThat(sep.getEndColumn()).isEqualTo(theFirstSeparator.length());
+        assertThat(sep.getText().toString()).isEqualTo(theFirstSeparator);
+        assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
+
+        assertThat(separator.hasNext()).isTrue();
+
+        sep = separator.next();
+        assertThat(sep).isNotNull();
+        assertThat(sep.getLineNumber()).isEqualTo(0);
+        assertThat(sep.getStartColumn()).isEqualTo(theFirstSeparator.length());
+        assertThat(sep.getEndColumn()).isEqualTo(
+                theFirstSeparator.length() + theSecondSeparator.length());
+        assertThat(sep.getText().toString()).isEqualTo(theSecondSeparator);
+        assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
+
+        assertThat(separator.hasNext()).isTrue();
+
+        sep = separator.next();
+        assertThat(sep).isNotNull();
+        assertThat(sep.getLineNumber()).isEqualTo(0);
+        assertThat(sep.getStartColumn()).isEqualTo(
+                theFirstSeparator.length() + theSecondSeparator.length()
+                        + action.length());
+        assertThat(sep.getEndColumn()).isEqualTo(text.length());
+        assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
+
+        assertThat(separator.hasNext()).isFalse();
+    }
+
+
+    @Test
     public void twoSeparatorsAt_theBegin() {
         String theFirstSeparator = "|";
         String theSecondSeparator = " | ";
