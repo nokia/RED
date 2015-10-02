@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9gbW0F4MEeWeit3EM6sPPA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/23/15 10:26 AM
+Save-Time: 10/2/15 11:34 AM
 Testcase-Type: ecl
 Verifications: _o6shkF4PEeWeit3EM6sPPA
 
@@ -32,6 +32,7 @@ get-view "Execution View" | get-tree | get-item "ExecutionViewProject \\(.* s\\)
 
 //rerun only failed cases - 3 will be run only        
 get-view "Execution View" | get-button "Rerun Failed Tests Only" | click
+wait 1000
 with [get-view "Execution View" | get-tree] {
     get-property "getItems().length" | equals 1 | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().length" | equals 3 | verify-true
