@@ -271,6 +271,14 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     }
                 }
 
+                List<IRobotLineElement> lineElements = line.getLineElements();
+                if (!lineElements.isEmpty()) {
+                    IRobotLineElement lineElem = lineElements.get(lineElements
+                            .size() - 1);
+                    currentOffset = lineElem.getStartOffset()
+                            + lineElem.getText().length();
+                }
+
                 List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
                 line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
                 currentOffset += utility.getEndOfLineLength(endOfLine);
