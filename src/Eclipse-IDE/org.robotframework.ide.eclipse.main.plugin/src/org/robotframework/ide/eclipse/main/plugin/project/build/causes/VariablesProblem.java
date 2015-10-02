@@ -74,6 +74,12 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Scalar variable cannot have multiple value in RobotFramework 2.8.x";
         }
+    },
+    UNDECLARED_VARIABLE_USE {
+        @Override
+        public String getProblemDescription() {
+            return "Variable '%s' is used, but not defined";
+        }
     };
 
     @Override
