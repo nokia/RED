@@ -10,6 +10,8 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -44,7 +46,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        locateInVariableFiles(PathsNormalizer.getNormalizedVariableFilesPaths(startingFile), detector);
+        locateGlobalVariables(startingFile, detector);
     }
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final VariableDetector detector) {
@@ -86,9 +88,25 @@ public class VariableDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
+    private ContinueDecision locateGlobalVariables(final RobotSuiteFile startingFile, final VariableDetector detector) {
+        final RobotProjectHolder projectHolder = startingFile.getProject().getRobotProjectHolder();
+        final List<ARobotInternalVariable<?>> globalVariables = projectHolder.getGlobalVariables();
+
+        for (final ARobotInternalVariable<?> variable : globalVariables) {
+            final ContinueDecision shouldContinue = detector.globalVariableDetected(variable.getName(),
+                    variable.getValue());
+            if (shouldContinue == ContinueDecision.STOP) {
+                return ContinueDecision.STOP;
+            }
+        }
+        return ContinueDecision.CONTINUE;
+    }
+
     public interface VariableDetector {
 
         ContinueDecision variableDetected(RobotSuiteFile file, RobotVariable variable);
+
+        ContinueDecision globalVariableDetected(String name, Object value);
 
     }
 }

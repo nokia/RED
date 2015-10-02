@@ -2,13 +2,11 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -19,18 +17,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 
 public class RedVariableProposals {
     
-    private final List<RedVariableProposal> builtInVariableProposals;
-    
     private final RobotSuiteFile suiteFile;
 
     public RedVariableProposals(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
-        
-        builtInVariableProposals = new ArrayList<>();
-        for (final ARobotInternalVariable<?> robotInternalVariable : suiteFile.getGlobalVariables()) {
-            builtInVariableProposals.add(RedVariableProposal.createBuiltIn(robotInternalVariable.getName(),
-                    robotInternalVariable.getValue().toString()));
-        }
     }
     
     public static Comparator<RedVariableProposal> variablesSortedByTypesAndNames() {
@@ -55,6 +45,12 @@ public class RedVariableProposals {
                 proposals.add(RedVariableProposal.create(variable));
                 return ContinueDecision.CONTINUE;
             }
+
+            @Override
+            public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                proposals.add(RedVariableProposal.createBuiltIn(name, value.toString()));
+                return ContinueDecision.CONTINUE;
+            }
         });
 
         for (final ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
@@ -66,8 +62,6 @@ public class RedVariableProposals {
             }
         }
         
-        proposals.addAll(builtInVariableProposals);
-
         Collections.sort(proposals, comparator);
         return proposals;
     }

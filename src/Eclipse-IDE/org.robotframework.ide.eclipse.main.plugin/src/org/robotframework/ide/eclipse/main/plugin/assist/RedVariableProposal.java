@@ -1,6 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import org.robotframework.ide.core.testData.importer.AVariableImported;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 public class RedVariableProposal {
@@ -28,11 +27,6 @@ public class RedVariableProposal {
         return new RedVariableProposal(robotVariable.getPrefix() + robotVariable.getName() + robotVariable.getSuffix(),
                 robotVariable.getSuiteFile().getName(), robotVariable.getValue(), robotVariable.getComment(),
                 VariableType.LOCAL);
-    }
-
-    static RedVariableProposal create(final AVariableImported<?> variable, final String filePath) {
-        return new RedVariableProposal(variable.getName(), filePath, variable.getValue().toString(), "",
-                VariableType.IMPORTED);
     }
 
     static RedVariableProposal create(final String name, final String value, final String path) {
