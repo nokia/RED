@@ -45,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.Variables
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -235,7 +236,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
 
-    private static List<String> extractVariableNames(final List<RobotToken> assignments) {
+    @VisibleForTesting
+    static List<String> extractVariableNames(final List<RobotToken> assignments) {
         return newArrayList(
                 Iterables.transform(extractVariables(assignments), new Function<VariableInsideCell, String>() {
                     @Override

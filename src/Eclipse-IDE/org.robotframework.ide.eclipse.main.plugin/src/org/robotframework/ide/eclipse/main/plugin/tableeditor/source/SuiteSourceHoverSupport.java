@@ -7,9 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchManager;
@@ -26,14 +28,21 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 
 import com.google.common.base.Optional;
@@ -69,15 +78,47 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     @Override
     public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
         try {
+            final String problem = getErrorMsgs(textViewer, hoverRegion);
+            if (problem != null) {
+                return problem;
+            }
+
             final String hoveredText = textViewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
             if (isVariable(hoveredText)) {
                 return getVariableHoverInfo(hoveredText);
             } else {
                 return getKeywordHoverInfo(hoveredText);
             }
-        } catch (final BadLocationException | DebugException e) {
+        } catch (final BadLocationException | CoreException e) {
         }
         return null;
+    }
+
+    private String getErrorMsgs(final ITextViewer textViewer, final IRegion hoverRegion) throws CoreException {
+        final IAnnotationModel model = getAnnotationModel((ISourceViewer) textViewer);
+        if (model == null) {
+            return null;
+        }
+
+        final Iterator<?> iter = model.getAnnotationIterator();
+        while (iter.hasNext()) {
+            final Annotation annotation = (Annotation) iter.next();
+            if (isAnnotationSupported(annotation)) {
+                final Position position = model.getPosition(annotation);
+                if (position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength())) {
+                    final String msg = annotation.getText();
+                    if (msg != null && msg.trim().length() > 0) {
+                        return msg;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isAnnotationSupported(final Annotation annotation) throws CoreException {
+        return annotation instanceof MarkerAnnotation
+                && RobotProblem.TYPE_ID.equals(((MarkerAnnotation) annotation).getMarker().getType());
     }
 
     private String getVariableHoverInfo(final String variableName) throws DebugException {
@@ -117,6 +158,14 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
     private static boolean isVariable(final String text) {
         return Pattern.matches("[@$&%]\\{.+\\}", text);
+    }
+
+    private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
+        if (viewer instanceof ISourceViewerExtension2) {
+            final ISourceViewerExtension2 extension = (ISourceViewerExtension2) viewer;
+            return extension.getVisualAnnotationModel();
+        }
+        return viewer.getAnnotationModel();
     }
 
     @Override
