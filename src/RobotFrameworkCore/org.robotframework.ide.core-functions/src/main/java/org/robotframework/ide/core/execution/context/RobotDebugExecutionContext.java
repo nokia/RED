@@ -30,6 +30,8 @@ public class RobotDebugExecutionContext {
     private LinkedList<RobotExecutableRow<?>> forLoopExecutionRows;
     private int forLoopExecutionRowsCounter = 0;
     
+    private boolean isSetupKeyword;
+    
     public RobotDebugExecutionContext() {
         currentKeywords = new LinkedList<>();
         userKeywords = new ArrayList<>();
@@ -70,7 +72,9 @@ public class RobotDebugExecutionContext {
     public KeywordPosition findKeywordPosition() {
         KeywordContext parentKeywordContext = null;
         RobotExecutableRow<?> executionRow = null;
-        if (currentKeywords.size() == 1) { // keyword directly from test case
+        if (isSetupKeyword) {   //just skip keywords from e.g. Test Setup
+            isSetupKeyword = false;
+        } else if (currentKeywords.size() == 1) { // keyword directly from test case
             executionRow = findTestCaseExecutionRow();
         } else if (isForLoopStarted) { // keyword inside For loop
             executionRow = findForLoopExecutionRow();
@@ -282,6 +286,8 @@ public class RobotDebugExecutionContext {
             isForLoopStarted = false;
             forLoopExecutionRows.clear();
             forLoopExecutionRowsCounter = 0;
+        } else if(!type.equalsIgnoreCase("Keyword") && !type.equalsIgnoreCase("Test For")) {
+            isSetupKeyword = true;
         }
     }
     
