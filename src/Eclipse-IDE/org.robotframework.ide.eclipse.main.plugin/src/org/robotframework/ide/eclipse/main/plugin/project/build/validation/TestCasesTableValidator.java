@@ -79,7 +79,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
         reportUnkownKeywords(suiteModel, reporter, findExecutableRows(cases));
-        reportUnknownVariables(suiteModel, reporter, cases);
+        reportUnknownVariables(suiteModel, cases);
     }
 
     private void reportEmptyCases(final IFile file, final List<TestCase> cases) {
@@ -188,8 +188,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return names;
     }
 
-    private static void reportUnknownVariables(final RobotSuiteFile suiteModel,
-            final ProblemsReportingStrategy reporter,
+    private void reportUnknownVariables(final RobotSuiteFile suiteModel,
             final List<TestCase> cases) {        
         final ImmutableSet<String> variables = collectAccessibleVariables(suiteModel);
 
@@ -198,7 +197,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
 
-    private static ImmutableSet<String> collectAccessibleVariables(final RobotSuiteFile suiteModel) {
+    static ImmutableSet<String> collectAccessibleVariables(final RobotSuiteFile suiteModel) {
         final Builder<String> setBuilder = ImmutableSet.builder();
         new VariableDefinitionLocator(suiteModel).locateVariableDefinition(new VariableDetector() {
             @Override
