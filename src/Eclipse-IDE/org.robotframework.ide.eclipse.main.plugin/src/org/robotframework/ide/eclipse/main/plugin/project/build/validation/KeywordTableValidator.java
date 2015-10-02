@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -28,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
@@ -48,25 +51,27 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
         final RobotSuiteFile suiteModel = keywordSection.get().getSuiteFile();
         final KeywordTable keywordTable = (KeywordTable) keywordSection.get().getLinkedElement();
+        final List<UserKeyword> keywords = keywordTable.getKeywords();
 
-        reportEmptyKeyword(suiteModel.getFile(), keywordTable);
-        reportDuplicatedKewords(suiteModel.getFile(), keywordTable);
-        TestCasesTableValidator.reportUnkownKeywords(suiteModel, reporter, findExecutableRows(keywordTable));
+        reportEmptyKeyword(suiteModel.getFile(), keywords);
+        reportDuplicatedKewords(suiteModel.getFile(), keywords);
+        TestCasesTableValidator.reportUnkownKeywords(suiteModel, reporter, findExecutableRows(keywords));
+        reportUnknownVariables(suiteModel, keywords);
     }
 
-    private void reportEmptyKeyword(final IFile file, final KeywordTable keywordTable) {
-        for (final UserKeyword keyword : keywordTable.getKeywords()) {
+    private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
+        for (final UserKeyword keyword : keywords) {
             final RobotToken caseName = keyword.getKeywordName();
             TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
                     keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
         }
     }
 
-    private void reportDuplicatedKewords(final IFile file, final KeywordTable keywordTable) {
+    private void reportDuplicatedKewords(final IFile file, final List<UserKeyword> keywords) {
         final Set<String> duplicatedNames = newHashSet();
 
-        for (final UserKeyword kw1 : keywordTable.getKeywords()) {
-            for (final UserKeyword kw2 : keywordTable.getKeywords()) {
+        for (final UserKeyword kw1 : keywords) {
+            for (final UserKeyword kw2 : keywords) {
                 if (kw1 != kw2) {
                     final String kw1Name = kw1.getKeywordName().getText().toString();
                     final String kw2Name = kw2.getKeywordName().getText().toString();
@@ -78,7 +83,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             }
         }
 
-        for (final UserKeyword keyword : keywordTable.getKeywords()) {
+        for (final UserKeyword keyword : keywords) {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText().toString();
 
@@ -94,11 +99,33 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
     }
 
-    private List<RobotExecutableRow<?>> findExecutableRows(final KeywordTable keywordTable) {
+    private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {
         final List<RobotExecutableRow<?>> executables = newArrayList();
-        for (final UserKeyword keyword : keywordTable.getKeywords()) {
+        for (final UserKeyword keyword : keywords) {
             executables.addAll(keyword.getKeywordExecutionRows());
         }
         return executables;
+    }
+
+    private void reportUnknownVariables(final RobotSuiteFile suiteModel, final List<UserKeyword> keywords) {
+        final ImmutableSet<String> variables = TestCasesTableValidator.collectAccessibleVariables(suiteModel);
+
+        for (final UserKeyword keyword : keywords) {
+            final ImmutableSet<String> allVariables = ImmutableSet.<String> builder()
+                    .addAll(variables)
+                    .addAll(extractArgumentVariables(keyword))
+                    .build();
+
+            TestCasesTableValidator.reportUnknownVariables(suiteModel.getFile(), reporter,
+                    keyword.getKeywordExecutionRows(), allVariables);
+        }
+    }
+
+    private Collection<String> extractArgumentVariables(final UserKeyword keyword) {
+        final Set<String> arguments = newHashSet();
+        for (final KeywordArguments argument : keyword.getArguments()) {
+            arguments.addAll(TestCasesTableValidator.extractVariableNames(argument.getArguments()));
+        }
+        return arguments;
     }
 }
