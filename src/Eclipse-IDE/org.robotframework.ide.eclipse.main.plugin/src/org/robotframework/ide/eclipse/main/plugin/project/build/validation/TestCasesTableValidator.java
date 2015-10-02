@@ -205,6 +205,12 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 setBuilder.add((variable.getPrefix() + variable.getName() + variable.getSuffix()).toLowerCase());
                 return ContinueDecision.CONTINUE;
             }
+
+            @Override
+            public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                setBuilder.add(name.toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
         });
         return setBuilder.build();
     }

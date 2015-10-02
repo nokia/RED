@@ -69,6 +69,11 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
                         return ContinueDecision.CONTINUE;
                     }
                 }
+
+                @Override
+                public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                    return ContinueDecision.CONTINUE;
+                }
             });
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
