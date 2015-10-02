@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +19,9 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.Position;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow.ExecutionLineDescriptor;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -40,17 +41,19 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 class TestCasesTableValidator implements ModelUnitValidator {
-
-    private static final String WHOLE_CELL_VARIABLE_PATTERN = "^[@$&%]\\{[^\\{]+\\} *=? *$";
 
     private static final String VARIABLE_PATTERN = "[@$&%]\\{[^\\{]+\\}";
 
@@ -74,7 +77,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
-        reportUnkownKeywords(testCaseSection.get().getSuiteFile(), reporter, findExecutableRows(cases));
+        reportUnkownKeywords(suiteModel, reporter, findExecutableRows(cases));
+        reportUnknownVariables(suiteModel, reporter, cases);
     }
 
     private void reportEmptyCases(final IFile file, final List<TestCase> cases) {
@@ -133,7 +137,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     }
 
-    private List<RobotExecutableRow<?>> findExecutableRows(final List<TestCase> cases) {
+    private static List<RobotExecutableRow<?>> findExecutableRows(final List<TestCase> cases) {
         final List<RobotExecutableRow<?>> executables = newArrayList();
         for (final TestCase testCase : cases) {
             executables.addAll(testCase.getTestExecutionRows());
@@ -146,12 +150,12 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> names = collectAccessibleKeywordNames(robotSuiteFile);
 
         for (final RobotExecutableRow<?> executable : executables) {
-            final RobotToken keywordName = getKeywordNameToken(executable);
+            final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
             if (keywordName == null || keywordName.getText().toString().trim().startsWith("#")) {
                 continue;
             }
             final String name = keywordName.getText().toString();
-            if (!names.contains(name)) {
+            if (!names.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                         .formatMessageWith(name);
                 final ProblemPosition position = new ProblemPosition(keywordName.getLineNumber(),
@@ -165,97 +169,112 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private static Set<String> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
         final Set<String> names = new HashSet<>();
-        new KeywordDefinitionLocator(robotSuiteFile, false)
-                .locateKeywordDefinition(new KeywordDetector() {
+        new KeywordDefinitionLocator(robotSuiteFile, false).locateKeywordDefinition(new KeywordDetector() {
 
-                    @Override
-                    public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                            final KeywordSpecification kwSpec) {
-                        names.add(kwSpec.getName());
-                        return ContinueDecision.CONTINUE;
-                    }
+            @Override
+            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec) {
+                names.add(kwSpec.getName().toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
 
-                    @Override
-                    public ContinueDecision keywordDetected(final RobotSuiteFile file,
-                            final RobotKeywordDefinition keyword) {
-                        names.add(keyword.getName());
-                        return ContinueDecision.CONTINUE;
-                    }
-                });
+            @Override
+            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
+                names.add(keyword.getName().toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+        });
         return names;
     }
 
-    private static RobotToken getKeywordNameToken(final RobotExecutableRow<?> executable) {
-        final List<RobotToken> candidates = newArrayList();
-        candidates.add(executable.getAction());
-        candidates.addAll(executable.getArguments());
+    private static void reportUnknownVariables(final RobotSuiteFile suiteModel,
+            final ProblemsReportingStrategy reporter,
+            final List<TestCase> cases) {        
+        final ImmutableSet<String> variables = collectAccessibleVariables(suiteModel);
 
-        boolean isFirst = true;
-        for (final RobotToken token : candidates) {
-            final String text = token.getText().toString().trim();
-            if (Pattern.matches(WHOLE_CELL_VARIABLE_PATTERN, text)) {
-                isFirst = false;
-                continue;
-            }
-            if (isFirst && "\\".equals(text)) {
-                // internal of FOR-loop
-                isFirst = false;
-                continue;
-            }
-            if (isFirst && ": FOR".equals(text) || ":FOR".equals(text)) {
-                // FOR-loop definition
-                return null;
-            }
-            return token;
+        for (final TestCase testCase : cases) {
+            reportUnknownVariables(suiteModel.getFile(), reporter, testCase.getTestExecutionRows(), variables);
         }
-        return null;
     }
 
-    private void reportUnknownVariables() {
-        final Set<String> variables = new HashSet<>();
-        new VariableDefinitionLocator(testCaseSection.get().getSuiteFile())
-                .locateVariableDefinition(new VariableDetector() {
+    private static ImmutableSet<String> collectAccessibleVariables(final RobotSuiteFile suiteModel) {
+        final Builder<String> setBuilder = ImmutableSet.builder();
+        new VariableDefinitionLocator(suiteModel).locateVariableDefinition(new VariableDetector() {
+            @Override
+            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+                setBuilder.add((variable.getPrefix() + variable.getName() + variable.getSuffix()).toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+        });
+        return setBuilder.build();
+    }
 
+    static void reportUnknownVariables(final IFile file, final ProblemsReportingStrategy reporter,
+            final List<? extends RobotExecutableRow<?>> executables, final ImmutableSet<String> variables) {
+        final Set<String> definedVariables = newHashSet(variables);
+
+        for (final RobotExecutableRow<?> row : executables) {
+            final ExecutionLineDescriptor lineDescription = row.buildLineDescription();
+            definedVariables.addAll(extractVariableNames(lineDescription.getAssignments()));
+
+            final RobotToken token = lineDescription.getFirstAction();
+
+            final List<VariableInsideCell> usedParameters = extractVariables(lineDescription.getParameters());
+            for (final VariableInsideCell usedParameter : usedParameters) {
+                if (!definedVariables.contains(usedParameter.name.toLowerCase())) {
+                    final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                            .formatMessageWith(usedParameter.name);
+                    final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
+                            Range.closed(usedParameter.position.offset,
+                                    usedParameter.position.offset + usedParameter.position.length));
+                    final Map<String, Object> additionalArguments = Maps.newHashMap();
+                    additionalArguments.put("name", usedParameter.name);
+                    reporter.handleProblem(problem, file, position, additionalArguments);
+                }
+            }
+        }
+    }
+
+    private static List<String> extractVariableNames(final List<RobotToken> assignments) {
+        return newArrayList(
+                Iterables.transform(extractVariables(assignments), new Function<VariableInsideCell, String>() {
                     @Override
-                    public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
-                        variables.add(variable.getName());
-                        return ContinueDecision.CONTINUE;
+                    public String apply(final VariableInsideCell var) {
+                        return var.name.toLowerCase();
                     }
-                });
+                }));
+    }
 
-        final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
-        final List<TestCase> cases = casesTable.getTestCases();
-        for (final RobotExecutableRow<?> row : findExecutableRows(cases)) {
+    private static List<VariableInsideCell> extractVariables(final List<RobotToken> tokens) {
+        final List<VariableInsideCell> vars = newArrayList();
 
+        for (final RobotToken token : tokens) {
+            vars.addAll(extractVariables(token.getText().toString(), token.getStartOffset()));
         }
+        return vars;
     }
 
-    private static List<RobotToken> getVariablesUsedTokens(final RobotExecutableRow<?> executable) {
-        final List<RobotToken> candidates = newArrayList();
-        candidates.add(executable.getAction());
-        candidates.addAll(executable.getArguments());
-
-        final int index = candidates.indexOf(getKeywordNameToken(executable));
-        return index < candidates.size() - 1 ? newArrayList(candidates.subList(index + 1, candidates.size() - 1))
-                : new ArrayList<RobotToken>();
-    }
-
-    private static List<RobotToken> getVariablesDefiningTokens(final RobotExecutableRow<?> executable) {
-        final List<RobotToken> candidates = newArrayList();
-        candidates.add(executable.getAction());
-        candidates.addAll(executable.getArguments());
-
-        final int index = candidates.indexOf(getKeywordNameToken(executable));
-        return index < candidates.size() - 1 ? newArrayList(candidates.subList(0, index)) : new ArrayList<RobotToken>();
-    }
-
-    @VisibleForTesting static List<String> extractVariables(final String content) {
-        final List<String> variables = newArrayList();
+    private static List<VariableInsideCell> extractVariables(final String content, final int cellOffset) {
+        final List<VariableInsideCell> variables = newArrayList();
         final Matcher matcher = Pattern.compile(VARIABLE_PATTERN).matcher(content);
         
         while (matcher.find()) {
-            variables.add(matcher.group(0));
+            final String name = matcher.group(0);
+            final Position position = new Position(cellOffset + matcher.start(), name.length());
+            variables.add(new VariableInsideCell(name, position));
         }
         return variables;
+    }
+
+    private static class VariableInsideCell {
+
+        private final String name;
+
+        private final Position position;
+
+        VariableInsideCell(final String name, final Position position) {
+            this.name = name;
+            this.position = position;
+        }
     }
 }
