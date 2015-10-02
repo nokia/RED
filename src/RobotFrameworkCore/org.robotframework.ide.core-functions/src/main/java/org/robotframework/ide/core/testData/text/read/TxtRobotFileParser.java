@@ -410,6 +410,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         useMapper = false;
                     } else {
                         // FIXME: add warning about incorrect table
+                        robotToken.getTypes().add(0,
+                                RobotTokenType.USER_OWN_TABLE_HEADER);
+
                         processingState.clear();
                         processingState.push(ParsingState.TRASH);
 
