@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yrzhQF1JEeWeit3EM6sPPA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/23/15 11:48 AM
+Save-Time: 10/2/15 11:37 AM
 Testcase-Type: ecl
 Verifications: _-dwU0F3XEeWeit3EM6sPPA
 
@@ -85,7 +85,7 @@ with [get-view "Execution View" | get-tree] {
 //check if tests shows execution time
 with [get-view "Execution View"] {
     with [get-tree] {
-        get-item "ExecutionViewProject .*" | get-property caption | equals "ExecutionViewProject \(2\.[23]\d?\d? s\)" 
+        get-item "ExecutionViewProject .*" | get-property caption | equals "ExecutionViewProject \(2\.\d\d?\d? s\)" 
             | verify-true
         get-item "ExecutionViewProject.*/Duplicate Test Case \\(.*\\)" | get-property caption 
             | equals "Duplicate Test Case \(0.\d\d?\d? s\)" | verify-true
