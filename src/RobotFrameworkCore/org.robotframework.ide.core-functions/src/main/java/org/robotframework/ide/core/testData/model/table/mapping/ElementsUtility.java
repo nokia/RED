@@ -529,11 +529,13 @@ public class ElementsUtility {
         }
 
         if (correctedString.endsWith(" ")) {
+            int theLongestTextLength = Math.max(rt.getRaw().length(),
+                    rawText.length());
             RobotToken prettyRightAlign = new RobotToken();
             prettyRightAlign.setStartOffset(rt.getStartOffset()
-                    + rt.getRaw().length() - 1);
+                    + theLongestTextLength - 1);
             prettyRightAlign.setLineNumber(rt.getLineNumber());
-            prettyRightAlign.setStartColumn(rt.getEndColumn() - 1);
+            prettyRightAlign.setStartColumn(theLongestTextLength - 1);
             prettyRightAlign.setRaw(new StringBuilder(" "));
             prettyRightAlign.setText(new StringBuilder(" "));
             prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
