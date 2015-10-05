@@ -13,16 +13,20 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-public class ArtificialGroupingRobotElement implements RobotElement {
+import com.google.common.base.Optional;
+
+public class ArtificialGroupingRobotElement implements RobotFileInternalElement {
 
     private final SettingsGroup group;
 
-    private final List<RobotElement> groupedElements;
+    private final List<RobotFileInternalElement> groupedElements;
 
-    public ArtificialGroupingRobotElement(final SettingsGroup group, final Collection<RobotElement> elements) {
+    public ArtificialGroupingRobotElement(final SettingsGroup group,
+            final Collection<? extends RobotFileInternalElement> elements) {
         this.group = group;
         this.groupedElements = new ArrayList<>(elements);
     }
@@ -52,7 +56,7 @@ public class ArtificialGroupingRobotElement implements RobotElement {
     }
 
     @Override
-    public List<RobotElement> getChildren() {
+    public List<RobotFileInternalElement> getChildren() {
         return groupedElements;
     }
 
@@ -69,6 +73,11 @@ public class ArtificialGroupingRobotElement implements RobotElement {
     @Override
     public Position getDefinitionPosition() {
         return groupedElements.get(0).getDefinitionPosition();
+    }
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        return groupedElements.get(0).findElement(offset);
     }
 
     @Override

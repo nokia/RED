@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
@@ -57,12 +57,12 @@ class RobotOutlinePage extends ContentOutlinePage {
 
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                final Optional<RobotElement> element = Selections
-                        .getOptionalFirstElement((IStructuredSelection) event.getSelection(), RobotElement.class);
+                final Optional<RobotFileInternalElement> element = Selections.getOptionalFirstElement(
+                        (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
                 if (!element.isPresent()) {
                     return;
                 }
-                final RobotElement robotElement = element.get();
+                final RobotFileInternalElement robotElement = element.get();
                 if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
                     final ISelectionProvider selectionProvider = editor.getActiveEditor()
                             .getSite()
