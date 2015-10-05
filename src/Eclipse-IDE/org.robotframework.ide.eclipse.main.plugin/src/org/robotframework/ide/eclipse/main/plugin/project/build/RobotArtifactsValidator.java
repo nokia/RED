@@ -42,6 +42,10 @@ public class RobotArtifactsValidator {
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
         final IFile file = suiteModel.getFile();
+        if (!file.exists()) {
+            return;
+        }
+
         final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
                 .createProperValidator(prepareValidationContext(file), file);
 
