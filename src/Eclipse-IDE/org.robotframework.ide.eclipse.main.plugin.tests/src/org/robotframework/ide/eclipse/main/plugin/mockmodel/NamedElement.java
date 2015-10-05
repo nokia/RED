@@ -10,10 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 public class NamedElement implements RobotElement {
 
@@ -29,17 +27,7 @@ public class NamedElement implements RobotElement {
     }
 
     @Override
-    public String getComment() {
-        return "";
-    }
-
-    @Override
     public RobotElement getParent() {
-        return null;
-    }
-
-    @Override
-    public RobotSuiteFile getSuiteFile() {
         return null;
     }
 
@@ -50,16 +38,6 @@ public class NamedElement implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return null;
-    }
-
-    @Override
-    public Position getPosition() {
-        return null;
-    }
-
-    @Override
-    public Position getDefinitionPosition() {
         return null;
     }
 
