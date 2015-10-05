@@ -18,6 +18,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -48,7 +49,8 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
 
             if (currentOffset < 0 || document.getChar(currentOffset) == '\n' || document.getChar(currentOffset) == '*') {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
-                return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
+                return TextEditorContentAssist.buildSectionProposals(currentWord,
+                        DocumentUtilities.getDelimiter(document), offset - currentWord.length());
             } else {
 
                 currentWord = TextEditorContentAssist.readEnteredKeyword(currentOffset, document);
