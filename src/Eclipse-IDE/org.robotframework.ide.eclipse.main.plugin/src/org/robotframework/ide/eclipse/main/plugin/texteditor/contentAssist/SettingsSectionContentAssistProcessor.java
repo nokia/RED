@@ -16,13 +16,14 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class SettingsSectionContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
 
-    private Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
+    private final Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
 
     public SettingsSectionContentAssistProcessor() {
     }
@@ -31,7 +32,7 @@ public class SettingsSectionContentAssistProcessor implements IContentAssistProc
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
 
         final IDocument document = viewer.getDocument();
-        int currentOffset = offset - 1;
+        final int currentOffset = offset - 1;
 
         try {
             String currentWord = "";
@@ -41,7 +42,8 @@ public class SettingsSectionContentAssistProcessor implements IContentAssistProc
                         currentWord, offset - currentWord.length(), image);
             } else if (document.getChar(currentOffset) == '*') {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
-                return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
+                return TextEditorContentAssist.buildSectionProposals(currentWord,
+                        DocumentUtilities.getDelimiter(document), offset - currentWord.length());
             } else {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
                 final List<String> filteredProposals = TextEditorContentAssist.filterProposals(

@@ -12,6 +12,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 public class DefaultContentAssistProcessor implements IContentAssistProcessor {
 
@@ -22,26 +23,26 @@ public class DefaultContentAssistProcessor implements IContentAssistProcessor {
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-
         final IDocument document = viewer.getDocument();
-        int currentOffset = offset - 1;
 
+        final String lineDelimiter = DocumentUtilities.getDelimiter(document);
+        final int currentOffset = offset - 1;
         try {
             String currentWord = "";
-            
+
             if (currentOffset < 0 || document.getChar(currentOffset) == '\n') {
-                return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
+                return TextEditorContentAssist.buildSectionProposals(currentWord, lineDelimiter,
+                        offset - currentWord.length());
             } else if (document.getChar(currentOffset) == '*' || document.getChar(currentOffset) == ' ') {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
-                return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
+                return TextEditorContentAssist.buildSectionProposals(currentWord, lineDelimiter,
+                        offset - currentWord.length());
             }
-            
             lastError = null;
         } catch (final BadLocationException e) {
             e.printStackTrace();
             lastError = e.getMessage();
         }
-
         return null;
     }
 

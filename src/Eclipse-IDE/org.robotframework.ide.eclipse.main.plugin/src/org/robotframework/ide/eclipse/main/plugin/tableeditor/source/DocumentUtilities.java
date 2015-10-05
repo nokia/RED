@@ -8,6 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -131,4 +136,20 @@ public class DocumentUtilities {
         return i;
     }
 
+    public static String getDelimiter(final IDocument document) {
+        try {
+            final String delimiter = document.getLineDelimiter(0);
+            if (delimiter != null) {
+                return delimiter;
+            }
+        } catch (final BadLocationException e) {
+            // ok just get it from preferences
+        }
+
+        final IScopeContext[] context = new IScopeContext[] { InstanceScope.INSTANCE, ConfigurationScope.INSTANCE,
+                DefaultScope.INSTANCE };
+        final String delimiter = Platform.getPreferencesService().getString(Platform.PI_RUNTIME,
+                Platform.PREF_LINE_SEPARATOR, null, context);
+        return delimiter != null ? delimiter : "\n";
+    }
 }
