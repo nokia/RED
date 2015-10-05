@@ -46,6 +46,8 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IDebugElement.class) {
             return this;
+        } else if (adapter == ILaunch.class) {
+            return getLaunch();
         }
         return super.getAdapter(adapter);
     }
