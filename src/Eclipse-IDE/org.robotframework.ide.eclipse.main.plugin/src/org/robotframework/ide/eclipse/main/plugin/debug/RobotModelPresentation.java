@@ -30,28 +30,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
  */
 public class RobotModelPresentation extends LabelProvider implements IDebugModelPresentation {
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String,
-     * java.lang.Object)
-     */
     @Override
     public void setAttribute(final String attribute, final Object value) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-     */
     @Override
     public Image getImage(final Object element) {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-     */
     @Override
     public String getText(final Object element) {
         try {
@@ -62,33 +49,27 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
             } else if (element instanceof IStackFrame) {
                 return ((IStackFrame) element).getName();
             } else if (element instanceof RobotLineBreakpoint) {
-                IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
+                final IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
                 String breakpointName = "";
                 breakpointName += breakpointMarker.getAttribute(IMarker.LOCATION, "");
                 breakpointName += " [line: " + breakpointMarker.getAttribute(IMarker.LINE_NUMBER) + "]";
-                int hitCount = breakpointMarker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+                final int hitCount = breakpointMarker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
                 if (hitCount > 1) {
                     breakpointName += " [hit count: " + hitCount + "]";
                 }
-                String condition = breakpointMarker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                final String condition = breakpointMarker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                 if (!"".equals(condition)) {
                     breakpointName += " [conditional]";
                 }
                 return breakpointName;
             }
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
         }
 
         return "RED";
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse.debug.core.model.IValue
-     * , org.eclipse.debug.ui.IValueDetailListener)
-     */
     @Override
     public void computeDetail(final IValue value, final IValueDetailListener listener) {
         String detail = "";
@@ -99,16 +80,12 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
             } else {
                 detail = value.getValueString();
             }
-        } catch (DebugException e) {
+        } catch (final DebugException e) {
             e.printStackTrace();
         }
         listener.detailComputed(value, detail);
     }
     
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
-     */
     @Override
     public IEditorInput getEditorInput(final Object element) {
         if (element instanceof IFile) {
@@ -120,11 +97,6 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput,
-     * java.lang.Object)
-     */
     @Override
     public String getEditorId(final IEditorInput input, final Object element) {
         if (element instanceof IFile || element instanceof ILineBreakpoint) {

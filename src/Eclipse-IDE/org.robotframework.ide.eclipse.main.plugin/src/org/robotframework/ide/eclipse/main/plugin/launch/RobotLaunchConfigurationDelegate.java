@@ -261,13 +261,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
     }
     
-    //TODO: unused?
-    protected final RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotLaunchConfiguration robotConfig)
-            throws CoreException {
-        //return getRobotRuntimeEnvironment(getProject(robotConfig));
-        return null;
-    }
-
     private RobotProject getRobotProject(final IProject project) throws CoreException {
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         if(robotProject == null) {
@@ -418,7 +411,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                         }
                         try {
                             page.showView(ExecutionView.ID);
-                        } catch (PartInitException e) {
+                        } catch (final PartInitException e) {
                             e.printStackTrace();
                         }
 
