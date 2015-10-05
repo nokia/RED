@@ -57,7 +57,7 @@ public class RedPlugin extends AbstractUIPlugin {
         FontsManager.disposeFonts();
         ImagesManager.disposeImages();
         RobotModelManager.getInstance().dispose();
-        RobotCommandExecutor.getInstance(null).close();
+        RobotCommandExecutor.getInstance().close();
     }
 
     public RedPreferences getPreferences() {
