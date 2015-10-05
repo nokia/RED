@@ -473,7 +473,10 @@ public class RobotRuntimeEnvironment {
             throws RobotEnvironmentException {
         final String result = RobotCommandExecutor.getInstance().createLibdoc(location.getAbsolutePath(),
                 resultFilePath, libName, libPath);
-        return Integer.parseInt(result);
+        if(result != null) {
+            return Integer.parseInt(result);
+        }
+        return -1;
     }
 
     private void runLibdoc(final String libName, final List<String> cmdLine)
