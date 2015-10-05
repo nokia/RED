@@ -15,12 +15,13 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 public class VariablesSectionContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
     
-    private TextEditorContentAssist textEditorContentAssist;
+    private final TextEditorContentAssist textEditorContentAssist;
 
     public VariablesSectionContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
         this.textEditorContentAssist = textEditorContentAssist;
@@ -30,14 +31,15 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
 
         final IDocument document = viewer.getDocument();
-        int currentOffset = offset - 1;
+        final int currentOffset = offset - 1;
 
         try {
             String currentWord = "";
 
             if (document.getChar(currentOffset) == '*') {
                 currentWord = TextEditorContentAssist.readEnteredWord(currentOffset, document);
-                return TextEditorContentAssist.buildSectionProposals(currentWord, offset - currentWord.length());
+                return TextEditorContentAssist.buildSectionProposals(currentWord,
+                        DocumentUtilities.getDelimiter(document), offset - currentWord.length());
             } else {
                 currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
                 final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(

@@ -26,7 +26,6 @@ import org.robotframework.red.graphics.ImagesManager;
 public class TextEditorContentAssist {
     
     private static final String PROPOSAL_SEPARATOR = "  ";  //placed after proposal text
-    private static final String SECTION_PROPOSAL_SEPARATOR = "\n";
     private static Image variableImage = ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
 
     private static List<String> sections = new ArrayList<>();
@@ -93,14 +92,14 @@ public class TextEditorContentAssist {
         return keywordMap;
     }
     
-    static ICompletionProposal[] buildSectionProposals(final String replacedWord,
+    static ICompletionProposal[] buildSectionProposals(final String replacedWord, final String lineDelimiter,
             final int offset) {
 
+        System.out.println(lineDelimiter.replaceAll("\n", "\\\n").replaceAll("\r", "\\\r"));
         final List<ICompletionProposal> completionProposals = newArrayList();
         for (final String proposal : sections) {
-            completionProposals
-                    .add(new CompletionProposal(proposal + SECTION_PROPOSAL_SEPARATOR, offset, replacedWord.length(),
-                            proposal.length() + SECTION_PROPOSAL_SEPARATOR.length(), null, proposal, null, null));
+            completionProposals.add(new CompletionProposal(proposal + lineDelimiter, offset, replacedWord.length(),
+                    proposal.length() + lineDelimiter.length(), null, proposal, null, null));
         }
         return completionProposals.toArray(new ICompletionProposal[0]);
     }
