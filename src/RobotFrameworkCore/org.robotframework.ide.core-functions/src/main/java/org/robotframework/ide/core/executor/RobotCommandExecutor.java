@@ -26,8 +26,6 @@ public class RobotCommandExecutor {
 
     private Map<String, PythonProcessContext> processesMap;
 
-    private static String currentPythonFolderLocation;
-
     private int port;
 
     private RobotCommandExecutor() {
@@ -50,23 +48,24 @@ public class RobotCommandExecutor {
         private static final RobotCommandExecutor instance = new RobotCommandExecutor();
     }
 
-    public static RobotCommandExecutor getInstance(final String pythonFolderLocation) {
-        currentPythonFolderLocation = pythonFolderLocation;
+    public static RobotCommandExecutor getInstance() {
         return InstanceHolder.instance;
     }
 
-    public synchronized void setupPythonProcess(final String pythonFileLocation, final String scriptLocation) {
-        if (!isPythonProcessStarted(currentPythonFolderLocation)) {
+    public synchronized void setupPythonProcess(final String pythonFolderLocation, final String pythonFileLocation,
+            final String scriptLocation) {
+        if (!isPythonProcessStarted(pythonFolderLocation)) {
             if (new File(pythonFileLocation).exists() && new File(scriptLocation).exists()) {
-                createPythonServerProcess(pythonFileLocation, scriptLocation);
-                createClient();
+                createPythonServerProcess(pythonFolderLocation, pythonFileLocation, scriptLocation);
+                createClient(pythonFolderLocation);
             } else {
-                throw new RuntimeException("Could not setup python server.");
+                throw new RuntimeException("Could not setup python server on file: " + pythonFileLocation);
             }
         }
     }
 
-    private void createPythonServerProcess(final String pythonFileLocation, final String scriptLocation) {
+    private void createPythonServerProcess(final String pythonFolderLocation, final String pythonFileLocation,
+            final String scriptLocation) {
 
         port = findFreePort();
         final List<String> command = new ArrayList<>();
@@ -75,9 +74,9 @@ public class RobotCommandExecutor {
         command.add(String.valueOf(port));
         try {
             final Process serverProcess = new ProcessBuilder(command).redirectErrorStream(true).start();
-            processesMap.put(currentPythonFolderLocation, new PythonProcessContext(serverProcess, pythonFileLocation,
+            processesMap.put(pythonFolderLocation, new PythonProcessContext(serverProcess, pythonFileLocation,
                     scriptLocation));
-            waitForProcessTermination(currentPythonFolderLocation);
+            waitForProcessTermination(pythonFolderLocation);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,7 +98,7 @@ public class RobotCommandExecutor {
         }).start();
     }
 
-    private void createClient() {
+    private void createClient(final String pythonFolderLocation) {
         final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try {
             config.setServerURL(new URL("http://127.0.0.1:" + port));
@@ -108,15 +107,19 @@ public class RobotCommandExecutor {
         }
         final XmlRpcClient client = new XmlRpcClient();
         client.setConfig(config);
-        processesMap.get(currentPythonFolderLocation).setClient(client);
-        waitForConnectionToServer(client);
+        processesMap.get(pythonFolderLocation).setClient(client);
+        waitForConnectionToServer(pythonFolderLocation);
     }
 
-    private void waitForConnectionToServer(final XmlRpcClient client) {
+    private void waitForConnectionToServer(final String pythonFolderLocation) {
         int retryCounter = 0;
         while (retryCounter < 50) {
             try {
-                client.execute("checkServerAvailability", new Object[] {});
+                if (processesMap.get(pythonFolderLocation).getServerProcess() != null) {
+                    processesMap.get(pythonFolderLocation)
+                            .getClient()
+                            .execute("checkServerAvailability", new Object[] {});
+                }
                 break;
             } catch (XmlRpcException e) {
                 try {
@@ -129,54 +132,63 @@ public class RobotCommandExecutor {
         }
     }
 
-    public String getVariables(final String filePath, final String fileArguments) {
-        Object result = invokeMethod("getVariables", new Object[] { filePath, fileArguments });
+    public String getVariables(final String pythonFolderLocation, final String filePath, final String fileArguments) {
+        Object result = invokeMethod(pythonFolderLocation, "getVariables", new Object[] { filePath, fileArguments });
         return getStringResult(result);
     }
 
-    public String getGlobalVariables() {
-        Object result = invokeMethod("getGlobalVariables", new Object[] {});
+    public String getGlobalVariables(final String pythonFolderLocation) {
+        Object result = invokeMethod(pythonFolderLocation, "getGlobalVariables", new Object[] {});
         return getStringResult(result);
     }
 
-    public String getStandardLibrariesNames() {
-        Object result = invokeMethod("getStandardLibrariesNames", new Object[] {});
-        return getStringResult(result);
-    }
-    
-    public String getStandardLibraryPath(final String libName) {
-        Object result = invokeMethod("getStandardLibraryPath", new Object[] { libName });
+    public String getStandardLibrariesNames(final String pythonFolderLocation) {
+        Object result = invokeMethod(pythonFolderLocation, "getStandardLibrariesNames", new Object[] {});
         return getStringResult(result);
     }
 
-    public String getRobotVersion() {
-        Object result = invokeMethod("getRobotVersion", new Object[] {});
-        return getStringResult(result);
-    }
-    
-    public String getRunModulePath() {
-        Object result = invokeMethod("getRunModulePath", new Object[] {});
-        return getStringResult(result);
-    }
-    
-    public String createLibdoc(final String resultFilePath, final String libName, final String libPath) {
-        Object result = invokeMethod("createLibdoc", new Object[] { resultFilePath, libName, libPath });
+    public String getStandardLibraryPath(final String pythonFolderLocation, final String libName) {
+        Object result = invokeMethod(pythonFolderLocation, "getStandardLibraryPath", new Object[] { libName });
         return getStringResult(result);
     }
 
-    private synchronized Object invokeMethod(final String methodName, final Object[] params) {
+    public String getRobotVersion(final String pythonFolderLocation) {
+        Object result = invokeMethod(pythonFolderLocation, "getRobotVersion", new Object[] {});
+        return getStringResult(result);
+    }
 
-        setupPythonProcess(processesMap.get(currentPythonFolderLocation).getPythonFileLocation(),
-                processesMap.get(currentPythonFolderLocation).getScriptLocation());
+    public String getRunModulePath(final String pythonFolderLocation) {
+        Object result = invokeMethod(pythonFolderLocation, "getRunModulePath", new Object[] {});
+        return getStringResult(result);
+    }
+
+    public String createLibdoc(final String pythonFolderLocation, final String resultFilePath, final String libName,
+            final String libPath) {
+        Object result = invokeMethod(pythonFolderLocation, "createLibdoc", new Object[] { resultFilePath, libName,
+                libPath });
+        return getStringResult(result);
+    }
+
+    private synchronized Object invokeMethod(final String pythonFolderLocation, final String methodName,
+            final Object[] params) {
+
+        setupPythonProcess(pythonFolderLocation, processesMap.get(pythonFolderLocation).getPythonFileLocation(),
+                processesMap.get(pythonFolderLocation).getScriptLocation());
 
         Object result = null;
         try {
-            final PythonProcessContext processContext = processesMap.get(currentPythonFolderLocation);
+            final PythonProcessContext processContext = processesMap.get(pythonFolderLocation);
             if (processContext != null && processContext.getClient() != null) {
                 result = processContext.getClient().execute(methodName, params);
             }
         } catch (XmlRpcException e) {
-            e.printStackTrace();
+            try {
+                throw new RobotCommandExecutorException("Could not invoke server method \"" + methodName
+                        + "\" on python installation: "
+                        + processesMap.get(pythonFolderLocation).getPythonFileLocation());
+            } catch (RobotCommandExecutorException e1) {
+                e1.printStackTrace();
+            }
         }
 
         return result;
@@ -250,6 +262,20 @@ public class RobotCommandExecutor {
 
         public String getScriptLocation() {
             return scriptLocation;
+        }
+    }
+    
+    @SuppressWarnings("serial")
+    public static class RobotCommandExecutorException extends Exception {
+
+        public RobotCommandExecutorException(final String message) {
+            super(message);
+        }
+
+
+        public RobotCommandExecutorException(final String message,
+                final Throwable cause) {
+            super(message, cause);
         }
     }
 }

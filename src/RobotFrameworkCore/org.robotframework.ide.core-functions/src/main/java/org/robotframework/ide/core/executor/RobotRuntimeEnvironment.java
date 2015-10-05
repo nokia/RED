@@ -190,7 +190,7 @@ public class RobotRuntimeEnvironment {
         };
         try {
             final String output;
-            String result = RobotCommandExecutor.getInstance(pythonLocation.getAbsolutePath()).getRobotVersion();
+            String result = RobotCommandExecutor.getInstance().getRobotVersion(pythonLocation.getAbsolutePath());
             if(result!=null && !result.equals("")) {
                 output = result;
             } else {
@@ -216,7 +216,7 @@ public class RobotRuntimeEnvironment {
             }
         };
         try {
-            String output = RobotCommandExecutor.getInstance(pythonLocation.getAbsolutePath()).getRunModulePath();
+            String output = RobotCommandExecutor.getInstance().getRunModulePath(pythonLocation.getAbsolutePath());
             if (output == null || output.equals("")) {
                 runExternalProcess(Arrays.asList(getPythonExecutablePath(pythonLocation), "-c",
                         "import robot;print(robot.__file__)"), linesHandler);
@@ -336,7 +336,7 @@ public class RobotRuntimeEnvironment {
         if (scriptFile != null) {
             scriptLocation = scriptFile.getAbsolutePath();
         }
-        RobotCommandExecutor.getInstance(pythonLocation.getAbsolutePath()).setupPythonProcess(pythonFileLocation,
+        RobotCommandExecutor.getInstance().setupPythonProcess(pythonLocation.getAbsolutePath(), pythonFileLocation,
                 scriptLocation);
     }
 
@@ -471,7 +471,7 @@ public class RobotRuntimeEnvironment {
     
     private int createLibdoc(final String resultFilePath, final String libName, final String libPath)
             throws RobotEnvironmentException {
-        final String result = RobotCommandExecutor.getInstance(location.getAbsolutePath()).createLibdoc(
+        final String result = RobotCommandExecutor.getInstance().createLibdoc(location.getAbsolutePath(),
                 resultFilePath, libName, libPath);
         return Integer.parseInt(result);
     }
@@ -523,7 +523,7 @@ public class RobotRuntimeEnvironment {
                         }
                     }
                 };
-                String result = RobotCommandExecutor.getInstance(location.getAbsolutePath()).getStandardLibrariesNames();
+                String result = RobotCommandExecutor.getInstance().getStandardLibrariesNames(location.getAbsolutePath());
                 if(result != null && !result.equals("")) {
                     result = result.replaceAll("'", "\"");
                     if (mapper == null) {
@@ -563,7 +563,7 @@ public class RobotRuntimeEnvironment {
 
             try {
                 String pycPath = "";
-                String result = RobotCommandExecutor.getInstance(location.getAbsolutePath()).getStandardLibraryPath(
+                String result = RobotCommandExecutor.getInstance().getStandardLibraryPath(location.getAbsolutePath(),
                         libraryName);
                 if (result != null) {
                     pycPath = result;
@@ -616,7 +616,7 @@ public class RobotRuntimeEnvironment {
 
                 String resultVars = "";
                 try {
-                    resultVars = RobotCommandExecutor.getInstance(location.getAbsolutePath()).getGlobalVariables();
+                    resultVars = RobotCommandExecutor.getInstance().getGlobalVariables(location.getAbsolutePath());
                     if(resultVars != null && !resultVars.equals("")) {
                         resultVars = resultVars.trim().replaceAll("'", "\"");
                     } else {
@@ -680,7 +680,8 @@ public class RobotRuntimeEnvironment {
 
             String resultVars = "";
             try {
-                String line = RobotCommandExecutor.getInstance(location.getAbsolutePath()).getVariables(normalizedPath, argsBuilder.toString());
+                String line = RobotCommandExecutor.getInstance().getVariables(location.getAbsolutePath(),
+                        normalizedPath, argsBuilder.toString());
                 if(line != null && !line.equals("")) {
                     resultVars = line.replaceAll("'", "\"");
                 } else { 
