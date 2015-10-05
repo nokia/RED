@@ -20,9 +20,10 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
-public class RobotVariable implements RobotElement, Serializable {
+public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     private transient RobotVariablesSection parent;
 
@@ -125,11 +126,17 @@ public class RobotVariable implements RobotElement, Serializable {
         return new Position(begin, end - begin);
     }
 
+    @Override
     public Position getDefinitionPosition() {
         final int begin = holder.getDeclaration().getStartOffset();
         final int length = holder.getDeclaration().getText().length();
 
         return new Position(begin, length);
+    }
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        return Optional.absent();
     }
 
     @Override

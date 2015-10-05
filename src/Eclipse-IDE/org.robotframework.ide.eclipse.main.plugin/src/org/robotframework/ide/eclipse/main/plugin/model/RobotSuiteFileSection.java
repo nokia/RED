@@ -19,7 +19,9 @@ import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-public abstract class RobotSuiteFileSection implements RobotElement {
+import com.google.common.base.Optional;
+
+public abstract class RobotSuiteFileSection implements RobotFileInternalElement {
 
     private final String name;
 
@@ -93,6 +95,11 @@ public abstract class RobotSuiteFileSection implements RobotElement {
     public Position getDefinitionPosition() {
         final RobotToken tableHeader = sectionTable.getHeaders().get(0).getTableHeader();
         return new Position(tableHeader.getStartOffset(), tableHeader.getText().length());
+    }
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        return Optional.absent();
     }
 
     @Override

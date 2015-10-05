@@ -318,8 +318,12 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenFileChangedExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
-        if (change.getKind() == Kind.CHANGED && change.getElement().getSuiteFile() == fileModel) {
-            refreshEverything();
+        if (change.getKind() == Kind.CHANGED) {
+            final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
+                    ? (RobotSuiteFile) change.getElement() : null;
+            if (suite == fileModel) {
+                refreshEverything();
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
@@ -42,8 +43,8 @@ class CodeCommentLabelProvider extends MatchesHighlightingLabelProvider {
     }
 
     private String getComment(final Object element) {
-        if (element instanceof RobotElement) {
-            return ((RobotElement) element).getComment();
+        if (element instanceof RobotFileInternalElement) {
+            return ((RobotFileInternalElement) element).getComment();
         }
         return "";
     }

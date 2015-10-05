@@ -14,6 +14,8 @@ import java.util.List;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 
+import com.google.common.base.Optional;
+
 public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
 
     private transient RobotSuiteFileSection parent;
@@ -91,6 +93,11 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
 
     @Override
     public abstract Position getPosition();
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        return Optional.absent();
+    }
 
     @Override
     public RobotSuiteFile getSuiteFile() {
