@@ -99,14 +99,15 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
 
     private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
         final List<RobotElement> grouped = new ArrayList<>(children);
-        final Multimap<SettingsGroup, RobotElement> removedElements = LinkedHashMultimap.create();
+        final Multimap<SettingsGroup, RobotSetting> removedElements = LinkedHashMultimap.create();
 
         for (final RobotElement element : children) {
             if (element instanceof RobotSetting) {
-                final SettingsGroup group = ((RobotSetting) element).getGroup();
+                final RobotSetting setting = (RobotSetting) element;
+                final SettingsGroup group = setting.getGroup();
                 if (group != SettingsGroup.NO_GROUP) {
                     grouped.remove(element);
-                    removedElements.put(group, element);
+                    removedElements.put(group, setting);
                 }
             }
         }

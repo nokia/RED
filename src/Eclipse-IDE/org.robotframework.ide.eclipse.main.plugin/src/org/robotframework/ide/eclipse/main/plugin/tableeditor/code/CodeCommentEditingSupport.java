@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseCommentCommand;
@@ -39,8 +40,8 @@ class CodeCommentEditingSupport extends RobotElementEditingSupport {
 
     @Override
     protected Object getValue(final Object element) {
-        if (element instanceof RobotElement) {
-            return ((RobotElement) element).getComment();
+        if (element instanceof RobotFileInternalElement) {
+            return ((RobotFileInternalElement) element).getComment();
         }
         return "";
     }

@@ -33,7 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
-public class RobotSuiteFile implements RobotElement {
+public class RobotSuiteFile implements RobotFileInternalElement {
 
     private final RobotElement parent;
 
@@ -251,6 +251,26 @@ public class RobotSuiteFile implements RobotElement {
         for (final RobotElement elem : getSections()) {
             if (sectionClass.isInstance(elem)) {
                 return (Optional<T>) Optional.of(elem);
+            }
+        }
+        return Optional.absent();
+    }
+
+    /**
+     * Gets model element for given offset in file
+     * 
+     * @param offset
+     * @return
+     */
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        for (final RobotSuiteFileSection section : getChildren()) {
+            final Position position = section.getPosition();
+            if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
+                // final Optional<? extends RobotElement> candidate = section.findElement(offset);
+                // if (candidate.isPresent()) {
+                // return candidate;
+                // }
             }
         }
         return Optional.absent();
