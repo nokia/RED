@@ -32,6 +32,17 @@ public class RobotCommandExecutor {
 
     private RobotCommandExecutor() {
         processesMap = new HashMap<>();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                for (String pythonLocation : processesMap.keySet()) {
+                    if (processesMap.get(pythonLocation).getServerProcess() != null) {
+                        processesMap.get(pythonLocation).getServerProcess().destroy();
+                    }
+                }
+            }
+        });
     }
 
     private static class InstanceHolder {
@@ -83,7 +94,6 @@ public class RobotCommandExecutor {
                     e.printStackTrace();
                 } finally {
                     processesMap.get(pythonFolderLocation).setServerProcess(null);
-                    ;
                 }
             }
         }).start();
