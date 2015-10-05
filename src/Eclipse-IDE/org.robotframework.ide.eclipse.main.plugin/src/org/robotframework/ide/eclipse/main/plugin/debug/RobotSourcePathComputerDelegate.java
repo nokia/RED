@@ -24,9 +24,8 @@ public class RobotSourcePathComputerDelegate implements ISourcePathComputerDeleg
 
         final String projectName = new RobotLaunchConfiguration(configuration).getProjectName();
         final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-        if (project.exists()) {
-            return new ISourceContainer[] { new ProjectSourceContainer(project, true) };
-        }
-        return new ISourceContainer[] { new WorkspaceSourceContainer() };
+        final ISourceContainer container = project.exists() ? new ProjectSourceContainer(project, true)
+                : new WorkspaceSourceContainer();
+        return new ISourceContainer[] { container };
     }
 }
