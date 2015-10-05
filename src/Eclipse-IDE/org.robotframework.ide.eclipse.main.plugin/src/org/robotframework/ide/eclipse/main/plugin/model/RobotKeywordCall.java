@@ -17,7 +17,9 @@ import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-public class RobotKeywordCall implements RobotElement, Serializable {
+import com.google.common.base.Optional;
+
+public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
     private String name;
     private List<String> args;
@@ -130,6 +132,11 @@ public class RobotKeywordCall implements RobotElement, Serializable {
             token = linkedElement.getElementTokens().get(0);
         }
         return new Position(token.getStartOffset(), token.getText().length());
+    }
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        return Optional.absent();
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.FindElementUsagesHandler.E4FindUsagesHandler;
 import org.robotframework.red.viewers.Selections;
@@ -39,7 +39,8 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
         @Execute
         public Object findUsages(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 @Named("org.robotframework.ide.eclipse.findElementUsages.place") final String place) {
-            final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
+            final RobotFileInternalElement element = Selections.getSingleElement(selection,
+                    RobotFileInternalElement.class);
             final String name = element.getName();
 
             try {

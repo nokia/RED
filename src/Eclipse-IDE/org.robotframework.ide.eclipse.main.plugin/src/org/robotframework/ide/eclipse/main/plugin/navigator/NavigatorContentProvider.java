@@ -70,7 +70,7 @@ public class NavigatorContentProvider implements ITreeContentProvider {
         if (parentElement instanceof IFile) {
             return RedPlugin.getModelManager().createSuiteFile((IFile) parentElement).getSections().toArray();
         } else if (parentElement instanceof RobotSettingsSection) {
-            final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
+            final List<? extends RobotElement> children = ((RobotSettingsSection) parentElement).getChildren();
             return groupedChildren(children).toArray();
         } else if (parentElement instanceof RobotElement) {
             return ((RobotElement) parentElement).getChildren().toArray();
@@ -80,14 +80,15 @@ public class NavigatorContentProvider implements ITreeContentProvider {
 
     private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
         final List<RobotElement> grouped = new ArrayList<>(children);
-        final Multimap<SettingsGroup, RobotElement> removedElements = LinkedHashMultimap.create();
+        final Multimap<SettingsGroup, RobotSetting> removedElements = LinkedHashMultimap.create();
 
         for (final RobotElement element : children) {
             if (element instanceof RobotSetting) {
-                final SettingsGroup group = ((RobotSetting) element).getGroup();
+                final RobotSetting setting = (RobotSetting) element;
+                final SettingsGroup group = setting.getGroup();
                 if (group != SettingsGroup.NO_GROUP) {
                     grouped.remove(element);
-                    removedElements.put(group, element);
+                    removedElements.put(group, setting);
                 }
             }
         }
@@ -134,7 +135,8 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenFileChangesExternally(
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
-            viewer.refresh(change.getElement().getSuiteFile().getFile());
+            final RobotSuiteFile suiteFile = (RobotSuiteFile) change.getElement();
+            viewer.refresh(suiteFile.getSuiteFile().getFile());
         }
     }
 
@@ -152,7 +154,8 @@ public class NavigatorContentProvider implements ITreeContentProvider {
     private void whenModelIsDisposed(
             @UIEventTopic(RobotModelEvents.SUITE_MODEL_DISPOSED) final RobotElementChange change) {
         if (change.getElement() instanceof RobotSuiteFile && change.getKind() == Kind.CHANGED && viewer != null) {
-            viewer.refresh(change.getElement().getSuiteFile().getFile());
+            final RobotSuiteFile suiteFile = (RobotSuiteFile) change.getElement();
+            viewer.refresh(suiteFile.getSuiteFile().getFile());
         }
     }
 
