@@ -40,6 +40,10 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.linkedElement = executableRow;
     }
 
+    public AModelElement<?> getLinkedElement() {
+        return linkedElement;
+    }
+
     @Override
     public String getName() {
         return name;
@@ -136,6 +140,10 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
+        if (linkedElement.getBeginPosition().getOffset() <= offset
+                && offset <= linkedElement.getEndPosition().getOffset()) {
+            return Optional.of(this);
+        }
         return Optional.absent();
     }
 

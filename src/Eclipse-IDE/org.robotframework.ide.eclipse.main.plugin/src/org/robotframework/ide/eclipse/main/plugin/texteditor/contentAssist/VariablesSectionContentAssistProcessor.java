@@ -42,8 +42,8 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
                         DocumentUtilities.getDelimiter(document), offset - currentWord.length());
             } else {
                 currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
-                final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
-                        textEditorContentAssist.getVariables(), currentWord);
+                final List<RedVariableProposal> filteredProposals = TextEditorContentAssist
+                        .filterVariablesProposals(textEditorContentAssist.getVariables(currentOffset), currentWord);
                 if (!filteredProposals.isEmpty()) {
                     return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
                             - currentWord.length());
@@ -60,7 +60,6 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
 
     @Override
     public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int offset) {
-
         return new IContextInformation[0];
     }
 
@@ -81,7 +80,6 @@ public class VariablesSectionContentAssistProcessor implements IContentAssistPro
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator(this);
+        return new TextEditorContextValidator();
     }
-
 }
