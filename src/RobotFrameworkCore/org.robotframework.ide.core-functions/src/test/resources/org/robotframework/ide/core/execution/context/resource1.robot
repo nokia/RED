@@ -21,3 +21,7 @@ testM
 Keyword1
 	Keyword2
 	Log  1234
+	
+SetupKeyword
+	Log  12345
+	Log  123

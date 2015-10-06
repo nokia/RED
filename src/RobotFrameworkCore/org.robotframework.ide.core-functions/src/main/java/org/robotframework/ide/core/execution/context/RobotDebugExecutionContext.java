@@ -17,6 +17,14 @@ import com.google.common.io.Files;
 
 public class RobotDebugExecutionContext {
     
+    public static final String KEYWORD_MAIN_TYPE = "Keyword";
+
+    public static final String KEYWORD_LOOP_TYPE = "Test For";
+
+    public static final String KEYWORD_LOOP_ITEM_TYPE = "Test Foritem";
+
+    public static final String KEYWORD_TEARDOWN_TYPE = "Test Teardown";
+    
     private RobotFile currentModel;
     private TestCase currentTestCase;
     private List<UserKeyword> userKeywords;
@@ -72,10 +80,12 @@ public class RobotDebugExecutionContext {
     public KeywordPosition findKeywordPosition() {
         KeywordContext parentKeywordContext = null;
         RobotExecutableRow<?> executionRow = null;
-        if (isSetupKeyword) {   //just skip keywords from e.g. Test Setup
-            isSetupKeyword = false;
-        } else if (currentKeywords.size() == 1) { // keyword directly from test case
-            executionRow = findTestCaseExecutionRow();
+        if (currentKeywords.size() == 1) { // keyword directly from test case
+            if(isSetupKeyword) {
+                isSetupKeyword = false; //just skip first keyword definition from e.g. Test Setup
+            } else {
+                executionRow = findTestCaseExecutionRow();
+            }
         } else if (isForLoopStarted) { // keyword inside For loop
             executionRow = findForLoopExecutionRow();
         } else { // keyword from Keywords section or resource file
@@ -265,7 +275,8 @@ public class RobotDebugExecutionContext {
         return null;
     }
     
-    private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword, final KeywordContext parentKeywordContext) {
+    private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword,
+            final KeywordContext parentKeywordContext) {
         final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getKeywordExecutionRows();
         if (parentKeywordContext.getKeywordExecutionRowCounter() < executableRows.size()) {
             final RobotExecutableRow<UserKeyword> executableRow = executableRows.get(parentKeywordContext.getKeywordExecutionRowCounter());
@@ -280,13 +291,16 @@ public class RobotDebugExecutionContext {
     }
     
     private void checkKeywordType(final String type) {
-        if(type.equalsIgnoreCase("Test Foritem")) {
+        if (type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE)) {
             isForLoopStarted = true;
-        } else if(!type.equalsIgnoreCase("Test Foritem") && isForLoopStarted) {
+        } else if (!type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE) && isForLoopStarted) {
             isForLoopStarted = false;
             forLoopExecutionRows.clear();
             forLoopExecutionRowsCounter = 0;
-        } else if(!type.equalsIgnoreCase("Keyword") && !type.equalsIgnoreCase("Test For")) {
+        } else if (isSetupKeyword && !type.equalsIgnoreCase(KEYWORD_LOOP_TYPE)
+                && !type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE)) {
+            isSetupKeyword = false;
+        } else if (!type.equalsIgnoreCase(KEYWORD_MAIN_TYPE) && !type.equalsIgnoreCase(KEYWORD_LOOP_TYPE)) {
             isSetupKeyword = true;
         }
     }
