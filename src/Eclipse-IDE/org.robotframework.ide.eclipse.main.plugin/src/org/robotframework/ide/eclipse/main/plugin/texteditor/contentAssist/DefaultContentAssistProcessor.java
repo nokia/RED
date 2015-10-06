@@ -18,9 +18,6 @@ public class DefaultContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
 
-    public DefaultContentAssistProcessor() {
-    }
-
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
         final IDocument document = viewer.getDocument();
@@ -69,7 +66,7 @@ public class DefaultContentAssistProcessor implements IContentAssistProcessor {
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator(this);
+        return new TextEditorContextValidator();
     }
 
 }

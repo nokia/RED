@@ -265,15 +265,19 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
         for (final RobotSuiteFileSection section : getChildren()) {
-            final Position position = section.getPosition();
-            if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
+            final Optional<? extends RobotElement> candidate = section.findElement(offset);
+            if (candidate.isPresent()) {
+                return candidate;
+            }
+//            final Position position = section.getPosition();
+//            if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
                 // final Optional<? extends RobotElement> candidate = section.findElement(offset);
                 // if (candidate.isPresent()) {
                 // return candidate;
                 // }
-            }
+            // }
         }
-        return Optional.absent();
+        return Optional.of(this);
     }
 
     public List<LibrarySpecification> getImportedLibraries() {

@@ -26,10 +26,12 @@ public class SettingsSectionContentAssistProcessor implements IContentAssistProc
     private final Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
 
     public SettingsSectionContentAssistProcessor() {
+        System.out.println("Created");
     }
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
+        System.out.println("asked for completions");
 
         final IDocument document = viewer.getDocument();
         final int currentOffset = offset - 1;
@@ -86,7 +88,7 @@ public class SettingsSectionContentAssistProcessor implements IContentAssistProc
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator(this);
+        return new TextEditorContextValidator();
     }
 
 }

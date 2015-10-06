@@ -11,8 +11,6 @@ import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 
-import com.google.common.base.Optional;
-
 public class RobotCasesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Test Cases";
@@ -47,9 +45,5 @@ public class RobotCasesSection extends RobotSuiteFileSection {
             newTestCase.link(testCase);
             elements.add(newTestCase);
         }
-    }
-    @Override
-    public Optional<? extends RobotElement> findElement(final int offset) {
-        return Optional.absent();
     }
 }

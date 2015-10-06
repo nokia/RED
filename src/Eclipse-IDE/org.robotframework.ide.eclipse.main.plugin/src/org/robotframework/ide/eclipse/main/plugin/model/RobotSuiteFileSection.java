@@ -26,7 +26,8 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
     private final String name;
 
     private final RobotElement parent;
-    protected final List<RobotElement> elements = new ArrayList<>();
+
+    protected final List<RobotFileInternalElement> elements = new ArrayList<>();
 
     protected ARobotSectionTable sectionTable;
 
@@ -99,6 +100,13 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
+        for (final RobotFileInternalElement element : getChildren()) {
+            final Optional<? extends RobotElement> candidate = element.findElement(offset);
+            if (candidate.isPresent()) {
+                return candidate;
+            }
+        }
+        // TODO : check if offset is within this section
         return Optional.absent();
     }
 
@@ -113,7 +121,7 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
     }
 
     @Override
-    public List<? extends RobotElement> getChildren() {
+    public List<? extends RobotFileInternalElement> getChildren() {
         return elements;
     }
 

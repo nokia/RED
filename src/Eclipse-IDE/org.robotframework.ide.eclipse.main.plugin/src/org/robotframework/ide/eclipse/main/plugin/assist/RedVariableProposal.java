@@ -29,6 +29,10 @@ public class RedVariableProposal {
                 VariableType.LOCAL);
     }
 
+    static RedVariableProposal createLocal(final String name, final String path) {
+        return new RedVariableProposal(name, path, "", "", VariableType.LOCAL);
+    }
+
     static RedVariableProposal create(final String name, final String value, final String path) {
         return new RedVariableProposal(name, path, value, "", VariableType.IMPORTED);
     }
