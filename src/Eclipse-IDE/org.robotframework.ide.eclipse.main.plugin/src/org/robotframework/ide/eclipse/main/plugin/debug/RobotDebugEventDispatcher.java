@@ -217,9 +217,12 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeyword = (String) startList.get(0);
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
+        final String keywordType = (String) startElements.get("type");
+        if(keywordType.equals(RobotDebugExecutionContext.KEYWORD_TEARDOWN_TYPE)) {
+            target.clearStackFrames();
+        }
         
-        executionContext.startKeyword(currentKeyword, (String) startElements.get("type"),
-                (List<String>) startElements.get("args"));
+        executionContext.startKeyword(currentKeyword, keywordType, (List<String>) startElements.get("args"));
 
         String executedSuite = currentSuite;
         
