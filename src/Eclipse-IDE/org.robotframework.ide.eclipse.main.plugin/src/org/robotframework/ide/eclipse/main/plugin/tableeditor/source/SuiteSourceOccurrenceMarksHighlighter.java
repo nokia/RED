@@ -68,6 +68,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
                         return Status.OK_STATUS;
                     }
                 };
+                refreshingJob.setSystem(true);
                 refreshingJob.schedule(50);
             }
         });
