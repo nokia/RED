@@ -10,9 +10,18 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -36,46 +45,103 @@ public class VariableDefinitionLocator {
         this.startingFile = file;
         this.useCommonModel = useCommonModel;
     }
-
-    public void locateVariableDefinition(final VariableDetector detector) {
-        ContinueDecision shouldContinue = locateInCurrentFile(startingFile, detector);
-        if (shouldContinue == ContinueDecision.STOP) {
-            return;
-        }
-        shouldContinue = locateInResourceFiles(PathsNormalizer.getNormalizedResourceFilesPaths(startingFile), detector);
-        if (shouldContinue == ContinueDecision.STOP) {
-            return;
-        }
-        locateGlobalVariables(startingFile, detector);
+    
+    public void locateVariableDefinitionWithLocalScope(final VariableDetector detector, final int offset) {
+        first(locateInLocalScope(startingFile, detector, offset))
+          .or(locateInCurrentFile(startingFile, detector))
+          .or(locateInResourceFiles(PathsNormalizer.getNormalizedResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsNormalizer.getNormalizedVariableFilesPaths(startingFile), detector))
+          .or(locateGlobalVariables(startingFile, detector));
     }
 
-    private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final VariableDetector detector) {
+    public void locateVariableDefinition(final VariableDetector detector) {
+        first(locateInCurrentFile(startingFile, detector))
+          .or(locateInResourceFiles(PathsNormalizer.getNormalizedResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsNormalizer.getNormalizedVariableFilesPaths(startingFile), detector))
+          .or(locateGlobalVariables(startingFile, detector));
+    }
+
+    private Optional<VoidResult> first(final Optional<VoidResult> firstStep) {
+        return firstStep;
+    }
+
+    private Optional<VoidResult> locateInLocalScope(final RobotSuiteFile file, final VariableDetector detector,
+            final int offset) {
+        final Optional<? extends RobotElement> element = file.findElement(offset);
+        if (element.isPresent() && element.get() instanceof RobotKeywordCall) {
+            final RobotKeywordCall call = (RobotKeywordCall) element.get();
+            final IRobotCodeHoldingElement parent = call.getParent();
+
+            locateInKeywordArguments(file, detector, parent).or(locateInPreviousCalls(file, detector, parent, call));
+        }
+        return Optional.absent();
+    }
+
+    private Optional<VoidResult> locateInKeywordArguments(final RobotSuiteFile file, final VariableDetector detector,
+            final IRobotCodeHoldingElement parent) {
+        if (parent instanceof RobotKeywordDefinition) {
+            final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) parent;
+            final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+            final AModelElement<?> linkedElement = argumentsSetting == null ? null
+                    : argumentsSetting.getLinkedElement();
+            if (linkedElement instanceof KeywordArguments) {
+                final KeywordArguments args = (KeywordArguments) linkedElement;
+                for (final RobotToken token : args.getArguments()) {
+                    final ContinueDecision shouldContinue = detector.localVariableDetected(file, token);
+                    if (shouldContinue == ContinueDecision.STOP) {
+                        return Optional.of(new VoidResult());
+                    }
+                }
+            }
+        }
+        return Optional.absent();
+    }
+
+    private Optional<VoidResult> locateInPreviousCalls(final RobotSuiteFile file, final VariableDetector detector,
+            final IRobotCodeHoldingElement parent, final RobotKeywordCall call) {
+        final List<RobotKeywordCall> children = parent.getChildren();
+        final int index = children.indexOf(call);
+        for (int i = 0; i < index; i++) {
+            final AModelElement<?> linkedElement = children.get(i).getLinkedElement();
+            if (linkedElement instanceof RobotExecutableRow<?>) {
+                final RobotExecutableRow<?> executableRow = (RobotExecutableRow<?>) linkedElement;
+                
+                for (final RobotToken token : executableRow.buildLineDescription().getAssignments()) {
+                    final ContinueDecision shouldContinue = detector.localVariableDetected(file, token);
+                    if (shouldContinue == ContinueDecision.STOP) {
+                        return Optional.of(new VoidResult());
+                    }
+                }
+            }
+        }
+        return Optional.absent();
+    }
+
+    private Optional<VoidResult> locateInCurrentFile(final RobotSuiteFile file, final VariableDetector detector) {
         final Optional<RobotVariablesSection> section = file.findSection(RobotVariablesSection.class);
         if (!section.isPresent()) {
-            return ContinueDecision.CONTINUE;
+            return Optional.absent();
         }
         for (final RobotVariable var : section.get().getChildren()) {
             final ContinueDecision shouldContinue = detector.variableDetected(file, var);
             if (shouldContinue == ContinueDecision.STOP) {
-                return ContinueDecision.STOP;
+                return Optional.of(new VoidResult());
             }
         }
-        return ContinueDecision.CONTINUE;
+        return Optional.absent();
     }
 
-    private ContinueDecision locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
+    private Optional<VoidResult> locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
         // FIXME : we should somehow be able to handle absolute files (probably by linking the file)
         for (final IPath path : resources) {
             if (!path.isAbsolute()) {
                 final IFile resourceFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
                 final RobotSuiteFile resourceSuiteFile = getSuiteFile(resourceFile);
-                final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
-                if (shouldContinue == ContinueDecision.STOP) {
-                    return ContinueDecision.STOP;
-                }
+
+                return locateInCurrentFile(resourceSuiteFile, detector);
             }
         }
-        return ContinueDecision.CONTINUE;
+        return Optional.absent();
     }
 
     private RobotSuiteFile getSuiteFile(final IFile resourceFile) {
@@ -83,12 +149,13 @@ public class VariableDefinitionLocator {
                 : new RobotSuiteFile(null, resourceFile);
     }
 
-    private ContinueDecision locateInVariableFiles(final List<IPath> variables, final VariableDetector detector) {
+    private Optional<VoidResult> locateInVariableFiles(final List<IPath> variables, final VariableDetector detector) {
         // TODO : implement for java, python and yaml files
-        return ContinueDecision.CONTINUE;
+        return Optional.absent();
     }
 
-    private ContinueDecision locateGlobalVariables(final RobotSuiteFile startingFile, final VariableDetector detector) {
+    private Optional<VoidResult> locateGlobalVariables(final RobotSuiteFile startingFile,
+            final VariableDetector detector) {
         final RobotProjectHolder projectHolder = startingFile.getProject().getRobotProjectHolder();
         final List<ARobotInternalVariable<?>> globalVariables = projectHolder.getGlobalVariables();
 
@@ -96,17 +163,22 @@ public class VariableDefinitionLocator {
             final ContinueDecision shouldContinue = detector.globalVariableDetected(variable.getName(),
                     variable.getValue());
             if (shouldContinue == ContinueDecision.STOP) {
-                return ContinueDecision.STOP;
+                return Optional.of(new VoidResult());
             }
         }
-        return ContinueDecision.CONTINUE;
+        return Optional.absent();
     }
 
     public interface VariableDetector {
 
         ContinueDecision variableDetected(RobotSuiteFile file, RobotVariable variable);
 
-        ContinueDecision globalVariableDetected(String name, Object value);
+        ContinueDecision localVariableDetected(RobotSuiteFile file, RobotToken variable);
 
+        ContinueDecision globalVariableDetected(String name, Object value);
+    }
+
+    private static class VoidResult {
+        // nothing to define
     }
 }
