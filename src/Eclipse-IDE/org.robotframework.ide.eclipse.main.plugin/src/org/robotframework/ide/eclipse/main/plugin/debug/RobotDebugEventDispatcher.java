@@ -218,7 +218,7 @@ public class RobotDebugEventDispatcher extends Job {
         final String currentKeyword = (String) startList.get(0);
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
         final String keywordType = (String) startElements.get("type");
-        if(keywordType.equals(RobotDebugExecutionContext.KEYWORD_TEARDOWN_TYPE)) {
+        if(keywordType.equals(RobotDebugExecutionContext.TEARDOWN_KEYWORD_TYPE)) {
             target.clearStackFrames();
         }
         

@@ -9,21 +9,28 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.setting.TestSetup;
+import org.robotframework.ide.core.testData.model.table.setting.TestTeardown;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseSetup;
+import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTeardown;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 import com.google.common.io.Files;
 
 
 public class RobotDebugExecutionContext {
     
-    public static final String KEYWORD_MAIN_TYPE = "Keyword";
+    public static final String MAIN_KEYWORD_TYPE = "Keyword";
 
-    public static final String KEYWORD_LOOP_TYPE = "Test For";
+    public static final String LOOP_KEYWORD_TYPE = "Test For";
 
-    public static final String KEYWORD_LOOP_ITEM_TYPE = "Test Foritem";
+    public static final String LOOP_ITEM_KEYWORD_TYPE = "Test Foritem";
 
-    public static final String KEYWORD_TEARDOWN_TYPE = "Test Teardown";
+    public static final String SETUP_KEYWORD_TYPE = "Test Setup";
+    
+    public static final String TEARDOWN_KEYWORD_TYPE = "Test Teardown";
     
     private RobotFile currentModel;
     private TestCase currentTestCase;
@@ -38,7 +45,7 @@ public class RobotDebugExecutionContext {
     private LinkedList<RobotExecutableRow<?>> forLoopExecutionRows;
     private int forLoopExecutionRowsCounter = 0;
     
-    private boolean isSetupKeyword;
+    private boolean isSetupTeardownKeywordStarted;
     
     public RobotDebugExecutionContext() {
         currentKeywords = new LinkedList<>();
@@ -54,9 +61,9 @@ public class RobotDebugExecutionContext {
     }
 
     public void startTest(final String testName) {
-        TestCaseTable testCaseTable = currentModel.getTestCaseTable();
-        List<TestCase> testCases = testCaseTable.getTestCases();
-        for (TestCase testCase : testCases) {
+        final TestCaseTable testCaseTable = currentModel.getTestCaseTable();
+        final List<TestCase> testCases = testCaseTable.getTestCases();
+        for (final TestCase testCase : testCases) {
             if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
                 currentTestCase = testCase;
                 break;
@@ -65,7 +72,7 @@ public class RobotDebugExecutionContext {
     }
 
     public void startKeyword(final String name, final String type, final List<String> arguments) {
-        currentKeywords.add(new KeywordContext(name));
+        currentKeywords.add(new KeywordContext(name, type));
         checkKeywordType(type);
     }
 
@@ -81,8 +88,8 @@ public class RobotDebugExecutionContext {
         KeywordContext parentKeywordContext = null;
         RobotExecutableRow<?> executionRow = null;
         if (currentKeywords.size() == 1) { // keyword directly from test case
-            if(isSetupKeyword) {
-                isSetupKeyword = false; //just skip first keyword definition from e.g. Test Setup
+            if(isSetupTeardownKeywordStarted) {
+                executionRow = findTestCaseSetupTeardownExecutionRow(currentKeywords.get(0));  //keyword from test setup or teardown
             } else {
                 executionRow = findTestCaseExecutionRow();
             }
@@ -98,7 +105,7 @@ public class RobotDebugExecutionContext {
     
     private KeywordPosition createNewKeywordPosition(final KeywordContext parentKeywordContext,
             final RobotExecutableRow<?> executionRow) {
-        KeywordPosition keywordPosition = new KeywordPosition();
+        final KeywordPosition keywordPosition = new KeywordPosition();
         if (parentKeywordContext != null && parentKeywordContext.getResourceImportReference() != null) {
             keywordPosition.setFilePath(parentKeywordContext.getResourceImportReference()
                     .getReference()
@@ -122,6 +129,42 @@ public class RobotDebugExecutionContext {
             }
         }
         return null;
+    }
+    
+    private RobotExecutableRow<TestCase> findTestCaseSetupTeardownExecutionRow(final KeywordContext keywordContext) {
+        if (keywordContext.getType().equals(SETUP_KEYWORD_TYPE)) {
+            final List<TestCaseSetup> setups = currentTestCase.getSetups();
+            if (setups != null && !setups.isEmpty()) {
+                return createSetupExecutableRow(setups.get(setups.size() - 1).getKeywordName());
+            } else {
+                final List<TestSetup> testSetups = currentTestCase.getParent().getParent().getSettingTable().getTestSetups();
+                if (testSetups != null && !testSetups.isEmpty()) {
+                    return createSetupExecutableRow(testSetups.get(0).getKeywordName());
+                }
+            }
+        } else if (keywordContext.getType().equals(TEARDOWN_KEYWORD_TYPE)) {
+            final List<TestCaseTeardown> teardowns = currentTestCase.getTeardowns();
+            if (teardowns != null && !teardowns.isEmpty()) {
+                return createSetupExecutableRow(teardowns.get(teardowns.size() - 1).getKeywordName());
+            } else {
+                final List<TestTeardown> testTeardowns = currentTestCase.getParent()
+                        .getParent()
+                        .getSettingTable()
+                        .getTestTeardowns();
+                if (testTeardowns != null && !testTeardowns.isEmpty()) {
+                    return createSetupExecutableRow(testTeardowns.get(0).getKeywordName());
+                }
+            }
+        }
+        
+        isSetupTeardownKeywordStarted = false;
+        return null;
+    }
+    
+    private RobotExecutableRow<TestCase> createSetupExecutableRow(final RobotToken token) {
+        final RobotExecutableRow<TestCase> row = new RobotExecutableRow<TestCase>();
+        row.setAction(token);
+        return row;
     }
     
     private RobotExecutableRow<?> findForLoopExecutionRow() {
@@ -291,21 +334,21 @@ public class RobotDebugExecutionContext {
     }
     
     private void checkKeywordType(final String type) {
-        if (type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE)) {
+        if (type.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE)) {    //for loop start
             isForLoopStarted = true;
-        } else if (!type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE) && isForLoopStarted) {
+        } else if (isForLoopStarted && !type.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE)) {    //for loop end
             isForLoopStarted = false;
             forLoopExecutionRows.clear();
             forLoopExecutionRowsCounter = 0;
-        } else if (isSetupKeyword && !type.equalsIgnoreCase(KEYWORD_LOOP_TYPE)
-                && !type.equalsIgnoreCase(KEYWORD_LOOP_ITEM_TYPE)) {
-            isSetupKeyword = false;
-        } else if (!type.equalsIgnoreCase(KEYWORD_MAIN_TYPE) && !type.equalsIgnoreCase(KEYWORD_LOOP_TYPE)) {
-            isSetupKeyword = true;
+        } else if (isSetupTeardownKeywordStarted && !type.equalsIgnoreCase(SETUP_KEYWORD_TYPE)
+                && !type.equalsIgnoreCase(TEARDOWN_KEYWORD_TYPE)) { //setup or teardown end
+            isSetupTeardownKeywordStarted = false;
+        } else if (!type.equalsIgnoreCase(MAIN_KEYWORD_TYPE) && !type.equalsIgnoreCase(LOOP_KEYWORD_TYPE)) { //setup or teardown start
+            isSetupTeardownKeywordStarted = true;
         }
     }
     
-    private void incrementExecutionRowCounterInsideForLoop(KeywordContext parentKeywordContext) {
+    private void incrementExecutionRowCounterInsideForLoop(final KeywordContext parentKeywordContext) {
         if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null)
             parentKeywordContext.incrementKeywordExecutionRowCounter();
         else
@@ -316,14 +359,17 @@ public class RobotDebugExecutionContext {
 
         private String name;
         
+        private String type;
+        
         private int keywordExeRowCounter = 0;
         
         private ResourceImportReference resourceImportReference;
         
         private UserKeyword userKeyword;
 
-        public KeywordContext(final String name) {
+        public KeywordContext(final String name, final String type) {
             this.name = name;
+            this.type = type;
         }
 
         public String getName() {
@@ -354,6 +400,10 @@ public class RobotDebugExecutionContext {
             this.userKeyword = userKeyword;
         }
 
+        public String getType() {
+            return type;
+        }
+
     }
     
     public class KeywordPosition {
@@ -364,7 +414,7 @@ public class RobotDebugExecutionContext {
             return lineNumber;
         }
         
-        public void setLineNumber(int lineNumber) {
+        public void setLineNumber(final int lineNumber) {
             this.lineNumber = lineNumber;
         }
         
@@ -372,7 +422,7 @@ public class RobotDebugExecutionContext {
             return filePath;
         }
         
-        public void setFilePath(String filePath) {
+        public void setFilePath(final String filePath) {
             this.filePath = filePath;
         }
     }
