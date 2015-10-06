@@ -30,7 +30,7 @@ public class RobotDebugExecutionContextTest {
 
     private int[] test4_lines = new int[] { 4, 21, 23, 26, 28, 7, 12, 26, 28 };
     
-    private int[] test5_lines = new int[] { -1, 20, 21, 26, 27, 8, 9, 10, -1, 23, 24, -1, 27, 15, 16, -1, 29 };
+    private int[] test5_lines = new int[] { 3, 20, 21, 26, 27, 8, 9, 10, 4, 23, 24, 13, 27, 15, 16, 14, 29 };
 
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
