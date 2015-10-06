@@ -2,7 +2,9 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
-public class RedVariableProposal {
+import com.google.common.base.Objects;
+
+public final class RedVariableProposal {
 
     private final String name;
 
@@ -59,6 +61,25 @@ public class RedVariableProposal {
 
     public VariableType getType() {
         return type;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() == RedVariableProposal.class) {
+            final RedVariableProposal that = (RedVariableProposal) obj;
+            return Objects.equal(this.name, that.name) && Objects.equal(this.source, that.source)
+                    && Objects.equal(this.value, that.value) && Objects.equal(this.comment, that.comment)
+                    && this.type == that.type;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(name, source, value, comment, type);
     }
 
     public enum VariableType {
