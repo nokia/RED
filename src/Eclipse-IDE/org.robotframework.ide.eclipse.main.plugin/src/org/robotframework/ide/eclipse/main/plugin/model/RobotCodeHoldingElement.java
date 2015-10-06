@@ -96,6 +96,16 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
+        for (final RobotKeywordCall element : calls) {
+            final Optional<? extends RobotElement> candidate = element.findElement(offset);
+            if (candidate.isPresent()) {
+                return candidate;
+            }
+        }
+        final Position position = getPosition();
+        if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
+            return Optional.of(this);
+        }
         return Optional.absent();
     }
 

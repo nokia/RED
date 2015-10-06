@@ -207,6 +207,12 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
 
             @Override
+            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
+                // local variables will be added to context during validation
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
             public ContinueDecision globalVariableDetected(final String name, final Object value) {
                 setBuilder.add(name.toLowerCase());
                 return ContinueDecision.CONTINUE;
@@ -221,16 +227,13 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         for (final RobotExecutableRow<?> row : executables) {
             final ExecutionLineDescriptor lineDescription = row.buildLineDescription();
-            definedVariables.addAll(extractVariableNames(lineDescription.getAssignments()));
-
-            final RobotToken token = lineDescription.getFirstAction();
 
             final List<VariableInsideCell> usedParameters = extractVariables(lineDescription.getParameters());
             for (final VariableInsideCell usedParameter : usedParameters) {
                 if (!definedVariables.contains(usedParameter.name.toLowerCase())) {
                     final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                             .formatMessageWith(usedParameter.name);
-                    final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
+                    final ProblemPosition position = new ProblemPosition(lineDescription.getFirstAction().getLineNumber(),
                             Range.closed(usedParameter.position.offset,
                                     usedParameter.position.offset + usedParameter.position.length));
                     final Map<String, Object> additionalArguments = Maps.newHashMap();
@@ -238,6 +241,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
                     reporter.handleProblem(problem, file, position, additionalArguments);
                 }
             }
+            definedVariables.addAll(extractVariableNames(lineDescription.getAssignments()));
         }
     }
 

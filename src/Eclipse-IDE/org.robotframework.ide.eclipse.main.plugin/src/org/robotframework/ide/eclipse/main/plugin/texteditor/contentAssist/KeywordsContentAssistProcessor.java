@@ -30,8 +30,6 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
 
     private String lastError = null;
 
-    private final TextEditorContextValidator validator = new TextEditorContextValidator(this);
-    
     private final TextEditorContentAssist textEditorContentAssist;
 
     public KeywordsContentAssistProcessor(final TextEditorContentAssist textEditorContentAssist) {
@@ -65,8 +63,8 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
                 
                 if (TextEditorContentAssist.shouldShowVariablesProposals(currentWord)) {
                     currentWord = TextEditorContentAssist.readEnteredVariable(currentOffset, document);
-                    final List<RedVariableProposal> filteredProposals = TextEditorContentAssist.filterVariablesProposals(
-                            textEditorContentAssist.getVariables(), currentWord);
+                    final List<RedVariableProposal> filteredProposals = TextEditorContentAssist
+                            .filterVariablesProposals(textEditorContentAssist.getVariables(currentOffset), currentWord);
                     if (!filteredProposals.isEmpty()) {
                         return TextEditorContentAssist.buildVariablesProposals(filteredProposals, currentWord, offset
                                 - currentWord.length());
@@ -93,7 +91,6 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
 
     @Override
     public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int offset) {
-
         return new IContextInformation[0];
     }
 
@@ -114,7 +111,6 @@ public class KeywordsContentAssistProcessor implements IContentAssistProcessor {
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return validator;
+        return new TextEditorContextValidator();
     }
-
 }
