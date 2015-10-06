@@ -88,6 +88,10 @@ public class TextEditorContentAssist {
         return variableProposals;
     }
 
+    public List<RedVariableProposal> getVariables(final int offset) {
+        return variableProposals;
+    }
+
     public Map<String, ContentAssistKeywordContext> getKeywordMap() {
         return keywordMap;
     }

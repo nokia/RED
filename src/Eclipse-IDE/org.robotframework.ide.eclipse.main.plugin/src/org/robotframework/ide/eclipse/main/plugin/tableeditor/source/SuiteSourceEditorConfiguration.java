@@ -15,6 +15,8 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rule
 
 import java.util.List;
 
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -101,6 +103,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.enableAutoActivation(true);
         contentAssistant.setEmptyMessage("No proposals");
         contentAssistant.setShowEmptyList(true);
+        contentAssistant.setStatusLineVisible(true);
+        contentAssistant.setRepeatedInvocationMode(true);
+        contentAssistant
+                .setRepeatedInvocationTrigger(KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
+
         final TextEditorContentAssist textEditorContentAssist = new SuiteSourceEditorContentAssist(
                 editor.getFileModel());
         contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
@@ -112,6 +119,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
         contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+
         contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
         contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
 

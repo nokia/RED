@@ -16,6 +16,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -48,37 +49,57 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             }
             final String fullVariableName = textViewer.getDocument().get(variableRegion.get().getOffset(),
                     variableRegion.get().getLength());
-            final String variableName = fullVariableName.substring(2, fullVariableName.length() -1);
 
             final List<IHyperlink> hyperlinks = newArrayList();
-            new VariableDefinitionLocator(suiteFile).locateVariableDefinition(new VariableDetector() {
-
-                @Override
-                public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
-                    if (variable.getName().equals(variableName)) {
-                        final Position position = variable.getDefinitionPosition();
-                        final IRegion destination = new Region(position.getOffset(), position.getLength());
-                        if (file == suiteFile) {
-                            hyperlinks.add(new RegionsHyperlink(textViewer, variableRegion.get(), destination));
-                        } else {
-                            hyperlinks
-                                    .add(new DifferentFileHyperlink(variableRegion.get(), file.getFile(), destination));
-                        }
-                        return ContinueDecision.STOP;
-                    } else {
-                        return ContinueDecision.CONTINUE;
-                    }
-                }
-
-                @Override
-                public ContinueDecision globalVariableDetected(final String name, final Object value) {
-                    return ContinueDecision.CONTINUE;
-                }
-            });
+            new VariableDefinitionLocator(suiteFile).locateVariableDefinitionWithLocalScope(
+                    createDetector(textViewer, variableRegion, fullVariableName, hyperlinks),
+                    region.getOffset());
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;
         }
+    }
+
+    private VariableDetector createDetector(final ITextViewer textViewer, final Optional<IRegion> variableRegion,
+            final String fullVariableName, final List<IHyperlink> hyperlinks) {
+        final String variableName = fullVariableName.substring(2, fullVariableName.length() -1);
+        return new VariableDetector() {
+
+            @Override
+            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+                if (variable.getName().equals(variableName)) {
+                    final Position position = variable.getDefinitionPosition();
+                    final IRegion destination = new Region(position.getOffset(), position.getLength());
+                    if (file == suiteFile) {
+                        hyperlinks.add(new RegionsHyperlink(textViewer, variableRegion.get(), destination));
+                    } else {
+                        hyperlinks.add(new DifferentFileHyperlink(variableRegion.get(), file.getFile(), destination));
+                    }
+                    return ContinueDecision.STOP;
+                } else {
+                    return ContinueDecision.CONTINUE;
+                }
+            }
+
+            @Override
+            public ContinueDecision localVariableDetected(final RobotSuiteFile file,
+                    final RobotToken variableToken) {
+                if (variableToken.getText().toString().startsWith(fullVariableName)) {
+                    final IRegion destination = new Region(variableToken.getStartOffset(),
+                            variableToken.getText().length());
+                    hyperlinks.add(new RegionsHyperlink(textViewer, variableRegion.get(), destination));
+                    return ContinueDecision.STOP;
+                } else {
+                    return ContinueDecision.CONTINUE;
+                }
+            }
+
+            @Override
+            public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                // we don't want to do anything if variable is global
+                return ContinueDecision.CONTINUE;
+            }
+        };
     }
 
 }

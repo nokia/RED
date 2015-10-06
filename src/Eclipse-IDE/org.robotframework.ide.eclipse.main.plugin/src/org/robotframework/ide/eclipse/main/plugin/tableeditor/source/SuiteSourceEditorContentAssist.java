@@ -40,6 +40,11 @@ public class SuiteSourceEditorContentAssist extends TextEditorContentAssist {
     }
 
     @Override
+    public List<RedVariableProposal> getVariables(final int offset) {
+        return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
+    }
+
+    @Override
     public Map<String, ContentAssistKeywordContext> getKeywordMap() {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteModel);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
