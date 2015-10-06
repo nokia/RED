@@ -1,11 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -39,7 +41,7 @@ public class RedVariableProposals {
 
     public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator,
             final int offset) {
-        final List<RedVariableProposal> proposals = newArrayList();
+        final Set<RedVariableProposal> proposals = newLinkedHashSet();
 
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile);
         final VariableDetector detector = createDetector(proposals);
@@ -59,15 +61,16 @@ public class RedVariableProposals {
             }
         }
 
-        Collections.sort(proposals, comparator);
-        return proposals;
+        final List<RedVariableProposal> resultProposals = newArrayList(proposals);
+        Collections.sort(resultProposals, comparator);
+        return resultProposals;
     }
     
     public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator) {
         return getVariableProposals(comparator, -1);
     }
 
-    private VariableDetector createDetector(final List<RedVariableProposal> proposals) {
+    private VariableDetector createDetector(final Set<RedVariableProposal> proposals) {
         return new VariableDetector() {
             @Override
             public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
