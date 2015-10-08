@@ -211,11 +211,17 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                     }
                 }
             });
-            form.setBusy(true);
-            form.addDisposeListener(new DisposeListener() {
+            form.getDisplay().syncExec(new Runnable() {
                 @Override
-                public void widgetDisposed(final DisposeEvent e) {
-                    job.cancel();
+                public void run() {
+                    form.setBusy(true);
+                    form.addDisposeListener(new DisposeListener() {
+
+                        @Override
+                        public void widgetDisposed(final DisposeEvent e) {
+                            job.cancel();
+                        }
+                    });
                 }
             });
             job.schedule();

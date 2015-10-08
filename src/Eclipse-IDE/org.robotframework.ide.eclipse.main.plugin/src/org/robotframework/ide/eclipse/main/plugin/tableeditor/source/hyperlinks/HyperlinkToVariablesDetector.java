@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
@@ -97,6 +98,13 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision globalVariableDetected(final String name, final Object value) {
                 // we don't want to do anything if variable is global
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file,
+                    final String variableName, final Object value) {
+                // we don't want to do anything if variable is defined in Variable file
                 return ContinueDecision.CONTINUE;
             }
         };

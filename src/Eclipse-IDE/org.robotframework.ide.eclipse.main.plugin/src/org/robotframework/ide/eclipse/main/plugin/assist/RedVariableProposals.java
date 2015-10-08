@@ -6,7 +6,6 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -51,16 +50,6 @@ public class RedVariableProposals {
             locator.locateVariableDefinitionWithLocalScope(detector, offset);
         }
 
-        for (final ReferencedVariableFile referencedVariableFile : suiteFile.getVariablesFromReferencedFiles()) {
-            final Map<String, Object> refVariableMap = referencedVariableFile.getVariables();
-            if (refVariableMap != null && !refVariableMap.isEmpty()) {
-                for (final String variableName : refVariableMap.keySet()) {
-                    proposals.add(RedVariableProposal.create(variableName,
-                            String.valueOf(refVariableMap.get(variableName)), referencedVariableFile.getPath()));
-                }
-            }
-        }
-
         final List<RedVariableProposal> resultProposals = newArrayList(proposals);
         Collections.sort(resultProposals, comparator);
         return resultProposals;
@@ -91,6 +80,13 @@ public class RedVariableProposals {
             @Override
             public ContinueDecision globalVariableDetected(final String name, final Object value) {
                 proposals.add(RedVariableProposal.createBuiltIn(name, value.toString()));
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file,
+                    final String variableName, final Object value) {
+                proposals.add(RedVariableProposal.create(variableName, value.toString(), file.getPath()));
                 return ContinueDecision.CONTINUE;
             }
         };

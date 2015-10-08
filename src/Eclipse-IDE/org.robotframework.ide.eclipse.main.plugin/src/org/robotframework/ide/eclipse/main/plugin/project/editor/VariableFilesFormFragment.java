@@ -12,11 +12,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -42,6 +44,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
@@ -68,8 +71,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private Button removeFileBtn;
 
-    private String fileDialogStartingPath;
-
     @Override
     public void initialize(final Composite parent) {
         final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
@@ -84,8 +85,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(internalComposite);
 
-        fileDialogStartingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
-
         createViewer(internalComposite);
         createButtons(internalComposite);
 
@@ -98,7 +97,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer.getTable().setEnabled(false);
 
         viewer.setContentProvider(new VariableFilesContentProvider());
-        viewer.setLabelProvider(new VariableFilesLabelProvider(fileDialogStartingPath));
+        viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new VariableFilesLabelProvider()));
         final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
 
             @Override
@@ -272,8 +271,9 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 }
             });
 
-            final Section section = toolkit.createSection(dialogComposite,
+            final ExpandableComposite section = toolkit.createExpandableComposite(dialogComposite,
                     ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+            section.setBackground(null);
             section.setText("Add Arguments");
             section.addExpansionListener(new IExpansionListener() {
 
@@ -320,14 +320,14 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
         @Override
         protected void okPressed() {
-            if (!pathText.getText().equals("")) {
+            if (!pathText.getText().isEmpty()) {
                 if (variableFile == null) {
                     variableFile = new ReferencedVariableFile();
                 }
-                variableFile.setPath(new Path(pathText.getText()).toPortableString());
+                final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(pathText.getText()));
+                variableFile.setPath(path.toPortableString());
                 variableFile.setArguments(argumentsEditor.getArguments());
             }
-
             super.okPressed();
         }
 

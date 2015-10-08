@@ -9,8 +9,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
@@ -35,13 +34,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.model.BaseWorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -171,18 +168,18 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                                 final PythonClass pythonClass = (PythonClass) selectedClass;
                                 editorInput.getProjectConfiguration().addReferencedLibraryInPython(
                                         pythonClass.getQualifiedName(),
-                                        ImportSettingFilePathResolver.createFileRelativePath(new Path(chosenFilePath),
+                                                ImportSettingFilePathResolver.createFileRelativePath(
+                                                        PathsConverter.toWorkspaceRelativeIfPossible(
+                                                                new Path(chosenFilePath)),
                                                 currentProject.getProject().getLocation()));
                                 added = true;
                             }
-                            
                         } 
                     } else {
                         for (final PythonClass pythonClass : pythonClasses) {
                             editorInput.getProjectConfiguration().addReferencedLibraryInPython(
                                     pythonClass.getQualifiedName(),
-                                    ImportSettingFilePathResolver.createFileParentRelativePath(
-                                            new Path(chosenFilePath), currentProject.getProject().getLocation()));
+                                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath)));
                             added = true;
                         }
                     }
@@ -216,7 +213,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                         for (final Object selectedClass : result) {
                             final JarClass jarClass = (JarClass) selectedClass;
                             editorInput.getProjectConfiguration().addReferencedLibraryInJava(
-                                    jarClass.getQualifiedName(), new Path(chosenFilePath));
+                                    jarClass.getQualifiedName(),
+                                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath)));
                             added = true;
                         }
                         if (added) {
@@ -252,15 +250,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(addLibspecButton.getShell(),
-                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
-                dialog.setAllowMultiple(true);
-                dialog.setTitle("Select library specification");
-                dialog.setMessage("Select the library specification file:");
-                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-                if (dialog.open() == Window.OK) {
-                    final IResource resource = (IResource) dialog.getFirstResult();
-                    editorInput.getProjectConfiguration().addReferencedLibrarySpecification(resource.getFullPath());
+                final FileDialog dialog = createReferencedLibFileDialog();
+                dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
+                final String chosenFilePath = dialog.open();
+                if (chosenFilePath != null) {
+                    final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath));
+
+                    editorInput.getProjectConfiguration().addReferencedLibrarySpecification(path);
                     dirtyProviderService.setDirtyState(true);
                     viewer.refresh();
                 }
