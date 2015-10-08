@@ -333,14 +333,6 @@ public class VariablesExtractor {
         public VariableDeclaration getVariableDeclaration() {
             return varDeclaration;
         }
-
-
-        @Override
-        public String toString() {
-            return String
-                    .format("VariableDeclarationInformation [variableName=%s, parent=%s, subChilds=%s, varDeclaration=%s]",
-                            variableName, parent, subChilds, varDeclaration);
-        }
     }
 
     public class VariableName {
@@ -402,13 +394,6 @@ public class VariablesExtractor {
 
             return name.toString();
         }
-
-
-        @Override
-        public String toString() {
-            return String.format("VariableName [text=%s, start=%s, end=%s]",
-                    originalText, start, end);
-        }
     }
 
     public class VariableDeclaration {
@@ -438,14 +423,6 @@ public class VariablesExtractor {
 
         public String getOriginalText() {
             return originalText;
-        }
-
-
-        @Override
-        public String toString() {
-            return String.format(
-                    "VariablesDeclaration [text=%s, start=%s, end=%s]",
-                    originalText, start, end);
         }
     }
 
