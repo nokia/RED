@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.core.executor;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -27,7 +30,7 @@ public class RobotCommandExecutor {
     private Map<String, PythonProcessContext> processesMap;
 
     private int port;
-
+    
     private RobotCommandExecutor() {
         processesMap = new HashMap<>();
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -74,12 +77,32 @@ public class RobotCommandExecutor {
         command.add(String.valueOf(port));
         try {
             final Process serverProcess = new ProcessBuilder(command).redirectErrorStream(true).start();
+            readFromProcessInputStream(serverProcess);
             processesMap.put(pythonFolderLocation, new PythonProcessContext(serverProcess, pythonFileLocation,
                     scriptLocation));
             waitForProcessTermination(pythonFolderLocation);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void readFromProcessInputStream(final Process serverProcess) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    final InputStream inputStream = serverProcess.getInputStream();
+                    final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        //TODO: handle line
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void waitForProcessTermination(final String pythonFolderLocation) {
@@ -105,7 +128,7 @@ public class RobotCommandExecutor {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        final XmlRpcClient client = new XmlRpcClient();
+        XmlRpcClient client = new XmlRpcClient();
         client.setConfig(config);
         processesMap.get(pythonFolderLocation).setClient(client);
         waitForConnectionToServer(pythonFolderLocation);
@@ -190,7 +213,7 @@ public class RobotCommandExecutor {
                 e1.printStackTrace();
             }
         }
-
+        
         return result;
     }
     
