@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -214,6 +215,13 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
             @Override
             public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                setBuilder.add(name.toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file, final String name,
+                    final Object value) {
                 setBuilder.add(name.toLowerCase());
                 return ContinueDecision.CONTINUE;
             }

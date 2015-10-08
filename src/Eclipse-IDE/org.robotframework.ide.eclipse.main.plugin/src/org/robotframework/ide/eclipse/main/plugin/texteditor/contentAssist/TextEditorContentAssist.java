@@ -99,7 +99,6 @@ public class TextEditorContentAssist {
     static ICompletionProposal[] buildSectionProposals(final String replacedWord, final String lineDelimiter,
             final int offset) {
 
-        System.out.println(lineDelimiter.replaceAll("\n", "\\\n").replaceAll("\r", "\\\r"));
         final List<ICompletionProposal> completionProposals = newArrayList();
         for (final String proposal : sections) {
             completionProposals.add(new CompletionProposal(proposal + lineDelimiter, offset, replacedWord.length(),
@@ -136,7 +135,7 @@ public class TextEditorContentAssist {
         return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
+    public static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
             final String replacedWord, final int offset) {
 
         final List<ICompletionProposal> completionProposals = newArrayList();
@@ -182,7 +181,7 @@ public class TextEditorContentAssist {
         return keywordProposals;
     }
     
-    static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
+    public static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
             final String filter) {
         final List<RedVariableProposal> filteredProposals = newArrayList();
         for (final RedVariableProposal variable : variables) {

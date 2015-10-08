@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -21,18 +20,15 @@ class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
     public StyledString getStyledText(final Object element) {
         final ReferencedLibrary lib = (ReferencedLibrary) element;
 
-        if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
-            final StyledString label = new StyledString(lib.getName());
-            label.append(" - " + lib.getPath(), new Styler() {
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
-                }
-            });
-            return label;
-        } else {
-            return new StyledString(lib.getPath());
-        }
+        final StyledString label = new StyledString(lib.getName());
+        label.append(" - " + lib.getPath(), new Styler() {
+
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = RedTheme.getEclipseDecorationColor();
+            }
+        });
+        return label;
     }
 
     @Override

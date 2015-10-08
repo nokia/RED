@@ -12,9 +12,11 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -35,6 +37,7 @@ public class LibrariesBuilder {
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
+        libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getRemoteLibrariesToRecreate(configuration, libspecsFolder));
@@ -75,6 +78,25 @@ public class LibrariesBuilder {
         return generators;
     }
 
+    private List<ILibdocGenerator> getReferencedVirtualLibrariesToRecreate(
+            final RobotProjectConfig configuration, final LibspecsFolder libspecsFolder) {
+        final List<ILibdocGenerator> generators = newArrayList();
+
+        for (final ReferencedLibrary lib : configuration.getLibraries()) {
+            if (lib.provideType() == LibraryType.VIRTUAL) {
+                final Path libPath = new Path(lib.getPath());
+                if (libPath.isAbsolute()) {
+                    final String libName = lib.getName();
+                    final IFile specFile = libspecsFolder.getSpecFile(libName);
+                    if (!specFile.exists()) {
+                        generators.add(new VirtualLibraryLibdocGenerator(libPath, specFile));
+                    }
+                }
+            }
+        }
+        return generators;
+    }
+
     private List<ILibdocGenerator> getReferencedPythonLibrariesToRecreate(final RobotProjectConfig configuration,
             final LibspecsFolder libspecsFolder) {
         final List<ILibdocGenerator> generators = newArrayList();
@@ -84,7 +106,9 @@ public class LibrariesBuilder {
                 final String libName = lib.getName();
                 final IFile specFile = libspecsFolder.getSpecFile(libName);
                 if (!specFile.exists()) {
-                    final String libPath = lib.getPath();
+                    final String libPath = PathsConverter
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(lib.getPath()))
+                            .toOSString();
                     generators.add(new PythonLibraryLibdocGenerator(libName, libPath, specFile));
                 }
             }
@@ -101,7 +125,9 @@ public class LibrariesBuilder {
                 final String libName = lib.getName();
                 final IFile specFile = libspecsFolder.getSpecFile(libName);
                 if (!specFile.exists()) {
-                    final String jarPath = lib.getPath();
+                    final String jarPath = PathsConverter
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(lib.getPath()))
+                            .toOSString();
                     generators.add(new JavaLibraryLibdocGenerator(libName, jarPath, specFile));
                 }
             }

@@ -14,16 +14,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.SuiteExecutor;
 
 import com.google.common.base.Optional;
 
 public class ValidationContext {
 
+    private final RobotRuntimeEnvironment runtimeEnvironment;
+
     private final RobotVersion version;
 
-
     public ValidationContext(final RobotRuntimeEnvironment runtimeEnvironment) {
+        this.runtimeEnvironment = runtimeEnvironment;
         this.version = RobotVersion.from(runtimeEnvironment.getVersion());
+    }
+
+    public SuiteExecutor getExecutorInUse() {
+        return runtimeEnvironment.getInterpreter();
     }
 
     public RobotVersion getVersion() {
