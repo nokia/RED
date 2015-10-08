@@ -77,7 +77,7 @@ public class RobotCommandExecutor {
         command.add(String.valueOf(port));
         try {
             final Process serverProcess = new ProcessBuilder(command).redirectErrorStream(true).start();
-            readFromProcessInputStream(serverProcess);
+            readFromProcessInputStream(serverProcess, pythonFolderLocation);
             processesMap.put(pythonFolderLocation, new PythonProcessContext(serverProcess, pythonFileLocation,
                     scriptLocation));
             waitForProcessTermination(pythonFolderLocation);
@@ -86,7 +86,7 @@ public class RobotCommandExecutor {
         }
     }
     
-    private void readFromProcessInputStream(final Process serverProcess) {
+    private void readFromProcessInputStream(final Process serverProcess, final String pythonFolderLocation) {
         new Thread(new Runnable() {
 
             @Override
@@ -96,7 +96,7 @@ public class RobotCommandExecutor {
                     final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        //TODO: handle line
+                        processesMap.get(pythonFolderLocation).setCurrentServerProcessMessage(line);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -208,7 +208,8 @@ public class RobotCommandExecutor {
             try {
                 throw new RobotCommandExecutorException("Could not invoke server method \"" + methodName
                         + "\" on python installation: "
-                        + processesMap.get(pythonFolderLocation).getPythonFileLocation());
+                        + processesMap.get(pythonFolderLocation).getPythonFileLocation() + "\nProcess message: "
+                        + processesMap.get(pythonFolderLocation).getCurrentServerProcessMessage());
             } catch (RobotCommandExecutorException e1) {
                 e1.printStackTrace();
             }
@@ -255,6 +256,8 @@ public class RobotCommandExecutor {
         private String pythonFileLocation;
 
         private String scriptLocation;
+        
+        private String currentServerProcessMessage = "";
 
         public PythonProcessContext(final Process serverProcess, final String pythonFileLocation,
                 final String scriptLocation) {
@@ -286,6 +289,15 @@ public class RobotCommandExecutor {
         public String getScriptLocation() {
             return scriptLocation;
         }
+
+        public String getCurrentServerProcessMessage() {
+            return currentServerProcessMessage;
+        }
+
+        public void setCurrentServerProcessMessage(final String currentServerProcessMessage) {
+            this.currentServerProcessMessage = currentServerProcessMessage;
+        }
+
     }
     
     @SuppressWarnings("serial")
