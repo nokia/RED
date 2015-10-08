@@ -6,6 +6,7 @@
 
 import os
 import tempfile
+import json
 
 # Global variables copied from robot.variables.__init__.py
 global_variables = {
@@ -55,12 +56,12 @@ try:
 			key = '${' + k + '}'
 		else:
 			key = k
-		data[key] = str(variables[k])
+		data[key] = variables[k]
 	
 	for k in global_variables:
 		if not k in data:
-			data[k] = str(global_variables[k])
+			data[k] = global_variables[k]
 	
-	print str(data)
+	print(json.dumps(data))
 except Exception, e:
-	print str(e)
+	print(json.dumps(dict()))
