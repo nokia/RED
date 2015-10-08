@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -16,8 +17,12 @@ import java.util.zip.ZipInputStream;
 public class JarStructureBuilder {
 
     public List<JarClass> provideEntriesFromJarFile(final String path) {
+        return provideEntriesFromJarFile(new File(path));
+    }
+
+    public List<JarClass> provideEntriesFromJarFile(final File file) {
         final List<JarClass> jarClasses = newArrayList();
-        try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(path))) {
+        try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {

@@ -95,16 +95,16 @@ public class RobotProjectConfig {
         return remoteLocations;
     }
 
-    public void addReferencedLibrarySpecification(final IPath workspaceRelativePath) {
-        addReferencedLibrary(LibraryType.VIRTUAL.toString(), null, workspaceRelativePath);
+    public void addReferencedLibrarySpecification(final IPath path) {
+        addReferencedLibrary(LibraryType.VIRTUAL.toString(), path.lastSegment(), path);
     }
 
-    public void addReferencedLibraryInPython(final String name, final IPath systemAbsolutePath) {
-        addReferencedLibrary(LibraryType.PYTHON.toString(), name, systemAbsolutePath);
+    public void addReferencedLibraryInPython(final String name, final IPath path) {
+        addReferencedLibrary(LibraryType.PYTHON.toString(), name, path);
     }
 
-    public void addReferencedLibraryInJava(final String name, final IPath systemAbsolutePath) {
-        addReferencedLibrary(LibraryType.JAVA.toString(), name, systemAbsolutePath);
+    public void addReferencedLibraryInJava(final String name, final IPath path) {
+        addReferencedLibrary(LibraryType.JAVA.toString(), name, path);
     }
     
     private void addReferencedLibrary(final String type, final String name, final IPath path) {

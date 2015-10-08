@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -148,12 +149,20 @@ public class RobotProject extends RobotContainer {
                             if (lib.provideType() == LibraryType.VIRTUAL) {
                                 final IPath path = Path.fromPortableString(lib.getPath());
                                 final IResource libspec = getProject().getParent().findMember(path);
+                                IFile fileToRead;
+                                
                                 if (libspec != null && libspec.getType() == IResource.FILE) {
+                                    fileToRead = (IFile) libspec;
                                     return LibrarySpecificationReader.readSpecification((IFile) libspec);
+                                } else if (libspec == null) {
+                                    fileToRead = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
+                                } else {
+                                    fileToRead = null;
                                 }
-                                return null;
+                                return fileToRead == null ? null
+                                        : LibrarySpecificationReader.readSpecification(fileToRead);
                             } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
-                                final IFile file = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
+                                final IFile file =  LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
                                 return LibrarySpecificationReader.readReferencedSpecification(file, lib.getPath());
                             } else {
                                 return null;
@@ -192,6 +201,7 @@ public class RobotProject extends RobotContainer {
 
     public synchronized void clearConfiguration() {
         configuration = null;
+        referencedVariableFiles = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
     }
@@ -289,7 +299,6 @@ public class RobotProject extends RobotContainer {
         return newArrayList();
     }
     
-    @SuppressWarnings("unchecked")
     public synchronized List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
         if(referencedVariableFiles != null) {
             return referencedVariableFiles;
@@ -298,8 +307,10 @@ public class RobotProject extends RobotContainer {
         if (configuration != null) {
             referencedVariableFiles = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                final Map<String, Object> varsMap = (Map<String, Object>) getRuntimeEnvironment().getVariablesFromFile(
-                        variableFile.getPath(), variableFile.getArguments());
+                final String path = variableFile.getPath();
+                final Map<String, Object> varsMap = getRuntimeEnvironment().getVariablesFromFile(
+                        PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path)).toPortableString(),
+                        variableFile.getArguments());
                 if (varsMap != null && !varsMap.isEmpty()) {
                     variableFile.setVariables(varsMap);
                     referencedVariableFiles.add(variableFile);
@@ -308,9 +319,5 @@ public class RobotProject extends RobotContainer {
             return referencedVariableFiles;
         }
         return newArrayList();
-    }
-
-    public void setReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
-        this.referencedVariableFiles = referencedVariableFiles;
     }
 }

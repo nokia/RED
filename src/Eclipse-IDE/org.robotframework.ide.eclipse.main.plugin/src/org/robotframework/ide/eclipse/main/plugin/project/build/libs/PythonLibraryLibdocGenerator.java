@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -23,7 +25,10 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForPythonLibrary(libName, libPath, targetSpecFile.getLocation().toFile());
+        final File libFile = new File(libPath);
+        final String additionalLocation = libFile.isFile() ? libFile.getParent() : libPath;
+        runtimeEnvironment.createLibdocForPythonLibrary(libName, additionalLocation,
+                targetSpecFile.getLocation().toFile());
     }
 
     @Override

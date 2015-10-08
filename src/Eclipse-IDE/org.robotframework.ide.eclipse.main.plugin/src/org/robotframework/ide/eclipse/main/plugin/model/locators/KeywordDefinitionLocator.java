@@ -43,7 +43,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        final List<IPath> resources = PathsNormalizer.getNormalizedResourceFilesPaths(startingFile);
+        final List<IPath> resources = PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile);
         shouldContinue = locateInResourceFiles(resources, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
