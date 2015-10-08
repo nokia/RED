@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.robotframework.ide.core.executor.RobotCommandExecutor;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
@@ -57,7 +56,6 @@ public class RedPlugin extends AbstractUIPlugin {
         FontsManager.disposeFonts();
         ImagesManager.disposeImages();
         RobotModelManager.getInstance().dispose();
-        RobotCommandExecutor.getInstance().close();
     }
 
     public RedPreferences getPreferences() {

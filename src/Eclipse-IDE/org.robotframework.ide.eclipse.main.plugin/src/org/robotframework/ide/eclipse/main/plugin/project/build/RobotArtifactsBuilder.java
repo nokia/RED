@@ -23,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigRead
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
-import org.robotframework.ide.eclipse.main.plugin.project.build.variables.VariablesBuilder;
 
 public class RobotArtifactsBuilder {
 
@@ -106,7 +105,6 @@ public class RobotArtifactsBuilder {
         }
 
         new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(40));
-        new VariablesBuilder().buildVariables(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(40));
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,

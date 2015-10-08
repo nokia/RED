@@ -6,16 +6,19 @@
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -25,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 import com.google.common.base.Optional;
 
@@ -49,15 +53,15 @@ public class VariableDefinitionLocator {
     public void locateVariableDefinitionWithLocalScope(final VariableDetector detector, final int offset) {
         first(locateInLocalScope(startingFile, detector, offset))
           .or(locateInCurrentFile(startingFile, detector))
-          .or(locateInResourceFiles(PathsNormalizer.getNormalizedResourceFilesPaths(startingFile), detector))
-          .or(locateInVariableFiles(PathsNormalizer.getNormalizedVariableFilesPaths(startingFile), detector))
+          .or(locateInResourceFiles(PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsNormalizer.getAbsoluteVariableFilesPaths(startingFile), detector))
           .or(locateGlobalVariables(startingFile, detector));
     }
 
     public void locateVariableDefinition(final VariableDetector detector) {
         first(locateInCurrentFile(startingFile, detector))
-          .or(locateInResourceFiles(PathsNormalizer.getNormalizedResourceFilesPaths(startingFile), detector))
-          .or(locateInVariableFiles(PathsNormalizer.getNormalizedVariableFilesPaths(startingFile), detector))
+          .or(locateInResourceFiles(PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsNormalizer.getAbsoluteVariableFilesPaths(startingFile), detector))
           .or(locateGlobalVariables(startingFile, detector));
     }
 
@@ -149,8 +153,27 @@ public class VariableDefinitionLocator {
                 : new RobotSuiteFile(null, resourceFile);
     }
 
-    private Optional<VoidResult> locateInVariableFiles(final List<IPath> variables, final VariableDetector detector) {
-        // TODO : implement for java, python and yaml files
+    private Optional<VoidResult> locateInVariableFiles(final List<IPath> absoluteVariablePaths,
+            final VariableDetector detector) {
+
+        final List<ReferencedVariableFile> knownParamFiles = startingFile.getProject()
+                .getVariablesFromReferencedFiles();
+        for (final IPath importedFilePath : absoluteVariablePaths) {
+            for (final ReferencedVariableFile knownFile : knownParamFiles) {
+                final IPath absKnownFilePath = PathsConverter
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(knownFile.getPath()));
+
+                if (absKnownFilePath.equals(importedFilePath)) {
+                    for (final Entry<String, Object> var : knownFile.getVariables().entrySet()) {
+                        final ContinueDecision shouldContinue = detector.varFileVariableDetected(knownFile,
+                                var.getKey(), var.getValue());
+                        if (shouldContinue == ContinueDecision.STOP) {
+                            return Optional.of(new VoidResult());
+                        }
+                    }
+                }
+            }
+        }
         return Optional.absent();
     }
 
@@ -171,9 +194,11 @@ public class VariableDefinitionLocator {
 
     public interface VariableDetector {
 
+        ContinueDecision localVariableDetected(RobotSuiteFile file, RobotToken variable);
+
         ContinueDecision variableDetected(RobotSuiteFile file, RobotVariable variable);
 
-        ContinueDecision localVariableDetected(RobotSuiteFile file, RobotToken variable);
+        ContinueDecision varFileVariableDetected(ReferencedVariableFile file, String variableName, Object value);
 
         ContinueDecision globalVariableDetected(String name, Object value);
     }

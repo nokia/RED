@@ -5,11 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.io.File;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.Location;
@@ -21,9 +23,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
@@ -74,6 +79,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             validateReferencedLibrary(library, index, configFile, linesMapping, reporter);
             index++;
         }
+
+        for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            validateReferencedVariableFile(variableFile, linesMapping, reporter);
+        }
     }
 
     private void validateRemoteLocation(final RemoteLocation location, final IFile configFile,
@@ -97,55 +109,91 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final Map<String, Object> additional = new HashMap<>();
         additional.put(ConfigFileProblem.LIBRARY_INDEX, index);
 
+        List<RobotProblem> libProblems;
         switch (libType) {
             case JAVA:
-            reporter.handleProblem(findJavaLibaryProblem(libraryPath, library.getName()),
-                    configFile, lineNumber, additional);
+                libProblems = findJavaLibaryProblem(libraryPath, library.getName());
+                break;
+            case PYTHON:
+                libProblems = findPythonLibraryProblem(libraryPath, library.getName());
                 break;
             case VIRTUAL:
-                reporter.handleProblem(findVirtualLibaryProblem(libraryPath), configFile, lineNumber, additional);
+                libProblems = findVirtualLibaryProblem(libraryPath);
                 break;
             default:
+                libProblems = newArrayList();
                 break;
         }
 
+        for (final RobotProblem problem : libProblems) {
+            reporter.handleProblem(problem, configFile, lineNumber, additional);
+        }
     }
 
-    private RobotProblem findJavaLibaryProblem(final IPath libraryPath, final String libName) {
-        final File filePath = libraryPath.toFile();
+    private List<RobotProblem> findJavaLibaryProblem(final IPath libraryPath, final String libName) {
+        final List<RobotProblem> javaLibProblems = newArrayList();
+
         if (!"jar".equals(libraryPath.getFileExtension())) {
-            return RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_FILE)
-                    .formatMessageWith(libraryPath);
+            javaLibProblems.add(
+                    RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_FILE).formatMessageWith(libraryPath));
         }
-        if (!filePath.exists()) {
-            return RobotProblem.causedBy(ConfigFileProblem.MISSING_JAR_FILE).formatMessageWith(
-                    libraryPath);
-        } else {
-            boolean containsClass = false;
-            for (final JarClass jarClass : new JarStructureBuilder().provideEntriesFromJarFile(filePath.toString())) {
-                if (jarClass.getQualifiedName().equals(libName)) {
-                    containsClass = true;
-                    break;
-                }
-            }
-            if (!containsClass) {
-                return RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_MISSING_CLASS)
-                        .formatMessageWith(libraryPath, libName);
+        javaLibProblems.addAll(validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
+
+        final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
+        boolean containsClass = false;
+        for (final JarClass jarClass : new JarStructureBuilder().provideEntriesFromJarFile(absolutePath.toFile())) {
+            if (jarClass.getQualifiedName().equals(libName)) {
+                containsClass = true;
+                break;
             }
         }
-        return null;
+        if (!containsClass) {
+            javaLibProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_MISSING_CLASS)
+                    .formatMessageWith(libraryPath, libName));
+        }
+
+        if (validationContext.getExecutorInUse() != SuiteExecutor.Jython) {
+            javaLibProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_IN_NON_JAVA_ENV)
+                    .formatMessageWith(libraryPath, validationContext.getExecutorInUse().toString()));
+        }
+        return javaLibProblems;
     }
 
-    private RobotProblem findVirtualLibaryProblem(final IPath libraryPath) {
+    private List<RobotProblem> findPythonLibraryProblem(final IPath libraryPath, final String libName) {
+        final List<RobotProblem> pyLibProblems = newArrayList();
+        pyLibProblems.addAll(validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
+        // TODO validate classes
+        return pyLibProblems;
+    }
+
+    private List<RobotProblem> findVirtualLibaryProblem(final IPath libraryPath) {
+        return newArrayList(validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
+    }
+
+    private List<RobotProblem> validateLibraryPath(final IPath libraryPath,
+            final ConfigFileProblem missingFileProblem) {
+        final List<RobotProblem> problems = newArrayList();
         if (libraryPath.isAbsolute()) {
-            return RobotProblem.causedBy(ConfigFileProblem.ABSOLUTE_PATH).formatMessageWith(
-                    libraryPath);
+            problems.add(RobotProblem.causedBy(ConfigFileProblem.ABSOLUTE_PATH).formatMessageWith(libraryPath));
+            if (!libraryPath.toFile().exists()) {
+                problems.add(RobotProblem.causedBy(missingFileProblem).formatMessageWith(libraryPath));
+            }
+        } else {
+            final IResource libspec = ResourcesPlugin.getWorkspace().getRoot().findMember(libraryPath);
+            if (libspec == null || !libspec.exists()) {
+                problems.add(RobotProblem.causedBy(missingFileProblem).formatMessageWith(libraryPath));
+            }
         }
-        final IResource libspec = ResourcesPlugin.getWorkspace().getRoot().findMember(libraryPath);
-        if (libspec == null || !libspec.exists()) {
-            return RobotProblem.causedBy(ConfigFileProblem.MISSING_LIBSPEC_FILE)
-                    .formatMessageWith(libraryPath);
+        return problems;
+    }
+
+    private void validateReferencedVariableFile(final ReferencedVariableFile variableFile,
+            final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) {
+
+        final IPath libraryPath = Path.fromPortableString(variableFile.getPath());
+        final List<RobotProblem> pathProblems = validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_VARIABLE_FILE);
+        for (final RobotProblem pathProblem : pathProblems) {
+            reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile).getLineNumber());
         }
-        return null;
     }
 }

@@ -24,12 +24,20 @@ import com.google.common.collect.Lists;
  */
 class PathsNormalizer {
 
-    static List<IPath> getNormalizedVariableFilesPaths(final RobotSuiteFile file) {
+    static List<IPath> getWorkspaceRelativeVariableFilesPaths(final RobotSuiteFile file) {
         return getNormalizedPaths(file.getVariablesPaths(), file.getFile().getFullPath());
     }
 
-    static List<IPath> getNormalizedResourceFilesPaths(final RobotSuiteFile file) {
+    static List<IPath> getAbsoluteVariableFilesPaths(final RobotSuiteFile file) {
+        return getNormalizedPaths(file.getVariablesPaths(), file.getFile().getLocation());
+    }
+
+    static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
         return getNormalizedPaths(file.getResourcesPaths(), file.getFile().getFullPath());
+    }
+
+    static List<IPath> getAbsoluteResourceFilesPaths(final RobotSuiteFile file) {
+        return getNormalizedPaths(file.getResourcesPaths(), file.getFile().getLocation());
     }
 
     private static List<IPath> getNormalizedPaths(final List<IPath> relativePaths, final IPath path) {
@@ -45,7 +53,7 @@ class PathsNormalizer {
                         return path;
                     } else {
                         final URI pathUri = filePath.resolve(path.toString());
-                        String pathUriAsString = pathUri.getPath();
+                        String pathUriAsString = pathUri.toString();
                         if (pathUriAsString.startsWith("/") && !pathUri.isAbsolute()) {
                             pathUriAsString = pathUriAsString.substring(1);
                         }

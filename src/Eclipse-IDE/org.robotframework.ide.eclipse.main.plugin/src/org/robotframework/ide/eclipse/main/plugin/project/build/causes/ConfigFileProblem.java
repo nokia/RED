@@ -30,11 +30,10 @@ public enum ConfigFileProblem implements IProblemCause {
             return "Unreachable remote server %s";
         }
     },
-    MISSING_JAR_FILE {
-
+    ABSOLUTE_PATH {
         @Override
-        public boolean hasResolution() {
-            return true;
+        public Severity getSeverity() {
+            return Severity.WARNING;
         }
 
         @Override
@@ -44,16 +43,32 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Missing Java library file '%s'. Keywords from this libary will not be visible";
+            return "The path %s is absolute. RED prefers using workspace-relative paths which makes your projects more portable";
+        }
+    },
+    MISSING_LIBRARY_FILE {
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Missing library file '%s'. Keywords from this libary will not be accessible";
+        }
+    },
+    MISSING_VARIABLE_FILE {
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Missing variable file '%s'. Variables from this file will not be accessible";
         }
     },
     JAVA_LIB_NOT_A_JAR_FILE {
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
@@ -66,11 +81,6 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     JAVA_LIB_MISSING_CLASS {
         @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
@@ -80,37 +90,21 @@ public enum ConfigFileProblem implements IProblemCause {
             return "Java library '%s' does not contain class '%s'. Keywords from this libary will not be visible";
         }
     },
-    ABSOLUTE_PATH {
+    JAVA_LIB_IN_NON_JAVA_ENV {
+
         @Override
         public boolean hasResolution() {
-            return true;
+            return false;
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
+            return newArrayList();
         }
 
         @Override
         public String getProblemDescription() {
-            return "The path %s is absolute but all libspec files for "
-                    + "given project should be placed in the workspace. Keywords from this library will not be visible";
-        }
-    },
-    MISSING_LIBSPEC_FILE {
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Missing library specification file '%s'. Keywords from this libary will not be visible";
+            return "Java library '%s' requires Jython, but %s environment is in use by this project";
         }
     };
 
@@ -119,6 +113,11 @@ public enum ConfigFileProblem implements IProblemCause {
     @Override
     public Severity getSeverity() {
         return Severity.ERROR;
+    }
+
+    @Override
+    public boolean hasResolution() {
+        return true;
     }
 
     @Override
