@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.core.executor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.robotframework.ide.core.execution.ExecutionElementsParser;
 import org.robotframework.ide.core.execution.IExecutionHandler;
 
@@ -41,15 +38,12 @@ public class RobotRuntimeEnvironment {
 
     private String version;
 
-    private ObjectMapper mapper;
-    
-    
-    private static boolean isWindows() {
+    static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 
 
-    private static int runExternalProcess(final List<String> command,
+    static int runExternalProcess(final List<String> command,
             final ILineHandler linesHandler) throws IOException {
         try {
             final Process process = new ProcessBuilder(command)
@@ -180,58 +174,11 @@ public class RobotRuntimeEnvironment {
      */
     private static String getRobotFrameworkVersion(
             final PythonInstallationDirectory pythonLocation) {
-        final StringBuilder versionOutput = new StringBuilder();
-        final ILineHandler linesHandler = new ILineHandler(){
-
-            @Override
-            public void processLine(final String line) {
-                versionOutput.append(line);
-            }
-        };
-        try {
-            final String output;
-            String result = RobotCommandExecutor.getInstance().getRobotVersion(pythonLocation.getAbsolutePath());
-            if(result!=null && !result.equals("")) {
-                output = result;
-            } else {
-                runExternalProcess(Arrays.asList(
-                        getPythonExecutablePath(pythonLocation), "-m", "robot.run",
-                        "--version"), linesHandler);
-                output = versionOutput.toString();
-            }
-            return output.startsWith("Robot Framework") ? output.trim() : null;
-        } catch (final IOException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return PythonInterpretersCommandExecutors.getInstance().getRobotCommandExecutor(pythonLocation).getRobotVersion();
     }
 
-
     private static String getRunModulePath(final PythonInstallationDirectory pythonLocation) {
-        final StringBuilder versionOutput = new StringBuilder();
-        final ILineHandler linesHandler = new ILineHandler() {
-
-            @Override
-            public void processLine(final String line) {
-                versionOutput.append(line);
-            }
-        };
-        try {
-            String output = RobotCommandExecutor.getInstance().getRunModulePath(pythonLocation.getAbsolutePath());
-            if (output == null || output.equals("")) {
-                runExternalProcess(Arrays.asList(getPythonExecutablePath(pythonLocation), "-c",
-                        "import robot;print(robot.__file__)"), linesHandler);
-                output = versionOutput.toString();
-            }
-
-            for (final File file : new File(output.trim()).getParentFile().listFiles()) {
-                if (file.getName().equals("run.py")) {
-                    return file.getAbsolutePath();
-                }
-            }
-            throw new IllegalArgumentException("Unable to find robot.run module");
-        } catch (final IOException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return PythonInterpretersCommandExecutors.getInstance().getRobotCommandExecutor(pythonLocation).getRunModulePath();
     }
 
 
@@ -253,7 +200,7 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    private static File copyResourceFile(final String filename)
+    static File copyResourceFile(final String filename)
             throws IOException {
         final Path tempDir = createTemporaryDirectory();
         final File scriptFile = new File(tempDir.toString() + File.separator
@@ -315,31 +262,12 @@ public class RobotRuntimeEnvironment {
     public static RobotRuntimeEnvironment create(final File pathToPython) {
         try {
             final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
-
-            setupPythonServer(location);
-
             return new RobotRuntimeEnvironment(location, getRobotFrameworkVersion(location));
         } catch (final IllegalArgumentException e) {
             return new RobotRuntimeEnvironment(pathToPython, null);
         }
     }
     
-    private static void setupPythonServer(final PythonInstallationDirectory pythonLocation) {
-        File scriptFile = null;
-        try {
-            scriptFile = copyResourceFile("RobotCommandExecutionServer.py");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        final String pythonFileLocation = getPythonExecutablePath(pythonLocation);
-        String scriptLocation = "";
-        if (scriptFile != null) {
-            scriptLocation = scriptFile.getAbsolutePath();
-        }
-        RobotCommandExecutor.getInstance().setupPythonProcess(pythonLocation.getAbsolutePath(), pythonFileLocation,
-                scriptLocation);
-    }
-
     public boolean isValidPythonInstallation() {
         return location instanceof PythonInstallationDirectory;
     }
@@ -419,18 +347,11 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-
-    public void createLibdocForStdLibrary(final String libName, final File file)
-            throws RobotEnvironmentException {
+    public void createLibdocForStdLibrary(final String libName, final File file) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final int returnCode = createLibdoc(file.getAbsolutePath(), libName, "");
-            if (returnCode != 0) {
-                final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-                final List<String> cmdLine = Arrays.asList(cmd, "-m",
-                        "robot.libdoc", "-f", "XML", libName,
-                        file.getAbsolutePath());
-                runLibdoc(libName, cmdLine);
-            }
+            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
         }
     }
 
@@ -438,13 +359,9 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final int returnCode = createLibdoc(file.getAbsolutePath(), libName, libPath);
-            if (returnCode != 0) {
-                final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-                final List<String> cmdLine = Arrays.asList(cmd, "-m", "robot.libdoc", "-f", "XML", "-P", libPath,
-                        libName, file.getAbsolutePath());
-                runLibdoc(libName, cmdLine);
-            }
+            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
         }
     }
 
@@ -452,256 +369,65 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForJavaLibrary(final String libName,
             final String jarPath, final File file)
             throws RobotEnvironmentException {
-        if (hasRobotInstalled()
-                && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
-            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-
-            final String cpSeparator = isWindows() ? ";" : ":";
-            final String classPath = "\""
-                    + Joiner.on(cpSeparator).join(Arrays.asList(".", jarPath))
-                    + "\"";
-
-            final List<String> cmdLine = Arrays.asList(cmd, "-J-cp", classPath,
-                    "-m", "robot.libdoc", "-f", "XML", libName,
-                    file.getAbsolutePath());
-
-            runLibdoc(libName, cmdLine);
+        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
+            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
         }
     }
     
-    private int createLibdoc(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException {
-        final String result = RobotCommandExecutor.getInstance().createLibdoc(location.getAbsolutePath(),
-                resultFilePath, libName, libPath);
-        if(result != null) {
-            return Integer.parseInt(result);
-        }
-        return -1;
-    }
-
-    private void runLibdoc(final String libName, final List<String> cmdLine)
-            throws RobotEnvironmentException {
-        try {
-            final List<String> lines = newArrayList();
-            final ILineHandler handler = new ILineHandler(){
-
-                @Override
-                public void processLine(final String line) {
-                    lines.add(line);
-                }
-            };
-            final int returnCode = runExternalProcess(cmdLine, handler);
-            if (returnCode != 0) {
-                throw new RobotEnvironmentException(
-                        "Unable to generate library specification file for library "
-                                + libName + "\nDetailed information:\n"
-                                + Joiner.on('\n').join(lines));
-            }
-        } catch (final IOException e) {
-            throw new RobotEnvironmentException(
-                    "Unable to generate library specification file for library "
-                            + libName, e);
-        }
-    }
-
-
     public List<String> getStandardLibrariesNames() {
         if (hasRobotInstalled()) {
-            try {
-                final File scriptFile = copyResourceFile("StdLibrariesReader.py");
-
-                final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-                final List<String> cmdLine = Arrays.asList(cmd, scriptFile.getAbsolutePath());
-                final List<String> stdLibs = new ArrayList<>();
-                final ILineHandler linesHandler = new ILineHandler() {
-
-                    @Override
-                    public void processLine(final String line) {
-                        final String libName = line.trim();
-                        // Remote is a library without keywords and libdoc
-                        // throws
-                        // exceptions when trying to generate its specification
-                        if (!libName.equals("Remote")) {
-                            stdLibs.add(libName);
-                        }
-                    }
-                };
-                String result = RobotCommandExecutor.getInstance().getStandardLibrariesNames(location.getAbsolutePath());
-                if(result != null && !result.equals("")) {
-                    result = result.replaceAll("'", "\"");
-                    if (mapper == null) {
-                        mapper = new ObjectMapper();
-                    }
-                    List<String> list = mapper.readValue(result, List.class);
-                    stdLibs.addAll(list);
-                    stdLibs.remove("Remote");
-                } else {
-                    runExternalProcess(cmdLine, linesHandler);
-                }
-                return stdLibs;
-            } catch (final IOException e) {
-                return new ArrayList<>();
-            }
+            final List<String> libs = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location)
+                    .getStandardLibrariesNames();
+            // Remote is a library without keywords and libdoc throws
+            // exceptions when trying to generate its specification
+            libs.remove("Remote");
+            return libs;
         } else {
             return new ArrayList<>();
         }
     }
 
-
     public File getStandardLibraryPath(final String libraryName) {
         if (hasRobotInstalled()) {
-            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-            final List<String> cmdLine = Arrays.asList(cmd, "-c",
-                    "import robot.libraries." + libraryName
-                            + ";print(robot.libraries." + libraryName
-                            + ".__file__)");
-            final StringBuilder path = new StringBuilder();
-            final ILineHandler linesHandler = new ILineHandler(){
-
-                @Override
-                public void processLine(final String line) {
-                    path.append(line);
-                }
-            };
-
-            try {
-                String pycPath = "";
-                String result = RobotCommandExecutor.getInstance().getStandardLibraryPath(location.getAbsolutePath(),
-                        libraryName);
-                if (result != null) {
-                    pycPath = result;
-                } else {
-                    runExternalProcess(cmdLine, linesHandler);
-                    pycPath = path.toString().trim();
-                }
-                
-                if (pycPath.endsWith(".py")) {
-                    return new File(pycPath);
-                } else if (pycPath.endsWith(".pyc")) {
-                    return new File(pycPath.substring(0, pycPath.length() - 1));
-                } else if (pycPath.endsWith("$py.class")) {
-                    return new File(pycPath.substring(0, pycPath.length() - 9)
-                            + ".py");
-                }
+            final String pycPath = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location)
+                    .getStandardLibraryPath(libraryName);
+            if (pycPath == null) {
                 return null;
-            } catch (final IOException e) {
+            } else if (pycPath.endsWith(".py")) {
+                return new File(pycPath);
+            } else if (pycPath.endsWith(".pyc")) {
+                return new File(pycPath.substring(0, pycPath.length() - 1));
+            } else if (pycPath.endsWith("$py.class")) {
+                return new File(pycPath.substring(0, pycPath.length() - 9) + ".py");
+            } else {
                 return null;
             }
         }
         return null;
     }
 
-
-    public Map<?, ?> getGlobalVariables() {
-        Map<?, ?> variables = new LinkedHashMap<>();
-
+    public Map<String, Object> getGlobalVariables() {
         if (hasRobotInstalled()) {
-            File scriptFile = null;
-            try {
-                scriptFile = copyResourceFile("GlobalVarsImporter.py");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-            if (scriptFile != null) {
-                final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-                final List<String> cmdLine = Arrays.asList(cmd,
-                        scriptFile.getAbsolutePath());
-
-                final StringBuilder result = new StringBuilder();
-                final ILineHandler linesHandler = new ILineHandler(){
-
-                    @Override
-                    public void processLine(final String line) {
-                        result.append(line);
-                    }
-                };
-
-                String resultVars = "";
-                try {
-                    resultVars = RobotCommandExecutor.getInstance().getGlobalVariables(location.getAbsolutePath());
-                    if(resultVars != null && !resultVars.equals("")) {
-                        resultVars = resultVars.trim().replaceAll("'", "\"");
-                    } else {
-                        runExternalProcess(cmdLine, linesHandler);
-                        resultVars = result.toString().trim().replaceAll("'", "\"");
-                    }
-                    
-                    if (mapper == null) {
-                        mapper = new ObjectMapper();
-                    }
-                    variables = mapper.readValue(resultVars, Map.class);
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Command line output " + resultVars);
-                }
-            }
-
+            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.getGlobalVariables();
         }
-        return variables;
+        return new LinkedHashMap<>();
     }
 
 
-    public Map<?, ?> getVariablesFromFile(final String path, final List<String> args) {
-
-        Map<?, ?> variables = new LinkedHashMap<>();
+    public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
         if (hasRobotInstalled()) {
-            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
-            final StringBuilder argsBuilder = new StringBuilder();
-            if (args != null && !args.isEmpty()) {
-                argsBuilder.append("[");
-                for (int i = 0; i < args.size(); i++) {
-                    argsBuilder.append("'" + args.get(i) + "'");
-                    if (i < args.size() - 1) {
-                        argsBuilder.append(",");
-                    }
-                }
-                argsBuilder.append("]");
-            } else {
-                argsBuilder.append("None");
-            }
-
-            final String normalizedPath = path.replace('\\', '/');
-            final List<String> cmdLine = Arrays
-                    .asList(cmd,
-                            "-c",
-                            "import robot.variables as rv;vars=rv.Variables();vars.set_from_file('"
-                                    + normalizedPath
-                                    + "',"
-                                    + argsBuilder.toString()
-                                    + ");exec('try:\\n\\tprint(str(vars.data))\\n"
-                                    + "except AttributeError:\\n\\tprint(str(vars.store.data))')");
-
-            final StringBuilder result = new StringBuilder();
-            final ILineHandler linesHandler = new ILineHandler(){
-
-                @Override
-                public void processLine(final String line) {
-                    result.append(line);
-                }
-            };
-
-            String resultVars = "";
-            try {
-                String line = RobotCommandExecutor.getInstance().getVariables(location.getAbsolutePath(),
-                        normalizedPath, argsBuilder.toString());
-                if(line != null && !line.equals("")) {
-                    resultVars = line.replaceAll("'", "\"");
-                } else { 
-                    runExternalProcess(cmdLine, linesHandler);
-                    resultVars = result.toString().trim().replaceAll("'", "\"");
-                }
-                
-                if (mapper == null) {
-                    mapper = new ObjectMapper();
-                }
-                variables = mapper.readValue(resultVars, Map.class);
-            } catch (final IOException e) {
-                e.printStackTrace();
-                System.out.println("Command line output " + resultVars);
-            }
+            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            final String argAsString = args.isEmpty() ? "None" : "['" + Joiner.on("','").join(args) + "']";
+            return executor.getVariables(path, argAsString);
         }
-        return variables;
+        return new LinkedHashMap<String, Object>();
     }
 
 
@@ -813,11 +539,11 @@ public class RobotRuntimeEnvironment {
 
     private void addTags(final List<String> cmdLine,
             final List<String> includedTags, final List<String> excludedTags) {
-        for (String tag : includedTags) {
+        for (final String tag : includedTags) {
             cmdLine.add("-i");
             cmdLine.add(tag);
         }
-        for (String tag : excludedTags) {
+        for (final String tag : excludedTags) {
             cmdLine.add("-e");
             cmdLine.add(tag);
         }
@@ -895,6 +621,10 @@ public class RobotRuntimeEnvironment {
                 final SuiteExecutor interpreter) {
             super(uri);
             this.interpreter = interpreter;
+        }
+
+        SuiteExecutor getInterpreter() {
+            return interpreter;
         }
     }
 
