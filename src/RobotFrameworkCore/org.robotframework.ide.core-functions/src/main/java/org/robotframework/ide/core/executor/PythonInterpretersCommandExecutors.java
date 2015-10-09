@@ -39,7 +39,7 @@ class PythonInterpretersCommandExecutors {
         }
     }
 
-    synchronized RobotCommandExec getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
+    synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
         final String pathAsName = interpreterPath.toPath()
                 .resolve(interpreterPath.getInterpreter().executableName())
                 .toAbsolutePath()

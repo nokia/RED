@@ -349,7 +349,7 @@ public class RobotRuntimeEnvironment {
 
     public void createLibdocForStdLibrary(final String libName, final File file) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
         }
@@ -359,7 +359,7 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
         }
@@ -370,7 +370,7 @@ public class RobotRuntimeEnvironment {
             final String jarPath, final File file)
             throws RobotEnvironmentException {
         if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
-            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
         }
@@ -412,7 +412,7 @@ public class RobotRuntimeEnvironment {
 
     public Map<String, Object> getGlobalVariables() {
         if (hasRobotInstalled()) {
-            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getGlobalVariables();
         }
@@ -422,7 +422,7 @@ public class RobotRuntimeEnvironment {
 
     public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
         if (hasRobotInstalled()) {
-            final RobotCommandExec executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             final String argAsString = args.isEmpty() ? "None" : "['" + Joiner.on("','").join(args) + "']";
             return executor.getVariables(path, argAsString);
