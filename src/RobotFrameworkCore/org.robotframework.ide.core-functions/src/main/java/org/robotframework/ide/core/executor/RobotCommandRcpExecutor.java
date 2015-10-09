@@ -89,6 +89,8 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                     }
                 } catch (final IOException e) {
                     // that fine
+                } finally {
+                    serverProcess = null;
                 }
             }
         }).start();
@@ -129,17 +131,18 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                 }
             }
             if (System.currentTimeMillis() - start > (timeoutInSec * 1000)) {
+                serverProcess = null;
                 break;
             }
         }
     }
 
     boolean isAlive() {
-        return serverProcess.isAlive();
+        return serverProcess != null;
     }
 
     void kill() {
-        serverProcess.destroyForcibly();
+        serverProcess.destroy();
         try {
             serverProcess.waitFor();
         } catch (final InterruptedException e) {
@@ -250,6 +253,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
+    @SuppressWarnings("serial")
     static class RobotCommandExecutorException extends RuntimeException {
 
         RobotCommandExecutorException(final String message) {
