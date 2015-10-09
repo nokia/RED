@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 /**
  * @author mmarzec
  */
-class RobotCommandRcpExecutor implements RobotCommandExec {
+class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     private static final int CONNECTION_TIMEOUT = 10;
     private final String interpreterPath;

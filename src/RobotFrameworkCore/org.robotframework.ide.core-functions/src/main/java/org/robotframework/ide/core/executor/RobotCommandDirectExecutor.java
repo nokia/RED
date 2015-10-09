@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
  * @author Michal Anglart
  *
  */
-class RobotCommandDirectExecutor implements RobotCommandExec {
+class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE = 
             new TypeReference<Map<String, Object>>() { };
