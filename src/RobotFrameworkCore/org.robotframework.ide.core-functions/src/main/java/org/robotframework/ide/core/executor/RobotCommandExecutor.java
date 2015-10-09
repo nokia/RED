@@ -14,7 +14,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnviron
  * @author Michal Anglart
  *
  */
-interface RobotCommandExec {
+interface RobotCommandExecutor {
 
     Map<String, Object> getVariables(final String filePath, final String fileArguments);
 
