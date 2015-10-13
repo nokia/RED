@@ -65,12 +65,22 @@ public class TestTemplateTrashDataMapper implements IParsingMapper {
             if (currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
                     || currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
                 result = true;
+            } else if (currentState == ParsingState.SETTING_TEST_TEMPLATE) {
+                List<TestTemplate> testTemplates = robotFileOutput
+                        .getFileModel().getSettingTable().getTestTemplates();
+                if (testTemplates.size() == 1) {
+                    TestTemplate template = testTemplates.get(0);
+                    result = (template.getKeywordName() != null);
+                } else {
+                    result = true;
+                }
             } else {
                 result = false;
             }
         } else {
             result = false;
         }
+
         return result;
     }
 
