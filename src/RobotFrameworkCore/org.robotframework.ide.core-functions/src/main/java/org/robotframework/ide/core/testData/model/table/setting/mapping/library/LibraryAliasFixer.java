@@ -105,7 +105,7 @@ public class LibraryAliasFixer {
                     // will be get as argument
                     RobotToken aliasToken = alias.getLibraryAliasDeclaration();
                     aliasToken.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
-                    lib.getArguments().add(aliasToken);
+                    lib.addArgument(aliasToken);
                     lib.setAlias(new LibraryAlias(null));
                     removeLibraryAliasState(processingState);
                 }
