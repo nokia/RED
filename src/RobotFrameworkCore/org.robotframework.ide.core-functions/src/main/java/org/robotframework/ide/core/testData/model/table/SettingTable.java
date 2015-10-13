@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.presenter.DataDrivenKeywordName;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
 import org.robotframework.ide.core.testData.model.table.setting.ForceTags;
@@ -38,6 +39,8 @@ public class SettingTable extends ARobotSectionTable {
     private final List<TestTemplate> testTemplates = new LinkedList<>();
     private final List<TestTimeout> testTimeouts = new LinkedList<>();
     private final List<UnknownSetting> unknownSettings = new LinkedList<>();
+
+    private final DataDrivenKeywordName<TestTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
 
     public SettingTable(final RobotFile parent) {
@@ -156,6 +159,11 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<TestTemplate> getTestTemplates() {
         return Collections.unmodifiableList(testTemplates);
+    }
+
+
+    public String getRobotViewAboutTestTemplate() {
+        return templateKeywordGenerator.createRepresentation(testTemplates);
     }
 
 

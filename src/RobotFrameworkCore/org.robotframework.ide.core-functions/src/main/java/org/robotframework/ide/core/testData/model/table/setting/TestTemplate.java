@@ -11,12 +11,14 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.IDataDrivenSetting;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class TestTemplate extends AModelElement<SettingTable> {
+public class TestTemplate extends AModelElement<SettingTable> implements
+        IDataDrivenSetting {
 
     private final RobotToken declaration;
     private RobotToken keywordName;
@@ -36,11 +38,13 @@ public class TestTemplate extends AModelElement<SettingTable> {
     }
 
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
 
 
+    @Override
     public RobotToken getKeywordName() {
         return keywordName;
     }
@@ -51,6 +55,7 @@ public class TestTemplate extends AModelElement<SettingTable> {
     }
 
 
+    @Override
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
@@ -61,6 +66,7 @@ public class TestTemplate extends AModelElement<SettingTable> {
     }
 
 
+    @Override
     public List<RobotToken> getComment() {
         return comment;
     }
