@@ -31,6 +31,8 @@ public class RobotDebugExecutionContextTest {
     private int[] test4_lines = new int[] { 4, 21, 23, 26, 28, 7, 12, 26, 28 };
     
     private int[] test5_lines = new int[] { 3, 20, 21, 26, 27, 8, 9, 10, 4, 23, 24, 13, 27, 15, 16, 14, 29 };
+    
+    private int[] test6_lines = new int[] { 2, 12, 13, 7, 8, 3, 15, 16 };
 
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
@@ -262,6 +264,33 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword();
     debugExecutionContext.endTest();
     }
+
+    @Test
+    public void test_SuiteSetupAndTeardownKeywords() throws URISyntaxException {
+        linesCounter = 0;
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test6.robot");
+        
+        debugExecutionContext = new RobotDebugExecutionContext();
+        debugExecutionContext.startSuite(modelFile.getParent());
+        
+        debugExecutionContext.startKeyword("my_setup", "Suite Setup", Arrays.asList(""));
+        checkKeywordLine6();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup", Arrays.asList("setup"));checkKeywordLine6();debugExecutionContext.endKeyword();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup", Arrays.asList("setup2"));checkKeywordLine6();debugExecutionContext.endKeyword();
+        debugExecutionContext.endKeyword();
+        
+        debugExecutionContext.startTest("test6");
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));checkKeywordLine6();debugExecutionContext.endKeyword();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("2"));checkKeywordLine6();debugExecutionContext.endKeyword();
+        debugExecutionContext.endTest();
+        
+        debugExecutionContext.startKeyword("my_teardown", "Suite Teardown", Arrays.asList(""));
+        checkKeywordLine6();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown", Arrays.asList("close"));checkKeywordLine6();debugExecutionContext.endKeyword();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown", Arrays.asList("close2"));checkKeywordLine6();debugExecutionContext.endKeyword();
+        debugExecutionContext.endKeyword();
+        
+    }
     
     private void startBuiltInLogKeyword1() {
         debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine1();debugExecutionContext.endKeyword();
@@ -353,6 +382,11 @@ public class RobotDebugExecutionContextTest {
     
     private void checkKeywordLine5() {
         Assert.assertEquals(test5_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
+        linesCounter++;
+    }
+    
+    private void checkKeywordLine6() {
+        Assert.assertEquals(test6_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
         linesCounter++;
     }
 }
