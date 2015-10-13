@@ -60,8 +60,17 @@ public class UnknownVariableMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
+        boolean result = false;
         ParsingState currentState = utility.getCurrentStatus(processingState);
 
-        return (currentState == ParsingState.VARIABLE_TABLE_INSIDE);
+        if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
+            if (text != null) {
+                result = (text.trim().length() > 0)
+                        || utility.isTheFirstColumnAfterSeparator(currentLine,
+                                rt);
+            }
+        }
+
+        return result;
     }
 }

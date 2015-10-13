@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -29,6 +30,61 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class ElementsUtility {
+
+    public void fixOnlyPrettyAlignLinesInSettings(final RobotLine line,
+            final Stack<ParsingState> processingState) {
+        ParsingState state = getCurrentStatus(processingState);
+        if (state == ParsingState.SETTING_TABLE_INSIDE) {
+            removeTokenWithoutTextFromSimpleTableLine(line);
+        }
+    }
+
+
+    public void fixOnlyPrettyAlignLinesInVariables(final RobotLine line,
+            final Stack<ParsingState> processingState) {
+        ParsingState state = getCurrentStatus(processingState);
+        if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
+            removeTokenWithoutTextFromSimpleTableLine(line);
+        }
+    }
+
+
+    private void removeTokenWithoutTextFromSimpleTableLine(final RobotLine line) {
+        boolean containsAnyValuableToken = false;
+        List<Integer> emptyStrings = new LinkedList<>();
+        List<IRobotLineElement> lineElements = line.getLineElements();
+        int length = lineElements.size();
+        for (int lineElementIndex = 0; lineElementIndex < length; lineElementIndex++) {
+            IRobotLineElement elem = lineElements.get(lineElementIndex);
+            if (elem instanceof RobotToken) {
+                RobotToken rt = (RobotToken) elem;
+                List<IRobotTokenType> types = rt.getTypes();
+                for (IRobotTokenType type : types) {
+                    if (type != RobotTokenType.UNKNOWN
+                            && type != RobotTokenType.PRETTY_ALIGN_SPACE) {
+                        containsAnyValuableToken = true;
+                    }
+                }
+
+                String text = rt.getRaw().toString();
+                if (text != null && text.trim().length() > 0) {
+                    containsAnyValuableToken = true;
+                } else if (!containsAnyValuableToken
+                        && types.contains(RobotTokenType.UNKNOWN)) {
+                    emptyStrings.add(lineElementIndex);
+                }
+            }
+        }
+
+        if (!containsAnyValuableToken) {
+            Collections.sort(emptyStrings);
+            int emptiesSize = emptyStrings.size();
+            for (int index = emptiesSize - 1; index >= 0; index--) {
+                lineElements.remove((int) emptyStrings.get(index));
+            }
+        }
+    }
+
 
     public boolean isNewExecutableSection(final ALineSeparator separator,
             final RobotLine line) {
