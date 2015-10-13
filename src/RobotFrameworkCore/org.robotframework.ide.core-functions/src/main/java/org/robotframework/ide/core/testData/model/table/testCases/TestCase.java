@@ -12,8 +12,10 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.presenter.DataDrivenKeywordName;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
+import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
@@ -28,6 +30,8 @@ public class TestCase extends AModelElement<TestCaseTable> {
     private final List<TestCaseTemplate> templates = new LinkedList<>();
     private final List<TestCaseTimeout> timeouts = new LinkedList<>();
     private final List<RobotExecutableRow<TestCase>> testContext = new LinkedList<>();
+
+    private final DataDrivenKeywordName<TestCaseTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
 
     public TestCase(final RobotToken testName) {
@@ -181,5 +185,34 @@ public class TestCase extends AModelElement<TestCaseTable> {
         }
 
         return tokens;
+    }
+
+
+    public boolean isDataDrivenTestCase() {
+        return (getTemplateKeywordName() != null);
+    }
+
+
+    public String getTemplateKeywordName() {
+        String keywordName = getRobotViewAboutTestTemplate();
+        if (keywordName == null) {
+            SettingTable settingTable = getParent().getParent()
+                    .getSettingTable();
+            if (settingTable.isPresent()) {
+                keywordName = settingTable.getRobotViewAboutTestTemplate();
+                if (keywordName != null && keywordName.isEmpty()) {
+                    keywordName = null;
+                }
+            }
+        } else if (keywordName.isEmpty()) {
+            keywordName = null;
+        }
+
+        return keywordName;
+    }
+
+
+    public String getRobotViewAboutTestTemplate() {
+        return templateKeywordGenerator.createRepresentation(templates);
     }
 }
