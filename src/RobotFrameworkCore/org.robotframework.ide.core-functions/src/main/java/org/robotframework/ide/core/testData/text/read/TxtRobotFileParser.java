@@ -271,6 +271,10 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     }
                 }
 
+                utility.fixOnlyPrettyAlignLinesInSettings(line, processingState);
+                utility.fixOnlyPrettyAlignLinesInVariables(line,
+                        processingState);
+
                 List<IRobotLineElement> lineElements = line.getLineElements();
                 if (!lineElements.isEmpty()) {
                     IRobotLineElement lineElem = lineElements.get(lineElements
