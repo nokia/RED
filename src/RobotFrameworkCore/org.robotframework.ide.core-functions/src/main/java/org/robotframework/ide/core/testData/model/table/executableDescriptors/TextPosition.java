@@ -37,7 +37,29 @@ public class TextPosition {
 
     @Override
     public String toString() {
-        return String.format("TextPosition [text=%s, start=%s, end=%s]", text,
-                startPosition, endPosition);
+        return String.format("TextPosition [text=%s, start=%s, end=%s, %s",
+                text, startPosition, endPosition, getPartOfText() + "]");
+    }
+
+
+    private String getPartOfText() {
+        String info = "";
+        int textLength = endPosition - startPosition;
+        if (textLength < 3) {
+            int fromTheBegin = startPosition - 1;
+            int fromTheEnd = textLength - endPosition;
+            if (fromTheBegin < fromTheEnd) {
+                info = "beforeText=" + text.substring(0, startPosition)
+                        + ", text="
+                        + text.substring(startPosition, endPosition + 1);
+            } else {
+                info = "text=" + text.substring(startPosition, endPosition + 1)
+                        + ", afterText=" + text.substring(endPosition);
+            }
+        } else {
+            info = "text=" + text.substring(startPosition, endPosition + 1);
+        }
+
+        return info;
     }
 }
