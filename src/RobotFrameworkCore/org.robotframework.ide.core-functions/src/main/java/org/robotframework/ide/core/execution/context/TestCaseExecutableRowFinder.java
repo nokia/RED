@@ -36,4 +36,12 @@ public class TestCaseExecutableRowFinder implements IRobotExecutableRowFinder {
         return null;
     }
 
+    public void setTestCaseExecutionRowCounter(TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
+        this.testCaseExecutionRowCounter = testCaseExecutionRowCounter;
+    }
+
+    public void setCurrentTestCase(TestCase currentTestCase) {
+        this.currentTestCase = currentTestCase;
+    }
+
 }
