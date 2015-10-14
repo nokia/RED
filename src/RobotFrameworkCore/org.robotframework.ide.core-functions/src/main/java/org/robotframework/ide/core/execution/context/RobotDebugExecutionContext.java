@@ -1,6 +1,5 @@
 package org.robotframework.ide.core.execution.context;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,9 +29,6 @@ public class RobotDebugExecutionContext {
     public static final String SUITE_TEARDOWN_KEYWORD_TYPE = "Suite Teardown";
     
     private RobotFile currentModel;
-    private TestCase currentTestCase;
-    private List<UserKeyword> userKeywords;
-    private List<ResourceImportReference> resourceImportReferences;
     
     private LinkedList<KeywordContext> currentKeywords;
     
@@ -40,19 +36,16 @@ public class RobotDebugExecutionContext {
     
     private boolean isSetupTeardownKeywordStarted;
     private boolean isForLoopStarted;
-    private ForLoopExecutableRowFinder forLoopExecutableRowFinder;
     
     public RobotDebugExecutionContext() {
         currentKeywords = new LinkedList<>();
-        userKeywords = new ArrayList<>();
-        resourceImportReferences = new ArrayList<>();
         testCaseExecutionRowCounter = new TestCaseExecutionRowCounter();
     }
     
     public void startSuite(final RobotFileOutput robotFileOutput) {
         currentModel = robotFileOutput.getFileModel();
-        userKeywords = currentModel.getKeywordTable().getKeywords();
-        resourceImportReferences = robotFileOutput.getResourceImportReferences();
+        ExecutableRowFindersManager.initFindersAtSuiteStart(currentModel, currentModel.getKeywordTable().getKeywords(),
+                robotFileOutput.getResourceImportReferences());
     }
 
     public void startTest(final String testName) {
@@ -60,7 +53,7 @@ public class RobotDebugExecutionContext {
         final List<TestCase> testCases = testCaseTable.getTestCases();
         for (final TestCase testCase : testCases) {
             if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
-                currentTestCase = testCase;
+                ExecutableRowFindersManager.initFindersAtTestCaseStart(testCase);
                 break;
             }
         }
@@ -77,7 +70,6 @@ public class RobotDebugExecutionContext {
     
     public void endTest() {
         testCaseExecutionRowCounter.reset();
-        forLoopExecutableRowFinder = null;
     }
     
     public KeywordPosition findKeywordPosition() {
@@ -90,17 +82,14 @@ public class RobotDebugExecutionContext {
         IRobotExecutableRowFinder executableRowFinder = null;
         if (isKeywordDirectlyFromTestCase()) {
             if (isSetupTeardownKeywordStarted) {
-                executableRowFinder = new SetupTeardownExecutableRowFinder(currentTestCase, currentModel);
+                executableRowFinder = ExecutableRowFindersManager.provideSetupTeardownExecutableRowFinder();
             } else {
-                executableRowFinder = new TestCaseExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter);
+                executableRowFinder = ExecutableRowFindersManager.provideTestCaseExecutableRowFinder(testCaseExecutionRowCounter);
             }
         } else if (isForLoopStarted) {
-            if (forLoopExecutableRowFinder == null) {
-                forLoopExecutableRowFinder = new ForLoopExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter);
-            }
-            executableRowFinder = forLoopExecutableRowFinder;
+            executableRowFinder = ExecutableRowFindersManager.provideForLoopExecutableRowFinder(testCaseExecutionRowCounter);
         } else { // keyword from Keywords section or resource file
-            executableRowFinder = new UserKeywordExecutableRowFinder(userKeywords, resourceImportReferences);
+            executableRowFinder = ExecutableRowFindersManager.provideUserKeywordExecutableRowFinder();
         }
         
         return executableRowFinder;
@@ -141,7 +130,7 @@ public class RobotDebugExecutionContext {
             isForLoopStarted = true;
         } else if (isForLoopEnd(type)) {
             isForLoopStarted = false;
-            forLoopExecutableRowFinder.clear();
+            ExecutableRowFindersManager.clearForLoopState();
         } else if (isSetupTeardownEnd(type)) {
             isSetupTeardownKeywordStarted = false;
         } else if (isSetupTeardownStart(type)) {

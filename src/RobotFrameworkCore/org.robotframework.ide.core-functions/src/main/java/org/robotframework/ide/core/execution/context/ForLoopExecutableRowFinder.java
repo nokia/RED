@@ -104,4 +104,13 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     private boolean hasReachedNextForLoopIteration() {
         return forLoopExecutableRowsCounter == forLoopExecutableRows.size();
     }
+
+    public void setCurrentTestCase(TestCase currentTestCase) {
+        this.currentTestCase = currentTestCase;
+    }
+
+    public void setTestCaseExecutionRowCounter(TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
+        this.testCaseExecutionRowCounter = testCaseExecutionRowCounter;
+    }
+
 }

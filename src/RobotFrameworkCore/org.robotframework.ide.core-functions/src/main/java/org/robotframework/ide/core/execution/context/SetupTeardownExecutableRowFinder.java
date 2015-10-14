@@ -67,4 +67,13 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
     private boolean isKeywordType(final String keywordType, final KeywordContext currentKeywordContext) {
         return currentKeywordContext.getType().equals(keywordType);
     }
+
+    public void setCurrentTestCase(TestCase currentTestCase) {
+        this.currentTestCase = currentTestCase;
+    }
+
+    public void setCurrentModel(RobotFile currentModel) {
+        this.currentModel = currentModel;
+    }
+
 }
