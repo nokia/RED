@@ -88,7 +88,7 @@ class RobotOutlinePage extends ContentOutlinePage {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 final Optional<? extends RobotElement> element = suiteModel.findElement(caretOffset);
-                if (element.isPresent()) {
+                if (element.isPresent() && !display.isDisposed()) {
                     display.asyncExec(new Runnable() {
 
                         @Override
