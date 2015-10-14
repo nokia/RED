@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/21/15 4:47 PM
+Save-Time: 10/14/15 11:24 AM
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -94,7 +94,7 @@ with [get-view "Project Explorer" | get-tree] {
         | verify-true
 }
 */
-//create folder
+//create new normal folder
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Folder" | click
 with [get-window "New Folder"] {
     with [get-editbox -after [get-label "Folder name:"]] {
@@ -127,8 +127,8 @@ with [get-editor "new_suite.robot"] {
         get-property "pages[1]" | equals Keywords | verify-true
         get-property "pages[2]" | equals Settings | verify-true
         get-property "pages[3]" | equals Variables | verify-true
-//        get-property "pages[4]" | equals Source | verify-true
-//        get-property activePage | equals Source | verify-true
+        get-property "pages[4]" | equals Source | verify-true
+        get-property activePage | equals Source | verify-true
         get-property tabCount | equals 5 | verify-true
     }
 }
