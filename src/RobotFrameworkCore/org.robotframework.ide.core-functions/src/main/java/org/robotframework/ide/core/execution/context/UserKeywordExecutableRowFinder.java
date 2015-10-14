@@ -149,4 +149,13 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
         return null;
     }
+
+    public void setUserKeywords(List<UserKeyword> userKeywords) {
+        this.userKeywords = userKeywords;
+    }
+
+    public void setResourceImportReferences(List<ResourceImportReference> resourceImportReferences) {
+        this.resourceImportReferences = resourceImportReferences;
+    }
+
 }
