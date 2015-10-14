@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -15,6 +17,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.content.IContentDescriber;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -42,7 +45,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -52,6 +54,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
@@ -209,13 +212,21 @@ public class RobotFormEditor extends FormEditor {
         boolean shouldSave = true;
         boolean shouldClose = false;
         final RobotSuiteFile currentModel = provideSuiteModel();
-        if (currentModel.isSuiteFile() && !currentModel.findSection(RobotCasesSection.class).isPresent()) {
+
+        int description = IContentDescriber.INDETERMINATE;
+        try {
+            final StringReader reader = new StringReader(getSourceEditor().getDocument().get());
+            description = new RobotSuiteFileDescriber().describe(reader, null);
+        } catch (final IOException e) {
+            // nothing to do
+        }
+        if (currentModel.isSuiteFile() && description == IContentDescriber.INVALID) {
             shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
                     "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
                             + "changes there is no Test Cases section. From now on this file will be recognized as "
                             + "Resource file.\n\nClick OK to save and reopen editor or cancel saving");
             shouldClose = true;
-        } else if (currentModel.isResourceFile() && currentModel.findSection(RobotCasesSection.class).isPresent()) {
+        } else if (currentModel.isResourceFile() && description == IContentDescriber.VALID) {
             shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
                     "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
                             + "changes there is a Test Cases section defined. From now on this file will be recognized "
