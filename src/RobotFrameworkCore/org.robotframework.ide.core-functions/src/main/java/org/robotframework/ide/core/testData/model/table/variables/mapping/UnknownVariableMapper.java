@@ -65,9 +65,8 @@ public class UnknownVariableMapper implements IParsingMapper {
 
         if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
             if (text != null) {
-                result = (text.trim().length() > 0)
-                        || utility.isTheFirstColumnAfterSeparator(currentLine,
-                                rt);
+                result = utility.isTheFirstColumn(currentLine, rt)
+                        || utility.isTheFirstColumn(currentLine, rt);
             }
         }
 
