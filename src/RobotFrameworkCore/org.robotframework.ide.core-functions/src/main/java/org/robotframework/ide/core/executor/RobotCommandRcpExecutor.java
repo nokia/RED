@@ -253,6 +253,22 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public List<File> getModulesSearchPaths() throws RobotEnvironmentException {
+        try {
+            final List<File> libraries = newArrayList();
+            final Object[] paths = (Object[]) client.execute("getModulesSearchPaths", newArrayList());
+            for (final Object o : paths) {
+                if (!"".equals(o)) {
+                    libraries.add(new File((String) o));
+                }
+            }
+            return libraries;
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to obtain modules search path", e);
+        }
+    }
+
     @SuppressWarnings("serial")
     static class RobotCommandExecutorException extends RuntimeException {
 

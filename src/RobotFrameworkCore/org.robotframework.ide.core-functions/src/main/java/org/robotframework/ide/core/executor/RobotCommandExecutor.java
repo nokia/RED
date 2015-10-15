@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.executor;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnviron
  *
  */
 interface RobotCommandExecutor {
+
+    List<File> getModulesSearchPaths() throws RobotEnvironmentException;
 
     Map<String, Object> getVariables(final String filePath, final String fileArguments);
 
