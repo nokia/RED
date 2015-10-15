@@ -18,6 +18,10 @@ import importlib
 def checkServerAvailability():
     pass
 
+def getModulesSearchPaths():
+	import robot
+    return sys.path
+    
 def getVariables(dir, args):
     import robot
     vars = robot.variables.Variables()
@@ -152,6 +156,7 @@ if __name__ == "__main__":
     PORT = int(sys.argv[1])
     
     server = SimpleXMLRPCServer((IP, PORT),allow_none=True)
+    server.register_function(getModulesSearchPaths, "getModulesSearchPaths")
     server.register_function(getVariables, "getVariables")
     server.register_function(getGlobalVariables, "getGlobalVariables")
     server.register_function(getStandardLibrariesNames, "getStandardLibrariesNames")
