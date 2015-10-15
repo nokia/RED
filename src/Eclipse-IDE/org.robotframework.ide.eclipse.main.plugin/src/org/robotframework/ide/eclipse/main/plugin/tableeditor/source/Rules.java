@@ -219,9 +219,12 @@ public class Rules {
                     return Token.UNDEFINED;
                 }
                 final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
+                if (isAssignment(ch, lineContentBefore)) {
+                    return Token.UNDEFINED;
+                }
 
                 final int numberOfCellSeparators = getNumberOfCellSeparators(lineContentBefore);
-                if (numberOfCellSeparators == 1 && !isAssignment(ch, lineContentBefore)) {
+                if (numberOfCellSeparators == 1) {
                     consumeWholeToken(scanner);
                     return token;
                 } else if (numberOfCellSeparators > 1) {
