@@ -24,25 +24,15 @@ public abstract class ATokenRecognizer {
     }
 
 
-    public boolean hasNext(StringBuilder text, int lineNumber) {
-        this.text = text;
-        this.lineNumber = lineNumber;
-        if (m == null || isTextDifferent(text)) {
-            m = pattern.matcher(text);
+    public boolean hasNext(StringBuilder newText, int currentLineNumber) {
+        if (m == null || lineNumber != currentLineNumber
+                || text.toString().equals(newText.toString())) {
+            m = pattern.matcher(newText);
+            this.text = newText;
+            this.lineNumber = currentLineNumber;
         }
+
         return m.find();
-    }
-
-
-    private boolean isTextDifferent(final StringBuilder text) {
-        boolean result = false;
-        if (this.text == null) {
-            result = true;
-        } else {
-            result = this.text.toString().equals(text.toString());
-        }
-
-        return result;
     }
 
 
