@@ -50,10 +50,6 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.StatusSetter;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordsAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
@@ -140,40 +136,51 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
     }
 
-    private void setupAssistantProcessors2(final ContentAssistant contentAssistant) {
-        final StatusSetter statusSetter = new StatusSetter() {
-            @Override
-            public void setStatus(final String title) {
-                contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals", title));
-            }
-        };
-
-        final SuiteSourceEditorContentAssist assist = new SuiteSourceEditorContentAssist(editor.getFileModel());
-        final CycledContentAssistProcessor testCasesProcessor = new CycledContentAssistProcessor(statusSetter);
-        testCasesProcessor.addProcessor(new VariablesAssistProcessor(assist));
-        testCasesProcessor.addProcessor(new KeywordsAssistProcessor());
-        contentAssistant.setContentAssistProcessor(testCasesProcessor, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
-
-        final CycledContentAssistProcessor keywordsProcessor = new CycledContentAssistProcessor(statusSetter);
-        keywordsProcessor.addProcessor(new VariablesAssistProcessor(assist));
-        keywordsProcessor.addProcessor(new KeywordsAssistProcessor());
-        contentAssistant.setContentAssistProcessor(keywordsProcessor, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
-
-        final CycledContentAssistProcessor settingsProcessor = new CycledContentAssistProcessor(statusSetter);
-        settingsProcessor.addProcessor(new VariablesAssistProcessor(assist));
-        settingsProcessor.addProcessor(new KeywordsAssistProcessor());
-        contentAssistant.setContentAssistProcessor(settingsProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
-
-        final CycledContentAssistProcessor variablesProcessor = new CycledContentAssistProcessor(statusSetter);
-        variablesProcessor.addProcessor(new VariablesAssistProcessor(assist));
-        variablesProcessor.addProcessor(new KeywordsAssistProcessor());
-        contentAssistant.setContentAssistProcessor(variablesProcessor, SuiteSourcePartitionScanner.VARIABLES_SECTION);
-
-        final CycledContentAssistProcessor defaultProcessor = new CycledContentAssistProcessor(statusSetter);
-        defaultProcessor.addProcessor(new VariablesAssistProcessor(assist));
-        defaultProcessor.addProcessor(new KeywordsAssistProcessor());
-        contentAssistant.setContentAssistProcessor(defaultProcessor, IDocument.DEFAULT_CONTENT_TYPE);
-    }
+    // private void setupAssistantProcessors2(final ContentAssistant contentAssistant) {
+    // final StatusSetter statusSetter = new StatusSetter() {
+    // @Override
+    // public void setStatus(final String title) {
+    // contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals",
+    // title));
+    // }
+    // };
+    //
+    // final SuiteSourceEditorContentAssist assist = new
+    // SuiteSourceEditorContentAssist(editor.getFileModel());
+    // final CycledContentAssistProcessor testCasesProcessor = new
+    // CycledContentAssistProcessor(statusSetter);
+    // testCasesProcessor.addProcessor(new VariablesAssistProcessor(assist));
+    // testCasesProcessor.addProcessor(new KeywordsAssistProcessor());
+    // contentAssistant.setContentAssistProcessor(testCasesProcessor,
+    // SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+    //
+    // final CycledContentAssistProcessor keywordsProcessor = new
+    // CycledContentAssistProcessor(statusSetter);
+    // keywordsProcessor.addProcessor(new VariablesAssistProcessor(assist));
+    // keywordsProcessor.addProcessor(new KeywordsAssistProcessor());
+    // contentAssistant.setContentAssistProcessor(keywordsProcessor,
+    // SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+    //
+    // final CycledContentAssistProcessor settingsProcessor = new
+    // CycledContentAssistProcessor(statusSetter);
+    // settingsProcessor.addProcessor(new VariablesAssistProcessor(assist));
+    // settingsProcessor.addProcessor(new KeywordsAssistProcessor());
+    // contentAssistant.setContentAssistProcessor(settingsProcessor,
+    // SuiteSourcePartitionScanner.SETTINGS_SECTION);
+    //
+    // final CycledContentAssistProcessor variablesProcessor = new
+    // CycledContentAssistProcessor(statusSetter);
+    // variablesProcessor.addProcessor(new VariablesAssistProcessor(assist));
+    // variablesProcessor.addProcessor(new KeywordsAssistProcessor());
+    // contentAssistant.setContentAssistProcessor(variablesProcessor,
+    // SuiteSourcePartitionScanner.VARIABLES_SECTION);
+    //
+    // final CycledContentAssistProcessor defaultProcessor = new
+    // CycledContentAssistProcessor(statusSetter);
+    // defaultProcessor.addProcessor(new VariablesAssistProcessor(assist));
+    // defaultProcessor.addProcessor(new KeywordsAssistProcessor());
+    // contentAssistant.setContentAssistProcessor(defaultProcessor, IDocument.DEFAULT_CONTENT_TYPE);
+    // }
 
     @Override
     public IQuickAssistAssistant getQuickAssistAssistant(final ISourceViewer sourceViewer) {
