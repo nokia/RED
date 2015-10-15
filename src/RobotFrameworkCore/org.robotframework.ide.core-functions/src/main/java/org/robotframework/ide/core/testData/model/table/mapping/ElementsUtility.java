@@ -27,6 +27,7 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+import org.robotframework.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -626,22 +627,9 @@ public class ElementsUtility {
             final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        List<IRobotLineElement> lineElements = line.getLineElements();
-        result = lineElements.size() >= 2;
-
-        if (!result) {
-            result = checkForVariableTable(separator, processingState);
-        }
-
-        return result;
-    }
-
-
-    private boolean checkForVariableTable(final ALineSeparator separator,
-            final Stack<ParsingState> processingState) {
-        boolean result = false;
-
-        if (getCurrentStatus(processingState) == ParsingState.VARIABLE_TABLE_INSIDE) {
+        ParsingState state = getCurrentStatus(processingState);
+        if (state == ParsingState.VARIABLE_TABLE_INSIDE
+                || state == ParsingState.TEST_CASE_DECLARATION) {
             int textPosition = 0;
             String textInLine = separator.getLine();
             while(separator.hasNext()) {
@@ -650,8 +638,15 @@ public class ElementsUtility {
                         next.getStartColumn());
                 textPosition = next.getEndColumn();
 
-                if (!toAnalyze.trim().isEmpty()) {
-                    result = true;
+                toAnalyze = toAnalyze.trim();
+                if (!toAnalyze.isEmpty()) {
+                    PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
+                    result = !recognizer.hasNext(new StringBuilder(toAnalyze),
+                            separator.getLineNumber());
+                    if (!result) {
+                        result = !"...".equals(toAnalyze);
+                    }
+                    textPosition = textInLine.length();
                     break;
                 }
             }
@@ -659,6 +654,9 @@ public class ElementsUtility {
             if (!result && textInLine.length() > textPosition) {
                 result = !textInLine.substring(textPosition).trim().isEmpty();
             }
+        } else {
+            List<IRobotLineElement> lineElements = line.getLineElements();
+            result = lineElements.size() >= 2;
         }
 
         return result;
