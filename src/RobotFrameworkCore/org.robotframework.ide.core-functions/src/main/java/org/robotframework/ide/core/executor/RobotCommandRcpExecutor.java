@@ -161,7 +161,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            return variables;
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -175,7 +175,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            return variables;
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -189,7 +189,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            return newArrayList();
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -198,7 +198,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         try {
             return (String) client.execute("getStandardLibraryPath", newArrayList(libName));
         } catch (final XmlRpcException e) {
-            return null;
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -207,7 +207,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         try {
             return (String) client.execute("getRobotVersion", newArrayList());
         } catch (final XmlRpcException e) {
-            return null;
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -216,7 +216,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         try {
             return (String) client.execute("getRunModulePath", newArrayList());
         } catch (final XmlRpcException e) {
-            throw new IllegalArgumentException("Unable to find robot.run module");
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
