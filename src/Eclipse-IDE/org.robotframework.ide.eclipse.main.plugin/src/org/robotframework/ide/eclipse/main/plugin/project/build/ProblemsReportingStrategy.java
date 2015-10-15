@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+
+import com.google.common.collect.Range;
 
 public class ProblemsReportingStrategy {
 
@@ -19,6 +22,19 @@ public class ProblemsReportingStrategy {
     public void handleProblem(final RobotProblem problem, final IFile file, final int line,
             final Map<String, Object> additionalAttributes) throws ReportingInterruptedException {
         handleProblem(problem, file, new ProblemPosition(line), additionalAttributes);
+    }
+
+    public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token) {
+        final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
+                Range.closed(token.getStartOffset(), token.getStartOffset() + token.getText().length()));
+        handleProblem(problem, file, position, new HashMap<String, Object>());
+    }
+
+    public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token,
+            final Map<String, Object> additionalAttributes) {
+        final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
+                Range.closed(token.getStartOffset(), token.getStartOffset() + token.getText().length()));
+        handleProblem(problem, file, position, additionalAttributes);
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {

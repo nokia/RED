@@ -66,6 +66,10 @@ public class KeywordSpecification {
         throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
     }
 
+    public ArgumentsDescriptor createArgumentsDescriptor() {
+        return ArgumentsDescriptor.createDescriptor(arguments);
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj == null) {

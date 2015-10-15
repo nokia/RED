@@ -21,7 +21,7 @@ public enum KeywordsProblem implements IProblemCause {
     UNKNOWN_KEYWORD {
         @Override
         public String getProblemDescription() {
-            return "Unknown keyword definition '%s'";
+            return "Unknown keyword '%s'";
         }
 
         @Override
@@ -55,6 +55,11 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new RemoveKeywordFixer(marker.getAttribute("name", null)));
         }
     };
+
+    @Override
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+        return newArrayList();
+    }
 
     @Override
     public Severity getSeverity() {

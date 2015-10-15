@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
@@ -100,6 +102,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             return null;
         }
 
+        final List<String> msgs = newArrayList();
         final Iterator<?> iter = model.getAnnotationIterator();
         while (iter.hasNext()) {
             final Annotation annotation = (Annotation) iter.next();
@@ -108,12 +111,17 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                 if (position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength())) {
                     final String msg = annotation.getText();
                     if (msg != null && msg.trim().length() > 0) {
-                        return msg;
+                        msgs.add(msg);
                     }
                 }
             }
         }
-        return null;
+        if (msgs.isEmpty()) {
+            return null;
+        } else {
+            final String prefix = msgs.size() == 1 ? "" : "Multiple markers at this line:\n- ";
+            return prefix + Joiner.on("\n- ").join(msgs);
+        }
     }
 
     private boolean isAnnotationSupported(final Annotation annotation) throws CoreException {

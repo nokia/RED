@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -109,7 +110,8 @@ public class RobotDebugEventDispatcher extends Job {
         final ObjectMapper mapper = new ObjectMapper();
         while (!target.isTerminated() && event != null) {
 
-            final Map<?, ?> eventMap = mapper.readValue(event, Map.class);
+            final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {};
+            final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
             if (eventType == null) {
                 continue;
@@ -182,7 +184,7 @@ public class RobotDebugEventDispatcher extends Job {
         target.started();
     }
 
-    private void handleStartSuiteEvent(final Map<?, ?> eventMap) {
+    private void handleStartSuiteEvent(final Map<String, ?> eventMap) {
         final List<?> suiteList = (List<?>) eventMap.get("start_suite");
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         currentSuite = new File((String) suiteElements.get("source")).getName();
@@ -198,7 +200,7 @@ public class RobotDebugEventDispatcher extends Job {
                 (String) suiteList.get(0), (String) suiteElements.get("source")));
     }
 
-    private void handleStartTestEvent(final Map<?, ?> eventMap) {
+    private void handleStartTestEvent(final Map<String, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("start_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Starting test: " + testElements.get("longname") + '\n';
@@ -210,7 +212,7 @@ public class RobotDebugEventDispatcher extends Job {
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
     }
     
-    private void handleStartKeywordEvent(final Map<?, ?> eventMap) {
+    private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
         if (executedFile == null) {
             throw new MissingFileToExecuteException("Missing suite file for execution");
         }
@@ -233,7 +235,7 @@ public class RobotDebugEventDispatcher extends Job {
             executedSuite = new File(currentResourceFile).getName();
         }
 
-        boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuite, keywordLineNumber);
+        final boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuite, keywordLineNumber);
 
         if (hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
                 && !target.hasStepReturn() && keywordLineNumber >= 0)) {
@@ -254,7 +256,7 @@ public class RobotDebugEventDispatcher extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    private void handleVarsEvent(final Map<?, ?> eventMap) {
+    private void handleVarsEvent(final Map<String, ?> eventMap) {
         final List<?> varList = (List<?>) eventMap.get("vars");
         final Map<?, ?> vars = (Map<?, ?>) varList.get(1);
         target.getLastKeywordFromCurrentFrames().setVariables((Map<String, Object>) vars);
@@ -262,7 +264,7 @@ public class RobotDebugEventDispatcher extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    private void handleGlobalVarsEvent(final Map<?, ?> eventMap) {
+    private void handleGlobalVarsEvent(final Map<String, ?> eventMap) {
         final List<?> globalVarList = (List<?>) eventMap.get("global_vars");
         final Map<?, ?> globalVars = (Map<?, ?>) globalVarList.get(1);
         target.getRobotVariablesManager().setGlobalVariables((Map<String, String>) globalVars);
@@ -294,7 +296,7 @@ public class RobotDebugEventDispatcher extends Job {
                 + "\"]]}";
     }
 
-    private void handleConditionResultEvent(final Map<?, ?> eventMap) {
+    private void handleConditionResultEvent(final Map<String, ?> eventMap) {
         final List<?> resultList = (List<?>) eventMap.get("condition_result");
         final Object result = resultList.get(0);
         if (result instanceof Boolean) {
@@ -302,7 +304,7 @@ public class RobotDebugEventDispatcher extends Job {
         }
     }
 
-    private void handleConditionErrorEvent(final Map<?, ?> eventMap) {
+    private void handleConditionErrorEvent(final Map<String, ?> eventMap) {
         isBreakpointConditionFulfilled = true;
         final List<?> errorList = (List<?>) eventMap.get("condition_error");
         final Display display = PlatformUI.getWorkbench().getDisplay();
@@ -329,11 +331,10 @@ public class RobotDebugEventDispatcher extends Job {
 
     private void handlePausedEvent() {
         target.suspended(DebugEvent.CLIENT_REQUEST);
-        target.getRobotVariablesManager().setIsVariablesViewerUpdated(false);
         target.getRobotVariablesManager().addVariablesViewerListener();
     }
 
-    private void handleEndKeywordEvent(final Map<?, ?> eventMap) {
+    private void handleEndKeywordEvent(final Map<String, ?> eventMap) {
         final List<?> endList = (List<?>) eventMap.get("end_keyword");
         final String keyword = (String) endList.get(0);
         target.getCurrentFrames().remove(keyword);
@@ -345,7 +346,7 @@ public class RobotDebugEventDispatcher extends Job {
         }
     }
 
-    private void handleEndTestEvent(final Map<?, ?> eventMap) {
+    private void handleEndTestEvent(final Map<String, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("end_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         
@@ -357,7 +358,7 @@ public class RobotDebugEventDispatcher extends Job {
                 (String) testList.get(0), testElements));
     }
     
-    private void handleEndSuiteEvent(final Map<?, ?> eventMap) {
+    private void handleEndSuiteEvent(final Map<String, ?> eventMap) {
         final List<?> suiteList = (List<?>) eventMap.get("end_suite");
         target.clearStackFrames();
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndSuiteExecutionElement(
@@ -371,7 +372,7 @@ public class RobotDebugEventDispatcher extends Job {
         target.terminated();
     }
 
-    private void handleLogMessageEvent(final Map<?, ?> eventMap) {
+    private void handleLogMessageEvent(final Map<String, ?> eventMap) {
         final List<?> messageList = (List<?>) eventMap.get("log_message");
         final Map<?, ?> messageElements = (Map<?, ?>) messageList.get(0);
         final String line = messageElements.get("timestamp") + " : " + messageElements.get("level") + " : "
@@ -384,15 +385,12 @@ public class RobotDebugEventDispatcher extends Job {
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createOutputFileExecutionElement((String) outputFileList.get(0)));
     }
 
-    private String getEventType(final Map<?, ?> eventMap) {
+    private String getEventType(final Map<String, ?> eventMap) {
         if (eventMap == null) {
             return null;
         }
-        final Set<?> keySet = eventMap.keySet();
-        if (!keySet.isEmpty()) {
-            return (String) keySet.iterator().next();
-        }
-        return null;
+        final Set<String> keySet = eventMap.keySet();
+        return keySet.isEmpty() ? null : keySet.iterator().next();
     }
     
     private IFile extractSuiteFile(final String suiteName, final List<IResource> resources) {
