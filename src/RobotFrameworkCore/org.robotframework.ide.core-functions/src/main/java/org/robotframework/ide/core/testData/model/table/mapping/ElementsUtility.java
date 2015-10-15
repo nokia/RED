@@ -22,6 +22,7 @@ import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
+import org.robotframework.ide.core.testData.text.read.ParsingState.TableType;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
@@ -149,7 +150,8 @@ public class ElementsUtility {
                 }
 
                 if (correct == null) {
-                    if (ParsingState.getSettingsStates().contains(state)) {
+                    if (ParsingState.getSettingsStates().contains(state)
+                            || getCurrentStatus(processingState).getTable() == TableType.VARIABLES) {
                         RobotToken newRobotToken = new RobotToken();
                         newRobotToken.setLineNumber(fp.getLine());
                         newRobotToken.setStartColumn(fp.getColumn());
@@ -624,7 +626,8 @@ public class ElementsUtility {
         boolean result = false;
 
         List<IRobotLineElement> lineElements = line.getLineElements();
-        result = lineElements.size() >= 2;
+        result = lineElements.size() >= 2
+                || getCurrentStatus(processingState) == ParsingState.VARIABLE_TABLE_INSIDE;
 
         return result;
     }
