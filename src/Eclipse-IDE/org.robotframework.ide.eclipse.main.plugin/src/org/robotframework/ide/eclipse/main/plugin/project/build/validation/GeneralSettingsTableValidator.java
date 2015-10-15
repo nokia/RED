@@ -6,92 +6,251 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
+import org.robotframework.ide.core.testData.model.ATags;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
-import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
+import org.robotframework.ide.core.testData.model.table.setting.Metadata;
+import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
+import org.robotframework.ide.core.testData.model.table.setting.SuiteDocumentation;
+import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.robotframework.ide.core.testData.model.table.setting.TestTimeout;
+import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
+import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
 
 class GeneralSettingsTableValidator implements ModelUnitValidator {
 
-    private final Optional<RobotSettingsSection> settingSection;
+    private final ValidationContext validationContext;
 
-    private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
+    private final Optional<RobotSettingsSection> settingsSection;
 
-    GeneralSettingsTableValidator(final Optional<RobotSettingsSection> settingSection) {
-        this.settingSection = settingSection;
+    private final ProblemsReportingStrategy reporter;
+
+
+    GeneralSettingsTableValidator(final ValidationContext validationContext,
+            final Optional<RobotSettingsSection> settingSection) {
+        this.validationContext = validationContext;
+        this.settingsSection = settingSection;
+        this.reporter = new ProblemsReportingStrategy();
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        if (!settingSection.isPresent()) {
+        if (!settingsSection.isPresent()) {
             return;
         }
-        final IFile file = settingSection.get().getSuiteFile().getFile();
-        final SettingTable settingsTable = (SettingTable) settingSection.get().getLinkedElement();
-        reportUnrecognizedLibraries(file, settingsTable);
+        final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
+        final IFile file = suiteFile.getFile();
+        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+
+        reportUnknownSettings(file, settingsTable.getUnknownSettings());
+
+        validateLibraries(suiteFile, getLibraryImports(settingsTable), monitor);
+        validateResources(suiteFile, getResourcesImports(settingsTable), monitor);
+        validateVariables(suiteFile, getVariablesImports(settingsTable), monitor);
+
+        validateSetupsAndTeardowns(file, getKeywordBasedSettings(settingsTable));
+        validateTestTemplates(file, settingsTable.getTestTemplates());
+        validateTestTimeouts(file, settingsTable.getTestTimeouts());
+        validateTags(file, getTags(settingsTable));
+        validateDocumentations(file, settingsTable.getDocumentation());
+        validateMetadatas(file, settingsTable.getMetadatas());
     }
 
-    private void reportUnrecognizedLibraries(final IFile file, final SettingTable settingTable) {
-        final RobotProject robotProject = RobotModelManager.getInstance()
-                .getModel()
-                .createRobotProject(file.getProject());
-        final List<LibrarySpecification> libs = newArrayList();
-        libs.addAll(robotProject.getStandardLibraries());
-        libs.addAll(robotProject.getReferencedLibraries());
+    private List<ATags<?>> getTags(final SettingTable settingsTable) {
+        final List<ATags<?>> tags = newArrayList();
+        tags.addAll(settingsTable.getDefaultTags());
+        tags.addAll(settingsTable.getForceTags());
+        return tags;
+    }
 
-        final Set<String> libNames = newHashSet(Lists.transform(libs, new Function<LibrarySpecification, String>() {
+    private void reportUnknownSettings(final IFile file, final List<UnknownSetting> unknownSettings) {
+        for (final UnknownSetting unknownSetting : unknownSettings) {
+            final RobotToken token = unknownSetting.getDeclaration();
+            final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_SETTING)
+                    .formatMessageWith(token.getText().toString());
+            reporter.handleProblem(problem, file, token);
+        }
+    }
 
-            @Override
-            public String apply(final LibrarySpecification lib) {
-                return lib.getName();
-            }
-        }));
+    private static List<VariablesImport> getVariablesImports(final SettingTable settingsTable) {
+        return newArrayList(Iterables.filter(settingsTable.getImports(), VariablesImport.class));
+    }
 
-        for (final AImported imported : settingTable.getImports()) {
-            if (imported instanceof LibraryImport) {
-                final LibraryImport libImport = (LibraryImport) imported;
-                final RobotToken pathOrName = libImport.getPathOrName();
-                if (pathOrName == null) {
-                    final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.MISSING_LIBRARY_NAME);
-                    final RobotToken libToken = libImport.getDeclaration();
-                    final ProblemPosition position = new ProblemPosition(libToken.getLineNumber(),
-                            Range.closed(libToken.getStartOffset(),
-                                    libToken.getStartOffset() + libToken.getText().toString().length()));
-                    reporter.handleProblem(problem, file, position);
-                } else {
-                    final String name = pathOrName.getText().toString();
-                    if (!libNames.contains(name)) {
-                        final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNRECOGNIZED_LIBRARY)
-                                .formatMessageWith(name);
-                        final ProblemPosition position = new ProblemPosition(pathOrName.getLineNumber(),
-                                Range.closed(pathOrName.getStartOffset(), pathOrName.getStartOffset() + name.length()));
-                        reporter.handleProblem(problem, file, position);
-                    }
+    private static List<ResourceImport> getResourcesImports(final SettingTable settingsTable) {
+        return newArrayList(Iterables.filter(settingsTable.getImports(), ResourceImport.class));
+    }
+
+    private static List<LibraryImport> getLibraryImports(final SettingTable settingsTable) {
+        return newArrayList(Iterables.filter(settingsTable.getImports(), LibraryImport.class));
+    }
+
+    private void validateLibraries(final RobotSuiteFile suiteFile, final List<LibraryImport> libraryImports,
+            final IProgressMonitor monitor) throws CoreException {
+        new GeneralSettingsImportsValidator.LibraryImportValidator(validationContext, suiteFile, libraryImports,
+                reporter).validate(monitor);
+    }
+
+    private void validateVariables(final RobotSuiteFile suiteFile, final List<VariablesImport> variablesImports,
+            final IProgressMonitor monitor) throws CoreException {
+        new GeneralSettingsImportsValidator.VariablesImportValidator(validationContext, suiteFile, variablesImports,
+                reporter).validate(monitor);
+    }
+
+    private void validateResources(final RobotSuiteFile suiteFile, final List<ResourceImport> resourcesImports,
+            final IProgressMonitor monitor) throws CoreException {
+        new GeneralSettingsImportsValidator.ResourcesImportValidator(validationContext, suiteFile, resourcesImports,
+                reporter).validate(monitor);
+    }
+
+    private static List<AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingsTable) {
+        final List<AKeywordBaseSetting<?>> settings = newArrayList();
+        settings.addAll(settingsTable.getSuiteSetups());
+        settings.addAll(settingsTable.getSuiteTeardowns());
+        settings.addAll(settingsTable.getTestSetups());
+        settings.addAll(settingsTable.getTestTeardowns());
+        return settings;
+    }
+
+    private void validateSetupsAndTeardowns(final IFile file, final List<AKeywordBaseSetting<?>> keywordBasedSettings) {
+        for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
+            final RobotToken keywordToken = keywordBased.getKeywordName();
+            if (keywordToken == null) {
+                final RobotToken settingToken = keywordBased.getDeclaration();
+                final String settingName = settingToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, settingToken);
+            } else {
+                final String keywordName = keywordToken.getText().toString();
+                if (!validationContext.getAccessibleKeywords().contains(keywordName.toLowerCase())) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
                 }
             }
         }
+    }
 
+    private void validateTestTemplates(final IFile file, final List<TestTemplate> testTemplates) {
+        for (final TestTemplate template : testTemplates) {
+            final RobotToken settingToken = template.getDeclaration();
+            final RobotToken keywordToken = template.getKeywordName();
+            if (keywordToken == null) {
+
+                final String settingName = settingToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, settingToken);
+            } else {
+
+                final String keywordName = keywordToken.getText().toString();
+                if (!validationContext.getAccessibleKeywords().contains(keywordName.toLowerCase())) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
+                }
+            }
+            if (!template.getUnexpectedTrashArguments().isEmpty()) {
+
+                final String actualArgs = "[" + Joiner.on(", ").join(toString(template.getUnexpectedTrashArguments()))
+                        + "]";
+                final String additionalMsg = "Only keyword name should be specified for templates.";
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE)
+                        .formatMessageWith(settingToken.getText().toString(), actualArgs, additionalMsg);
+                reporter.handleProblem(problem, file, settingToken);
+            }
+        }
+
+    }
+
+    private void validateTestTimeouts(final IFile file, final List<TestTimeout> timeouts) {
+        for (final TestTimeout testTimeout : timeouts) {
+            final RobotToken timeoutToken = testTimeout.getTimeout();
+            if (timeoutToken == null) {
+
+                final RobotToken settingToken = testTimeout.getDeclaration();
+                final String settingName = settingToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, settingToken);
+            } else {
+                final String timeout = timeoutToken.getText().toString();
+                if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
+                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                            .formatMessageWith(timeout);
+                    reporter.handleProblem(problem, file, timeoutToken);
+                }
+            }
+        }
+    }
+
+    private void validateTags(final IFile file, final List<ATags<?>> tagsSetting) {
+        for (final ATags<?> tags : tagsSetting) {
+            if (tags.getTags().isEmpty()) {
+                final RobotToken declarationToken = tags.getDeclaration();
+                final String settingName = declarationToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, declarationToken);
+            }
+        }
+    }
+
+    private void validateMetadatas(final IFile file, final List<Metadata> metadatas) {
+        for (final Metadata metadata : metadatas) {
+            if (metadata.getKey() == null) {
+                final RobotToken declarationToken = metadata.getDeclaration();
+                final String settingName = declarationToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, declarationToken);
+            }
+        }
+    }
+
+    private void validateDocumentations(final IFile file, final List<SuiteDocumentation> documentations) {
+        for (final SuiteDocumentation docu : documentations) {
+            if (docu.getDocumentationText().isEmpty()) {
+                final RobotToken declarationToken = docu.getDeclaration();
+                final String settingName = declarationToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, declarationToken);
+            }
+        }
+
+    }
+
+    private static List<String> toString(final List<RobotToken> tokens) {
+        return newArrayList(Lists.transform(tokens, new Function<RobotToken, String>() {
+
+            @Override
+            public String apply(final RobotToken token) {
+                return token.getText().toString().trim();
+            }
+        }));
     }
 }

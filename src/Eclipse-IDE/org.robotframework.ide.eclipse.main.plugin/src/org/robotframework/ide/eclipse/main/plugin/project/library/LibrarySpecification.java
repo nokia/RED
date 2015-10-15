@@ -21,6 +21,7 @@ public class LibrarySpecification {
     private String scope;
     private String format;
     private String version;
+    private LibraryConstructor constructor;
     private String documentation;
 
     private List<KeywordSpecification> keywords;
@@ -80,6 +81,15 @@ public class LibrarySpecification {
     @XmlElement(name = "kw")
     public void setKeywords(final List<KeywordSpecification> keywords) {
         this.keywords = keywords;
+    }
+
+    public LibraryConstructor getConstructor() {
+        return constructor;
+    }
+
+    @XmlElement(name = "init")
+    public void setConstructor(final LibraryConstructor constructor) {
+        this.constructor = constructor;
     }
 
     public boolean isRemote() {

@@ -8,8 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,12 +24,9 @@ import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
@@ -43,28 +38,28 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 class TestCasesTableValidator implements ModelUnitValidator {
 
-    private static final String VARIABLE_PATTERN = "[@$&%]\\{[^\\{]+\\}";
+    private static final String VARIABLE_PATTERN = "[@$&%]\\{[^\\}]+\\}";
 
+    private final ValidationContext validationContext;
 
     private final Optional<RobotCasesSection> testCaseSection;
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    TestCasesTableValidator(final Optional<RobotCasesSection> section) {
+    TestCasesTableValidator(final ValidationContext validationContext, final Optional<RobotCasesSection> section) {
+        this.validationContext = validationContext;
         this.testCaseSection = section;
     }
 
@@ -79,7 +74,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
-        reportUnkownKeywords(suiteModel, reporter, findExecutableRows(cases));
+        reportUnkownKeywords(suiteModel, validationContext, reporter, findExecutableRows(cases));
         reportUnknownVariables(suiteModel, cases);
     }
 
@@ -96,13 +91,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final IProblemCause causeToReport) {
         if (executables.isEmpty()) {
             final String name = def.getText().toString();
-
             final RobotProblem problem = RobotProblem.causedBy(causeToReport).formatMessageWith(name);
-            final ProblemPosition position = new ProblemPosition(def.getLineNumber(),
-                    Range.closed(def.getStartOffset(), def.getStartOffset() + name.length()));
-            final Map<String, Object> arguments = new HashMap<>();
-            arguments.put("name", name);
-            reporter.handleProblem(problem, file, position, arguments);
+            final Map<String, Object> arguments = ImmutableMap.<String, Object> of("name", name);
+            reporter.handleProblem(problem, file, def, arguments);
         }
     }
 
@@ -129,11 +120,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.DUPLICATED_CASE)
                         .formatMessageWith(name);
-                final ProblemPosition position = new ProblemPosition(caseName.getLineNumber(),
-                        Range.closed(caseName.getStartOffset(), caseName.getStartOffset() + name.length()));
-                final Map<String, Object> additionalArguments = Maps.newHashMap();
-                additionalArguments.put("name", name);
-                reporter.handleProblem(problem, file, position, additionalArguments);
+                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                reporter.handleProblem(problem, file, caseName, additionalArguments);
             }
         }
 
@@ -147,9 +135,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return executables;
     }
 
-    static void reportUnkownKeywords(final RobotSuiteFile robotSuiteFile, final ProblemsReportingStrategy reporter,
-            final List<RobotExecutableRow<?>> executables) {
-        final Set<String> names = collectAccessibleKeywordNames(robotSuiteFile);
+    static void reportUnkownKeywords(final RobotSuiteFile robotSuiteFile, final ValidationContext validationContext,
+            final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
+        final Set<String> names = validationContext.getAccessibleKeywords();
 
         for (final RobotExecutableRow<?> executable : executables) {
             final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
@@ -160,33 +148,10 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (!names.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                         .formatMessageWith(name);
-                final ProblemPosition position = new ProblemPosition(keywordName.getLineNumber(),
-                        Range.closed(keywordName.getStartOffset(), keywordName.getStartOffset() + name.length()));
-                final Map<String, Object> additionalArguments = Maps.newHashMap();
-                additionalArguments.put("name", name);
-                reporter.handleProblem(problem, robotSuiteFile.getFile(), position, additionalArguments);
+                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
             }
         }
-    }
-
-    private static Set<String> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
-        final Set<String> names = new HashSet<>();
-        new KeywordDefinitionLocator(robotSuiteFile, false).locateKeywordDefinition(new KeywordDetector() {
-
-            @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec) {
-                names.add(kwSpec.getName().toLowerCase());
-                return ContinueDecision.CONTINUE;
-            }
-
-            @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                names.add(keyword.getName().toLowerCase());
-                return ContinueDecision.CONTINUE;
-            }
-        });
-        return names;
     }
 
     private void reportUnknownVariables(final RobotSuiteFile suiteModel,
@@ -244,8 +209,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
                     final ProblemPosition position = new ProblemPosition(lineDescription.getFirstAction().getLineNumber(),
                             Range.closed(usedParameter.position.offset,
                                     usedParameter.position.offset + usedParameter.position.length));
-                    final Map<String, Object> additionalArguments = Maps.newHashMap();
-                    additionalArguments.put("name", usedParameter.name);
+                    final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
+                            usedParameter.name);
                     reporter.handleProblem(problem, file, position, additionalArguments);
                 }
             }

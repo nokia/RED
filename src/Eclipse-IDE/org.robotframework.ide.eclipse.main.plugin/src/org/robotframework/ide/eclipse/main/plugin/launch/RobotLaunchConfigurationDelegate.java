@@ -173,11 +173,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         // possibility
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        final SuiteExecutor executor = robotConfig.getExecutor();
         final IProject project = getProject(robotConfig);
         final List<IResource> suiteResources = getSuiteResources(robotConfig, project);
         final RobotProject robotProject = getRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
+        final SuiteExecutor executor = robotConfig.getExecutor();
 
         final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
 
@@ -195,7 +195,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         
         final List<String> pythonpath = robotProject.getPythonpath();
         final List<String> classpath = robotProject.getClasspath();
-        final List<String> variableFilesPath = robotProject.getVariableFiles();
+        final List<String> variableFilesPath = robotProject.getVariableFilePaths();
         
         final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, pythonpath,
                 variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,

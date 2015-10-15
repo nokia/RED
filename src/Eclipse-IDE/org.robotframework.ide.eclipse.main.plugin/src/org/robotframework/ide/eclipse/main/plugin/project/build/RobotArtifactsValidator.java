@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
@@ -47,7 +46,7 @@ public class RobotArtifactsValidator {
         }
 
         final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
-                .createProperValidator(prepareValidationContext(file), file);
+                .createProperValidator(new ValidationContext(file), file);
 
         if (validator.isPresent()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
@@ -119,7 +118,7 @@ public class RobotArtifactsValidator {
 
         final IFile file = (IFile) resource;
 
-        final ValidationContext validationContext = prepareValidationContext(file);
+        final ValidationContext validationContext = new ValidationContext(file);
         final Optional<? extends ModelUnitValidator> validator = createProperValidator(validationContext, file);
 
         if (validator.isPresent()) {
@@ -128,11 +127,6 @@ public class RobotArtifactsValidator {
             }
             validator.get().validate(monitor);
         }
-    }
-
-    private static ValidationContext prepareValidationContext(final IFile file) {
-        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-        return new ValidationContext(project.getRuntimeEnvironment());
     }
 
     public static Optional<? extends ModelUnitValidator> createProperValidator(

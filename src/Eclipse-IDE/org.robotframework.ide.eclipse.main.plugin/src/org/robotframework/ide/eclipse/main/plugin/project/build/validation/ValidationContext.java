@@ -10,13 +10,26 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 public class ValidationContext {
 
@@ -24,9 +37,19 @@ public class ValidationContext {
 
     private final RobotVersion version;
 
-    public ValidationContext(final RobotRuntimeEnvironment runtimeEnvironment) {
-        this.runtimeEnvironment = runtimeEnvironment;
-        this.version = RobotVersion.from(runtimeEnvironment.getVersion());
+    private final Set<String> accessibleKeywords;
+
+    private final Set<LibrarySpecification> librarySpecifications;
+
+    private final Map<ReferencedLibrary, LibrarySpecification> referencedLibrarySpecifications;
+
+    public ValidationContext(final IFile file) {
+        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
+        this.runtimeEnvironment = project.getRuntimeEnvironment();
+        this.version = RobotVersion.from(project.getVersion());
+        this.accessibleKeywords = newHashSet();
+        this.librarySpecifications = newHashSet();
+        this.referencedLibrarySpecifications = newHashMap();
     }
 
     public SuiteExecutor getExecutorInUse() {
@@ -35,6 +58,38 @@ public class ValidationContext {
 
     public RobotVersion getVersion() {
         return version;
+    }
+
+    public void setAccessibleKeywords(final Collection<String> keywords) {
+        accessibleKeywords.addAll(keywords);
+    }
+
+    public Set<String> getAccessibleKeywords() {
+        return ImmutableSet.copyOf(accessibleKeywords);
+    }
+
+    public void setLibrarySpecifications(final Collection<LibrarySpecification> specs) {
+        librarySpecifications.addAll(specs);
+    }
+
+    public ImmutableSet<LibrarySpecification> getLibrarySpecifications() {
+        return ImmutableSet.copyOf(librarySpecifications);
+    }
+
+    public Map<String, LibrarySpecification> getLibrarySpecificationsAsMap() {
+        final Map<String, LibrarySpecification> mapping = Maps.newHashMap();
+        for (final LibrarySpecification specification : getLibrarySpecifications()) {
+            mapping.put(specification.getName(), specification);
+        }
+        return mapping;
+    }
+
+    public void setReferencedLibrarySpecifications(final Map<ReferencedLibrary, LibrarySpecification> mapping) {
+        referencedLibrarySpecifications.putAll(mapping);
+    }
+
+    public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
+        return referencedLibrarySpecifications;
     }
 
     public static class RobotVersion implements Comparable<RobotVersion> {
