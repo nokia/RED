@@ -19,7 +19,7 @@ def checkServerAvailability():
     pass
 
 def getModulesSearchPaths():
-	import robot
+    import robot
     return sys.path
     
 def getVariables(dir, args):
