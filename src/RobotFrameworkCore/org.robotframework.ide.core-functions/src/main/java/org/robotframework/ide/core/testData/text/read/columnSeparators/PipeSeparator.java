@@ -19,7 +19,7 @@ public class PipeSeparator extends ALineSeparator {
             + REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE
             + ")|" + "(\\s+[|]"
             + REGEXP_DO_NOT_CONSUME_WHEN_WHITESPACE_SHOULD_BELONGS_TO_NEXT_PIPE
-            + ")|" + "((\\s)+[|](\\s)+$)|" + "((\\s)+[|]$)|" + "|(^[|]$)");
+            + ")|" + "((\\s)+[|](\\s)+$)|" + "((\\s)+[|]$)|" + "(^[|]$)");
 
     private final Matcher matcher;
 
