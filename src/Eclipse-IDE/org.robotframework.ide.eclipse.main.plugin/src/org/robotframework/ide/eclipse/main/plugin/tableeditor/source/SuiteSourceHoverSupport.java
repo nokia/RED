@@ -157,7 +157,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
 
         for (final RedKeywordProposal proposal : keywordProposals) {
-            if (proposal.getLabel().equals(keywordName)) {
+            if (proposal.getLabel().equalsIgnoreCase(keywordName)) {
                 return new ContentAssistKeywordContext(proposal).getDescription();
             }
         }
