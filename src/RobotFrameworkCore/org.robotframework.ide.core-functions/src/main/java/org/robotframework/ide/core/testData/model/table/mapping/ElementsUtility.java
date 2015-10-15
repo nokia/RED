@@ -628,8 +628,7 @@ public class ElementsUtility {
         boolean result = false;
 
         ParsingState state = getCurrentStatus(processingState);
-        if (state == ParsingState.VARIABLE_TABLE_INSIDE
-                || state == ParsingState.TEST_CASE_DECLARATION) {
+        if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
             int textPosition = 0;
             String textInLine = separator.getLine();
             while(separator.hasNext()) {
