@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
+
+import com.google.common.collect.ImmutableMap;
 
 public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
@@ -106,9 +107,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final IPath libraryPath = Path.fromPortableString(library.getPath());
         final int lineNumber = linesMapping.get(library).getLineNumber();
 
-        final Map<String, Object> additional = new HashMap<>();
-        additional.put(ConfigFileProblem.LIBRARY_INDEX, index);
-
+        final Map<String, Object> additional = ImmutableMap.<String, Object> of(ConfigFileProblem.LIBRARY_INDEX, index);
         List<RobotProblem> libProblems;
         switch (libType) {
             case JAVA:

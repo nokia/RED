@@ -5,9 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 
 public class RobotProject extends RobotContainer {
 
@@ -95,31 +98,10 @@ public class RobotProject extends RobotContainer {
             return newArrayList();
         }
 
-        stdLibsSpecs = newArrayList(Iterables.filter(Iterables.transform(configuration.getRemoteLocations(),
-                new Function<RemoteLocation, LibrarySpecification>() {
-                    @Override
-                    public LibrarySpecification apply(final RemoteLocation remoteLocation) {
-                        try {
-                            final IFile file = LibspecsFolder.get(getProject()).getSpecFile(
-                                    remoteLocation.createLibspecFileName());
-                            return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
-                        } catch (final CannotReadlibrarySpecificationException e) {
-                            return null;
-                        }
-                    }
-                }), Predicates.<LibrarySpecification> notNull()));
-        stdLibsSpecs.addAll(newArrayList(Iterables.filter(
-                Iterables.transform(env.getStandardLibrariesNames(), new Function<String, LibrarySpecification>() {
-                    @Override
-                    public LibrarySpecification apply(final String libraryName) {
-                        try {
-                            final IFile file = LibspecsFolder.get(getProject()).getSpecFile(libraryName);
-                            return LibrarySpecificationReader.readSpecification(file);
-                        } catch (final CannotReadlibrarySpecificationException e) {
-                            return null;
-                        }
-                    }
-                }), Predicates.<LibrarySpecification> notNull())));
+        stdLibsSpecs = newArrayList(filter(transform(configuration.getRemoteLocations(), remoteLibToSpec(getProject())),
+                Predicates.<LibrarySpecification> notNull()));
+        stdLibsSpecs.addAll(newArrayList(filter(transform(env.getStandardLibrariesNames(), stdLibToSpec(getProject())),
+                Predicates.<LibrarySpecification> notNull())));
         return stdLibsSpecs;
     }
 
@@ -140,39 +122,88 @@ public class RobotProject extends RobotContainer {
             return newArrayList();
         }
 
-        refLibsSpecs = newArrayList(Iterables.filter(
-                Iterables.transform(configuration.getLibraries(),
-                new Function<ReferencedLibrary, LibrarySpecification>() {
-                    @Override
-                    public LibrarySpecification apply(final ReferencedLibrary lib) {
-                        try {
-                            if (lib.provideType() == LibraryType.VIRTUAL) {
-                                final IPath path = Path.fromPortableString(lib.getPath());
-                                final IResource libspec = getProject().getParent().findMember(path);
-                                IFile fileToRead;
-                                
-                                if (libspec != null && libspec.getType() == IResource.FILE) {
-                                    fileToRead = (IFile) libspec;
-                                    return LibrarySpecificationReader.readSpecification((IFile) libspec);
-                                } else if (libspec == null) {
-                                    fileToRead = LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
-                                } else {
-                                    fileToRead = null;
-                                }
-                                return fileToRead == null ? null
-                                        : LibrarySpecificationReader.readSpecification(fileToRead);
-                            } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
-                                final IFile file =  LibspecsFolder.get(getProject()).getSpecFile(lib.getName());
-                                return LibrarySpecificationReader.readReferencedSpecification(file, lib.getPath());
-                            } else {
-                                return null;
-                            }
-                        } catch (final CannotReadlibrarySpecificationException e) {
-                            return null;
-                        }
-                    }
-                }), Predicates.<LibrarySpecification> notNull()));
+        refLibsSpecs = newArrayList(filter(transform(configuration.getLibraries(), libToSpec(getProject())),
+                Predicates.<LibrarySpecification> notNull()));
         return refLibsSpecs;
+    }
+
+    public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMapping() {
+        readProjectConfigurationIfNeeded();
+        if (configuration == null) {
+            return newHashMap();
+        }
+
+        final Map<ReferencedLibrary, LibrarySpecification> spcs = newHashMap();
+        for (final ReferencedLibrary library : configuration.getLibraries()) {
+            final LibrarySpecification spec = libToSpec(getProject()).apply(library);
+            if (spec != null) {
+                spcs.put(library, spec);
+            }
+        }
+        return spcs;
+    }
+
+    private static Function<String, LibrarySpecification> stdLibToSpec(final IProject project) {
+        return new Function<String, LibrarySpecification>() {
+
+            @Override
+            public LibrarySpecification apply(final String libraryName) {
+                try {
+                    final IFile file = LibspecsFolder.get(project).getSpecFile(libraryName);
+                    return LibrarySpecificationReader.readSpecification(file);
+                } catch (final CannotReadlibrarySpecificationException e) {
+                    return null;
+                }
+            }
+        };
+    }
+
+    private static Function<RemoteLocation, LibrarySpecification> remoteLibToSpec(final IProject project) {
+        return new Function<RemoteLocation, LibrarySpecification>() {
+
+            @Override
+            public LibrarySpecification apply(final RemoteLocation remoteLocation) {
+                try {
+                    final IFile file = LibspecsFolder.get(project).getSpecFile(remoteLocation.createLibspecFileName());
+                    return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
+                } catch (final CannotReadlibrarySpecificationException e) {
+                    return null;
+                }
+            }
+        };
+    }
+
+    private static Function<ReferencedLibrary, LibrarySpecification> libToSpec(final IProject project) {
+        return new Function<ReferencedLibrary, LibrarySpecification>() {
+
+            @Override
+            public LibrarySpecification apply(final ReferencedLibrary lib) {
+                try {
+                    if (lib.provideType() == LibraryType.VIRTUAL) {
+                        final IPath path = Path.fromPortableString(lib.getPath());
+                        final IResource libspec = project.getParent().findMember(path);
+                        IFile fileToRead;
+
+                        if (libspec != null && libspec.getType() == IResource.FILE) {
+                            fileToRead = (IFile) libspec;
+                            return LibrarySpecificationReader.readSpecification((IFile) libspec);
+                        } else if (libspec == null) {
+                            fileToRead = LibspecsFolder.get(project).getSpecFile(lib.getName());
+                        } else {
+                            fileToRead = null;
+                        }
+                        return fileToRead == null ? null : LibrarySpecificationReader.readSpecification(fileToRead);
+                    } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
+                        final IFile file = LibspecsFolder.get(project).getSpecFile(lib.getName());
+                        return LibrarySpecificationReader.readReferencedSpecification(file, lib.getPath());
+                    } else {
+                        return null;
+                    }
+                } catch (final CannotReadlibrarySpecificationException e) {
+                    return null;
+                }
+            }
+        };
     }
 
     private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
@@ -220,6 +251,10 @@ public class RobotProject extends RobotContainer {
 
     public IFile getFile(final String filename) {
         return getProject().getFile(filename);
+    }
+
+    public List<File> getModuleSearchPaths() {
+        return getRuntimeEnvironment().getModuleSearchPaths();
     }
     
     public synchronized List<String> getPythonpath() {
@@ -282,17 +317,16 @@ public class RobotProject extends RobotContainer {
         return "";
     }
     
-    public synchronized List<String> getVariableFiles() {
+    public List<String> getVariableFilePaths() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
             final List<String> list = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                String path = variableFile.getPath();
+                final String path = PathsConverter
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toPortableString();
                 final List<String> args = variableFile.getArguments();
-                if (args != null && !args.isEmpty()) {
-                    path = path + ":" + Joiner.on(":").join(args);
-                }
-                list.add(path);
+                final String arguments = args == null || args.isEmpty() ? "" : ":" + Joiner.on(":").join(args);
+                list.add(path + arguments);
             }
             return list;
         }

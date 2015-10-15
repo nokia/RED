@@ -13,6 +13,12 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 
 public enum GeneralSettingsProblem implements IProblemCause {
+    UNKNOWN_SETTING {
+        @Override
+        public String getProblemDescription() {
+            return "Unknwon '%s' setting";
+        }
+    },
     UNSUPPORTED_SETTING {
         @Override
         public String getProblemDescription() {
@@ -22,13 +28,79 @@ public enum GeneralSettingsProblem implements IProblemCause {
     MISSING_LIBRARY_NAME {
         @Override
         public String getProblemDescription() {
-            return "Specify name or path of library to import";
+            return "Empty setting '%s'. Specify name or path of library to import";
         }
     },
-    UNRECOGNIZED_LIBRARY {
+    MISSING_RESOURCE_NAME {
         @Override
         public String getProblemDescription() {
-            return "Unrecognized '%s' library";
+            return "Empty setting '%s'. Specify path of resource file to import";
+        }
+    },
+    MISSING_VARIABLES_NAME {
+        @Override
+        public String getProblemDescription() {
+            return "Empty setting '%s'. Specify path of variable file to import";
+        }
+    },
+    PARAMETERIZED_IMPORT_PATH {
+        @Override
+        public String getProblemDescription() {
+            return "The library name/path '%s' is parameterized. RED currently does not support such imports";
+        }
+    },
+    ABSOLUTE_IMPORT_PATH {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Path '%s' is absolute. RED prefers relative paths";
+        }
+    },
+    IMPORT_PATH_OUTSIDE_WORKSPACE {
+        @Override
+        public String getProblemDescription() {
+            return "Path '%s' points to location outside your workspace";
+        }
+    },
+    UNKNOWN_LIBRARY {
+        @Override
+        public String getProblemDescription() {
+            return "Unknown '%s' library";
+        }
+    },
+    SETTING_ARGUMENTS_NOT_APPLICABLE {
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is not applicable for arguments: %s. %s";
+        }
+    },
+    INVALID_RESOURCE_IMPORT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Resource import '%s' is invalid%s";
+        }
+    },
+    INVALID_VARIABLES_IMPORT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Variable import '%s' is invalid%s";
+        }
+    },
+    EMPTY_SETTING {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Empty setting '%s'";
         }
     };
 

@@ -5,9 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class FatalProblemsReportingStrategy extends ProblemsReportingStrategy {
 
@@ -25,8 +27,21 @@ public class FatalProblemsReportingStrategy extends ProblemsReportingStrategy {
     }
 
     @Override
+    public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token) {
+        super.handleProblem(problem, file, token);
+        throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
+    }
+
+    @Override
+    public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token,
+            final Map<String, Object> additionalAttributes) {
+        super.handleProblem(problem, file, token, additionalAttributes);
+        throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
+    }
+
+    @Override
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {
-        super.handleProblem(problem, file, filePosition);
+        super.handleProblem(problem, file, filePosition, new HashMap<String, Object>());
         throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
     }
 

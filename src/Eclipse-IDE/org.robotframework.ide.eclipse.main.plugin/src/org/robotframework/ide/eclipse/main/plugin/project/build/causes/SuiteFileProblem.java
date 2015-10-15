@@ -19,6 +19,13 @@ public enum SuiteFileProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Suite initialization file shouldn't contain Test Cases section";
         }
+    },
+    UNRECOGNIZED_TABLE_HEADER {
+
+        @Override
+        public String getProblemDescription() {
+            return "Unrecognized table header: '%s";
+        }
     };
 
     @Override

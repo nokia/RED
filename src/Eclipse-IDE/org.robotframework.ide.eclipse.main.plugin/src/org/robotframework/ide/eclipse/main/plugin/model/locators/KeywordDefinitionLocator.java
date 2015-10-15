@@ -8,8 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.model.locators;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -43,7 +44,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        final List<IPath> resources = PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile);
+        final List<IPath> resources = PathsResolver.getAbsoluteResourceFilesPaths(startingFile);
         shouldContinue = locateInResourceFiles(resources, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -74,15 +75,16 @@ public class KeywordDefinitionLocator {
     }
 
     private ContinueDecision locateInResourceFiles(final List<IPath> resources, final KeywordDetector detector) {
-        // FIXME : we should somehow be able to handle absolute files (probably by linking the file)
         for (final IPath path : resources) {
-            if (!path.isAbsolute()) {
-                final IFile resourceFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-                final RobotSuiteFile resourceSuiteFile = getSuiteFile(resourceFile);
-                final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
-                if (shouldContinue == ContinueDecision.STOP) {
-                    return ContinueDecision.STOP;
-                }
+            final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
+            final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
+            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE) {
+                continue;
+            }
+            final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
+            final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
+            if (shouldContinue == ContinueDecision.STOP) {
+                return ContinueDecision.STOP;
             }
         }
         return ContinueDecision.CONTINUE;
