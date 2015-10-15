@@ -215,13 +215,13 @@ public class Rules {
             public IToken evaluate(final ICharacterScanner scanner) {
                 final int ch = scanner.read();
                 scanner.unread();
-                if (ch == EOF || Character.isWhitespace(ch)) {
+                if (ch == EOF || Character.isWhitespace(ch) || ch == '|') {
                     return Token.UNDEFINED;
                 }
                 final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
 
                 final int numberOfCellSeparators = getNumberOfCellSeparators(lineContentBefore);
-                if (numberOfCellSeparators == 1) {
+                if (numberOfCellSeparators == 1 && !isAssignment(ch, lineContentBefore)) {
                     consumeWholeToken(scanner);
                     return token;
                 } else if (numberOfCellSeparators > 1) {
@@ -246,6 +246,10 @@ public class Rules {
                 }
                 return Token.UNDEFINED;
             }
+
+            private boolean isAssignment(final int ch, final String lineContentBefore) {
+                return ch == '=' && (lineContentBefore.endsWith("} ") || lineContentBefore.endsWith("}"));
+            }
         };
     }
 
@@ -255,7 +259,7 @@ public class Rules {
             if (ch == ' ') {
                 ch = scanner.read();
                 scanner.unread();
-                if (ch == ' ' || ch == '\t') {
+                if (ch == ' ' || ch == '\t' || ch == '|') {
                     break;
                 }
             }
@@ -265,7 +269,7 @@ public class Rules {
     }
 
     private static boolean hasVariablesToAssign(final String lineBegin, final int expectedNumberOfVariables) {
-        String withoutTabs = lineBegin.replace("\t", "  ");
+        String withoutTabs = lineBegin.replace("\t", "  ").replaceAll(" \\| ", "   ").replaceFirst("^\\| ", "  ");
         if (withoutTabs.startsWith("  ")) {
             withoutTabs = withoutTabs.trim();
             if (withoutTabs.isEmpty()) {
@@ -276,7 +280,7 @@ public class Rules {
             }
 
             final List<String> splitted = newArrayList(Splitter.on(Pattern.compile(" ( )+")).splitToList(withoutTabs));
-            if (!lineBegin.endsWith("  ") && !lineBegin.endsWith("\t")) {
+            if (!lineBegin.endsWith("  ") && !lineBegin.endsWith("\t") && !lineBegin.endsWith(" | ")) {
                 splitted.remove(splitted.size() - 1);
             }
             if (splitted.size() == 0 && expectedNumberOfVariables == 0) {
@@ -301,7 +305,9 @@ public class Rules {
     }
 
     private static int getNumberOfCellSeparators(final String lineContentBefore) {
-        final String withoutTabs = lineContentBefore.replaceAll("\t", "  ");
+        final String withoutTabs = lineContentBefore.replaceAll("\t", "  ")
+                .replaceAll(" \\| ", "   ")
+                .replaceFirst("^\\| ", "  ");
         if (withoutTabs.isEmpty()) {
             return 0;
         }
