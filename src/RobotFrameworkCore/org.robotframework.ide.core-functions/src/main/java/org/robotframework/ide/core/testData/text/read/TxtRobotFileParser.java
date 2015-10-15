@@ -212,8 +212,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // before
                             // '|' pipe separator
                             if (remainingData > 0
-                                    || utility.shouldGiveEmptyToProcess(line,
-                                            processingState)) {
+                                    || utility.shouldGiveEmptyToProcess(
+                                            tokenSeparatorBuilder
+                                                    .createSeparator(
+                                                            lineNumber,
+                                                            currentLineText),
+                                            line, processingState)) {
                                 String rawText = text.substring(
                                         lastColumnProcessed, startColumn);
 

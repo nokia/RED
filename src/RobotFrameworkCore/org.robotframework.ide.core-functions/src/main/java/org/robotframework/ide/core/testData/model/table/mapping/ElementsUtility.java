@@ -25,6 +25,7 @@ import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.ParsingState.TableType;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
+import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
@@ -621,13 +622,44 @@ public class ElementsUtility {
     }
 
 
-    public boolean shouldGiveEmptyToProcess(final RobotLine line,
-            final Stack<ParsingState> processingState) {
+    public boolean shouldGiveEmptyToProcess(final ALineSeparator separator,
+            final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
         List<IRobotLineElement> lineElements = line.getLineElements();
-        result = lineElements.size() >= 2
-                || getCurrentStatus(processingState) == ParsingState.VARIABLE_TABLE_INSIDE;
+        result = lineElements.size() >= 2;
+
+        if (!result) {
+            result = checkForVariableTable(separator, processingState);
+        }
+
+        return result;
+    }
+
+
+    private boolean checkForVariableTable(final ALineSeparator separator,
+            final Stack<ParsingState> processingState) {
+        boolean result = false;
+
+        if (getCurrentStatus(processingState) == ParsingState.VARIABLE_TABLE_INSIDE) {
+            int textPosition = 0;
+            String textInLine = separator.getLine();
+            while(separator.hasNext()) {
+                Separator next = separator.next();
+                String toAnalyze = textInLine.substring(textPosition,
+                        next.getStartColumn());
+                textPosition = next.getEndColumn();
+
+                if (!toAnalyze.trim().isEmpty()) {
+                    result = true;
+                    break;
+                }
+            }
+
+            if (!result && textInLine.length() > textPosition) {
+                result = !textInLine.substring(textPosition).trim().isEmpty();
+            }
+        }
 
         return result;
     }
