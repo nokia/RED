@@ -9,12 +9,14 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
@@ -23,9 +25,12 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -282,15 +287,15 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public List<LibrarySpecification> getImportedLibraries() {
         final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
-        final List<String> alreadyImported = newArrayList();
+        final List<String> toImport = newArrayList();
         if (section.isPresent()) {
             final List<RobotKeywordCall> importSettings = section.get().getImportSettings();
             for (final RobotKeywordCall element : importSettings) {
                 final RobotSetting setting = (RobotSetting) element;
                 if (SettingsGroup.LIBRARIES == setting.getGroup()) {
-                    final String name = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
-                    if (name != null) {
-                        alreadyImported.add(name);
+                    final String nameOrPath = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
+                    if (nameOrPath != null) {
+                        toImport.add(nameOrPath);
                     }
                 }
             }
@@ -298,16 +303,37 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
         final List<LibrarySpecification> imported = newArrayList();
         for (final LibrarySpecification spec : getProject().getStandardLibraries()) {
-            if (spec.isAccessibleWithoutImport() || alreadyImported.contains(spec.getName())) {
+            if (spec.isAccessibleWithoutImport() || toImport.contains(spec.getName())) {
                 imported.add(spec);
+                toImport.remove(spec.getName());
             }
         }
         for (final LibrarySpecification spec : getProject().getReferencedLibraries()) {
-            if (alreadyImported.contains(spec.getName())) {
+            if (toImport.contains(spec.getName())) {
+                imported.add(spec);
+                toImport.remove(spec.getName());
+            }
+        }
+        for (final String toImportPathOrName : toImport) {
+            final LibrarySpecification spec = findSpecForPath(toImportPathOrName);
+            if (spec != null) {
                 imported.add(spec);
             }
         }
         return imported;
+    }
+
+    private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibrariesMapping()
+                .entrySet()) {
+            for (final IPath path : PathsResolver.resolveToAbsolutePath(this, toImportPathOrName)) {
+                if (path.equals(
+                        PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(entry.getKey().getPath())))) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {

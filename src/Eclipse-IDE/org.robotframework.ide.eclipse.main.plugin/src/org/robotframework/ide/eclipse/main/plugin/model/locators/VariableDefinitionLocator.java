@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -53,15 +53,15 @@ public class VariableDefinitionLocator {
     public void locateVariableDefinitionWithLocalScope(final VariableDetector detector, final int offset) {
         first(locateInLocalScope(startingFile, detector, offset))
           .or(locateInCurrentFile(startingFile, detector))
-          .or(locateInResourceFiles(PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile), detector))
-          .or(locateInVariableFiles(PathsNormalizer.getAbsoluteVariableFilesPaths(startingFile), detector))
+          .or(locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsResolver.getAbsoluteVariableFilesPaths(startingFile), detector))
           .or(locateGlobalVariables(startingFile, detector));
     }
 
     public void locateVariableDefinition(final VariableDetector detector) {
         first(locateInCurrentFile(startingFile, detector))
-          .or(locateInResourceFiles(PathsNormalizer.getWorkspaceRelativeResourceFilesPaths(startingFile), detector))
-          .or(locateInVariableFiles(PathsNormalizer.getAbsoluteVariableFilesPaths(startingFile), detector))
+          .or(locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile), detector))
+          .or(locateInVariableFiles(PathsResolver.getAbsoluteVariableFilesPaths(startingFile), detector))
           .or(locateGlobalVariables(startingFile, detector));
     }
 
@@ -105,6 +105,7 @@ public class VariableDefinitionLocator {
             final IRobotCodeHoldingElement parent, final RobotKeywordCall call) {
         final List<RobotKeywordCall> children = parent.getChildren();
         final int index = children.indexOf(call);
+        
         for (int i = 0; i < index; i++) {
             final AModelElement<?> linkedElement = children.get(i).getLinkedElement();
             if (linkedElement instanceof RobotExecutableRow<?>) {
@@ -136,14 +137,15 @@ public class VariableDefinitionLocator {
     }
 
     private Optional<VoidResult> locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
-        // FIXME : we should somehow be able to handle absolute files (probably by linking the file)
         for (final IPath path : resources) {
-            if (!path.isAbsolute()) {
-                final IFile resourceFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-                final RobotSuiteFile resourceSuiteFile = getSuiteFile(resourceFile);
-
-                return locateInCurrentFile(resourceSuiteFile, detector);
+            final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
+            final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
+            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE) {
+                continue;
             }
+            final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
+
+            return locateInCurrentFile(resourceSuiteFile, detector);
         }
         return Optional.absent();
     }

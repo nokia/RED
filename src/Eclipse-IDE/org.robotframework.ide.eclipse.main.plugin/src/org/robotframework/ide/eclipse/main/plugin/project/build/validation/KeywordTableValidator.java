@@ -23,16 +23,14 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Range;
 
 class KeywordTableValidator implements ModelUnitValidator {
 
@@ -40,7 +38,11 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    KeywordTableValidator(final Optional<RobotKeywordsSection> keywordSection) {
+    private final ValidationContext validationContext;
+
+    KeywordTableValidator(final ValidationContext validationContext,
+            final Optional<RobotKeywordsSection> keywordSection) {
+        this.validationContext = validationContext;
         this.keywordSection = keywordSection;
     }
 
@@ -55,7 +57,8 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         reportEmptyKeyword(suiteModel.getFile(), keywords);
         reportDuplicatedKewords(suiteModel.getFile(), keywords);
-        TestCasesTableValidator.reportUnkownKeywords(suiteModel, reporter, findExecutableRows(keywords));
+        TestCasesTableValidator.reportUnkownKeywords(suiteModel, validationContext, reporter,
+                findExecutableRows(keywords));
         reportUnknownVariables(suiteModel, keywords);
     }
 
@@ -90,11 +93,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
                         .formatMessageWith(name);
-                final ProblemPosition position = new ProblemPosition(keywordName.getLineNumber(),
-                        Range.closed(keywordName.getStartOffset(), keywordName.getStartOffset() + name.length()));
-                final Map<String, Object> additionalArguments = Maps.newHashMap();
-                additionalArguments.put("name", name);
-                reporter.handleProblem(problem, file, position, additionalArguments);
+                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                reporter.handleProblem(problem, file, keywordName, additionalArguments);
             }
         }
     }

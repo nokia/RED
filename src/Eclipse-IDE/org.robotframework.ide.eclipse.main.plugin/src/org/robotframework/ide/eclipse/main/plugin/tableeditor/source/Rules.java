@@ -172,6 +172,42 @@ public class Rules {
         };
     }
 
+    static IRule createKeywordUsageInSettings(final IToken token) {
+        return new IRule() {
+
+            @Override
+            public IToken evaluate(final ICharacterScanner scanner) {
+                final int ch = scanner.read();
+                scanner.unread();
+                if (ch == EOF || Character.isWhitespace(ch)) {
+                    return Token.UNDEFINED;
+                }
+                final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
+
+                final int numberOfCellSeparators = getNumberOfCellSeparators(lineContentBefore);
+                if (numberOfCellSeparators == 1 && isKeywordBasedSetting(lineContentBefore)) {
+                    consumeWholeToken(scanner);
+                    return token;
+                } else {
+                    return Token.UNDEFINED;
+                }
+            }
+
+            private boolean isKeywordBasedSetting(final String lineContentBefore) {
+                final String lowerCasedLine = lineContentBefore.trim().toLowerCase();
+                if (lowerCasedLine.contains("suite")) {
+                    return lowerCasedLine.contains("suite setup") || lowerCasedLine.contains("suite precondition") ||
+                            lowerCasedLine.contains("suite teardown") || lowerCasedLine.contains("suite postcondition");
+                } else if (lowerCasedLine.contains("test")) {
+                    return lowerCasedLine.contains("test setup") || lowerCasedLine.contains("test precondition") ||
+                            lowerCasedLine.contains("test teardown") || lowerCasedLine.contains("test postcondition") ||
+                            lowerCasedLine.contains("test template");
+                }
+                return false;
+            }
+        };
+    }
+
     static IRule createKeywordCallRule(final IToken token) {
         return new IRule() {
 
@@ -210,22 +246,22 @@ public class Rules {
                 }
                 return Token.UNDEFINED;
             }
-
-            private void consumeWholeToken(final ICharacterScanner scanner) {
-                int ch = scanner.read();
-                while (ch != EOF && ch != '\t' && ch != '\n' && ch != '\r') {
-                    if (ch == ' ') {
-                        ch = scanner.read();
-                        scanner.unread();
-                        if (ch == ' ' || ch == '\t') {
-                            break;
-                        }
-                    }
-                    ch = scanner.read();
-                }
-                scanner.unread();
-            }
         };
+    }
+
+    private static void consumeWholeToken(final ICharacterScanner scanner) {
+        int ch = scanner.read();
+        while (ch != EOF && ch != '\t' && ch != '\n' && ch != '\r') {
+            if (ch == ' ') {
+                ch = scanner.read();
+                scanner.unread();
+                if (ch == ' ' || ch == '\t') {
+                    break;
+                }
+            }
+            ch = scanner.read();
+        }
+        scanner.unread();
     }
 
     private static boolean hasVariablesToAssign(final String lineBegin, final int expectedNumberOfVariables) {

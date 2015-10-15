@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createCommentRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createDefinitionRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordCallRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordUsageInSettings;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createLocalSettingRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createSectionHeaderRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createVariableRule;
@@ -49,6 +50,10 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.StatusSetter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
@@ -108,6 +113,20 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant
                 .setRepeatedInvocationTrigger(KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
 
+        setupAssistantProcessors(contentAssistant);
+
+        contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+        contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
+
+            @Override
+            protected IInformationControl doCreateInformationControl(final Shell parent) {
+                return new DefaultInformationControl(parent, true);
+            }
+        });
+        return contentAssistant;
+    }
+
+    private void setupAssistantProcessors(final ContentAssistant contentAssistant) {
         final TextEditorContentAssist textEditorContentAssist = new SuiteSourceEditorContentAssist(
                 editor.getFileModel());
         contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
@@ -119,16 +138,41 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
         contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+    }
 
-        contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
-        contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
-
+    private void setupAssistantProcessors2(final ContentAssistant contentAssistant) {
+        final StatusSetter statusSetter = new StatusSetter() {
             @Override
-            protected IInformationControl doCreateInformationControl(final Shell parent) {
-                return new DefaultInformationControl(parent, true);
+            public void setStatus(final String title) {
+                contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals", title));
             }
-        });
-        return contentAssistant;
+        };
+
+        final SuiteSourceEditorContentAssist assist = new SuiteSourceEditorContentAssist(editor.getFileModel());
+        final CycledContentAssistProcessor testCasesProcessor = new CycledContentAssistProcessor(statusSetter);
+        testCasesProcessor.addProcessor(new VariablesAssistProcessor(assist));
+        testCasesProcessor.addProcessor(new KeywordsAssistProcessor());
+        contentAssistant.setContentAssistProcessor(testCasesProcessor, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+
+        final CycledContentAssistProcessor keywordsProcessor = new CycledContentAssistProcessor(statusSetter);
+        keywordsProcessor.addProcessor(new VariablesAssistProcessor(assist));
+        keywordsProcessor.addProcessor(new KeywordsAssistProcessor());
+        contentAssistant.setContentAssistProcessor(keywordsProcessor, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+
+        final CycledContentAssistProcessor settingsProcessor = new CycledContentAssistProcessor(statusSetter);
+        settingsProcessor.addProcessor(new VariablesAssistProcessor(assist));
+        settingsProcessor.addProcessor(new KeywordsAssistProcessor());
+        contentAssistant.setContentAssistProcessor(settingsProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
+
+        final CycledContentAssistProcessor variablesProcessor = new CycledContentAssistProcessor(statusSetter);
+        variablesProcessor.addProcessor(new VariablesAssistProcessor(assist));
+        variablesProcessor.addProcessor(new KeywordsAssistProcessor());
+        contentAssistant.setContentAssistProcessor(variablesProcessor, SuiteSourcePartitionScanner.VARIABLES_SECTION);
+
+        final CycledContentAssistProcessor defaultProcessor = new CycledContentAssistProcessor(statusSetter);
+        defaultProcessor.addProcessor(new VariablesAssistProcessor(assist));
+        defaultProcessor.addProcessor(new KeywordsAssistProcessor());
+        contentAssistant.setContentAssistProcessor(defaultProcessor, IDocument.DEFAULT_CONTENT_TYPE);
     }
 
     @Override
@@ -177,7 +221,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
 
         final IRule[] settingsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createDefinitionRule(setting), createCommentRule(comment) };
+                createDefinitionRule(setting), createKeywordUsageInSettings(call), createCommentRule(comment) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
 
         final IRule[] variablesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),

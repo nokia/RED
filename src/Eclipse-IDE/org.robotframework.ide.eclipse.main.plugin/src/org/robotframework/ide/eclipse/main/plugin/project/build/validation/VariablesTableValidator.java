@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.Variables
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
 class VariablesTableValidator implements ModelUnitValidator {
@@ -81,9 +81,8 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (variable.getType() == VariableType.INVALID) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_TYPE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = new HashMap<>();
-                attributes.put("name", variable.getName());
-                reporter.handleProblem(problem, file, toPosition(variable), attributes);
+                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variable.getName());
+                reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
             }
         }
     }
@@ -103,9 +102,8 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(variable.getName())) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = new HashMap<>();
-                attributes.put("name", variable.getName());
-                reporter.handleProblem(problem, file, toPosition(variable), attributes);
+                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variable.getName());
+                reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
             }
         }
     }
