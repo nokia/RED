@@ -75,14 +75,18 @@ public class DocumentUtilities {
             throws BadLocationException {
         final String prev = offset > 0 ? document.get(offset - 1, 1) : "";
         final String next = offset < document.getLength() ? document.get(offset, 1) : "";
-        if (!prev.isEmpty() && Character.isWhitespace(prev.charAt(0)) && !next.isEmpty()
-                && Character.isWhitespace(next.charAt(0))) {
+        if (isInsideSeparator(prev, next)) {
             return Optional.absent();
         }
 
         final int beginOffset = offset - calculateCellRegionBegin(document, offset);
         final int endOffset = offset + calculateCellRegionEnd(document, offset);
         return Optional.<IRegion> of(new Region(beginOffset, endOffset - beginOffset));
+    }
+
+    private static boolean isInsideSeparator(final String prev, final String next) {
+        return !prev.isEmpty() && (Character.isWhitespace(prev.charAt(0)) || prev.charAt(0) == '|') && !next.isEmpty()
+                && (Character.isWhitespace(next.charAt(0)) || next.charAt(0) == '|');
     }
 
     private static int calculateCellRegionBegin(final IDocument document, final int caretOffset)
@@ -103,8 +107,11 @@ public class DocumentUtilities {
                 }
                 break;
             }
-            if (prev.equals(" ") && Character.isWhitespace(document.get(caretOffset - j - 1, 1).charAt(0))) {
-                break;
+            if (prev.equals(" ")) {
+                final char lookBack = document.get(caretOffset - j - 1, 1).charAt(0);
+                if (Character.isWhitespace(lookBack) || lookBack == '|') {
+                    break;
+                }
             }
             j++;
         }
@@ -128,8 +135,11 @@ public class DocumentUtilities {
                 }
                 break;
             }
-            if (next.equals(" ") && Character.isWhitespace(document.get(caretOffset + i + 1, 1).charAt(0))) {
-                break;
+            if (next.equals(" ")) {
+                final char lookAhead = document.get(caretOffset + i + 1, 1).charAt(0);
+                if (Character.isWhitespace(lookAhead) || lookAhead == '|') {
+                    break;
+                }
             }
             i++;
         }
