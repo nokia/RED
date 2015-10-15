@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.core.executor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -181,13 +183,11 @@ public class RobotRuntimeEnvironment {
         return PythonInterpretersCommandExecutors.getInstance().getRobotCommandExecutor(pythonLocation).getRunModulePath();
     }
 
-
     private static String getPythonExecutablePath(
             final PythonInstallationDirectory location) {
         final String pythonExec = location.interpreter.executableName();
         return findFile(location, pythonExec).getAbsolutePath();
     }
-
 
     private static File findFile(
             final PythonInstallationDirectory pythonLocation, final String name) {
@@ -198,7 +198,6 @@ public class RobotRuntimeEnvironment {
         }
         return null;
     }
-
 
     static File copyResourceFile(final String filename)
             throws IOException {
@@ -288,6 +287,18 @@ public class RobotRuntimeEnvironment {
                 : null;
     }
 
+    public List<File> getModuleSearchPaths() {
+        if (hasRobotInstalled()) {
+            try {
+                return PythonInterpretersCommandExecutors.getInstance()
+                        .getRobotCommandExecutor((PythonInstallationDirectory) location)
+                        .getModulesSearchPaths();
+            } catch (final RobotEnvironmentException e) {
+                return newArrayList();
+            }
+        }
+        return newArrayList();
+    }
 
     public String getVersion(final SuiteExecutor executor) {
         final boolean isSameInterpreter = executor == getInterpreter();

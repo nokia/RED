@@ -18,7 +18,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 /**
@@ -29,6 +32,9 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE = 
             new TypeReference<Map<String, Object>>() { };
+
+    private static final TypeReference<List<String>> STRING_LIST_TYPE =
+            new TypeReference<List<String>>() { };
 
     private final String interpreterPath;
 
@@ -221,6 +227,41 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to generate library specification file for library " + libName,
                     e);
+        }
+    }
+
+    @Override
+    public List<File> getModulesSearchPaths() throws RobotEnvironmentException {
+        try {
+            final StringBuilder jsonEncodedOutput = new StringBuilder();
+            final ILineHandler handler = new ILineHandler() {
+                @Override
+                public void processLine(final String line) {
+                    jsonEncodedOutput.append(line);
+                }
+            };
+            final List<String> cmdLine = Arrays.asList(interpreterPath, "-c",
+                    "\"import robot;import sys;import json;print(json.dumps(sys.path))\"");
+            final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, handler);
+            if (returnCode != 0) {
+                throw new RobotEnvironmentException("Unable to obtain modules search paths");
+            }
+            final List<String> pathsFromJson = new ObjectMapper().readValue(jsonEncodedOutput.toString(),
+                    STRING_LIST_TYPE);
+            final List<String> paths = newArrayList(Iterables.filter(pathsFromJson, new Predicate<String>() {
+                @Override
+                public boolean apply(final String input) {
+                    return !("".equals(input) || ".".equals(input));
+                }
+            }));
+            return newArrayList(Iterables.transform(paths, new Function<String, File>() {
+                @Override
+                public File apply(final String path) {
+                    return new File(path);
+                }
+            }));
+        } catch (final IOException e) {
+            throw new RobotEnvironmentException("Unable to obtain modules search paths", e);
         }
     }
 }
