@@ -213,6 +213,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // '|' pipe separator
                             if (remainingData > 0
                                     || utility.shouldGiveEmptyToProcess(
+                                            currentSeparator,
                                             tokenSeparatorBuilder
                                                     .createSeparator(
                                                             lineNumber,
