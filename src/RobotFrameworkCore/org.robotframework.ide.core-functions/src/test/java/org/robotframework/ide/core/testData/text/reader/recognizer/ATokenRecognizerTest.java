@@ -39,9 +39,9 @@ public class ATokenRecognizerTest {
         assertThat(rec.hasNext(text, 0)).isTrue();
 
         RobotToken two = rec.next();
-        assertThat(two.getStartColumn()).isEqualTo(0);
+        assertThat(two.getStartColumn()).isEqualTo(6);
         assertThat(two.getText().toString()).isEqualTo("foobar");
-        assertThat(two.getEndColumn()).isEqualTo("foobar".length());
+        assertThat(two.getEndColumn()).isEqualTo(6 + "foobar".length());
         assertThat(two.getTypes()).containsExactly(type);
     }
 
