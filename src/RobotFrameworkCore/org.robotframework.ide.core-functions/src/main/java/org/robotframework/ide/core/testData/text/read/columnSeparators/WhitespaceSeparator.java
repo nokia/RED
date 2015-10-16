@@ -26,7 +26,7 @@ public class WhitespaceSeparator extends ALineSeparator {
 
 
     @Override
-    public Separator next() {
+    protected Separator nextSeparator() {
         int start = matcher.start();
         int end = matcher.end();
 
@@ -42,7 +42,7 @@ public class WhitespaceSeparator extends ALineSeparator {
 
 
     @Override
-    public boolean hasNext() {
+    protected boolean hasNextSeparator() {
         return matcher.find();
     }
 
