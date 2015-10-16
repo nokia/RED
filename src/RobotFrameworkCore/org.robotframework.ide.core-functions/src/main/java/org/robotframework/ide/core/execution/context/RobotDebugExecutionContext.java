@@ -49,12 +49,14 @@ public class RobotDebugExecutionContext {
     }
 
     public void startTest(final String testName) {
-        final TestCaseTable testCaseTable = currentModel.getTestCaseTable();
-        final List<TestCase> testCases = testCaseTable.getTestCases();
-        for (final TestCase testCase : testCases) {
-            if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
-                ExecutableRowFindersManager.initFindersAtTestCaseStart(testCase);
-                break;
+        if (currentModel != null) {
+            final TestCaseTable testCaseTable = currentModel.getTestCaseTable();
+            final List<TestCase> testCases = testCaseTable.getTestCases();
+            for (final TestCase testCase : testCases) {
+                if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
+                    ExecutableRowFindersManager.initFindersAtTestCaseStart(testCase);
+                    break;
+                }
             }
         }
     }

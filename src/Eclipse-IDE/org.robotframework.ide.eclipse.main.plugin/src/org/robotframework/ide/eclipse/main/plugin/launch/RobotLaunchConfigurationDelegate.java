@@ -82,7 +82,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -174,7 +174,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final IProject project = getProject(robotConfig);
-        final List<IResource> suiteResources = getSuiteResources(robotConfig, project);
+        List<IResource> suiteResources = getSuiteResources(robotConfig, project);
         final RobotProject robotProject = getRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final SuiteExecutor executor = robotConfig.getExecutor();
@@ -235,7 +235,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (isDebugging) {
             robotPartListener = new RobotPartListener(robotEventBroker);
             registerPartListener(robotPartListener);
-            
+            if(suiteResources.isEmpty()) {
+                suiteResources = newArrayList();
+                suiteResources.add(project);
+            }
             IDebugTarget target = null;
             try {
                 target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
