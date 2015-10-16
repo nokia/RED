@@ -30,8 +30,8 @@ public class PipeSeparatorTest {
                 + lastSeparator;
         separator = new PipeSeparator(0, text);
 
-        assertThat(separator.hasNext()).isTrue();
-        Separator sep = separator.next();
+        assertThat(separator.hasNextSeparator()).isTrue();
+        Separator sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(0);
@@ -39,9 +39,9 @@ public class PipeSeparatorTest {
         assertThat(sep.getText().toString()).isEqualTo(theFirstSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
-        assertThat(separator.hasNext()).isTrue();
+        assertThat(separator.hasNextSeparator()).isTrue();
 
-        sep = separator.next();
+        sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(theFirstSeparator.length());
@@ -50,9 +50,9 @@ public class PipeSeparatorTest {
         assertThat(sep.getText().toString()).isEqualTo(theSecondSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
-        assertThat(separator.hasNext()).isTrue();
+        assertThat(separator.hasNextSeparator()).isTrue();
 
-        sep = separator.next();
+        sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(
@@ -61,7 +61,7 @@ public class PipeSeparatorTest {
         assertThat(sep.getEndColumn()).isEqualTo(text.length());
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
-        assertThat(separator.hasNext()).isFalse();
+        assertThat(separator.hasNextSeparator()).isFalse();
     }
 
 
@@ -72,8 +72,8 @@ public class PipeSeparatorTest {
         String text = theFirstSeparator + theSecondSeparator + "...    foobar";
         separator = new PipeSeparator(0, text);
 
-        assertThat(separator.hasNext()).isTrue();
-        Separator sep = separator.next();
+        assertThat(separator.hasNextSeparator()).isTrue();
+        Separator sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(0);
@@ -81,9 +81,9 @@ public class PipeSeparatorTest {
         assertThat(sep.getText().toString()).isEqualTo(theFirstSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
-        assertThat(separator.hasNext()).isTrue();
+        assertThat(separator.hasNextSeparator()).isTrue();
 
-        sep = separator.next();
+        sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(theFirstSeparator.length());
@@ -91,7 +91,7 @@ public class PipeSeparatorTest {
                 theFirstSeparator.length() + theSecondSeparator.length());
         assertThat(sep.getText().toString()).isEqualTo(theSecondSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
-        assertThat(separator.hasNext()).isFalse();
+        assertThat(separator.hasNextSeparator()).isFalse();
     }
 
 
@@ -100,8 +100,8 @@ public class PipeSeparatorTest {
         String theFirstSeparator = "| ";
         separator = new PipeSeparator(0, theFirstSeparator);
 
-        assertThat(separator.hasNext()).isTrue();
-        Separator sep = separator.next();
+        assertThat(separator.hasNextSeparator()).isTrue();
+        Separator sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(0);
@@ -109,7 +109,7 @@ public class PipeSeparatorTest {
         assertThat(sep.getText().toString()).isEqualTo(theFirstSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
-        assertThat(separator.hasNext()).isFalse();
+        assertThat(separator.hasNextSeparator()).isFalse();
     }
 
 
@@ -117,7 +117,7 @@ public class PipeSeparatorTest {
     public void no_separator() {
         separator = new PipeSeparator(0, "  test");
 
-        assertThat(separator.hasNext()).isFalse();
+        assertThat(separator.hasNextSeparator()).isFalse();
     }
 
 
