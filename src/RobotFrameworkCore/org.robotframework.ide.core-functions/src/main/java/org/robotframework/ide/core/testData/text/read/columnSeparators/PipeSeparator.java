@@ -31,7 +31,7 @@ public class PipeSeparator extends ALineSeparator {
 
 
     @Override
-    public Separator next() {
+    protected Separator nextSeparator() {
         int start = matcher.start();
         int end = matcher.end();
         Separator s = new Separator();
@@ -46,7 +46,7 @@ public class PipeSeparator extends ALineSeparator {
 
 
     @Override
-    public boolean hasNext() {
+    protected boolean hasNextSeparator() {
         return matcher.find();
     }
 
