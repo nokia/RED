@@ -623,35 +623,42 @@ public class ElementsUtility {
     }
 
 
-    public boolean shouldGiveEmptyToProcess(final ALineSeparator separator,
-            final RobotLine line, final Stack<ParsingState> processingState) {
+    public boolean shouldGiveEmptyToProcess(final Separator currentSeparator,
+            final ALineSeparator separator, final RobotLine line,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
 
         ParsingState state = getCurrentStatus(processingState);
         if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
-            int textPosition = 0;
-            String textInLine = separator.getLine();
-            while(separator.hasNext()) {
-                Separator next = separator.next();
-                String toAnalyze = textInLine.substring(textPosition,
-                        next.getStartColumn());
-                textPosition = next.getEndColumn();
+            if (separator.getProducedType() == SeparatorType.PIPE
+                    && currentSeparator.getStartColumn() == 0) {
+                result = false;
+            } else {
+                int textPosition = 0;
+                String textInLine = separator.getLine();
+                while(separator.hasNext()) {
+                    Separator next = separator.next();
+                    String toAnalyze = textInLine.substring(textPosition,
+                            next.getStartColumn());
+                    textPosition = next.getEndColumn();
 
-                toAnalyze = toAnalyze.trim();
-                if (!toAnalyze.isEmpty()) {
-                    PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
-                    result = !recognizer.hasNext(new StringBuilder(toAnalyze),
-                            separator.getLineNumber());
-                    if (!result) {
-                        result = !"...".equals(toAnalyze);
+                    toAnalyze = toAnalyze.trim();
+                    if (!toAnalyze.isEmpty()) {
+                        PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
+                        result = !recognizer.hasNext(new StringBuilder(
+                                toAnalyze), separator.getLineNumber());
+                        if (!result) {
+                            result = !"...".equals(toAnalyze);
+                        }
+                        textPosition = textInLine.length();
+                        break;
                     }
-                    textPosition = textInLine.length();
-                    break;
                 }
-            }
 
-            if (!result && textInLine.length() > textPosition) {
-                result = !textInLine.substring(textPosition).trim().isEmpty();
+                if (!result && textInLine.length() > textPosition) {
+                    result = !textInLine.substring(textPosition).trim()
+                            .isEmpty();
+                }
             }
         } else {
             List<IRobotLineElement> lineElements = line.getLineElements();
