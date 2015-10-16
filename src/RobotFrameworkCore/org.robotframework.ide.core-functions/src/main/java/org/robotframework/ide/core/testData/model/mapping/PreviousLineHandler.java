@@ -55,25 +55,21 @@ public class PreviousLineHandler {
                                 && containsAnyVariables(model)) {
                             continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
                         }
-                    } else {
-                        if (utility.isTheFirstColumnAfterSeparator(currentLine,
-                                currentToken)) {
-                            if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
-                                    || currentState == ParsingState.TEST_CASE_DECLARATION) {
-                                currentToken
-                                        .getTypes()
-                                        .add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
-                                if (containsAnyTestCases(model)) {
-                                    continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
-                                }
-                            } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
-                                    || currentState == ParsingState.KEYWORD_DECLARATION) {
-                                currentToken
-                                        .getTypes()
-                                        .add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
-                                if (containsAnyKeywords(model)) {
-                                    continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
-                                }
+                    } else if (couldBeInsideExecutableTable(currentLine,
+                            currentToken)) {
+                        if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
+                                || currentState == ParsingState.TEST_CASE_DECLARATION) {
+                            currentToken.getTypes().add(
+                                    RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
+                            if (containsAnyTestCases(model)) {
+                                continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
+                            }
+                        } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
+                                || currentState == ParsingState.KEYWORD_DECLARATION) {
+                            currentToken.getTypes().add(
+                                    RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
+                            if (containsAnyKeywords(model)) {
+                                continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
                             }
                         }
                     }
@@ -82,6 +78,25 @@ public class PreviousLineHandler {
         }
 
         return continueType;
+    }
+
+
+    private boolean couldBeInsideExecutableTable(final RobotLine currentLine,
+            final RobotToken currentToken) {
+        boolean result = false;
+        if (currentLine.getSeparatorForLine().or(SeparatorType.PIPE) == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+            result = utility.isTheFirstColumnAfterSeparator(currentLine,
+                    currentToken);
+        } else {
+            List<IRobotLineElement> lineElements = currentLine.getLineElements();
+            if (lineElements.size() == 2) {
+                result = lineElements.get(0).getTypes()
+                        .contains(SeparatorType.PIPE)
+                        && lineElements.get(1).getTypes()
+                                .contains(SeparatorType.PIPE);
+            }
+        }
+        return result;
     }
 
 
@@ -113,9 +128,7 @@ public class PreviousLineHandler {
                 for (int k = 0; k < lineElements.size() && k < 2; k++) {
                     IRobotLineElement elem = lineElements.get(k);
                     List<IRobotTokenType> types = elem.getTypes();
-                    if (types.contains(RobotTokenType.SETTING_UNKNOWN)
-                            || types.contains(RobotTokenType.SETTING_UNKNOWN_ARGUMENT)
-                            || types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)
+                    if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)
                             || types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)
                             || types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)
                             || types.contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
@@ -199,9 +212,7 @@ public class PreviousLineHandler {
             final Stack<ParsingState> parsingStates) {
         for (int i = parsingStates.size() - 1; i >= 0; i--) {
             ParsingState state = parsingStates.get(i);
-            if (state == ParsingState.COMMENT
-                    || state == ParsingState.SETTING_UNKNOWN
-                    || state == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT) {
+            if (state == ParsingState.COMMENT) {
                 parsingStates.remove(i);
             } else {
                 break;

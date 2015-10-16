@@ -62,9 +62,7 @@ public class UnknownSettingMapper implements IParsingMapper {
 
         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
             if (text != null) {
-                result = (text.trim().length() > 0)
-                        || utility.isTheFirstColumnAfterSeparator(currentLine,
-                                rt);
+                result = utility.isTheFirstColumn(currentLine, rt);
             }
         }
 

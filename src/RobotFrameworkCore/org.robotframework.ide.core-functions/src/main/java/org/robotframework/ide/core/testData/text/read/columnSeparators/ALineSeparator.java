@@ -148,6 +148,16 @@ public abstract class ALineSeparator {
     }
 
 
+    public int getPreviousElementIndex() {
+        return prevElementIndex;
+    }
+
+
+    public int getCurrentElementIndex() {
+        return elementIndex;
+    }
+
+
     public int getLineNumber() {
         return lineNumber;
     }
