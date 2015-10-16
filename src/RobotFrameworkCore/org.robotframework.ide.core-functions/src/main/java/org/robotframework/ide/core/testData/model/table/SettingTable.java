@@ -54,7 +54,7 @@ public class SettingTable extends ARobotSectionTable {
                 && suiteTeardowns.isEmpty() && forceTags.isEmpty()
                 && defaultTags.isEmpty() && testSetups.isEmpty()
                 && testTeardowns.isEmpty() && testTemplates.isEmpty()
-                && testTimeouts.isEmpty();
+                && testTimeouts.isEmpty() && unknownSettings.isEmpty();
     }
 
 

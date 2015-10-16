@@ -27,7 +27,6 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
-import org.robotframework.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -363,8 +362,8 @@ public class ElementsUtility {
             List<IRobotLineElement> lineElements = currentLine
                     .getLineElements();
             int size = lineElements.size();
-            if (size > 0) {
-                IRobotLineElement lastElement = lineElements.get(size - 1);
+            if (size == 1) {
+                IRobotLineElement lastElement = lineElements.get(0);
                 result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
                         .getStartColumn() == 0);
             }
@@ -623,46 +622,15 @@ public class ElementsUtility {
     }
 
 
-    public boolean shouldGiveEmptyToProcess(final Separator currentSeparator,
-            final ALineSeparator separator, final RobotLine line,
-            final Stack<ParsingState> processingState) {
+    public boolean shouldGiveEmptyToProcess(final ALineSeparator separator,
+            final Separator currentSeparator, final RobotLine robotLine,
+            String line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        ParsingState state = getCurrentStatus(processingState);
-        if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
-            if (separator.getProducedType() == SeparatorType.PIPE
-                    && currentSeparator.getStartColumn() == 0) {
-                result = false;
-            } else {
-                int textPosition = 0;
-                String textInLine = separator.getLine();
-                while(separator.hasNext()) {
-                    Separator next = separator.next();
-                    String toAnalyze = textInLine.substring(textPosition,
-                            next.getStartColumn());
-                    textPosition = next.getEndColumn();
+        if (currentSeparator.getStartColumn() > 0) {
+            if (separator.getProducedType() == SeparatorType.PIPE) {
 
-                    toAnalyze = toAnalyze.trim();
-                    if (!toAnalyze.isEmpty()) {
-                        PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
-                        result = !recognizer.hasNext(new StringBuilder(
-                                toAnalyze), separator.getLineNumber());
-                        if (!result) {
-                            result = !"...".equals(toAnalyze);
-                        }
-                        textPosition = textInLine.length();
-                        break;
-                    }
-                }
-
-                if (!result && textInLine.length() > textPosition) {
-                    result = !textInLine.substring(textPosition).trim()
-                            .isEmpty();
-                }
             }
-        } else {
-            List<IRobotLineElement> lineElements = line.getLineElements();
-            result = lineElements.size() >= 2;
         }
 
         return result;
