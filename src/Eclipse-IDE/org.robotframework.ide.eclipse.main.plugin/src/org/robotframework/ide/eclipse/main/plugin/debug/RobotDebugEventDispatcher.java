@@ -399,7 +399,10 @@ public class RobotDebugEventDispatcher extends Job {
                 return (IFile) resource;
             } else if (resource instanceof IContainer) {
                 try {
-                    extractSuiteFile(suiteName, Arrays.asList(((IContainer) resource).members()));
+                    IFile file = extractSuiteFile(suiteName, Arrays.asList(((IContainer) resource).members()));
+                    if(file != null) {
+                        return file;
+                    }
                 } catch (final CoreException e) {
                     e.printStackTrace();
                 }
