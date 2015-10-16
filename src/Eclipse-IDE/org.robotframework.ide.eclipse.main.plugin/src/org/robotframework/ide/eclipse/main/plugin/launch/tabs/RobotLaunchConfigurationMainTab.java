@@ -7,11 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -55,7 +53,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchElementsTreeViewer.SuiteLaunchElement;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchElementsTreeViewer.TestCaseLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -102,10 +99,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             projectText.setText(projectName);
             argumentsText.setText(robotConfig.getExecutorArguments());
             
+            TagsContentProposalsManager.clearTagProposals();
             launchElementsTreeViewer.initLaunchElements(projectName, robotConfig.getSuitePaths(),
                     robotConfig.getTestCasesNames());
 
-            clearTags();
+            clearNotSavedTags();
             includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
             for (String tag : robotConfig.getIncludedTags()) {
                 createTag(includedTagsScrolledComposite, includedTagsComposite, includedTags, tag);
@@ -388,15 +386,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                     for (final Object obj : dialog.getResult()) {
                         final IPath pathToAdd = ((IResource) obj).getProjectRelativePath();
                         final String suiteName = RobotLaunchConfigurationDelegate.createSuiteName(((IResource) obj));
-                        SuiteLaunchElement suiteElement = new SuiteLaunchElement(pathToAdd.toPortableString(),
-                                suiteName, new ArrayList<TestCaseLaunchElement>());
-                        if (obj instanceof IFile) {
-                            launchElementsTreeViewer.createTestCasesLaunchElements((IFile) obj, suiteName, suiteElement,
-                                    null);
-                        } else {
-                            suiteElement.setIsFolder(true);
-                        }
-                        launchElementsTreeViewer.addSuiteElement(suiteElement);
+                        launchElementsTreeViewer.addSuiteElement(obj, pathToAdd.toPortableString(), suiteName);
                     }
                     updateLaunchConfigurationDialog();
                 }
@@ -412,10 +402,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 final List<SuiteLaunchElement> selectedElements = Selections.getElements(
                         (IStructuredSelection) launchElementsTreeViewer.getViewer().getSelection(), SuiteLaunchElement.class);
                 if (!selectedElements.isEmpty()) {
-                    launchElementsTreeViewer.getTreeViewerInput().removeAll(selectedElements);
-                    launchElementsTreeViewer.getViewer().setInput(
-                            launchElementsTreeViewer.getTreeViewerInput().toArray(
-                                    new SuiteLaunchElement[launchElementsTreeViewer.getTreeViewerInput().size()]));
+                    launchElementsTreeViewer.removeSuiteElements(selectedElements);
                     updateLaunchConfigurationDialog();
                 }
             }
@@ -459,9 +446,10 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Composite addTagComposite = new Composite(tagsComposite, SWT.NONE);
         GridDataFactory.fillDefaults().applyTo(addTagComposite);
         GridLayoutFactory.fillDefaults().numColumns(2).spacing(1, 0).applyTo(addTagComposite);
-        
+
         final Text tagNameTxt = new Text(addTagComposite, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(false, false).hint(60, SWT.DEFAULT).applyTo(tagNameTxt);
+        TagsContentProposalsManager.install(tagNameTxt);
         
         final Button addTagBtn = new Button(addTagComposite, SWT.PUSH);
         addTagBtn.setImage(ImagesManager.getImage(RedImages.getAddImage()));
@@ -471,7 +459,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             
             @Override
             public void widgetSelected(SelectionEvent e) {
-                createTag(parent, tagsComposite, tags, tagNameTxt.getText());
+                createTag(parent, tagsComposite, tags, tagNameTxt.getText().trim());
                 tagNameTxt.setText("");
             }
         });
@@ -494,7 +482,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             newTag.setBackground(tagsComposite.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
             newTag.setBackgroundMode(SWT.INHERIT_FORCE);
             GridDataFactory.fillDefaults().grab(false, false).applyTo(newTag);
-            GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(newTag);
+            GridLayoutFactory.fillDefaults().numColumns(2).spacing(1, 0).applyTo(newTag);
             
             final CLabel newTagLabel = new CLabel(newTag, SWT.NONE);
             newTagLabel.setImage(ImagesManager.getImage(RedImages.getTagImage()));
@@ -525,7 +513,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         }
     }
     
-    private void clearTags() {
+    private void clearNotSavedTags() {
         includedTags.clear();
         excludedTags.clear();
         Control[] children = includedTagsComposite.getChildren();
@@ -537,4 +525,5 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             children[i].dispose();
         }
     }
+
 }
