@@ -36,9 +36,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class LaunchElementsTreeViewer {
 
     private CheckboxTreeViewer treeViewer;
@@ -95,9 +100,9 @@ public class LaunchElementsTreeViewer {
         }
     }
     
-    public void createTestCasesLaunchElements(final IFile suiteFile, final String suiteName,
+    private void createTestCasesLaunchElements(final IFile suiteFile, final String suiteName,
             final SuiteLaunchElement suiteElement, final List<String> testCasesFromLaunchConfig) {
-        final List<RobotCase> testCasesFromSuite = extractTestCasesFromSuiteFile(suiteFile);
+        final List<RobotCase> testCasesFromSuite = extractTestCasesFromSuiteFile(suiteFile, suiteElement);
         boolean hasAllTestCasesIncludedInLaunchConfig = true;
         if (testCasesFromLaunchConfig != null) {
             hasAllTestCasesIncludedInLaunchConfig = hasAllTestCasesIncluded(testCasesFromLaunchConfig, testCasesFromSuite, suiteName);
@@ -115,30 +120,54 @@ public class LaunchElementsTreeViewer {
         }
     }
     
-    private List<RobotCase> extractTestCasesFromSuiteFile(final IFile suiteFile) {
+    private List<RobotCase> extractTestCasesFromSuiteFile(final IFile suiteFile, final SuiteLaunchElement suiteElement) {
         final List<RobotCase> testCasesList = newArrayList();
         final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(suiteFile);
         if (robotSuiteFile != null) {
-            for (RobotElement robotSection : robotSuiteFile.getSections()) {
+            TagsContentProposalsManager.extractTagProposalsFromSettingsTable(robotSuiteFile);
+            for (RobotSuiteFileSection robotSection : robotSuiteFile.getSections()) {
                 if (robotSection instanceof RobotCasesSection) {
-                   for(RobotElement testCasesElement : robotSection.getChildren()) {
-                       if (testCasesElement instanceof RobotCase) {
-                           testCasesList.add((RobotCase)testCasesElement);
-                       }
-                   }
-                   return testCasesList;
+                    for (RobotElement testCasesElement : robotSection.getChildren()) {
+                        if (testCasesElement instanceof RobotCase) {
+                            testCasesList.add((RobotCase) testCasesElement);
+                            TagsContentProposalsManager.extractTagProposalsFromTestCaseTable(testCasesElement,
+                                    suiteElement.getPath());
+                        }
+                    }
+                    return testCasesList;
                 }
             }
         }
         return testCasesList;
     }
     
-    public void addSuiteElement(final SuiteLaunchElement element) {
-        if (!treeViewerInput.contains(element)) {
-            treeViewerInput.add(element);
+    public void addSuiteElement(final Object dialogResult, final String suitePath, final String suiteName) {
+
+        SuiteLaunchElement suiteElement = new SuiteLaunchElement(suitePath, suiteName,
+                new ArrayList<TestCaseLaunchElement>());
+        if (dialogResult instanceof IFile) {
+            createTestCasesLaunchElements((IFile) dialogResult, suiteName, suiteElement, null);
+        } else {
+            suiteElement.setIsFolder(true);
+        }
+
+        if (!treeViewerInput.contains(suiteElement)) {
+            treeViewerInput.add(suiteElement);
             treeViewer.setInput(treeViewerInput.toArray(new SuiteLaunchElement[treeViewerInput.size()]));
             treeViewer.refresh();
         }
+    }
+    
+    public void removeSuiteElements(List<SuiteLaunchElement> selectedElements) {
+        final List<String> suitesPathList = new ArrayList<>();
+        for (SuiteLaunchElement suiteLaunchElement : selectedElements) {
+            suitesPathList.add(suiteLaunchElement.getPath());
+        }
+        TagsContentProposalsManager.removeTagsProposals(suitesPathList);
+        
+        treeViewerInput.removeAll(selectedElements);
+        treeViewer.setInput(treeViewerInput.toArray(new SuiteLaunchElement[treeViewerInput.size()]));
+        treeViewer.refresh();
     }
 
     public void setLaunchElementsChecked(final boolean isChecked) {
