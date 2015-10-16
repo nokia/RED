@@ -26,7 +26,7 @@ public abstract class ATokenRecognizer {
 
     public boolean hasNext(StringBuilder newText, int currentLineNumber) {
         if (m == null || lineNumber != currentLineNumber
-                || text.toString().equals(newText.toString())) {
+                || !text.toString().equals(newText.toString())) {
             m = pattern.matcher(newText);
             this.text = newText;
             this.lineNumber = currentLineNumber;
