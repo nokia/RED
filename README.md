@@ -19,12 +19,14 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 * support for plugins via Eclipse mechanisms
 
 ## Look & feel
-* Text editor & project view
-![](https://raw.github.com/j00zef/RED/master/doc/img/red_overview_source_1.png)
-* Table editor
+Text editor & project view
+![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_source_1.png)
 
-* Debug perspective
+Table editor
+![](https://github.com/nokia/RED/blob/master/doc/img/red_testcases_table.png)
 
+Debug perspective
+![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_debug.png)
 
 ## Binaries distribution
 RED will be distributed as Eclipse feature to be installed on existing Eclipse platform. 
