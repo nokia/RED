@@ -195,6 +195,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 // get separator for this line
                 ALineSeparator separator = tokenSeparatorBuilder
                         .createSeparator(lineNumber, currentLineText);
+                line.setSeparatorType(separator.getProducedType());
                 RobotToken rt = null;
 
                 int textLength = currentLineText.length();
@@ -213,12 +214,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // '|' pipe separator
                             if (remainingData > 0
                                     || utility.shouldGiveEmptyToProcess(
-                                            currentSeparator,
-                                            tokenSeparatorBuilder
-                                                    .createSeparator(
-                                                            lineNumber,
-                                                            currentLineText),
-                                            line, processingState)) {
+                                            separator, currentSeparator, line,
+                                            currentLineText, processingState)) {
                                 String rawText = text.substring(
                                         lastColumnProcessed, startColumn);
 
