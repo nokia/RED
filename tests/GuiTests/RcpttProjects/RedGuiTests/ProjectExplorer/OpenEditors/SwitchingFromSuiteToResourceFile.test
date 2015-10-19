@@ -1,0 +1,146 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _a-5zUB8dEeWYlfCPyvfohw
+Element-Name: SwitchingFromSuiteToResourceFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _YROtsHKDEeWGwMKsQg8irg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/15/15 2:13 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
+    | select "ScriptWithResource/BigScript.robot" | double-click
+
+//Remove only Test Case section line
+with [get-editor "BigScript.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 13 18
+        select-range 13 19 13 1
+        key-type BackSpace
+        key-type "M1+s"
+    }
+}
+//check window
+get-window "File content mismatch" 
+    | get-label ".*" -index 1 
+    | get-property caption 
+    | equals "The file BigScript.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+    + "Click OK to save and reopen editor or cancel saving" | verify-true 
+get-window "File content mismatch" | get-button OK | click
+
+//check caret postion and if tes case tab was removed
+with [get-editor "BigScript.robot"] {
+    with [get-text-viewer] {
+        get-property "caretPosition.line" | equals 1 | verify-true
+        get-property "caretPosition.column" | equals 1 | verify-true
+    }
+    with [get-tab-folder] {
+        get-property "pages[0]" | equals Keywords | verify-true
+        get-property "pages[1]" | equals Settings | verify-true
+        get-property "pages[2]" | equals Variables | verify-true
+        get-property "pages[3]" | equals Source | verify-true
+        get-property activePage | equals Source | verify-true
+        get-property tabCount | equals 4 | verify-true
+    }
+}
+
+//check if file content is the same
+get-editor "BigScript.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n"
+    + "Resource  my_keywords.robot\n"
+    + "Test Setup  my_setup\n"
+    + "Test Teardown  Join text\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n\n"
+    + "\tLog   ${long_name_global_value} \n\n\n"
+    + "test2\n"
+    + "\t[Documentation]  This is second test\n"
+    + "\t\n"
+    + "\t@{list2}=  Create List  20  21  22  23  24 \n"
+    + "\tAppend To List  ${list2}  25   26\n"
+    + "\tInsert Into List   ${list2}  0   beginning\n"
+    + "\t\n"
+    + "\t${a}=    Set Variable    test2\n"
+    + "\t${bytes}=  Convert To Bytes  89\n"
+    + "\tShould Be Equal   10  10\n"
+    + "\tSum Two Values  5  5\n"
+    + "\tLog\t${a}\n"
+    + "\t\n"
+    + "\t\n"
+    + "failing test\n"
+    + "\t[TAGs]  NOT_WORKING\n"
+    + "\t#Thi test will fail\n"
+    + "   Log  lol\n"
+    + "   Should Be True   True\n"
+    + "   Should Be Empty  \"I am not empty haha!\"\n"
+    + "   Should Be True   True\n\n\n"
+    + "convert to lower case\n"
+    + "\t${small_letter} =   convert text   MONITOR\n"
+    + "\tShould Be Equal  ${small_letter}  monitor\n\n"
+    + "make dict\n"
+    + "\t${dict} = \tCreate Dictionary \tname \tvalue\n"
+    + "\t${values} = \tGet Dictionary Values \t${dict}\n"
+    + "\tSet To Dictionary \t${dict} \tnowy \tldlld\n"
+    + "\t\n"
+    + "\t\n"
+    + "check resource\n"
+    + "\t${res}=  Validate string   string1    string2\n\n"
+    + "\t\n"
+    + "keyword are lowercase from resource\n"
+    + "\tvalidate string\t abc  def\n\n"
+    + "double loop\n"
+    + "\t:FOR  ${item}  in range  3\n"
+    + "\t\\ \tLog  ${item}\n"
+    + "\t\\\tMy loop\n"
+    + "\t\n"
+    + "*** Keywords ***\n\n"
+    + "Sum Two Values\n"
+    + "    [Arguments]    ${expression}    ${expected}\n"
+    + "    \n"
+    + "    Should Contain  text5  ${expected}\n"
+    + "    Should be equal   ${expression}    ${expected}\n"
+    + "    ${a}=    Set Variable    inna\n\n"
+    + "    Should Contain  text  x\n"
+    + "    \n"
+    + "    Log   ${expression}=6\n"
+    + "    \n"
+    + "convert text\n"
+    + "\t[Arguments]    ${text}\n"
+    + "\tLog  ${text}\n"
+    + "    ${text}=  Convert To Lowercase  ${text}\n"
+    + "  \t[Return]  ${text}\n\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}\n\n"
+    + "My loop\n"
+    + "\t:FOR  ${i}  in range  2\n"
+    + "\t\\\t\n"
+    + "\t\\ \t${eval}=  Evaluate  ${i} +5\n"
+    + "\t\n"
+    + "\t\n"
+    + "my_setup\n"
+    + "\tLog  setup my" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

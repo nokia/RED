@@ -1,0 +1,113 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ejsFwHPtEeWGwMKsQg8irg
+Element-Name: MarkersOnResourceFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Vq8JMHM5EeWGwMKsQg8irg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/19/15 4:33 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-if-no-markers-exists" [val test_name]{
+	concat $RCPTT_project_path "/Logs/markers.txt" | let [val marker_log_path -input]{
+		if [get-file [uri-from-path $marker_log_path] | get exists]{
+			delete-file [uri-from-path  $marker_log_path] 
+		}
+		write-lines  -uri [uri-from-path $marker_log_path]
+	
+	
+		get-editor $test_name| get-text-viewer | let [val viewer -input]{
+			$viewer| get-property "getLineCount()" -raw  |int | let [val line_number -input] {
+		 		repeat [val index] -times $line_number -command{
+		 		
+			 		if [plus $index 1 | eq 1]{
+						with $viewer {
+						    get-property "markers['1'][0].line" | equals 1 | verify-true
+						    get-property "markers['1'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.quickdiffUnchanged" | verify-true		     
+						}
+					}-else{
+				 		try {
+				 			$viewer | get-property [format "markers['%s'][0].line" [plus $index 1 ] ]| equals [plus $index 1] | verify-true
+				 			concat [plus $index 1] "," | write-lines  -uri [uri-from-path $marker_log_path] -append
+				 		
+				 		}-catch{
+				 		
+						}
+					}
+				}
+			}
+		
+		}
+	
+		if [read-lines -uri [uri-from-path $marker_log_path]  |  length |gt 0 ]{
+			read-lines -uri [uri-from-path $marker_log_path]  |  length  | eq 0 | assert-true -message  [concat [read-lines -uri [uri-from-path $marker_log_path]]]
+			delete-file [uri-from-path  $marker_log_path] 
+		}
+		
+	}
+
+}
+
+//open editor for Suite end check if no error is shown
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" | double-click
+}
+check-if-no-markers-exists -test_name "TestFile.robot"
+
+//open resource
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/resource_file.robot" | select "RobotProject/resource_file.robot" | double-click
+}
+
+
+with [get-editor "resource_file.robot" | get-text-viewer] {
+    get-property "markers['7'][0].text" | equals "The setting 'Test Setup' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['10'][0].text" | equals "The setting 'Suite Setup' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['11'][0].text" | equals "The setting 'Suite Teardown' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['8'][0].text" | equals "The setting 'Test Teardown' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['12'][0].text" | equals "The setting 'Force Tags' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['13'][0].text" | equals "The setting 'Default Tags' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['14'][0].text" | equals "The setting 'Test Template' is not supported inside resource file" 
+        | verify-true
+    get-property "markers['15'][0].text" | equals "The setting 'Test Timeout' is not supported inside resource file" 
+        | verify-true
+}
+
+
+//check problems
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(9 items\\)" | get-property childCount | equals 9 | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "The setting 'Test Timeout' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "The setting 'Test Template' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "The setting 'Test Teardown' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "The setting 'Test Setup' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "The setting 'Suite Teardown' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "The setting 'Suite Setup' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+        | equals "The setting 'Metadata' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+        | equals "The setting 'Force Tags' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+        | equals "The setting 'Default Tags' is not supported inside resource file" | verify-true
+    get-item "Errors \\(9 items\\)" | get-property "getText()" | equals "Errors (9 items)" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
