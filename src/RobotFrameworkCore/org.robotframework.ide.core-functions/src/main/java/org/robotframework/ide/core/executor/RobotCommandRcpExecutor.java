@@ -36,6 +36,8 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnviron
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Optional;
+
 /**
  * @author mmarzec
  */
@@ -269,6 +271,16 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public Optional<File> getModulePath(final String moduleName) throws RobotEnvironmentException {
+        try {
+            final String path = (String) client.execute("getModulePath", newArrayList(moduleName));
+            return Optional.of(new File(path));
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to path of '" + moduleName + "' module", e);
+        }
+    }
+
     @SuppressWarnings("serial")
     static class RobotCommandExecutorException extends RuntimeException {
 
@@ -321,5 +333,4 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
         }
     }
-
 }

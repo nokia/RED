@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
+import com.google.common.base.Optional;
+
 /**
  * @author Michal Anglart
  *
@@ -18,6 +20,8 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnviron
 interface RobotCommandExecutor {
 
     List<File> getModulesSearchPaths() throws RobotEnvironmentException;
+
+    Optional<File> getModulePath(String moduleName) throws RobotEnvironmentException;
 
     Map<String, Object> getVariables(final String filePath, final String fileArguments);
 
