@@ -8,10 +8,8 @@ package org.robotframework.ide.core.testData.model.mapping;
 import java.util.List;
 import java.util.Stack;
 
-import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -54,7 +52,7 @@ public class PreviousLineHandler {
                                 continueType = LineContinueType.SETTING_TABLE_ELEMENT;
                             }
                         } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
-                                && isLastVariableCorrectOne(model)) {
+                                && containsAnyVariable(model)) {
                             continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
                         }
                     } else if (couldBeInsideExecutableTable(currentLine,
@@ -162,16 +160,8 @@ public class PreviousLineHandler {
 
 
     @VisibleForTesting
-    protected boolean isLastVariableCorrectOne(final RobotFile file) {
-        boolean result = false;
-        List<AVariable> variables = file.getVariableTable().getVariables();
-        if (!variables.isEmpty()) {
-            if (variables.get(variables.size() - 1).getModelType() != ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE) {
-                result = true;
-            }
-        }
-
-        return result;
+    protected boolean containsAnyVariable(final RobotFile file) {
+        return !file.getVariableTable().getVariables().isEmpty();
     }
 
 
