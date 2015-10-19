@@ -1,0 +1,87 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>Create Project, add test,run</h2>
+	
+	In order to start working with RED & Eclipse, you need to set up couple of things first.
+
+    Robot Perspective
+    Workspace & project
+    Create TestSuite
+        Content assistant
+    Running TestSuite
+        Console and message log
+        Execution status
+
+Robot Perspective
+
+All RED activities are performed within 2 perspectives: Robot Perspective , Debug Perspective. Former one is used to construct and execute tests, later one is for debugging test-cases.
+
+To start working with RED, you should activate Robot perspective first.
+
+    Check if you have already set Robot perspective: 
+
+     
+
+    Set perspective to Robot by issuing action: Window -> Open Perspective -> Other ... -> Robot
+
+Workspace & project
+
+Workspace stores all global Eclipse & Red preferences, if not set previously (first run or workspace path is non valid) Eclipse will show dialog to set path.
+
+User can always switch workspaces, and if necessary, perform projects import from locations outside of current workspace.
+
+Switching Workspace is done by menu action: File -> Switch Workspace ...
+
+Project is an equivalent to folder in OS, it stores files and settings relevant to a group of files. In order to work with RED, Robot Project has to be created.
+
+Create new Project can be done by:
+
+       File->New-> Robot Project (item can be found under selection Project .. -> Robot Framework -> Robot Project)
+       Right click menu on Project Explorer with selection as above
+
+If you which to import anything into Workspace ( already existing Project) or into Project (existing testcases), menu Import ... will open up wizard.
+
+Upon creating Project, you should have see similar structure in Project Explorer tree which will also indicate that RobotFramework is visible to Eclipse
+
+ 
+
+Create TestSuite
+
+To create sample test you should invoke action: File -> New -> Other ... -> Robot Framework -> Robot Test Suite. Same action can be accessed by right click menu.
+
+RED consists of 2 different modes of editing, a Table (Ride-like style) and Text style. By default Table editor is used when TestCase is used. Each main RobotFramework section is seen as separate bookmark:
+
+ 
+
+Additionally, Source tab shows text representation of TestSuite:
+
+Currently there is issue when doing editing file with Source and Table at the same time without reloading file.
+
+If you wish to edit file in Table and in Source on the same file, before using different editor it is best to save and reopen file as changes might not be visible after the editor switch.
+Content assistant
+
+Just like other modern Developments Environments, RED supports content assistance/code completion. When editing tab or item in text editor press CTRL+SPACE keys to activate hints for Keywords.
+Running TestSuite
+
+To run TestSuite, Run button needs to be selected or right-click menu on file can be issued.
+
+If you need to provide additional arguments or limit TestCases to be executed by name or tag, click on down arrow next to Run button and select Run Configurations...
+
+Console and message log
+
+During TestSuite execution, RED displays RobotFramework console and message logs. Those information are available by view Console and Message Log, by default visible in the Robot perspective or by Window -> Show View -> Other.... -> Robot
+
+If any of those 2 views are missing, best way is to reset perspective settings by using action Window -> Reset Perspective ...
+
+Execution status
+
+RED can show execution status of TestCases along with outcome result and execution time.
+
+Execution View is not in default Robot perspective thus it needs to be manually added. Visit Window-> Show View -> Robot -> Execution View
+</body>
+</html>
