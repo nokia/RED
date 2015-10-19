@@ -14,7 +14,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RedMarkerResolution;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -23,7 +22,7 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class CreateKeywordFixer extends RedMarkerResolution {
+public class CreateKeywordFixer extends RedSuiteMarkerResolution {
 
     private final String keywordName;
 
@@ -63,7 +62,7 @@ public class CreateKeywordFixer extends RedMarkerResolution {
                         ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
             }
         }
-        return null;
+        return Optional.absent();
     }
 
     private static String getLineDelimiter(final IDocument document) {

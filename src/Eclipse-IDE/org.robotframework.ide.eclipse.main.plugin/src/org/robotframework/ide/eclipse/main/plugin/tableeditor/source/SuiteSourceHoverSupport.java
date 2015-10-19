@@ -44,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 
 import com.google.common.base.Joiner;
@@ -85,10 +86,17 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                 return problem;
             }
 
-            final String hoveredText = textViewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
+            final IDocument document = textViewer.getDocument();
+            final String hoveredText = document.get(hoverRegion.getOffset(), hoverRegion.getLength());
             if (isVariable(hoveredText)) {
                 return getVariableHoverInfo(hoveredText);
             } else {
+                if (isLibrary(document, hoverRegion.getOffset(), hoveredText)) {
+                    final String libInfo = getLibraryHoverInfo(hoveredText);
+                    if (libInfo != null) {
+                        return libInfo;
+                    }
+                }
                 return getKeywordHoverInfo(hoveredText);
             }
         } catch (final BadLocationException | CoreException e) {
@@ -129,6 +137,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                 && RobotProblem.TYPE_ID.equals(((MarkerAnnotation) annotation).getMarker().getType());
     }
 
+    private static boolean isVariable(final String text) {
+        return Pattern.matches("[@$&%]\\{.+\\}", text);
+    }
+
     private String getVariableHoverInfo(final String variableName) throws DebugException {
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         for (final IDebugTarget target : launchManager.getDebugTargets()) {
@@ -152,6 +164,19 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return null;
     }
 
+    private boolean isLibrary(final IDocument document, final int offset, final String hoveredText) {
+        final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+        return lineContent.trim().startsWith("Library");
+    }
+
+    private String getLibraryHoverInfo(final String hoveredText) {
+        LibrarySpecification spec = suiteFile.getProject().getLibrariesMapping().get(hoveredText);
+        if (spec == null) {
+            spec = suiteFile.getProject().getReferencedLibrariesMapping().get(hoveredText);
+        }
+        return spec == null ? null : spec.getDocumentation();
+    }
+
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
@@ -162,10 +187,6 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             }
         }
         return null;
-    }
-
-    private static boolean isVariable(final String text) {
-        return Pattern.matches("[@$&%]\\{.+\\}", text);
     }
 
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {

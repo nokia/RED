@@ -58,6 +58,10 @@ public final class RobotModelManager {
         return InstanceHolder.INSTANCE;
     }
 
+    public RobotProject createProject(final IProject project) {
+        return model.createRobotProject(project);
+    }
+
     public RobotSuiteFile createSuiteFile(final IFile file) {
         return model.createSuiteFile(file);
     }
