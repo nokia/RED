@@ -169,6 +169,6 @@ public class DocumentUtilities {
                 DefaultScope.INSTANCE };
         final String delimiter = Platform.getPreferencesService().getString(Platform.PI_RUNTIME,
                 Platform.PREF_LINE_SEPARATOR, null, context);
-        return delimiter != null ? delimiter : "\n";
+        return delimiter != null ? delimiter : System.lineSeparator();
     }
 }

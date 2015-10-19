@@ -8,10 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -26,6 +37,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.GotoLineAction;
@@ -141,19 +154,15 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void updateLineDelimitersStatus() {
-        try {
-            final IDocument document = getDocument();
+        final IDocument document = getDocument();
 
-            final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
-                    .getStatusLineManager()
-                    .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
-            final String delimiter = document.getLineDelimiter(1);
-            find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
-        } catch (final BadLocationException e) {
-            RedPlugin.logError("Unable to recognize used line delimiters", e);
-        }
+        final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+                .getStatusLineManager()
+                .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
+        String delimiter = DocumentUtilities.getDelimiter(document);
+        find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
     }
-
+	
     private void installBreakpointTogglingOnDoubleClick() {
         getVerticalRuler().getControl().addMouseListener(new MouseAdapter() {
 
