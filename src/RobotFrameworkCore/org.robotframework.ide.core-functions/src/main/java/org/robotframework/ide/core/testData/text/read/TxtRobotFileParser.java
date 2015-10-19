@@ -37,14 +37,10 @@ import org.robotframework.ide.core.testData.model.table.mapping.VariablesDeclara
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.UnknownSettingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.mapping.library.LibraryAliasFixer;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseExecutableRowActionMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseExecutableRowArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseFinder;
-import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowActionMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowArgumentMapper;
-import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordFinder;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
@@ -214,7 +210,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // '|' pipe separator
                             if (remainingData > 0
                                     || utility.shouldGiveEmptyToProcess(
-                                            separator, currentSeparator, line,
+                                            parsingOutput, separator,
+                                            currentSeparator, line,
                                             currentLineText, processingState)) {
                                 String rawText = text.substring(
                                         lastColumnProcessed, startColumn);
@@ -477,18 +474,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
             ParsingState currentStatus = utility
                     .getCurrentStatus(processingState);
-            if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE) {
-                KeywordFinder keywordFinder = new KeywordFinder();
-                List<UserKeyword> keywordsAfterLastHeader = keywordFinder
-                        .filterByKeywordAfterLastHeader(fileModel
-                                .getKeywordTable());
-                isPrettyAlign = !keywordsAfterLastHeader.isEmpty();
-            } else if (currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE) {
-                TestCaseFinder testCaseFinder = new TestCaseFinder();
-                List<TestCase> testCasesAfterLastHeader = testCaseFinder
-                        .filterByTestCasesAfterLastHeader(fileModel
-                                .getTestCaseTable());
-                isPrettyAlign = !testCasesAfterLastHeader.isEmpty();
+            if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE
+                    || currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE) {
+                isPrettyAlign = true;
             }
 
             if (isPrettyAlign) {
