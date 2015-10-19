@@ -75,12 +75,12 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 .validate(monitor);
     }
 
-    private static Set<LibrarySpecification> collectLibraries(final RobotSuiteFile robotSuiteFile) {
+    private static Map<String, LibrarySpecification> collectLibraries(final RobotSuiteFile robotSuiteFile) {
         final RobotProject robotProject = robotSuiteFile.getProject();
         final Set<LibrarySpecification> libs = newHashSet();
         libs.addAll(robotProject.getStandardLibraries());
         libs.addAll(robotProject.getReferencedLibraries());
-        return libs;
+        return robotSuiteFile.getProject().getLibrariesMapping();
     }
 
     private static Map<ReferencedLibrary, LibrarySpecification> collectReferencedLibraries(

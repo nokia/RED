@@ -5,19 +5,25 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -33,6 +39,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -45,7 +52,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
@@ -73,6 +79,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private Button removeButton;
 
     private ControlDecoration decoration;
+
+    private RobotRuntimeEnvironment environment;
 
     @Override
     public void initialize(final Composite parent) {
@@ -154,32 +162,45 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder();
-                    final List<PythonClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath);
+
+                    final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
+                            environment);
+                    final List<PythonClass> pythonClasses = newArrayList();
                     
-                    boolean added = false;
-                    if(pythonLibStructureBuilder.isArchive()) {
-                        final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(addPythonLibButton,
-                                pythonClasses, new PythonClassesLabelProvider());
-                        if (classesDialog.open() == Window.OK) {
-                            final Object[] result = classesDialog.getResult();
-                            
-                            for (final Object selectedClass : result) {
-                                final PythonClass pythonClass = (PythonClass) selectedClass;
-                                editorInput.getProjectConfiguration().addReferencedLibraryInPython(
-                                        pythonClass.getQualifiedName(),
-                                                ImportSettingFilePathResolver.createFileRelativePath(
-                                                        PathsConverter.toWorkspaceRelativeIfPossible(
-                                                                new Path(chosenFilePath)),
-                                                currentProject.getProject().getLocation()));
-                                added = true;
+                    try {
+                        PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+
+                            @Override
+                            public void run(final IProgressMonitor monitor)
+                                    throws InvocationTargetException, InterruptedException {
+                                monitor.beginTask("Reading classes from module '" + chosenFilePath + "'", 100);
+                                pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath));
                             }
-                        } 
-                    } else {
-                        for (final PythonClass pythonClass : pythonClasses) {
+                        });
+                    } catch (InvocationTargetException | InterruptedException e1) {
+                        // that's fine
+                    }
+
+                    if (pythonClasses.isEmpty()) {
+                        MessageDialog.openError(viewer.getTable().getShell(), "No classes found",
+                                "RED was unable to find classes inside '" + chosenFilePath + "' module");
+                        return;
+                    }
+                    boolean added = false;
+                    final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(
+                            addPythonLibButton, pythonClasses, new PythonClassesLabelProvider());
+                    if (classesDialog.open() == Window.OK) {
+                        final Object[] result = classesDialog.getResult();
+
+                        for (final Object selectedClass : result) {
+                            final PythonClass pythonClass = (PythonClass) selectedClass;
+                            final IPath path = new Path(chosenFilePath);
+                            final IPath pathWithoutModuleName = chosenFilePath.endsWith("__init__.py")
+                                    ? path.removeLastSegments(2) : path.removeLastSegments(1);
+
                             editorInput.getProjectConfiguration().addReferencedLibraryInPython(
                                     pythonClass.getQualifiedName(),
-                                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath)));
+                                    PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName));
                             added = true;
                         }
                     }
@@ -201,8 +222,28 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.jar" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final List<JarClass> classesFromJar = new JarStructureBuilder()
-                            .provideEntriesFromJarFile(chosenFilePath);
+                    final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder();
+                    final List<JarClass> classesFromJar = newArrayList();
+                    try {
+                        PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+
+                            @Override
+                            public void run(final IProgressMonitor monitor)
+                                    throws InvocationTargetException, InterruptedException {
+                                monitor.beginTask("Reading classes from module '" + chosenFilePath + "'", 100);
+                                classesFromJar.addAll(jarStructureBuilder.provideEntriesFromJarFile(chosenFilePath));
+                            }
+                        });
+                    } catch (InvocationTargetException | InterruptedException e1) {
+                        // that's fine
+                    }
+
+                    if (classesFromJar.isEmpty()) {
+                        MessageDialog.openError(viewer.getTable().getShell(), "No classes found",
+                                "RED was unable to find classes inside '" + chosenFilePath + "' module");
+                        return;
+                    }
+
                     final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(addJavaLibButton,
                             classesFromJar, new JarClassesLabelProvider());
 
@@ -278,6 +319,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     void whenEnvironmentWasLoaded(final RobotRuntimeEnvironment env) {
+        this.environment = env;
+
         final boolean isEditable = editorInput.isEditable();
         final boolean projectIsInterpretedByJython = env.getInterpreter() == SuiteExecutor.Jython;
 

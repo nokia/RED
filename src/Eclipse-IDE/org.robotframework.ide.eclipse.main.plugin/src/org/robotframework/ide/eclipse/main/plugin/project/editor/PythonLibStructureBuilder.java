@@ -6,48 +6,34 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 
 class PythonLibStructureBuilder {
     
-    private boolean isArchive;
+    private final RobotRuntimeEnvironment environment;
+
+    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
+        this.environment = environment;
+    }
 
     public List<PythonClass> provideEntriesFromFile(final String path) {
-        final List<PythonClass> pythonClasses = newArrayList();
         
-        if (isPythonClass(path)) {
-            pythonClasses.add(PythonClass.create(new File(path).getName()));
-        } else {
-            try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(path))) {
-                ZipEntry entry = zipStream.getNextEntry();
-                if (entry != null) {
-                    isArchive = true;
-                }
-                while (entry != null) {
-                    if (isPythonClass(entry.getName())) {
-                        pythonClasses.add(PythonClass.create(entry.getName()));
-                    }
-                    entry = zipStream.getNextEntry();
-                }
-            } catch (final IOException e) {
-                return pythonClasses;
+        final List<String> classes = environment.getClassesDefinedInModule(new File(path));
+        return newArrayList(transform(classes, new Function<String, PythonClass>() {
+            @Override
+            public PythonClass apply(final String name) {
+                return PythonClass.create(name);
             }
-        }
-        return pythonClasses;
-    }
-
-    private boolean isPythonClass(final String entryName) {
-        return entryName.endsWith(".py") && !entryName.contains("__init__");
-    }
-
-    public boolean isArchive() {
-        return isArchive;
+        }));
     }
 
     static class PythonClass {
@@ -58,9 +44,21 @@ class PythonLibStructureBuilder {
         }
 
         private static PythonClass create(final String name) {
-            final String nameWithoutExtension = name.substring(0, name.length() - ".py".length());
-            final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
-            return new PythonClass(qualifiedName);
+            final List<String> splitted = newArrayList(Splitter.on('.').splitToList(name));
+            if (splitted.size() > 1) {
+                final String last = splitted.get(splitted.size() - 1);
+                final String beforeLast = splitted.get(splitted.size() - 2);
+
+                // ROBOT requires whole qualified name of class if it is defined with different name
+                // than module
+                // containing it in module
+                if (last.equals(beforeLast)) {
+                    splitted.remove(splitted.size() - 1);
+                }
+                return new PythonClass(Joiner.on('.').join(splitted));
+            } else {
+                return new PythonClass(name);
+            }
         }
 
         public String getQualifiedName() {

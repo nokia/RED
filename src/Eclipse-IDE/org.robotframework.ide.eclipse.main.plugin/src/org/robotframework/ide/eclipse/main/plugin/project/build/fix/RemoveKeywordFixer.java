@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RedMarkerResolution;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -26,7 +25,7 @@ import com.google.common.collect.Range;
  * @author Michal Anglart
  *
  */
-public class RemoveKeywordFixer extends RedMarkerResolution {
+public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
 
     private final String keywordName;
 

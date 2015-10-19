@@ -29,7 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 
 public class ValidationContext {
 
@@ -39,7 +38,7 @@ public class ValidationContext {
 
     private final Set<String> accessibleKeywords;
 
-    private final Set<LibrarySpecification> librarySpecifications;
+    private final Map<String, LibrarySpecification> librarySpecifications;
 
     private final Map<ReferencedLibrary, LibrarySpecification> referencedLibrarySpecifications;
 
@@ -48,7 +47,7 @@ public class ValidationContext {
         this.runtimeEnvironment = project.getRuntimeEnvironment();
         this.version = RobotVersion.from(project.getVersion());
         this.accessibleKeywords = newHashSet();
-        this.librarySpecifications = newHashSet();
+        this.librarySpecifications = newHashMap();
         this.referencedLibrarySpecifications = newHashMap();
     }
 
@@ -68,20 +67,12 @@ public class ValidationContext {
         return ImmutableSet.copyOf(accessibleKeywords);
     }
 
-    public void setLibrarySpecifications(final Collection<LibrarySpecification> specs) {
-        librarySpecifications.addAll(specs);
-    }
-
-    public ImmutableSet<LibrarySpecification> getLibrarySpecifications() {
-        return ImmutableSet.copyOf(librarySpecifications);
+    public void setLibrarySpecifications(final Map<String, LibrarySpecification> specs) {
+        librarySpecifications.putAll(specs);
     }
 
     public Map<String, LibrarySpecification> getLibrarySpecificationsAsMap() {
-        final Map<String, LibrarySpecification> mapping = Maps.newHashMap();
-        for (final LibrarySpecification specification : getLibrarySpecifications()) {
-            mapping.put(specification.getName(), specification);
-        }
-        return mapping;
+        return librarySpecifications;
     }
 
     public void setReferencedLibrarySpecifications(final Map<ReferencedLibrary, LibrarySpecification> mapping) {

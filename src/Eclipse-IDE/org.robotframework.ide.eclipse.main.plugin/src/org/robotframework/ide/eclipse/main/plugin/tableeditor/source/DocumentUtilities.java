@@ -146,6 +146,15 @@ public class DocumentUtilities {
         return i;
     }
 
+    public static String lineContentBeforeCurrentPosition(final IDocument document, final int offset) {
+        try {
+            final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+            return document.get(lineInfo.getOffset(), offset - lineInfo.getOffset());
+        } catch (final BadLocationException e) {
+            throw new IllegalStateException("Unable to get line content at offset " + offset, e);
+        }
+    }
+
     public static String getDelimiter(final IDocument document) {
         try {
             final String delimiter = document.getLineDelimiter(0);

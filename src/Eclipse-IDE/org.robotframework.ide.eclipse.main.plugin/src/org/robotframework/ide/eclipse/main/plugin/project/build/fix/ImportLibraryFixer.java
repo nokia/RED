@@ -28,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RedMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
@@ -41,7 +40,7 @@ import com.google.common.collect.Iterables;
  * @author Michal Anglart
  *
  */
-public class ImportLibraryFixer extends RedMarkerResolution {
+public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
     public static Collection<IMarkerResolution> createFixers(final IMarker marker) {
         final IFile file = (IFile) marker.getResource();
