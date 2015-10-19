@@ -6,11 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
@@ -327,13 +329,18 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibrariesMapping()
                 .entrySet()) {
             for (final IPath path : PathsResolver.resolveToAbsolutePath(this, toImportPathOrName)) {
-                if (path.equals(
-                        PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(entry.getKey().getPath())))) {
+                if (createPossiblePaths(entry.getKey().getPath(), entry.getKey().getName()).contains(path)) {
                     return entry.getValue();
                 }
             }
         }
         return null;
+    }
+
+    private static Set<IPath> createPossiblePaths(final String path, final String className) {
+        return newHashSet(
+                PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + "/")),
+                PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + ".py")));
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {

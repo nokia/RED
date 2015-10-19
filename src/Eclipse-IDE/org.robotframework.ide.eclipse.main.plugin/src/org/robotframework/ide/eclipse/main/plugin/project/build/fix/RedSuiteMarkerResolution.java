@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
+package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -27,7 +27,7 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public abstract class RedMarkerResolution implements IMarkerResolution {
+public abstract class RedSuiteMarkerResolution implements IMarkerResolution {
 
     @Override
     public final void run(final IMarker marker) {

@@ -5,8 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -36,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibraryConstru
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Michal Anglart
@@ -187,24 +192,30 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
                 for (final IPath p : PathsResolver.resolveToAbsolutePath(suiteFile, path.getText().toString())) {
-                    if (p.equals(PathsConverter
-                            .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(entry.getKey().getPath())))) {
+                    if (createPossiblePaths(entry.getKey().getPath(), entry.getKey().getName()).contains(p)) {
                         specification = entry.getValue();
                     }
                 }
             }
-            validateWithSpec(imported, specification, path, monitor);
+            validateWithSpec(imported, specification, path, monitor, true);
+        }
+
+        private static Set<IPath> createPossiblePaths(final String path, final String className) {
+            return newHashSet(
+                    PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + "/")),
+                    PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + ".py")));
         }
 
         @Override
         protected void validateNameImport(final AImported imported, final RobotToken name,
                 final IProgressMonitor monitor) throws CoreException {
             validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(name.getText().toString()),
-                    name, monitor);
+                    name, monitor, false);
         }
 
         private void validateWithSpec(final AImported imported, final LibrarySpecification specification,
-                final RobotToken pathOrNameToken, final IProgressMonitor monitor) throws CoreException {
+                final RobotToken pathOrNameToken, final IProgressMonitor monitor, final boolean isPath)
+                        throws CoreException {
             if (specification != null) {
                 final List<RobotToken> arguments = ((LibraryImport) imported).getArguments();
                 final LibraryConstructor constructor = specification.getConstructor();
@@ -214,9 +225,12 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 new KeywordCallArgumentsValidator(suiteFile.getFile(), pathOrNameToken, reporter, descriptor, arguments)
                         .validate(monitor);
             } else {
+                final String pathOrName = pathOrNameToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_LIBRARY)
-                        .formatMessageWith(pathOrNameToken.getText().toString());
-                reporter.handleProblem(problem, suiteFile.getFile(), pathOrNameToken);
+                        .formatMessageWith(pathOrName);
+                final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", pathOrName, "isPath",
+                        isPath);
+                reporter.handleProblem(problem, suiteFile.getFile(), pathOrNameToken, additional);
             }
         }
     }

@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.RedMarkerResolution;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -26,7 +25,7 @@ import com.google.common.collect.Range;
  * @author Michal Anglart
  *
  */
-public class RemoveVariableFixer extends RedMarkerResolution {
+public class RemoveVariableFixer extends RedSuiteMarkerResolution {
 
     private final String variableName;
 
