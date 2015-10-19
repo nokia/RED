@@ -53,7 +53,7 @@
       <wizard
             category="org.robotframework.red.wizards.import.category"
             class="org.robotframework.ide.eclipse.main.plugin.wizards.ImportRobotProjectWizard"
-            icon="resources/new_robot_project.png"
+            icon="resources/import_robot_project.png"
             id="org.robotframework.red.wizards.import.project"
             name="Robot Project">
          <description>
