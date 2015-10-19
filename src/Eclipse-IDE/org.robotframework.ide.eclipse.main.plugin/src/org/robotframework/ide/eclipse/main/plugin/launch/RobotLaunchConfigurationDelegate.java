@@ -130,8 +130,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
         if (resources.size() == 1) {
             final String resourceName = resources.get(0).getName();
+            final String projectName = resources.get(0).getProject().getName();
             for (final ILaunchConfiguration configuration : launchConfigs) {
-                if (configuration.getName().equals(resourceName)) {
+                if (configuration.getName().equals(resourceName)
+                        && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
                     return configuration;
                 }
             }
