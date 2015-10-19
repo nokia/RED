@@ -1,0 +1,146 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SwitchingFromSuiteToResourceAndBack
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: __TFz8HJoEeWGwMKsQg8irg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/15/15 2:05 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open Suite file and add content
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+    
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "new test\n"
+    + "    Log  1\n"
+    + "    \n"
+    + "*** Settings ***\n"
+    + "Library  Collections\n\n"
+    + "*** Keywords ***\n"
+    + "new keyword\n"
+    + "    Log  2\n"
+    + "    \n"
+    + "*** Variables ***\n"
+    + "${a}  7" 
+    
+    
+    
+//remove Test Case section - will be Resource
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 10
+    select-range 3 11 1 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+
+//check window
+with [get-window "File content mismatch"] {
+     get-label ".*" -index 1 
+        | get-property caption 
+        | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+        + "Click OK to save and reopen editor or cancel saving" | verify-true
+    with [get-button OK] {
+        get-property caption | equals OK | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button Cancel] {
+        get-property caption | equals Cancel | verify-true
+        get-property selected | equals false | verify-true
+    }
+}
+get-window "File content mismatch" | get-button OK | click
+
+
+//check if Test Case tab was removed
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals Keywords | verify-true
+    get-property "pages[1]" | equals Settings | verify-true
+    get-property "pages[2]" | equals Variables | verify-true
+    get-property "pages[3]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+}
+
+//check decorator
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/TestFile.robot" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/file_robot.png" | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "image.decorations[0].path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
+}  
+
+//add test cases at the end
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 11 8
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    type-text "test at the end"
+    key-type Enter
+    key-type Tab
+    type-text "Log  3"
+    key-type "M1+s"
+}
+
+//check window
+with [get-window "File content mismatch"] {
+    get-label ".*" -index 1 
+        | get-property caption 
+        | equals "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.\n\n"
+        + "Click OK to save and reopen editor or cancel saving" | verify-true
+    get-button OK | get-property caption | equals OK | verify-true
+    with [get-button Cancel] {
+        get-property caption | equals Cancel | verify-true
+        get-property selected | equals false | verify-true
+    }
+}     
+get-window "File content mismatch" | get-button OK | click
+
+
+//check if Test case tab was added again
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+//check file content after opening
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  Collections\n\n"
+    + "*** Keywords ***\n"
+    + "new keyword\n"
+    + "    Log  2\n"
+    + "    \n"
+    + "*** Variables ***\n"
+    + "${a}  7\n\n"
+    + "*** Test Cases ***\n"
+    + "test at the end\n"
+    + "    Log  3" | verify-true
+
+//check caret position
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 1 | verify-true
+    get-property "caretPosition.column" | equals 1 | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
