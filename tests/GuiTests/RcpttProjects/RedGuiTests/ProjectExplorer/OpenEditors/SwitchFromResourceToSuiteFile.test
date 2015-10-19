@@ -1,0 +1,102 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SwitchFromResourceToSuiteFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nWFw0HJ_EeWGwMKsQg8irg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/15/15 2:02 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add Resource file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Resource file" 
+    | click
+with [get-window "New Robot Resource file"] {
+    get-editbox -after [get-label "File name:"] | set-text "resource.robot"
+    get-button Finish | click
+}
+//check if it is Resource file
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/resource.robot" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/file_robot.png" | verify-true
+    get-item "RobotProject/resource.robot" | get-property "image.decorations[0].path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
+}    
+//check tab items
+with [get-editor "resource.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals Keywords | verify-true
+    get-property "pages[1]" | equals Settings | verify-true
+    get-property "pages[2]" | equals Variables | verify-true
+    get-property "pages[3]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+}
+   
+    
+//add Test Case section    
+with [get-editor "resource.robot" | get-text-viewer] {
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    key-type "M1+s"
+}
+
+//check if window is shown
+with [get-window "File content mismatch"] {
+    get-label "The file resource.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.Click OK to save and reopen editor or cancel saving" 
+        | get-property caption 
+        | equals "The file resource.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.\n\n"
+        + "Click OK to save and reopen editor or cancel saving" | verify-true
+    get-button OK | get-property selected | equals false | verify-true
+    get-button Cancel | get-property selected | equals false | verify-true
+}
+get-window "File content mismatch" | get-button OK | click
+
+//check if file is now Suite file
+get-view "Project Explorer" | get-tree | get-item "RobotProject/resource.robot" | get-property "image.path" 
+    | equals "org.robotframework.ide.eclipse.main.plugin/resources/file_robot.png" | verify-true
+try -times 1-command{
+
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item "RobotProject/resource.robot" | get-property "image.decorations[0].path" 
+	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
+	}
+
+}-catch{
+
+	str "OK! Decorator was not found" |eq "OK! Decorator was not found" | verify-true
+}
+
+//check Source text and caret position
+with [get-editor "resource.robot" | get-text-viewer] {
+    get-property text | equals "*** Test Cases ***" | verify-true
+    get-property "caretPosition.line" | equals 1 | verify-true
+    get-property "caretPosition.column" | equals 1 | verify-true
+}
+
+//check if Test Case tab was added
+with [get-editor "resource.robot"] {
+    get-text-viewer | get-property text | equals "*** Test Cases ***" | verify-true
+    with [get-tab-folder] {
+        get-property "pages[0]" | equals "Test Cases" | verify-true
+        get-property "pages[1]" | equals Keywords | verify-true
+        get-property "pages[2]" | equals Settings | verify-true
+        get-property "pages[3]" | equals Variables | verify-true
+        get-property "pages[4]" | equals Source | verify-true
+        get-property activePage | equals Source | verify-true
+        get-property tabCount | equals 5 | verify-true
+    }
+}
+
+
+get-editor "resource.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+with [get-editor "resource.robot" | get-tree] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "...add new test case" | verify-true
+}
+get-editor "resource.robot" | get-canvas | get-property "getMessage()" | equals "" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
