@@ -30,6 +30,8 @@ import org.robotframework.ide.core.execution.ExecutionElementsParser;
 import org.robotframework.ide.core.execution.IExecutionHandler;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 
 
 public class RobotRuntimeEnvironment {
@@ -246,7 +248,6 @@ public class RobotRuntimeEnvironment {
         });
     }
 
-
     private RobotRuntimeEnvironment(final File location, final String version) {
         this.location = location;
         this.version = version;
@@ -298,6 +299,19 @@ public class RobotRuntimeEnvironment {
             }
         }
         return newArrayList();
+    }
+
+    public Optional<File> getModulePath(final String moduleName) {
+        if (hasRobotInstalled()) {
+            try {
+                return PythonInterpretersCommandExecutors.getInstance()
+                        .getRobotCommandExecutor((PythonInstallationDirectory) location)
+                        .getModulePath(moduleName);
+            } catch (final RobotEnvironmentException e) {
+                return Optional.absent();
+            }
+        }
+        return Optional.absent();
     }
 
     public String getVersion(final SuiteExecutor executor) {
@@ -419,6 +433,45 @@ public class RobotRuntimeEnvironment {
             }
         }
         return null;
+    }
+
+    /**
+     * Return names of python classes contained in module point by argument and all
+     * of its submodules. For packages-module __init__.py file path should be provided.
+     * 
+     * @param moduleLocation
+     * @return
+     */
+    public List<String> getClassesDefinedInModule(final File moduleLocation) {
+        // DO NOT split & move to direct/rpc executors since this code may import quite a lot of
+        // modules;
+        // maybe we could restart xml-rpc server from time to time; then we can consider moving this
+        try {
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("module_classes_printer.py");
+
+            if (scriptFile != null) {
+                final String interpreterPath = location.toPath()
+                        .resolve(((PythonInstallationDirectory) location).getInterpreter().executableName())
+                        .toAbsolutePath()
+                        .toString();
+
+                final List<String> cmdLine = Arrays.asList(interpreterPath,
+                        scriptFile.getAbsolutePath(), moduleLocation.getAbsolutePath());
+                final List<String> classes = newArrayList();
+                final ILineHandler linesHandler = new ILineHandler() {
+
+                    @Override
+                    public void processLine(final String line) {
+                        classes.add(line);
+                    }
+                };
+                final int result = RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
+                return result == 0 ? classes : Lists.<String> newArrayList();
+            }
+            return newArrayList();
+        } catch (final IOException e) {
+            return newArrayList();
+        }
     }
 
     public Map<String, Object> getGlobalVariables() {
