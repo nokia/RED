@@ -210,7 +210,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             // '|' pipe separator
                             if (remainingData > 0
                                     || utility.shouldGiveEmptyToProcess(
-                                            separator, currentSeparator, line,
+                                            parsingOutput, separator,
+                                            currentSeparator, line,
                                             currentLineText, processingState)) {
                                 String rawText = text.substring(
                                         lastColumnProcessed, startColumn);

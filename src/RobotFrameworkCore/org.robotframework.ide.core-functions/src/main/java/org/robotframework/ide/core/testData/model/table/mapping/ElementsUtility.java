@@ -622,15 +622,20 @@ public class ElementsUtility {
     }
 
 
-    public boolean shouldGiveEmptyToProcess(final ALineSeparator separator,
-            final Separator currentSeparator, final RobotLine robotLine,
-            String line, final Stack<ParsingState> processingState) {
+    public boolean shouldGiveEmptyToProcess(
+            final RobotFileOutput parsingOutput,
+            final ALineSeparator separator, final Separator currentSeparator,
+            final RobotLine robotLine, String line,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        if (currentSeparator.getStartColumn() > 0) {
-            if (separator.getProducedType() == SeparatorType.PIPE) {
+        if (separator.getProducedType() == SeparatorType.PIPE
+                && currentSeparator.getStartColumn() == 0) {
+            result = false;
+        } else {
+            // simple logic: if was something before and something after
+            // also exists, we treat data as to process
 
-            }
         }
 
         return result;
