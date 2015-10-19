@@ -19,8 +19,13 @@ def checkServerAvailability():
     pass
 
 def getModulesSearchPaths():
-    import robot
+    import robot    # Robot will add some paths to PYTHONPATH
     return sys.path
+    
+def getModulePath(moduleName):
+    import imp
+    _, path, _ = imp.find_module(moduleName)
+    return path
     
 def getVariables(dir, args):
     import robot
@@ -157,6 +162,7 @@ if __name__ == "__main__":
     
     server = SimpleXMLRPCServer((IP, PORT),allow_none=True)
     server.register_function(getModulesSearchPaths, "getModulesSearchPaths")
+    server.register_function(getModulePath, "getModulePath")
     server.register_function(getVariables, "getVariables")
     server.register_function(getGlobalVariables, "getGlobalVariables")
     server.register_function(getStandardLibrariesNames, "getStandardLibrariesNames")
