@@ -45,6 +45,23 @@
       </wizard>
    </extension>
    <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.robotframework.red.wizards.import.category"
+            name="Robot Framework">
+      </category>
+      <wizard
+            category="org.robotframework.red.wizards.import.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.ImportRobotProjectWizard"
+            icon="resources/new_robot_project.png"
+            id="org.robotframework.red.wizards.import.project"
+            name="Robot Project">
+         <description>
+            Import folder with Robot files as project into the workspace
+         </description>
+      </wizard>
+   </extension>
+   <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
