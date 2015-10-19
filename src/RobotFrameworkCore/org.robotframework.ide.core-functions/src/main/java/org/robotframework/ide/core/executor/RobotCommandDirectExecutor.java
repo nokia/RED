@@ -20,6 +20,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnviron
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -262,6 +263,25 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             }));
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to obtain modules search paths", e);
+        }
+    }
+
+    @Override
+    public Optional<File> getModulePath(final String moduleName) throws RobotEnvironmentException {
+        final StringBuilder pathOutput = new StringBuilder();
+        final ILineHandler linesHandler = new ILineHandler() {
+
+            @Override
+            public void processLine(final String line) {
+                pathOutput.append(line);
+            }
+        };
+        try {
+            final String script = "\"import imp; _,path,_ = imp.find_module(" + moduleName + ");print(path)\"";
+            RobotRuntimeEnvironment.runExternalProcess(Arrays.asList(interpreterPath, "-c", script), linesHandler);
+            return Optional.of(new File(pathOutput.toString()));
+        } catch (final IOException e) {
+            throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
 }
