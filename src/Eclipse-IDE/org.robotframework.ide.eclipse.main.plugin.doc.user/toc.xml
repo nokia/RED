@@ -2,5 +2,11 @@
 <toc label="RED Robot Editor User Guide" topic="user_guide.html">
 	<topic href="doc/red_overview.html" label="RED Overview" >	</topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
-	<topic href="doc/first_steps.html" label="First steps with RED">	</topic>
+	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
+		<topic href="doc/first_steps/download_install.html" label="Download&install"></topic>
+		<topic href="doc/first_steps/eclipse_principles.html" label="Eclipse principles"></topic>
+		<topic href="doc/first_steps/create_run.html" label="Create project,add test,run"></topic>
+		<topic href="doc/first_steps/debug.html" label="Debug"></topic>
+		
+	</topic>
 </toc>
