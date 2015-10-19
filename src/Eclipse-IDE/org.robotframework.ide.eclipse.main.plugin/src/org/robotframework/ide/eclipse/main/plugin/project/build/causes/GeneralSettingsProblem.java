@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
         @Override
         public String getProblemDescription() {
-            return "Unknwon '%s' setting";
+            return "Unknown '%s' setting";
         }
     },
     UNSUPPORTED_SETTING {
@@ -70,6 +71,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Unknown '%s' library";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String nameOrPath = marker.getAttribute("name", null);
+            final boolean isPath = marker.getAttribute("isPath", false);
+            return newArrayList(new AddLibraryToRedXmlFixer(nameOrPath, isPath));
         }
     },
     SETTING_ARGUMENTS_NOT_APPLICABLE {

@@ -127,6 +127,17 @@ public class RobotProject extends RobotContainer {
         return refLibsSpecs;
     }
 
+    public Map<String, LibrarySpecification> getLibrariesMapping() {
+        final Map<String, LibrarySpecification> mapping = newHashMap();
+        for (final LibrarySpecification specification : getStandardLibraries()) {
+            mapping.put(specification.getName(), specification);
+        }
+        for (final LibrarySpecification specification : getReferencedLibraries()) {
+            mapping.put(specification.getName(), specification);
+        }
+        return mapping;
+    }
+
     public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMapping() {
         readProjectConfigurationIfNeeded();
         if (configuration == null) {
