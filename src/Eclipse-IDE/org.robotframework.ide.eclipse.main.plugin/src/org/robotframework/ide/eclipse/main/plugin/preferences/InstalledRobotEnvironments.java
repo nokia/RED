@@ -12,8 +12,8 @@ import java.util.List;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -70,7 +70,7 @@ public class InstalledRobotEnvironments {
 
     private static List<RobotRuntimeEnvironment> createRuntimeEnvironments(final String prefValue) {
         if (Strings.isNullOrEmpty(prefValue)) {
-            return null;
+            return newArrayList();
         }
         final List<String> all = newArrayList(prefValue.split(";"));
         final List<RobotRuntimeEnvironment> envs = newArrayList(Iterables.transform(all, new Function<String, RobotRuntimeEnvironment>() {
