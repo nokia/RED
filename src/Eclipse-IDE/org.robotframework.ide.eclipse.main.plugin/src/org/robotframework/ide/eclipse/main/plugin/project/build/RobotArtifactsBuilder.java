@@ -64,7 +64,7 @@ public class RobotArtifactsBuilder {
 
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
-                        return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Unable to build project", e);
+                        return new Status(IStatus.OK, RedPlugin.PLUGIN_ID, "Unable to build project", e);
                     } finally {
                         monitor.done();
                     }
