@@ -9,6 +9,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
@@ -138,6 +139,44 @@ public class RobotProject extends RobotContainer {
         return mapping;
     }
 
+    public Map<String, LibrarySpecification> getStandardLibrariesMapping() {
+        final Map<String, LibrarySpecification> mapping = newHashMap();
+        for (final LibrarySpecification specification : getStandardLibraries()) {
+            final String libName = specification.getName();
+            if ("Remote".equals(libName)) {
+                mapping.put(libName + " " + specification.getAdditionalInformation(), specification);
+            } else {
+                mapping.put(libName, specification);
+            }
+        }
+        return mapping;
+    }
+
+    public synchronized Map<String, LibrarySpecification> getStandardLibrariesMappingWithNulls() {
+        final Map<String, LibrarySpecification> mapping = newHashMap();
+        readProjectConfigurationIfNeeded();
+        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
+        if (env == null || configuration == null) {
+            return mapping;
+        }
+        
+        final Map<String, LibrarySpecification> specs = getStandardLibrariesMapping();
+        
+        for (final String libName : env.getStandardLibrariesNames()) {
+            if ("Remote".equals(libName)) {
+                final String name = libName + " " + specs.get(libName).getAdditionalInformation();
+                mapping.put(name, specs.get(name));
+            } else {
+                mapping.put(libName, specs.get(libName));
+            }
+        }
+        for (final RemoteLocation remoteLocation : configuration.getRemoteLocations()) {
+            final String name = "Remote " + remoteLocation.getUri();
+            mapping.put(name, specs.get(name));
+        }
+        return mapping;
+    }
+
     public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMapping() {
         readProjectConfigurationIfNeeded();
         if (configuration == null) {
@@ -150,6 +189,20 @@ public class RobotProject extends RobotContainer {
             if (spec != null) {
                 spcs.put(library, spec);
             }
+        }
+        return spcs;
+    }
+
+    public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMappingWithNulls() {
+        readProjectConfigurationIfNeeded();
+        if (configuration == null) {
+            return newHashMap();
+        }
+
+        final Map<ReferencedLibrary, LibrarySpecification> spcs = newLinkedHashMap();
+        for (final ReferencedLibrary library : configuration.getLibraries()) {
+            final LibrarySpecification spec = libToSpec(getProject()).apply(library);
+            spcs.put(library, spec);
         }
         return spcs;
     }
