@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.core.execution.context;
 
 import java.util.List;
@@ -8,6 +13,10 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class ExecutableRowFindersManager {
 
     private ExecutableRowFindersManager() {
