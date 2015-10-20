@@ -21,12 +21,13 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
     private final List<RobotToken> comment = new LinkedList<>();
     private final VariableScope scope = VariableScope.GLOBAL;
     private final String robotRepresentation;
-    private T value;
+    private final T value;
 
 
-    public ARobotInternalVariable(final String name, final VariableType type) {
+    public ARobotInternalVariable(final String name, final T value, final VariableType type) {
         this.name = name;
         this.type = type;
+        this.value = value;
         if (!this.name.startsWith(type.getIdentificator())) {
             this.robotRepresentation = type.getIdentificator() + '{' + name
                     + '}';
@@ -36,11 +37,13 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
     }
 
 
+    @Override
     public String getName() {
         return name;
     }
 
 
+    @Override
     public VariableType getType() {
         return type;
     }
@@ -51,16 +54,12 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
     }
 
 
-    public void setValue(T value) {
-        this.value = value;
-    }
-
-
     public String getRobotRepresentation() {
         return robotRepresentation;
     }
 
 
+    @Override
     public VariableScope getScope() {
         return scope;
     }
@@ -81,7 +80,7 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
 
 
     @Override
-    public void addCommentPart(RobotToken rt) {
+    public void addCommentPart(final RobotToken rt) {
         // nothing to do
     }
 

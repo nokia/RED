@@ -13,7 +13,7 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable.Vari
 public class DictionaryRobotInternalVariable extends
         ARobotInternalVariable<Map<String, ?>> {
 
-    public DictionaryRobotInternalVariable(String name) {
-        super(name, VariableType.DICTIONARY);
+    public DictionaryRobotInternalVariable(final String name, final Map<String, ?> value) {
+        super(name, value, VariableType.DICTIONARY);
     }
 }
