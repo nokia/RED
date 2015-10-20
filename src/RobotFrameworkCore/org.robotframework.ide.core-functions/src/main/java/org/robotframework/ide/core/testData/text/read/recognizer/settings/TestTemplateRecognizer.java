@@ -23,4 +23,10 @@ public class TestTemplateRecognizer extends ATokenRecognizer {
     public TestTemplateRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new TestTemplateRecognizer();
+    }
 }

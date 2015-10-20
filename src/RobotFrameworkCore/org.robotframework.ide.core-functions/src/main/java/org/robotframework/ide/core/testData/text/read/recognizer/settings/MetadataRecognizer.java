@@ -21,4 +21,10 @@ public class MetadataRecognizer extends ATokenRecognizer {
     public MetadataRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_METADATA_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new MetadataRecognizer();
+    }
 }

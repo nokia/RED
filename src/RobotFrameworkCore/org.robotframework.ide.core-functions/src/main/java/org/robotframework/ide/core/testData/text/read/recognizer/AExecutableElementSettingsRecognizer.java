@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class AExecutableElementSettingsRecognizer extends ATokenRecognizer {
+public abstract class AExecutableElementSettingsRecognizer extends
+        ATokenRecognizer {
 
     private final static Pattern BRACKET_EXTRACTION = Pattern
             .compile("(?!\\[)([^\\]])+(?!\\\\])");

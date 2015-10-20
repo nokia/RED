@@ -23,4 +23,10 @@ public class DefaultTagsRecognizer extends ATokenRecognizer {
     public DefaultTagsRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new DefaultTagsRecognizer();
+    }
 }

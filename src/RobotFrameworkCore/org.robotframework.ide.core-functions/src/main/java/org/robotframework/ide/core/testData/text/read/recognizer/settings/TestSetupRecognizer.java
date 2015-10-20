@@ -27,4 +27,10 @@ public class TestSetupRecognizer extends ATokenRecognizer {
     public TestSetupRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_TEST_SETUP_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new TestSetupRecognizer();
+    }
 }

@@ -21,4 +21,10 @@ public class LibraryAliasRecognizer extends ATokenRecognizer {
     public LibraryAliasRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_LIBRARY_ALIAS);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new LibraryAliasRecognizer();
+    }
 }

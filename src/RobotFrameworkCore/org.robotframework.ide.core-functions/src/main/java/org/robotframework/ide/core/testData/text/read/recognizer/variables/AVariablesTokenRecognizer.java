@@ -13,7 +13,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognize
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class AVariablesTokenRecognizer extends ATokenRecognizer {
+public abstract class AVariablesTokenRecognizer extends ATokenRecognizer {
 
     private static final String TEMPLATE = "[ ]?[" + "%s" + "]"
             + "(\\s*)[{].*([}]$|$)";
