@@ -23,4 +23,10 @@ public class ForceTagsRecognizer extends ATokenRecognizer {
     public ForceTagsRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new ForceTagsRecognizer();
+    }
 }

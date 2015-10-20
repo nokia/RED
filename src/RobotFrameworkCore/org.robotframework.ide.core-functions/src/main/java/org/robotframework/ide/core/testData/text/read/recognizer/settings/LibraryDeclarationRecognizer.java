@@ -21,4 +21,10 @@ public class LibraryDeclarationRecognizer extends ATokenRecognizer {
     public LibraryDeclarationRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_LIBRARY_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new LibraryDeclarationRecognizer();
+    }
 }

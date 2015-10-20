@@ -23,4 +23,10 @@ public class TestTimeoutRecognizer extends ATokenRecognizer {
     public TestTimeoutRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new TestTimeoutRecognizer();
+    }
 }

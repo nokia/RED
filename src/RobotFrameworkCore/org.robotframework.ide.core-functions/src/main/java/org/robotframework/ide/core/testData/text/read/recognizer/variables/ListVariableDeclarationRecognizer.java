@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.text.read.recognizer.variables;
 
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 
 
 public class ListVariableDeclarationRecognizer extends
@@ -13,5 +14,11 @@ public class ListVariableDeclarationRecognizer extends
 
     public ListVariableDeclarationRecognizer() {
         super(VariableType.LIST);
+    }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new ListVariableDeclarationRecognizer();
     }
 }

@@ -23,4 +23,10 @@ public class SettingsTableHeaderRecognizer extends ATokenRecognizer {
     public SettingsTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.SETTINGS_TABLE_HEADER);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new SettingsTableHeaderRecognizer();
+    }
 }

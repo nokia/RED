@@ -23,4 +23,10 @@ public class TestCasesTableHeaderRecognizer extends ATokenRecognizer {
     public TestCasesTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.TEST_CASES_TABLE_HEADER);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new TestCasesTableHeaderRecognizer();
+    }
 }

@@ -262,5 +262,12 @@ public class ATokenRecognizerTest {
         public DummyTokenRecognizer(Pattern p, RobotTokenType type) {
             super(p, type);
         }
+
+
+        @Override
+        public ATokenRecognizer newInstance() {
+            // added only for compile
+            return null;
+        }
     }
 }

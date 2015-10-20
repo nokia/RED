@@ -23,4 +23,10 @@ public class KeywordsTableHeaderRecognizer extends ATokenRecognizer {
     public KeywordsTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new KeywordsTableHeaderRecognizer();
+    }
 }

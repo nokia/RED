@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.text.read.recognizer.variables;
 
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 
 
 public class DictionaryVariableDeclarationRecognizer extends
@@ -13,5 +14,11 @@ public class DictionaryVariableDeclarationRecognizer extends
 
     public DictionaryVariableDeclarationRecognizer() {
         super(VariableType.DICTIONARY);
+    }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new DictionaryVariableDeclarationRecognizer();
     }
 }
