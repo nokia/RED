@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -62,7 +64,7 @@ public class RobotArtifactsBuilder {
 
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
-                        return new Status(IStatus.CANCEL, RedPlugin.PLUGIN_ID, "Unable to build libraries", e);
+                        return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Unable to build libraries", e);
                     } finally {
                         monitor.done();
                     }
@@ -130,8 +132,9 @@ public class RobotArtifactsBuilder {
 
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
+            final File location = configuration.providePythonLocation();
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_MISSING)
-                    .formatMessageWith(configuration.providePythonLocation());
+                    .formatMessageWith(location == null ? "" : location.getAbsolutePath());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
         } else if (!runtimeEnvironment.isValidPythonInstallation()) {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_NOT_A_PYTHON)
