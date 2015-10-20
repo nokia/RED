@@ -45,7 +45,7 @@ public class ValidationContext {
     public ValidationContext(final IFile file) {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         this.runtimeEnvironment = project.getRuntimeEnvironment();
-        this.version = RobotVersion.from(project.getVersion());
+        this.version = runtimeEnvironment != null ? RobotVersion.from(project.getVersion()) : null;
         this.accessibleKeywords = newHashSet();
         this.librarySpecifications = newHashMap();
         this.referencedLibrarySpecifications = newHashMap();
