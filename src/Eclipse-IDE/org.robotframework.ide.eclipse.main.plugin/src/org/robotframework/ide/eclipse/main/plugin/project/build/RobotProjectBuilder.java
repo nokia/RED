@@ -44,7 +44,8 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 buildJob.schedule();
                 buildJob.join();
 
-                if (buildJob.getResult().getSeverity() == IStatus.CANCEL) {
+                if (buildJob.getResult().getSeverity() == IStatus.CANCEL
+                        || buildJob.getResult().getSeverity() == IStatus.ERROR) {
                     RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
