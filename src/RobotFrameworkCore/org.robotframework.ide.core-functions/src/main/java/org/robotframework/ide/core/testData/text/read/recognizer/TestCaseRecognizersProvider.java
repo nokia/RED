@@ -32,6 +32,12 @@ public class TestCaseRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        return recognized;
+        List<ATokenRecognizer> recognizersProvided = new LinkedList<>();
+        synchronized (recognized) {
+            for (ATokenRecognizer rec : recognized) {
+                recognizersProvided.add(rec.newInstance());
+            }
+        }
+        return recognizersProvided;
     }
 }
