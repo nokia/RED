@@ -49,7 +49,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                     RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
-                        return new IProject[0];
+                        return null;
                     }
                 }
                 RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
@@ -65,7 +65,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             } finally {
                 progressMonitor.done();
             }
-            return new IProject[0];
+            return null;
         } finally {
             monitor.worked(1);
         }
