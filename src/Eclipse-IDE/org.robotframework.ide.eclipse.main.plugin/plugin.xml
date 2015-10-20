@@ -277,12 +277,6 @@
             name="Execution View"
             restorable="true">
       </view>
-      <view
-            class="org.robotframework.red.tmp.ModelViewWrapper"
-            id="org.robotframework.ide.eclipse.main.plugin.view1"
-            name="Model"
-            restorable="true">
-      </view>
  </extension>
  <extension
        point="org.eclipse.debug.core.launchConfigurationTypes">
