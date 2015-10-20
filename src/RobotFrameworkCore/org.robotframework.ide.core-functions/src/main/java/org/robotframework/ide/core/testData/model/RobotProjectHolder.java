@@ -74,8 +74,7 @@ public class RobotProjectHolder {
                 final Map<String, Object> value = convert((Map<?, ?>) varValue);
                 variables.add(new DictionaryRobotInternalVariable(varName, value));
             } else {
-                final String value = (String) varValue;
-                variables.add(new ScalarRobotInternalVariable(varName, value));
+                variables.add(new ScalarRobotInternalVariable(varName, "" + varValue));
             }
         }
         return variables;
