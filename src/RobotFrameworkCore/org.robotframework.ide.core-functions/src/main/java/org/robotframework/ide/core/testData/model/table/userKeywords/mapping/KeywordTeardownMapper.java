@@ -34,7 +34,6 @@ public class KeywordTeardownMapper extends AKeywordSettingDeclarationMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
-        types.add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
 
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));

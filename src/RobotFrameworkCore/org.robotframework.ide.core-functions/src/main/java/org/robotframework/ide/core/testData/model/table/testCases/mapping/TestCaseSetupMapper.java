@@ -33,7 +33,6 @@ public class TestCaseSetupMapper extends ATestCaseSettingDeclarationMapper {
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_SETUP);
-        types.add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
 
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));

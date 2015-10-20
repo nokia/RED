@@ -33,7 +33,6 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
             String text) {
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_SETTING_RETURN);
-        types.add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
 
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
