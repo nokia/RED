@@ -6,11 +6,11 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
@@ -50,66 +50,52 @@ public class RobotProjectHolder {
 
 
     public List<ARobotInternalVariable<?>> getGlobalVariables() {
-
         return globalVariables;
     }
 
 
     @VisibleForTesting
     protected void initGlobalVariables() {
-        Map<?, ?> variables = robotRuntime.getGlobalVariables();
+        final Map<String, Object> variables = robotRuntime == null ? new HashMap<String, Object>()
+                : robotRuntime.getGlobalVariables();
         globalVariables.addAll(map(variables));
     }
 
 
-    @SuppressWarnings("rawtypes")
-    private List<ARobotInternalVariable<?>> map(final Map<?, ?> varsRead) {
-        List<ARobotInternalVariable<?>> variables = new LinkedList<>();
-        Set<?> variablesNames = varsRead.keySet();
-        for (Object varName : variablesNames) {
-            Object varValue = varsRead.get(varName);
-            ARobotInternalVariable<?> var;
+    private List<ARobotInternalVariable<?>> map(final Map<String, Object> varsRead) {
+        final List<ARobotInternalVariable<?>> variables = new LinkedList<>();
+        for (final String varName : varsRead.keySet()) {
+            final Object varValue = varsRead.get(varName);
+
             if (varValue instanceof List) {
-                ListRobotInternalVariable listVar = new ListRobotInternalVariable(
-                        "" + varName);
-                listVar.setValue((List) varValue);
-                var = listVar;
+                final List<?> value = (List<?>) varValue;
+                variables.add(new ListRobotInternalVariable(varName, value));
             } else if (varValue instanceof Map) {
-                DictionaryRobotInternalVariable dictVar = new DictionaryRobotInternalVariable(
-                        "" + varName);
-                dictVar.setValue(convert((Map) varValue));
-                var = dictVar;
+                final Map<String, Object> value = convert((Map<?, ?>) varValue);
+                variables.add(new DictionaryRobotInternalVariable(varName, value));
             } else {
-                ScalarRobotInternalVariable scalarVar = new ScalarRobotInternalVariable(
-                        "" + varName);
-                scalarVar.setValue("" + varValue);
-                var = scalarVar;
+                final String value = (String) varValue;
+                variables.add(new ScalarRobotInternalVariable(varName, value));
             }
-
-            variables.add(var);
         }
-
         return variables;
     }
 
 
-    private Map<String, Object> convert(@SuppressWarnings("rawtypes") Map m) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        @SuppressWarnings("rawtypes")
-        Set keySet = m.keySet();
-        for (Object key : keySet) {
+    private Map<String, Object> convert(final Map<?, ?> m) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+        for (final Object key : m.keySet()) {
             map.put("" + key, m.get(key));
         }
-
         return map;
     }
 
 
     public void addModelFile(final RobotFileOutput robotOutput) {
         if (robotOutput != null) {
-            File processedFile = robotOutput.getProcessedFile();
+            final File processedFile = robotOutput.getProcessedFile();
             if (processedFile != null) {
-                RobotFileOutput file = findFileByName(processedFile);
+                final RobotFileOutput file = findFileByName(processedFile);
                 removeModelFile(file);
             }
 
@@ -125,7 +111,7 @@ public class RobotProjectHolder {
 
     public void addImportedResources(
             final List<ResourceImportReference> referenced) {
-        for (ResourceImportReference ref : referenced) {
+        for (final ResourceImportReference ref : referenced) {
             addImportedResource(ref);
         }
     }
@@ -143,7 +129,7 @@ public class RobotProjectHolder {
 
 
     public boolean shouldBeLoaded(final File file) {
-        RobotFileOutput foundFile = findFileByName(file);
+        final RobotFileOutput foundFile = findFileByName(file);
         return (foundFile == null)
                 || (file.lastModified() != foundFile
                         .getLastModificationEpochTime());
@@ -152,10 +138,10 @@ public class RobotProjectHolder {
 
     public List<RobotFileOutput> findFilesWithImportedVariableFile(
             final File variableFile) {
-        List<RobotFileOutput> found = new LinkedList<>();
-        List<Integer> foundFiles = findFile(new SearchByVariablesImport(
+        final List<RobotFileOutput> found = new LinkedList<>();
+        final List<Integer> foundFiles = findFile(new SearchByVariablesImport(
                 variableFile));
-        for (Integer fileId : foundFiles) {
+        for (final Integer fileId : foundFiles) {
             found.add(readableProjectFiles.get(fileId));
         }
 
@@ -173,11 +159,11 @@ public class RobotProjectHolder {
 
 
         @Override
-        public boolean matchCriteria(RobotFileOutput robotFile) {
+        public boolean matchCriteria(final RobotFileOutput robotFile) {
             boolean matchResult = false;
-            List<VariablesFileImportReference> varImports = robotFile
+            final List<VariablesFileImportReference> varImports = robotFile
                     .getVariablesImportReferences();
-            for (VariablesFileImportReference variablesFileImportReference : varImports) {
+            for (final VariablesFileImportReference variablesFileImportReference : varImports) {
                 if (variablesFileImportReference.getVariablesFile()
                         .getAbsolutePath().equals(toFound.getAbsolutePath())) {
                     matchResult = true;
@@ -193,7 +179,7 @@ public class RobotProjectHolder {
 
     public RobotFileOutput findFileByName(final File file) {
         RobotFileOutput found = null;
-        List<Integer> findFile = findFile(new SearchByName(file));
+        final List<Integer> findFile = findFile(new SearchByName(file));
         if (!findFile.isEmpty()) {
             found = readableProjectFiles.get(findFile.get(0));
         }
@@ -212,7 +198,7 @@ public class RobotProjectHolder {
 
 
         @Override
-        public boolean matchCriteria(RobotFileOutput robotFile) {
+        public boolean matchCriteria(final RobotFileOutput robotFile) {
             return (robotFile.getProcessedFile().getAbsolutePath()
                     .equals(toFound.getAbsolutePath()));
         }
@@ -220,10 +206,10 @@ public class RobotProjectHolder {
 
 
     protected List<Integer> findFile(final ISearchCriteria criteria) {
-        List<Integer> foundFiles = new LinkedList<>();
-        int size = readableProjectFiles.size();
+        final List<Integer> foundFiles = new LinkedList<>();
+        final int size = readableProjectFiles.size();
         for (int i = 0; i < size; i++) {
-            RobotFileOutput robotFile = readableProjectFiles.get(i);
+            final RobotFileOutput robotFile = readableProjectFiles.get(i);
             if (criteria.matchCriteria(robotFile)) {
                 foundFiles.add(i);
                 break;
