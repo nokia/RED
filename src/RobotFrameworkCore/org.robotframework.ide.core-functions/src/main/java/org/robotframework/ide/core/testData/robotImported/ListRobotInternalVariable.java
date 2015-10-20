@@ -12,7 +12,7 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable.Vari
 
 public class ListRobotInternalVariable extends ARobotInternalVariable<List<?>> {
 
-    public ListRobotInternalVariable(String name) {
-        super(name, VariableType.LIST);
+    public ListRobotInternalVariable(final String name, final List<?> value) {
+        super(name, value, VariableType.LIST);
     }
 }

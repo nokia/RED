@@ -10,7 +10,7 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable.Vari
 
 public class ScalarRobotInternalVariable extends ARobotInternalVariable<String> {
 
-    public ScalarRobotInternalVariable(String name) {
-        super(name, VariableType.SCALAR);
+    public ScalarRobotInternalVariable(final String name, final String value) {
+        super(name, value, VariableType.SCALAR);
     }
 }
