@@ -6,13 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,8 +45,8 @@ public class RobotProject extends RobotContainer {
 
     private RobotProjectHolder projectHolder;
     
-    private List<LibrarySpecification> stdLibsSpecs;
-    private List<LibrarySpecification> refLibsSpecs;
+    private Map<String, LibrarySpecification> stdLibsSpecs;
+    private Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs;
     private List<ReferencedVariableFile> referencedVariableFiles;
     
     private RobotProjectConfig configuration;
@@ -81,6 +80,13 @@ public class RobotProject extends RobotContainer {
         return env == null ? "???" : env.getVersion();
     }
 
+    public Collection<LibrarySpecification> getLibrariesSpecifications() {
+        final List<LibrarySpecification> specifications = newArrayList();
+        specifications.addAll(getStandardLibraries().values());
+        specifications.addAll(getReferencedLibraries().values());
+        return newArrayList(filter(specifications, Predicates.notNull()));
+    }
+
     public synchronized boolean hasStandardLibraries() {
         readProjectConfigurationIfNeeded();
         if (stdLibsSpecs != null && !stdLibsSpecs.isEmpty()) {
@@ -89,20 +95,22 @@ public class RobotProject extends RobotContainer {
         return configuration != null;
     }
 
-    public synchronized List<LibrarySpecification> getStandardLibraries() {
+    public synchronized Map<String, LibrarySpecification> getStandardLibraries() {
         if (stdLibsSpecs != null) {
             return stdLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
         if (env == null || configuration == null) {
-            return newArrayList();
+            return newLinkedHashMap();
         }
-
-        stdLibsSpecs = newArrayList(filter(transform(configuration.getRemoteLocations(), remoteLibToSpec(getProject())),
-                Predicates.<LibrarySpecification> notNull()));
-        stdLibsSpecs.addAll(newArrayList(filter(transform(env.getStandardLibrariesNames(), stdLibToSpec(getProject())),
-                Predicates.<LibrarySpecification> notNull())));
+        stdLibsSpecs = newLinkedHashMap();
+        for (final String stdLib : env.getStandardLibrariesNames()) {
+            stdLibsSpecs.put(stdLib, stdLibToSpec(getProject()).apply(stdLib));
+        }
+        for (final RemoteLocation location : configuration.getRemoteLocations()) {
+            stdLibsSpecs.put("Remote " + location.getUri(), remoteLibToSpec(getProject()).apply(location));
+        }
         return stdLibsSpecs;
     }
 
@@ -114,97 +122,19 @@ public class RobotProject extends RobotContainer {
         return configuration != null && configuration.hasReferencedLibraries();
     }
 
-    public synchronized List<LibrarySpecification> getReferencedLibraries() {
+    public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibraries() {
         if (refLibsSpecs != null) {
             return refLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
         if (configuration == null) {
-            return newArrayList();
+            return newLinkedHashMap();
         }
-
-        refLibsSpecs = newArrayList(filter(transform(configuration.getLibraries(), libToSpec(getProject())),
-                Predicates.<LibrarySpecification> notNull()));
+        refLibsSpecs = newLinkedHashMap();
+        for (final ReferencedLibrary library : configuration.getLibraries()) {
+            refLibsSpecs.put(library, libToSpec(getProject()).apply(library));
+        }
         return refLibsSpecs;
-    }
-
-    public Map<String, LibrarySpecification> getLibrariesMapping() {
-        final Map<String, LibrarySpecification> mapping = newHashMap();
-        for (final LibrarySpecification specification : getStandardLibraries()) {
-            mapping.put(specification.getName(), specification);
-        }
-        for (final LibrarySpecification specification : getReferencedLibraries()) {
-            mapping.put(specification.getName(), specification);
-        }
-        return mapping;
-    }
-
-    public Map<String, LibrarySpecification> getStandardLibrariesMapping() {
-        final Map<String, LibrarySpecification> mapping = newHashMap();
-        for (final LibrarySpecification specification : getStandardLibraries()) {
-            final String libName = specification.getName();
-            if ("Remote".equals(libName)) {
-                mapping.put(libName + " " + specification.getAdditionalInformation(), specification);
-            } else {
-                mapping.put(libName, specification);
-            }
-        }
-        return mapping;
-    }
-
-    public synchronized Map<String, LibrarySpecification> getStandardLibrariesMappingWithNulls() {
-        final Map<String, LibrarySpecification> mapping = newHashMap();
-        readProjectConfigurationIfNeeded();
-        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        if (env == null || configuration == null) {
-            return mapping;
-        }
-        
-        final Map<String, LibrarySpecification> specs = getStandardLibrariesMapping();
-        
-        for (final String libName : env.getStandardLibrariesNames()) {
-            if ("Remote".equals(libName)) {
-                final String name = libName + " " + specs.get(libName).getAdditionalInformation();
-                mapping.put(name, specs.get(name));
-            } else {
-                mapping.put(libName, specs.get(libName));
-            }
-        }
-        for (final RemoteLocation remoteLocation : configuration.getRemoteLocations()) {
-            final String name = "Remote " + remoteLocation.getUri();
-            mapping.put(name, specs.get(name));
-        }
-        return mapping;
-    }
-
-    public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMapping() {
-        readProjectConfigurationIfNeeded();
-        if (configuration == null) {
-            return newHashMap();
-        }
-
-        final Map<ReferencedLibrary, LibrarySpecification> spcs = newHashMap();
-        for (final ReferencedLibrary library : configuration.getLibraries()) {
-            final LibrarySpecification spec = libToSpec(getProject()).apply(library);
-            if (spec != null) {
-                spcs.put(library, spec);
-            }
-        }
-        return spcs;
-    }
-
-    public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrariesMappingWithNulls() {
-        readProjectConfigurationIfNeeded();
-        if (configuration == null) {
-            return newHashMap();
-        }
-
-        final Map<ReferencedLibrary, LibrarySpecification> spcs = newLinkedHashMap();
-        for (final ReferencedLibrary library : configuration.getLibraries()) {
-            final LibrarySpecification spec = libToSpec(getProject()).apply(library);
-            spcs.put(library, spec);
-        }
-        return spcs;
     }
 
     private static Function<String, LibrarySpecification> stdLibToSpec(final IProject project) {
@@ -350,14 +280,16 @@ public class RobotProject extends RobotContainer {
     }
     
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
-        return isLibraryFrom(spec, getStandardLibraries());
+        final Map<String, LibrarySpecification> stdLibs = getStandardLibraries();
+        return isLibraryFrom(spec, stdLibs == null ? null : stdLibs.values());
     }
     
     public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
-        return isLibraryFrom(spec, getReferencedLibraries());
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = getReferencedLibraries();
+        return isLibraryFrom(spec, refLibs == null ? null : refLibs.values());
     }
 
-    private boolean isLibraryFrom(final LibrarySpecification spec, final List<LibrarySpecification> libs) {
+    private boolean isLibraryFrom(final LibrarySpecification spec, final Collection<LibrarySpecification> libs) {
         if (libs == null) {
             return false;
         }
