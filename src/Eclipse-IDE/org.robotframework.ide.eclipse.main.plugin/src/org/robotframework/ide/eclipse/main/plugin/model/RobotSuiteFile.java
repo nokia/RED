@@ -304,14 +304,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
 
         final List<LibrarySpecification> imported = newArrayList();
-        for (final LibrarySpecification spec : getProject().getStandardLibraries()) {
+        for (final LibrarySpecification spec : getProject().getLibrariesSpecifications()) {
             if (spec.isAccessibleWithoutImport() || toImport.contains(spec.getName())) {
-                imported.add(spec);
-                toImport.remove(spec.getName());
-            }
-        }
-        for (final LibrarySpecification spec : getProject().getReferencedLibraries()) {
-            if (toImport.contains(spec.getName())) {
                 imported.add(spec);
                 toImport.remove(spec.getName());
             }
@@ -326,10 +320,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibrariesMapping()
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
                 .entrySet()) {
             for (final IPath path : PathsResolver.resolveToAbsolutePath(this, toImportPathOrName)) {
-                if (createPossiblePaths(entry.getKey().getPath(), entry.getKey().getName()).contains(path)) {
+                if (entry.getValue() != null
+                        && createPossiblePaths(entry.getKey().getPath(), entry.getKey().getName()).contains(path)) {
                     return entry.getValue();
                 }
             }
