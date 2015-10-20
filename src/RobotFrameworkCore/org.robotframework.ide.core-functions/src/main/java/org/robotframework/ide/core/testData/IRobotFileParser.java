@@ -16,6 +16,9 @@ public interface IRobotFileParser {
     boolean canParseFile(final File file);
 
 
+    IRobotFileParser newInstance();
+
+
     void parse(final RobotFileOutput output, final File robotFile);
 
 

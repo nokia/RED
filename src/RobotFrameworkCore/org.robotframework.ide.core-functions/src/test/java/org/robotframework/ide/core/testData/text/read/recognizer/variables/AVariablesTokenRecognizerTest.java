@@ -42,6 +42,14 @@ public class AVariablesTokenRecognizerTest {
 
 
     @Test
+    public void test_newInstance_shouldReturn_twoDifferentInstances() {
+        ATokenRecognizer rec = new DummyTokenRecognizer();
+
+        assertThat(rec.newInstance()).isNotSameAs(rec.newInstance());
+    }
+
+
+    @Test
     public void test_getPattern() {
         // prepare
         ATokenRecognizer rec = new DummyTokenRecognizer();
@@ -63,6 +71,12 @@ public class AVariablesTokenRecognizerTest {
 
         public DummyTokenRecognizer() {
             super(TYPE);
+        }
+
+
+        @Override
+        public ATokenRecognizer newInstance() {
+            return new DummyTokenRecognizer();
         }
     }
 }

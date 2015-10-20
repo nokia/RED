@@ -27,4 +27,10 @@ public class TestTeardownRecognizer extends ATokenRecognizer {
     public TestTeardownRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new TestTeardownRecognizer();
+    }
 }

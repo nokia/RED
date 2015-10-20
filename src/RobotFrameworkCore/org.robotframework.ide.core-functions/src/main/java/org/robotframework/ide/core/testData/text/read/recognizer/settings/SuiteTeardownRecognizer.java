@@ -27,4 +27,10 @@ public class SuiteTeardownRecognizer extends ATokenRecognizer {
     public SuiteTeardownRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new SuiteTeardownRecognizer();
+    }
 }

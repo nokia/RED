@@ -114,6 +114,12 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
+    public IRobotFileParser newInstance() {
+        return new TxtRobotFileParser();
+    }
+
+
+    @Override
     public void parse(final RobotFileOutput parsingOutput,
             final InputStream inputStream, final File robotFile) {
         boolean wasProcessingError = false;

@@ -19,4 +19,10 @@ public class HashCommentRecognizer extends ATokenRecognizer {
     public HashCommentRecognizer() {
         super(EXPECTED, RobotTokenType.START_HASH_COMMENT);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new HashCommentRecognizer();
+    }
 }

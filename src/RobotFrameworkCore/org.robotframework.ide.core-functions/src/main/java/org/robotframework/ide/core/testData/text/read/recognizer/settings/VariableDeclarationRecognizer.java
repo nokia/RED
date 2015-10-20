@@ -21,4 +21,10 @@ public class VariableDeclarationRecognizer extends ATokenRecognizer {
     public VariableDeclarationRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_VARIABLES_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new VariableDeclarationRecognizer();
+    }
 }

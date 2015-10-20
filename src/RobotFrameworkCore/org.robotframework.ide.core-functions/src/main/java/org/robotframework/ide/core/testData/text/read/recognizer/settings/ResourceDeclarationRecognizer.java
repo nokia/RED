@@ -21,4 +21,10 @@ public class ResourceDeclarationRecognizer extends ATokenRecognizer {
     public ResourceDeclarationRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_RESOURCE_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new ResourceDeclarationRecognizer();
+    }
 }
