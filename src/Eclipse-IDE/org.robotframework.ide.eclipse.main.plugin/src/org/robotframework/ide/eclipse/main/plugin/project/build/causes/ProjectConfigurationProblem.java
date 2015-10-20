@@ -54,7 +54,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
     ENVIRONMENT_MISSING {
         @Override
         public String getProblemDescription() {
-            return "FATAL: %s is not defined in preferences. Fix this problem to build project";
+            return "FATAL: %s Python environment is not defined in preferences. Fix this problem to build project";
         }
 
         @Override
