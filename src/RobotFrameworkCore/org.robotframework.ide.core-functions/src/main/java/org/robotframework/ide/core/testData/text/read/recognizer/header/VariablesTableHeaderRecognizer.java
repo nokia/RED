@@ -22,4 +22,10 @@ public class VariablesTableHeaderRecognizer extends ATokenRecognizer {
     public VariablesTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.VARIABLES_TABLE_HEADER);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new VariablesTableHeaderRecognizer();
+    }
 }

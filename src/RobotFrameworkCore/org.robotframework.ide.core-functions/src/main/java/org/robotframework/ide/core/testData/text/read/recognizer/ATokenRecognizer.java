@@ -24,6 +24,9 @@ public abstract class ATokenRecognizer {
     }
 
 
+    public abstract ATokenRecognizer newInstance();
+
+
     public boolean hasNext(StringBuilder newText, int currentLineNumber) {
         if (m == null || lineNumber != currentLineNumber
                 || !text.toString().equals(newText.toString())) {

@@ -21,4 +21,10 @@ public class SettingDocumentationRecognizer extends ATokenRecognizer {
     public SettingDocumentationRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new SettingDocumentationRecognizer();
+    }
 }

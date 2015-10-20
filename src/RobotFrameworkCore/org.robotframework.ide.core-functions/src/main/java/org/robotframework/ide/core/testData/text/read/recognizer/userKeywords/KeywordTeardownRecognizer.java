@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.text.read.recognizer.userKeywords;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.AExecutableElementSettingsRecognizer;
+import org.robotframework.ide.core.testData.text.read.recognizer.ATokenRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
@@ -14,5 +15,11 @@ public class KeywordTeardownRecognizer extends
 
     public KeywordTeardownRecognizer() {
         super(RobotTokenType.KEYWORD_SETTING_TEARDOWN);
+    }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new KeywordTeardownRecognizer();
     }
 }

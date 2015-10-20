@@ -32,9 +32,10 @@ public class RobotParser {
 
     private final RobotProjectHolder robotProject;
 
+
     /**
-     * Creates parser which eagerly parses given file with all dependent resources (resource files,
-     * variables)
+     * Creates parser which eagerly parses given file with all dependent
+     * resources (resource files, variables)
      * 
      * @param projectHolder
      * @return eager parser
@@ -42,6 +43,7 @@ public class RobotParser {
     public static RobotParser createEager(final RobotProjectHolder projectHolder) {
         return new RobotParser(projectHolder, true);
     }
+
 
     /**
      * Creates parser which parses only given file without dependencies.
@@ -53,14 +55,18 @@ public class RobotParser {
         return new RobotParser(projectHolder, false);
     }
 
-    private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
+
+    private RobotParser(final RobotProjectHolder robotProject,
+            final boolean shouldImportEagerly) {
         this.robotProject = robotProject;
         this.shouldEagerImport = shouldImportEagerly;
     }
 
+
     public boolean isImportingEagerly() {
         return shouldEagerImport;
     }
+
 
     /**
      * Should be used for unsaved editor content. Parsed output is not replacing
@@ -164,9 +170,11 @@ public class RobotParser {
     private IRobotFileParser getParser(final File fileOrDir) {
         IRobotFileParser parserToUse = null;
         for (final IRobotFileParser parser : availableFormatParsers) {
-            if (parser.canParseFile(fileOrDir)) {
-                parserToUse = parser;
-                break;
+            synchronized (parser) {
+                if (parser.canParseFile(fileOrDir)) {
+                    parserToUse = parser.newInstance();
+                    break;
+                }
             }
         }
         return parserToUse;

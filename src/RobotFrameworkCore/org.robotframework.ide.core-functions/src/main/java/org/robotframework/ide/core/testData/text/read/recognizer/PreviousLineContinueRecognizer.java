@@ -19,4 +19,10 @@ public class PreviousLineContinueRecognizer extends ATokenRecognizer {
     public PreviousLineContinueRecognizer() {
         super(EXPECTED, RobotTokenType.PREVIOUS_LINE_CONTINUE);
     }
+
+
+    @Override
+    public ATokenRecognizer newInstance() {
+        return new PreviousLineContinueRecognizer();
+    }
 }
