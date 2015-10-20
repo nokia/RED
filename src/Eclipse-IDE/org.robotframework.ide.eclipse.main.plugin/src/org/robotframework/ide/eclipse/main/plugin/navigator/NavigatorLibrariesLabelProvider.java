@@ -13,7 +13,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies.ErroneousLibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -54,7 +56,19 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                     textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
+        } else if (element instanceof ErroneousLibrarySpecification) {
+
+            final ErroneousLibrarySpecification libSpec = (ErroneousLibrarySpecification) element;
+            return new StyledString(libSpec.getName() + " (non-accessible)", new Styler() {
+                @Override
+                public void applyStyles(final TextStyle textStyle) {
+                    textStyle.foreground = ColorsManager.getColor(255, 0, 0);
+                    textStyle.strikeout = true;
+                }
+            });
+
         } else if (element instanceof LibrarySpecification) {
+
             final LibrarySpecification libSpec = (LibrarySpecification) element;
             final StyledString styled = new StyledString(libSpec.getName());
             final String additonalInfo = libSpec.getAdditionalInformation();
@@ -68,12 +82,14 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                 });
             }
             styled.append(" ");
-            return styled.append("(" + libSpec.getKeywords().size() + ")", new Styler() {
+            styled.append("(" + libSpec.getKeywords().size() + ")", new Styler() {
+
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = RedTheme.getEclipseDecorationColor();
                 }
             });
+            return styled;
         }
         return new StyledString();
     }

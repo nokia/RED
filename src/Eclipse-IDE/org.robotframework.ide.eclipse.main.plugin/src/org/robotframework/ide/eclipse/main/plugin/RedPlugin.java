@@ -76,7 +76,8 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
-        return InstalledRobotEnvironments.getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
+        final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments.getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
+        return allRobotInstallation == null ? new ArrayList<RobotRuntimeEnvironment>() : allRobotInstallation;
     }
 
     public static void logInfo(final String message) {
