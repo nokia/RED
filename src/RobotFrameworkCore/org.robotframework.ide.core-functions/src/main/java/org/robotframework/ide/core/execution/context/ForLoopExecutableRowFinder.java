@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.core.execution.context;
 
 import java.util.ArrayList;
@@ -9,6 +14,10 @@ import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
 
     private TestCase currentTestCase;

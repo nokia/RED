@@ -20,7 +20,10 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.ui.ISources;
+import org.robotframework.ide.core.execution.context.RobotDebugExecutableLineChecker;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler.E4ToggleBreakpointHandler;
@@ -50,14 +53,13 @@ public class ToggleBreakpointHandler extends DIHandler<E4ToggleBreakpointHandler
             }
 
             final IFile file = (IFile) sourceEditor.getEditorInput().getAdapter(IResource.class);
-
+            
             toggle(file, line);
 
             return null;
         }
 
         public static void toggle(final IResource file, final int line) throws CoreException {
-            // TODO: check in model if the line can have a breakpoint
             final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
             for (final IBreakpoint breakpoint : breakpointManager.getBreakpoints()) {
                 if (breakpoint.getMarker().getResource().equals(file)
@@ -66,7 +68,20 @@ public class ToggleBreakpointHandler extends DIHandler<E4ToggleBreakpointHandler
                     return;
                 }
             }
-            breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, line));
+            if (isExecutableLine(file, line)) {
+                breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, line));
+            }
         }
+
+        private static boolean isExecutableLine(IResource file, int line) {
+            if (file instanceof IFile) {
+                final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) file);
+                if (robotSuiteFile != null) {
+                    return RobotDebugExecutableLineChecker.isExecutableLine(robotSuiteFile.getLinkedElement(), line);
+                }
+            }
+            return false;
+        }
+        
     }
 }
