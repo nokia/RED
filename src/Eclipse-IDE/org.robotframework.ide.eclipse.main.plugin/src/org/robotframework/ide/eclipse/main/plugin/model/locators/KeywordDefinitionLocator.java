@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -54,9 +55,9 @@ public class KeywordDefinitionLocator {
 
     public void locateKeywordDefinitionInLibraries(final RobotProject project,
             final KeywordDetector detector) {
-        final ContinueDecision shouldContinue = locateInLibraries(project.getStandardLibraries(), detector);
+        final ContinueDecision shouldContinue = locateInLibraries(project.getStandardLibraries().values(), detector);
         if (shouldContinue == ContinueDecision.CONTINUE) {
-            locateInLibraries(project.getReferencedLibraries(), detector);
+            locateInLibraries(project.getReferencedLibraries().values(), detector);
         }
     }
 
@@ -95,9 +96,9 @@ public class KeywordDefinitionLocator {
                 : new RobotSuiteFile(null, resourceFile);
     }
 
-    private ContinueDecision locateInLibraries(final List<LibrarySpecification> libraries,
+    private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
             final KeywordDetector detector) {
-        for (final LibrarySpecification libSpec : libraries) {
+        for (final LibrarySpecification libSpec : collection) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
                 final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec);
                 if (shouldContinue == ContinueDecision.STOP) {
