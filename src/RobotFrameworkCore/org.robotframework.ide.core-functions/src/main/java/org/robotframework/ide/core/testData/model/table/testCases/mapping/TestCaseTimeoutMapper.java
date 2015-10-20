@@ -34,7 +34,6 @@ public class TestCaseTimeoutMapper extends ATestCaseSettingDeclarationMapper {
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
-        types.add(RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
 
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));
