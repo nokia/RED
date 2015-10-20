@@ -35,7 +35,6 @@ public class KeywordDocumentationMapper extends
         List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
-        types.add(RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
 
         rt.setRaw(new StringBuilder(text));
         rt.setText(new StringBuilder(text));

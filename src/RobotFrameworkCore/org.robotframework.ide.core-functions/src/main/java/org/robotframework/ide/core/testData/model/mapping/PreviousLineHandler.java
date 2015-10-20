@@ -59,15 +59,11 @@ public class PreviousLineHandler {
                             currentToken)) {
                         if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
                                 || currentState == ParsingState.TEST_CASE_DECLARATION) {
-                            currentToken.getTypes().add(
-                                    RobotTokenType.TEST_CASE_THE_FIRST_ELEMENT);
                             if (containsAnyTestCases(model)) {
                                 continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
                             }
                         } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
                                 || currentState == ParsingState.KEYWORD_DECLARATION) {
-                            currentToken.getTypes().add(
-                                    RobotTokenType.KEYWORD_THE_FIRST_ELEMENT);
                             if (containsAnyKeywords(model)) {
                                 continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
                             }
