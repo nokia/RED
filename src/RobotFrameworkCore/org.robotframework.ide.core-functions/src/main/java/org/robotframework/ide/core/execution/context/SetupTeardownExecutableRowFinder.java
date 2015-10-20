@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.core.execution.context;
 
 import java.util.LinkedList;
@@ -11,6 +16,10 @@ import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFinder {
 
     private TestCase currentTestCase;
