@@ -22,12 +22,8 @@ class Settings {
     private final List<ImportedVariablesFile> importedVariables;
 
     static Settings create(final RobotSuiteFile fileModel) {
-        final List<LibrarySpecification> standardLibraries = fileModel.getProject().getStandardLibraries();
-        final List<LibrarySpecification> referencedLibraries = fileModel.getProject().getReferencedLibraries();
-
         final List<LibrarySpecification> imported = fileModel.getImportedLibraries();
-        final List<LibrarySpecification> toImport = newArrayList(standardLibraries);
-        toImport.addAll(referencedLibraries);
+        final List<LibrarySpecification> toImport = newArrayList(fileModel.getProject().getLibrariesSpecifications());
         toImport.removeAll(imported);
         final List<IPath> importedResources = fileModel.getResourcesPaths();
         final List<ImportedVariablesFile> importedVariables = fileModel.getImportedVariables();

@@ -25,7 +25,7 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
     List<LibrarySpecification> getLibraries() {
         final List<LibrarySpecification> libraries = newArrayList();
 
-        final Map<ReferencedLibrary, LibrarySpecification> libs = project.getReferencedLibrariesMappingWithNulls();
+        final Map<ReferencedLibrary, LibrarySpecification> libs = project.getReferencedLibraries();
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : libs.entrySet()) {
             if (entry.getValue() != null) {
                 libraries.add(entry.getValue());

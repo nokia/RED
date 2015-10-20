@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
@@ -91,7 +92,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             if (isVariable(hoveredText)) {
                 return getVariableHoverInfo(hoveredText);
             } else {
-                if (isLibrary(document, hoverRegion.getOffset(), hoveredText)) {
+                if (isLibrary(document, hoverRegion.getOffset())) {
                     final String libInfo = getLibraryHoverInfo(hoveredText);
                     if (libInfo != null) {
                         return libInfo;
@@ -164,15 +165,20 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return null;
     }
 
-    private boolean isLibrary(final IDocument document, final int offset, final String hoveredText) {
+    private boolean isLibrary(final IDocument document, final int offset) {
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         return lineContent.trim().startsWith("Library");
     }
 
     private String getLibraryHoverInfo(final String hoveredText) {
-        LibrarySpecification spec = suiteFile.getProject().getLibrariesMapping().get(hoveredText);
+        LibrarySpecification spec = suiteFile.getProject().getStandardLibraries().get(hoveredText);
         if (spec == null) {
-            spec = suiteFile.getProject().getReferencedLibrariesMapping().get(hoveredText);
+            for (final ReferencedLibrary referencedLibrary : suiteFile.getProject().getReferencedLibraries().keySet()) {
+                if (referencedLibrary.getName().equals(hoveredText)) {
+                    spec = suiteFile.getProject().getReferencedLibraries().get(referencedLibrary);
+                    break;
+                }
+            }
         }
         return spec == null ? null : spec.getDocumentation();
     }

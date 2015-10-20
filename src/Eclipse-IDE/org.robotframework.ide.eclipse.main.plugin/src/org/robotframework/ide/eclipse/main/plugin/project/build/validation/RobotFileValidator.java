@@ -5,10 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -61,7 +62,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         // TODO : check output status and parsing messages
 
         validationContext.setLibrarySpecifications(collectLibraries(fileModel));
-        validationContext.setReferencedLibrarySpecifications(collectReferencedLibraries(fileModel));
+        validationContext.setReferencedLibrarySpecifications(fileModel.getProject().getReferencedLibraries());
         validationContext.setAccessibleKeywords(collectAccessibleKeywordNames(fileModel));
 
         new UnknownTablesValidator(fileModel).validate(monitor);
@@ -77,15 +78,13 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
     private static Map<String, LibrarySpecification> collectLibraries(final RobotSuiteFile robotSuiteFile) {
         final RobotProject robotProject = robotSuiteFile.getProject();
-        final Set<LibrarySpecification> libs = newHashSet();
-        libs.addAll(robotProject.getStandardLibraries());
-        libs.addAll(robotProject.getReferencedLibraries());
-        return robotSuiteFile.getProject().getLibrariesMapping();
-    }
-
-    private static Map<ReferencedLibrary, LibrarySpecification> collectReferencedLibraries(
-            final RobotSuiteFile robotSuiteFile) {
-        return robotSuiteFile.getProject().getReferencedLibrariesMapping();
+        final Map<String, LibrarySpecification> libs = newLinkedHashMap();
+        libs.putAll(robotProject.getStandardLibraries());
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
+                .entrySet()) {
+            libs.put(entry.getKey().getName(), entry.getValue());
+        }
+        return libs;
     }
 
     private static Set<String> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -300,7 +301,7 @@ public class ImportLibraryComposite {
     private void addNewLibraryToSettingsSection(final String nameWithoutExtension) {
         if (!isLibraryAvailable(nameWithoutExtension)) {
             final List<LibrarySpecification> specs = newArrayList();
-            final List<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
+            final Collection<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries().values();
             for (final LibrarySpecification librarySpecification : referencedLibraries) {
                 if (librarySpecification.getName().equals(nameWithoutExtension)) {
                     specs.add(librarySpecification);

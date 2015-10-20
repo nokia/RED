@@ -28,7 +28,7 @@ class RobotProjectDependencies {
     List<LibrarySpecification> getLibraries() {
         final List<LibrarySpecification> libraries = newArrayList();
 
-        final Map<String, LibrarySpecification> libs = project.getStandardLibrariesMappingWithNulls();
+        final Map<String, LibrarySpecification> libs = project.getStandardLibraries();
         for (final Entry<String, LibrarySpecification> entry : libs.entrySet()) {
             if (entry.getValue() != null) {
                 libraries.add(entry.getValue());
