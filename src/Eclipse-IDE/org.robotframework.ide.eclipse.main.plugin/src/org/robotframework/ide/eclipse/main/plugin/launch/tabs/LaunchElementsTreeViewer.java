@@ -221,11 +221,7 @@ public class LaunchElementsTreeViewer {
     public CheckboxTreeViewer getViewer() {
         return treeViewer;
     }
-
-    public List<SuiteLaunchElement> getTreeViewerInput() {
-        return treeViewerInput;
-    }
-
+    
     public List<String> extractCheckedSuitesPaths() {
         final List<String> suitesPaths = newArrayList();
         for (SuiteLaunchElement suite : treeViewerInput) {
