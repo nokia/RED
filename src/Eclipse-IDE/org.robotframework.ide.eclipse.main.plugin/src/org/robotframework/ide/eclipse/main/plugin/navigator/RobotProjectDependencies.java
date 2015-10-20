@@ -5,9 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Objects;
@@ -21,7 +26,17 @@ class RobotProjectDependencies {
     }
 
     List<LibrarySpecification> getLibraries() {
-        return project.getStandardLibraries();
+        final List<LibrarySpecification> libraries = newArrayList();
+
+        final Map<String, LibrarySpecification> libs = project.getStandardLibrariesMappingWithNulls();
+        for (final Entry<String, LibrarySpecification> entry : libs.entrySet()) {
+            if (entry.getValue() != null) {
+                libraries.add(entry.getValue());
+            } else {
+                libraries.add(new ErroneousLibrarySpecification(entry.getKey()));
+            }
+        }
+        return libraries;
     }
 
     String getAdditionalInformation() {
@@ -48,5 +63,18 @@ class RobotProjectDependencies {
     @Override
     public int hashCode() {
         return Objects.hashCode(getLibraries());
+    }
+
+    static class ErroneousLibrarySpecification extends LibrarySpecification {
+
+        public ErroneousLibrarySpecification(final String name) {
+            setName(name);
+        }
+
+        @Override
+        public List<KeywordSpecification> getKeywords() {
+            return newArrayList();
+        }
+
     }
 }
