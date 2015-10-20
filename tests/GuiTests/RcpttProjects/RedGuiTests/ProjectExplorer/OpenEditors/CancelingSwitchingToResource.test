@@ -1,0 +1,127 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CancelingSwitchingToResource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _9OjrEHZzEeWYifgNPLzx_Q
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/20/15 1:43 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+
+//add test and kewords
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "case 1 \n"
+    + "    Log  1\n"
+    + "    \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "keyword 1\n"
+    + "    Log  2" 
+
+
+//check if all tabs are shown
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+//remove Test Case and save
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 11
+    select-range 4 5 1 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+
+//cancel switching to Resource
+get-window "File content mismatch" 
+    | get-label -index 1 
+    | get-property caption 
+    | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+    + "Click OK to save and reopen editor or cancel saving" | verify-true
+        
+get-window "File content mismatch" | get-button Cancel | click
+
+// check if it is still Suite
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+    + "keyword 1\n"
+    + "    Log  2" | verify-true
+    
+//check if it is dirty    
+get-tab-folder -index 1 | get-property activePage | equals "*TestFile.robot" | verify-true
+
+//save to switch to Resource
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	key-type "M1+s"
+}
+get-window "File content mismatch" 
+    | get-label -index 1 
+    | get-property caption 
+    | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+    + "Click OK to save and reopen editor or cancel saving" | verify-true
+get-window "File content mismatch" | get-button OK | click
+
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals Keywords | verify-true
+    get-property "pages[1]" | equals Settings | verify-true
+    get-property "pages[2]" | equals Variables | verify-true
+    get-property "pages[3]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+}
+
+//add test to the end
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Keywords ***\n"
+    + "keyword 1\n"
+    + "    Log  2\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "new \n"
+    + "    Log  3" 
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+
+}
+
+//Resource will be switch to Suite - cancel
+get-window "File content mismatch" 
+    | get-label "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.Click OK to save and reopen editor or cancel saving" 
+    | get-property caption 
+    | equals "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.\n\n"
+    + "Click OK to save and reopen editor or cancel saving" | verify-true
+get-window "File content mismatch" | get-button Cancel | click
+
+//check if it is still Resource
+get-tab-folder -index 1 | get-property activePage | equals "*TestFile.robot" | verify-true
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+    + "keyword 1\n"
+    + "    Log  2\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "new \n"
+    + "    Log  3" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
