@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.content.IContentDescription;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
@@ -306,7 +307,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                         pathToken);
             } else {
                 try {
-                    final String id = ((IFile) resource).getContentDescription().getContentType().getId();
+                    final IContentDescription contentDescription = ((IFile) resource).getContentDescription();
+                    final String id = contentDescription == null ? "" : contentDescription.getContentType().getId();
                     if (!RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(id)) {
                         reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                                 .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
