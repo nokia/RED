@@ -24,30 +24,30 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
         ICompletionProposalExtension6 {
 
     /** The string to be displayed in the completion proposal popup. */
-    private String displayString;
+    private final String displayString;
 
     /** The replacement string. */
-    private String replacementString;
+    private final String replacementString;
 
     /** The replacement offset. */
-    private int replacementOffset;
+    private final int replacementOffset;
 
     /** The replacement length. */
-    private int replacementLength;
+    private final int replacementLength;
 
     /** The cursor position after this proposal has been applied. */
-    private int cursorPosition;
+    private final int cursorPosition;
 
     /** The image to be displayed in the completion proposal popup. */
-    private Image image;
+    private final Image image;
 
     /** The context information of this proposal. */
-    private IContextInformation contextInformation;
+    private final IContextInformation contextInformation;
 
     /** The additional info of this proposal. */
-    private String additionalProposalInfo;
+    private final String additionalProposalInfo;
 
-    private String sourceName;
+    private final String sourceName;
 
     /**
      * Creates a new completion proposal. All fields are initialized based on the provided
@@ -70,9 +70,9 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
      * @param additionalProposalInfo
      *            the additional information associated with this proposal
      */
-    public TextEditorCompletionProposal(String replacementString, int replacementOffset, int replacementLength,
-            int cursorPosition, Image image, String displayString, IContextInformation contextInformation,
-            String additionalProposalInfo, String sourceName) {
+    public TextEditorCompletionProposal(final String replacementString, final int replacementOffset, final int replacementLength,
+            final int cursorPosition, final Image image, final String displayString, final IContextInformation contextInformation,
+            final String additionalProposalInfo, final String sourceName) {
         Assert.isNotNull(replacementString);
         Assert.isTrue(replacementOffset >= 0);
         Assert.isTrue(replacementLength >= 0);
@@ -90,16 +90,16 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     }
 
     @Override
-    public void apply(IDocument document) {
+    public void apply(final IDocument document) {
         try {
             document.replace(replacementOffset, replacementLength, replacementString);
-        } catch (BadLocationException x) {
+        } catch (final BadLocationException x) {
             // ignore
         }
     }
 
     @Override
-    public Point getSelection(IDocument document) {
+    public Point getSelection(final IDocument document) {
         return new Point(replacementOffset + cursorPosition, 0);
     }
 
@@ -110,8 +110,9 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
 
     @Override
     public String getDisplayString() {
-        if (displayString != null)
+        if (displayString != null) {
             return displayString;
+        }
         return replacementString;
     }
 
@@ -130,25 +131,25 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
         return new IInformationControlCreator() {
 
             @Override
-            public IInformationControl createInformationControl(Shell parent) {
+            public IInformationControl createInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent);
             }
         };
     }
 
     @Override
-    public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
-        return null;
+    public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
+        return replacementString;
     }
 
     @Override
-    public int getPrefixCompletionStart(IDocument document, int completionOffset) {
-        return 0;
+    public int getPrefixCompletionStart(final IDocument document, final int completionOffset) {
+        return replacementOffset;
     }
 
     @Override
     public StyledString getStyledDisplayString() {
-        StyledString styledString = new StyledString();
+        final StyledString styledString = new StyledString();
         styledString.append(getDisplayString());
         if (sourceName != null) {
             styledString.append(" - " + sourceName, StyledString.DECORATIONS_STYLER);
