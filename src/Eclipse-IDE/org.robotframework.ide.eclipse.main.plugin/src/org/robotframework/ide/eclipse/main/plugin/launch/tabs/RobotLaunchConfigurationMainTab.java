@@ -340,6 +340,8 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                         comboExecutorName.select(index);
                     }
                     projectText.setText(project.getName());
+                    TagsContentProposalsManager.clearProjectTagProposals();
+                    TagsContentProposalsManager.setProject(project);
                     updateLaunchConfigurationDialog();
                 }
             }
