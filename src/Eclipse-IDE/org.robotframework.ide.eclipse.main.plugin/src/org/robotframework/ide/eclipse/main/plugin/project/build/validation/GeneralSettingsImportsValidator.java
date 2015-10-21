@@ -5,12 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -192,18 +189,13 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
                 for (final IPath p : PathsResolver.resolveToAbsolutePath(suiteFile, path.getText().toString())) {
-                    if (createPossiblePaths(entry.getKey().getPath(), entry.getKey().getName()).contains(p)) {
+                    final Path entryPath = new Path(entry.getKey().getPath());
+                    if (p.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath))) {
                         specification = entry.getValue();
                     }
                 }
             }
             validateWithSpec(imported, specification, path, monitor, true);
-        }
-
-        private static Set<IPath> createPossiblePaths(final String path, final String className) {
-            return newHashSet(
-                    PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + "/")),
-                    PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path + "/" + className + ".py")));
         }
 
         @Override
