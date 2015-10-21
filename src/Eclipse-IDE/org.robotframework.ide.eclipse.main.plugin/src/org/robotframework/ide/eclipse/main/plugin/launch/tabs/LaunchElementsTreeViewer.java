@@ -73,7 +73,7 @@ public class LaunchElementsTreeViewer {
         treeViewerInput.clear();
         treeViewer.setInput(null);
         treeViewer.refresh();
-
+ 
         if (projectName != null && !projectName.equals("")) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             for (String suitePath : suites) {
@@ -94,6 +94,9 @@ public class LaunchElementsTreeViewer {
                 if (suiteElement != null) {
                     treeViewerInput.add(suiteElement);
                 }
+            }
+            if(suites.isEmpty()) {
+                TagsContentProposalsManager.setProject(project);
             }
             treeViewer.setInput(treeViewerInput.toArray(new SuiteLaunchElement[treeViewerInput.size()]));
             treeViewer.refresh();
@@ -124,6 +127,7 @@ public class LaunchElementsTreeViewer {
         final List<RobotCase> testCasesList = newArrayList();
         final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(suiteFile);
         if (robotSuiteFile != null) {
+            TagsContentProposalsManager.clearProjectTagProposals();
             TagsContentProposalsManager.extractTagProposalsFromSettingsTable(robotSuiteFile);
             for (RobotSuiteFileSection robotSection : robotSuiteFile.getSections()) {
                 if (robotSection instanceof RobotCasesSection) {
