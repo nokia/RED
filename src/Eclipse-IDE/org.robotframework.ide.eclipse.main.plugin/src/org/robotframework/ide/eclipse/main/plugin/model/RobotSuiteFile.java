@@ -79,7 +79,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return getSections(new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
-                return getProject().getRobotParser().parse(file.getLocation().toFile()).get(0);
+                final List<RobotFileOutput> outputs = getProject().getRobotParser().parse(file.getLocation().toFile());
+                return outputs.isEmpty() ? null : outputs.get(0);
             }
         });
     }
@@ -87,9 +88,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     public List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
         if (sections == null) {
             fileOutput = parseModel(parsingStrategy);
-            link(fileOutput.getFileModel());
+            if (fileOutput != null) {
+                link(fileOutput.getFileModel());
+            }
         }
-        return sections;
+        return sections == null ? new ArrayList<RobotSuiteFileSection>() : sections;
     }
     
     private void link(final RobotFile model) {
