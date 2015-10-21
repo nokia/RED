@@ -29,3 +29,4 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 ## Binaries distribution
 RED will be distributed as Eclipse feature to be installed on existing Eclipse platform. 
 
+
