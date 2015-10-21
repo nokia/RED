@@ -23,8 +23,8 @@ Create new Project can be done by:
 *   _File->New-> Robot Project_ (item can be found under selection _New -> Project .. -> Robot Framework -> Robot Project_ )
 *   Right click menu on Project Explorer with selection as above
 
-If you which to import anything into Workspace ( already existing Project) or into Project (existing testcases), menu _Import ..._ will open up wizard.
-Upon creating Project, you should have see similar structure in Project Explorer tree which will also indicate that RobotFramework is visible to Eclipse
+If you wish to import anything into Workspace ( already existing Project) or into Project (existing testcases), menu _Import ..._ will open up wizard.
+Upon creating Project, you should see similar structure in Project Explorer tree as below which will also indicate that RobotFramework is visible to Eclipse
 
 ![](img/create_run/simple_project_1.png)
 
