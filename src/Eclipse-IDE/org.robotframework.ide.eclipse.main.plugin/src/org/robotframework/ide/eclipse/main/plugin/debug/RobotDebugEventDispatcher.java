@@ -252,14 +252,14 @@ public class RobotDebugEventDispatcher extends Job {
 
         currentKeywordContext = new KeywordContext(null, executedSuite, keywordLineNumber);
         target.getPartListener().setKeywordContext(currentKeywordContext);
-        target.getCurrentFrames().put(currentKeyword, currentKeywordContext);
+        target.getCurrentKeywordsContextMap().put(currentKeyword, currentKeywordContext);
     }
 
     @SuppressWarnings("unchecked")
     private void handleVarsEvent(final Map<String, ?> eventMap) {
         final List<?> varList = (List<?>) eventMap.get("vars");
         final Map<?, ?> vars = (Map<?, ?>) varList.get(1);
-        target.getLastKeywordFromCurrentFrames().setVariables((Map<String, Object>) vars);
+        target.getLastKeywordFromCurrentContextMap().setVariables((Map<String, Object>) vars);
         target.getRobotVariablesManager().sortVariablesNames((Map<String, Object>) vars);
     }
 
@@ -336,7 +336,7 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleEndKeywordEvent(final Map<String, ?> eventMap) {
         final List<?> endList = (List<?>) eventMap.get("end_keyword");
         final String keyword = (String) endList.get(0);
-        target.getCurrentFrames().remove(keyword);
+        target.getCurrentKeywordsContextMap().remove(keyword);
         
         executionContext.endKeyword();
 

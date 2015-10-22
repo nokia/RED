@@ -35,6 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatche
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
@@ -65,17 +66,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     // suspend state
     private boolean isSuspended = false;
 
-    private boolean hasStackFramesCreated;
-
     // threads
     private final RobotThread thread;
 
     private final IThread[] threads;
 
-    private final Map<String, KeywordContext> currentFrames;
+    private final Map<String, KeywordContext> currentKeywordDebugContextMap;
 
-    private IStackFrame[] stackFrames;
-    
     private int currentStepOverLevel = 0;
     
     private int currentStepReturnLevel = 0;
@@ -88,6 +85,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private final RobotDebugValueManager robotDebugValueManager;
     
+    private RobotDebugStackFrameManager robotDebugStackFrameManager;
+    
     public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
             final RobotPartListener partListener, final RobotEventBroker robotEventBroker,
             final DebugSocketManager socketManager) throws CoreException {
@@ -97,7 +96,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         this.process = process;
         this.partListener = partListener;
         this.robotEventBroker = robotEventBroker;
-        currentFrames = new LinkedHashMap<>();
+        currentKeywordDebugContextMap = new LinkedHashMap<>();
         robotVariablesManager = new RobotDebugVariablesManager(this);
         robotDebugValueManager = new RobotDebugValueManager();
         
@@ -124,6 +123,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         thread = new RobotThread(this);
         threads = new IThread[] { thread };
+        
+        robotDebugStackFrameManager = new RobotDebugStackFrameManager(thread);
 
         final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, suiteResources,
                 robotEventBroker);
@@ -236,12 +237,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     protected void stepOver() {
-        currentStepOverLevel = currentFrames.size();
+        currentStepOverLevel = currentKeywordDebugContextMap.size();
         step();
     }
     
     protected void stepReturn() {
-        currentStepReturnLevel = currentFrames.size();
+        currentStepReturnLevel = currentKeywordDebugContextMap.size();
         step();
     }
 
@@ -342,69 +343,15 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     protected IStackFrame[] getStackFrames() {
 
-        if (!hasStackFramesCreated) {
-            
-            if (getLastKeywordFromCurrentFrames().getVariables() == null) {
-                if (stackFrames != null) {
-                    return stackFrames;
-                }
-                return new IStackFrame[0];
-            }
-
-            int numberOfStackTracesToCopy = 0;
-            if (stackFrames != null) {
-                if (stackFrames.length < currentFrames.size()) {
-                    numberOfStackTracesToCopy = stackFrames.length;
-                } else {
-                    numberOfStackTracesToCopy = currentFrames.size() - 1;
-                }
-            }
-
-            if (stackFrames == null || stackFrames.length == 0) {
-                stackFrames = new IStackFrame[currentFrames.size()];
-            }
-            final IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
-            int currentFramesCounter = 1;
-            for (final String keywordName : currentFrames.keySet()) {
-                final KeywordContext keywordContext = currentFrames.get(keywordName);
-                // only the highest level of StackFrames is created, lower levels are copied from
-                // previous StackFrames
-                final int lastStackFrameLevel = currentFrames.size() - currentFramesCounter;
-                if (currentFramesCounter > numberOfStackTracesToCopy) {
-                    if (stackFrames.length == currentFrames.size() && stackFrames[lastStackFrameLevel] != null) {
-                        ((RobotStackFrame) stackFrames[lastStackFrameLevel]).setStackFrameData(currentFramesCounter,
-                                keywordName, keywordContext);
-                        newStackFrames[lastStackFrameLevel] = stackFrames[lastStackFrameLevel];
-                    } else {
-                        newStackFrames[lastStackFrameLevel] = new RobotStackFrame(thread, currentFramesCounter,
-                                keywordName, keywordContext);
-                    }
-                } else {
-                    IStackFrame previousStackFrame = null;
-                    if (stackFrames.length < currentFrames.size()) {
-                        previousStackFrame = stackFrames[numberOfStackTracesToCopy - currentFramesCounter];
-                    } else {
-                        previousStackFrame = stackFrames[stackFrames.length - currentFramesCounter];
-                    }
-                    ((RobotStackFrame) previousStackFrame).setStackFrameData(currentFramesCounter, keywordName,
-                            keywordContext);
-                    newStackFrames[lastStackFrameLevel] = previousStackFrame;
-                }
-                currentFramesCounter++;
-            }
-            stackFrames = newStackFrames;
-            hasStackFramesCreated = true;
-        }
-
-        return stackFrames;
+        return robotDebugStackFrameManager.getStackFrames(currentKeywordDebugContextMap);
     }
 
-    public void setHasStackFramesCreated(final boolean hasCreated) {
-        hasStackFramesCreated = hasCreated;
+    public void setHasStackFramesCreated(final boolean hasStackFramesCreated) {
+        robotDebugStackFrameManager.setHasStackFramesCreated(hasStackFramesCreated);
     }
     
     public void clearStackFrames() {
-        stackFrames = null;
+        robotDebugStackFrameManager.setStackFrames(null);
     }
 
     /**
@@ -474,7 +421,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public boolean hasStepOver() {
 
-        if (thread.isSteppingOver() && currentStepOverLevel <= currentFrames.size()) {
+        if (thread.isSteppingOver() && currentStepOverLevel <= currentKeywordDebugContextMap.size()) {
             return true;
         }
 
@@ -483,7 +430,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     public boolean hasStepReturn() {
 
-        if (thread.isSteppingReturn() && currentStepReturnLevel <= currentFrames.size()+1) {
+        if (thread.isSteppingReturn() && currentStepReturnLevel <= currentKeywordDebugContextMap.size()+1) {
             return true;
         }
 
@@ -502,13 +449,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return thread;
     }
 
-    public Map<String, KeywordContext> getCurrentFrames() {
-        return currentFrames;
+    public Map<String, KeywordContext> getCurrentKeywordsContextMap() {
+        return currentKeywordDebugContextMap;
     }
 
-    public KeywordContext getLastKeywordFromCurrentFrames() {
-        if(currentFrames.size() > 0) {
-            return (KeywordContext) currentFrames.values().toArray()[currentFrames.size() - 1];
+    public KeywordContext getLastKeywordFromCurrentContextMap() {
+        if(currentKeywordDebugContextMap.size() > 0) {
+            return (KeywordContext) currentKeywordDebugContextMap.values().toArray()[currentKeywordDebugContextMap.size() - 1];
         }
         return new KeywordContext();
     }
