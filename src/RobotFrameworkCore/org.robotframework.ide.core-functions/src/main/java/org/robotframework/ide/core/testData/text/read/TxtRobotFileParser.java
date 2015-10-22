@@ -481,7 +481,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
             ParsingState currentStatus = utility
                     .getCurrentStatus(processingState);
             if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE
-                    || currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE) {
+                    || currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE
+                    || currentStatus == ParsingState.TEST_CASE_DECLARATION
+                    || currentStatus == ParsingState.KEYWORD_DECLARATION) {
                 isPrettyAlign = true;
             }
 
