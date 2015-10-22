@@ -40,8 +40,8 @@ public class PreviousLineHandler {
         LineContinueType continueType = LineContinueType.NONE;
 
         if (isNewLine) {
-            if (currentToken.getTypes().contains(
-                    RobotTokenType.PREVIOUS_LINE_CONTINUE)
+            if ((currentToken.getTypes().size() == 1 && currentToken.getTypes()
+                    .contains(RobotTokenType.PREVIOUS_LINE_CONTINUE))
                     || isCommentContinue(currentToken, storedStack)) {
                 ParsingState currentState = utility
                         .getCurrentStatus(parsingStates);
