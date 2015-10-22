@@ -343,35 +343,54 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     protected IStackFrame[] getStackFrames() {
 
         if (!hasStackFramesCreated) {
+            
+            if (getLastKeywordFromCurrentFrames().getVariables() == null) {
+                if (stackFrames != null) {
+                    return stackFrames;
+                }
+                return new IStackFrame[0];
+            }
 
             int numberOfStackTracesToCopy = 0;
             if (stackFrames != null) {
-                if(stackFrames.length < currentFrames.size()) {
+                if (stackFrames.length < currentFrames.size()) {
                     numberOfStackTracesToCopy = stackFrames.length;
                 } else {
                     numberOfStackTracesToCopy = currentFrames.size() - 1;
                 }
             }
 
+            if (stackFrames == null || stackFrames.length == 0) {
+                stackFrames = new IStackFrame[currentFrames.size()];
+            }
             final IStackFrame[] newStackFrames = new IStackFrame[currentFrames.size()];
-            int id = 1;
-            for (final String key : currentFrames.keySet()) {
-                final KeywordContext keywordContext = currentFrames.get(key);
-                //only the highest level of StackFrames is created, lower levels are copied from previous StackFrames
-                if (id > numberOfStackTracesToCopy) {
-                    newStackFrames[currentFrames.size() - id] = new RobotStackFrame(thread,
-                            keywordContext.getFileName(), key, keywordContext.getLineNumber(),
-                            keywordContext.getVariables(), id);
+            int currentFramesCounter = 1;
+            for (final String keywordName : currentFrames.keySet()) {
+                final KeywordContext keywordContext = currentFrames.get(keywordName);
+                // only the highest level of StackFrames is created, lower levels are copied from
+                // previous StackFrames
+                final int lastStackFrameLevel = currentFrames.size() - currentFramesCounter;
+                if (currentFramesCounter > numberOfStackTracesToCopy) {
+                    if (stackFrames.length == currentFrames.size() && stackFrames[lastStackFrameLevel] != null) {
+                        ((RobotStackFrame) stackFrames[lastStackFrameLevel]).setStackFrameData(currentFramesCounter,
+                                keywordName, keywordContext);
+                        newStackFrames[lastStackFrameLevel] = stackFrames[lastStackFrameLevel];
+                    } else {
+                        newStackFrames[lastStackFrameLevel] = new RobotStackFrame(thread, currentFramesCounter,
+                                keywordName, keywordContext);
+                    }
                 } else {
                     IStackFrame previousStackFrame = null;
-                    if(stackFrames.length < currentFrames.size()) {
-                        previousStackFrame = stackFrames[numberOfStackTracesToCopy - id];
+                    if (stackFrames.length < currentFrames.size()) {
+                        previousStackFrame = stackFrames[numberOfStackTracesToCopy - currentFramesCounter];
                     } else {
-                        previousStackFrame = stackFrames[stackFrames.length - id];
+                        previousStackFrame = stackFrames[stackFrames.length - currentFramesCounter];
                     }
-                    newStackFrames[currentFrames.size() - id] = previousStackFrame;
+                    ((RobotStackFrame) previousStackFrame).setStackFrameData(currentFramesCounter, keywordName,
+                            keywordContext);
+                    newStackFrames[lastStackFrameLevel] = previousStackFrame;
                 }
-                id++;
+                currentFramesCounter++;
             }
             stackFrames = newStackFrames;
             hasStackFramesCreated = true;
