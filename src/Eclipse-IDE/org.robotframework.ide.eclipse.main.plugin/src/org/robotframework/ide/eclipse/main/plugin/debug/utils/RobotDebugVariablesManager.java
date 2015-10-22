@@ -13,14 +13,6 @@ import java.util.Set;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
-import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
@@ -46,8 +38,6 @@ public class RobotDebugVariablesManager {
     private final Map<String, IVariable> nestedGlobalVars;
 
     private final LinkedList<String> sortedVariablesNames;
-
-    private VariablesViewerUpdateListener variablesViewerUpdateListener;
 
     public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
@@ -242,102 +232,4 @@ public class RobotDebugVariablesManager {
         return variableName;
     }
 
-    public void addVariablesViewerListener() {
-        if (variablesViewerUpdateListener == null) {
-            registerViewerUpdateListener();
-        } else {
-            variablesViewerUpdateListener.setViewerUpdateIsNeeded();
-        }
-    }
-
-    public void removeVariablesViewerListener() {
-        unregisterViewerUpdateListener();
-    }
-
-    private void registerViewerUpdateListener() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                final IViewPart viewPart = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .findView("org.eclipse.debug.ui.VariableView");
-                if (viewPart instanceof IDebugView) {
-                    final IDebugView variablesView = (IDebugView) viewPart;
-                    final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
-                    if (variablesTreeModelViewer != null) {
-                        variablesViewerUpdateListener = new VariablesViewerUpdateListener(variablesTreeModelViewer);
-                        variablesTreeModelViewer.addViewerUpdateListener(variablesViewerUpdateListener);
-                    }
-                }
-            }
-        });
-    }
-
-    private void unregisterViewerUpdateListener() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                final IViewPart viewPart = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .findView("org.eclipse.debug.ui.VariableView");
-                if (viewPart instanceof IDebugView) {
-                    final IDebugView variablesView = (IDebugView) viewPart;
-                    final TreeModelViewer variablesTreeModelViewer = (TreeModelViewer) variablesView.getViewer();
-                    if (variablesTreeModelViewer != null) {
-                        variablesTreeModelViewer.removeViewerUpdateListener(variablesViewerUpdateListener);
-                    }
-                }
-            }
-        });
-    }
-
-    private class VariablesViewerUpdateListener implements IViewerUpdateListener {
-
-        private final TreeViewer treeModelViewer;
-
-        private boolean viewerNeedsUpdate;
-
-        public VariablesViewerUpdateListener(final TreeViewer variablesTreeModelViewer) {
-            this.treeModelViewer = variablesTreeModelViewer;
-        }
-
-        @Override
-        public void viewerUpdatesBegin() {
-        }
-
-        @Override
-        public void viewerUpdatesComplete() {
-            if (viewerNeedsUpdate) {
-                final int itemCount = treeModelViewer.getTree().getItemCount();
-                if (itemCount > 0) {
-                    try {
-                        treeModelViewer.getTree().deselectAll();
-                        treeModelViewer.collapseAll();
-                    } catch (final IllegalArgumentException e) {
-                        // that's fine
-                    } finally {
-                        viewerNeedsUpdate = false;
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void updateStarted(final IViewerUpdate update) {
-        }
-
-        @Override
-        public void updateComplete(final IViewerUpdate update) {
-        }
-
-        void setViewerUpdateIsNeeded() {
-            this.viewerNeedsUpdate = true;
-        }
-    }
 }

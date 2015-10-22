@@ -331,7 +331,6 @@ public class RobotDebugEventDispatcher extends Job {
 
     private void handlePausedEvent() {
         target.suspended(DebugEvent.CLIENT_REQUEST);
-        target.getRobotVariablesManager().addVariablesViewerListener();
     }
 
     private void handleEndKeywordEvent(final Map<String, ?> eventMap) {
@@ -368,7 +367,6 @@ public class RobotDebugEventDispatcher extends Job {
 
     private void handleCloseEvent() {
         robotEventBroker.sendClearAllEventToTextEditor();
-        target.getRobotVariablesManager().removeVariablesViewerListener();
         target.terminated();
     }
 

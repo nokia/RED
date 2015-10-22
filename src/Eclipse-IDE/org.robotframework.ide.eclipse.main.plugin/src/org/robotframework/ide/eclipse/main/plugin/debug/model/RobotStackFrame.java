@@ -15,6 +15,7 @@ import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 
 /**
  * @author mmarzec
@@ -41,28 +42,31 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
      * frame data.
      * 
      * @param thread
-     * @param fileName
-     * @param keywordName
-     * @param lineNumber
-     * @param vars
      * @param id
-     *            stack frame id (1 is the bottom of the stack)
+     *      stack frame id (1 is the bottom of the stack)
+     * @param keywordName
+     * @param keywordContext
+     *            
      */
-    public RobotStackFrame(final RobotThread thread, final String fileName, final String keywordName, final int lineNumber,
-            final Map<String, Object> vars, final int id) {
+    public RobotStackFrame(final RobotThread thread, final int id, final String keywordName, final KeywordContext keywordContext) {
         super((RobotDebugTarget) thread.getDebugTarget());
-        this.id = id;
         this.thread = thread;
-        this.fileName = fileName;
-        this.lineNumber = lineNumber;
-        name = keywordName + " [line:" + lineNumber + "]";
-        initVariables(vars);
+        setStackFrameData(id, keywordName, keywordContext);
+    }
+    
+    public void setStackFrameData(final int id, final String keywordName, final KeywordContext keywordContext) {
+        this.id = id;
+        this.fileName = keywordContext.getFileName();
+        this.lineNumber = keywordContext.getLineNumber();
+        name = keywordName + " [line:" + keywordContext.getLineNumber() + "]";
+        initVariables(keywordContext.getVariables());
     }
 
-    public void initVariables(final Map<String, Object> vars) {
-
-        variables = ((RobotDebugTarget) thread.getDebugTarget()).getRobotVariablesManager().extractRobotDebugVariables(
-                id, vars);
+    private void initVariables(final Map<String, Object> vars) {
+        if (vars != null) {
+            variables = ((RobotDebugTarget) thread.getDebugTarget()).getRobotVariablesManager()
+                    .extractRobotDebugVariables(id, vars);
+        }
     }
 
     @Override
@@ -72,6 +76,9 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     @Override
     public IVariable[] getVariables() throws DebugException {
+        if(variables == null) {
+            return new IVariable[0];
+        }
         return variables;
     }
 
@@ -90,6 +97,9 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     @Override
     public boolean hasVariables() throws DebugException {
+        if(variables == null) {
+            return false;
+        }
         return variables.length > 0;
     }
 
