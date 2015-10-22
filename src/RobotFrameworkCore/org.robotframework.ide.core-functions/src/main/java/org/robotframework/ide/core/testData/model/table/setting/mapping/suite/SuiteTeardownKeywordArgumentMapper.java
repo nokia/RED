@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
@@ -23,10 +24,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public SuiteTeardownKeywordArgumentMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -59,7 +62,7 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.SETTING_SUITE_TEARDOWN) {
             List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
                     .getSettingTable().getSuiteTeardowns();

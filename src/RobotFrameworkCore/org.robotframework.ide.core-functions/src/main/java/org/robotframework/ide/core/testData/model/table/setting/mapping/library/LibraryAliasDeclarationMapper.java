@@ -10,8 +10,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
@@ -25,11 +25,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper utility;
 
 
     public LibraryAliasDeclarationMapper() {
-        this.utility = new ElementsUtility();
+        this.utility = new ParsingStateHelper();
     }
 
 

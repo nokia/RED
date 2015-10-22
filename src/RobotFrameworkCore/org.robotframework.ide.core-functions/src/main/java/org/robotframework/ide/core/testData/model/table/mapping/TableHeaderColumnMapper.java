@@ -26,10 +26,12 @@ import com.google.common.annotations.VisibleForTesting;
 public class TableHeaderColumnMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TableHeaderColumnMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -42,11 +44,11 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TABLE_HEADER_COLUMN);
         rt.setText(new StringBuilder(text));
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state != ParsingState.TABLE_HEADER_COLUMN) {
             processingState.push(ParsingState.TABLE_HEADER_COLUMN);
         }
-        ParsingState tableHeaderState = utility
+        ParsingState tableHeaderState = stateHelper
                 .getNearestTableHeaderState(processingState);
         List<TableHeader<? extends ARobotSectionTable>> headersForTable = utility
                 .getKnownHeadersForTable(robotFileOutput, tableHeaderState);
@@ -68,13 +70,14 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState currentState = utility.getCurrentStatus(processingState);
+        ParsingState currentState = stateHelper
+                .getCurrentStatus(processingState);
         if (!processingState.isEmpty()
-                && !utility.isTableInsideStateInHierarchy(currentState)
+                && !stateHelper.isTableInsideStateInHierarchy(currentState)
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 && isNotExistLineContinueAfterHeader(currentLine)) {
             ParsingState state = processingState.peek();
-            result = (utility.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
+            result = (stateHelper.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
         }
 
         return result;

@@ -10,8 +10,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTemplate;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,11 +25,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseTemplateKeywordMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TestCaseTemplateKeywordMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -64,7 +64,7 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE) {
             List<TestCase> tests = robotFileOutput.getFileModel()
                     .getTestCaseTable().getTestCases();

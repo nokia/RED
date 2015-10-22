@@ -11,8 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -26,11 +26,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseTimeoutValueMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper utility;
 
 
     public TestCaseTimeoutValueMapper() {
-        this.utility = new ElementsUtility();
+        this.utility = new ParsingStateHelper();
     }
 
 

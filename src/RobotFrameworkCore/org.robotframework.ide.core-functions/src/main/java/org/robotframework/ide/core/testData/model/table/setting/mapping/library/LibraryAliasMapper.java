@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -22,12 +23,14 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class LibraryAliasMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper parsingStateHelper;
     private final LibraryAliasFixer libraryFixer;
 
 
     public LibraryAliasMapper() {
         this.utility = new ElementsUtility();
-        this.libraryFixer = new LibraryAliasFixer(utility);
+        this.parsingStateHelper = new ParsingStateHelper();
+        this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
     }
 
 
@@ -63,7 +66,8 @@ public class LibraryAliasMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result;
 
-        ParsingState status = utility.getCurrentStatus(processingState);
+        ParsingState status = parsingStateHelper
+                .getCurrentStatus(processingState);
         if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             result = true;
         } else if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
