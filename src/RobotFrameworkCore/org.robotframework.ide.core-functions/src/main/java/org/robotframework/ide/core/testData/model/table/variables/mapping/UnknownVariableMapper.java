@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.UnknownVariable;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,10 +26,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class UnknownVariableMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public UnknownVariableMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -61,7 +64,8 @@ public class UnknownVariableMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState currentState = utility.getCurrentStatus(processingState);
+        ParsingState currentState = stateHelper
+                .getCurrentStatus(processingState);
 
         if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
             if (text != null) {

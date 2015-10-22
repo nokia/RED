@@ -11,6 +11,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -22,10 +23,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class VariablesArgumentsMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public VariablesArgumentsMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -63,7 +66,7 @@ public class VariablesArgumentsMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
+            ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_VARIABLE_IMPORT_PATH
                     || currentState == ParsingState.SETTING_VARIABLE_ARGUMENTS) {

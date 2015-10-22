@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -23,11 +24,13 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class UnknownSettingMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementsUtility elemUtility;
+    private final ParsingStateHelper utility;
 
 
     public UnknownSettingMapper() {
-        this.utility = new ElementsUtility();
+        this.elemUtility = new ElementsUtility();
+        this.utility = new ParsingStateHelper();
     }
 
 
@@ -62,7 +65,7 @@ public class UnknownSettingMapper implements IParsingMapper {
 
         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
             if (text != null) {
-                result = utility.isTheFirstColumn(currentLine, rt);
+                result = elemUtility.isTheFirstColumn(currentLine, rt);
             }
         }
 

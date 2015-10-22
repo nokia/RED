@@ -30,6 +30,8 @@ import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
+import org.robotframework.ide.core.testData.model.table.mapping.PrettyAlignSpaceUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.SettingsMapperProvider;
 import org.robotframework.ide.core.testData.model.table.mapping.TestCaseMapperProvider;
 import org.robotframework.ide.core.testData.model.table.mapping.UserKeywordMapperProvider;
@@ -65,14 +67,18 @@ public class TxtRobotFileParser implements IRobotFileParser {
     private final List<IParsingMapper> mappers = new LinkedList<>();
     private final List<IParsingMapper> unknownTableElementsMapper = new LinkedList<>();
     private final ElementsUtility utility;
+    private final PrettyAlignSpaceUtility alignUtility;
+    private final ParsingStateHelper parsingStateHelper;
     private final LibraryAliasFixer libraryFixer;
     private final PreviousLineHandler previousLineHandler;
 
 
     public TxtRobotFileParser() {
         this.utility = new ElementsUtility();
+        this.alignUtility = new PrettyAlignSpaceUtility();
+        this.parsingStateHelper = new ParsingStateHelper();
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
-        this.libraryFixer = new LibraryAliasFixer(utility);
+        this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
         this.previousLineHandler = new PreviousLineHandler();
 
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
@@ -233,8 +239,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                 currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
 
-                                utility.extractPrettyAlignWhitespaces(line, rt,
-                                        rawText);
+                                alignUtility.extractPrettyAlignWhitespaces(
+                                        line, rt, rawText);
 
                                 isNewLine = false;
                             }
@@ -267,8 +273,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
 
-                            utility.extractPrettyAlignWhitespaces(line, rt,
-                                    rawText);
+                            alignUtility.extractPrettyAlignWhitespaces(line,
+                                    rt, rawText);
 
                             lastColumnProcessed = textLength;
                             isNewLine = false;
@@ -276,8 +282,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     }
                 }
 
-                utility.fixOnlyPrettyAlignLinesInSettings(line, processingState);
-                utility.fixOnlyPrettyAlignLinesInVariables(line,
+                alignUtility.fixOnlyPrettyAlignLinesInSettings(line,
+                        processingState);
+                alignUtility.fixOnlyPrettyAlignLinesInVariables(line,
                         processingState);
 
                 List<IRobotLineElement> lineElements = line.getLineElements();
@@ -308,7 +315,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     previousLineHandler.flushNew(processingState);
                 }
                 parsingOutput.getFileModel().addNewLine(line);
-                utility.updateStatusesForNewLine(processingState);
+                parsingStateHelper.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }
         } catch (FileNotFoundException e) {
@@ -374,7 +381,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         if (processThisElement) {
-            ParsingState newStatus = utility.getStatus(robotToken);
+            ParsingState newStatus = parsingStateHelper.getStatus(robotToken);
             boolean wasRecognizedCorrectly = true;
             if (robotToken != null) {
                 if (!text.trim().equals(robotToken.getText().toString().trim())) {
@@ -449,9 +456,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 useMapper = false;
             }
 
-            robotToken = applyPrettyAlignTokenIfIsValid(currentLine,
-                    processingState, robotFileOutput, fp, text, fileName,
-                    robotToken);
+            robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(
+                    currentLine, processingState, robotFileOutput, fp, text,
+                    fileName, robotToken);
 
             useMapper = useMapper
                     & !robotToken.getTypes().contains(
@@ -465,32 +472,6 @@ public class TxtRobotFileParser implements IRobotFileParser {
         }
 
         utility.fixNotSetPositions(robotToken, fp);
-
-        return robotToken;
-    }
-
-
-    private RobotToken applyPrettyAlignTokenIfIsValid(RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, String fileName, RobotToken robotToken) {
-        if (" ".equals(text)) {
-            boolean isPrettyAlign = false;
-            RobotFile fileModel = robotFileOutput.getFileModel();
-
-            ParsingState currentStatus = utility
-                    .getCurrentStatus(processingState);
-            if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE
-                    || currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE
-                    || currentStatus == ParsingState.TEST_CASE_DECLARATION
-                    || currentStatus == ParsingState.KEYWORD_DECLARATION) {
-                isPrettyAlign = true;
-            }
-
-            if (isPrettyAlign) {
-                robotToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-            }
-        }
 
         return robotToken;
     }

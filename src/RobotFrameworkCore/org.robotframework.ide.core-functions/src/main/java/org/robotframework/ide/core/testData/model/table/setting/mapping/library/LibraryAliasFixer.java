@@ -10,6 +10,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryAlias;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -24,16 +25,19 @@ import com.google.common.annotations.VisibleForTesting;
 public class LibraryAliasFixer {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper parsingStateHelper;
 
 
-    public LibraryAliasFixer(final ElementsUtility utility) {
+    public LibraryAliasFixer(final ElementsUtility utility,
+            final ParsingStateHelper parsingStateHelper) {
         this.utility = utility;
+        this.parsingStateHelper = parsingStateHelper;
     }
 
 
     public void checkAndFixLine(final RobotFileOutput robotFileOutput,
             final Stack<ParsingState> processingState) {
-        ParsingState state = utility
+        ParsingState state = parsingStateHelper
                 .findNearestNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             LibraryImport lib = utility

@@ -11,8 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -23,12 +23,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
     private final KeywordFinder keywordFinder;
 
 
     public KeywordExecutableRowArgumentMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
         this.keywordFinder = new KeywordFinder();
     }
 
@@ -59,7 +59,7 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
 
         return result;

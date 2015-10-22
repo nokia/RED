@@ -10,8 +10,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,11 +25,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseTimeoutMessageMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TestCaseTimeoutMessageMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -65,7 +65,7 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
+            ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
                     || currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
