@@ -76,8 +76,8 @@ public abstract class ATokenRecognizer {
 
                 str.append(']');
             }
-
         }
+
         return str.toString();
     }
 
