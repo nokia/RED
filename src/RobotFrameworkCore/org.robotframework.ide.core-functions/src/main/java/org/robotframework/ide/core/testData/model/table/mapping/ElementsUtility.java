@@ -154,7 +154,9 @@ public class ElementsUtility {
 
                 if (correct == null) {
                     if (ParsingState.getSettingsStates().contains(state)
-                            || getCurrentStatus(processingState).getTable() == TableType.VARIABLES) {
+                            || state.getTable() == TableType.VARIABLES
+                            || state.getTable() == TableType.KEYWORD
+                            || state.getTable() == TableType.TEST_CASE) {
                         RobotToken newRobotToken = new RobotToken();
                         newRobotToken.setLineNumber(fp.getLine());
                         newRobotToken.setStartColumn(fp.getColumn());
@@ -191,6 +193,24 @@ public class ElementsUtility {
             } else {
                 correct = token;
             }
+        }
+
+        boolean hasAnyProposalVariableInside = false;
+        for (RobotToken rt : robotTokens) {
+            List<IRobotTokenType> types = rt.getTypes();
+            for (IRobotTokenType type : types) {
+                if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
+                        || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
+                        || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
+                        || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
+                    hasAnyProposalVariableInside = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasAnyProposalVariableInside) {
+            correct.getTypes().add(RobotTokenType.VARIABLE_USAGE);
         }
 
         return correct;
