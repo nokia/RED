@@ -42,11 +42,13 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public IStackFrame[] getStackFrames() throws DebugException {
-        if (isSuspended()) {
-            return ((RobotDebugTarget) getDebugTarget()).getStackFrames();
-        } else {
+
+        IStackFrame[] stackFrames = ((RobotDebugTarget) getDebugTarget()).getStackFrames();
+        if (stackFrames == null) {
             return new IStackFrame[0];
         }
+
+        return stackFrames;
     }
 
     @Override
