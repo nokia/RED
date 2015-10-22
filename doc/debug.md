@@ -43,7 +43,7 @@ When breakpoint line is activated during execution, following icons are active:
 
 moving from left to right:
 
-*   Blue circle - Skip All Breakpoints - allow to continue testcase execution onwards without stopping on next breakpoint
+*   Blue circle - Skip All Breakpoints - allow to continue testcase execution onwards without stopping on defined breakpoints
 *   Green Play - Resume - resumes test execution
 *   Pause
 *   Stop
