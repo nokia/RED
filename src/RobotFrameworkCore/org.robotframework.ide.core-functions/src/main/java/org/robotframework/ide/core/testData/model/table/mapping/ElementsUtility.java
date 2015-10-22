@@ -432,19 +432,21 @@ public class ElementsUtility {
                     }
 
                     result = result
-                            && lineTokenInfo.getDataEndIndex() > separator
+                            && lineTokenInfo.getDataEndIndex() >= separator
                                     .getCurrentElementIndex();
                 } else if (tableType == TableType.TEST_CASE
                         || tableType == TableType.KEYWORD) {
-                    if (line.getLineElements().size() >= 2
-                            && lineTokenInfo.getDataEndIndex() > separator
-                                    .getCurrentElementIndex()) {
+                    if (line.getLineElements().size() >= 2) {
                         if (isContinoue) {
                             result = lineTokenInfo.getDataStartIndex() <= separator
                                     .getCurrentElementIndex();
                         } else {
                             result = true;
                         }
+
+                        result = result
+                                && lineTokenInfo.getDataEndIndex() >= separator
+                                        .getCurrentElementIndex();
                     }
                 }
             }
