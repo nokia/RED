@@ -10,6 +10,7 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -24,10 +25,12 @@ import com.google.common.annotations.VisibleForTesting;
 public class PreviousLineHandler {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public PreviousLineHandler() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
     private final Stack<ParsingState> storedStack = new Stack<>();
@@ -43,7 +46,7 @@ public class PreviousLineHandler {
             if ((currentToken.getTypes().size() == 1 && currentToken.getTypes()
                     .contains(RobotTokenType.PREVIOUS_LINE_CONTINUE))
                     || isCommentContinue(currentToken, storedStack)) {
-                ParsingState currentState = utility
+                ParsingState currentState = stateHelper
                         .getCurrentStatus(parsingStates);
                 if (isSomethingToContinue(model, currentLine)) {
                     if (utility.isTheFirstColumn(currentLine, currentToken)) {

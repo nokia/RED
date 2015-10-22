@@ -11,8 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.NamedSpecial;
 import org.robotframework.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.Special;
@@ -30,12 +30,12 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class DictionaryVariableValueMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
     private final SpecialEscapedCharactersExtractor escapedExtractor;
 
 
     public DictionaryVariableValueMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
         this.escapedExtractor = new SpecialEscapedCharactersExtractor();
     }
 
@@ -160,7 +160,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
     }
 }

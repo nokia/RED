@@ -12,6 +12,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTeardown;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,10 +25,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class TestCaseTeardownKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TestCaseTeardownKeywordMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -61,7 +64,7 @@ public class TestCaseTeardownKeywordMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.TEST_CASE_SETTING_TEARDOWN) {
             List<TestCase> tests = robotFileOutput.getFileModel()
                     .getTestCaseTable().getTestCases();

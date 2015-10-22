@@ -10,8 +10,8 @@ import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTemplate;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,11 +24,11 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class TestCaseTemplateKeywordTrashArgumentMapper implements
         IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TestCaseTemplateKeywordTrashArgumentMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -65,7 +65,7 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
             Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
+            ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD
                     || currentState == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
