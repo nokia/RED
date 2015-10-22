@@ -37,7 +37,7 @@ public class RobotDebugExecutionContextTest {
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test1.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_1.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
@@ -80,7 +80,7 @@ public class RobotDebugExecutionContextTest {
     @Test
     public void test_MultipleResources() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test2.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_2.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
@@ -119,11 +119,11 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endTest();
         
     }
-    
+
     @Test
     public void test_ForLoop() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test3.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_3.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
@@ -192,7 +192,7 @@ public class RobotDebugExecutionContextTest {
     @Test
     public void test_Comments() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test4.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_4.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
@@ -222,7 +222,7 @@ public class RobotDebugExecutionContextTest {
     @Test
     public void test_SetupAndTeardownKeywords() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test5.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_5.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
@@ -268,7 +268,7 @@ public class RobotDebugExecutionContextTest {
     @Test
     public void test_SuiteSetupAndTeardownKeywords() throws URISyntaxException {
         linesCounter = 0;
-        RobotFile modelFile = RobotModelTestProvider.getModelFile("test6.robot");
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_6.robot");
         
         debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent());
