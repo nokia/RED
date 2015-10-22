@@ -27,6 +27,7 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+import org.robotframework.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -126,6 +127,8 @@ public class ElementsUtility {
             final RobotFileOutput robotFileOutput, final FilePosition fp,
             String text, boolean isNewLine, List<RobotToken> robotTokens,
             String fileName) {
+        ParsingState state = getCurrentStatus(processingState);
+
         RobotToken correct = null;
         if (robotTokens.size() > 1) {
             List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
@@ -136,7 +139,6 @@ public class ElementsUtility {
                     // FIXME: error
                 }
             } else {
-                ParsingState state = getCurrentStatus(processingState);
 
                 RobotToken comment = findCommentToken(robotTokens, text);
                 if (comment != null) {
@@ -170,7 +172,25 @@ public class ElementsUtility {
                 }
             }
         } else {
-            correct = robotTokens.get(0);
+            RobotToken token = robotTokens.get(0);
+            if (!token.getTypes().contains(RobotTokenType.UNKNOWN)) {
+                if (text.equals(token.getRaw().toString())) {
+                    correct = token;
+                } else {
+                    RobotToken newRobotToken = new RobotToken();
+                    newRobotToken.setLineNumber(fp.getLine());
+                    newRobotToken.setStartColumn(fp.getColumn());
+                    newRobotToken.setText(new StringBuilder(text));
+                    newRobotToken.setRaw(new StringBuilder(text));
+                    newRobotToken.setType(RobotTokenType.UNKNOWN);
+                    // FIXME: decide what to do
+                    newRobotToken.getTypes().addAll(token.getTypes());
+                    // or add warning about possible type
+                    correct = newRobotToken;
+                }
+            } else {
+                correct = token;
+            }
         }
 
         return correct;
@@ -625,17 +645,44 @@ public class ElementsUtility {
     public boolean shouldGiveEmptyToProcess(
             final RobotFileOutput parsingOutput,
             final ALineSeparator separator, final Separator currentSeparator,
-            final RobotLine robotLine, String line,
-            final Stack<ParsingState> processingState) {
+            final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        if (separator.getProducedType() == SeparatorType.PIPE
-                && currentSeparator.getStartColumn() == 0) {
-            result = false;
-        } else {
-            // simple logic: if was something before and something after
-            // also exists, we treat data as to process
+        ParsingState state = getCurrentStatus(processingState);
+        if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
+            if (separator.getProducedType() == SeparatorType.PIPE
+                    && currentSeparator.getStartColumn() == 0) {
+                result = false;
+            } else {
+                int textPosition = 0;
+                String textInLine = separator.getLine();
+                while(separator.hasNext()) {
+                    Separator next = separator.next();
+                    String toAnalyze = textInLine.substring(textPosition,
+                            next.getStartColumn());
+                    textPosition = next.getEndColumn();
 
+                    toAnalyze = toAnalyze.trim();
+                    if (!toAnalyze.isEmpty()) {
+                        PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
+                        result = !recognizer.hasNext(new StringBuilder(
+                                toAnalyze), separator.getLineNumber());
+                        if (!result) {
+                            result = !"...".equals(toAnalyze);
+                        }
+                        textPosition = textInLine.length();
+                        break;
+                    }
+                }
+
+                if (!result && textInLine.length() > textPosition) {
+                    result = !textInLine.substring(textPosition).trim()
+                            .isEmpty();
+                }
+            }
+        } else {
+            List<IRobotLineElement> lineElements = line.getLineElements();
+            result = lineElements.size() >= 2;
         }
 
         return result;
