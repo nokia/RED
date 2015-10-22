@@ -608,8 +608,10 @@ public class ElementsUtility {
 
     public void extractPrettyAlignWhitespaces(RobotLine line, RobotToken rt,
             String rawText) {
+        boolean isNotPrettyAlign = !rt.getTypes().contains(
+                RobotTokenType.PRETTY_ALIGN_SPACE);
         String correctedString = rawText;
-        if (rawText.startsWith(" ")) {
+        if (rawText.startsWith(" ") && isNotPrettyAlign) {
             RobotToken prettyLeftAlign = new RobotToken();
             prettyLeftAlign.setStartOffset(rt.getStartOffset());
             prettyLeftAlign.setLineNumber(rt.getLineNumber());
@@ -627,7 +629,7 @@ public class ElementsUtility {
             rt.setRaw(new StringBuilder(correctedString));
         }
 
-        if (correctedString.endsWith(" ")) {
+        if (correctedString.endsWith(" ") && isNotPrettyAlign) {
             int theLongestTextLength = Math.max(rt.getRaw().length(),
                     rawText.length());
             RobotToken prettyRightAlign = new RobotToken();
