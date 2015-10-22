@@ -1,0 +1,130 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: AddingVariablesUsingContentAssist
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _9rWNQHf-EeWYifgNPLzx_Q
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 10/21/15 5:34 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Resource file" 
+    | click
+with [get-window "New Robot Resource file"] {
+    with [get-editbox -after [get-label "File name:"]] {
+        set-text "resource_file.robot"
+    }
+    get-button Finish | click
+}
+with [get-editor "resource_file.robot" | get-text-viewer] {
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "${ala}  5"
+    key-type Enter
+    type-text "@{int_list}  1  2  3"
+    key-type Enter
+    type-text "${ALA}  text"
+    key-type Enter
+    type-text "&{bands}  key=value"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+
+//adding Settings
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type End
+    key-type Enter -times 2
+    key-type Up
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    
+    //adding Resource
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text "resource_file.robot"
+    key-type Enter -times 2
+    key-type "M1+SPACE"
+    key-type "NUMPAD_MULTIPLY" "*"
+    key-type Enter
+    
+    //adding variables from eresource
+    type-text "${a"
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+    type-text "${A"
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter -times 2
+    type-text "@{"
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+    type-text "&"
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+  
+  	//adding system variables
+    key-type "M1+SPACE"
+    key-type Down -times 8
+    key-type Enter -times 2
+    key-type "M1+SPACE"
+    key-type Up
+    key-type Enter -times 2
+    key-type "M1+SPACE"
+    type-text c
+    key-type Enter -times 3
+    
+    // adding new variables
+    type-text "${ip}  localhost"
+    key-type Enter
+    type-text "@{port}  5001"
+    key-type Enter
+    type-text "&{book}  name=Matti    address=Finland         phone=123"
+    key-type Enter
+    
+    
+    //check if writing only letters will find var
+    key-type "M1+SPACE"
+    type-text po
+    key-type Enter -times 2
+    
+    //check if backspace will not close assistant
+    key-type "M1+SPACE"
+    type-text o
+    key-type BackSpace
+    type-text ip
+    key-type Enter -times 2
+    
+    //type during content assist - cpaital leter
+    type-text "&{B"
+    key-type "M1+SPACE"
+    type-text o
+    key-type Enter
+
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Resource  resource_file.robot\n\n"
+    + "*** Variables ***\n"
+    + "${ala}\n"
+    + "${ALA}\n"
+    + "@{int_list}\n"
+    + "&{bands}\n\n"
+    + "${/}\n"
+    + "@{TEST_TAGS}\n"
+    + "${CURDIR}\n\n"
+    + "${ip}  localhost\n"
+    + "@{port}  5001\n"
+    + "&{book}  name=Matti    address=Finland         phone=123\n"
+    + "@{port}\n"
+    + "${ip}\n"
+    + "&{book}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
