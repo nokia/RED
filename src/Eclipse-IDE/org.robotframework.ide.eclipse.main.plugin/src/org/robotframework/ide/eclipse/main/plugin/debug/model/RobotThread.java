@@ -130,7 +130,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public boolean canStepReturn() {
-        return isSuspended() && ((RobotDebugTarget) getDebugTarget()).getCurrentFrames().size() > 1;
+        return isSuspended() && ((RobotDebugTarget) getDebugTarget()).getCurrentKeywordsContextMap().size() > 1;
     }
 
     @Override
