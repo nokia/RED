@@ -48,7 +48,7 @@ public class PreviousLineHandler {
                     || isCommentContinue(currentToken, storedStack)) {
                 ParsingState currentState = stateHelper
                         .getCurrentStatus(parsingStates);
-                if (isSomethingToContinue(model, currentLine)) {
+                if (isSomethingToContinue(model)) {
                     if (utility.isTheFirstColumn(currentLine, currentToken)) {
                         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
                             if (containsAnySetting(model)) {
@@ -115,9 +115,7 @@ public class PreviousLineHandler {
     }
 
 
-    @VisibleForTesting
-    protected boolean isSomethingToContinue(final RobotFile model,
-            final RobotLine currentLine) {
+    public boolean isSomethingToContinue(final RobotFile model) {
         boolean result = false;
         List<RobotLine> fileContent = model.getFileContent();
         boolean notFoundYet = true;
@@ -137,7 +135,8 @@ public class PreviousLineHandler {
                         break;
                     } else if (types.contains(SeparatorType.PIPE)
                             || types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)
-                            || types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                            || types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                            || types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                         continue;
                     } else {
                         result = true;
