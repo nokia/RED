@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
@@ -24,11 +25,13 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class TestCaseExecutableRowActionMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
     private final TestCaseFinder testCaseFinder;
 
 
     public TestCaseExecutableRowActionMapper() {
         this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
         this.testCaseFinder = new TestCaseFinder();
     }
 
@@ -57,7 +60,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION)
                 && !utility.isTheFirstColumn(currentLine, rt);
     }

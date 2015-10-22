@@ -11,8 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTags;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,11 +24,11 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class TestCaseTagsTagNameMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper stateHelper;
 
 
     public TestCaseTagsTagNameMapper() {
-        this.utility = new ElementsUtility();
+        this.stateHelper = new ParsingStateHelper();
     }
 
 
@@ -61,7 +61,7 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.TEST_CASE_SETTING_TAGS || state == ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME);
 
         return result;

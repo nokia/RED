@@ -11,8 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,11 +24,11 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class KeywordArgumentsValueMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ParsingStateHelper utility;
 
 
     public KeywordArgumentsValueMapper() {
-        this.utility = new ElementsUtility();
+        this.utility = new ParsingStateHelper();
     }
 
 
