@@ -162,7 +162,8 @@ public class ElementsUtility {
             }
         }
 
-        if (hasAnyProposalVariableInside) {
+        if (hasAnyProposalVariableInside
+                && state != ParsingState.VARIABLE_TABLE_INSIDE) {
             correct.getTypes().add(RobotTokenType.VARIABLE_USAGE);
         }
 
@@ -438,6 +439,7 @@ public class ElementsUtility {
 
         private final List<Integer> positionsOfNotEmptyElements = new LinkedList<>();
         private final List<Integer> positionsOfLineContinoue = new LinkedList<>();
+        private boolean isLineContinoue;
 
 
         public static LineTokenInfo build(final List<IRobotLineElement> elements) {
@@ -451,6 +453,9 @@ public class ElementsUtility {
                     if (RobotTokenType.PREVIOUS_LINE_CONTINUE
                             .getRepresentation().get(0).equals(tokenText)) {
                         lti.positionsOfLineContinoue.add(elemIndex);
+                        if (lti.positionsOfNotEmptyElements.isEmpty()) {
+                            lti.isLineContinoue = true;
+                        }
                     } else if (tokenText != null
                             && !"".equals(tokenText.trim())) {
                         lti.positionsOfNotEmptyElements.add(elemIndex);
@@ -469,6 +474,11 @@ public class ElementsUtility {
 
         public List<Integer> getPositionsOfLineContinoue() {
             return positionsOfLineContinoue;
+        }
+
+
+        public boolean isLineContinoueTheFirst() {
+            return isLineContinoue;
         }
     }
 
