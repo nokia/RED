@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.AKeywordBaseSetting;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
@@ -26,7 +27,6 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
-import org.robotframework.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -396,43 +396,78 @@ public class ElementsUtility {
 
         ParsingState state = parsingStateHelper
                 .getCurrentStatus(processingState);
-        if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
-            if (separator.getProducedType() == SeparatorType.PIPE
-                    && currentSeparator.getStartColumn() == 0) {
-                result = false;
-            } else {
-                int textPosition = 0;
-                String textInLine = separator.getLine();
-                while(separator.hasNext()) {
-                    Separator next = separator.next();
-                    String toAnalyze = textInLine.substring(textPosition,
-                            next.getStartColumn());
-                    textPosition = next.getEndColumn();
+        TableType tableType = state.getTable();
+        List<IRobotLineElement> splittedLine = separator.getSplittedLine();
 
-                    toAnalyze = toAnalyze.trim();
-                    if (!toAnalyze.isEmpty()) {
-                        PreviousLineContinueRecognizer recognizer = new PreviousLineContinueRecognizer();
-                        result = !recognizer.hasNext(new StringBuilder(
-                                toAnalyze), separator.getLineNumber());
-                        if (!result) {
-                            result = !"...".equals(toAnalyze);
+        if (separator.getProducedType() == SeparatorType.PIPE
+                && currentSeparator.getStartColumn() == 0) {
+            result = false;
+        } else if (separator.getProducedType() == SeparatorType.PIPE) {
+            LineTokenInfo lineTokenInfo = LineTokenInfo.build(splittedLine);
+            if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
+                    || !lineTokenInfo.getPositionsOfNotEmptyElements()
+                            .isEmpty()) {
+                // Logic: Grant valid to process empty elements in case:
+                // SETTINGS or VARIABLES: always read empty the exclusion is
+                // only that we have line continue and element is not the first
+                // after header declaration
+                // TEST CASES and KEYWORDS: read empty the exclusion is only
+                // line continue in any case only first element is omitted
+                // GRANT LOGIC main: always process start from beginning until
+                // last not empty element
+                boolean isContinoue = lineTokenInfo.isLineContinoueTheFirst();
+                if (tableType == TableType.SETTINGS
+                        || tableType == TableType.VARIABLES) {
+                    if (isContinoue) {
+                        RobotFile model = parsingOutput.getFileModel();
+                        PreviousLineHandler prevLineHandler = new PreviousLineHandler();
+                        if (prevLineHandler.isSomethingToContinue(model)) {
+                            result = lineTokenInfo.getDataStartIndex() <= separator
+                                    .getCurrentElementIndex();
+                        } else {
+                            result = true;
                         }
-                        textPosition = textInLine.length();
-                        break;
+                    } else {
+                        result = true;
+                    }
+
+                    result = result
+                            && lineTokenInfo.getDataEndIndex() > separator
+                                    .getCurrentElementIndex();
+                } else if (tableType == TableType.TEST_CASE
+                        || tableType == TableType.KEYWORD) {
+                    if (line.getLineElements().size() >= 2
+                            && lineTokenInfo.getDataEndIndex() > separator
+                                    .getCurrentElementIndex()) {
+                        if (isContinoue) {
+                            result = lineTokenInfo.getDataStartIndex() <= separator
+                                    .getCurrentElementIndex();
+                        } else {
+                            result = true;
+                        }
                     }
                 }
-
-                if (!result && textInLine.length() > textPosition) {
-                    result = !textInLine.substring(textPosition).trim()
-                            .isEmpty();
-                }
             }
-        } else {
-            List<IRobotLineElement> lineElements = line.getLineElements();
-            result = lineElements.size() >= 2;
         }
 
         return result;
+    }
+
+
+    public ARobotSectionTable getTable(final RobotFile robotModel,
+            final TableType type) {
+        ARobotSectionTable table = null;
+        if (type == TableType.SETTINGS) {
+            table = robotModel.getSettingTable();
+        } else if (type == TableType.VARIABLES) {
+            table = robotModel.getVariableTable();
+        } else if (type == TableType.KEYWORD) {
+            table = robotModel.getKeywordTable();
+        } else if (type == TableType.TEST_CASE) {
+            table = robotModel.getTestCaseTable();
+        }
+
+        return table;
     }
 
     private static class LineTokenInfo {
@@ -440,6 +475,8 @@ public class ElementsUtility {
         private final List<Integer> positionsOfNotEmptyElements = new LinkedList<>();
         private final List<Integer> positionsOfLineContinoue = new LinkedList<>();
         private boolean isLineContinoue;
+        private int dataStartIndex = -1;
+        private int dataEndIndex = -1;
 
 
         public static LineTokenInfo build(final List<IRobotLineElement> elements) {
@@ -456,9 +493,19 @@ public class ElementsUtility {
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
                             lti.isLineContinoue = true;
                         }
+
+                        if (lti.dataStartIndex == -1) {
+                            lti.dataStartIndex = elemIndex;
+                        }
+                        lti.dataEndIndex = elemIndex;
                     } else if (tokenText != null
                             && !"".equals(tokenText.trim())) {
                         lti.positionsOfNotEmptyElements.add(elemIndex);
+
+                        if (lti.dataStartIndex == -1) {
+                            lti.dataStartIndex = elemIndex;
+                        }
+                        lti.dataEndIndex = elemIndex;
                     }
                 }
             }
@@ -479,6 +526,16 @@ public class ElementsUtility {
 
         public boolean isLineContinoueTheFirst() {
             return isLineContinoue;
+        }
+
+
+        public int getDataStartIndex() {
+            return dataStartIndex;
+        }
+
+
+        public int getDataEndIndex() {
+            return dataEndIndex;
         }
     }
 
