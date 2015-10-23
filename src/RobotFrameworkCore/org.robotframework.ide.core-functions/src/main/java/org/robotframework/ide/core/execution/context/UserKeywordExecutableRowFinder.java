@@ -100,10 +100,21 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         }
         final String[] nameElements = keywordContext.getName().split("\\.");
         if (nameElements.length > 0) {
-            final String name = nameElements[0];
+            final String name = extractResourceName(nameElements);
             return findImportReference(name, resourceImportReferences);
         }
         return null;
+    }
+
+    private String extractResourceName(final String[] nameElements) {
+        String name = nameElements[0];
+        if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') {
+            final int variableDeclarationIndex = name.lastIndexOf("=");
+            if (variableDeclarationIndex >= 0) {
+                name = name.substring(variableDeclarationIndex + 1).trim();
+            }
+        }
+        return name;
     }
 
     private ResourceImportReference findImportReference(final String name,
