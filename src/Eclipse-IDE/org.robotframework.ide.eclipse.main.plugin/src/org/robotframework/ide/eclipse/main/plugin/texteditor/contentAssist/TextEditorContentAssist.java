@@ -145,7 +145,7 @@ public class TextEditorContentAssist {
                     .will(AcceptanceMode.INSERT)
                     .theText(proposedKeyword + separator)
                     .atOffset(offset)
-                    .givenThatCurrentPrefixIs("")
+                    .givenThatCurrentPrefixIs(replacedWord)
                     .andWholeContentIs(replacedWord)
                     .secondaryPopupShouldBeDisplayed(keywordContext.getDescription())
                     .contextInformationShouldBeShownAfterAccepting(contextInformation)
@@ -161,7 +161,7 @@ public class TextEditorContentAssist {
         return completionProposals.toArray(new ICompletionProposal[0]);
     }
     
-    public static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
+    static ICompletionProposal[] buildVariablesProposals(final List<RedVariableProposal> proposals,
             final String replacedWord, final int offset) {
 
         final List<ICompletionProposal> completionProposals = newArrayList();
