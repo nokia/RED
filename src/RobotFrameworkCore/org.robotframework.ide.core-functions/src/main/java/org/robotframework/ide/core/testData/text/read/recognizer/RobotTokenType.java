@@ -30,6 +30,10 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
+    ASSIGNMENT(TableType.NOT_STRICTLY_BELONGS, "="),
+    /**
+     * 
+     */
     PRETTY_ALIGN_SPACE(TableType.NOT_STRICTLY_BELONGS, " "),
     /**
      * 
