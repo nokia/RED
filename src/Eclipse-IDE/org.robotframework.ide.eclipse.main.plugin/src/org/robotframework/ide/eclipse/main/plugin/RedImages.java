@@ -9,6 +9,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 public class RedImages {
 
@@ -203,6 +204,11 @@ public class RedImages {
     
     public static ImageDescriptor getRemoveTagImage() {
         return RedPlugin.getImageDescriptor("resources/close_tag.png");
+    }
+
+    public static ImageDescriptor getImageForFileWithExtension(final String extension) {
+        final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
+        return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor("file." + extWithoutDot);
     }
 
 

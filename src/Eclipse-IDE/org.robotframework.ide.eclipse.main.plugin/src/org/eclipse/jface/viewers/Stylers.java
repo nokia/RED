@@ -10,14 +10,29 @@ import java.util.List;
 
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.red.graphics.ColorsManager;
 
 public class Stylers {
+
+    public static class Common {
+
+        public static Styler MARKED_PREFIX_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle style) {
+                style.foreground = ColorsManager.getColor(135, 150, 255);
+                style.background = ColorsManager.getColor(230, 240, 255);
+                style.borderColor = ColorsManager.getColor(135, 150, 255);
+                style.borderStyle = SWT.BORDER_DOT;
+            }
+        };
+    }
 
     public static DisposeNeededStyler mixStylers(final Styler... stylers) {
         return new DisposeNeededStyler() {

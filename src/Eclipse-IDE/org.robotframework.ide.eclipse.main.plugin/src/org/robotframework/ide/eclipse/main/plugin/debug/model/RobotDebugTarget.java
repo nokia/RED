@@ -32,7 +32,6 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
@@ -77,25 +76,18 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private int currentStepReturnLevel = 0;
 
-    private final RobotPartListener partListener;
-
-    private final RobotEventBroker robotEventBroker;
-    
     private final RobotDebugVariablesManager robotVariablesManager;
     
     private final RobotDebugValueManager robotDebugValueManager;
     
-    private RobotDebugStackFrameManager robotDebugStackFrameManager;
+    private final RobotDebugStackFrameManager robotDebugStackFrameManager;
     
     public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
-            final RobotPartListener partListener, final RobotEventBroker robotEventBroker,
-            final DebugSocketManager socketManager) throws CoreException {
+            final RobotEventBroker robotEventBroker, final DebugSocketManager socketManager) throws CoreException {
         super(null);
         target = this;
         this.launch = launch;
         this.process = process;
-        this.partListener = partListener;
-        this.robotEventBroker = robotEventBroker;
         currentKeywordDebugContextMap = new LinkedHashMap<>();
         robotVariablesManager = new RobotDebugVariablesManager(this);
         robotDebugValueManager = new RobotDebugValueManager();
@@ -197,8 +189,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             sendEventToAgent("interrupt");
         }
         terminated();
-
-        robotEventBroker.sendClearAllEventToTextEditor();
     }
 
     @Override
@@ -226,8 +216,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         thread.setStepping(false);
         sendEventToAgent("resume");
         resumed(DebugEvent.CLIENT_REQUEST);
-
-        robotEventBroker.sendClearAllEventToTextEditor();
     }
 
     protected void step() {
@@ -435,10 +423,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
 
         return false;
-    }
-
-    public RobotPartListener getPartListener() {
-        return partListener;
     }
 
     public BufferedReader getEventReader() {
