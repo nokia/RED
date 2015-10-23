@@ -15,37 +15,36 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword
 
 /**
  * @author mmarzec
- *
  */
 public class ExecutableRowFindersManager {
 
-    private ExecutableRowFindersManager() {
+    public ExecutableRowFindersManager() {
     }
 
-    private static TestCase currentTestCase;
+    private TestCase currentTestCase;
 
-    private static RobotFile currentModel;
+    private RobotFile currentModel;
 
-    private static List<UserKeyword> userKeywords;
+    private List<UserKeyword> userKeywords;
 
-    private static List<ResourceImportReference> resourceImportReferences;
+    private List<ResourceImportReference> resourceImportReferences;
 
-    private static ForLoopExecutableRowFinder forLoopExecutableRowFinder;
+    private ForLoopExecutableRowFinder forLoopExecutableRowFinder;
 
-    private static UserKeywordExecutableRowFinder userKeywordExecutableRowFinder;
+    private UserKeywordExecutableRowFinder userKeywordExecutableRowFinder;
 
-    private static SetupTeardownExecutableRowFinder setupTeardownExecutableRowFinder;
+    private SetupTeardownExecutableRowFinder setupTeardownExecutableRowFinder;
 
-    private static TestCaseExecutableRowFinder testCaseExecutableRowFinder;
+    private TestCaseExecutableRowFinder testCaseExecutableRowFinder;
 
-    public static IRobotExecutableRowFinder provideSetupTeardownExecutableRowFinder() {
+    public IRobotExecutableRowFinder provideSetupTeardownExecutableRowFinder() {
         if (setupTeardownExecutableRowFinder == null) {
             setupTeardownExecutableRowFinder = new SetupTeardownExecutableRowFinder(currentTestCase, currentModel);
         }
         return setupTeardownExecutableRowFinder;
     }
 
-    public static IRobotExecutableRowFinder provideForLoopExecutableRowFinder(
+    public IRobotExecutableRowFinder provideForLoopExecutableRowFinder(
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         if (forLoopExecutableRowFinder == null) {
             forLoopExecutableRowFinder = new ForLoopExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter);
@@ -54,14 +53,14 @@ public class ExecutableRowFindersManager {
         return forLoopExecutableRowFinder;
     }
 
-    public static IRobotExecutableRowFinder provideUserKeywordExecutableRowFinder() {
+    public IRobotExecutableRowFinder provideUserKeywordExecutableRowFinder() {
         if (userKeywordExecutableRowFinder == null) {
             userKeywordExecutableRowFinder = new UserKeywordExecutableRowFinder(userKeywords, resourceImportReferences);
         }
         return userKeywordExecutableRowFinder;
     }
 
-    public static IRobotExecutableRowFinder provideTestCaseExecutableRowFinder(
+    public IRobotExecutableRowFinder provideTestCaseExecutableRowFinder(
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         if (testCaseExecutableRowFinder == null) {
             testCaseExecutableRowFinder = new TestCaseExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter);
@@ -70,15 +69,15 @@ public class ExecutableRowFindersManager {
         return testCaseExecutableRowFinder;
     }
 
-    public static void clearForLoopState() {
+    public void clearForLoopState() {
         forLoopExecutableRowFinder.clear();
     }
 
-    public static void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
+    public void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
             final List<ResourceImportReference> resourceImportReferences) {
-        ExecutableRowFindersManager.currentModel = currentModel;
-        ExecutableRowFindersManager.userKeywords = userKeywords;
-        ExecutableRowFindersManager.resourceImportReferences = resourceImportReferences;
+        this.currentModel = currentModel;
+        this.userKeywords = userKeywords;
+        this.resourceImportReferences = resourceImportReferences;
         if (setupTeardownExecutableRowFinder != null) {
             setupTeardownExecutableRowFinder.setCurrentModel(currentModel);
         }
@@ -88,8 +87,8 @@ public class ExecutableRowFindersManager {
         }
     }
 
-    public static void initFindersAtTestCaseStart(final TestCase currentTestCase) {
-        ExecutableRowFindersManager.currentTestCase = currentTestCase;
+    public void initFindersAtTestCaseStart(final TestCase currentTestCase) {
+        this.currentTestCase = currentTestCase;
         if (setupTeardownExecutableRowFinder != null) {
             setupTeardownExecutableRowFinder.setCurrentTestCase(currentTestCase);
         }
