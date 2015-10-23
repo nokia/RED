@@ -50,7 +50,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         final List<String> cmdLine = Arrays.asList(interpreterPath, "-c",
                 "import json;import robot.variables as rv;vars=rv.Variables();vars.set_from_file('" + normalizedPath
                         + "'," + fileArguments + ");exec('try:\\n\\tprint(json.dumps(vars.data))\\n"
-                        + "except AttributeError:\\n\\tprint(json.dumps(vars.store.data))')");
+                        + "except AttributeError:\\n\\tprint(json.dumps(vars.store.data._data))')");
 
         final StringBuilder jsonEncodedOutput = new StringBuilder();
         final ILineHandler linesHandler = new ILineHandler() {
