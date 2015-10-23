@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.List;
 
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -25,7 +26,7 @@ class PythonLibStructureBuilder {
         this.environment = environment;
     }
 
-    public List<PythonClass> provideEntriesFromFile(final String path) {
+    public List<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
         
         final List<String> classes = environment.getClassesDefinedInModule(new File(path));
         return newArrayList(transform(classes, new Function<String, PythonClass>() {
