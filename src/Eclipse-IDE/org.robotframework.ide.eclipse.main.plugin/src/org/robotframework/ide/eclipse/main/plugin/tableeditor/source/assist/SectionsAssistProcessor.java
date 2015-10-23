@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -33,7 +34,11 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     private static List<String> SECTION_NAMES = newArrayList("*** Keywords ***", "*** Settings ***",
             "*** Test Cases ***", "*** Variables ***");
 
-    private final AssistPreferences assistPreferences = new AssistPreferences();
+    private final SuiteSourceAssistantContext assist;
+
+    public SectionsAssistProcessor(final SuiteSourceAssistantContext assist) {
+        this.assist = assist;
+    }
 
     @Override
     protected String getProposalsTitle() {
@@ -60,7 +65,7 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
                         final String textToInsert = sectionName + DocumentUtilities.getDelimiter(document);
                         
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assistPreferences.getAcceptanceMode())
+                                .will(assist.getAcceptanceMode())
                                 .theText(textToInsert)
                                 .atOffset(lineInformation.getOffset())
                                 .givenThatCurrentPrefixIs(prefix)

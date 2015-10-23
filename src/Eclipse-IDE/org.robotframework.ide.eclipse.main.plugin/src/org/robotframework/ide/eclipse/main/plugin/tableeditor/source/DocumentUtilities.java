@@ -56,6 +56,25 @@ public class DocumentUtilities {
         return Optional.absent();
     }
 
+    public static Optional<IRegion> findLiveVariable(final IDocument document, final int offset)
+            throws BadLocationException {
+        final Optional<IRegion> cellRegion = findLiveCellRegion(document, offset);
+        if (cellRegion.isPresent()) {
+            final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
+
+            final Matcher matcher = Pattern.compile("[@$&%].*").matcher(cellContent);
+            while (matcher.find()) {
+                final int start = matcher.start() + cellRegion.get().getOffset();
+                final int end = matcher.end() + cellRegion.get().getOffset();
+                if (Range.closed(start, end).contains(offset)) {
+                    return Optional.<IRegion> of(new Region(start, end - start));
+                }
+            }
+            return Optional.absent();
+        }
+        return Optional.absent();
+    }
+
     /**
      * Returns region around offset which constitutes a cell in robot file table. The region
      * is surrounded with file begin or cells separator on the left and by the file end or another
