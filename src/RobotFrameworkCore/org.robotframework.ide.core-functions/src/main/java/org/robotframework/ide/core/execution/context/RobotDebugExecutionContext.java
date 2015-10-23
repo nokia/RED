@@ -43,17 +43,20 @@ public class RobotDebugExecutionContext {
     
     private TestCaseExecutionRowCounter testCaseExecutionRowCounter;
     
+    private ExecutableRowFindersManager executableRowFindersManager;
+    
     private boolean isSetupTeardownKeywordStarted;
     private boolean isForLoopStarted;
     
     public RobotDebugExecutionContext() {
         currentKeywords = new LinkedList<>();
         testCaseExecutionRowCounter = new TestCaseExecutionRowCounter();
+        executableRowFindersManager = new ExecutableRowFindersManager();
     }
     
     public void startSuite(final RobotFileOutput robotFileOutput) {
         currentModel = robotFileOutput.getFileModel();
-        ExecutableRowFindersManager.initFindersAtSuiteStart(currentModel, currentModel.getKeywordTable().getKeywords(),
+        executableRowFindersManager.initFindersAtSuiteStart(currentModel, currentModel.getKeywordTable().getKeywords(),
                 robotFileOutput.getResourceImportReferences());
     }
 
@@ -63,7 +66,7 @@ public class RobotDebugExecutionContext {
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase testCase : testCases) {
                 if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
-                    ExecutableRowFindersManager.initFindersAtTestCaseStart(testCase);
+                    executableRowFindersManager.initFindersAtTestCaseStart(testCase);
                     break;
                 }
             }
@@ -93,14 +96,14 @@ public class RobotDebugExecutionContext {
         IRobotExecutableRowFinder executableRowFinder = null;
         if (isKeywordDirectlyFromTestCase()) {
             if (isSetupTeardownKeywordStarted) {
-                executableRowFinder = ExecutableRowFindersManager.provideSetupTeardownExecutableRowFinder();
+                executableRowFinder = executableRowFindersManager.provideSetupTeardownExecutableRowFinder();
             } else {
-                executableRowFinder = ExecutableRowFindersManager.provideTestCaseExecutableRowFinder(testCaseExecutionRowCounter);
+                executableRowFinder = executableRowFindersManager.provideTestCaseExecutableRowFinder(testCaseExecutionRowCounter);
             }
         } else if (isForLoopStarted) {
-            executableRowFinder = ExecutableRowFindersManager.provideForLoopExecutableRowFinder(testCaseExecutionRowCounter);
+            executableRowFinder = executableRowFindersManager.provideForLoopExecutableRowFinder(testCaseExecutionRowCounter);
         } else { // keyword from Keywords section or resource file
-            executableRowFinder = ExecutableRowFindersManager.provideUserKeywordExecutableRowFinder();
+            executableRowFinder = executableRowFindersManager.provideUserKeywordExecutableRowFinder();
         }
         
         return executableRowFinder;
@@ -141,7 +144,7 @@ public class RobotDebugExecutionContext {
             isForLoopStarted = true;
         } else if (isForLoopEnd(type)) {
             isForLoopStarted = false;
-            ExecutableRowFindersManager.clearForLoopState();
+            executableRowFindersManager.clearForLoopState();
         } else if (isSetupTeardownEnd(type)) {
             isSetupTeardownKeywordStarted = false;
         } else if (isSetupTeardownStart(type)) {
