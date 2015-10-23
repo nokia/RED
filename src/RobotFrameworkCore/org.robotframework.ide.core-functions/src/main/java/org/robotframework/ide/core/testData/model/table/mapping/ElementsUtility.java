@@ -109,7 +109,8 @@ public class ElementsUtility {
                     if (ParsingState.getSettingsStates().contains(state)
                             || state.getTable() == TableType.VARIABLES
                             || state.getTable() == TableType.KEYWORD
-                            || state.getTable() == TableType.TEST_CASE) {
+                            || state.getTable() == TableType.TEST_CASE
+                            || state == ParsingState.COMMENT) {
                         RobotToken newRobotToken = new RobotToken();
                         newRobotToken.setLineNumber(fp.getLine());
                         newRobotToken.setStartColumn(fp.getColumn());
