@@ -14,7 +14,9 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -43,9 +45,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -156,7 +161,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private void addPythonHandler() {
         addPythonLibButton.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetSelected(final SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent event) {
                 
                 final FileDialog dialog = createReferencedLibFileDialog();
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
@@ -174,16 +179,25 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             public void run(final IProgressMonitor monitor)
                                     throws InvocationTargetException, InterruptedException {
                                 monitor.beginTask("Reading classes from module '" + chosenFilePath + "'", 100);
-                                pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath));
+                                try {
+                                    pythonClasses
+                                            .addAll(pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath));
+                                } catch (final RobotEnvironmentException e) {
+                                    throw new InvocationTargetException(e);
+                                }
                             }
                         });
-                    } catch (InvocationTargetException | InterruptedException e1) {
-                        // that's fine
+                    } catch (InvocationTargetException | InterruptedException e) {
+                        StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes inside '" + chosenFilePath + "' module", e.getCause()),
+                                StatusManager.SHOW);
+                        return;
                     }
 
                     if (pythonClasses.isEmpty()) {
-                        MessageDialog.openError(viewer.getTable().getShell(), "No classes found",
-                                "RED was unable to find classes inside '" + chosenFilePath + "' module");
+                        StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes inside '" + chosenFilePath + "' module"), 
+                                StatusManager.SHOW);
                         return;
                     }
                     boolean added = false;
