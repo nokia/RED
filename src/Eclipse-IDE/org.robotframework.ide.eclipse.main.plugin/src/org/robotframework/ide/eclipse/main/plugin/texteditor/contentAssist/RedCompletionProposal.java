@@ -16,12 +16,13 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
-public class TextEditorCompletionProposal implements ICompletionProposal, ICompletionProposalExtension3,
-        ICompletionProposalExtension6 {
+public class RedCompletionProposal implements Comparable<RedCompletionProposal>, ICompletionProposal,
+        ICompletionProposalExtension3, ICompletionProposalExtension6 {
 
     /** The string to be displayed in the completion proposal popup. */
     private final String displayString;
@@ -35,6 +36,8 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     /** The replacement length. */
     private final int replacementLength;
 
+    private final int prefixLength;
+
     /** The cursor position after this proposal has been applied. */
     private final int cursorPosition;
 
@@ -47,7 +50,13 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     /** The additional info of this proposal. */
     private final String additionalProposalInfo;
 
-    private final String sourceName;
+    private final String additionalInfoForStyledLabel;
+
+    private final boolean decoratePrefix;
+
+    private final int priority;
+
+    private final boolean activateAssistant;
 
     /**
      * Creates a new completion proposal. All fields are initialized based on the provided
@@ -69,24 +78,43 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
      *            the context information associated with this proposal
      * @param additionalProposalInfo
      *            the additional information associated with this proposal
+     * @param additionalInfoForStyledLabel
+     *            the additional information visible as styled label part
+     * @param prefixLength
+     * @param decoratePrefix
+     * @param activateAssitant
      */
-    public TextEditorCompletionProposal(final String replacementString, final int replacementOffset, final int replacementLength,
-            final int cursorPosition, final Image image, final String displayString, final IContextInformation contextInformation,
-            final String additionalProposalInfo, final String sourceName) {
+    RedCompletionProposal(final int priority, final String replacementString, final int replacementOffset,
+            final int replacementLength, final int prefixLength, final int cursorPosition, final Image image,
+            final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
+            final IContextInformation contextInformation, final String additionalProposalInfo,
+            final String additionalInfoForStyledLabel) {
         Assert.isNotNull(replacementString);
         Assert.isTrue(replacementOffset >= 0);
         Assert.isTrue(replacementLength >= 0);
         Assert.isTrue(cursorPosition >= 0);
 
+        this.priority = priority;
         this.replacementString = replacementString;
         this.replacementOffset = replacementOffset;
         this.replacementLength = replacementLength;
+        this.prefixLength = prefixLength;
+        this.decoratePrefix = decoratePrefix;
         this.cursorPosition = cursorPosition;
         this.image = image;
         this.displayString = displayString;
         this.contextInformation = contextInformation;
+        this.activateAssistant = activateAssitant;
         this.additionalProposalInfo = additionalProposalInfo;
-        this.sourceName = sourceName;
+        this.additionalInfoForStyledLabel = additionalInfoForStyledLabel;
+    }
+
+    @Override
+    public int compareTo(final RedCompletionProposal that) {
+        if (this.priority == that.priority) {
+            return this.getDisplayString().compareTo(that.getDisplayString());
+        }
+        return Integer.valueOf(this.priority).compareTo(Integer.valueOf(that.priority));
     }
 
     @Override
@@ -150,12 +178,24 @@ public class TextEditorCompletionProposal implements ICompletionProposal, ICompl
     @Override
     public StyledString getStyledDisplayString() {
         final StyledString styledString = new StyledString();
-        styledString.append(getDisplayString());
-        if (sourceName != null) {
-            styledString.append(" - " + sourceName, StyledString.DECORATIONS_STYLER);
-        }
+        final String toDisplay = getDisplayString();
 
+        if (decoratePrefix) {
+            final String alreadyWrittenPrefix = toDisplay.substring(0, prefixLength);
+            final String suffixWhichWillBeAdded = toDisplay.substring(prefixLength);
+            styledString.append(alreadyWrittenPrefix, Stylers.Common.MARKED_PREFIX_STYLER);
+            styledString.append(suffixWhichWillBeAdded);
+        } else {
+            styledString.append(toDisplay);
+        }
+        if (additionalInfoForStyledLabel != null) {
+            styledString.append(" " + additionalInfoForStyledLabel, StyledString.DECORATIONS_STYLER);
+        }
         return styledString;
+    }
+
+    public boolean shouldActivateAssitantAfterAccepting() {
+        return activateAssistant;
     }
 
 }

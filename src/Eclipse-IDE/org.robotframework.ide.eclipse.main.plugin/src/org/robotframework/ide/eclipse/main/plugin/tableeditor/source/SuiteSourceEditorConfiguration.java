@@ -50,11 +50,19 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.SettingsSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssist;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.VariablesSectionContentAssistProcessor;
@@ -99,8 +107,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
         final ContentAssistant contentAssistant = new ContentAssistant();
         contentAssistant.enableColoredLabels(true);
-        contentAssistant.enableAutoInsert(true);
-        contentAssistant.enablePrefixCompletion(true);
+        contentAssistant.enableAutoInsert(false);
         contentAssistant.enableAutoActivation(true);
         contentAssistant.setEmptyMessage("No proposals");
         contentAssistant.setShowEmptyList(true);
@@ -109,7 +116,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant
                 .setRepeatedInvocationTrigger(KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
 
-        setupAssistantProcessors(contentAssistant);
+        setupOldAssistantProcessors(contentAssistant);
+        setupNewAssistantProcessors(contentAssistant);
 
         contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
         contentAssistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
@@ -122,65 +130,55 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         return contentAssistant;
     }
 
-    private void setupAssistantProcessors(final ContentAssistant contentAssistant) {
+    private void setupOldAssistantProcessors(final ContentAssistant contentAssistant) {
         final TextEditorContentAssist textEditorContentAssist = new SuiteSourceEditorContentAssist(
                 editor.getFileModel());
         contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION);
         contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
-        contentAssistant.setContentAssistProcessor(new SettingsSectionContentAssistProcessor(),
-                SuiteSourcePartitionScanner.SETTINGS_SECTION);
         contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
         contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
     }
 
-    // private void setupAssistantProcessors2(final ContentAssistant contentAssistant) {
-    // final StatusSetter statusSetter = new StatusSetter() {
-    // @Override
-    // public void setStatus(final String title) {
-    // contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals",
-    // title));
-    // }
-    // };
-    //
-    // final SuiteSourceEditorContentAssist assist = new
-    // SuiteSourceEditorContentAssist(editor.getFileModel());
-    // final CycledContentAssistProcessor testCasesProcessor = new
-    // CycledContentAssistProcessor(statusSetter);
-    // testCasesProcessor.addProcessor(new VariablesAssistProcessor(assist));
-    // testCasesProcessor.addProcessor(new KeywordsAssistProcessor());
-    // contentAssistant.setContentAssistProcessor(testCasesProcessor,
-    // SuiteSourcePartitionScanner.TEST_CASES_SECTION);
-    //
-    // final CycledContentAssistProcessor keywordsProcessor = new
-    // CycledContentAssistProcessor(statusSetter);
-    // keywordsProcessor.addProcessor(new VariablesAssistProcessor(assist));
-    // keywordsProcessor.addProcessor(new KeywordsAssistProcessor());
-    // contentAssistant.setContentAssistProcessor(keywordsProcessor,
-    // SuiteSourcePartitionScanner.KEYWORDS_SECTION);
-    //
-    // final CycledContentAssistProcessor settingsProcessor = new
-    // CycledContentAssistProcessor(statusSetter);
-    // settingsProcessor.addProcessor(new VariablesAssistProcessor(assist));
-    // settingsProcessor.addProcessor(new KeywordsAssistProcessor());
-    // contentAssistant.setContentAssistProcessor(settingsProcessor,
-    // SuiteSourcePartitionScanner.SETTINGS_SECTION);
-    //
-    // final CycledContentAssistProcessor variablesProcessor = new
-    // CycledContentAssistProcessor(statusSetter);
-    // variablesProcessor.addProcessor(new VariablesAssistProcessor(assist));
-    // variablesProcessor.addProcessor(new KeywordsAssistProcessor());
-    // contentAssistant.setContentAssistProcessor(variablesProcessor,
-    // SuiteSourcePartitionScanner.VARIABLES_SECTION);
-    //
-    // final CycledContentAssistProcessor defaultProcessor = new
-    // CycledContentAssistProcessor(statusSetter);
-    // defaultProcessor.addProcessor(new VariablesAssistProcessor(assist));
-    // defaultProcessor.addProcessor(new KeywordsAssistProcessor());
-    // contentAssistant.setContentAssistProcessor(defaultProcessor, IDocument.DEFAULT_CONTENT_TYPE);
-    // }
+    private void setupNewAssistantProcessors(final ContentAssistant contentAssistant) {
+        final AssitantCallbacks assistantAccessor = new AssitantCallbacks() {
+
+            @Override
+            public void setStatus(final String title) {
+                contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals", title));
+            }
+
+            @Override
+            public void openCompletionProposals() {
+                contentAssistant.showPossibleCompletions();
+            }
+        };
+        createSettingsAssist(contentAssistant, assistantAccessor);
+    }
+
+    private void createSettingsAssist(final ContentAssistant contentAssistant,
+            final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceEditorContentAssist assist = new SuiteSourceEditorContentAssist(editor.getFileModel());
+
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistantAccessor);
+
+        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor();
+        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor();
+        final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assist);
+        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(assist);
+        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(assist);
+        final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assist);
+
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(librariesProcessor,
+                variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
+                variablesAssistProcessor);
+        cycledProcessor.addProcessor(combinedProcessor);
+        cycledProcessor.addProcessor(variablesAssistProcessor);
+        contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
+        contentAssistant.addCompletionListener(cycledProcessor);
+    }
 
     @Override
     public IQuickAssistAssistant getQuickAssistAssistant(final ISourceViewer sourceViewer) {

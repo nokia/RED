@@ -338,7 +338,7 @@ public class ImportLibraryComposite {
             public void widgetSelected(final SelectionEvent e) {
                 final LibrarySpecification spec = Selections.getSingleElement(
                         (IStructuredSelection) rightViewer.getSelection(), LibrarySpecification.class);
-                final IPath oldPath = new Path(spec.getAdditionalInformation());
+                final IPath oldPath = new Path(spec.getSecondaryKey());
                 final Shell newShell = new Shell(shell);
                 final IResource initialProjectSelection = robotProject.getProject().findMember(
                         oldPath + "/" + spec.getName() + ".py");    //TODO: check file extension
@@ -376,7 +376,7 @@ public class ImportLibraryComposite {
                         MessageDialog.openError(shell, "Error", "Libraries names are not equal.");
                     } else {
                         editLibraryInProjectConfiguration(oldPath, newPath, nameWithoutExtension);
-                        spec.setAdditionalInformation(newPath);
+                        spec.setSecondaryKey(newPath);
                         rightViewer.refresh();
                     }
                 }
@@ -446,7 +446,7 @@ public class ImportLibraryComposite {
         for (final LibrarySpecification spec : specs) {
             final ArrayList<String> args = newArrayList(spec.getName());
             if (spec.isRemote()) {
-                String host = spec.getAdditionalInformation();
+                String host = spec.getSecondaryKey();
                 if (!host.startsWith("http://")) {
                     host = "http://" + host;
                 }
@@ -605,8 +605,8 @@ public class ImportLibraryComposite {
                         textStyle.foreground = RedTheme.getEclipseDecorationColor();
                     }
                 });
-            } else if (!spec.getAdditionalInformation().equals("")) {
-                text.append(" - " + spec.getAdditionalInformation(), new Styler() {
+            } else if (!spec.getSecondaryKey().equals("")) {
+                text.append(" - " + spec.getSecondaryKey(), new Styler() {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {

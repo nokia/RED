@@ -33,7 +33,7 @@ public class LibrarySpecificationReader {
             final RemoteLocation remoteLocation) {
         final LibrarySpecification spec = readSpecification(libraryFile);
         spec.setRemote();
-        spec.setAdditionalInformation(remoteLocation.getUri());
+        spec.setSecondaryKey(remoteLocation.getUri());
         return spec;
     }
     
@@ -41,7 +41,7 @@ public class LibrarySpecificationReader {
             final String location) {
         final LibrarySpecification spec = readSpecification(libraryFile);
         spec.setReferenced();
-        spec.setAdditionalInformation(location);
+        spec.setSecondaryKey(location);
         return spec;
     }
 

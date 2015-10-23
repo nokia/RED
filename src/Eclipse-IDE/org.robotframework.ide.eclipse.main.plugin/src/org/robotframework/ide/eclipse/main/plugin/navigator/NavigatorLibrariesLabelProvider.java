@@ -71,7 +71,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
 
             final LibrarySpecification libSpec = (LibrarySpecification) element;
             final StyledString styled = new StyledString(libSpec.getName());
-            final String additonalInfo = libSpec.getAdditionalInformation();
+            final String additonalInfo = libSpec.getSecondaryKey();
             if (!additonalInfo.isEmpty()) {
                 styled.append(" ");
                 styled.append(additonalInfo, new Styler() {

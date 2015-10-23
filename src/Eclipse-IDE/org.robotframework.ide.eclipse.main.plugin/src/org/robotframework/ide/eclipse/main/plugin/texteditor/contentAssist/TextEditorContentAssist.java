@@ -18,9 +18,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class TextEditorContentAssist {
@@ -122,14 +124,28 @@ public class TextEditorContentAssist {
             final String replacedWord, final int offset) {
 
         final List<ICompletionProposal> completionProposals = newArrayList();
-        String separator = "";
-        for (final String proposal : proposals.keySet()) {
-            final ContentAssistKeywordContext keywordContext = proposals.get(proposal);
-            separator = keywordContext.getArguments().equals("[]") ? "" : PROPOSAL_SEPARATOR;
-            completionProposals.add(new TextEditorCompletionProposal(proposal + separator, offset,
-                    replacedWord.length(), proposal.length() + separator.length(), keywordContext.getImage(), proposal,
-                    new ContextInformation(proposal, keywordContext.getArguments()), keywordContext.getDescription(),
-                    keywordContext.getLibName()));
+        for (final String proposedKeyword : proposals.keySet()) {
+
+            final ContentAssistKeywordContext keywordContext = proposals.get(proposedKeyword);
+            final String separator = keywordContext.getArguments().equals("[]") ? "" : PROPOSAL_SEPARATOR;
+            final IContextInformation contextInformation = new ContextInformation(proposedKeyword,
+                    keywordContext.getArguments());
+
+            final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                    .will(AcceptanceMode.INSERT)
+                    .theText(proposedKeyword + separator)
+                    .atOffset(offset)
+                    .givenThatCurrentPrefixIs("")
+                    .andWholeContentIs(replacedWord)
+                    .secondaryPopupShouldBeDisplayed(keywordContext.getDescription())
+                    .contextInformationShouldBeShownAfterAccepting(contextInformation)
+                    .thenCursorWillStopAtTheEndOfInsertion()
+                    .displayedLabelShouldBe(proposedKeyword)
+                    .proposalsShouldHaveIcon(variableImage)
+                    .labelShouldBeAugmentedWith(keywordContext.getLibName())
+                    .create();
+
+            completionProposals.add(proposal);
         }
 
         return completionProposals.toArray(new ICompletionProposal[0]);
@@ -139,24 +155,38 @@ public class TextEditorContentAssist {
             final String replacedWord, final int offset) {
 
         final List<ICompletionProposal> completionProposals = newArrayList();
-        for (final RedVariableProposal proposal : proposals) {
-            final String variableName = proposal.getName();
-            String info = "Source: " + proposal.getSource() + "\n";
+        for (final RedVariableProposal varProposal : proposals) {
 
-            final String variableValue = proposal.getValue();
-            if (variableValue != null && !variableValue.isEmpty()) {
-                info += "Value: " + variableValue + "\n";
-            }
-            final String variableComment = proposal.getComment();
-            if (variableComment != null && !variableComment.isEmpty()) {
-                info += "Comment: " + variableComment;
-            }
-
-            completionProposals.add(new TextEditorCompletionProposal(variableName, offset, replacedWord.length(),
-                    variableName.length(), variableImage, variableName, null, info, null));
+            final String variableName = varProposal.getName();
+            final String info = createSecondaryInfo(varProposal);
+            final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                    .will(AcceptanceMode.INSERT)
+                    .theText(variableName)
+                    .atOffset(offset)
+                    .givenThatCurrentPrefixIs("")
+                    .andWholeContentIs(replacedWord)
+                    .secondaryPopupShouldBeDisplayed(info)
+                    .thenCursorWillStopAtTheEndOfInsertion()
+                    .displayedLabelShouldBe(variableName)
+                    .proposalsShouldHaveIcon(variableImage)
+                    .create();
+            completionProposals.add(proposal);
         }
 
         return completionProposals.toArray(new ICompletionProposal[0]);
+    }
+
+    private static String createSecondaryInfo(final RedVariableProposal varProposal) {
+        String info = "Source: " + varProposal.getSource() + "\n";
+        final String variableValue = varProposal.getValue();
+        if (variableValue != null && !variableValue.isEmpty()) {
+            info += "Value: " + variableValue + "\n";
+        }
+        final String variableComment = varProposal.getComment();
+        if (variableComment != null && !variableComment.isEmpty()) {
+            info += "Comment: " + variableComment;
+        }
+        return info;
     }
     
     static List<String> filterProposals(final List<String> allProposals, final String filter) {
@@ -183,6 +213,9 @@ public class TextEditorContentAssist {
     
     public static List<RedVariableProposal> filterVariablesProposals(final List<RedVariableProposal> variables,
             final String filter) {
+        if (filter.isEmpty()) {
+            return variables;
+        }
         final List<RedVariableProposal> filteredProposals = newArrayList();
         for (final RedVariableProposal variable : variables) {
             if (variable.getName().toLowerCase().contains(filter.toLowerCase())) {

@@ -153,7 +153,7 @@ public class Rules {
                 }
                 final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
 
-                if (getNumberOfCellSeparators(lineContentBefore) == 1) {
+                if (DocumentUtilities.getNumberOfCellSeparators(lineContentBefore) == 1) {
                     ch = scanner.read();
                     if (ch != '[') {
                         scanner.unread();
@@ -184,7 +184,7 @@ public class Rules {
                 }
                 final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
 
-                final int numberOfCellSeparators = getNumberOfCellSeparators(lineContentBefore);
+                final int numberOfCellSeparators = DocumentUtilities.getNumberOfCellSeparators(lineContentBefore);
                 if (numberOfCellSeparators == 1 && isKeywordBasedSetting(lineContentBefore)) {
                     consumeWholeToken(scanner);
                     return token;
@@ -223,7 +223,7 @@ public class Rules {
                     return Token.UNDEFINED;
                 }
 
-                final int numberOfCellSeparators = getNumberOfCellSeparators(lineContentBefore);
+                final int numberOfCellSeparators = DocumentUtilities.getNumberOfCellSeparators(lineContentBefore);
                 if (numberOfCellSeparators == 1) {
                     consumeWholeToken(scanner);
                     return token;
@@ -251,7 +251,7 @@ public class Rules {
             }
 
             private boolean isAssignment(final int ch, final String lineContentBefore) {
-                return ch == '=' && (lineContentBefore.endsWith("} ") || lineContentBefore.endsWith("}"));
+                return (ch == '=' || ch == ' ') && lineContentBefore.matches(".*\\} ?( ?=)* ?$");
             }
         };
     }
@@ -306,33 +306,5 @@ public class Rules {
             return true;
         }
         return false;
-    }
-
-    private static int getNumberOfCellSeparators(final String lineContentBefore) {
-        final String withoutTabs = lineContentBefore.replaceAll("\t", "  ")
-                .replaceAll(" \\| ", "   ")
-                .replaceFirst("^\\| ", "  ");
-        if (withoutTabs.isEmpty()) {
-            return 0;
-        }
-
-        int spacesRegions = 0;
-        int currentNumberOfSpaces = 0;
-        for (int i = 0; i < withoutTabs.length(); i++) {
-            if (withoutTabs.charAt(i) == ' ') {
-                currentNumberOfSpaces++;
-            } else if (currentNumberOfSpaces == 1) {
-                currentNumberOfSpaces = 0;
-            } else if (currentNumberOfSpaces > 1) {
-                spacesRegions++;
-                currentNumberOfSpaces = 0;
-            }
-        }
-        // maybe spaces were suffix of line content
-        if (currentNumberOfSpaces > 1) {
-            spacesRegions++;
-        }
-
-        return spacesRegions;
     }
 }

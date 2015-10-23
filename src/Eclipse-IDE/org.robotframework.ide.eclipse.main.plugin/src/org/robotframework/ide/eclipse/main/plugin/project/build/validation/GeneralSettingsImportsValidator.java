@@ -202,8 +202,19 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         @Override
         protected void validateNameImport(final AImported imported, final RobotToken name,
                 final IProgressMonitor monitor) throws CoreException {
-            validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(name.getText().toString()),
+            final String libName = createLibName(name, ((LibraryImport) imported).getArguments());
+            validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(libName),
                     name, monitor, false);
+        }
+
+        private String createLibName(final RobotToken nameToken, final List<RobotToken> arguments) {
+            final String name = nameToken.getText().toString();
+            if ("Remote".equals(name)) {
+                // TODO : raise problem when there are no arguments for remote
+                return name + " "
+                        + (arguments.isEmpty() ? "http://127.0.0.1:8270/RPC2" : arguments.get(0).getText().toString());
+            }
+            return name;
         }
 
         private void validateWithSpec(final AImported imported, final LibrarySpecification specification,

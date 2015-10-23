@@ -88,7 +88,7 @@ public class PathsResolver {
                     paths.add(new Path(resolvedPath.getPath()));
                 }
                 return paths;
-            } catch (final URISyntaxException e) {
+            } catch (final URISyntaxException | IllegalArgumentException e) {
                 throw new PathResolvingException("Path syntax problem", e);
             }
         }

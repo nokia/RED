@@ -1,0 +1,119 @@
+/*
+ * Copyright 2015 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
+
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.swt.graphics.Image;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
+import org.robotframework.red.graphics.ImagesManager;
+
+import com.google.common.base.Optional;
+
+
+/**
+ * @author Michal Anglart
+ *
+ */
+public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
+
+    private final AssistPreferences assistPreferences = new AssistPreferences();
+
+    private final SuiteSourceEditorContentAssist assist;
+
+    public LibrariesImportAssistProcessor(final SuiteSourceEditorContentAssist assist) {
+        this.assist = assist;
+    }
+
+    @Override
+    protected String getProposalsTitle() {
+        return "Libraries";
+    }
+
+    @Override
+    protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+        final IDocument document = viewer.getDocument();
+        try {
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+            final boolean shouldShowProposal = shouldShowProposals(lineContent);
+
+            if (shouldShowProposal) {
+                final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
+                final String prefix = getPrefix(document, region, offset);
+                final String content = region.isPresent()
+                        ? document.get(region.get().getOffset(), region.get().getLength()) : "";
+                final String separator = assistPreferences.getSeparatorToFollow();
+
+                final List<RedCompletionProposal> proposals = newArrayList();
+                for (final LibrarySpecification library : assist.getLibraries()) {
+                    final String libraryName = library.getName();
+
+                    if (libraryName.toLowerCase().startsWith(prefix.toLowerCase())) {
+
+                        final String argument = library.isRemote() ? separator + library.getSecondaryKey() : "";
+                        final String textToInsert = libraryName + argument;
+
+                        final Image image = ImagesManager.getImage(RedImages.getLibraryImage());
+                        
+                        final boolean isImported = assist.isAlreadyImported(library);
+                        final String importedInfo = isImported ? "(already imported)" : null;
+                        
+                        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                                .will(assistPreferences.getAcceptanceMode()).theText(textToInsert)
+                                .atOffset(offset - prefix.length())
+                                .givenThatCurrentPrefixIs(prefix)
+                                .andWholeContentIs(content)
+                                .secondaryPopupShouldBeDisplayed(library.getDocumentation())
+                                .thenCursorWillStopAtTheEndOfInsertion()
+                                .currentPrefixShouldBeDecorated()
+                                .displayedLabelShouldBe(textToInsert.replaceAll("  +", " ").trim())
+                                .proposalsShouldHaveIcon(image)
+                                .currentPrefixShouldBeDecorated()
+                                .labelShouldBeAugmentedWith(importedInfo)
+                                .createWithPriority(isImported ? 1 : 0);
+                        
+                        proposals.add(proposal);
+                    }
+                }
+                Collections.sort(proposals);
+                return proposals;
+            }
+            return null;
+        } catch (final BadLocationException e) {
+            return null;
+        }
+    }
+
+    private boolean shouldShowProposals(final String lineContent) {
+        return lineContent.toLowerCase().startsWith("library")
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
+    }
+
+    private String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset) {
+        if (!optional.isPresent()) {
+            return "";
+        }
+        try {
+            return document.get(optional.get().getOffset(), offset - optional.get().getOffset());
+        } catch (final BadLocationException e) {
+            return "";
+        }
+    }
+
+}
