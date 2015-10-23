@@ -166,7 +166,7 @@ public class VariableDefinitionLocator {
                         .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(knownFile.getPath()));
 
                 if (absKnownFilePath.equals(importedFilePath)) {
-                    for (final Entry<String, Object> var : knownFile.getVariables().entrySet()) {
+                    for (final Entry<String, Object> var : knownFile.getVariablesWithProperPrefixes().entrySet()) {
                         final ContinueDecision shouldContinue = detector.varFileVariableDetected(knownFile,
                                 var.getKey(), var.getValue());
                         if (shouldContinue == ContinueDecision.STOP) {

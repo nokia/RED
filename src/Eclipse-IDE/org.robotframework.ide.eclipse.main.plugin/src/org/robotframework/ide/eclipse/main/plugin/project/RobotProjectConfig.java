@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -379,6 +381,34 @@ public class RobotProjectConfig {
 
         public Map<String, Object> getVariables() {
             return variables;
+        }
+
+        public Map<String, Object> getVariablesWithProperPrefixes() {
+            if (variables == null) {
+                return null;
+            }
+            final Map<String, Object> varsWithTypes = newLinkedHashMap();
+            for (final Entry<String, Object> var : variables.entrySet()) {
+                String name = var.getKey();
+                if (name.matches("^[$@&]\\{.+\\}$")) {
+                    name = name.substring(2, name.length() - 1);
+                }
+
+                String newName;
+                if (var.getValue() instanceof Map<?, ?>) {
+                    newName = "&{" + name + "}";
+                } else if (var.getValue() instanceof List<?> || var.getValue() instanceof Object[]) {
+                    newName = "@{" + name + "}";
+                } else {
+                    newName = "${" + name + "}";
+                }
+                varsWithTypes.put(newName, toListIfNeeded(var.getValue()));
+            }
+            return varsWithTypes;
+        }
+
+        private Object toListIfNeeded(final Object object) {
+            return object instanceof Object[] ? newArrayList((Object[]) object) : object;
         }
 
         public void setVariables(final Map<String, Object> variables) {
