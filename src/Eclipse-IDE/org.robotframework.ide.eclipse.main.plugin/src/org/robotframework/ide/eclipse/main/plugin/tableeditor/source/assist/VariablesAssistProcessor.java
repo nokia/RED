@@ -54,7 +54,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
             final String prefix = variable.isPresent() ? getPrefix(document, variable.get(), offset) : "";
             final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
-            final String content = cellRegion.isPresent()
+            final String content = cellRegion.isPresent() && variable.isPresent()
                     ? document.get(variable.get().getOffset(), cellRegion.get().getLength()) : "";
 
             final List<ICompletionProposal> proposals = newArrayList();
