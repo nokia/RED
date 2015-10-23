@@ -84,6 +84,26 @@ public class DocumentUtilities {
         return Optional.<IRegion> of(new Region(beginOffset, endOffset - beginOffset));
     }
 
+    /**
+     * Returns region around offset which consitutues a cell during live editing. This is very
+     * similar to {@link #findCellRegion(IDocument, int)} method with a single exception that
+     * there can be a single space just before offset prefixed with whole cell content.
+     * 
+     * @param document
+     * @param offset
+     * @return
+     * @throws BadLocationException
+     */
+    public static Optional<IRegion> findLiveCellRegion(final IDocument document, final int offset)
+            throws BadLocationException {
+        final Optional<IRegion> region = findCellRegion(document, offset).or(findCellRegion(document, offset - 1));
+        if (region.isPresent()) {
+            final int length = offset - region.get().getOffset();
+            return Optional.<IRegion>of(new Region(region.get().getOffset(), length));
+        }
+        return region;
+    }
+
     private static boolean isInsideSeparator(final String prev, final String next) {
         return !prev.isEmpty() && (Character.isWhitespace(prev.charAt(0)) || prev.charAt(0) == '|') && !next.isEmpty()
                 && (Character.isWhitespace(next.charAt(0)) || next.charAt(0) == '|');
@@ -153,6 +173,34 @@ public class DocumentUtilities {
         } catch (final BadLocationException e) {
             throw new IllegalStateException("Unable to get line content at offset " + offset, e);
         }
+    }
+
+    public static int getNumberOfCellSeparators(final String lineContentBefore) {
+        final String withoutTabs = lineContentBefore.replaceAll("\t", "  ")
+                .replaceAll(" \\| ", "   ")
+                .replaceFirst("^\\| ", "  ");
+        if (withoutTabs.isEmpty()) {
+            return 0;
+        }
+
+        int spacesRegions = 0;
+        int currentNumberOfSpaces = 0;
+        for (int i = 0; i < withoutTabs.length(); i++) {
+            if (withoutTabs.charAt(i) == ' ') {
+                currentNumberOfSpaces++;
+            } else if (currentNumberOfSpaces == 1) {
+                currentNumberOfSpaces = 0;
+            } else if (currentNumberOfSpaces > 1) {
+                spacesRegions++;
+                currentNumberOfSpaces = 0;
+            }
+        }
+        // maybe spaces were suffix of line content
+        if (currentNumberOfSpaces > 1) {
+            spacesRegions++;
+        }
+
+        return spacesRegions;
     }
 
     public static String getDelimiter(final IDocument document) {

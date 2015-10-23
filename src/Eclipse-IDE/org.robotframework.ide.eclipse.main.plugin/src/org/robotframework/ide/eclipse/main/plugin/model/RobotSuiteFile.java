@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
@@ -312,9 +313,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             }
         }
         for (final String toImportPathOrName : toImport) {
-            final LibrarySpecification spec = findSpecForPath(toImportPathOrName);
-            if (spec != null) {
-                imported.add(spec);
+            try {
+                final LibrarySpecification spec = findSpecForPath(toImportPathOrName);
+                if (spec != null) {
+                    imported.add(spec);
+                }
+            } catch (final PathResolvingException e) {
+                // ok we won't provide any spec, since we can't resolve uri
             }
         }
         return imported;
