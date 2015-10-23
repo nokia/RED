@@ -43,6 +43,7 @@ import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCa
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseExecutableRowArgumentMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowActionMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordExecutableRowArgumentMapper;
+import org.robotframework.ide.core.testData.model.table.variables.mapping.CommonVariableHelper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableMapper;
 import org.robotframework.ide.core.testData.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
@@ -71,11 +72,13 @@ public class TxtRobotFileParser implements IRobotFileParser {
     private final ParsingStateHelper parsingStateHelper;
     private final LibraryAliasFixer libraryFixer;
     private final PreviousLineHandler previousLineHandler;
+    private final CommonVariableHelper variableHelper;
 
 
     public TxtRobotFileParser() {
         this.utility = new ElementsUtility();
         this.alignUtility = new PrettyAlignSpaceUtility();
+        this.variableHelper = new CommonVariableHelper();
         this.parsingStateHelper = new ParsingStateHelper();
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
         this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
@@ -312,9 +315,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
                  * </pre>
                  */
                 if (utility.isNotOnlySeparatorOrEmptyLine(line)) {
+                    variableHelper.extractVariableAssignmentPart(line);
                     previousLineHandler.flushNew(processingState);
                 }
                 parsingOutput.getFileModel().addNewLine(line);
+
                 parsingStateHelper.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }
