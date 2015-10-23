@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -34,7 +35,11 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
             "Metadata", "Suite Setup", "Suite Teardown", "Force Tags", "Default Tags", "Test Setup", "Test Teardown",
             "Test Template", "Test Timeout");
 
-    private final AssistPreferences assistPreferences = new AssistPreferences();
+    private final SuiteSourceAssistantContext assist;
+
+    public SettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
+        this.assist = assist;
+    }
 
     @Override
     protected String getProposalsTitle() {
@@ -55,14 +60,14 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
 
                 final List<ICompletionProposal> proposals = newArrayList();
-                final String separator = assistPreferences.getSeparatorToFollow();
+                final String separator = assist.getSeparatorToFollow();
                 for (final String settingName : SETTING_NAMES) {
                     if (settingName.toLowerCase().startsWith(prefix.toLowerCase())) {
                         final String textToInsert = settingName + separator;
                         final Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
                         
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assistPreferences.getAcceptanceMode())
+                                .will(assist.getAcceptanceMode())
                                 .theText(textToInsert)
                                 .atOffset(lineInformation.getOffset())
                                 .givenThatCurrentPrefixIs(prefix)

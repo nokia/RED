@@ -61,7 +61,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Vari
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.DefaultContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.KeywordsContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TestCasesSectionContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssist;
@@ -131,15 +130,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void setupOldAssistantProcessors(final ContentAssistant contentAssistant) {
-        final TextEditorContentAssist textEditorContentAssist = new SuiteSourceEditorContentAssist(
-                editor.getFileModel());
+        final TextEditorContentAssist textEditorContentAssist = new TextEditorContentAssist(
+                new SuiteSourceAssistantContext(editor.getFileModel()));
         contentAssistant.setContentAssistProcessor(new TestCasesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION);
         contentAssistant.setContentAssistProcessor(new KeywordsContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
         contentAssistant.setContentAssistProcessor(new VariablesSectionContentAssistProcessor(textEditorContentAssist),
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
-        contentAssistant.setContentAssistProcessor(new DefaultContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
     }
 
     private void setupNewAssistantProcessors(final ContentAssistant contentAssistant) {
@@ -156,16 +154,17 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             }
         };
         createSettingsAssist(contentAssistant, assistantAccessor);
+        createDefaultAssist(contentAssistant, assistantAccessor);
     }
 
     private void createSettingsAssist(final ContentAssistant contentAssistant,
             final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceEditorContentAssist assist = new SuiteSourceEditorContentAssist(editor.getFileModel());
+        final SuiteSourceAssistantContext assist = new SuiteSourceAssistantContext(editor.getFileModel());
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistantAccessor);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor();
-        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor();
+        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assist);
+        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor(assist);
         final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assist);
         final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(assist);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(assist);
@@ -177,6 +176,19 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
         contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
+        contentAssistant.addCompletionListener(cycledProcessor);
+    }
+
+    private void createDefaultAssist(final ContentAssistant contentAssistant,
+            final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assist = new SuiteSourceAssistantContext(editor.getFileModel());
+
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistantAccessor);
+
+        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assist);
+        cycledProcessor.addProcessor(sectionsAssistProcessor);
+
+        contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 

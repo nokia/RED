@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -33,11 +33,9 @@ import com.google.common.base.Optional;
  */
 public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
-    private final AssistPreferences assistPreferences = new AssistPreferences();
+    private final SuiteSourceAssistantContext assist;
 
-    private final SuiteSourceEditorContentAssist assist;
-
-    public LibrariesImportAssistProcessor(final SuiteSourceEditorContentAssist assist) {
+    public LibrariesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
 
@@ -58,7 +56,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
                 final String prefix = getPrefix(document, region, offset);
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
-                final String separator = assistPreferences.getSeparatorToFollow();
+                final String separator = assist.getSeparatorToFollow();
 
                 final List<RedCompletionProposal> proposals = newArrayList();
                 for (final LibrarySpecification library : assist.getLibraries()) {
@@ -75,7 +73,8 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
                         final String importedInfo = isImported ? "(already imported)" : null;
                         
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assistPreferences.getAcceptanceMode()).theText(textToInsert)
+                                .will(assist.getAcceptanceMode())
+                                .theText(textToInsert)
                                 .atOffset(offset - prefix.length())
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)

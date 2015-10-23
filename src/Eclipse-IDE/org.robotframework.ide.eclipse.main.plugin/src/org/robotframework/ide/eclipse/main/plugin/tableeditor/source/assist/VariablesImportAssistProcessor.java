@@ -21,7 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -35,11 +35,9 @@ import com.google.common.base.Optional;
  */
 public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
 
-    private final AssistPreferences assistPreferences = new AssistPreferences();
+    private final SuiteSourceAssistantContext assist;
 
-    private final SuiteSourceEditorContentAssist assist;
-
-    public VariablesImportAssistProcessor(final SuiteSourceEditorContentAssist assist) {
+    public VariablesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
 
@@ -68,7 +66,7 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
                     if (resourcePath.toLowerCase().startsWith(prefix.toLowerCase())) {
                         final String resourceRelativePath = createCurrentFileRelativePath(resourcePath);
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assistPreferences.getAcceptanceMode())
+                                .will(assist.getAcceptanceMode())
                                 .theText(resourceRelativePath)
                                 .atOffset(offset - prefix.length())
                                 .givenThatCurrentPrefixIs(prefix)

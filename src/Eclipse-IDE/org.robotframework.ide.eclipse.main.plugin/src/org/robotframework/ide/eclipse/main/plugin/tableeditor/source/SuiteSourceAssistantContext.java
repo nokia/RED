@@ -29,37 +29,40 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 
 /**
  * @author Michal Anglart
  *
  */
-public class SuiteSourceEditorContentAssist extends TextEditorContentAssist {
+public class SuiteSourceAssistantContext {
 
     private final RobotSuiteFile suiteModel;
 
-    public SuiteSourceEditorContentAssist(final RobotSuiteFile robotSuiteFile) {
-        super(null, null);
+    private final AssistPreferences assistPreferences;
+
+    public SuiteSourceAssistantContext(final RobotSuiteFile robotSuiteFile) {
         this.suiteModel = robotSuiteFile;
+        this.assistPreferences = new AssistPreferences();
     }
 
     public IFile getFile() {
         return suiteModel.getFile();
     }
 
-    @Override
-    public List<RedVariableProposal> getVariables() {
-        return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames());
+    public String getSeparatorToFollow() {
+        return assistPreferences.getSeparatorToFollow();
     }
 
-    @Override
+    public AcceptanceMode getAcceptanceMode() {
+        return assistPreferences.getAcceptanceMode();
+    }
+
     public List<RedVariableProposal> getVariables(final int offset) {
         return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
     }
 
-    @Override
     public Map<String, ContentAssistKeywordContext> getKeywordMap() {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteModel);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
@@ -105,5 +108,20 @@ public class SuiteSourceEditorContentAssist extends TextEditorContentAssist {
             return resourceFiles;
         }
         return resourceFiles;
+    }
+
+    public static class AssistPreferences {
+
+        AssistPreferences() {
+            // changing visibility
+        }
+
+        public String getSeparatorToFollow() {
+            return "    ";
+        }
+
+        public AcceptanceMode getAcceptanceMode() {
+            return AcceptanceMode.SUBSTITUTE;
+        }
     }
 }
