@@ -100,4 +100,36 @@ public class Container implements IContainerElement {
 
         return result;
     }
+
+
+    public ContainerType getContainerType() {
+        ContainerType type = ContainerType.MIX;
+        if (!getElements().isEmpty()) {
+            IContainerElement element = getElements().get(0);
+            if (element.getType() == ContainerElementType.CURRLY_BRACKET_OPEN) {
+                type = ContainerType.VARIABLE;
+            } else if (element.getType() == ContainerElementType.SQUARE_BRACKET_OPEN) {
+                type = ContainerType.INDEX;
+            }
+        }
+
+        return type;
+    }
+
+    public enum ContainerType {
+        MIX(null), VARIABLE(ContainerElementType.CURRLY_BRACKET_OPEN), INDEX(
+                ContainerElementType.SQUARE_BRACKET_OPEN);
+
+        private ContainerElementType openType;
+
+
+        private ContainerType(final ContainerElementType openType) {
+            this.openType = openType;
+        }
+
+
+        public ContainerElementType getOpenType() {
+            return openType;
+        }
+    }
 }
