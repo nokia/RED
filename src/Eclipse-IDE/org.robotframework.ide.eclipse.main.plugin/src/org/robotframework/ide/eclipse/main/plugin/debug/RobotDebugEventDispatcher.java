@@ -223,7 +223,7 @@ public class RobotDebugEventDispatcher extends Job {
         if(keywordType.equals(RobotDebugExecutionContext.TESTCASE_TEARDOWN_KEYWORD_TYPE)) {
             target.clearStackFrames();
         }
-        
+
         executionContext.startKeyword(currentKeyword, keywordType, (List<String>) startElements.get("args"));
 
         String executedSuite = currentSuite;
@@ -422,24 +422,8 @@ public class RobotDebugEventDispatcher extends Job {
                     final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                             IMarker.LINE_NUMBER);
                     if(keywordLineNumber == breakpointLineNum) {
-                        boolean hasHitCount = false;
-                        final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
-                                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                        if (breakpointHitCount > 1) {
-                            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
-                                final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
-                                if (currentHitCount == breakpointHitCount) {
-                                    hasHitCount = true;
-                                }
-                                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
-                            } else {
-                                breakpointHitCounts.put(currentBreakpoint, 1);
-                            }
-                        } else {
-                            hasHitCount = true;
-                        }
-
-                        if (hasHitCount) {
+                        boolean hasHitCountConditionFullfilled = checkHitCountCondition(currentBreakpoint);
+                        if (hasHitCountConditionFullfilled) {
                             breakpointCondition = currentBreakpoint.getMarker().getAttribute(
                                     RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                             hasBreakpoint = true;
@@ -452,6 +436,26 @@ public class RobotDebugEventDispatcher extends Job {
             }
         }
         return hasBreakpoint;
+    }
+
+    private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
+        boolean hasHitCountConditionFullfilled = false;
+        final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
+                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+        if (breakpointHitCount > 1) {
+            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
+                final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
+                if (currentHitCount == breakpointHitCount) {
+                    hasHitCountConditionFullfilled = true;
+                }
+                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
+            } else {
+                breakpointHitCounts.put(currentBreakpoint, 1);
+            }
+        } else {
+            hasHitCountConditionFullfilled = true;
+        }
+        return hasHitCountConditionFullfilled;
     }
     
     private static class MissingFileToExecuteException extends RuntimeException {
