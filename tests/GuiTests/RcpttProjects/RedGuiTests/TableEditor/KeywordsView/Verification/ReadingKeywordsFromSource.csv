@@ -1,0 +1,17 @@
+_indent,,,,,,,Comment
+0,My loop,,,,,,
+1,:FOR,${i},in range,2,,,
+1,\,,,,,,
+1,\,${eval}=,Evaluate,${i} +5,,,
+1,...,,,,,,
+0,Any Number Of Arguments,@{varargs},,,,,
+1,Log Many,@{varargs},,,,,
+1,...,,,,,,
+0,One Or More Arguments,${required},@{rest},,,,# Comment 1
+1,Log Many,${required},@{rest},,,,
+1,...,,,,,,
+0,"Required, Default, Varargs",${req},${opt}=42,@{others},,,
+1,Log,Required: ${req},,,,,
+1,Log,Required: ${Empty},,,,,# Comment 2
+1,...,,,,,,
+0,...add new keyword,,,,,,
