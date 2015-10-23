@@ -31,7 +31,6 @@ import org.robotframework.ide.core.execution.IExecutionHandler;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 
 
 public class RobotRuntimeEnvironment {
@@ -441,8 +440,9 @@ public class RobotRuntimeEnvironment {
      * 
      * @param moduleLocation
      * @return
+     * @throws RobotEnvironmentException
      */
-    public List<String> getClassesDefinedInModule(final File moduleLocation) {
+    public List<String> getClassesDefinedInModule(final File moduleLocation) throws RobotEnvironmentException {
         // DO NOT split & move to direct/rpc executors since this code may import quite a lot of
         // modules;
         // maybe we could restart xml-rpc server from time to time; then we can consider moving this
@@ -457,16 +457,21 @@ public class RobotRuntimeEnvironment {
 
                 final List<String> cmdLine = Arrays.asList(interpreterPath,
                         scriptFile.getAbsolutePath(), moduleLocation.getAbsolutePath());
-                final List<String> classes = newArrayList();
+                final List<String> output = newArrayList();
                 final ILineHandler linesHandler = new ILineHandler() {
 
                     @Override
                     public void processLine(final String line) {
-                        classes.add(line);
+                        output.add(line);
                     }
                 };
                 final int result = RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
-                return result == 0 ? classes : Lists.<String> newArrayList();
+                if (result == 0) {
+                    return output;
+                } else {
+                    throw new RobotEnvironmentException(
+                            "Python interpreter returned following errors:\n\n" + Joiner.on('\n').join(output));
+                }
             }
             return newArrayList();
         } catch (final IOException e) {
