@@ -1,0 +1,72 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A
+Element-Name: DebugOnProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _BW-V4B8oEeWYlfCPyvfohw
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 7/1/15 11:08 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+//get-editor "BigScript.robot" | get-left-ruler |double-click-ruler 16
+//get-view "Project Explorer" | get-tree | select "ScriptWithResource/Tests/SecondInsideTest.robot" | double-click
+//get-editor "SecondInsideTest.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 13
+//get-view "Project Explorer" | get-tree | select "ScriptWithResource/Tests/TestInside.robot" | double-click
+//get-editor "TestInside.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 13
+//
+
+get-view "Project Explorer" | get-tree | select ScriptWithResource | get-menu "Debug As/1 Robot Test" | click
+
+////check if line is highlighted
+//wait 200
+//check-debug-marker-on-ruler -line 16 -script_name "BigScript.robot"
+//
+//exec-with-options -disableJobWaiting -command {
+//	get-button "Resume (F8)" | click	//Go to next breakpoint
+//}
+//
+////check if line is highlighted
+//wait 200
+//check-debug-marker-on-ruler -line 13 -script_name "SecondInsideTest.robot" 
+//
+//exec-with-options -disableJobWaiting -command {
+//	get-button "Resume (F8)" | click	//Go to next breakpoint
+//}
+//
+//
+////check if line is highlighted
+//wait 200
+//check-debug-marker-on-ruler -line 13 -script_name "TestInside.robot"
+//
+//exec-with-options -disableJobWaiting -command {
+//	get-button "Resume (F8)" | click	//Go to next breakpoint
+//}
+//
+
+
+wait 1000
+
+exec-with-options -disableJobWaiting -command {
+	get-button "Resume (F8)" | click	//Go to next breakpoint
+	
+
+
+	get-button "Resume (F8)" | click	//Go to next breakpoint
+	
+	wait 200
+	
+
+	get-button "Resume (F8)" | click	//Go to next breakpoint
+	}
+	wait 500
+	
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
