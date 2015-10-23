@@ -98,10 +98,10 @@ public class HashCommentMapper implements IParsingMapper {
         boolean addToStack = false;
         rt.setRaw(new StringBuilder(text));
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-            rt.setType(RobotTokenType.START_HASH_COMMENT);
             addToStack = true;
         } else {
-            rt.setType(RobotTokenType.COMMENT_CONTINUE);
+            rt.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
+            rt.getTypes().add(0, RobotTokenType.COMMENT_CONTINUE);
         }
 
         ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
