@@ -38,7 +38,7 @@ def getVariables(dir, args):
     try:
         return vars.data
     except AttributeError:  # for robot >2.9
-        return vars.store.data
+        return vars.store.data._data
 
 def getGlobalVariables():
     try:
