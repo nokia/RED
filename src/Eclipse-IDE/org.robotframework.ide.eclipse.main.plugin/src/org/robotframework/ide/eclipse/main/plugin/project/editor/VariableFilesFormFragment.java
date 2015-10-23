@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
@@ -264,6 +265,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 public void widgetSelected(final SelectionEvent e) {
                     final FileDialog dialog = new FileDialog(dialogComposite.getShell(), SWT.OPEN);
                     dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+                    dialog.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
                     final String chosenFilePath = dialog.open();
                     if (chosenFilePath != null) {
                         pathText.setText(chosenFilePath);
