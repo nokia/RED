@@ -141,7 +141,7 @@ public class TextEditorContentAssist {
                     .contextInformationShouldBeShownAfterAccepting(contextInformation)
                     .thenCursorWillStopAtTheEndOfInsertion()
                     .displayedLabelShouldBe(proposedKeyword)
-                    .proposalsShouldHaveIcon(variableImage)
+                    .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getKeywordImage()))
                     .labelShouldBeAugmentedWith(keywordContext.getLibName())
                     .create();
 
