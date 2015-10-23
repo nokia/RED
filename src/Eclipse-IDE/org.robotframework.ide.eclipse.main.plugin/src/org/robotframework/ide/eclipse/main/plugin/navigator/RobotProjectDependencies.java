@@ -76,5 +76,20 @@ class RobotProjectDependencies {
             return newArrayList();
         }
 
+        @Override
+        public String getVersion() {
+            return "unknown";
+        }
+
+        @Override
+        public String getScope() {
+            return "unknown";
+        }
+
+        @Override
+        public String getDocumentation() {
+            return "";
+        }
+
     }
 }

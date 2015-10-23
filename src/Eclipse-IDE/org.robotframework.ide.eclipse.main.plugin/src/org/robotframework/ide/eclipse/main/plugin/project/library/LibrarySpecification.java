@@ -27,7 +27,7 @@ public class LibrarySpecification {
     private List<KeywordSpecification> keywords;
     private boolean isRemote;
     private boolean isReferenced;
-    private String additionalInfo = "";
+    private String secondaryKey = "";
 
     public String getName() {
         return name;
@@ -114,12 +114,12 @@ public class LibrarySpecification {
         }
     }
 
-    public String getAdditionalInformation() {
-        return additionalInfo;
+    public String getSecondaryKey() {
+        return secondaryKey;
     }
 
-    public void setAdditionalInformation(final String info) {
-        this.additionalInfo = info;
+    public void setSecondaryKey(final String key) {
+        this.secondaryKey = key;
     }
 
     public boolean isAccessibleWithoutImport() {
@@ -156,15 +156,15 @@ public class LibrarySpecification {
         }
         if (LibrarySpecification.class == obj.getClass()) {
             final LibrarySpecification that = (LibrarySpecification) obj;
-            return Objects.equal(this.name, that.name) && Objects.equal(this.keywords, that.keywords)
-                    && Objects.equal(this.version, that.version) && this.isReferenced == that.isReferenced
-                    && this.isRemote == that.isRemote;
+            return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
+                    && Objects.equal(this.keywords, that.keywords) && Objects.equal(this.version, that.version)
+                    && this.isReferenced == that.isReferenced && this.isRemote == that.isRemote;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, keywords, version, isReferenced, isRemote);
+        return Objects.hashCode(name, secondaryKey, keywords, version, isReferenced, isRemote);
     }
 }

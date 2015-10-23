@@ -42,6 +42,11 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
             if (end > start) {
                 final String whitespacesFromPreviousLine = document.get(start, end - start);
                 buf.append(whitespacesFromPreviousLine);
+                final String commandLineContent = DocumentUtilities
+                        .lineContentBeforeCurrentPosition(document, command.offset).trim().toLowerCase();
+                if (commandLineContent.startsWith(":for") || commandLineContent.startsWith("\\")) {
+                    buf.append('\\');
+                }
             }
             command.text = buf.toString();
 

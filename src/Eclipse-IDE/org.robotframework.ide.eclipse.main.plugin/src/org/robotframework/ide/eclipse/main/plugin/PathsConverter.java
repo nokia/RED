@@ -26,6 +26,15 @@ public class PathsConverter {
         return new Path(resolvedPath.getPath()).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
     }
 
+    public static IPath fromWorkspaceRelativeToResourceRelative(final IResource resource, final IPath path) {
+        if (path.isAbsolute()) {
+            throw new IllegalArgumentException("Unable to convert absolute path");
+        }
+        resource.getFullPath().toFile().toURI().relativize(path.toFile().toURI());
+        path.toFile().toURI().relativize(resource.getFullPath().toFile().toURI());
+        return path.makeRelativeTo(resource.getFullPath()).removeFirstSegments(1);
+    }
+
     public static IPath toWorkspaceRelativeIfPossible(final IPath fullPath) {
         final IPath wsPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
         if (wsPath.isPrefixOf(fullPath)) {

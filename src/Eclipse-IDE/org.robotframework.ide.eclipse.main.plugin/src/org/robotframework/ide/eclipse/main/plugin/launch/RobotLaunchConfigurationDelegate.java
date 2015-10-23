@@ -54,7 +54,6 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotPartListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -82,7 +81,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -233,18 +232,14 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         printCommandOnConsole(cmdLine.getCommandLine(), executorVersion, configuration, description);
 
-        RobotPartListener robotPartListener = null;
         if (isDebugging) {
-            robotPartListener = new RobotPartListener(robotEventBroker);
-            registerPartListener(robotPartListener);
             if(suiteResources.isEmpty()) {
                 suiteResources = newArrayList();
                 suiteResources.add(project);
             }
             IDebugTarget target = null;
             try {
-                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotPartListener,
-                        robotEventBroker, socketManager);
+                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager);
             } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
@@ -259,10 +254,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             }
         } catch (final InterruptedException e) {
             throw newCoreException("Robot process was interrupted", e);
-        } finally {
-            if (robotPartListener != null) {
-                unregisterPartListener(robotPartListener);
-            }
         }
     }
     
@@ -362,26 +353,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 ((IOConsole) console).newOutputStream().write(command + env);
             }
         }
-    }
-
-    private static void registerPartListener(final RobotPartListener listener) {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                workbench.getActiveWorkbenchWindow().getActivePage().addPartListener(listener);
-            }
-        });
-    }
-
-    private static void unregisterPartListener(final RobotPartListener listener) {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                workbench.getActiveWorkbenchWindow().getActivePage().removePartListener(listener);
-            }
-        });
     }
     
     private void waitForDebugServerSocket(final int port) {

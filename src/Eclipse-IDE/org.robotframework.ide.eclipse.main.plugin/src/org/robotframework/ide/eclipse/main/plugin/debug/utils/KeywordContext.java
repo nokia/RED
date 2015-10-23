@@ -13,26 +13,27 @@ import java.util.Map;
  */
 public class KeywordContext {
 
+    private final String fileName;
+
+    private final int lineNumber;
+
     private Map<String, Object> variables;
 
-    private String fileName;
-    
-    private int lineNumber;
+    public KeywordContext() {
+        this(null, null, 0);
+    }
 
-    public KeywordContext(Map<String, Object> variables, String fileName, int lineNumber) {
+    public KeywordContext(final Map<String, Object> variables, final String fileName, final int lineNumber) {
         this.variables = variables;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
-    }
-    
-    public KeywordContext() {
     }
 
     public Map<String, Object> getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, Object> variables) {
+    public void setVariables(final Map<String, Object> variables) {
         this.variables = variables;
     }
 
@@ -40,16 +41,7 @@ public class KeywordContext {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     public int getLineNumber() {
         return lineNumber;
     }
-
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-    
 }

@@ -251,7 +251,6 @@ public class RobotDebugEventDispatcher extends Job {
         }
 
         currentKeywordContext = new KeywordContext(null, executedSuite, keywordLineNumber);
-        target.getPartListener().setKeywordContext(currentKeywordContext);
         target.getCurrentKeywordsContextMap().put(currentKeyword, currentKeywordContext);
     }
 
@@ -274,13 +273,7 @@ public class RobotDebugEventDispatcher extends Job {
         if (!breakpointCondition.isEmpty()) {
             target.sendEventToAgent(createJsonFromBreakpointCondition(breakpointCondition));
         } else {
-            if (isStopping) {
-                target.sendEventToAgent("stop");
-                robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
-                        currentKeywordContext.getLineNumber(), currentKeywordContext.getVariables());
-            } else {
-                target.sendEventToAgent("run");
-            }
+            target.sendEventToAgent(isStopping ? "stop" : "run");
         }
     }
 
@@ -320,8 +313,6 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleConditionCheckedEvent() {
         if (isStopping && isBreakpointConditionFulfilled) {
             target.sendEventToAgent("stop");
-            robotEventBroker.sendHighlightLineEventToTextEditor(currentKeywordContext.getFileName(),
-                    currentKeywordContext.getLineNumber(), currentKeywordContext.getVariables());
         } else {
             target.sendEventToAgent("run");
         }
@@ -339,10 +330,6 @@ public class RobotDebugEventDispatcher extends Job {
         target.getCurrentKeywordsContextMap().remove(keyword);
         
         executionContext.endKeyword();
-
-        if (currentResourceFile != null) {
-            robotEventBroker.sendClearEventToTextEditor(currentResourceFile);
-        }
     }
 
     private void handleEndTestEvent(final Map<String, ?> eventMap) {
@@ -366,7 +353,6 @@ public class RobotDebugEventDispatcher extends Job {
 
 
     private void handleCloseEvent() {
-        robotEventBroker.sendClearAllEventToTextEditor();
         target.terminated();
     }
 
@@ -397,7 +383,7 @@ public class RobotDebugEventDispatcher extends Job {
                 return (IFile) resource;
             } else if (resource instanceof IContainer) {
                 try {
-                    IFile file = extractSuiteFile(suiteName, Arrays.asList(((IContainer) resource).members()));
+                    final IFile file = extractSuiteFile(suiteName, Arrays.asList(((IContainer) resource).members()));
                     if(file != null) {
                         return file;
                     }

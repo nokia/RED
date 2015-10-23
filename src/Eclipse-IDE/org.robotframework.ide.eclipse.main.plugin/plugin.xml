@@ -247,13 +247,6 @@
               id="org.robotframework.ide.project.editor"
               name="RED Project Editor">
         </editor>
-        <editor
-                name="Robot Text Editor"
-                extensions="txt,robot"
-                default="false"
-                class="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper"
-                id="org.robotframework.ide.eclipse.main.plugin.texteditor.TextEditorWrapper">
-        </editor>
     </extension>
  <extension
          point="org.eclipse.ui.views">
@@ -799,6 +792,10 @@
     <command
           id="org.robotframework.red.formatSource"
           name="Format source">
+    </command>
+    <command
+          id="org.robotframework.red.renameInSource"
+          name="Rename">
     </command>
  </extension>
  <extension
@@ -1823,6 +1820,15 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RenameInSourceHandler"
+          commandId="org.robotframework.red.renameInSource">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -1899,6 +1905,12 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+F">
+    </key>
+    <key
+          commandId="org.robotframework.red.renameInSource"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+R">
     </key>
  </extension>
  <extension
@@ -2683,6 +2695,9 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:#TextEditorContext?after=additions">
+         <menu
+               label="Refactor">
+         </menu>
          <menu
                label="Source">
             <command
