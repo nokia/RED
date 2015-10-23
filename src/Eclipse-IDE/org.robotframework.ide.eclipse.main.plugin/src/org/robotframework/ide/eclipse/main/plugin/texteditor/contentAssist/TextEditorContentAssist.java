@@ -22,6 +22,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -79,23 +80,32 @@ public class TextEditorContentAssist {
     private final List<RedVariableProposal> variableProposals;
     
     private final Map<String, ContentAssistKeywordContext> keywordMap;
+
+    private final SuiteSourceAssistantContext context;
     
     public TextEditorContentAssist(final List<RedVariableProposal> variableProposals,
             final Map<String, ContentAssistKeywordContext> keywordMap) {
         this.variableProposals = variableProposals;
         this.keywordMap = keywordMap;
+        this.context = null;
+    }
+
+    public TextEditorContentAssist(final SuiteSourceAssistantContext context) {
+        this.variableProposals = null;
+        this.keywordMap = null;
+        this.context = context;
     }
 
     public List<RedVariableProposal> getVariables() {
-        return variableProposals;
+        return getVariables(0);
     }
 
     public List<RedVariableProposal> getVariables(final int offset) {
-        return variableProposals;
+        return context != null ? context.getVariables(offset) : variableProposals;
     }
 
     public Map<String, ContentAssistKeywordContext> getKeywordMap() {
-        return keywordMap;
+        return context != null ? context.getKeywordMap() : keywordMap;
     }
     
     static ICompletionProposal[] buildSectionProposals(final String replacedWord, final String lineDelimiter,
@@ -163,7 +173,7 @@ public class TextEditorContentAssist {
                     .will(AcceptanceMode.INSERT)
                     .theText(variableName)
                     .atOffset(offset)
-                    .givenThatCurrentPrefixIs("")
+                    .givenThatCurrentPrefixIs(replacedWord)
                     .andWholeContentIs(replacedWord)
                     .secondaryPopupShouldBeDisplayed(info)
                     .thenCursorWillStopAtTheEndOfInsertion()

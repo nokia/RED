@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditorContentAssist;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -32,13 +32,10 @@ import com.google.common.base.Optional;
  */
 public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
-    private final SuiteSourceEditorContentAssist assist;
+    private final SuiteSourceAssistantContext assist;
 
-    private final AssistPreferences assistPreferences;
-
-    public VariablesAssistProcessor(final SuiteSourceEditorContentAssist assist) {
+    public VariablesAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
-        this.assistPreferences = new AssistPreferences();
     }
 
     @Override
@@ -54,22 +51,24 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
                 return null;
             }
 
-            final Optional<IRegion> variable = DocumentUtilities.findVariable(document, offset);
+            final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
             final String prefix = variable.isPresent() ? getPrefix(document, variable.get(), offset) : "";
+            final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
+            final String content = cellRegion.isPresent()
+                    ? document.get(variable.get().getOffset(), cellRegion.get().getLength()) : "";
 
             final List<ICompletionProposal> proposals = newArrayList();
             for (final RedVariableProposal varProposal : assist.getVariables(offset)) {
-                if (varProposal.getName().toLowerCase().startsWith(prefix)) {
+                if (varProposal.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
                     final String additionalInfo = createSecondaryInfo(varProposal);
-                    // FIXME : provide different images for different kind of variables
-                    final Image image = ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
+                    final Image image = getImage(varProposal.getName());
 
                     final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                            .will(assistPreferences.getAcceptanceMode())
+                            .will(assist.getAcceptanceMode())
                             .theText(varProposal.getName())
                             .atOffset(offset - prefix.length())
                             .givenThatCurrentPrefixIs(prefix)
-                            .andWholeContentIs(prefix) // FIXME : get whole content of variable
+                            .andWholeContentIs(content)
                             .secondaryPopupShouldBeDisplayed(additionalInfo)
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
@@ -81,6 +80,16 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             return proposals;
         } catch (final BadLocationException e) {
             return newArrayList();
+        }
+    }
+
+    private Image getImage(final String name) {
+        if (name.startsWith("&")) {
+            return ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage());
+        } else if (name.startsWith("@")) {
+            return ImagesManager.getImage(RedImages.getRobotListVariableImage());
+        } else {
+            return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
         }
     }
 
