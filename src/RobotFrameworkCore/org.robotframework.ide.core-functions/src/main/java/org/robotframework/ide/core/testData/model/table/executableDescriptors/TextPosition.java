@@ -54,7 +54,7 @@ public class TextPosition {
                         + text.substring(startPosition, endPosition + 1);
             } else {
                 info = "text=" + text.substring(startPosition, endPosition + 1)
-                        + ", afterText=" + text.substring(endPosition);
+                        + ", afterText=" + text.substring(endPosition + 1);
             }
         } else {
             info = "text=" + text.substring(startPosition, endPosition + 1);
