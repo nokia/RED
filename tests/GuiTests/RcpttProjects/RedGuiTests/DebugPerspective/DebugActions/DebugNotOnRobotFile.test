@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9Mz18BseEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 8/10/15 11:06 AM
+Save-Time: 10/23/15 6:17 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -15,59 +15,33 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-//
-////doc
-//with [get-view "Project Explorer" | get-tree] {
-//    double-click
-//    select "ScriptWithResource/Simple doc.docx" | get-menu "Debug As/1 Robot Test" | click
-//}
-//
-//get-view Console | get-text-viewer | get-property text  //| write-lines  -uri "file:/c:/aaa/aa.txt"
-//   |  matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//   + "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.Simple doc'\.\n\n"
-//   +"Try --help for usage information\." | verify-true
-//   
-//
-//// jpg 
-//with [get-view "Project Explorer" | get-tree] {
-//    select "ScriptWithResource/photo.jpg" | get-menu "Debug As/1 Robot Test" | click
-//}
-//get-view Console | get-text-viewer | get-property text 
-//    | matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//   + "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.Photo'.\n\n"
-//   +"Try --help for usage information\." | verify-true
-//   
-////html   
-//get-view "Project Explorer" | get-tree | select "ScriptWithResource/Logs/report.html" | get-menu "Debug As/1 Robot Test" 
-//    | click
-//get-view Console | get-text-viewer | get-property text 
-//    | matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//   +  "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.Logs.Report'.\n\n"
-//   + "Try --help for usage information\." | verify-true
-//
-////xml
-//get-view "Project Explorer" | get-tree | select "ScriptWithResource/Logs/output.xml" | get-menu "Debug As/1 Robot Test" 
-//    | click
-//get-view Console | get-text-viewer | get-property text 
-//     | matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//    + "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.Logs.Output'.\n\n"
-//    + "Try --help for usage information." | verify-true
-//
-////xml one more time
-//get-view "Project Explorer" | get-tree | select "ScriptWithResource/Logs/output.xml" | get-menu "Debug As/1 Robot Test" 
-//    | click
-//get-view Console | get-text-viewer | get-property text 
-//     | matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//    + "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.Logs.Output'.\n\n"
-//    + "Try --help for usage information." | verify-true
-//    
-////keywords
-//get-view "Project Explorer" | get-tree | select "ScriptWithResource/my_keywords.robot" 
-//    | get-menu "Debug As/1 Robot Test" | click
-//get-view Console | get-text-viewer | get-property text 
-//     | matches "^Command: .*\nSuite Executor: Robot Framework .*\n"
-//    + "\[ ERROR \] Suite 'ScriptWithResource' contains no tests in suite 'ScriptWithResource.My_keywords'.\n\n"
-//    + "Try --help for usage information." | verify-true
-//    
-//    
+//select doc
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/Simple doc.docx"
+with [get-view "Project Explorer" | get-tree] {
+    get-menu "Debug As/Debug Configurations..." | get-property caption | equals "De&bug Configurations..." | verify-true
+    get-menu "Debug As/Debug Configurations..." | get-property index | equals 0 | verify-true
+}
+//select txt
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/PlainText.txt"
+get-view "Project Explorer" | get-tree | get-menu "Debug As/Debug Configurations..." | get-property caption 
+    | equals "De&bug Configurations..." | verify-true
+    
+//select jpg    
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/photo.jpg"
+with [get-view "Project Explorer" | get-tree] {
+    get-menu "Debug As/Debug Configurations..." | get-property caption | equals "De&bug Configurations..." | verify-true
+    get-menu "Debug As/Debug Configurations..." | get-property index | equals 0 | verify-true
+}
+
+//select resource
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/my_keywords.robot"
+with [get-view "Project Explorer" | get-tree] {
+    get-menu "Debug As/Debug Configurations..." | get-property caption | equals "De&bug Configurations..." | verify-true
+    get-menu "Debug As/Debug Configurations..." | get-property index | equals 0 | verify-true
+}
+
+//select robot file
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot"
+get-view "Project Explorer" | get-tree | get-menu "Debug As/1 Robot Test" | get-property caption 
+    | equals "&1 Robot Test" | verify-true  
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
