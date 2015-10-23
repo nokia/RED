@@ -13,6 +13,7 @@ import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
@@ -124,6 +125,18 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
 
         public RobotTokenType getType() {
             return type;
+        }
+
+
+        public static VariableType getTypeByTokenType(IRobotTokenType type) {
+            VariableType varType = null;
+            for (VariableType vt : values()) {
+                if (vt.getType() == type) {
+                    varType = vt;
+                    break;
+                }
+            }
+            return varType;
         }
     }
 

@@ -568,4 +568,5 @@ public class ElementsUtility {
             token.setStartColumn(fp.getColumn());
         }
     }
+
 }
