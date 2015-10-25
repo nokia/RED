@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.setting.Metadata;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,11 +26,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class MetadataMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver positionResolver;
 
 
     public MetadataMapper() {
-        this.utility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
     }
 
 
@@ -60,7 +61,9 @@ public class MetadataMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1
                 && types.get(0) == RobotTokenType.SETTING_METADATA_DECLARATION) {
-            if (utility.isTheFirstColumn(currentLine, rt)) {
+            if (positionResolver.isCorrectPosition(
+                    PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
+                    robotFileOutput.getFileModel(), currentLine, rt)) {
                 if (isIncludedInSettingTable(currentLine, processingState)) {
                     result = true;
                 } else {
