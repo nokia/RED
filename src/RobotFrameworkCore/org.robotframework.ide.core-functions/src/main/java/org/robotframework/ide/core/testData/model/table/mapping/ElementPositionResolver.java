@@ -158,6 +158,24 @@ public class ElementPositionResolver {
                     final RobotLine currentLine, final RobotToken currentToken) {
                 return isReallyFirstElement(posInfo, currentToken);
             }
+        },
+        TEST_CASE_NAME {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isReallyFirstElement(posInfo, currentToken);
+            }
+        },
+        VARIABLE_DECLARATION_IN_VARIABLE_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isReallyFirstElement(posInfo, currentToken);
+            }
         };
 
         private static boolean isReallyFirstElement(
