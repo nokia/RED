@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
@@ -24,12 +25,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class UnknownSettingMapper implements IParsingMapper {
 
-    private final ElementsUtility elemUtility;
+    private final ElementPositionResolver positionResolver;
     private final ParsingStateHelper utility;
 
 
     public UnknownSettingMapper() {
-        this.elemUtility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
         this.utility = new ParsingStateHelper();
     }
 
@@ -65,7 +66,9 @@ public class UnknownSettingMapper implements IParsingMapper {
 
         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
             if (text != null) {
-                result = elemUtility.isTheFirstColumn(currentLine, rt);
+                result = positionResolver.isCorrectPosition(
+                        PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
+                        robotFileOutput.getFileModel(), currentLine, rt);
             }
         }
 

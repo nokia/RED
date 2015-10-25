@@ -147,22 +147,36 @@ public class ElementPositionResolver {
             public boolean isExpectedPosition(
                     final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
-                boolean result = false;
-                SeparatorType separator = posInfo.getLineSeparator();
-                if (separator == SeparatorType.PIPE) {
-                    if (posInfo.getSeparatorsPosIndexes().size() == 1
-                            && posInfo.getRobotTokensPosIndexes().size() == 1) {
-                        result = posInfo.isFirstSeparator();
-                    }
-                } else {
-                    result = (currentToken.getStartColumn() == 0)
-                            && posInfo.getRobotTokensPosIndexes().size() == 1
-                            && posInfo.getSeparatorsPosIndexes().isEmpty()
-                            && !posInfo.isFirstSeparator();
-                }
-                return result;
+                return isReallyFirstElement(posInfo, currentToken);
+            }
+        },
+        SETTING_TABLE_ELEMENT_DECLARATION {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isReallyFirstElement(posInfo, currentToken);
             }
         };
+
+        private static boolean isReallyFirstElement(
+                final PositionInformation posInfo, final RobotToken currentToken) {
+            boolean result = false;
+            SeparatorType separator = posInfo.getLineSeparator();
+            if (separator == SeparatorType.PIPE) {
+                if (posInfo.getSeparatorsPosIndexes().size() == 1
+                        && posInfo.getRobotTokensPosIndexes().size() == 1) {
+                    result = posInfo.isFirstSeparator();
+                }
+            } else {
+                result = (currentToken.getStartColumn() == 0)
+                        && posInfo.getRobotTokensPosIndexes().size() == 1
+                        && posInfo.getSeparatorsPosIndexes().isEmpty()
+                        && !posInfo.isFirstSeparator();
+            }
+            return result;
+        }
     }
 
 
