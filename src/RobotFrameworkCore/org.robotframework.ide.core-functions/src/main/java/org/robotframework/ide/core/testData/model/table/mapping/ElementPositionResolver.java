@@ -14,13 +14,10 @@ import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 
 public class ElementPositionResolver {
-
-    public ElementPositionResolver() {
-    }
-
 
     public PositionInformation buildPositionDescription(final RobotFile model,
             final RobotLine currentLine, final RobotToken currentToken) {
@@ -38,9 +35,13 @@ public class ElementPositionResolver {
                             .get(0));
                 }
 
-                posInfo.addSeparatorsPosIndexes(elemIndex);
+                posInfo.addSeparatorPosIndex(elemIndex);
             } else if (elem instanceof RobotToken) {
-                posInfo.addRobotTokenPosIndex(elemIndex);
+                if (elem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    posInfo.addPrettyAlignPosIndex(elemIndex);
+                } else {
+                    posInfo.addRobotTokenPosIndex(elemIndex);
+                }
             }
         }
 
@@ -51,6 +52,7 @@ public class ElementPositionResolver {
 
         private SeparatorType lineSeparator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
         private List<Integer> robotTokensPosIndexes = new LinkedList<>();
+        private List<Integer> prettyAlignPosIndexes = new LinkedList<>();
         private List<Integer> separatorsPosIndexes = new LinkedList<>();
         private boolean wasLastSeparator = false;
         private boolean isFirstSeparator = false;
@@ -67,7 +69,12 @@ public class ElementPositionResolver {
         }
 
 
-        private void addSeparatorsPosIndexes(final int separatorPosIndex) {
+        private void addPrettyAlignPosIndex(final int prettyAlignPosIndex) {
+            prettyAlignPosIndexes.add(prettyAlignPosIndex);
+        }
+
+
+        private void addSeparatorPosIndex(final int separatorPosIndex) {
             if (robotTokensPosIndexes.isEmpty()
                     && separatorsPosIndexes.isEmpty()) {
                 isFirstSeparator = true;
@@ -89,6 +96,11 @@ public class ElementPositionResolver {
 
         public List<Integer> getSeparatorsPosIndexes() {
             return separatorsPosIndexes;
+        }
+
+
+        public List<Integer> getPrettyAlignPosIndexes() {
+            return prettyAlignPosIndexes;
         }
 
 
