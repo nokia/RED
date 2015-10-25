@@ -168,6 +168,15 @@ public class ElementPositionResolver {
                 return isReallyFirstElement(posInfo, currentToken);
             }
         },
+        USER_KEYWORD_NAME {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isReallyFirstElement(posInfo, currentToken);
+            }
+        },
         VARIABLE_DECLARATION_IN_VARIABLE_TABLE {
 
             @Override
