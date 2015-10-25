@@ -457,7 +457,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     // FIXME: add warning about wrong place
                 }
             } else if (utility.isUserTableHeader(robotToken)
-                    && utility.isTheFirstColumn(currentLine, robotToken)) {
+                    && positionResolvers.isCorrectPosition(
+                            PositionExpected.TABLE_HEADER, fileModel,
+                            currentLine, robotToken)) {
                 robotToken.getTypes().add(0,
                         RobotTokenType.USER_OWN_TABLE_HEADER);
                 // FIXME: add warning about user trash table
