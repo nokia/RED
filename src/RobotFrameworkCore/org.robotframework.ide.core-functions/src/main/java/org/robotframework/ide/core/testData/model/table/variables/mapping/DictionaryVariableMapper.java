@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
@@ -24,12 +25,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class DictionaryVariableMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver positionResolver;
     private final CommonVariableHelper varHelper;
 
 
     public DictionaryVariableMapper() {
-        this.utility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
         this.varHelper = new CommonVariableHelper();
     }
 
@@ -65,7 +66,9 @@ public class DictionaryVariableMapper implements IParsingMapper {
         List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1
                 && types.get(0) == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) {
-            if (utility.isTheFirstColumn(currentLine, rt)) {
+            if (positionResolver.isCorrectPosition(
+                    PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
+                    robotFileOutput.getFileModel(), currentLine, rt)) {
                 if (varHelper.isIncludedInVariableTable(currentLine,
                         processingState)) {
                     if (varHelper.isCorrectVariable(text)) {
