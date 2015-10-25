@@ -28,6 +28,8 @@ import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler.LineContinueType;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
@@ -73,6 +75,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
     private final LibraryAliasFixer libraryFixer;
     private final PreviousLineHandler previousLineHandler;
     private final CommonVariableHelper variableHelper;
+    private final ElementPositionResolver positionResolvers;
 
 
     public TxtRobotFileParser() {
@@ -83,6 +86,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         this.tokenSeparatorBuilder = new TokenSeparatorBuilder();
         this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
         this.previousLineHandler = new PreviousLineHandler();
+        this.positionResolvers = new ElementPositionResolver();
 
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
         recognized.addAll(new VariablesDeclarationRecognizersProvider()
@@ -417,7 +421,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
             boolean useMapper = true;
             RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
-                if (utility.isTheFirstColumn(currentLine, robotToken)) {
+                if (positionResolvers.isCorrectPosition(
+                        PositionExpected.TABLE_HEADER, fileModel, currentLine,
+                        robotToken)) {
                     if (wasRecognizedCorrectly) {
                         @SuppressWarnings("rawtypes")
                         TableHeader header = new TableHeader(robotToken);
