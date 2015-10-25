@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,11 +26,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseNameMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver positionResolver;
 
 
     public TestCaseNameMapper() {
-        this.utility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
     }
 
 
@@ -59,7 +60,8 @@ public class TestCaseNameMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (utility.isTheFirstColumn(currentLine, rt)) {
+        if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
+                robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInTestCaseTable(currentLine, processingState)) {
                 result = true;
             } else {

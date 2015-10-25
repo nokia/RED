@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.VariableTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
@@ -25,12 +26,12 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class UnknownVariableMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver positionResolver;
     private final ParsingStateHelper stateHelper;
 
 
     public UnknownVariableMapper() {
-        this.utility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
         this.stateHelper = new ParsingStateHelper();
     }
 
@@ -69,8 +70,10 @@ public class UnknownVariableMapper implements IParsingMapper {
 
         if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
             if (text != null) {
-                result = utility.isTheFirstColumn(currentLine, rt)
-                        || utility.isTheFirstColumn(currentLine, rt);
+                result = positionResolver
+                        .isCorrectPosition(
+                                PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
+                                robotFileOutput.getFileModel(), currentLine, rt);
             }
         }
 
