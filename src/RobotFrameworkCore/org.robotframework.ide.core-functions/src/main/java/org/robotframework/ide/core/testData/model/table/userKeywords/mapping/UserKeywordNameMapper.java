@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -25,11 +26,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class UserKeywordNameMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver positionResolver;
 
 
     public UserKeywordNameMapper() {
-        this.utility = new ElementsUtility();
+        this.positionResolver = new ElementPositionResolver();
     }
 
 
@@ -60,7 +61,9 @@ public class UserKeywordNameMapper implements IParsingMapper {
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
         boolean result = false;
-        if (utility.isTheFirstColumn(currentLine, rt)) {
+        if (positionResolver.isCorrectPosition(
+                PositionExpected.USER_KEYWORD_NAME,
+                robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInKeywordTable(currentLine, processingState)) {
                 result = true;
             } else {
