@@ -34,7 +34,7 @@ public class RobotDebugExecutionContextTest {
     
     private int[] test6_lines = new int[] { 2, 12, 13, 7, 8, 3, 15, 16 };
     
-    private int[] test7_lines = new int[] { 6, 30, 7 };
+    private int[] test7_lines = new int[] { 6, 30, 7, 8, 13, 9 };
 
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
@@ -307,6 +307,11 @@ public class RobotDebugExecutionContextTest {
                 debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("Return value"));checkKeywordLine7();debugExecutionContext.endKeyword();
             debugExecutionContext.endKeyword();
             debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${var}"));checkKeywordLine7();debugExecutionContext.endKeyword();
+            
+            debugExecutionContext.startKeyword("${var2} = SecondKeywordReturnValue", "Keyword", Arrays.asList(""));checkKeywordLine7();
+                debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("Return value"));checkKeywordLine7();debugExecutionContext.endKeyword();
+            debugExecutionContext.endKeyword();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${var2}"));checkKeywordLine7();debugExecutionContext.endKeyword();
         debugExecutionContext.endTest();
 
     }
