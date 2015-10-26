@@ -140,10 +140,10 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> names = validationContext.getAccessibleKeywords();
 
         for (final RobotExecutableRow<?> executable : executables) {
-            final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
-            if (keywordName == null || keywordName.getText().toString().trim().startsWith("#")) {
+            if (!executable.isExecutable()) {
                 continue;
             }
+            final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
             final String name = keywordName.getText().toString();
             if (!names.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
