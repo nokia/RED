@@ -31,10 +31,13 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private int currentPage;
 
+    private boolean canReopenAssitantProgramatically;
+
     public CycledContentAssistProcessor(final AssitantCallbacks assistant) {
         this.processors = newArrayList();
         this.assistant = assistant;
         this.currentPage = 0;
+        this.canReopenAssitantProgramatically = false;
     }
 
     public void addProcessor(final RedContentAssistProcessor processor) {
@@ -55,6 +58,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void assistSessionStarted(final ContentAssistEvent event) {
         if (event.processor == this) {
+            canReopenAssitantProgramatically = true;
             currentPage = 0;
         }
     }
@@ -62,6 +66,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void assistSessionRestarted(final ContentAssistEvent event) {
         if (event.processor == this) {
+            canReopenAssitantProgramatically = true;
             currentPage--;
             if (currentPage < 0) {
                 currentPage = processors.size() - 1;
@@ -79,8 +84,12 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     @Override
     public void applied(final ICompletionProposal proposal) {
-        if (proposal instanceof RedCompletionProposal
+        // this method is called also for processors from which the proposal was not chosen
+        // hence canReopenAssistantProgramatically is holding information which proccessor
+        // is able to open proposals after accepting
+        if (canReopenAssitantProgramatically && proposal instanceof RedCompletionProposal
                 && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
+            canReopenAssitantProgramatically = false;
             assistant.openCompletionProposals();
         }
     }
