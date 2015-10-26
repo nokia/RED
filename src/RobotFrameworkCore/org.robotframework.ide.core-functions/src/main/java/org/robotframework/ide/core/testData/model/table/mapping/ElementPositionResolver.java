@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ForDescriptorInfo;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
@@ -267,6 +268,30 @@ public class ElementPositionResolver {
                     final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
                 return isInlined(posInfo);
+            }
+        },
+        LINE_CONTINUE_INLINED_IN_FOR_LOOP {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                boolean isInlined = false;
+                List<IRobotLineElement> elements = new LinkedList<>(
+                        currentLine.getLineElements());
+                if (currentToken != null) {
+                    elements.add(currentToken);
+                }
+                ForDescriptorInfo forDescInfo = ForDescriptorInfo
+                        .build(elements);
+                if (forDescInfo.getForStartIndex() > -1) {
+                    if (forDescInfo.getForLineContinueInlineIndex() == currentLine
+                            .getLineElements().size()) {
+                        isInlined = true;
+                    }
+                }
+
+                return isInlined;
             }
         };
 
