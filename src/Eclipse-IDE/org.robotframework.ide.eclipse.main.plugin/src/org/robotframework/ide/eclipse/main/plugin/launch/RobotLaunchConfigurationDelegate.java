@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -81,7 +82,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -126,8 +127,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private ILaunchConfiguration findLaunchConfiguration(final List<IResource> resources) throws CoreException {
+        
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        if (resources.size() == 1) {
+        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
             final String resourceName = resources.get(0).getName();
             final String projectName = resources.get(0).getProject().getName();
             for (final ILaunchConfiguration configuration : launchConfigs) {
