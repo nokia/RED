@@ -71,8 +71,9 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         if (keywordContext.getUserKeyword() != null) {
             return keywordContext.getUserKeyword();
         }
+        final String keywordName = extractKeywordNameFromVariableDeclaration(keywordContext.getName());
         for (final UserKeyword userKeyword : userKeywords) {
-            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(keywordContext.getName())) {
+            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(keywordName)) {
                 return userKeyword;
             }
         }
@@ -100,14 +101,14 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         }
         final String[] nameElements = keywordContext.getName().split("\\.");
         if (nameElements.length > 0) {
-            final String name = extractResourceName(nameElements);
+            final String name = extractKeywordNameFromVariableDeclaration(nameElements[0]);
             return findImportReference(name, resourceImportReferences);
         }
         return null;
     }
 
-    private String extractResourceName(final String[] nameElements) {
-        String name = nameElements[0];
+    private String extractKeywordNameFromVariableDeclaration(final String keywordName) {
+        String name = keywordName;
         if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') {
             final int variableDeclarationIndex = name.lastIndexOf("=");
             if (variableDeclarationIndex >= 0) {
