@@ -19,17 +19,20 @@ import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.executables.RobotSpecialTokens;
 
 
 public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
     private final KeywordFinder keywordFinder;
+    private final RobotSpecialTokens specialTokensRecognizer;
 
 
     public KeywordExecutableRowArgumentMapper() {
         this.stateHelper = new ParsingStateHelper();
         this.keywordFinder = new KeywordFinder();
+        this.specialTokensRecognizer = new RobotSpecialTokens();
     }
 
 
@@ -42,6 +45,12 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
                 currentLine, processingState, robotFileOutput, rt, fp);
         List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
+
+        List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp,
+                text);
+        for (RobotToken token : specialTokens) {
+            types.addAll(token.getTypes());
+        }
 
         List<RobotExecutableRow<UserKeyword>> keywordExecutionRows = keyword
                 .getKeywordExecutionRows();
