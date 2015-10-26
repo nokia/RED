@@ -46,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -189,7 +188,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
         for (final RedKeywordProposal proposal : keywordProposals) {
             if (proposal.getLabel().equalsIgnoreCase(keywordName)) {
-                return new ContentAssistKeywordContext(proposal).getDescription();
+                return proposal.getDocumentation();
             }
         }
         return null;
