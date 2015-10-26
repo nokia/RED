@@ -426,7 +426,7 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    FOR_TOKEN(TableType.NOT_STRICTLY_BELONGS, ":FOR"),
+    FOR_TOKEN(TableType.NOT_STRICTLY_BELONGS, ": FOR"),
     /**
      * 
      */
