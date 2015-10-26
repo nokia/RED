@@ -118,6 +118,13 @@ public class PreviousLineHandler {
                         continueType = LineContinueType.LINE_CONTINUE_INLINED;
                     }
                 }
+            } else if (currentState == ParsingState.TEST_CASE_INSIDE_ACTION
+                    || currentState == ParsingState.KEYWORD_INSIDE_ACTION) {
+                if (posResolver.isCorrectPosition(
+                        PositionExpected.LINE_CONTINUE_INLINED_IN_FOR_LOOP,
+                        model, currentLine, currentToken)) {
+                    continueType = LineContinueType.LINE_CONTINUE_INLINED;
+                }
             }
         }
 
