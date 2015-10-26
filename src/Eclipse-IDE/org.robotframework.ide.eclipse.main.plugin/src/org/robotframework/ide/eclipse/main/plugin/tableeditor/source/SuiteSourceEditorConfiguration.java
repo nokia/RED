@@ -53,6 +53,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
@@ -168,12 +169,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assist);
         final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(assist);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(assist);
+        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(assist);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assist);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(librariesProcessor,
                 variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
-                variablesAssistProcessor);
+                keywordsAssistProcessor, variablesAssistProcessor);
         cycledProcessor.addProcessor(combinedProcessor);
+        cycledProcessor.addProcessor(settingNamesProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
         contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
         contentAssistant.addCompletionListener(cycledProcessor);
