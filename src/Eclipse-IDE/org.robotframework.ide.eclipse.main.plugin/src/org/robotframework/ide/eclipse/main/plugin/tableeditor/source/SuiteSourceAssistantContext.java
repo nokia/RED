@@ -10,9 +10,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordPropos
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -28,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.ContentAssistKeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 
@@ -47,6 +44,10 @@ public class SuiteSourceAssistantContext {
         this.assistPreferences = new AssistPreferences();
     }
 
+    public RobotSuiteFile getModel() {
+        return suiteModel;
+    }
+
     public IFile getFile() {
         return suiteModel.getFile();
     }
@@ -63,15 +64,9 @@ public class SuiteSourceAssistantContext {
         return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
     }
 
-    public Map<String, ContentAssistKeywordContext> getKeywordMap() {
+    public Collection<RedKeywordProposal> getKeywords() {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteModel);
-        final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
-
-        final Map<String, ContentAssistKeywordContext> mapping = new LinkedHashMap<>();
-        for (final RedKeywordProposal proposal : keywordProposals) {
-            mapping.put(proposal.getLabel(), new ContentAssistKeywordContext(proposal));
-        }
-        return mapping;
+        return proposals.getKeywordProposals(sortedByNames());
     }
 
     public Collection<LibrarySpecification> getLibraries() {

@@ -126,6 +126,10 @@ public class LibrarySpecification {
         return Arrays.asList("BuiltIn", "Easter", "Reserved").contains(name);
     }
 
+    public boolean isReserved() {
+        return "Reserved".equals(name);
+    }
+
     public boolean canBeConvertedToHtml() {
         return "ROBOT".equals(format);
     }

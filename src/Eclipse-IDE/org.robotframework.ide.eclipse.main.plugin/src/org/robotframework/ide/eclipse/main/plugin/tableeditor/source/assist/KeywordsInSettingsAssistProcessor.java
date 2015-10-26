@@ -15,9 +15,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
@@ -31,17 +29,17 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
+public class KeywordsInSettingsAssistProcessor extends RedContentAssistProcessor {
 
     private final SuiteSourceAssistantContext assist;
 
-    public LibrariesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public KeywordsInSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
 
     @Override
     protected String getProposalsTitle() {
-        return "Libraries";
+        return "Keywords";
     }
 
     @Override
@@ -56,36 +54,28 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
                 final String prefix = getPrefix(document, region, offset);
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
-                final String separator = assist.getSeparatorToFollow();
 
                 final List<RedCompletionProposal> proposals = newArrayList();
-                for (final LibrarySpecification library : assist.getLibraries()) {
-                    final String libraryName = library.getName();
+                for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
+                    final String keywordName = keywordProposal.getLabel();
 
-                    if (libraryName.toLowerCase().startsWith(prefix.toLowerCase())) {
+                    if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())) {
+                        final String textToInsert = keywordName;
 
-                        final String argument = library.isRemote() ? separator + library.getSecondaryKey() : "";
-                        final String textToInsert = libraryName + argument;
-
-                        final Image image = ImagesManager.getImage(RedImages.getLibraryImage());
-                        
-                        final boolean isImported = assist.isAlreadyImported(library);
-                        final String importedInfo = isImported ? "(already imported)" : null;
-                        
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                                 .will(assist.getAcceptanceMode())
                                 .theText(textToInsert)
                                 .atOffset(offset - prefix.length())
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)
-                                .secondaryPopupShouldBeDisplayed(library.getDocumentation())
+                                .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
                                 .thenCursorWillStopAtTheEndOfInsertion()
                                 .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(textToInsert.replaceAll("  +", " ").trim())
-                                .proposalsShouldHaveIcon(image)
-                                .labelShouldBeAugmentedWith(importedInfo)
-                                .createWithPriority(isImported ? 1 : 0);
-                        
+                                .displayedLabelShouldBe(textToInsert)
+                                .labelShouldBeAugmentedWith(keywordProposal.getLabelDecoration())
+                                .proposalsShouldHaveIcon(ImagesManager.getImage(keywordProposal.getImage()))
+                                .create();
+
                         proposals.add(proposal);
                     }
                 }
@@ -99,8 +89,12 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     private boolean shouldShowProposals(final String lineContent) {
-        return lineContent.toLowerCase().startsWith("library")
-                && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
+        return DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1
+                && (lineContent.toLowerCase().startsWith("suite setup")
+                || lineContent.toLowerCase().startsWith("suite teardown")
+                || lineContent.toLowerCase().startsWith("test setup")
+                || lineContent.toLowerCase().startsWith("test teardown")
+                || lineContent.toLowerCase().startsWith("test template"));
     }
 
     private String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset) {
@@ -113,5 +107,4 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
             return "";
         }
     }
-
 }

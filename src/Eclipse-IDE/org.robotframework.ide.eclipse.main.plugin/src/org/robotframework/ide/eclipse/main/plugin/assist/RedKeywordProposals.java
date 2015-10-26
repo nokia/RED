@@ -75,7 +75,7 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec) {
-                if (kwSpec.getName().startsWith(prefix)) {
+                if (kwSpec.getName().startsWith(prefix) && !libSpec.isReserved()) {
                     proposals.add(RedKeywordProposal.create(libSpec, kwSpec));
                 }
                 return ContinueDecision.CONTINUE;
@@ -84,11 +84,7 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
                 if (keyword.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
-                    if (file == suiteFile) {
-                        proposals.add(RedKeywordProposal.create(keyword));
-                    } else {
-                        proposals.add(RedKeywordProposal.createExternal(file, keyword));
-                    }
+                    proposals.add(RedKeywordProposal.create(file, keyword));
                 }
                 return ContinueDecision.CONTINUE;
             }
