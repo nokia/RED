@@ -20,6 +20,9 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTags
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTeardown;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordTimeout;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.collect.Lists;
@@ -169,6 +172,46 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             }
         }
         return null;
+    }
+
+    public String getDocumentation() {
+        final RobotDefinitionSetting documentationSetting = getDocumentationSetting();
+        if (documentationSetting != null) {
+            final KeywordDocumentation documentation = (KeywordDocumentation) documentationSetting.getLinkedElement();
+            final StringBuilder docBuilder = new StringBuilder();
+            for (final RobotToken token : documentation.getDocumentationText()) {
+                docBuilder.append(token.getText().toString());
+            }
+            return docBuilder.toString();
+        }
+        return "<not documented>";
+    }
+
+    public List<String> getArguments() {
+        final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
+        if (argumentsSetting != null) {
+            final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
+            final List<String> args = newArrayList();
+            for (final RobotToken token : arguments.getArguments()) {
+                args.add(toPythonicNotation(token));
+            }
+            return args;
+        }
+        return newArrayList();
+    }
+
+    private String toPythonicNotation(final RobotToken token) {
+        final List<IRobotTokenType> types = token.getTypes();
+        final String text = token.getText().toString();
+        if (types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+            return "**" + text.substring(2, text.length() - 1);
+        } else if (types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)) {
+            return "*" + text.substring(2, text.length() - 1);
+        } else if (types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)) {
+            return text.substring(2, text.length() - 1);
+        } else {
+            return text;
+        }
     }
 
     @Override
