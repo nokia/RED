@@ -41,6 +41,45 @@ public class ElementsUtility {
     }
 
 
+    public boolean isTheFirstColumn(RobotLine currentLine, RobotToken robotToken) {
+        boolean result = false;
+        if (robotToken.getStartColumn() == 0) {
+            result = true;
+        } else {
+            List<IRobotLineElement> lineElements = currentLine
+                    .getLineElements();
+            int size = lineElements.size();
+            if (size == 1) {
+                IRobotLineElement lastElement = lineElements.get(0);
+                result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
+                        .getStartColumn() == 0);
+            }
+        }
+
+        return result;
+    }
+
+
+    public boolean isTheFirstColumnAfterSeparator(RobotLine currentLine,
+            RobotToken robotToken) {
+        boolean result = false;
+        if (robotToken.getStartColumn() > 0) {
+            List<IRobotLineElement> lineElements = currentLine
+                    .getLineElements();
+            int size = lineElements.size();
+            if (size > 0) {
+                IRobotLineElement lastElement = lineElements.get(size - 1);
+                List<IRobotTokenType> types = lastElement.getTypes();
+                result = ((types.contains(SeparatorType.PIPE) || types
+                        .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)) && lastElement
+                        .getStartColumn() == 0);
+            }
+        }
+
+        return result;
+    }
+
+
     public boolean isNewExecutableSection(final ALineSeparator separator,
             final RobotLine line) {
         boolean result = false;
@@ -254,45 +293,6 @@ public class ElementsUtility {
     }
 
 
-    public boolean isTheFirstColumn(RobotLine currentLine, RobotToken robotToken) {
-        boolean result = false;
-        if (robotToken.getStartColumn() == 0) {
-            result = true;
-        } else {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            int size = lineElements.size();
-            if (size == 1) {
-                IRobotLineElement lastElement = lineElements.get(0);
-                result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
-                        .getStartColumn() == 0);
-            }
-        }
-
-        return result;
-    }
-
-
-    public boolean isTheFirstColumnAfterSeparator(RobotLine currentLine,
-            RobotToken robotToken) {
-        boolean result = false;
-        if (robotToken.getStartColumn() > 0) {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            int size = lineElements.size();
-            if (size > 0) {
-                IRobotLineElement lastElement = lineElements.get(size - 1);
-                List<IRobotTokenType> types = lastElement.getTypes();
-                result = ((types.contains(SeparatorType.PIPE) || types
-                        .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)) && lastElement
-                        .getStartColumn() == 0);
-            }
-        }
-
-        return result;
-    }
-
-
     public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(
             final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
@@ -442,7 +442,29 @@ public class ElementsUtility {
                             result = lineTokenInfo.getDataStartIndex() <= separator
                                     .getCurrentElementIndex();
                         } else {
-                            result = true;
+                            if (state == ParsingState.TEST_CASE_DECLARATION
+                                    || state == ParsingState.KEYWORD_DECLARATION) {
+                                /**
+                                 * <pre>
+                                 *  *** Test Cases *** 
+                                 *  | x | | ... | Log | ... |
+                                 *  
+                                 *  is not inline:
+                                 *  
+                                 * ** Test Cases *** 
+                                 * | | x | | ... | Log | ... |
+                                 * </pre>
+                                 */
+                                if (shouldTreatAsInlineContinue(lineTokenInfo)) {
+                                    result = separator.getCurrentElementIndex() > lineTokenInfo
+                                            .getPositionsOfLineContinoue().get(
+                                                    0);
+                                } else {
+                                    result = true;
+                                }
+                            } else {
+                                result = true;
+                            }
                         }
 
                         result = result
@@ -450,6 +472,30 @@ public class ElementsUtility {
                                         .getCurrentElementIndex();
                     }
                 }
+            }
+        }
+
+        return result;
+    }
+
+
+    private boolean shouldTreatAsInlineContinue(
+            final LineTokenInfo lineTokenInfo) {
+        boolean result = false;
+
+        if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
+                && !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
+            int theFirstToken = lineTokenInfo.getPositionsOfNotEmptyElements()
+                    .get(0);
+            int theFirstContinoue = lineTokenInfo.getPositionsOfLineContinoue()
+                    .get(0);
+            if (lineTokenInfo.getPositionsOfNotEmptyElements().size() > 1) {
+                int theSecondToken = lineTokenInfo
+                        .getPositionsOfNotEmptyElements().get(1);
+                result = theFirstToken < theFirstContinoue
+                        && theFirstContinoue < theSecondToken;
+            } else {
+                result = theFirstToken < theFirstContinoue;
             }
         }
 
