@@ -418,7 +418,23 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS);
+    KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS),
+    /**
+     * 
+     */
+    COMMENT_TOKEN(TableType.NOT_STRICTLY_BELONGS, "Comment"),
+    /**
+     * 
+     */
+    FOR_TOKEN(TableType.NOT_STRICTLY_BELONGS, ":FOR"),
+    /**
+     * 
+     */
+    IN_TOKEN(TableType.NOT_STRICTLY_BELONGS, "IN", "IN RANGE"),
+    /**
+     * 
+     */
+    FOR_CONTINUE_TOKEN(TableType.NOT_STRICTLY_BELONGS, "\\");
 
     private final List<String> representationForNew = new LinkedList<>();
     private final TableType type;
