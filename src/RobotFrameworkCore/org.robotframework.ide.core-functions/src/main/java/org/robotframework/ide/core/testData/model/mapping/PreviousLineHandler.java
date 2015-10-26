@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -24,12 +25,12 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class PreviousLineHandler {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver posResolver;
     private final ParsingStateHelper stateHelper;
 
 
     public PreviousLineHandler() {
-        this.utility = new ElementsUtility();
+        this.posResolver = new ElementPositionResolver();
         this.stateHelper = new ParsingStateHelper();
     }
 
@@ -42,61 +43,85 @@ public class PreviousLineHandler {
             final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
-        if (isNewLine) {
-            if ((currentToken.getTypes().size() == 1 && currentToken.getTypes()
-                    .contains(RobotTokenType.PREVIOUS_LINE_CONTINUE))
-                    || isCommentContinue(currentToken, storedStack)) {
-                ParsingState currentState = stateHelper
-                        .getCurrentStatus(parsingStates);
-                if (isSomethingToContinue(model)) {
-                    if (utility.isTheFirstColumn(currentLine, currentToken)) {
-                        if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
-                            if (containsAnySetting(model)) {
-                                continueType = LineContinueType.SETTING_TABLE_ELEMENT;
-                            }
-                        } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE
-                                && containsAnyVariable(model)) {
-                            continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
+        if ((currentToken.getTypes().size() == 1 && currentToken.getTypes()
+                .contains(RobotTokenType.PREVIOUS_LINE_CONTINUE))
+                || isCommentContinue(currentToken, storedStack)) {
+            ParsingState currentState = stateHelper
+                    .getCurrentStatus(parsingStates);
+
+            if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
+                if (isNewLine && containsAnySetting(model)
+                        && isSomethingToContinue(model)) {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_SETTING_TABLE,
+                                    model, currentLine, currentToken)) {
+                        continueType = LineContinueType.SETTING_TABLE_ELEMENT;
+                    }
+                }
+            } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
+                if (isNewLine && containsAnyVariable(model)
+                        && isSomethingToContinue(model)) {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_VARIABLE_TABLE,
+                                    model, currentLine, currentToken)) {
+                        continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
+                    }
+                }
+            } else if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
+                    || currentState == ParsingState.TEST_CASE_DECLARATION) {
+                if (isNewLine) {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE,
+                                    model, currentLine, currentToken)) {
+                        ParsingState state = stateHelper
+                                .getCurrentStatus(storedStack);
+                        if (state == ParsingState.TEST_CASE_TABLE_HEADER) {
+                            storedStack
+                                    .remove(ParsingState.TEST_CASE_TABLE_HEADER);
+                            storedStack
+                                    .push(ParsingState.TEST_CASE_TABLE_INSIDE);
                         }
-                    } else if (couldBeInsideExecutableTable(currentLine,
-                            currentToken)) {
-                        if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
-                                || currentState == ParsingState.TEST_CASE_DECLARATION) {
-                            if (containsAnyTestCases(model)) {
-                                continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
-                            }
-                        } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
-                                || currentState == ParsingState.KEYWORD_DECLARATION) {
-                            if (containsAnyKeywords(model)) {
-                                continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
-                            }
+                        continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
+                    }
+                } else {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_INLINED_FOR_TESTCASE_TABLE,
+                                    model, currentLine, currentToken)) {
+                        continueType = LineContinueType.LINE_CONTINUE_INLINED;
+                    }
+                }
+            } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
+                    || currentState == ParsingState.KEYWORD_DECLARATION) {
+                if (isNewLine) {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE,
+                                    model, currentLine, currentToken)) {
+                        ParsingState state = stateHelper
+                                .getCurrentStatus(storedStack);
+                        if (state == ParsingState.KEYWORD_TABLE_HEADER) {
+                            storedStack
+                                    .remove(ParsingState.KEYWORD_TABLE_HEADER);
+                            storedStack.push(ParsingState.KEYWORD_TABLE_INSIDE);
                         }
+                        continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
+                    }
+                } else {
+                    if (posResolver
+                            .isCorrectPosition(
+                                    PositionExpected.LINE_CONTINUE_INLINED_FOR_KEYWORD_TABLE,
+                                    model, currentLine, currentToken)) {
+                        continueType = LineContinueType.LINE_CONTINUE_INLINED;
                     }
                 }
             }
         }
 
         return continueType;
-    }
-
-
-    private boolean couldBeInsideExecutableTable(final RobotLine currentLine,
-            final RobotToken currentToken) {
-        boolean result = false;
-        if (currentLine.getSeparatorForLine().or(SeparatorType.PIPE) == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
-            result = utility.isTheFirstColumnAfterSeparator(currentLine,
-                    currentToken);
-        } else {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            if (lineElements.size() == 2) {
-                result = lineElements.get(0).getTypes()
-                        .contains(SeparatorType.PIPE)
-                        && lineElements.get(1).getTypes()
-                                .contains(SeparatorType.PIPE);
-            }
-        }
-        return result;
     }
 
 
@@ -202,7 +227,7 @@ public class PreviousLineHandler {
     }
 
     public static enum LineContinueType {
-        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT, TEST_CASE_TABLE_ELEMENT, KEYWORD_TABLE_ELEMENT;
+        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT, TEST_CASE_TABLE_ELEMENT, KEYWORD_TABLE_ELEMENT, LINE_CONTINUE_INLINED;
     }
 
 
