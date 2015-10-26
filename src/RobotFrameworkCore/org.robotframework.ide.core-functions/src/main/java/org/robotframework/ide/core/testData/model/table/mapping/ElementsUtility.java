@@ -16,6 +16,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ForDescriptorInfo;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
@@ -462,6 +463,21 @@ public class ElementsUtility {
                                             || separator
                                                     .getCurrentElementIndex() < lineTokenInfo
                                                     .getDataStartIndex();
+                                } else {
+                                    result = true;
+                                }
+                            } else if (state == ParsingState.TEST_CASE_INSIDE_ACTION
+                                    || state == ParsingState.KEYWORD_INSIDE_ACTION) {
+                                ForDescriptorInfo forInfo = ForDescriptorInfo
+                                        .build(splittedLine);
+                                if (forInfo.getForStartIndex() > -1) {
+                                    if (forInfo.getForLineContinueInlineIndex() > -1) {
+                                        result = (separator
+                                                .getCurrentElementIndex() > forInfo
+                                                .getForLineContinueInlineIndex());
+                                    } else {
+                                        result = true;
+                                    }
                                 } else {
                                     result = true;
                                 }
