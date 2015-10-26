@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JuIiAB8QEeWYlfCPyvfohw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/21/15 5:08 PM
+Save-Time: 10/26/15 11:40 AM
 Testcase-Type: ecl
 Verifications: _KKSfQB8gEeWYlfCPyvfohw
 
@@ -53,15 +53,6 @@ with [get-editor "BigScript.robot" | get-tab-folder] {
 }    
 get-editor "BigScript.robot" | close
 
-//open in Robot text editor
-get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
-    | select "ScriptWithResource/BigScript.robot" | get-menu "Open With/Robot Text Editor" | click
-with [get-tab-folder -index 1] {
-    get-property "pages[0]" | equals "Robot Text Editor" | verify-true
-    get-property activePage | equals "Robot Text Editor" | verify-true
-    get-property tabCount | equals 1 | verify-true
-}
-get-editor "Robot Text Editor" | close
 
 //open in Text editor
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Open With/Text Editor" 
