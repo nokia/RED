@@ -91,7 +91,8 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
     }
 
     private boolean shouldActivate(final String settingName) {
-        return newArrayList("library", "resource", "variables").contains(settingName.toLowerCase());
+        return newArrayList("library", "resource", "variables", "test setup", "test teardown", "suite setup",
+                "suite teardown", "test template").contains(settingName.toLowerCase());
     }
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)

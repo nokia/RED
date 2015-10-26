@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -45,10 +44,6 @@ public class RedKeywordProposal {
     }
 
     static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword) {
-        final String libName = spec.getName();
-        final KeywordType type = "Reserved".equals(libName) ? KeywordType.RESERVED : KeywordType.STD_LIBRARY;
-        final boolean hasDescription = !"Reserved".equals(libName);
-
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
             @Override
             public String provide() {
@@ -61,20 +56,11 @@ public class RedKeywordProposal {
                 return keyword.getArguments() == null ? new ArrayList<String>() : keyword.getArguments();
             }
         };
-        return new RedKeywordProposal(libName, type, keyword.getName(), "- " + libName, hasDescription, argsProvider,
-                htmlDocuProvider, keyword.getDocumentation());
+        return new RedKeywordProposal(spec.getName(), KeywordType.LIBRARY, keyword.getName(), "- " + spec.getName(),
+                true, argsProvider, htmlDocuProvider, keyword.getDocumentation());
     }
 
-    static RedKeywordProposal create(final RobotKeywordDefinition userKeyword) {
-        return createUserDefinedProposal(userKeyword, "- user defined");
-    }
-
-    static RedKeywordProposal createExternal(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword) {
-        return createUserDefinedProposal(userKeyword, "- " + file.getName());
-    }
-
-    private static RedKeywordProposal createUserDefinedProposal(final RobotKeywordDefinition userKeyword,
-            final String decoration) {
+    static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
             @Override
             public String provide() {
@@ -84,11 +70,12 @@ public class RedKeywordProposal {
         final LazyProvider<List<String>> argsProvider = new LazyProvider<List<String>>() {
             @Override
             public List<String> provide() {
-                return Arrays.asList("not", "yet", "implemented");
+                return userKeyword.getArguments();
             }
         };
-        return new RedKeywordProposal("User Defined", KeywordType.USER_DEFINED, userKeyword.getName(), decoration, true,
-                argsProvider, htmlDocuProvider, "to be implemented");
+        return new RedKeywordProposal("User Defined (" + file.getName() + ")", KeywordType.USER_DEFINED,
+                userKeyword.getName(), "- " + file.getName(), true, argsProvider, htmlDocuProvider,
+                userKeyword.getDocumentation());
     }
 
     public String getSourceName() {
@@ -132,11 +119,13 @@ public class RedKeywordProposal {
     }
 
     public String getDocumentation() {
-        return documentation;
+        return String.format("Name: %s\nSource: %s\nArguments: %s\n\n%s", name, sourceName, getArgumentsLabel(),
+                documentation);
     }
 
     public enum KeywordType {
-        RESERVED(null), STD_LIBRARY(RedImages.getKeywordImage()), USER_DEFINED(RedImages.getUserKeywordImage());
+        LIBRARY(RedImages.getKeywordImage()),
+        USER_DEFINED(RedImages.getUserKeywordImage());
 
         private ImageDescriptor image;
 

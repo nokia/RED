@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,6 +22,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
@@ -105,9 +108,20 @@ public class TextEditorContentAssist {
     }
 
     public Map<String, ContentAssistKeywordContext> getKeywordMap() {
-        return context != null ? context.getKeywordMap() : keywordMap;
+        if (context == null) {
+            return keywordMap;
+        } else {
+            final RedKeywordProposals proposals = new RedKeywordProposals(context.getModel());
+            final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
+
+            final Map<String, ContentAssistKeywordContext> mapping = new LinkedHashMap<>();
+            for (final RedKeywordProposal proposal : keywordProposals) {
+                mapping.put(proposal.getLabel(), new ContentAssistKeywordContext(proposal));
+            }
+            return mapping;
+        }
     }
-    
+
     static ICompletionProposal[] buildSectionProposals(final String replacedWord, final String lineDelimiter,
             final int offset) {
 
