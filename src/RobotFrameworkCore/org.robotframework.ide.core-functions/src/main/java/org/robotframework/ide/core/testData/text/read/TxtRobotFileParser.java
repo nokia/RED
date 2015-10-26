@@ -380,7 +380,9 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         robotFileOutput.getFileModel(), currentLine, robotToken);
 
         boolean processThisElement = true;
-        if (previousLineHandler.isSomethingToDo(lineContinueType)) {
+        if (lineContinueType == LineContinueType.LINE_CONTINUE_INLINED) {
+            processThisElement = false;
+        } else if (previousLineHandler.isSomethingToDo(lineContinueType)) {
             previousLineHandler.restorePreviousStack(lineContinueType,
                     processingState, currentLine, robotToken);
 

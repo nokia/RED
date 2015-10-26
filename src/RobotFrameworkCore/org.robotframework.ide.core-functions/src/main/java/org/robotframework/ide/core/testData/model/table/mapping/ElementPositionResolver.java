@@ -39,6 +39,9 @@ public class ElementPositionResolver {
             } else if (elem instanceof RobotToken) {
                 if (elem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                     posInfo.addPrettyAlignPosIndex(elemIndex);
+                } else if (elem.getTypes().contains(
+                        RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                    posInfo.addPreviousLineContinuePosIndex(elemIndex);
                 } else {
                     posInfo.addRobotTokenPosIndex(elemIndex);
                 }
@@ -51,9 +54,10 @@ public class ElementPositionResolver {
     public static class PositionInformation {
 
         private SeparatorType lineSeparator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
-        private List<Integer> robotTokensPosIndexes = new LinkedList<>();
-        private List<Integer> prettyAlignPosIndexes = new LinkedList<>();
-        private List<Integer> separatorsPosIndexes = new LinkedList<>();
+        private final List<Integer> robotTokensPosIndexes = new LinkedList<>();
+        private final List<Integer> previousLineContinuePosIndexes = new LinkedList<>();
+        private final List<Integer> prettyAlignPosIndexes = new LinkedList<>();
+        private final List<Integer> separatorsPosIndexes = new LinkedList<>();
         private boolean wasLastSeparator = false;
         private boolean isFirstSeparator = false;
 
@@ -71,6 +75,11 @@ public class ElementPositionResolver {
 
         private void addPrettyAlignPosIndex(final int prettyAlignPosIndex) {
             prettyAlignPosIndexes.add(prettyAlignPosIndex);
+        }
+
+
+        private void addPreviousLineContinuePosIndex(final int prevLineContIndex) {
+            previousLineContinuePosIndexes.add(prevLineContIndex);
         }
 
 
@@ -101,6 +110,26 @@ public class ElementPositionResolver {
 
         public List<Integer> getPrettyAlignPosIndexes() {
             return prettyAlignPosIndexes;
+        }
+
+
+        public List<Integer> getPreviousLineContinuePosIndexes() {
+            return previousLineContinuePosIndexes;
+        }
+
+
+        public boolean isContinuePreviousLineTheFirstToken() {
+            boolean result = false;
+            if (!previousLineContinuePosIndexes.isEmpty()) {
+                int theFirstContinue = previousLineContinuePosIndexes.get(0);
+                if (!robotTokensPosIndexes.isEmpty()) {
+                    int theFirstToken = robotTokensPosIndexes.get(0);
+                    result = theFirstContinue < theFirstToken;
+                } else {
+                    result = true;
+                }
+            }
+            return result;
         }
 
 
@@ -185,7 +214,95 @@ public class ElementPositionResolver {
                     final RobotLine currentLine, final RobotToken currentToken) {
                 return isReallyFirstElement(posInfo, currentToken);
             }
+        },
+        LINE_CONTINUE_NEWLINE_FOR_SETTING_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return posInfo.isContinuePreviousLineTheFirstToken();
+            }
+        },
+        LINE_CONTINUE_NEWLINE_FOR_VARIABLE_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return posInfo.isContinuePreviousLineTheFirstToken();
+            }
+        },
+        LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return posInfo.isContinuePreviousLineTheFirstToken();
+            }
+        },
+        LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return posInfo.isContinuePreviousLineTheFirstToken();
+            }
+        },
+        LINE_CONTINUE_INLINED_FOR_TESTCASE_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isInlined(posInfo);
+            }
+        },
+        LINE_CONTINUE_INLINED_FOR_KEYWORD_TABLE {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return isInlined(posInfo);
+            }
         };
+
+        private static boolean isInlined(final PositionInformation posInfo) {
+            boolean result = false;
+            if (posInfo.getPreviousLineContinuePosIndexes().size() == 1
+                    && posInfo.getRobotTokensPosIndexes().size() == 1) {
+                int theFirstPreviousContinue = posInfo
+                        .getPreviousLineContinuePosIndexes().get(0);
+                int theFirstToken = posInfo.getRobotTokensPosIndexes().get(0);
+                if (theFirstToken < theFirstPreviousContinue) {
+                    SeparatorType separatorType = posInfo.getLineSeparator();
+                    List<Integer> separatorsPosIndexes = posInfo
+                            .getSeparatorsPosIndexes();
+                    if (separatorType == SeparatorType.PIPE) {
+                        if (separatorsPosIndexes.size() >= 2) {
+                            int theFirstSeparator = separatorsPosIndexes.get(0);
+                            int theSecondSeparator = separatorsPosIndexes
+                                    .get(1);
+                            result = theFirstSeparator < theFirstToken
+                                    && theFirstToken < theSecondSeparator
+                                    && theSecondSeparator < theFirstPreviousContinue;
+                        }
+                    } else {
+                        if (separatorsPosIndexes.size() == 1) {
+                            int theFirstSeparator = separatorsPosIndexes.get(0);
+                            result = theFirstToken < theFirstSeparator
+                                    && theFirstSeparator < theFirstPreviousContinue;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
 
         private static boolean isReallyFirstElement(
                 final PositionInformation posInfo, final RobotToken currentToken) {
@@ -193,12 +310,14 @@ public class ElementPositionResolver {
             SeparatorType separator = posInfo.getLineSeparator();
             if (separator == SeparatorType.PIPE) {
                 if (posInfo.getSeparatorsPosIndexes().size() == 1
-                        && posInfo.getRobotTokensPosIndexes().size() == 1) {
+                        && (posInfo.getRobotTokensPosIndexes().size() == 1 || posInfo
+                                .getPreviousLineContinuePosIndexes().size() == 1)) {
                     result = posInfo.isFirstSeparator();
                 }
             } else {
                 result = (currentToken.getStartColumn() == 0)
-                        && posInfo.getRobotTokensPosIndexes().size() == 1
+                        && (posInfo.getRobotTokensPosIndexes().size() == 1 || posInfo
+                                .getPreviousLineContinuePosIndexes().size() == 1)
                         && posInfo.getSeparatorsPosIndexes().isEmpty()
                         && !posInfo.isFirstSeparator();
             }
