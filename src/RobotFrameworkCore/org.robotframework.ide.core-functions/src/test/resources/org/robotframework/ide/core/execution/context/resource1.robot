@@ -25,3 +25,7 @@ Keyword1
 SetupKeyword
 	Log  12345
 	Log  123
+	
+KeywordReturnValue
+    Log  Return value
+    [Return]  1
