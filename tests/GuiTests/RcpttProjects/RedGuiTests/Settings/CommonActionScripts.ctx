@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/1/15 6:10 PM
+Save-Time: 10/26/15 1:46 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -278,6 +278,7 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 
 
 proc "check-debug-marker-on-ruler" [val line] [val script_name]{
+	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
  	loop [val index 0]{
 	 	try -times 1 -command{
 			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
