@@ -458,7 +458,10 @@ public class ElementsUtility {
                                 if (shouldTreatAsInlineContinue(lineTokenInfo)) {
                                     result = separator.getCurrentElementIndex() > lineTokenInfo
                                             .getPositionsOfLineContinoue().get(
-                                                    0);
+                                                    0)
+                                            || separator
+                                                    .getCurrentElementIndex() < lineTokenInfo
+                                                    .getDataStartIndex();
                                 } else {
                                     result = true;
                                 }
