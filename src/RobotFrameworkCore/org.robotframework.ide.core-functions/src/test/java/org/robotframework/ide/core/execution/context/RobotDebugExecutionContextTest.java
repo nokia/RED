@@ -33,6 +33,8 @@ public class RobotDebugExecutionContextTest {
     private int[] test5_lines = new int[] { 3, 20, 21, 26, 27, 8, 9, 10, 4, 23, 24, 13, 27, 15, 16, 14, 29 };
     
     private int[] test6_lines = new int[] { 2, 12, 13, 7, 8, 3, 15, 16 };
+    
+    private int[] test7_lines = new int[] { 6, 30, 7 };
 
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
@@ -218,7 +220,7 @@ public class RobotDebugExecutionContextTest {
             debugExecutionContext.endKeyword();
         debugExecutionContext.endTest();
     }
-    
+
     @Test
     public void test_SetupAndTeardownKeywords() throws URISyntaxException {
         linesCounter = 0;
@@ -290,6 +292,23 @@ public class RobotDebugExecutionContextTest {
             debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown", Arrays.asList("close2"));checkKeywordLine6();debugExecutionContext.endKeyword();
         debugExecutionContext.endKeyword();
         
+    }
+    
+    @Test
+    public void test_VariableDeclarationAsKeyword() throws URISyntaxException {
+        linesCounter = 0;
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_7.robot");
+        
+        debugExecutionContext = new RobotDebugExecutionContext();
+        debugExecutionContext.startSuite(modelFile.getParent());
+
+        debugExecutionContext.startTest("test7");
+            debugExecutionContext.startKeyword("${var} = resource1.KeywordReturnValue", "Keyword", Arrays.asList(""));checkKeywordLine7();
+                debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("Return value"));checkKeywordLine7();debugExecutionContext.endKeyword();
+            debugExecutionContext.endKeyword();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${var}"));checkKeywordLine7();debugExecutionContext.endKeyword();
+        debugExecutionContext.endTest();
+
     }
     
     private void startBuiltInLogKeyword1() {
@@ -387,6 +406,11 @@ public class RobotDebugExecutionContextTest {
     
     private void checkKeywordLine6() {
         Assert.assertEquals(test6_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
+        linesCounter++;
+    }
+    
+    private void checkKeywordLine7() {
+        Assert.assertEquals(test7_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
         linesCounter++;
     }
 }
