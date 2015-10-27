@@ -38,7 +38,8 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
+        rt.getTypes().add(0,
+                RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 

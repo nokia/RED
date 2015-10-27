@@ -35,7 +35,7 @@ public class DefaultTagsTagNameMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_DEFAULT_TAG);
+        rt.getTypes().add(0, RobotTokenType.SETTING_DEFAULT_TAG);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 

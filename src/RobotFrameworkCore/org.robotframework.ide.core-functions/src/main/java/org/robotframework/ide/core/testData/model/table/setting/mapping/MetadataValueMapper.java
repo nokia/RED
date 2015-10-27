@@ -35,7 +35,7 @@ public class MetadataValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_METADATA_VALUE);
+        rt.getTypes().add(0, RobotTokenType.SETTING_METADATA_VALUE);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 

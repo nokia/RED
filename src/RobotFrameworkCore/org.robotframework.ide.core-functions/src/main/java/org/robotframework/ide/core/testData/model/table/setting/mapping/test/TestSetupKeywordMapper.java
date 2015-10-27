@@ -38,7 +38,7 @@ public class TestSetupKeywordMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME);
+        rt.getTypes().add(0, RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 
