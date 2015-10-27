@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
@@ -25,14 +26,14 @@ import org.robotframework.ide.core.testData.text.read.recognizer.executables.Rob
 
 public class KeywordExecutableRowActionMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver posResolver;
     private final ParsingStateHelper stateHelper;
     private final KeywordFinder keywordFinder;
     private final RobotSpecialTokens specialTokensRecognizer;
 
 
     public KeywordExecutableRowActionMapper() {
-        this.utility = new ElementsUtility();
+        this.posResolver = new ElementPositionResolver();
         this.stateHelper = new ParsingStateHelper();
         this.keywordFinder = new KeywordFinder();
         this.specialTokensRecognizer = new RobotSpecialTokens();
@@ -72,7 +73,9 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         boolean result = false;
         ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION)
-                && !utility.isTheFirstColumn(currentLine, rt);
+                && posResolver.isCorrectPosition(
+                        PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME,
+                        robotFileOutput.getFileModel(), currentLine, rt);
 
         return result;
     }
