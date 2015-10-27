@@ -32,6 +32,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher.ExecutionEvent;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
@@ -186,7 +187,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void terminate() throws DebugException {
         if (eventSocket != null) {
-            sendEventToAgent("interrupt");
+            sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.INTERRUPT_EXECUTION);
         }
         terminated();
     }
@@ -214,13 +215,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void resume() throws DebugException {
         thread.setStepping(false);
-        sendEventToAgent("resume");
+        sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.RESUME_EXECUTION);
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
     protected void step() {
         thread.setStepping(true);
-        sendEventToAgent("resume");
+        sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.RESUME_EXECUTION);
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
@@ -365,6 +366,10 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             eventWriter.print(event);
             eventWriter.flush();
         }
+    }
+    
+    public void sendExecutionEventToAgent(final ExecutionEvent event) {
+        sendEventToAgent(event.getMessage());
     }
 
     /**
