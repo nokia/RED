@@ -37,7 +37,7 @@ public class TestTimeoutValueMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
+        rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 

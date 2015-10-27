@@ -37,7 +37,7 @@ public class ResourceTrashDataMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
+        rt.getTypes().add(0, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
         rt.setText(new StringBuilder(text));
         AImported imported = utility.getNearestImport(robotFileOutput);
         ResourceImport resource;

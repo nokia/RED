@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.setting.SuiteTeardown;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.ParsingState;
 import org.robotframework.ide.core.testData.text.read.RobotLine;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -38,7 +39,9 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.add(0, RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT);
+        types.remove(RobotTokenType.UNKNOWN);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 

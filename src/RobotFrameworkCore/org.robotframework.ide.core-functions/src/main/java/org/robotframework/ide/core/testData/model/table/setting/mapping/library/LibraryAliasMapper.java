@@ -39,7 +39,7 @@ public class LibraryAliasMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
+        rt.getTypes().add(0, RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
         rt.setText(new StringBuilder(text));
 
         AImported imported = utility.getNearestImport(robotFileOutput);
