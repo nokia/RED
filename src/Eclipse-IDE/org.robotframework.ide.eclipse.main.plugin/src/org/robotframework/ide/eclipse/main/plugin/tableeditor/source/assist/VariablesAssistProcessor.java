@@ -47,19 +47,17 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     protected List<ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final IDocument document = viewer.getDocument();
         try {
-            final Optional<IRegion> liveCellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
             final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
 
-            if (!liveCellRegion.isPresent() || DocumentUtilities.getNumberOfCellSeparators(lineContent) < 1) {
+            if (DocumentUtilities.getNumberOfCellSeparators(lineContent) < 1) {
                 return null;
             }
 
             final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
 
             final String prefix = variable.isPresent() ? getPrefix(document, variable.get(), offset) : "";
-            final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
-            final String content = cellRegion.isPresent() && variable.isPresent()
-                    ? document.get(variable.get().getOffset(), cellRegion.get().getLength()) : "";
+            final String content = variable.isPresent()
+                    ? document.get(variable.get().getOffset(), variable.get().getLength()) : "";
 
             final List<ICompletionProposal> proposals = newArrayList();
             for (final RedVariableProposal varProposal : assist.getVariables(offset)) {
