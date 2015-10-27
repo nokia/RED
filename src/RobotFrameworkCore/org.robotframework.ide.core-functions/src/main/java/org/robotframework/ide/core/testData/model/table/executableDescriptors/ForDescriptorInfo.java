@@ -33,48 +33,26 @@ public class ForDescriptorInfo {
                 RobotToken token = (RobotToken) elem;
                 if (separatorType == SeparatorType.PIPE) {
                     if (separatorsNumbers == 2) {
-                        String text = trimWhitespaces(token.getText()
-                                .toString());
-                        if (":for".equalsIgnoreCase(text)) {
-                            info.setForStartIndex(elementIndex);
-                        }
+                        tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 2) {
                         String text = token.getText().toString();
-                        if (text != null) {
-                            text = text.trim().toLowerCase();
-                            if (text.startsWith("in ")
-                                    || (text.endsWith("in") && text.length() == 2)) {
-                                info.setForInIndex(elementIndex);
-                                break;
-                            } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE
-                                    .getRepresentation().get(0).equals(text)) {
-                                if (info.getForLineContinueInlineIndex() == -1) {
-                                    info.setForLineContinueInlineIndex(elementIndex);
-                                }
-                            }
+                        boolean shouldBreak = tryToFindPreviousLineContinoue(
+                                info, elementIndex, text);
+
+                        if (shouldBreak) {
+                            break;
                         }
                     }
                 } else {
                     if (separatorsNumbers == 1) {
-                        String text = trimWhitespaces(token.getText()
-                                .toString());
-                        if (":for".equalsIgnoreCase(text)) {
-                            info.setForStartIndex(elementIndex);
-                        }
+                        tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 1) {
                         String text = token.getText().toString();
-                        if (text != null) {
-                            text = text.trim().toLowerCase();
-                            if (text.startsWith("in ")
-                                    || (text.endsWith("in") && text.length() == 2)) {
-                                info.setForInIndex(elementIndex);
-                                break;
-                            } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE
-                                    .getRepresentation().get(0).equals(text)) {
-                                if (info.getForLineContinueInlineIndex() == -1) {
-                                    info.setForLineContinueInlineIndex(elementIndex);
-                                }
-                            }
+                        boolean shouldBreak = tryToFindPreviousLineContinoue(
+                                info, elementIndex, text);
+
+                        if (shouldBreak) {
+                            break;
                         }
                     }
                 }
@@ -89,6 +67,36 @@ public class ForDescriptorInfo {
         }
 
         return info;
+    }
+
+
+    private static void tryToFindFor(ForDescriptorInfo info, int elementIndex,
+            RobotToken token) {
+        String text = trimWhitespaces(token.getText()
+                .toString());
+        if (":for".equalsIgnoreCase(text)) {
+            info.setForStartIndex(elementIndex);
+        }
+    }
+
+
+    private static boolean tryToFindPreviousLineContinoue(
+            ForDescriptorInfo info, int elementIndex, String text) {
+        boolean shouldBreak = false;
+        if (text != null) {
+            text = text.trim().toLowerCase();
+            if (text.startsWith("in ")
+                    || (text.endsWith("in") && text.length() == 2)) {
+                info.setForInIndex(elementIndex);
+                shouldBreak = true;
+            } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE
+                    .getRepresentation().get(0).equals(text)) {
+                if (info.getForLineContinueInlineIndex() == -1) {
+                    info.setForLineContinueInlineIndex(elementIndex);
+                }
+            }
+        }
+        return shouldBreak;
     }
 
 
