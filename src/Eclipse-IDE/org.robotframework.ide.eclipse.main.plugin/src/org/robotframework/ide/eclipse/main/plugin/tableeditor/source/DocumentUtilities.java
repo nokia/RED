@@ -64,10 +64,14 @@ public class DocumentUtilities {
 
             final Matcher matcher = Pattern.compile("[@$&%].*").matcher(cellContent);
             while (matcher.find()) {
-                final int start = matcher.start() + cellRegion.get().getOffset();
-                final int end = matcher.end() + cellRegion.get().getOffset();
-                if (Range.closed(start, end).contains(offset)) {
-                    return Optional.<IRegion> of(new Region(start, end - start));
+                final int start = matcher.start();
+                final int closingBracketIndex = cellContent.indexOf('}', start + 1);
+                final int end = closingBracketIndex == -1 ? matcher.end()
+                        : Math.min(matcher.end(), closingBracketIndex + 1);
+                final int shiftedStart = start + cellRegion.get().getOffset();
+                final int shiftedEnd = end + cellRegion.get().getOffset();
+                if (Range.closed(shiftedStart, shiftedEnd).contains(offset)) {
+                    return Optional.<IRegion> of(new Region(shiftedStart, shiftedEnd - shiftedStart));
                 }
             }
             return Optional.absent();
