@@ -42,45 +42,6 @@ public class ElementsUtility {
     }
 
 
-    public boolean isTheFirstColumn(RobotLine currentLine, RobotToken robotToken) {
-        boolean result = false;
-        if (robotToken.getStartColumn() == 0) {
-            result = true;
-        } else {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            int size = lineElements.size();
-            if (size == 1) {
-                IRobotLineElement lastElement = lineElements.get(0);
-                result = (lastElement.getTypes().contains(SeparatorType.PIPE) && lastElement
-                        .getStartColumn() == 0);
-            }
-        }
-
-        return result;
-    }
-
-
-    public boolean isTheFirstColumnAfterSeparator(RobotLine currentLine,
-            RobotToken robotToken) {
-        boolean result = false;
-        if (robotToken.getStartColumn() > 0) {
-            List<IRobotLineElement> lineElements = currentLine
-                    .getLineElements();
-            int size = lineElements.size();
-            if (size > 0) {
-                IRobotLineElement lastElement = lineElements.get(size - 1);
-                List<IRobotTokenType> types = lastElement.getTypes();
-                result = ((types.contains(SeparatorType.PIPE) || types
-                        .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE)) && lastElement
-                        .getStartColumn() == 0);
-            }
-        }
-
-        return result;
-    }
-
-
     public boolean isNewExecutableSection(final ALineSeparator separator,
             final RobotLine line) {
         boolean result = false;
