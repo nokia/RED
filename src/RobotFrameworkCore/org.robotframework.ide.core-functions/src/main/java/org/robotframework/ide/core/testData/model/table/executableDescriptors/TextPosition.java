@@ -37,8 +37,9 @@ public class TextPosition {
 
     @Override
     public String toString() {
-        return String.format("TextPosition [text=%s, start=%s, end=%s, %s",
-                text, startPosition, endPosition, getPartOfText() + "]");
+        return String.format(
+                "TextPosition [wholeText=%s, start=%s, end=%s, %s", text,
+                startPosition, endPosition, getPartOfText() + "]");
     }
 
 
