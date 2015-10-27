@@ -11,7 +11,8 @@ import java.util.Stack;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementsUtility;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
+import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
 import org.robotframework.ide.core.testData.model.table.mapping.IParsingMapper;
 import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
@@ -25,14 +26,14 @@ import org.robotframework.ide.core.testData.text.read.recognizer.executables.Rob
 
 public class TestCaseExecutableRowActionMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementPositionResolver posResolver;
     private final ParsingStateHelper stateHelper;
     private final TestCaseFinder testCaseFinder;
     private final RobotSpecialTokens specialTokensRecognizer;
 
 
     public TestCaseExecutableRowActionMapper() {
-        this.utility = new ElementsUtility();
+        this.posResolver = new ElementPositionResolver();
         this.stateHelper = new ParsingStateHelper();
         this.testCaseFinder = new TestCaseFinder();
         this.specialTokensRecognizer = new RobotSpecialTokens();
@@ -71,6 +72,8 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         ParsingState state = stateHelper.getCurrentStatus(processingState);
         return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION)
-                && !utility.isTheFirstColumn(currentLine, rt);
+                && posResolver.isCorrectPosition(
+                        PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
+                        robotFileOutput.getFileModel(), currentLine, rt);
     }
 }

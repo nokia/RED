@@ -293,6 +293,24 @@ public class ElementPositionResolver {
 
                 return isInlined;
             }
+        },
+        TEST_CASE_EXEC_ROW_ACTION_NAME {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return !isReallyFirstElement(posInfo, currentToken);
+            }
+        },
+        KEYWORD_EXEC_ROW_ACTION_NAME {
+
+            @Override
+            public boolean isExpectedPosition(
+                    final PositionInformation posInfo, final RobotFile model,
+                    final RobotLine currentLine, final RobotToken currentToken) {
+                return !isReallyFirstElement(posInfo, currentToken);
+            }
         };
 
         private static boolean isInlined(final PositionInformation posInfo) {
