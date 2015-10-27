@@ -35,7 +35,7 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
         rt.setText(new StringBuilder(text));
-        rt.setType(RobotTokenType.SETTING_UNKNOWN_ARGUMENT);
+        rt.getTypes().add(0, RobotTokenType.SETTING_UNKNOWN_ARGUMENT);
         rt.setRaw(new StringBuilder(text));
 
         List<UnknownSetting> unknownSettings = robotFileOutput.getFileModel()

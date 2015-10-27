@@ -36,7 +36,7 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME);
+        rt.getTypes().add(0, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 
