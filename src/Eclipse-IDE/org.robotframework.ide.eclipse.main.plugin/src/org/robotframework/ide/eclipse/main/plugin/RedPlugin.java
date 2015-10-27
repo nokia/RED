@@ -27,8 +27,6 @@ public class RedPlugin extends AbstractUIPlugin {
 
     private static RedPlugin plugin;
 
-    private final List<File> installedPythons = new ArrayList<>();
-
     public static RedPlugin getDefault() {
         return plugin;
     }
@@ -51,7 +49,6 @@ public class RedPlugin extends AbstractUIPlugin {
     public void stop(final BundleContext context) throws Exception {
         super.stop(context);
         plugin = null;
-        installedPythons.clear();
         ColorsManager.disposeColors();
         FontsManager.disposeFonts();
         ImagesManager.disposeImages();

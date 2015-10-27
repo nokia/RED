@@ -16,6 +16,7 @@ import org.eclipse.jface.text.contentassist.ICompletionListenerExtension;
 import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 
 /**
@@ -25,17 +26,21 @@ import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCo
 public class CycledContentAssistProcessor extends DefaultContentAssistProcessor implements IContentAssistProcessor,
         ICompletionListener, ICompletionListenerExtension, ICompletionListenerExtension2 {
 
-    private final List<RedContentAssistProcessor> processors;
+    private final SuiteSourceAssistantContext assistContext;
 
     private final AssitantCallbacks assistant;
+
+    private final List<RedContentAssistProcessor> processors;
 
     private int currentPage;
 
     private boolean canReopenAssitantProgramatically;
 
-    public CycledContentAssistProcessor(final AssitantCallbacks assistant) {
-        this.processors = newArrayList();
+    public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
+            final AssitantCallbacks assistant) {
+        this.assistContext = assistContext;
         this.assistant = assistant;
+        this.processors = newArrayList();
         this.currentPage = 0;
         this.canReopenAssitantProgramatically = false;
     }
@@ -58,6 +63,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void assistSessionStarted(final ContentAssistEvent event) {
         if (event.processor == this) {
+            assistContext.refreshPreferences();
             canReopenAssitantProgramatically = true;
             currentPage = 0;
         }
