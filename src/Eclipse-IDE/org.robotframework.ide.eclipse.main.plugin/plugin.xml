@@ -3382,6 +3382,12 @@
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
             name="Editor">
       </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.ContentAssistPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist"
+            name="Content Assist">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

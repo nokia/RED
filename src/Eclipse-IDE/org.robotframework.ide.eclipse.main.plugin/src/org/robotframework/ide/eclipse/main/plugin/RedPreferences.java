@@ -6,12 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 public class RedPreferences {
     
     private final IPreferenceStore store;
 
-    public RedPreferences(final IPreferenceStore store) {
+    RedPreferences(final IPreferenceStore store) {
         this.store = store;
     }
 
@@ -19,6 +20,8 @@ public class RedPreferences {
     public static final String ACTIVE_RUNTIME = "activeRuntime";
 
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
+
+    public static final String ASSISTANT_COMPLETION_MODE = "assistantCompletionMode";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -30,5 +33,9 @@ public class RedPreferences {
     
     public int getMimalNumberOfArgumentColumns() {
         return store.getInt(MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
+    }
+
+    public AcceptanceMode getAcceptanceMode() {
+        return AcceptanceMode.valueOf(store.getString(ASSISTANT_COMPLETION_MODE));
     }
 }

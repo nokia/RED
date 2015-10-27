@@ -160,17 +160,21 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createSettingsAssist(final ContentAssistant contentAssistant,
             final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assist = new SuiteSourceAssistantContext(editor.getFileModel());
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
-        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistantAccessor);
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
+                assistantAccessor);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assist);
-        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor(assist);
-        final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assist);
-        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(assist);
-        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(assist);
-        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(assist);
-        final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assist);
+        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
+        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor(assistContext);
+        final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assistContext);
+        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
+                assistContext);
+        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
+                assistContext);
+        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(
+                assistContext);
+        final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(librariesProcessor,
                 variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
@@ -184,11 +188,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createDefaultAssist(final ContentAssistant contentAssistant,
             final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assist = new SuiteSourceAssistantContext(editor.getFileModel());
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
-        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistantAccessor);
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
+                assistantAccessor);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assist);
+        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         cycledProcessor.addProcessor(sectionsAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);

@@ -117,7 +117,7 @@ public class DocumentUtilities {
             throws BadLocationException {
         final Optional<IRegion> region = findCellRegion(document, offset).or(findCellRegion(document, offset - 1));
         if (region.isPresent()) {
-            final int length = offset - region.get().getOffset();
+            final int length = Math.max(offset - region.get().getOffset(), region.get().getLength());
             return Optional.<IRegion>of(new Region(region.get().getOffset(), length));
         }
         return region;
