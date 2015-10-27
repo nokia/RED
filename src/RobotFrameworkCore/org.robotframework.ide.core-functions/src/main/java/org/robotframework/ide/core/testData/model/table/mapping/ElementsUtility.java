@@ -120,11 +120,19 @@ public class ElementsUtility {
                         newRobotToken.setType(RobotTokenType.UNKNOWN);
                         correct = newRobotToken;
                     } else {
-                        // FIXME: error no matching tokens to state
-                        throw new IllegalStateException(
-                                "Some problem to fix. Cannot find correct token for text \'"
-                                        + text + "\' and found tokens "
-                                        + robotTokens + " in file " + fileName);
+                        // FIXME: info that nothing was found so token will be
+                        // treat as UNKNOWN
+                        RobotToken newRobotToken = new RobotToken();
+                        newRobotToken.setLineNumber(fp.getLine());
+                        newRobotToken.setStartColumn(fp.getColumn());
+                        newRobotToken.setText(new StringBuilder(text));
+                        newRobotToken.setRaw(new StringBuilder(text));
+                        newRobotToken.setType(RobotTokenType.UNKNOWN);
+                        List<IRobotTokenType> types = newRobotToken.getTypes();
+                        for (RobotToken currentProposal : robotTokens) {
+                            types.addAll(currentProposal.getTypes());
+                        }
+                        correct = newRobotToken;
                     }
                 }
             }

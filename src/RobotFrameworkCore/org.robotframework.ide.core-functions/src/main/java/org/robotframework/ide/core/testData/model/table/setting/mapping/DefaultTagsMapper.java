@@ -39,7 +39,8 @@ public class DefaultTagsMapper implements IParsingMapper {
             Stack<ParsingState> processingState,
             RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
             String text) {
-        rt.setType(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
+        List<IRobotTokenType> types = rt.getTypes();
+        types.add(0, RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
         rt.setText(new StringBuilder(text));
         rt.setRaw(new StringBuilder(text));
 
