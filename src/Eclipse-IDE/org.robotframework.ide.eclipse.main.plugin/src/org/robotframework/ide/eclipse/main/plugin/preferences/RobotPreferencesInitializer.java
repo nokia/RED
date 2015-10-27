@@ -10,11 +10,11 @@ import java.util.List;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -24,9 +24,14 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        final IScopeContext scope = DefaultScope.INSTANCE;
-        final IEclipsePreferences preferences = scope.getNode(RedPlugin.PLUGIN_ID);
+        final IEclipsePreferences preferences = DefaultScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID);
 
+        initializeFrameworkPreferences(preferences);
+        initializeEditorPreferences(preferences);
+        initializeSourceEditorAssistantPreferences(preferences);
+    }
+
+    private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
         final List<PythonInstallationDirectory> pybotPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
         if (!pybotPaths.isEmpty()) {
             final String activePath = pybotPaths.get(0).getAbsolutePath();
@@ -41,8 +46,13 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
             preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
         }
+    }
 
+    private void initializeEditorPreferences(final IEclipsePreferences preferences) {
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
     }
 
+    private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.ASSISTANT_COMPLETION_MODE, AcceptanceMode.INSERT.name());
+    }
 }
