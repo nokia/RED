@@ -47,11 +47,15 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     protected List<ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final IDocument document = viewer.getDocument();
         try {
-            if (offset < document.getLineInformationOfOffset(offset).getOffset() + 2) {
+            final Optional<IRegion> liveCellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+
+            if (!liveCellRegion.isPresent() || DocumentUtilities.getNumberOfCellSeparators(lineContent) < 1) {
                 return null;
             }
 
             final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
+
             final String prefix = variable.isPresent() ? getPrefix(document, variable.get(), offset) : "";
             final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
             final String content = cellRegion.isPresent() && variable.isPresent()
@@ -95,13 +99,13 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     private static String createSecondaryInfo(final RedVariableProposal varProposal) {
         String info = "Source: " + varProposal.getSource() + "\n";
-        final String variableValue = varProposal.getValue();
-        if (variableValue != null && !variableValue.isEmpty()) {
-            info += "Value: " + variableValue + "\n";
+        final String value = varProposal.getValue();
+        if (!value.isEmpty()) {
+            info += "Value: " + value + "\n";
         }
-        final String variableComment = varProposal.getComment();
-        if (variableComment != null && !variableComment.isEmpty()) {
-            info += "Comment: " + variableComment;
+        final String comment = varProposal.getComment();
+        if (!comment.isEmpty()) {
+            info += "Comment: " + comment;
         }
         return info;
     }

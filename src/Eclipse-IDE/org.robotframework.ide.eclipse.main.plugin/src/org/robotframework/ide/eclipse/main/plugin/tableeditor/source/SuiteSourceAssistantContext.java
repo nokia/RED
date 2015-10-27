@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
@@ -42,6 +43,10 @@ public class SuiteSourceAssistantContext {
     public SuiteSourceAssistantContext(final RobotSuiteFile robotSuiteFile) {
         this.suiteModel = robotSuiteFile;
         this.assistPreferences = new AssistPreferences();
+    }
+
+    public void refreshPreferences() {
+        assistPreferences.refresh();
     }
 
     public RobotSuiteFile getModel() {
@@ -107,8 +112,14 @@ public class SuiteSourceAssistantContext {
 
     public static class AssistPreferences {
 
+        private AcceptanceMode acceptanceMode;
+
         AssistPreferences() {
-            // changing visibility
+            this.acceptanceMode = RedPlugin.getDefault().getPreferences().getAcceptanceMode();
+        }
+
+        void refresh() {
+            acceptanceMode = RedPlugin.getDefault().getPreferences().getAcceptanceMode();
         }
 
         public String getSeparatorToFollow() {
@@ -116,7 +127,7 @@ public class SuiteSourceAssistantContext {
         }
 
         public AcceptanceMode getAcceptanceMode() {
-            return AcceptanceMode.SUBSTITUTE;
+            return acceptanceMode;
         }
     }
 }
