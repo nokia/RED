@@ -237,14 +237,9 @@ public class RobotDebugEventDispatcher extends Job {
 
         final boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuite, keywordLineNumber);
 
-        if (hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
-                && !target.hasStepReturn() && keywordLineNumber >= 0)) {
-
-            if (target.getRobotThread().isStepping()) {
-                target.getRobotThread().setSteppingOver(false);
-                target.getRobotThread().setSteppingReturn(false);
-            }
-            target.setHasStackFramesCreated(false);
+        if (shouldStopExecution(keywordLineNumber, hasBreakpoint)) {
+            resetSteppingState();
+            resetStackFramesState();
             isStopping = true;
         } else {
             isStopping = false;
@@ -254,6 +249,11 @@ public class RobotDebugEventDispatcher extends Job {
         target.getCurrentKeywordsContextMap().put(currentKeyword, currentKeywordContext);
     }
 
+    private boolean shouldStopExecution(final int keywordLineNumber, final boolean hasBreakpoint) {
+        return hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
+                && !target.hasStepReturn() && keywordLineNumber >= 0);
+    }
+    
     @SuppressWarnings("unchecked")
     private void handleVarsEvent(final Map<String, ?> eventMap) {
         final List<?> varList = (List<?>) eventMap.get("vars");
@@ -273,7 +273,7 @@ public class RobotDebugEventDispatcher extends Job {
         if (!breakpointCondition.isEmpty()) {
             target.sendEventToAgent(createJsonFromBreakpointCondition(breakpointCondition));
         } else {
-            target.sendEventToAgent(isStopping ? "stop" : "run");
+            target.sendExecutionEventToAgent(isStopping ? ExecutionEvent.STOP_EXECUTION : ExecutionEvent.CONTINUE_EXECUTION);
         }
     }
 
@@ -312,12 +312,11 @@ public class RobotDebugEventDispatcher extends Job {
 
     private void handleConditionCheckedEvent() {
         if (isStopping && isBreakpointConditionFulfilled) {
-            target.sendEventToAgent("stop");
+            target.sendExecutionEventToAgent(ExecutionEvent.STOP_EXECUTION);
         } else {
-            target.sendEventToAgent("run");
+            target.sendExecutionEventToAgent(ExecutionEvent.CONTINUE_EXECUTION);
         }
-        isBreakpointConditionFulfilled = false;
-        breakpointCondition = "";
+        resetBreakpointConditionState();
     }
 
     private void handlePausedEvent() {
@@ -444,10 +443,43 @@ public class RobotDebugEventDispatcher extends Job {
         return hasHitCountConditionFullfilled;
     }
     
+    private void resetSteppingState() {
+        if (target.getRobotThread().isStepping()) {
+            target.getRobotThread().setSteppingOver(false);
+            target.getRobotThread().setSteppingReturn(false);
+        }
+    }
+    
+    private void resetStackFramesState() {
+        target.setHasStackFramesCreated(false);
+    }
+    
+    private void resetBreakpointConditionState() {
+        isBreakpointConditionFulfilled = false;
+        breakpointCondition = "";
+    }
+    
     private static class MissingFileToExecuteException extends RuntimeException {
 
         public MissingFileToExecuteException(final String message) {
             super(message);
+        }
+    }
+    
+    public static enum ExecutionEvent {
+        CONTINUE_EXECUTION("continue"),
+        STOP_EXECUTION("stop"),
+        RESUME_EXECUTION("resume"),
+        INTERRUPT_EXECUTION("interrupt");
+
+        private final String message;
+
+        private ExecutionEvent(final String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
         }
     }
 }
