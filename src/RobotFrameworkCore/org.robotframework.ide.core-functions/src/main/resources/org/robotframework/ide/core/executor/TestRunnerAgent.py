@@ -248,13 +248,13 @@ class TestRunnerAgent:
     def _check_breakpoint(self):
         data = ''
         self._send_socket('check_condition')
-        while data != 'stop' and data != 'run' and data != 'interrupt':
+        while data != 'stop' and data != 'continue' and data != 'interrupt':
             data = self.sock.recv(4096)
-            if data != 'stop' and data != 'run' and data != 'interrupt':
+            if data != 'stop' and data != 'continue' and data != 'interrupt':
                 self._run_keyword(data)
         if data == 'stop':
             return True
-        if data == 'run':
+        if data == 'continue':
             return False
         if data == 'interrupt':
             sys.exit()
