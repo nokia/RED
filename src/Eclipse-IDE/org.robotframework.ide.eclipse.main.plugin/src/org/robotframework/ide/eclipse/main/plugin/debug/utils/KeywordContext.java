@@ -20,13 +20,13 @@ public class KeywordContext {
     private Map<String, Object> variables;
 
     public KeywordContext() {
-        this(null, null, 0);
+        this(null, 0, null);
     }
 
-    public KeywordContext(final Map<String, Object> variables, final String fileName, final int lineNumber) {
-        this.variables = variables;
+    public KeywordContext(final String fileName, final int lineNumber, final Map<String, Object> variables) {
         this.fileName = fileName;
         this.lineNumber = lineNumber;
+        this.variables = variables;
     }
 
     public Map<String, Object> getVariables() {
