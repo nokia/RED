@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xf9_cPS5EeSLOvIIpQkwfQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 7/17/15 3:05 PM
+Save-Time: 10/28/15 4:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -62,7 +62,7 @@ get-view "Message Log" | get-editbox | get-property text | matches [concat "Star
 exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click	//Go to next breakpoint
 }
-wait 200
+wait 1000
 
 //check Mesage log
 
