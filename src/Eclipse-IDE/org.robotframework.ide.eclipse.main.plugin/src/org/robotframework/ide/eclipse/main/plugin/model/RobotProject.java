@@ -257,7 +257,9 @@ public class RobotProject extends RobotContainer {
             final Set<String> pp = newHashSet();
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON) {
-                    pp.add(lib.getPath());
+                    final String path = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                            new Path(lib.getPath())).toPortableString();
+                    pp.add(path);
                 }
             }
             return newArrayList(pp);
