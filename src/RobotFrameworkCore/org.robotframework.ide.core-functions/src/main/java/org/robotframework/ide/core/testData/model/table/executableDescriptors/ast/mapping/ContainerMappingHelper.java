@@ -8,6 +8,7 @@ package org.robotframework.ide.core.testData.model.table.executableDescriptors.a
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.FileRegion;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container;
@@ -81,11 +82,12 @@ public class ContainerMappingHelper {
 
             if (container.isOpenForModification()) {
                 if (container.getParent() != null) {
-                    mappingResult.addBuildMessage(BuildMessage
-                            .createWarnMessage(
-                                    createWarningAboutMissingClose(
-                                            containerType, startElement),
-                                    mappingResult.getFilename()));
+                    BuildMessage warn = BuildMessage.createWarnMessage(
+                            createWarningAboutMissingClose(containerType,
+                                    startElement), mappingResult.getFilename());
+                    warn.setFileRegion(new FileRegion(currentPosition,
+                            newPosition));
+                    mappingResult.addBuildMessage(warn);
                 }
                 contentEnd = elements.size();
             } else {
