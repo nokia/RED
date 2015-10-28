@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhitespacesFromVariableNameFixer;
 
 
 public enum VariablesProblem implements IProblemCause {
@@ -52,6 +53,22 @@ public enum VariablesProblem implements IProblemCause {
             return newArrayList(new RemoveVariableFixer(marker.getAttribute("name", null)));
         }
     },
+    INVALID_NAME {
+        @Override
+        public String getProblemDescription() {
+            return "Invalid variable name '%s'. Name can't contain whitespaces after the type identificator";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveWhitespacesFromVariableNameFixer(marker.getAttribute("name", null)));
+        }
+    },    
     DICTIONARY_NOT_AVAILABLE {
         @Override
         public String getProblemDescription() {

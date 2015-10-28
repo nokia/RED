@@ -54,12 +54,30 @@ class VariablesTableValidator implements ModelUnitValidator {
         final RobotSuiteFile suiteModel = variablesSection.get().getSuiteFile();
         final VariableTable variableTable = (VariableTable) variablesSection.get().getLinkedElement();
         reportVersionSpecificProblems(suiteModel.getFile(), variableTable, monitor);
-
+        
+        reportInvalidVariableName(suiteModel.getFile(), variableTable);
         reportUnknownVariableTypes(suiteModel.getFile(), variableTable);
         reportDuplicatedVariables(suiteModel.getFile(), variableTable);
     }
 
-    private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
+    private void reportInvalidVariableName(IFile file, VariableTable variableTable) {
+    	for (final IVariableHolder variable : variableTable.getVariables()) {
+    		final VariableType varType = variable.getType();
+			if (varType != VariableType.INVALID) {
+				final String variableName = variable.getDeclaration().getRaw().toString();
+				if (variableName != null && variableName.length() >= 2) {
+					if (variableName.charAt(1) != '{') {
+		                final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)
+		                        .formatMessageWith(variableName);
+		                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variableName);
+		                reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
+					}
+				}
+    		}
+    	}
+	}
+
+	private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
             final IProgressMonitor monitor) throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
             final List<? extends ModelUnitValidator> validators = new VersionDependentValidators()
