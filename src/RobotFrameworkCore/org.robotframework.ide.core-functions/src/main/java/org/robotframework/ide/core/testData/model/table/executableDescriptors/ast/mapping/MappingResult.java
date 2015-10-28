@@ -11,14 +11,13 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
 public class MappingResult {
 
     private final List<BuildMessage> messages = new LinkedList<>();
+    private final List<IElementDeclaration> mappedElements = new LinkedList<>();
     private final String fileName;
-    private final List<RobotToken> foundTokens = new LinkedList<>();
     private FilePosition fp;
 
 
@@ -38,6 +37,23 @@ public class MappingResult {
     }
 
 
+    public void addMappedElement(final IElementDeclaration mapped) {
+        mappedElements.add(mapped);
+    }
+
+
+    public void addMappedElements(final List<IElementDeclaration> mapped) {
+        for (IElementDeclaration elemDec : mapped) {
+            addMappedElement(elemDec);
+        }
+    }
+
+
+    public List<IElementDeclaration> getMappedElements() {
+        return Collections.unmodifiableList(mappedElements);
+    }
+
+
     public void addBuildMessage(final BuildMessage msg) {
         messages.add(msg);
     }
@@ -50,16 +66,6 @@ public class MappingResult {
 
     public List<BuildMessage> getMessages() {
         return Collections.unmodifiableList(messages);
-    }
-
-
-    public void addFoundToken(final RobotToken token) {
-        foundTokens.add(token);
-    }
-
-
-    public List<RobotToken> getFoundTokens() {
-        return Collections.unmodifiableList(foundTokens);
     }
 
 
