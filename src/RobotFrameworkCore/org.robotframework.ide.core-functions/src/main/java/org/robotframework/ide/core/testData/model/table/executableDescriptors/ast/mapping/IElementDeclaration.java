@@ -8,6 +8,7 @@ package org.robotframework.ide.core.testData.model.table.executableDescriptors.a
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
 
 public interface IElementDeclaration {
@@ -18,7 +19,10 @@ public interface IElementDeclaration {
     TextPosition getEnd();
 
 
-    void addElementsDeclarationInside(final IElementDeclaration elementToAdd);
+    void addElementDeclarationInside(final IElementDeclaration elementToAdd);
+
+
+    List<ContainerElementType> getTypes();
 
 
     List<IElementDeclaration> getElementsDeclarationInside();
