@@ -20,11 +20,14 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -56,26 +59,26 @@ import com.google.common.base.Joiner;
 public class RobotDebugEventDispatcher extends Job {
 
     private final RobotDebugTarget target;
-
-    private IFile executedFile;
     
     private final RobotEventBroker robotEventBroker;
     
-    private final List<IResource> suiteResources;
+    private final List<IResource> suiteFilesToDebug;
+
+    private IFile currentSuiteFile;
     
-    private final Map<IBreakpoint, Integer> breakpointHitCounts;
-
-    private String currentSuite = "";
-
-    private String breakpointCondition = "";
+    private String currentSuiteName = "";
+    
+    private IContainer currentSuiteParent;
     
     private String currentResourceFile;
 
+    private String breakpointCondition = "";
+    
     private boolean isBreakpointConditionFulfilled;
+    
+    private final Map<IBreakpoint, Integer> breakpointHitCounts;
 
     private boolean isStopping;
-    
-    private KeywordContext currentKeywordContext = new KeywordContext();
     
     private final RobotDebugExecutionContext executionContext;
     
@@ -85,7 +88,7 @@ public class RobotDebugEventDispatcher extends Job {
         setSystem(true);
 
         this.target = target;
-        this.suiteResources = suiteResources;
+        this.suiteFilesToDebug = suiteResources;
         this.robotEventBroker = robotEventBroker;
 
         breakpointHitCounts = new LinkedHashMap<>();
@@ -187,13 +190,15 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleStartSuiteEvent(final Map<String, ?> eventMap) {
         final List<?> suiteList = (List<?>) eventMap.get("start_suite");
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
-        currentSuite = new File((String) suiteElements.get("source")).getName();
-        executedFile = extractSuiteFile(currentSuite, suiteResources);
+        final IPath suiteFilePath = new Path((String) suiteElements.get("source"));
+        currentSuiteName = suiteFilePath.lastSegment();
+        currentSuiteFile = extractSuiteFile(currentSuiteName, suiteFilePath.removeLastSegments(1).lastSegment(), suiteFilesToDebug);
         
-        if (executedFile != null) {
-            final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(executedFile);
+        if (currentSuiteFile != null) {
+            final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
             final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
-            executionContext.startSuite(robotParser.parse(executedFile.getLocation().toFile()).get(0));
+            executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0));
+            currentSuiteParent = currentSuiteFile.getParent();
         }
 
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
@@ -213,7 +218,7 @@ public class RobotDebugEventDispatcher extends Job {
     }
     
     private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
-        if (executedFile == null) {
+        if (currentSuiteFile == null) {
             throw new MissingFileToExecuteException("Missing suite file for execution");
         }
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
@@ -226,32 +231,41 @@ public class RobotDebugEventDispatcher extends Job {
 
         executionContext.startKeyword(currentKeyword, keywordType, (List<String>) startElements.get("args"));
 
-        String executedSuite = currentSuite;
+        String executedSuiteFileName = currentSuiteName;
         
         final KeywordPosition keywordPosition = executionContext.findKeywordPosition();
         final int keywordLineNumber = keywordPosition.getLineNumber();
         currentResourceFile = keywordPosition.getFilePath();
         if(currentResourceFile != null) {
-            executedSuite = new File(currentResourceFile).getName();
+            executedSuiteFileName = new File(currentResourceFile).getName();
         }
 
-        final boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuite, keywordLineNumber);
+        final boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuiteFileName, keywordLineNumber);
 
         if (shouldStopExecution(keywordLineNumber, hasBreakpoint)) {
+            isStopping = true;
             resetSteppingState();
             resetStackFramesState();
-            isStopping = true;
         } else {
             isStopping = false;
         }
-
-        currentKeywordContext = new KeywordContext(null, executedSuite, keywordLineNumber);
+        
+        final KeywordContext currentKeywordContext = new KeywordContext(
+                extractFileNameWithParentFolderInfo(executedSuiteFileName), keywordLineNumber, null);
         target.getCurrentKeywordsContextMap().put(currentKeyword, currentKeywordContext);
     }
 
     private boolean shouldStopExecution(final int keywordLineNumber, final boolean hasBreakpoint) {
         return hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
                 && !target.hasStepReturn() && keywordLineNumber >= 0);
+    }
+    
+    private String extractFileNameWithParentFolderInfo(String executedSuiteName) {
+        String fileName = executedSuiteName;
+        if(currentResourceFile == null && currentSuiteParent != null && currentSuiteParent instanceof IFolder) {
+            fileName = currentSuiteParent.getName() + File.separator + executedSuiteName;
+        }
+        return fileName;
     }
     
     @SuppressWarnings("unchecked")
@@ -376,13 +390,13 @@ public class RobotDebugEventDispatcher extends Job {
         return keySet.isEmpty() ? null : keySet.iterator().next();
     }
     
-    private IFile extractSuiteFile(final String suiteName, final List<IResource> resources) {
+    private IFile extractSuiteFile(final String suiteName, final String suiteParentName, final List<IResource> resources) {
         for (final IResource resource : resources) {
-            if (resource.getName().equalsIgnoreCase(suiteName) && resource instanceof IFile) {
+            if (resource.getName().equalsIgnoreCase(suiteName) && resource instanceof IFile && resource.getParent().getName().equalsIgnoreCase(suiteParentName)) {
                 return (IFile) resource;
             } else if (resource instanceof IContainer) {
                 try {
-                    final IFile file = extractSuiteFile(suiteName, Arrays.asList(((IContainer) resource).members()));
+                    final IFile file = extractSuiteFile(suiteName, suiteParentName, Arrays.asList(((IContainer) resource).members()));
                     if(file != null) {
                         return file;
                     }
@@ -401,12 +415,13 @@ public class RobotDebugEventDispatcher extends Job {
                 .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
         for (int i = 0; i < currentBreakpoints.length; i++) {
             final IBreakpoint currentBreakpoint = currentBreakpoints[i];
-            final String breakpointResourceName = currentBreakpoint.getMarker().getResource().getName();
             try {
-                if (breakpointResourceName.equals(executedSuite) && currentBreakpoint.isEnabled()) {
+                if (currentBreakpoint.isEnabled()
+                        && isBreakpointSourceFileInCurrentExecutionContext(currentBreakpoint.getMarker().getResource(),
+                                executedSuite)) {
                     final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                             IMarker.LINE_NUMBER);
-                    if(keywordLineNumber == breakpointLineNum) {
+                    if (keywordLineNumber == breakpointLineNum) {
                         boolean hasHitCountConditionFullfilled = checkHitCountCondition(currentBreakpoint);
                         if (hasHitCountConditionFullfilled) {
                             breakpointCondition = currentBreakpoint.getMarker().getAttribute(
@@ -421,6 +436,13 @@ public class RobotDebugEventDispatcher extends Job {
             }
         }
         return hasBreakpoint;
+    }
+    
+    private boolean isBreakpointSourceFileInCurrentExecutionContext(final IResource breakpointSourceFile,
+            final String executedSuite) {
+        return breakpointSourceFile.getName().equals(executedSuite)
+                && (currentResourceFile != null || currentSuiteParent.getName().equalsIgnoreCase(
+                        breakpointSourceFile.getParent().getName()));
     }
 
     private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
