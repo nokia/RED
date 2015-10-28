@@ -28,11 +28,6 @@ public class DeclarationMapper {
         FilePosition currentPosition = fp;
 
         List<IContainerElement> elements = container.getElements();
-        if (!elements.isEmpty()) {
-
-        } else {
-
-        }
 
         mappingResult.setLastFilePosition(currentPosition);
 
