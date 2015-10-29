@@ -36,3 +36,9 @@ s1
     Log  s
 t1  
     Log  t
+k1
+	#Log  comment
+	Log  123
+#  Log  321
+	Log  123 # 123
+	
