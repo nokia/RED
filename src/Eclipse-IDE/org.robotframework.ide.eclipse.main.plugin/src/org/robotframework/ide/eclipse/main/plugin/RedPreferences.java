@@ -6,9 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.graphics.RGB;
-import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
-import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 public class RedPreferences {
@@ -42,13 +39,5 @@ public class RedPreferences {
 
     public AcceptanceMode getAcceptanceMode() {
         return AcceptanceMode.valueOf(store.getString(ASSISTANT_COMPLETION_MODE));
-    }
-
-    public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
-        final int fontStyle = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle");
-        final int red = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.r");
-        final int green = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.g");
-        final int blue = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.b");
-        return new ColoringPreference(new RGB(red, green, blue), fontStyle);
     }
 }
