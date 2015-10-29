@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -97,24 +98,19 @@ public class RobotProjectConfig {
         return remoteLocations;
     }
 
-    public void addReferencedLibrarySpecification(final IPath path) {
-        addReferencedLibrary(LibraryType.VIRTUAL.toString(), path.lastSegment(), path);
-    }
-
     public void addReferencedLibraryInPython(final String name, final IPath path) {
         addReferencedLibrary(LibraryType.PYTHON.toString(), name, path);
     }
 
-    public void addReferencedLibraryInJava(final String name, final IPath path) {
-        addReferencedLibrary(LibraryType.JAVA.toString(), name, path);
-    }
-    
     private void addReferencedLibrary(final String type, final String name, final IPath path) {
         final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
         referencedLibrary.setType(type);
         referencedLibrary.setName(name);
         referencedLibrary.setPath(path.toPortableString());
-        
+        addReferencedLibrary(referencedLibrary);
+    }
+
+    public void addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
         if (libraries == null) {
             libraries = newArrayList();
         }
@@ -254,6 +250,14 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
+        }
+
+        public IPath getFilepath() {
+            if (provideType() == LibraryType.PYTHON) {
+                return new Path(path + "/" + name.replaceAll("\\.", "/"));
+            } else {
+                return new Path(path);
+            }
         }
 
         public LibraryType provideType() {

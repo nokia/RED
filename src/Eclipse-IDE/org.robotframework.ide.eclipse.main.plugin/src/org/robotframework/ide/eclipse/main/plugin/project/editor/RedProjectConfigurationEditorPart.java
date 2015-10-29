@@ -159,7 +159,9 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
 
                         @Override
                         public void whenFileChanged() {
-                            whenConfigurationFiledChanged();
+                            editorInput.refreshProjectConfiguration();
+
+                            whenConfigurationFileChanged();
                             setupEnvironmentLoadingJob();
                         }
                     });
@@ -231,14 +233,14 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
             return new QualifiedName(RedPlugin.PLUGIN_ID, localName);
         }
 
-        private void whenConfigurationFiledChanged() {
+        private void whenConfigurationFileChanged() {
             form.getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    frameworksFragment.whenConfigurationFiledChanged();
-                    referencedFragment.whenConfigurationFiledChanged();
-                    remoteFragment.whenConfigurationFiledChanged();
-                    variablesFragment.whenConfigurationFiledChanged();
+                    frameworksFragment.whenConfigurationFileChanged();
+                    referencedFragment.whenConfigurationFileChanged();
+                    remoteFragment.whenConfigurationFileChanged();
+                    variablesFragment.whenConfigurationFileChanged();
                 }
             });
         }
