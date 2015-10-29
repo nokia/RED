@@ -17,7 +17,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -38,6 +38,11 @@ public class KeywordsInSettingsAssistProcessor extends RedContentAssistProcessor
     }
 
     @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+    }
+
+    @Override
     protected String getProposalsTitle() {
         return "Keywords";
     }
@@ -47,7 +52,7 @@ public class KeywordsInSettingsAssistProcessor extends RedContentAssistProcessor
         final IDocument document = viewer.getDocument();
         try {
             final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-            final boolean shouldShowProposal = shouldShowProposals(lineContent);
+            final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
 
             if (shouldShowProposal) {
                 final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
@@ -88,8 +93,9 @@ public class KeywordsInSettingsAssistProcessor extends RedContentAssistProcessor
         }
     }
 
-    private boolean shouldShowProposals(final String lineContent) {
-        return DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1
+    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+            throws BadLocationException {
+        return isInProperContentType(document, offset) && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1
                 && (lineContent.toLowerCase().startsWith("suite setup")
                 || lineContent.toLowerCase().startsWith("suite teardown")
                 || lineContent.toLowerCase().startsWith("test setup")

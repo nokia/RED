@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -17,7 +18,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -41,6 +42,13 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+    }
+
+    @Override
     protected String getProposalsTitle() {
         return "Sections";
     }
@@ -60,7 +68,7 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
 
                 final List<ICompletionProposal> proposals = newArrayList();
                 final Image image = ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage());
-                for (final String sectionName : SECTION_NAMES) {
+                for (final String sectionName : getPossibleSections()) {
                     if (sectionName.toLowerCase().startsWith(prefix.toLowerCase())) {
                         final String textToInsert = sectionName + DocumentUtilities.getDelimiter(document);
                         
@@ -84,6 +92,16 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
             return null;
         } catch (final BadLocationException e) {
             return null;
+        }
+    }
+
+    private List<String> getPossibleSections() {
+        if (assist.getModel().isSuiteFile()) {
+            return SECTION_NAMES;
+        } else {
+            final ArrayList<String> names = newArrayList(SECTION_NAMES);
+            names.remove("*** Test Cases ***");
+            return names;
         }
     }
 

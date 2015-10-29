@@ -20,7 +20,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
@@ -40,6 +39,11 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
 
     public VariablesDefinitionsProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
+    }
+
+    @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Override
@@ -91,7 +95,7 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
             throws BadLocationException {
-        if (isInProperContentType(offset, document)) {
+        if (isInProperContentType(document, offset)) {
             // we only want to show those proposals in first cell of the line
             if (offset != lineInformation.getOffset()) {
                 final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
@@ -101,15 +105,6 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
             }
         }
         return false;
-    }
-
-    private boolean isInProperContentType(final int offset, final IDocument document) throws BadLocationException {
-        // it is valid to show those proposals when we are in variables content type or in default
-        // section at the end of document when previous content type is a variable table
-        final String contentType = document.getContentType(offset);
-        return contentType == SuiteSourcePartitionScanner.VARIABLES_SECTION
-                || (contentType == IDocument.DEFAULT_CONTENT_TYPE && offset > 0 && offset == document.getLength()
-                        && document.getContentType(offset - 1) == SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     private String getPrefix(final IDocument document, final IRegion wholeRegion, final int offset) {
