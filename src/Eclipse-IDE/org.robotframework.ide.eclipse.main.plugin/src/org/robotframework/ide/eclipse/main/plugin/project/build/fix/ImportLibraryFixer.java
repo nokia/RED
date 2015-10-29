@@ -56,11 +56,12 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
                     @Override
                     public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                             final KeywordSpecification kwSpec) {
-                        if (kwSpec.getName().equals(keywordName)) {
+                        if (kwSpec.getName().equalsIgnoreCase(keywordName)) {
                             libs.add(libSpec.getName());
                         }
                         return ContinueDecision.CONTINUE;
                     }
+
 
                     @Override
                     public ContinueDecision keywordDetected(final RobotSuiteFile file,

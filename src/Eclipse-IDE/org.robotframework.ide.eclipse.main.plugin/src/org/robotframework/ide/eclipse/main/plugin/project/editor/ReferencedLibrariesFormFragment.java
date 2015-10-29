@@ -5,34 +5,22 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -41,21 +29,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
@@ -165,61 +145,15 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 
                 final FileDialog dialog = createReferencedLibFileDialog();
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-
-                    final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                            environment);
-                    final List<PythonClass> pythonClasses = newArrayList();
-                    
-                    try {
-                        PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-                            @Override
-                            public void run(final IProgressMonitor monitor)
-                                    throws InvocationTargetException, InterruptedException {
-                                monitor.beginTask("Reading classes from module '" + chosenFilePath + "'", 100);
-                                try {
-                                    pythonClasses
-                                            .addAll(pythonLibStructureBuilder.provideEntriesFromFile(chosenFilePath));
-                                } catch (final RobotEnvironmentException e) {
-                                    throw new InvocationTargetException(e);
-                                }
-                            }
-                        });
-                    } catch (InvocationTargetException | InterruptedException e) {
-                        StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "RED was unable to find classes inside '" + chosenFilePath + "' module", e.getCause()),
-                                StatusManager.SHOW);
-                        return;
-                    }
-
-                    if (pythonClasses.isEmpty()) {
-                        StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "RED was unable to find classes inside '" + chosenFilePath + "' module"), 
-                                StatusManager.SHOW);
-                        return;
-                    }
-                    boolean added = false;
-                    final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(
-                            addPythonLibButton, pythonClasses, new PythonClassesLabelProvider());
-                    if (classesDialog.open() == Window.OK) {
-                        final Object[] result = classesDialog.getResult();
-
-                        for (final Object selectedClass : result) {
-                            final PythonClass pythonClass = (PythonClass) selectedClass;
-                            final IPath path = new Path(chosenFilePath);
-                            final IPath pathWithoutModuleName = chosenFilePath.endsWith("__init__.py")
-                                    ? path.removeLastSegments(2) : path.removeLastSegments(1);
-
-                            editorInput.getProjectConfiguration().addReferencedLibraryInPython(
-                                    pythonClass.getQualifiedName(),
-                                    PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName));
-                            added = true;
-                        }
-                    }
-                    if (added) {
-                        dirtyProviderService.setDirtyState(true);
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibrary lib = importer.importPythonLib(viewer.getTable().getShell(), environment,
+                            chosenFilePath);
+                    if (lib != null) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(lib);
+                        setDirty(true);
                         viewer.refresh();
                     }
                 }
@@ -236,71 +170,18 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.jar" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder();
-                    final List<JarClass> classesFromJar = newArrayList();
-                    try {
-                        PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-                            @Override
-                            public void run(final IProgressMonitor monitor)
-                                    throws InvocationTargetException, InterruptedException {
-                                monitor.beginTask("Reading classes from module '" + chosenFilePath + "'", 100);
-                                classesFromJar.addAll(jarStructureBuilder.provideEntriesFromJarFile(chosenFilePath));
-                            }
-                        });
-                    } catch (InvocationTargetException | InterruptedException e1) {
-                        // that's fine
-                    }
-
-                    if (classesFromJar.isEmpty()) {
-                        MessageDialog.openError(viewer.getTable().getShell(), "No classes found",
-                                "RED was unable to find classes inside '" + chosenFilePath + "' module");
-                        return;
-                    }
-
-                    final ElementListSelectionDialog classesDialog = createReferencedLibClassesDialog(addJavaLibButton,
-                            classesFromJar, new JarClassesLabelProvider());
-
-                    if (classesDialog.open() == Window.OK) {
-                        final Object[] result = classesDialog.getResult();
-
-                        boolean added = false;
-                        for (final Object selectedClass : result) {
-                            final JarClass jarClass = (JarClass) selectedClass;
-                            editorInput.getProjectConfiguration().addReferencedLibraryInJava(
-                                    jarClass.getQualifiedName(),
-                                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath)));
-                            added = true;
-                        }
-                        if (added) {
-                            dirtyProviderService.setDirtyState(true);
-                            viewer.refresh();
-                        }
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibrary lib = importer.importJavaLib(viewer.getTable().getShell(), chosenFilePath);
+                    if (lib != null) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(lib);
+                        setDirty(true);
+                        viewer.refresh();
                     }
                 }
             }
         });
     }
     
-    private FileDialog createReferencedLibFileDialog() {
-        final String startingPath = currentProject.getProject().getLocation().toOSString();
-        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
-        dialog.setFilterPath(startingPath);
-        return dialog;
-    }
-
-    private ElementListSelectionDialog createReferencedLibClassesDialog(final Button button, final List<?> classes,
-            final LabelProvider labelProvider) {
-        final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(button.getShell(),
-                labelProvider);
-        classesDialog.setMultipleSelection(true);
-        classesDialog.setTitle("Select library class");
-        classesDialog.setMessage("Select the class(es) which defines library:");
-        classesDialog.setElements(classes.toArray());
-
-        return classesDialog;
-    }
-
     private void addLibspecHandler() {
         addLibspecButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -309,14 +190,23 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFilePath));
-
-                    editorInput.getProjectConfiguration().addReferencedLibrarySpecification(path);
-                    dirtyProviderService.setDirtyState(true);
-                    viewer.refresh();
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibrary referencedLibrary = importer.importLibFromSpecFile(chosenFilePath);
+                    if (referencedLibrary != null) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(referencedLibrary);
+                        setDirty(true);
+                        viewer.refresh();
+                    }
                 }
             }
         });
+    }
+
+    private FileDialog createReferencedLibFileDialog() {
+        final String startingPath = currentProject.getProject().getLocation().toOSString();
+        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
+        dialog.setFilterPath(startingPath);
+        return dialog;
     }
 
     private void addRemoveHandler() {
@@ -326,10 +216,14 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 final List<ReferencedLibrary> selectedLibs = Selections.getElements(
                         (IStructuredSelection) viewer.getSelection(), ReferencedLibrary.class);
                 editorInput.getProjectConfiguration().removeLibraries(selectedLibs);
-                dirtyProviderService.setDirtyState(true);
+                setDirty(true);
                 viewer.refresh();
             }
         });
+    }
+
+    private void setDirty(final boolean isDirty) {
+        dirtyProviderService.setDirtyState(isDirty);
     }
 
     void whenEnvironmentWasLoaded(final RobotRuntimeEnvironment env) {
@@ -356,12 +250,14 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         }
     }
 
-    void whenConfigurationFiledChanged() {
+    void whenConfigurationFileChanged() {
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
         removeButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
+        setInput();
+        viewer.refresh();
     }
     
     private void setInput() {

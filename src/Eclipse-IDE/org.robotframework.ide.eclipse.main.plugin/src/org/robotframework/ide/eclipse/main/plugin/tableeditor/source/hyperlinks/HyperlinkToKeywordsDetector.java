@@ -68,7 +68,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec) {
-                if (kwSpec.getName().equals(name)) {
+                if (kwSpec.getName().equalsIgnoreCase(name)) {
                     hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
                     return ContinueDecision.STOP;
                 } else {

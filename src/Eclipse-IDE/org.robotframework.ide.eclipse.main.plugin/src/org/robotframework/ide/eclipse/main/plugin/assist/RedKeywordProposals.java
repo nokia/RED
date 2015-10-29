@@ -61,10 +61,6 @@ public class RedKeywordProposals {
         return getKeywordProposals("", comparator);
     }
 
-    public List<RedKeywordProposal> getKeywordProposals(final String prefix) {
-        return getKeywordProposals(prefix, null);
-    }
-
     public List<RedKeywordProposal> getKeywordProposals(final String prefix,
             final Comparator<RedKeywordProposal> comparator) {
 
@@ -75,7 +71,7 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec) {
-                if (kwSpec.getName().startsWith(prefix) && !libSpec.isReserved()) {
+                if (kwSpec.getName().toLowerCase().startsWith(prefix.toLowerCase()) && !libSpec.isReserved()) {
                     proposals.add(RedKeywordProposal.create(libSpec, kwSpec));
                 }
                 return ContinueDecision.CONTINUE;

@@ -199,7 +199,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     }
 
-    void whenConfigurationFiledChanged() {
+    void whenConfigurationFileChanged() {
         addFileBtn.setEnabled(false);
         removeFileBtn.setEnabled(false);
         viewer.getTable().setEnabled(false);

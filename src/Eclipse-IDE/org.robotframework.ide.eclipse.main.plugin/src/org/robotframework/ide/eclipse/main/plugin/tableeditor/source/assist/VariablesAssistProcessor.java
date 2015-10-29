@@ -49,7 +49,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         try {
             final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
 
-            if (DocumentUtilities.getNumberOfCellSeparators(lineContent) < 1) {
+            if (!shouldShowProposals(lineContent, document, offset)) {
                 return null;
             }
 
@@ -83,6 +83,22 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         } catch (final BadLocationException e) {
             return newArrayList();
         }
+    }
+
+    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+            throws BadLocationException {
+        return isInProperContentType(offset, document) && DocumentUtilities.getNumberOfCellSeparators(lineContent) >= 1;
+    }
+
+    private boolean isInProperContentType(final int offset, final IDocument document) throws BadLocationException {
+        // it is valid to show those proposals when we are in non-default content type or in default
+        // type at the end of document when previous content type is non-default
+        final String contentType = document.getContentType(offset);
+        if (contentType == IDocument.DEFAULT_CONTENT_TYPE) {
+            return offset > 0 && offset == document.getLength()
+                    && document.getContentType(offset - 1) != IDocument.DEFAULT_CONTENT_TYPE;
+        }
+        return true;
     }
 
     private Image getImage(final String name) {

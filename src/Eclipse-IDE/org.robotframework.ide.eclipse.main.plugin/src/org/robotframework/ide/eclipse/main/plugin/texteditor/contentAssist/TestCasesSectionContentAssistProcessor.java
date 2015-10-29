@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceContextInformationValidator;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -111,7 +112,7 @@ public class TestCasesSectionContentAssistProcessor implements IContentAssistPro
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator();
+        return new SuiteSourceContextInformationValidator();
     }
 
 }

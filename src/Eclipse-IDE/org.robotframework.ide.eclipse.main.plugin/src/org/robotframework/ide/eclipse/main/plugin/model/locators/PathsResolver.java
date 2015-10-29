@@ -65,29 +65,39 @@ public class PathsResolver {
      * @param path
      * @return
      */
-    public static List<IPath> resolveToAbsolutePath(final RobotSuiteFile file, final String path)
+    public static List<IPath> resolveToAbsolutePossiblePaths(final RobotSuiteFile file, final String path)
+            throws PathResolvingException {
+        return resolveToAbsolutePossiblePath(file, new Path(path));
+    }
+
+    private static List<IPath> resolveToAbsolutePossiblePath(final RobotSuiteFile file, final IPath path)
+            throws PathResolvingException {
+        final List<IPath> paths = newArrayList(resolveToAbsolutePath(file, path));
+        for (final File f : file.getProject().getModuleSearchPaths()) {
+            final URI resolvedPath = f.toURI().resolve(path.toString());
+            paths.add(new Path(resolvedPath.getPath()));
+        }
+        return paths;
+    }
+
+    public static IPath resolveToAbsolutePath(final RobotSuiteFile file, final String path)
             throws PathResolvingException {
         return resolveToAbsolutePath(file, new Path(path));
     }
 
-    private static List<IPath> resolveToAbsolutePath(final RobotSuiteFile file, final IPath path)
+    private static IPath resolveToAbsolutePath(final RobotSuiteFile file, final IPath path)
             throws PathResolvingException {
         if (isParameterized(path)) {
             throw new PathResolvingException("Given path is parameterized");
         } else if (path.isAbsolute()) {
-            return newArrayList(path);
+            return path;
         } else {
             try {
                 final URI filePath = new URI(file.getFile().getLocation().toPortableString());
                 final URI pathUri = filePath.resolve(path.toString());
 
                 final List<IPath> paths = newArrayList();
-                paths.add(new Path(pathUri.toString()));
-                for (final File f : file.getProject().getModuleSearchPaths()) {
-                    final URI resolvedPath = f.toURI().resolve(path.toString());
-                    paths.add(new Path(resolvedPath.getPath()));
-                }
-                return paths;
+                return new Path(pathUri.toString());
             } catch (final URISyntaxException | IllegalArgumentException e) {
                 throw new PathResolvingException("Path syntax problem", e);
             }
