@@ -175,7 +175,7 @@ public class RobotDebugExecutionContext {
         return currentKeywords.size() == 1;
     }
 
-    protected class KeywordContext {
+    protected static class KeywordContext {
 
         private String name;
         

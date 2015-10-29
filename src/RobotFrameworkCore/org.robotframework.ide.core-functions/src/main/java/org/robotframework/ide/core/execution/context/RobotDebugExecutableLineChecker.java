@@ -34,9 +34,13 @@ public class RobotDebugExecutableLineChecker {
     }
 
     public static boolean isExecutableLine(final RobotFile file, final int lineNumber) {
-        if (file != null && (lineNumber - 1) >= 0) {
+        if (file != null && (lineNumber - 1) >= 0 && (lineNumber-1) < file.getFileContent().size()) {
             final RobotLine robotLine = file.getFileContent().get(lineNumber - 1);
-            for (IRobotLineElement robotLineElement : robotLine.getLineElements()) {
+            final List<IRobotLineElement> lineElements = robotLine.getLineElements();
+            if(hasComment(lineElements)) {
+                return false;
+            }
+            for (IRobotLineElement robotLineElement : lineElements) {
                 if (hasExecutableRobotLineType(robotLineElement.getTypes())) {
                     return true;
                 }
@@ -60,5 +64,21 @@ public class RobotDebugExecutableLineChecker {
 
     private static boolean hasSeparator(final List<IRobotTokenType> types) {
         return types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE) || types.contains(SeparatorType.PIPE);
+    }
+    
+    private static boolean hasComment(final List<IRobotLineElement> lineElements) {
+        if (!lineElements.isEmpty()) {
+            final List<IRobotTokenType> types = lineElements.get(0).getTypes();
+            if(hasSeparator(types) && lineElements.size() > 1) {
+                return hasCommentTypes(lineElements.get(1).getTypes());
+            } else {
+                return hasCommentTypes(types);
+            }
+        }
+        return false;
+    }
+    
+    private static boolean hasCommentTypes(final List<IRobotTokenType> types) {
+        return types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE);
     }
 }
