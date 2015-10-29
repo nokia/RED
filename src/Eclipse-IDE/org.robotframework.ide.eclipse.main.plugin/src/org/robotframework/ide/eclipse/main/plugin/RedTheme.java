@@ -6,10 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.ui.PlatformUI;
 
 public class RedTheme {
+
+    private static final String TEXT_EDITOR_FONT = "org.eclipse.jface.textfont";
 
     private static final String SECTION_HEADER = "org.robotframework.ide.eclipse.section.header";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
@@ -21,6 +25,10 @@ public class RedTheme {
 
     private static ColorRegistry getColorRegistry() {
         return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+    }
+
+    private static FontRegistry getFontRegistry() {
+        return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
     }
 
     public static Color getEclipseDecorationColor() {
@@ -51,4 +59,7 @@ public class RedTheme {
         return getColorRegistry().get(SETTING);
     }
 
+    public static Font getTextEditorFont() {
+        return getFontRegistry().get(TEXT_EDITOR_FONT);
+    }
 }

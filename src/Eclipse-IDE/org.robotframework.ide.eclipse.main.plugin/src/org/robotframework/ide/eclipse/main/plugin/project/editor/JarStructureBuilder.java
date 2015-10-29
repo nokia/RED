@@ -16,17 +16,25 @@ import java.util.zip.ZipInputStream;
 
 public class JarStructureBuilder {
 
-    public List<JarClass> provideEntriesFromJarFile(final String path) {
-        return provideEntriesFromJarFile(new File(path));
+    public List<JarClass> provideEntriesFromFile(final String path) {
+        return provideEntriesFromFile(new File(path));
     }
 
-    public List<JarClass> provideEntriesFromJarFile(final File file) {
+    public List<JarClass> provideEntriesFromFile(final File file) {
+        if (file.getName().endsWith(".jar")) {
+            return provideEntriesFromJarFile(file);
+        } else {
+            return newArrayList();
+        }
+    }
+
+    private List<JarClass> provideEntriesFromJarFile(final File file) {
         final List<JarClass> jarClasses = newArrayList();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {
-                    jarClasses.add(JarClass.create(entry.getName()));
+                    jarClasses.add(JarClass.createFromZipEntry(entry.getName()));
                 }
                 entry = zipStream.getNextEntry();
             }
@@ -47,7 +55,19 @@ public class JarStructureBuilder {
             this.qualifiedName = qualifiedName;
         }
 
-        private static JarClass create(final String name) {
+        private static JarClass createFromJavaFile(final String name) {
+            final String nameWithoutExtension = name.substring(0, name.length() - ".java".length());
+            return new JarClass(nameWithoutExtension);
+        }
+
+        private static JarClass createFromClassFile(final String name) {
+            final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
+            final String nameWithoutNested = nameWithoutExtension.contains("$")
+                    ? nameWithoutExtension.substring(0, nameWithoutExtension.lastIndexOf('$')) : nameWithoutExtension;
+            return new JarClass(nameWithoutNested);
+        }
+
+        private static JarClass createFromZipEntry(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
             return new JarClass(qualifiedName);

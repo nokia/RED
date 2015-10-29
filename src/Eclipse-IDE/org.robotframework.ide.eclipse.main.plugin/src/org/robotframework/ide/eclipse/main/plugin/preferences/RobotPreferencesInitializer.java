@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -14,6 +15,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.base.Function;
@@ -29,6 +31,7 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeFrameworkPreferences(preferences);
         initializeEditorPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
+        initializeSyntaxColoringPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -54,5 +57,20 @@ public class RobotPreferencesInitializer extends AbstractPreferenceInitializer {
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
         preferences.put(RedPreferences.ASSISTANT_COMPLETION_MODE, AcceptanceMode.INSERT.name());
+    }
+
+    private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {
+        for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
+            final ColoringPreference defaultPref = category.getDefault();
+
+            preferences.putInt(RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle",
+                    defaultPref.getFontStyle());
+            preferences.putInt(RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.r",
+                    defaultPref.getRgb().red);
+            preferences.putInt(RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.g",
+                    defaultPref.getRgb().green);
+            preferences.putInt(RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.b",
+                    defaultPref.getRgb().blue);
+        }
     }
 }
