@@ -21,8 +21,6 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -59,7 +57,7 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
             final boolean shouldShowProposal = shouldShowProposals(offset, document, lineInformation);
 
             if (shouldShowProposal) {
-                final String prefix = getPrefix(document, lineInformation, offset);
+                final String prefix = DocumentUtilities.getPrefix(document, Optional.of(lineInformation), offset);
                 final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
                 final String content = cellRegion.isPresent()
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
@@ -105,14 +103,6 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
             }
         }
         return false;
-    }
-
-    private String getPrefix(final IDocument document, final IRegion wholeRegion, final int offset) {
-        try {
-            return document.get(wholeRegion.getOffset(), offset - wholeRegion.getOffset());
-        } catch (final BadLocationException e) {
-            return "";
-        }
     }
 
     private enum VarDef {
