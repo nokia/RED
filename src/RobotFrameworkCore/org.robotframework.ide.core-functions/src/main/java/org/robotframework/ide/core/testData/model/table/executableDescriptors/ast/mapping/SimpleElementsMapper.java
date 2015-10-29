@@ -164,7 +164,7 @@ public class SimpleElementsMapper {
     }
 
 
-    private boolean containsOnly(final IElementDeclaration elem,
+    public boolean containsOnly(final IElementDeclaration elem,
             final List<ContainerElementType> typesAllowed) {
         boolean result = true;
         final List<ContainerElementType> types = elem.getTypes();
