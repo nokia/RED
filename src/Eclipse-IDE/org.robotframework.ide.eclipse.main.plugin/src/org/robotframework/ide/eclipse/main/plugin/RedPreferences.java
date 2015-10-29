@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder.AcceptanceMode;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 public class RedPreferences {
     
