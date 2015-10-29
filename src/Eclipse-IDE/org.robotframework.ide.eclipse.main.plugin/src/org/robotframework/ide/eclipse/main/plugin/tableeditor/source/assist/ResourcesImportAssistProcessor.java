@@ -20,7 +20,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -41,6 +41,11 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+    }
+
+    @Override
     protected String getProposalsTitle() {
         return "Resource files";
     }
@@ -50,7 +55,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
         final IDocument document = viewer.getDocument();
         try {
             final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-            final boolean shouldShowProposal = shouldShowProposals(lineContent);
+            final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
 
             if (shouldShowProposal) {
                 final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
@@ -92,8 +97,9 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
         return PathsConverter.fromWorkspaceRelativeToResourceRelative(assist.getFile(), resourcePath).toString();
     }
 
-    private boolean shouldShowProposals(final String lineContent) {
-        return lineContent.toLowerCase().startsWith("resource")
+    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+            throws BadLocationException {
+        return isInProperContentType(document, offset) && lineContent.toLowerCase().startsWith("resource")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
     }
 

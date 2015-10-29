@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -36,6 +36,13 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     public VariablesAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
+    }
+
+    @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Override
@@ -87,18 +94,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(offset, document) && DocumentUtilities.getNumberOfCellSeparators(lineContent) >= 1;
-    }
-
-    private boolean isInProperContentType(final int offset, final IDocument document) throws BadLocationException {
-        // it is valid to show those proposals when we are in non-default content type or in default
-        // type at the end of document when previous content type is non-default
-        final String contentType = document.getContentType(offset);
-        if (contentType == IDocument.DEFAULT_CONTENT_TYPE) {
-            return offset > 0 && offset == document.getLength()
-                    && document.getContentType(offset - 1) != IDocument.DEFAULT_CONTENT_TYPE;
-        }
-        return true;
+        return isInProperContentType(document, offset) && DocumentUtilities.getNumberOfCellSeparators(lineContent) >= 1;
     }
 
     private Image getImage(final String name) {

@@ -58,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Libr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
@@ -144,7 +145,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
             @Override
             public void setStatus(final String title) {
-                contentAssistant.setStatusMessage(String.format("Press Ctrl+Space to show %s proposals", title));
+                contentAssistant.setStatusMessage(title);
             }
 
             @Override
@@ -163,7 +164,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor(assistContext);
-        final LibrariesImportAssistProcessor librariesProcessor = new LibrariesImportAssistProcessor(assistContext);
+        final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(assistContext);
         final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
                 assistContext);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
@@ -172,12 +173,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(librariesProcessor,
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(libraryImportsProcessor,
                 variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
                 keywordsAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
-                assistantAccessor);
+                assistantAccessor, "Settings");
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(settingNamesProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
@@ -198,7 +199,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 sectionsAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
-                assistantAccessor);
+                assistantAccessor, "Variables");
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
 
@@ -212,15 +213,25 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
+        final SettingsAssistProcessor settingNamesProcessor = new SettingsAssistProcessor(assistContext);
         final VariablesDefinitionsProcessor variableDefsAssistProcessor = new VariablesDefinitionsProcessor(
                 assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(
+                assistContext);
+        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
+                assistContext);
+        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
+                assistContext);
+        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(
+                assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
-                sectionsAssistProcessor, variablesAssistProcessor);
+                sectionsAssistProcessor, settingNamesProcessor, libraryImportsProcessor, variableImportsProcessor,
+                resourceImportsProcessor, keywordsAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
-                assistantAccessor);
+                assistantAccessor, "Default");
         cycledProcessor.addProcessor(combinedProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);

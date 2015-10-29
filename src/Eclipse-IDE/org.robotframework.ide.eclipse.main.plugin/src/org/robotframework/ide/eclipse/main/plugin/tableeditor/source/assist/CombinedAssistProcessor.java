@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 
 
 /**
@@ -23,6 +24,13 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
 
     public CombinedAssistProcessor(final RedContentAssistProcessor... assistProcessors) {
         this.processors = newArrayList(assistProcessors);
+    }
+
+    @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Override
@@ -44,5 +52,4 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
         }
         return shouldBeNull && proposals.isEmpty() ? null : proposals;
     }
-
 }
