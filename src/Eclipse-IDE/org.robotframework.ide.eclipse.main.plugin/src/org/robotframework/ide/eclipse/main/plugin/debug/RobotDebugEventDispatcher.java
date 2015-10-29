@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,8 +38,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.execution.ExecutionElementsParser;
-import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext;
-import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
+import org.robotframework.ide.context.RobotDebugExecutionContext;
+import org.robotframework.ide.context.RobotDebugExecutionContext.KeywordPosition;
 import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
@@ -69,6 +70,8 @@ public class RobotDebugEventDispatcher extends Job {
     private String currentSuiteName = "";
     
     private IContainer currentSuiteParent;
+    
+    private IContainer currentResourceParent;
     
     private String currentResourceFile;
 
@@ -238,6 +241,7 @@ public class RobotDebugEventDispatcher extends Job {
         currentResourceFile = keywordPosition.getFilePath();
         if(currentResourceFile != null) {
             executedSuiteFileName = new File(currentResourceFile).getName();
+            extractResourceParent();
         }
 
         final boolean hasBreakpoint = hasBreakpointAtCurrentKeywordPosition(executedSuiteFileName, keywordLineNumber);
@@ -262,10 +266,23 @@ public class RobotDebugEventDispatcher extends Job {
     
     private String extractFileNameWithParentFolderInfo(String executedSuiteName) {
         String fileName = executedSuiteName;
-        if(currentResourceFile == null && currentSuiteParent != null && currentSuiteParent instanceof IFolder) {
-            fileName = currentSuiteParent.getName() + File.separator + executedSuiteName;
+        if (currentResourceFile != null && currentResourceParent != null && currentResourceParent instanceof IFolder) {
+            fileName = currentResourceParent.getName() + File.separator + fileName;
+        } else if (currentSuiteParent != null && currentSuiteParent instanceof IFolder) {
+            fileName = currentSuiteParent.getName() + File.separator + fileName;
         }
         return fileName;
+    }
+    
+    private void extractResourceParent() {
+        final IContainer resourceContainer = ResourcesPlugin.getWorkspace()
+                .getRoot()
+                .getContainerForLocation(new Path(currentResourceFile));
+        if (resourceContainer != null) {
+            currentResourceParent = resourceContainer.getParent();
+        } else {
+            currentResourceParent = null;
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -440,9 +457,16 @@ public class RobotDebugEventDispatcher extends Job {
     
     private boolean isBreakpointSourceFileInCurrentExecutionContext(final IResource breakpointSourceFile,
             final String executedSuite) {
+
+        String currentFileParentName = "";
+        if (currentResourceFile != null && currentResourceParent != null) {
+            currentFileParentName = currentResourceParent.getName();
+        } else {
+            currentFileParentName = currentSuiteParent.getName();
+        }
+
         return breakpointSourceFile.getName().equals(executedSuite)
-                && (currentResourceFile != null || currentSuiteParent.getName().equalsIgnoreCase(
-                        breakpointSourceFile.getParent().getName()));
+                && breakpointSourceFile.getParent().getName().equalsIgnoreCase(currentFileParentName);
     }
 
     private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
