@@ -39,4 +39,15 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
                 || (contentType == IDocument.DEFAULT_CONTENT_TYPE && offset > 0 && offset == document.getLength()
                         && getValidContentTypes().contains(document.getContentType(offset - 1)));
     }
+
+    protected final String getVirtualContentType(final IDocument document, final int offset)
+            throws BadLocationException {
+        final String contentType = document.getContentType(offset);
+        if (contentType != IDocument.DEFAULT_CONTENT_TYPE) {
+            return contentType;
+        } else if (offset > 0 && offset == document.getLength()) {
+            return document.getContentType(offset - 1);
+        }
+        return contentType;
+    }
 }
