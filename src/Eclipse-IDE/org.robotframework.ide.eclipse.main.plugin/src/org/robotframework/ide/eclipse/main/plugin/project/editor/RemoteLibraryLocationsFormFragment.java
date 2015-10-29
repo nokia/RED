@@ -163,7 +163,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         viewer.getTable().setEnabled(isEditable);
     }
 
-    void whenConfigurationFiledChanged() {
+    void whenConfigurationFileChanged() {
         addLocationButton.setEnabled(false);
         removeLocationButton.setEnabled(false);
         viewer.getTable().setEnabled(false);

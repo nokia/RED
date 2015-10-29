@@ -213,16 +213,6 @@ public class TextEditorContentAssist {
         return info;
     }
     
-    static List<String> filterProposals(final List<String> allProposals, final String filter) {
-        final List<String> filteredProposals = newArrayList();
-        for (final String word : allProposals) {
-            if (word.toLowerCase().startsWith(filter.toLowerCase())) {
-                filteredProposals.add(word);
-            }
-        }
-        return filteredProposals;
-    }
-    
     static Map<String, ContentAssistKeywordContext> filterKeywordsProposals(
             final Map<String, ContentAssistKeywordContext> keywordMap, final String filter) {
         final Map<String, ContentAssistKeywordContext> keywordProposals = new LinkedHashMap<>();
@@ -305,10 +295,6 @@ public class TextEditorContentAssist {
     static boolean shouldShowVariablesProposals(final String currentWord) {
         return currentWord.startsWith("$") || currentWord.startsWith("@") || currentWord.startsWith("&")
                 || currentWord.startsWith("{");
-    }
-
-    static List<String> getSettingsSectionWords() {
-        return settingsSectionWords;
     }
 
     static List<String> getKeywordsSectionWords() {

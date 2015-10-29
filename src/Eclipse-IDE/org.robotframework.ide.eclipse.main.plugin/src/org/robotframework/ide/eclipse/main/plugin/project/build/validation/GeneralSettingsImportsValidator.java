@@ -189,9 +189,13 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             LibrarySpecification specification = null;
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
-                for (final IPath p : PathsResolver.resolveToAbsolutePath(suiteFile, path.getText().toString())) {
-                    final Path entryPath = new Path(entry.getKey().getPath());
+                for (final IPath p : PathsResolver.resolveToAbsolutePossiblePaths(suiteFile,
+                        path.getText().toString())) {
+                    final IPath entryPath = entry.getKey().getFilepath();
                     if (p.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath))) {
+                        specification = entry.getValue();
+                    } else if (p.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath)
+                            .addFileExtension("py"))) {
                         specification = entry.getValue();
                     }
                 }

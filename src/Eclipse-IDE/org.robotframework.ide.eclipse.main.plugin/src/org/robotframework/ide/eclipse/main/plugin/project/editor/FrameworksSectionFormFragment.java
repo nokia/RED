@@ -108,7 +108,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         createViewer(sectionInternal);
     }
 
-    void whenConfigurationFiledChanged() {
+    void whenConfigurationFileChanged() {
         currentFramework.setText("", false, false);
         sourceButton.setEnabled(false);
         viewer.getTable().setEnabled(false);

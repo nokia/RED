@@ -9,7 +9,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.TextEditorContextValidator;
 
 /**
  * @author Michal Anglart
@@ -19,7 +18,7 @@ public abstract class DefaultContentAssistProcessor implements IContentAssistPro
 
     @Override
     public IContextInformationValidator getContextInformationValidator() {
-        return new TextEditorContextValidator();
+        return new SuiteSourceContextInformationValidator();
     }
 
     @Override

@@ -328,10 +328,15 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
                 .entrySet()) {
-            for (final IPath path : PathsResolver.resolveToAbsolutePath(this, toImportPathOrName)) {
-                if (entry.getValue() != null && path.equals(
-                        PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(entry.getKey().getPath())))) {
-                    return entry.getValue();
+            for (final IPath path : PathsResolver.resolveToAbsolutePossiblePaths(this, toImportPathOrName)) {
+                if (entry.getValue() != null) {
+                    if (path.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                            new Path(entry.getKey().getFilepath().toString())))) {
+                        return entry.getValue();
+                    } else if (path.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                            new Path(entry.getKey().getFilepath().toString())).addFileExtension("py"))) {
+                        return entry.getValue();
+                    }
                 }
             }
         }
