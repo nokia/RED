@@ -198,6 +198,14 @@ public class DocumentUtilities {
         }
     }
 
+    public static String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset)
+            throws BadLocationException {
+        if (!optional.isPresent()) {
+            return "";
+        }
+        return document.get(optional.get().getOffset(), offset - optional.get().getOffset());
+    }
+
     public static int getNumberOfCellSeparators(final String lineContentBefore) {
         final String withoutTabs = lineContentBefore.replaceAll("\t", "  ")
                 .replaceAll(" \\| ", "   ")
