@@ -41,11 +41,6 @@ public class JoinedTextDeclarations implements IElementDeclaration {
     }
 
 
-    public List<ContainerElementType> getMappedTypes() {
-        return null;
-    }
-
-
     @Override
     public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
         textInside.add(elementToAdd);
@@ -77,5 +72,11 @@ public class JoinedTextDeclarations implements IElementDeclaration {
             types.addAll(dec.getTypes());
         }
         return types;
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format("Joined [start=%s, end=%s]", getStart(), getEnd());
     }
 }
