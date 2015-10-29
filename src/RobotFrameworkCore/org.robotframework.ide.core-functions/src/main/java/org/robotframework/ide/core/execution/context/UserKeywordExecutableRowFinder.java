@@ -5,9 +5,11 @@
  */
 package org.robotframework.ide.core.execution.context;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.execution.context.IRobotExecutableRowFinder;
 import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
@@ -71,7 +73,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         if (keywordContext.getUserKeyword() != null) {
             return keywordContext.getUserKeyword();
         }
-        final String keywordName = extractKeywordNameFromVariableDeclaration(keywordContext.getName());
+        final String keywordName = extractNameFromVariableDeclaration(keywordContext.getName());
         for (final UserKeyword userKeyword : userKeywords) {
             if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(keywordName)) {
                 return userKeyword;
@@ -101,15 +103,18 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         }
         final String[] nameElements = keywordContext.getName().split("\\.");
         if (nameElements.length > 0) {
-            final String name = extractKeywordNameFromVariableDeclaration(nameElements[0]);
-            return findImportReference(name, resourceImportReferences);
+            final String resourceName = extractNameFromVariableDeclaration(nameElements[0]);
+            final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
+            findImportReferencesByFileName(resourceName, resourceImportReferences, referencesByFileName);
+            return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
         }
         return null;
     }
 
-    private String extractKeywordNameFromVariableDeclaration(final String keywordName) {
-        String name = keywordName;
-        if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') {
+    private String extractNameFromVariableDeclaration(final String keywordOrResourceName) {
+        String name = keywordOrResourceName;
+        if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') { 
+            // e.g. ${var}= resource1.MyKeyword
             final int variableDeclarationIndex = name.lastIndexOf("=");
             if (variableDeclarationIndex >= 0) {
                 name = name.substring(variableDeclarationIndex + 1).trim();
@@ -118,18 +123,28 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return name;
     }
 
-    private ResourceImportReference findImportReference(final String name,
-            final List<ResourceImportReference> references) {
+    private void findImportReferencesByFileName(final String name, final List<ResourceImportReference> references,
+            final List<ResourceImportReference> resultReferences) {
         for (final ResourceImportReference resourceImportReference : references) {
             if (name.equalsIgnoreCase(Files.getNameWithoutExtension(resourceImportReference.getReference()
                     .getProcessedFile()
                     .getAbsolutePath()))) {
-                return resourceImportReference;
+                resultReferences.add(resourceImportReference);
             } else {
-                final ResourceImportReference nestedResource = findImportReference(name,
-                        resourceImportReference.getReference().getResourceImportReferences());
-                if (nestedResource != null) {
-                    return nestedResource;
+                findImportReferencesByFileName(name, resourceImportReference.getReference()
+                        .getResourceImportReferences(), resultReferences);
+            }
+        }
+    }
+    
+    private ResourceImportReference findImportReferenceByKeywordName(final String name,
+            final List<ResourceImportReference> references) {
+        if (references.size() == 1) {
+            return references.get(0);
+        } else { //resource files with the same name
+            for (ResourceImportReference resourceImportReference : references) {
+                if (findResourceKeyword(resourceImportReference, new KeywordContext(name, "")) != null) {
+                    return resourceImportReference;
                 }
             }
         }
@@ -153,7 +168,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
             return keywordContext.getUserKeyword();
         }
         String name = keywordContext.getName();
-        final String[] nameElements = keywordContext.getName().split("\\.");
+        final String[] nameElements = keywordContext.getName().split("\\.");    //e.g. resource1.MyKeyword
         if (nameElements.length > 1) {
             name = nameElements[1];
         }
