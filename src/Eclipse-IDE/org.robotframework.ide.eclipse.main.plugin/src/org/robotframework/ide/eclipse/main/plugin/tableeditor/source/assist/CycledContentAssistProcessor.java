@@ -17,7 +17,6 @@ import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 
 /**
  * @author Michal Anglart
@@ -36,11 +35,8 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private boolean canReopenAssitantProgramatically;
 
-    private final String temp;
-
     public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
-            final AssitantCallbacks assistant, final String temp) {
-        this.temp = temp;
+            final AssitantCallbacks assistant) {
         this.assistContext = assistContext;
         this.assistant = assistant;
         this.processors = newArrayList();
@@ -64,7 +60,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private String getTitle() {
         final String title = processors.get((currentPage + 1) % processors.size()).getProposalsTitle();
-        return String.format("%s. Press Ctrl+Space to show %s proposals", this.temp, title);
+        return String.format("Press Ctrl+Space to show %s proposals", title);
     }
 
     @Override

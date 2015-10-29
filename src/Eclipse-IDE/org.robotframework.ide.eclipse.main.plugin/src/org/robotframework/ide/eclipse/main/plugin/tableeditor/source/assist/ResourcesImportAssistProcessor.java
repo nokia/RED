@@ -21,8 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -59,7 +57,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
 
             if (shouldShowProposal) {
                 final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
-                final String prefix = getPrefix(document, region, offset);
+                final String prefix = DocumentUtilities.getPrefix(document, region, offset);
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
                 final Image image = ImagesManager.getImage(RedImages.getImageForFileWithExtension(".robot"));
@@ -101,17 +99,6 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
             throws BadLocationException {
         return isInProperContentType(document, offset) && lineContent.toLowerCase().startsWith("resource")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
-    }
-
-    private String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset) {
-        if (!optional.isPresent()) {
-            return "";
-        }
-        try {
-            return document.get(optional.get().getOffset(), offset - optional.get().getOffset());
-        } catch (final BadLocationException e) {
-            return "";
-        }
     }
 
 }
