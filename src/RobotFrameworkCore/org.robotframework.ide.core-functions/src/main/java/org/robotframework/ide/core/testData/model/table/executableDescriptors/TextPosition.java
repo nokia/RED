@@ -20,8 +20,22 @@ public class TextPosition {
     }
 
 
-    public String getText() {
+    public String getFullText() {
         return text;
+    }
+
+
+    public String getText() {
+        String myText = null;
+        if (startPosition >= 0) {
+            if (endPosition >= 0) {
+                myText = text.substring(startPosition, endPosition + 1);
+            } else {
+                myText = text.substring(startPosition);
+            }
+        }
+
+        return myText;
     }
 
 
@@ -32,6 +46,16 @@ public class TextPosition {
 
     public int getEnd() {
         return endPosition;
+    }
+
+
+    public int getLength() {
+        int length = 0;
+        if (startPosition >= 0 && endPosition >= 0) {
+            length = (endPosition - startPosition) + 1;
+        }
+
+        return length;
     }
 
 

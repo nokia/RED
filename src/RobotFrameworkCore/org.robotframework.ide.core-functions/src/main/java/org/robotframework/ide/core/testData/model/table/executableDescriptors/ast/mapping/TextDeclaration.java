@@ -46,6 +46,15 @@ public class TextDeclaration implements IElementDeclaration {
     }
 
 
+    public int getLength() {
+        int length = 0;
+        if (text != null) {
+            length = text.getLength();
+        }
+        return length;
+    }
+
+
     @Override
     public List<IElementDeclaration> getElementsDeclarationInside() {
         return Collections.unmodifiableList(elementsDeclaredInside);

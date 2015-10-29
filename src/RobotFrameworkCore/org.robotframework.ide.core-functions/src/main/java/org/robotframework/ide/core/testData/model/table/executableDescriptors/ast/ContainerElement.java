@@ -27,7 +27,7 @@ public class ContainerElement implements IContainerElement {
 
 
     public void increaseEndPosition() {
-        position = new TextPosition(position.getText(), position.getStart(),
+        position = new TextPosition(position.getFullText(), position.getStart(),
                 position.getEnd() + 1);
     }
 
