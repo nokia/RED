@@ -16,7 +16,7 @@ import org.eclipse.jface.text.contentassist.ICompletionListenerExtension;
 import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 
 /**
@@ -36,8 +36,11 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private boolean canReopenAssitantProgramatically;
 
+    private final String temp;
+
     public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
-            final AssitantCallbacks assistant) {
+            final AssitantCallbacks assistant, final String temp) {
+        this.temp = temp;
         this.assistContext = assistContext;
         this.assistant = assistant;
         this.processors = newArrayList();
@@ -51,13 +54,17 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-        final String title = processors.get((currentPage + 1) % processors.size()).getProposalsTitle();
-        assistant.setStatus(title);
+        assistant.setStatus(processors.size() == 1 ? "" : getTitle());
 
         final ICompletionProposal[] proposals = processors.get(currentPage).computeCompletionProposals(viewer, offset);
 
         currentPage = (currentPage + 1) % processors.size();
         return proposals;
+    }
+
+    private String getTitle() {
+        final String title = processors.get((currentPage + 1) % processors.size()).getProposalsTitle();
+        return String.format("%s. Press Ctrl+Space to show %s proposals", this.temp, title);
     }
 
     @Override
@@ -96,7 +103,13 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         if (canReopenAssitantProgramatically && proposal instanceof RedCompletionProposal
                 && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
             canReopenAssitantProgramatically = false;
-            assistant.openCompletionProposals();
+            Display.getCurrent().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    assistant.openCompletionProposals();
+                }
+            });
         }
     }
 

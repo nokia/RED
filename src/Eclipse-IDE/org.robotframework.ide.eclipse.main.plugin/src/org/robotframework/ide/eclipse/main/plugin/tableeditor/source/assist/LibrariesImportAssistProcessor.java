@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -40,6 +40,11 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+    }
+
+    @Override
     protected String getProposalsTitle() {
         return "Libraries";
     }
@@ -49,7 +54,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
         final IDocument document = viewer.getDocument();
         try {
             final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-            final boolean shouldShowProposal = shouldShowProposals(lineContent);
+            final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
 
             if (shouldShowProposal) {
                 final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
@@ -98,8 +103,9 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private boolean shouldShowProposals(final String lineContent) {
-        return lineContent.toLowerCase().startsWith("library")
+    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+            throws BadLocationException {
+        return isInProperContentType(document, offset) && lineContent.toLowerCase().startsWith("library")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
     }
 

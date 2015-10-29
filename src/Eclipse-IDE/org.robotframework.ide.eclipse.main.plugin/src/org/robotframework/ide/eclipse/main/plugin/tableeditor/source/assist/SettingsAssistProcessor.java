@@ -17,7 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
@@ -39,6 +39,11 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
     public SettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
+    }
+
+    @Override
+    protected List<String> getValidContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Override
@@ -97,11 +102,15 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
             throws BadLocationException {
-        if (offset != lineInformation.getOffset()) {
-            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
-            return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
+        if (isInProperContentType(document, offset)) {
+            if (offset != lineInformation.getOffset()) {
+                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+                return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
+            } else {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private String getPrefix(final IDocument document, final IRegion wholeRegion, final int offset) {
