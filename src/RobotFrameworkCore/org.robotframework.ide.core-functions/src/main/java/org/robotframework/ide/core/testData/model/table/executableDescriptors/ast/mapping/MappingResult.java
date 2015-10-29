@@ -17,6 +17,7 @@ public class MappingResult {
 
     private final List<BuildMessage> messages = new LinkedList<>();
     private final List<IElementDeclaration> mappedElements = new LinkedList<>();
+    private final List<VariableDeclaration> correctVariables = new LinkedList<>();
     private final String fileName;
     private FilePosition fp;
 
@@ -51,6 +52,16 @@ public class MappingResult {
 
     public List<IElementDeclaration> getMappedElements() {
         return Collections.unmodifiableList(mappedElements);
+    }
+
+
+    public List<VariableDeclaration> getCorrectVariables() {
+        return Collections.unmodifiableList(correctVariables);
+    }
+
+
+    public void addCorrectVariable(final VariableDeclaration variable) {
+        correctVariables.add(variable);
     }
 
 
