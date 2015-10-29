@@ -20,11 +20,11 @@ public class RobotDebugExecutableLineCheckerTest {
 
         modelFile = RobotModelTestProvider.getModelFile("test_ExeChecker_1.robot");
 
-        checkExecutableLines(new int[] { 2, 3, 4, 5, 13, 14, 16, 17, 18, 22, 23, 24, 26, 29, 32, 36, 38 });
+        checkExecutableLines(new int[] { 2, 3, 4, 5, 13, 14, 16, 17, 18, 22, 23, 24, 26, 29, 32, 36, 38, 41, 43 });
 
         checkNotExecutableLines(new int[] { 1, 6, 7, 8, 9, 10, 11, 12, 15, 19, 20, 21, 25, 27, 28, 30, 31, 33, 34, 35,
-                37 });
-        
+                37, 39, 40, 42, 44 });
+
     }
 
     private void checkExecutableLines(final int[] lines) {
