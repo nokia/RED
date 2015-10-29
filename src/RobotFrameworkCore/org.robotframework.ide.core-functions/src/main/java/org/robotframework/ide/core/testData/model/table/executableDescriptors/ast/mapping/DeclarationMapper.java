@@ -84,12 +84,20 @@ public class DeclarationMapper {
                     mappedElements = mappingResult.getMappedElements();
                 }
 
+                IElementDeclaration lastComplex = mappedElements
+                        .get(mappedElements.size() - 1);
                 final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
                 if (variableIdentificator != null) {
+                    VariableDeclaration variable = (VariableDeclaration) lastComplex;
                     List<IElementDeclaration> escape = getEscape(mappedElements);
                     if (!escape.isEmpty()) {
 
+                    } else {
+
                     }
+                } else {
+                    IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
+
                 }
             } else {
                 ContainerElementType type = containerElement.getType();
