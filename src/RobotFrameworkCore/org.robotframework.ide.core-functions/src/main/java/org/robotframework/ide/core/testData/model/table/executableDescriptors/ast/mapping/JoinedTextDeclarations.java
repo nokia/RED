@@ -75,8 +75,31 @@ public class JoinedTextDeclarations implements IElementDeclaration {
     }
 
 
+    public String getText() {
+        StringBuilder text = new StringBuilder();
+        int end = 0;
+        int inside = textInside.size();
+        for (int index = 0; index < inside; index++) {
+            IElementDeclaration t = textInside.get(index);
+            if (index > 0) {
+                if (end != t.getStart().getStart()) {
+                    throw new IllegalStateException(
+                            "No chain connection between "
+                                    + textInside.get(index - 1) + " and " + t);
+                }
+            }
+            end = t.getEnd().getEnd() + 1;
+            text.append(t.getStart().getFullText()
+                    .substring(t.getStart().getStart(), end));
+        }
+
+        return text.toString();
+    }
+
+
     @Override
     public String toString() {
-        return String.format("Joined [start=%s, end=%s]", getStart(), getEnd());
+        return String.format("JoinedTextDeclarations [start=%s, end=%s]",
+                getStart(), getEnd());
     }
 }

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class DeclarationMapper {
                             .getMappedElements());
                 }
 
-                List<IElementDeclaration> mappedElements = new LinkedList<>();
+                List<IElementDeclaration> mappedElements;
                 if (topContainer != null) {
                     mappedElements = topContainer
                             .getElementsDeclarationInside();
@@ -85,10 +86,10 @@ public class DeclarationMapper {
 
                 final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
                 if (variableIdentificator != null) {
-                    System.out.println("==== VAR ====\n\n start-of-id\n"
-                            + variableIdentificator + "\n end-of-id\n\n");
                     List<IElementDeclaration> escape = getEscape(mappedElements);
-                    System.out.println("=== END ===");
+                    if (!escape.isEmpty()) {
+
+                    }
                 }
             } else {
                 ContainerElementType type = containerElement.getType();
@@ -123,12 +124,31 @@ public class DeclarationMapper {
 
     private List<IElementDeclaration> getEscape(
             final List<IElementDeclaration> mappedElements) {
-        List<IElementDeclaration> varElements = new LinkedList<>();
+        final List<IElementDeclaration> varElements = new LinkedList<>();
+
         if (mappedElements != null) {
-            for (IElementDeclaration dec : mappedElements) {
-                System.out.println(dec);
+            int nrOfMapped = mappedElements.size();
+            if (nrOfMapped >= 3) {
+                final IElementDeclaration possibleEscape = mappedElements
+                        .get(nrOfMapped - 3);
+                if (possibleEscape instanceof JoinedTextDeclarations) {
+                    final JoinedTextDeclarations joined = (JoinedTextDeclarations) possibleEscape;
+                    if (mapperFactory.containsOnly(joined,
+                            Arrays.asList(ContainerElementType.ESCAPE))) {
+                        List<IElementDeclaration> elementsInside = joined
+                                .getElementsDeclarationInside();
+                        if (elementsInside.size() == 1) {
+                            TextDeclaration dec = (TextDeclaration) elementsInside
+                                    .get(0);
+                            if (dec.getLength() == 1) {
+                                varElements.add(possibleEscape);
+                            }
+                        }
+                    }
+                }
             }
         }
+
         return varElements;
     }
 
