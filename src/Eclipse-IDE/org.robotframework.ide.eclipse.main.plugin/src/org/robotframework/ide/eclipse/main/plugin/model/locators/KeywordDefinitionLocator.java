@@ -40,6 +40,13 @@ public class KeywordDefinitionLocator {
         this.useCommonModel = useCommonModel;
     }
 
+    public void locateKeywordDefinitionInLibraries(final RobotProject project, final KeywordDetector detector) {
+        final ContinueDecision shouldContinue = locateInLibraries(project.getStandardLibraries().values(), detector);
+        if (shouldContinue == ContinueDecision.CONTINUE) {
+            locateInLibraries(project.getReferencedLibraries().values(), detector);
+        }
+    }
+
     public void locateKeywordDefinition(final KeywordDetector detector) {
         ContinueDecision shouldContinue = locateInCurrentFile(startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
@@ -51,14 +58,6 @@ public class KeywordDefinitionLocator {
             return;
         }
         locateInLibraries(startingFile.getImportedLibraries(), detector);
-    }
-
-    public void locateKeywordDefinitionInLibraries(final RobotProject project,
-            final KeywordDetector detector) {
-        final ContinueDecision shouldContinue = locateInLibraries(project.getStandardLibraries().values(), detector);
-        if (shouldContinue == ContinueDecision.CONTINUE) {
-            locateInLibraries(project.getReferencedLibraries().values(), detector);
-        }
     }
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final KeywordDetector detector) {
