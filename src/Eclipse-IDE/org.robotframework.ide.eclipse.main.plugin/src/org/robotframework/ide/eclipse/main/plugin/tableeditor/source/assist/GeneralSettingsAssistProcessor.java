@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -28,27 +27,26 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class SectionsAssistProcessor extends RedContentAssistProcessor {
+public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
-    private static List<String> SECTION_NAMES = newArrayList("*** Keywords ***", "*** Settings ***",
-            "*** Test Cases ***", "*** Variables ***");
+    private static List<String> SETTING_NAMES = newArrayList("Library", "Resource", "Variables", "Documentation",
+            "Metadata", "Suite Setup", "Suite Teardown", "Force Tags", "Default Tags", "Test Setup", "Test Teardown",
+            "Test Template", "Test Timeout");
 
     private final SuiteSourceAssistantContext assist;
 
-    public SectionsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public GeneralSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
 
     @Override
     protected List<String> getValidContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
-                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Override
     protected String getProposalsTitle() {
-        return "Sections";
+        return "Settings";
     }
 
     @Override
@@ -65,10 +63,11 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
 
                 final List<ICompletionProposal> proposals = newArrayList();
-                final Image image = ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage());
-                for (final String sectionName : getPossibleSections()) {
-                    if (sectionName.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String textToInsert = sectionName + DocumentUtilities.getDelimiter(document);
+                final String separator = assist.getSeparatorToFollow();
+                for (final String settingName : SETTING_NAMES) {
+                    if (settingName.toLowerCase().startsWith(prefix.toLowerCase())) {
+                        final String textToInsert = settingName + separator;
+                        final Image image = ImagesManager.getImage(RedImages.getRobotSettingImage());
                         
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                                 .will(assist.getAcceptanceMode())
@@ -76,9 +75,10 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
                                 .atOffset(lineInformation.getOffset())
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)
+                                .activateAssistantAfterAccepting(shouldActivate(settingName))
                                 .thenCursorWillStopAtTheEndOfInsertion()
                                 .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(sectionName)
+                                .displayedLabelShouldBe(settingName)
                                 .proposalsShouldHaveIcon(image)
                                 .create();
                         proposals.add(proposal);
@@ -93,22 +93,21 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private List<String> getPossibleSections() {
-        if (assist.getModel().isSuiteFile()) {
-            return SECTION_NAMES;
-        } else {
-            final ArrayList<String> names = newArrayList(SECTION_NAMES);
-            names.remove("*** Test Cases ***");
-            return names;
-        }
+    private boolean shouldActivate(final String settingName) {
+        return newArrayList("library", "resource", "variables", "test setup", "test teardown", "suite setup",
+                "suite teardown", "test template").contains(settingName.toLowerCase());
     }
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
             throws BadLocationException {
-        if (offset != lineInformation.getOffset()) {
-            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
-            return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
+        if (isInProperContentType(document, offset)) {
+            if (offset != lineInformation.getOffset()) {
+                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+                return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
+            } else {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 }

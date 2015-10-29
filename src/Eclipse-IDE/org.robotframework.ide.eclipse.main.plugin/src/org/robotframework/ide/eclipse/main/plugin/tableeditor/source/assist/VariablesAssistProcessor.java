@@ -19,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.texteditor.contentAssist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -62,7 +60,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
             final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
 
-            final String prefix = variable.isPresent() ? getPrefix(document, variable.get(), offset) : "";
+            final String prefix = variable.isPresent() ? DocumentUtilities.getPrefix(document, variable, offset) : "";
             final String content = variable.isPresent()
                     ? document.get(variable.get().getOffset(), variable.get().getLength()) : "";
 
@@ -118,13 +116,5 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             info += "Comment: " + comment;
         }
         return info;
-    }
-
-    private String getPrefix(final IDocument document, final IRegion wholeRegion, final int offset) {
-        try {
-            return document.get(wholeRegion.getOffset(), offset - wholeRegion.getOffset());
-        } catch (final BadLocationException e) {
-            return "";
-        }
     }
 }
