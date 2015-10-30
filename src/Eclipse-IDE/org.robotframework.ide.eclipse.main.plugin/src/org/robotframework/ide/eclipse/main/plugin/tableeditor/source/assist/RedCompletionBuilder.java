@@ -152,6 +152,7 @@ public class RedCompletionBuilder {
 
         @Override
         public DecorationsStep thenCursorWillStopAt(final int position, final int length) {
+            this.cursorPosition = position;
             this.selectionLength = length;
             return this;
         }
