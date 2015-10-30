@@ -57,7 +57,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         reportEmptyKeyword(suiteModel.getFile(), keywords);
         reportDuplicatedKewords(suiteModel.getFile(), keywords);
-        TestCasesTableValidator.reportUnkownKeywords(suiteModel, validationContext, reporter,
+        TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
                 findExecutableRows(keywords));
         reportUnknownVariables(suiteModel, keywords);
     }
