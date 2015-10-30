@@ -8,9 +8,12 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -34,7 +37,25 @@ public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implemen
     @Override
     public StyledString getStyledText(final Object element) {
         if (element instanceof KeywordSpecification) {
-            return new StyledString(((KeywordSpecification) element).getName());
+            final KeywordSpecification kwSpecification = (KeywordSpecification) element;
+            if (!kwSpecification.isDeprecated()) {
+                return new StyledString(kwSpecification.getName());
+            } else {
+                final StyledString label = new StyledString(kwSpecification.getName(), new Styler() {
+                    @Override
+                    public void applyStyles(final TextStyle textStyle) {
+                        textStyle.foreground = ColorsManager.getColor(245, 160, 70);
+                        textStyle.strikeout = true;
+                    }
+                });
+                label.append(" (deprecated)", new Styler() {
+                    @Override
+                    public void applyStyles(final TextStyle textStyle) {
+                        textStyle.foreground = ColorsManager.getColor(245, 160, 70);
+                    }
+                });
+                return label;
+            }
         }
         return new StyledString();
     }
