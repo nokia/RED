@@ -140,6 +140,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> names = validationContext.getAccessibleKeywords();
 
         for (final RobotExecutableRow<?> executable : executables) {
+            // FIXME : this disables for loops validating, enable asap
+            if (executable.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals(":for")) {
+                continue;
+            } else if (executable.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals("\\")) {
+                continue;
+            }
+            // remove this thing up from here
+
             if (!executable.isExecutable()) {
                 continue;
             }
@@ -199,6 +207,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> definedVariables = newHashSet(variables);
 
         for (final RobotExecutableRow<?> row : executables) {
+            // FIXME : this disables for loops validating, enable asap
+            if (row.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals(":for")) {
+                continue;
+            } else if (row.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals("\\")) {
+                continue;
+            }
+            // remove this thing up from here
+
             final ExecutionLineDescriptor lineDescription = row.buildLineDescription();
 
             final List<VariableInsideCell> usedParameters = extractVariables(lineDescription.getParameters());
