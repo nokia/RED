@@ -75,7 +75,7 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)
                                 .secondaryPopupShouldBeDisplayed(varDef.info)
-                                .thenCursorWillStopAt(2, textToInsert.length() - 4)
+                                .thenCursorWillStopAt(2, varDef.content.length() - 3)
                                 .displayedLabelShouldBe(varDef.label)
                                 .proposalsShouldHaveIcon(varDef.getImage())
                                 .create();
