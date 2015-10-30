@@ -57,15 +57,22 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                 }
             });
         } else if (element instanceof ErroneousLibrarySpecification) {
-
             final ErroneousLibrarySpecification libSpec = (ErroneousLibrarySpecification) element;
-            return new StyledString(libSpec.getName() + " (non-accessible)", new Styler() {
+
+            final StyledString label = new StyledString(libSpec.getName(), new Styler() {
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = ColorsManager.getColor(255, 0, 0);
                     textStyle.strikeout = true;
                 }
             });
+            label.append(" (non-accessible)", new Styler() {
+                @Override
+                public void applyStyles(final TextStyle textStyle) {
+                    textStyle.foreground = ColorsManager.getColor(255, 0, 0);
+                }
+            });
+            return label;
 
         } else if (element instanceof LibrarySpecification) {
 
