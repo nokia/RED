@@ -3388,11 +3388,17 @@
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist"
             name="Content Assist">
       </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax"
+            name="Syntax Coloring">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotPreferencesInitializer">
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.RedPreferencesInitializer">
       </initializer>
    </extension>
    <extension

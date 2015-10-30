@@ -41,6 +41,8 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     /** The cursor position after this proposal has been applied. */
     private final int cursorPosition;
 
+    private final int selectionLength;
+
     /** The image to be displayed in the completion proposal popup. */
     private final Image image;
 
@@ -85,8 +87,8 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
      * @param activateAssitant
      */
     RedCompletionProposal(final int priority, final String replacementString, final int replacementOffset,
-            final int replacementLength, final int prefixLength, final int cursorPosition, final Image image,
-            final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
+            final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
+            final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
             final IContextInformation contextInformation, final String additionalProposalInfo,
             final String additionalInfoForStyledLabel) {
         Assert.isNotNull(replacementString);
@@ -101,6 +103,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.prefixLength = prefixLength;
         this.decoratePrefix = decoratePrefix;
         this.cursorPosition = cursorPosition;
+        this.selectionLength = selectionLength;
         this.image = image;
         this.displayString = displayString;
         this.contextInformation = contextInformation;
@@ -128,7 +131,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     @Override
     public Point getSelection(final IDocument document) {
-        return new Point(replacementOffset + cursorPosition, 0);
+        return new Point(replacementOffset + cursorPosition, selectionLength);
     }
 
     @Override

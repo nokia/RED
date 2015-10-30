@@ -115,11 +115,11 @@ public class SuiteSourceAssistantContext {
         private AcceptanceMode acceptanceMode;
 
         AssistPreferences() {
-            this.acceptanceMode = RedPlugin.getDefault().getPreferences().getAcceptanceMode();
+            this.acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
         }
 
         void refresh() {
-            acceptanceMode = RedPlugin.getDefault().getPreferences().getAcceptanceMode();
+            acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
         }
 
         public String getSeparatorToFollow() {
