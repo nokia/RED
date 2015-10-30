@@ -152,12 +152,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 continue;
             }
             final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
-            final String name = keywordName.getText().toString();
-            if (!names.contains(name.toLowerCase())) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
-                        .formatMessageWith(name);
-                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
-                reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
+            if (!keywordName.getFilePosition().isNotSet()) {
+                final String name = keywordName.getText().toString();
+                if (!names.contains(name.toLowerCase())) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(name);
+                    final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
+                }
             }
         }
     }
