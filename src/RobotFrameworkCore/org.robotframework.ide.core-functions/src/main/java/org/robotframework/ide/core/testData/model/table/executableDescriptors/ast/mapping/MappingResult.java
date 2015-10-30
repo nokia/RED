@@ -43,6 +43,11 @@ public class MappingResult {
     }
 
 
+    public void removeMappedElement(final int indexToRemove) {
+        mappedElements.remove(indexToRemove);
+    }
+
+
     public void addMappedElements(final List<IElementDeclaration> mapped) {
         for (IElementDeclaration elemDec : mapped) {
             addMappedElement(elemDec);

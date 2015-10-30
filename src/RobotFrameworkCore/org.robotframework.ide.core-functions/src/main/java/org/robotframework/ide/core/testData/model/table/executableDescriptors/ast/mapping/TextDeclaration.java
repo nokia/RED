@@ -75,7 +75,30 @@ public class TextDeclaration implements IElementDeclaration {
 
 
     @Override
+    public void removeElementDeclarationInside(final int indexOfElementToRemove) {
+        throw new UnsupportedOperationException(
+                "Removing elements to TEXT declaration is not allowed please use container class for it.");
+
+    }
+
+
+    @Override
+    public void removeExactlyTheSameInstance(IElementDeclaration elementToRemove) {
+        throw new UnsupportedOperationException(
+                "Removing elements to TEXT declaration is not allowed please use container class for it.");
+
+    }
+
+
+    @Override
     public List<ContainerElementType> getTypes() {
         return Arrays.asList(mappedType);
     }
+
+
+    @Override
+    public boolean isComplex() {
+        return false;
+    }
+
 }

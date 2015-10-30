@@ -5,25 +5,19 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
-import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
 
-public class JoinedTextDeclarations implements IElementDeclaration {
+public class JoinedTextDeclarations extends AContainerOperation {
 
     private IElementDeclaration parent;
-    private final List<IElementDeclaration> textInside = new LinkedList<>();
 
 
     @Override
     public TextPosition getStart() {
         TextPosition pos = null;
-        if (!textInside.isEmpty()) {
-            pos = textInside.get(0).getStart();
+        if (!super.elementsDeclaredInside.isEmpty()) {
+            pos = super.elementsDeclaredInside.get(0).getStart();
         }
 
         return pos;
@@ -33,23 +27,12 @@ public class JoinedTextDeclarations implements IElementDeclaration {
     @Override
     public TextPosition getEnd() {
         TextPosition pos = null;
-        if (!textInside.isEmpty()) {
-            pos = textInside.get(textInside.size() - 1).getEnd();
+        if (!super.elementsDeclaredInside.isEmpty()) {
+            pos = super.elementsDeclaredInside.get(
+                    super.elementsDeclaredInside.size() - 1).getEnd();
         }
 
         return pos;
-    }
-
-
-    @Override
-    public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
-        textInside.add(elementToAdd);
-    }
-
-
-    @Override
-    public List<IElementDeclaration> getElementsDeclarationInside() {
-        return Collections.unmodifiableList(textInside);
     }
 
 
@@ -65,27 +48,19 @@ public class JoinedTextDeclarations implements IElementDeclaration {
     }
 
 
-    @Override
-    public List<ContainerElementType> getTypes() {
-        List<ContainerElementType> types = new LinkedList<>();
-        for (IElementDeclaration dec : textInside) {
-            types.addAll(dec.getTypes());
-        }
-        return types;
-    }
-
-
     public String getText() {
         StringBuilder text = new StringBuilder();
         int end = 0;
-        int inside = textInside.size();
+        int inside = super.elementsDeclaredInside.size();
         for (int index = 0; index < inside; index++) {
-            IElementDeclaration t = textInside.get(index);
+            IElementDeclaration t = super.elementsDeclaredInside.get(index);
             if (index > 0) {
                 if (end != t.getStart().getStart()) {
                     throw new IllegalStateException(
                             "No chain connection between "
-                                    + textInside.get(index - 1) + " and " + t);
+                                    + super.elementsDeclaredInside.get(
+                                            index - 1).getEnd() + " and "
+                                    + t.getStart());
                 }
             }
             end = t.getEnd().getEnd() + 1;
@@ -101,5 +76,11 @@ public class JoinedTextDeclarations implements IElementDeclaration {
     public String toString() {
         return String.format("JoinedTextDeclarations [start=%s, end=%s]",
                 getStart(), getEnd());
+    }
+
+
+    @Override
+    public boolean isComplex() {
+        return false;
     }
 }

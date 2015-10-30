@@ -22,6 +22,12 @@ public interface IElementDeclaration {
     void addElementDeclarationInside(final IElementDeclaration elementToAdd);
 
 
+    void removeElementDeclarationInside(final int indexOfElementToRemove);
+
+
+    void removeExactlyTheSameInstance(final IElementDeclaration elementToRemove);
+
+
     List<ContainerElementType> getTypes();
 
 
@@ -32,4 +38,7 @@ public interface IElementDeclaration {
 
 
     IElementDeclaration getLevelUpElement();
+
+
+    boolean isComplex();
 }
