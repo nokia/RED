@@ -32,7 +32,7 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
         }
 
         try {
-            final int shift = (command.offset == document.getLength() ? command.offset - 1 : command.offset);
+            final int shift = command.offset;
 
             final IRegion lineRegion = document.getLineInformationOfOffset(shift);
             final int start = lineRegion.getOffset();
