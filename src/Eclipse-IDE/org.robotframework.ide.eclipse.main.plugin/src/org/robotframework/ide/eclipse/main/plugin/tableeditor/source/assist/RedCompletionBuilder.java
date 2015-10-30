@@ -42,6 +42,8 @@ public class RedCompletionBuilder {
 
         DecorationsStep thenCursorWillStopAt(int position);
 
+        DecorationsStep thenCursorWillStopAt(int position, int length);
+
         DecorationsStep thenCursorWillStopAtTheEndOfInsertion();
     }
 
@@ -88,6 +90,8 @@ public class RedCompletionBuilder {
         private boolean decoratePrefix;
 
         private boolean activateAssitant;
+
+        private int selectionLength;
 
         @Override
         public ProposalContentStep will(final AcceptanceMode mode) {
@@ -142,12 +146,20 @@ public class RedCompletionBuilder {
         @Override
         public DecorationsStep thenCursorWillStopAt(final int position) {
             this.cursorPosition = position;
+            this.selectionLength = 0;
+            return this;
+        }
+
+        @Override
+        public DecorationsStep thenCursorWillStopAt(final int position, final int length) {
+            this.selectionLength = length;
             return this;
         }
 
         @Override
         public DecorationsStep thenCursorWillStopAtTheEndOfInsertion() {
             this.cursorPosition = -1;
+            this.selectionLength = 0;
             return this;
         }
 
@@ -185,16 +197,16 @@ public class RedCompletionBuilder {
             final int cursorPos = cursorPosition == -1 ? contentToInsert.length() : cursorPosition;
             if (mode == AcceptanceMode.INSERT) {
                 return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
-                        currentPrefix.length(), cursorPos, image, decoratePrefix, labelToDisplay, activateAssitant,
-                        contextInformation, additionalInfo, additionalInfoInLabel);
+                        currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
+                        activateAssitant, contextInformation, additionalInfo, additionalInfoInLabel);
             } else if (mode == AcceptanceMode.SUBSTITUTE) {
                 if (wholeContent == null) {
                     throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
                             + "content to substitute specified");
                 }
                 return new RedCompletionProposal(priority, contentToInsert, offset, wholeContent.length(),
-                        currentPrefix.length(), cursorPos, image, decoratePrefix, labelToDisplay, activateAssitant,
-                        contextInformation, additionalInfo, additionalInfoInLabel);
+                        currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
+                        activateAssitant, contextInformation, additionalInfo, additionalInfoInLabel);
             } else {
                 throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
             }

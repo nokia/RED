@@ -49,7 +49,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
@@ -108,7 +112,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final ContentAssistant contentAssistant = new ContentAssistant();
         contentAssistant.enableColoredLabels(true);
         contentAssistant.enableAutoInsert(false);
-        contentAssistant.enableAutoActivation(true);
+        contentAssistant
+                .enableAutoActivation(RedPlugin.getDefault().getPreferences().isAssistantAutoActivationEnabled());
+        contentAssistant
+                .setAutoActivationDelay(RedPlugin.getDefault().getPreferences().getAssistantAutoActivationDelay());
         contentAssistant.setEmptyMessage("No proposals");
         contentAssistant.setShowEmptyList(true);
         contentAssistant.setStatusLineVisible(true);
@@ -306,12 +313,25 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
         final PresentationReconciler reconciler = new PresentationReconciler();
 
-        final IToken section = new Token(new TextAttribute(ColorsManager.getColor(255, 0, 0)));
-        final IToken comment = new Token(new TextAttribute(ColorsManager.getColor(192, 192, 192)));
-        final IToken definition = new Token(new TextAttribute(ColorsManager.getColor(0, 0, 0), null, SWT.BOLD));
-        final IToken variable = new Token(new TextAttribute(ColorsManager.getColor(0, 128, 0)));
-        final IToken call = new Token(new TextAttribute(ColorsManager.getColor(0, 128, 192), null, SWT.BOLD));
-        final IToken setting = new Token(new TextAttribute(ColorsManager.getColor(149, 0, 85)));
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+
+        final ColoringPreference sectionPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SECTION_HEADER);
+        final IToken section = new Token(createAttribute(sectionPref));
+
+        final ColoringPreference commentPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.COMMENT);
+        final IToken comment = new Token(createAttribute(commentPref));
+
+        final ColoringPreference definitionPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.DEFINITION);
+        final IToken definition = new Token(createAttribute(definitionPref));
+
+        final ColoringPreference variablePref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.VARIABLE);
+        final IToken variable = new Token(createAttribute(variablePref));
+
+        final ColoringPreference callPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final IToken call = new Token(createAttribute(callPref));
+
+        final ColoringPreference settingPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SETTING);
+        final IToken setting = new Token(createAttribute(settingPref));
         
         final IRule[] defaultRules = new IRule[] {};
         createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
@@ -335,6 +355,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules);
 
         return reconciler;
+    }
+
+    private TextAttribute createAttribute(final ColoringPreference sectionPref) {
+        return new TextAttribute(ColorsManager.getColor(sectionPref.getRgb()), null, sectionPref.getFontStyle());
     }
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
