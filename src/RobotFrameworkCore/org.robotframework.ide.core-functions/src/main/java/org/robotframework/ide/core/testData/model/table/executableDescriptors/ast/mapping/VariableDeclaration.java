@@ -5,19 +5,13 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
-import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
 
-public class VariableDeclaration implements IElementDeclaration {
+public class VariableDeclaration extends AContainerOperation {
 
     private IElementDeclaration levelUpElement;
-    private final List<IElementDeclaration> elementsDeclaredInside = new LinkedList<>();
-    private boolean isEscaped = false;
+    private TextPosition escape;
     private final TextPosition variableStart;
     private final TextPosition variableName;
     private final TextPosition variableEnd;
@@ -32,12 +26,17 @@ public class VariableDeclaration implements IElementDeclaration {
 
 
     public boolean isEscaped() {
-        return isEscaped;
+        return (escape != null);
     }
 
 
-    public void escaped() {
-        this.isEscaped = true;
+    public TextPosition getEscape() {
+        return escape;
+    }
+
+
+    public void setEscape(final TextPosition escape) {
+        this.escape = escape;
     }
 
 
@@ -58,12 +57,6 @@ public class VariableDeclaration implements IElementDeclaration {
     }
 
 
-    @Override
-    public List<IElementDeclaration> getElementsDeclarationInside() {
-        return Collections.unmodifiableList(elementsDeclaredInside);
-    }
-
-
     public void setLevelUpElement(final IElementDeclaration levelUpElement) {
         this.levelUpElement = levelUpElement;
     }
@@ -76,17 +69,7 @@ public class VariableDeclaration implements IElementDeclaration {
 
 
     @Override
-    public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
-        elementsDeclaredInside.add(elementToAdd);
-    }
-
-
-    @Override
-    public List<ContainerElementType> getTypes() {
-        List<ContainerElementType> types = new LinkedList<>();
-        for (IElementDeclaration dec : elementsDeclaredInside) {
-            types.addAll(dec.getTypes());
-        }
-        return types;
+    public boolean isComplex() {
+        return true;
     }
 }
