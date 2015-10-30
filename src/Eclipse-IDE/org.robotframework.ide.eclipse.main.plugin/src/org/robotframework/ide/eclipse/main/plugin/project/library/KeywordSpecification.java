@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -22,6 +23,8 @@ public class KeywordSpecification {
     private String documentation;
 
     private List<String> arguments;
+
+    private Boolean isDeprecated;
 
     public String getName() {
         return name;
@@ -68,6 +71,14 @@ public class KeywordSpecification {
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
         return ArgumentsDescriptor.createDescriptor(arguments);
+    }
+
+    public boolean isDeprecated() {
+        if (isDeprecated == null) {
+            isDeprecated = Boolean.valueOf(documentation != null
+                    && Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(documentation.toLowerCase()).find());
+        }
+        return isDeprecated.booleanValue();
     }
 
     @Override
