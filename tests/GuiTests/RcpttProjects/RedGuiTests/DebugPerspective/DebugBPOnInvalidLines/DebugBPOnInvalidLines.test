@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ljgl0BEMEeWWSplrwZ3vkg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/22/15 4:44 PM
+Save-Time: 10/30/15 3:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -40,8 +40,7 @@ get-view Console | get-button Terminate | get-property enablement | equals false
 get-view Variables | get-tree | get-property itemCount | equals 0 | verify-true
 get-tab-folder -index 1 | get-tab-item Breakpoints | click
 with [get-view Breakpoints | get-tree] {
-    get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "BigScript.robot [line: 25]" | verify-true
+    get-property itemCount | equals 0 | verify-true
 }
 
 get-button Resume | get-property enablement | equals false | verify-true
