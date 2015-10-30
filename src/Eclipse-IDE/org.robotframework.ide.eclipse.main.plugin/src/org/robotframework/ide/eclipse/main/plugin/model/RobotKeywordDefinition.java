@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -212,6 +213,10 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         } else {
             return text;
         }
+    }
+
+    public boolean isDeprecated() {
+        return Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(getDocumentation().toLowerCase()).find();
     }
 
     @Override

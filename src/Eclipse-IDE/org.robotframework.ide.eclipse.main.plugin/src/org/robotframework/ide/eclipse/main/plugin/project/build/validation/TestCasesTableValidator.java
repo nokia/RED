@@ -74,7 +74,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
-        reportUnkownKeywords(suiteModel, validationContext, reporter, findExecutableRows(cases));
+        reportKeywordUsageProblems(suiteModel, validationContext, reporter, findExecutableRows(cases));
         reportUnknownVariables(suiteModel, cases);
     }
 
@@ -135,9 +135,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return executables;
     }
 
-    static void reportUnkownKeywords(final RobotSuiteFile robotSuiteFile, final ValidationContext validationContext,
+    static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final ValidationContext validationContext,
             final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
-        final Set<String> names = validationContext.getAccessibleKeywords();
 
         for (final RobotExecutableRow<?> executable : executables) {
             // FIXME : this disables for loops validating, enable asap
@@ -154,12 +153,19 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText().toString();
-                if (!names.contains(name.toLowerCase())) {
+                if (!validationContext.isKeywordAccessible(name)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(name);
                     final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
                 }
+                if (validationContext.isKeywordDeprecated(name)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
+                            .formatMessageWith(name);
+                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                }
+            } else {
+
             }
         }
     }

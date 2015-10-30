@@ -144,8 +144,13 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, settingToken);
             } else {
                 final String keywordName = keywordToken.getText().toString();
-                if (!validationContext.getAccessibleKeywords().contains(keywordName.toLowerCase())) {
+                if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
+                }
+                if (validationContext.isKeywordDeprecated(keywordName)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
@@ -166,8 +171,13 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             } else {
 
                 final String keywordName = keywordToken.getText().toString();
-                if (!validationContext.getAccessibleKeywords().contains(keywordName.toLowerCase())) {
+                if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
+                }
+                if (validationContext.isKeywordDeprecated(keywordName)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
