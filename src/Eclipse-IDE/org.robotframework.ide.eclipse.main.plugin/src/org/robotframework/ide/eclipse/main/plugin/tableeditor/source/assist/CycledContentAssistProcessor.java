@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 /**
  * @author Michal Anglart
@@ -112,6 +113,11 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
         // nothing to do here
+    }
+
+    @Override
+    public char[] getCompletionProposalAutoActivationCharacters() {
+        return RedPlugin.getDefault().getPreferences().getAssistantAutoActivationChars();
     }
 
     public interface AssitantCallbacks {
