@@ -5,18 +5,13 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
-import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
 
-public class IndexDeclaration implements IElementDeclaration {
+public class IndexDeclaration extends AContainerOperation {
 
     private IElementDeclaration levelUpElement;
-    private final List<IElementDeclaration> elementsDeclaredInside = new LinkedList<>();
+
     private final TextPosition indexBegin;
     private final TextPosition indexEnd;
 
@@ -46,29 +41,13 @@ public class IndexDeclaration implements IElementDeclaration {
 
 
     @Override
-    public List<IElementDeclaration> getElementsDeclarationInside() {
-        return Collections.unmodifiableList(elementsDeclaredInside);
-    }
-
-
-    @Override
     public IElementDeclaration getLevelUpElement() {
         return levelUpElement;
     }
 
 
     @Override
-    public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
-        elementsDeclaredInside.add(elementToAdd);
-    }
-
-
-    @Override
-    public List<ContainerElementType> getTypes() {
-        List<ContainerElementType> types = new LinkedList<>();
-        for (IElementDeclaration dec : elementsDeclaredInside) {
-            types.addAll(dec.getTypes());
-        }
-        return types;
+    public boolean isComplex() {
+        return true;
     }
 }

@@ -61,8 +61,9 @@ public class DeclarationMapper {
                 .getContentEnd(); index++) {
             IContainerElement containerElement = elements.get(index);
             if (containerElement.isComplex()) {
+                Container subContainer = (Container) containerElement;
                 MappingResult subResult = map(mappingResult, currentPosition,
-                        (Container) containerElement, filename);
+                        subContainer, filename);
                 mappingResult.addBuildMessages(subResult.getMessages());
                 if (topContainer != null) {
                     List<IElementDeclaration> mappedElements = subResult
@@ -88,16 +89,23 @@ public class DeclarationMapper {
                         .get(mappedElements.size() - 1);
                 final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
                 if (variableIdentificator != null) {
-                    VariableDeclaration variable = (VariableDeclaration) lastComplex;
+                    VariableDeclaration variableDec = (VariableDeclaration) lastComplex;
                     List<IElementDeclaration> escape = getEscape(mappedElements);
                     if (!escape.isEmpty()) {
+                        if (topContainer != null) {
+                        } else {
 
-                    } else {
+                        }
+                    }
+
+                    if (subContainer.isOpenForModification()) {
 
                     }
                 } else {
                     IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
+                    if (subContainer.isOpenForModification()) {
 
+                    }
                 }
             } else {
                 ContainerElementType type = containerElement.getType();
