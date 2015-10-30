@@ -11,9 +11,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -36,7 +34,7 @@ public class ValidationContext {
 
     private final RobotVersion version;
 
-    private final Set<String> accessibleKeywords;
+    private final Map<String, Boolean> accessibleKeywords;
 
     private final Map<String, LibrarySpecification> librarySpecifications;
 
@@ -46,7 +44,7 @@ public class ValidationContext {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         this.runtimeEnvironment = project.getRuntimeEnvironment();
         this.version = runtimeEnvironment != null ? RobotVersion.from(project.getVersion()) : null;
-        this.accessibleKeywords = newHashSet();
+        this.accessibleKeywords = newHashMap();
         this.librarySpecifications = newHashMap();
         this.referencedLibrarySpecifications = newHashMap();
     }
@@ -59,12 +57,20 @@ public class ValidationContext {
         return version;
     }
 
-    public void setAccessibleKeywords(final Collection<String> keywords) {
-        accessibleKeywords.addAll(keywords);
+    public void setAccessibleKeywords(final Map<String, Boolean> keywords) {
+        accessibleKeywords.putAll(keywords);
     }
 
     public Set<String> getAccessibleKeywords() {
-        return ImmutableSet.copyOf(accessibleKeywords);
+        return ImmutableSet.copyOf(accessibleKeywords.keySet());
+    }
+
+    public boolean isKeywordAccessible(final String name) {
+        return accessibleKeywords.containsKey(name.toLowerCase());
+    }
+
+    public boolean isKeywordDeprecated(final String name) {
+        return Boolean.TRUE.equals(accessibleKeywords.get(name.toLowerCase()));
     }
 
     public void setLibrarySpecifications(final Map<String, LibrarySpecification> specs) {
