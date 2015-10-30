@@ -32,6 +32,17 @@ public enum KeywordsProblem implements IProblemCause {
             return fixers;
         }
     },
+    DEPRECATED_KEYWORD {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword '%s' is deprecated";
+        }
+    },
     DUPLICATED_KEYWORD {
         @Override
         public String getProblemDescription() {

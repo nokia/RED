@@ -5,12 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -87,23 +86,23 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         return libs;
     }
 
-    private static Set<String> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
-        final Set<String> names = new HashSet<>();
+    private static Map<String, Boolean> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
+        final Map<String, Boolean> accessibleKeywords = newHashMap();
         new KeywordDefinitionLocator(robotSuiteFile, false).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec) {
-                names.add(kwSpec.getName().toLowerCase());
+                accessibleKeywords.put(kwSpec.getName().toLowerCase(), kwSpec.isDeprecated());
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                names.add(keyword.getName().toLowerCase());
+                accessibleKeywords.put(keyword.getName().toLowerCase(), keyword.isDeprecated());
                 return ContinueDecision.CONTINUE;
             }
         });
-        return names;
+        return accessibleKeywords;
     }
 }
