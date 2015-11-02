@@ -82,6 +82,8 @@ public class KeywordDefinitionLocator {
                 continue;
             }
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
+            final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
+            locateInResourceFiles(nestedResources, detector);
             final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
