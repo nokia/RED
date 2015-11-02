@@ -494,7 +494,8 @@ public class RobotRuntimeEnvironment {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             final String argAsString = args.isEmpty() ? "None" : "['" + Joiner.on("','").join(args) + "']";
-            return executor.getVariables(path, argAsString);
+            final String normalizedPath = path.replace('\\', '/');
+            return executor.getVariables(normalizedPath, argAsString);
         }
         return new LinkedHashMap<String, Object>();
     }
