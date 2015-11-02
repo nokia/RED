@@ -135,7 +135,7 @@ public class VariableDefinitionLocator {
         }
         return Optional.absent();
     }
-
+    
     private Optional<VoidResult> locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
@@ -144,8 +144,12 @@ public class VariableDefinitionLocator {
                 continue;
             }
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
-
-            return locateInCurrentFile(resourceSuiteFile, detector);
+            final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
+            locateInResourceFiles(nestedResources, detector);
+            final Optional<VoidResult> result = locateInCurrentFile(resourceSuiteFile, detector);
+            if(!result.equals(Optional.absent())) {
+                return Optional.of(new VoidResult());
+            }
         }
         return Optional.absent();
     }
