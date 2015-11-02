@@ -272,21 +272,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_VARIABLES_IMPORT)
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
                         pathToken);
-            } else {
-                boolean isDefinedInProject = false;
-                for (final String p : suiteFile.getProject().getVariableFilePaths()) {
-                    final Path projectDefinedFilePath = new Path(p);
-                    if (projectDefinedFilePath.equals(resource.getFullPath())
-                            || projectDefinedFilePath.equals(resource.getLocation())) {
-                        isDefinedInProject = true;
-                    }
-                }
-                if (!isDefinedInProject) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(GeneralSettingsProblem.INVALID_VARIABLES_IMPORT)
-                                    .formatMessageWith(path, ": Variable files should be defined in red.xml file"),
-                            suiteFile.getFile(), pathToken);
-                }
             }
         }
     }
