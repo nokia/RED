@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dEBUwBtDEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/30/15 4:03 PM
+Save-Time: 11/3/15 4:02 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -20,23 +20,23 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" 
     | select "ScriptWithResource/BigScript.robot" | double-click
 
-get-editor "BigScript.robot" | get-text-viewer | set-caret-pos 1 1
-get-button "Run.*.robot" | click
-get-button "Debug .*.robot" | click
+//get-editor "BigScript.robot" | get-text-viewer | set-caret-pos 1 1
+get-menu "Run/Run" | click
+get-menu "Run/Debug" | click
 
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/Tests/SecondInsideTest.robot" 
     | select "ScriptWithResource/Tests/SecondInsideTest.robot" | double-click
 
 
-get-button "Run .*.robot" | click
-get-button "Debug .*.robot" | click
+get-button "Run.*" | click
+get-button "Debug.*" | click
 
 
 get-editor "SecondInsideTest.robot" | close
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/Tests/SecondInsideTest.robot" 
     | select "ScriptWithResource/Tests/SecondInsideTest.robot" | get-menu Delete | click
 get-window "Delete Resources" | get-button OK | click
-get-button "Debug SecondInsideTest.robot" | click -arrow
+get-button "Debug.*" | click -arrow
 exec-with-options {
     get-menu "1 SecondInsideTest.robot" | click
     get-window "Problem Occurred" | get-label "'Launching SecondInsideTest.robot' has encountered a problem." 
