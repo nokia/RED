@@ -68,6 +68,8 @@ public class DeclarationMapper {
                 FilePosition previousForContainer = currentPosition;
                 MappingResult subResult = map(mappingResult, currentPosition,
                         subContainer, filename);
+                mappingResult.addCorrectVariables(subResult
+                        .getCorrectVariables());
                 mappingResult.addBuildMessages(subResult.getMessages());
                 if (topContainer != null) {
                     List<IElementDeclaration> mappedElements = subResult
@@ -195,7 +197,6 @@ public class DeclarationMapper {
                     } else {
                         mappingResult.addMappedElement(dec);
                     }
-
                     dec.setLevelUpElement(topContainer);
                 }
             } else {
@@ -300,15 +301,19 @@ public class DeclarationMapper {
                                         "Incorrect variable id with space between "
                                                 + idText.charAt(0)
                                                 + " and '{'.", getFileMapped());
-                        warnMessage.setFileRegion(new FileRegion(
-                                new FilePosition(currentPosition.getLine(),
+                        warnMessage
+                                .setFileRegion(new FileRegion(new FilePosition(
+                                        currentPosition.getLine(),
                                         currentPosition.getColumn(),
                                         currentPosition.getOffset()),
-                                new FilePosition(currentPosition.getLine(),
-                                        currentPosition.getColumn()
-                                                + typeId.getLength(),
-                                        currentPosition.getOffset()
-                                                + typeId.getLength())));
+                                        new FilePosition(currentPosition
+                                                .getLine(),
+                                                currentPosition.getColumn()
+                                                        + variableDec.getEnd()
+                                                                .getEnd(),
+                                                currentPosition.getOffset()
+                                                        + variableDec.getEnd()
+                                                                .getEnd())));
                         mappingResult.addBuildMessage(warnMessage);
                     }
                 }
