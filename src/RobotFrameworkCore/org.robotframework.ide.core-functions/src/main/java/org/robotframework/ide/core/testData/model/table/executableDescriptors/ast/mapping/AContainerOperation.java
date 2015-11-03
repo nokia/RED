@@ -30,9 +30,15 @@ public abstract class AContainerOperation implements IElementDeclaration {
 
 
     @Override
-    public void removeExactlyTheSameInstance(IElementDeclaration elementToRemove) {
-        // TODO Auto-generated method stub
-
+    public void removeExactlyTheSameInstance(
+            final IElementDeclaration elementToRemove) {
+        for (int i = 0; i < elementsDeclaredInside.size(); i++) {
+            IElementDeclaration d = elementsDeclaredInside.get(i);
+            if (d == elementToRemove) {
+                elementsDeclaredInside.remove(i);
+                i--;
+            }
+        }
     }
 
 

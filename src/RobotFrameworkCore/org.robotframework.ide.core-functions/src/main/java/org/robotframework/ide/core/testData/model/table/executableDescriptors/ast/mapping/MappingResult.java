@@ -55,6 +55,12 @@ public class MappingResult {
     }
 
 
+    public void updateMappedElements(final List<IElementDeclaration> mapped) {
+        mappedElements.clear();
+        addMappedElements(mappedElements);
+    }
+
+
     public List<IElementDeclaration> getMappedElements() {
         return Collections.unmodifiableList(mappedElements);
     }
@@ -67,6 +73,19 @@ public class MappingResult {
 
     public void addCorrectVariable(final VariableDeclaration variable) {
         correctVariables.add(variable);
+    }
+
+
+    public void addCorrectVariables(final List<VariableDeclaration> variables) {
+        for (VariableDeclaration variable : variables) {
+            addCorrectVariable(variable);
+        }
+    }
+
+
+    public void updateCorrectVariables(final List<VariableDeclaration> variables) {
+        correctVariables.clear();
+        addCorrectVariables(correctVariables);
     }
 
 
@@ -87,5 +106,16 @@ public class MappingResult {
 
     public String getFilename() {
         return fileName;
+    }
+
+
+    public void removeExactlyTheSameInstance(final IElementDeclaration elem) {
+        for (int i = 0; i < mappedElements.size(); i++) {
+            IElementDeclaration d = mappedElements.get(i);
+            if (d == elem) {
+                mappedElements.remove(i);
+                i--;
+            }
+        }
     }
 }
