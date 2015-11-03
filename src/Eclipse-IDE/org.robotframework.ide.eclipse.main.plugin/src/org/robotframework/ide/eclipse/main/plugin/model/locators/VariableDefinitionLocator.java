@@ -12,6 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.core.testData.importer.AVariableImported;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
@@ -133,7 +135,33 @@ public class VariableDefinitionLocator {
                 return Optional.of(new VoidResult());
             }
         }
+        
+        final ContinueDecision shouldContinue = locateInLocalVariableFiles(file, detector);
+        if (shouldContinue == ContinueDecision.STOP) {
+            return Optional.of(new VoidResult());
+        }
+        
         return Optional.absent();
+    }
+    
+    private ContinueDecision locateInLocalVariableFiles(final RobotSuiteFile file, final VariableDetector detector) {
+        for (VariablesFileImportReference variablesFileImportReference : file.getVariablesFromLocalReferencedFiles()) {
+            final String path = variablesFileImportReference.getImportDeclaration()
+                    .getPathOrName()
+                    .getText()
+                    .toString();
+            final ReferencedVariableFile localReferencedFile = new ReferencedVariableFile();
+            localReferencedFile.setPath(path);
+            localReferencedFile.setName(path);
+            for (AVariableImported<?> aVariableImported : variablesFileImportReference.getVariables()) {
+                final ContinueDecision shouldContinue = detector.varFileVariableDetected(localReferencedFile,
+                        aVariableImported.getRobotRepresentation(), aVariableImported.getValue());
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
+        }
+        return ContinueDecision.CONTINUE;
     }
     
     private Optional<VoidResult> locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
