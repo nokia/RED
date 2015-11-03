@@ -20,10 +20,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.robotframework.ide.core.testData.importer.VariablesFileImportReference;
 import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -371,6 +370,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return getProject().getVariablesFromReferencedFiles();
     }
     
+    public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
+        return fileOutput.getVariablesImportReferences();
+    }
+    
     public List<ARobotInternalVariable<?>> getGlobalVariables() {
         return getProject().getRobotProjectHolder().getGlobalVariables();
     }
@@ -386,23 +389,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             return alreadyImported;
         }
         return newArrayList();
-    }
-    
-    public List<String> getSectionHeaders() {
-        final RobotFile file = fileOutput.getFileModel();
-        final List<String> headersList = new ArrayList<>();
-        headersList.add(extractHeader(file.getSettingTable().getHeaders(), "*** Settings ***"));
-        headersList.add(extractHeader(file.getVariableTable().getHeaders(), "*** Variables ***"));
-        headersList.add(extractHeader(file.getTestCaseTable().getHeaders(), "*** Test Cases ***"));
-        headersList.add(extractHeader(file.getKeywordTable().getHeaders(), "*** Keywords ***"));
-        return headersList;
-    }
-
-    private String extractHeader(final List<TableHeader<? extends ARobotSectionTable>> modelHeaders, final String defaultHeader) {
-        if (!modelHeaders.isEmpty()) {
-            return modelHeaders.get(0).getTableHeader().getText().toString();
-        }
-        return defaultHeader;
     }
 
     public int getLineDelimiterLength() {
