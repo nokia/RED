@@ -138,6 +138,19 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
             }
             return varType;
         }
+
+
+        public static VariableType getTypeByChar(char varId) {
+            VariableType varType = null;
+            final String varIdText = "" + varId;
+            for (VariableType vt : values()) {
+                if (vt.getIdentificator().equals(varIdText)) {
+                    varType = vt;
+                    break;
+                }
+            }
+            return varType;
+        }
     }
 
 

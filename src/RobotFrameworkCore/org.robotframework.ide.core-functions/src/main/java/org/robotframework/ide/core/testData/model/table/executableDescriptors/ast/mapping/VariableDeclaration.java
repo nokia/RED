@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
+import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 
 
 public class VariableDeclaration extends AContainerOperation {
@@ -61,6 +62,19 @@ public class VariableDeclaration extends AContainerOperation {
 
     public TextPosition getTypeIdentficator() {
         return variableIdentificator;
+    }
+
+
+    public VariableType getRobotType() {
+        char c = (char) -1;
+        String text = getTypeIdentficator().getText();
+        if (!text.isEmpty()) {
+            c = text.charAt(0);
+        }
+
+        VariableType robotType = VariableType.getTypeByChar(c);
+
+        return robotType;
     }
 
 
@@ -145,28 +159,34 @@ public class VariableDeclaration extends AContainerOperation {
             type = GeneralVariableType.DYNAMIC;
         } else {
             String variableNameText = getVariableName().getText();
-            if (EXPONENT_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                type = Number.EXPONENT_NUMBER;
-            } else if (COMPUTATION_PATTERN.matcher(variableNameText).find()) {
-                type = GeneralVariableType.COMPUTATION;
-            } else if (NUMBER_PATTERN.matcher(variableNameText).find()) {
-                type = Number.NORMAL_NUMBER;
-            } else if (BINARY_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                type = Number.BINARY_NUMBER;
-            } else if (OCTAL_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                type = Number.OCTAL_NUMBER;
-            } else if (HEX_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                type = Number.HEX_NUMBER;
-            } else {
-                if (PYTHON_METHOD_INVOKE_PATTERN.matcher(variableNameText)
+            if (getTypeIdentficator().getText().charAt(0) == '$') {
+                if (EXPONENT_NUMBER_PATTERN.matcher(variableNameText).find()) {
+                    type = Number.EXPONENT_NUMBER;
+                } else if (COMPUTATION_PATTERN.matcher(variableNameText).find()) {
+                    type = GeneralVariableType.COMPUTATION;
+                } else if (NUMBER_PATTERN.matcher(variableNameText).find()) {
+                    type = Number.NORMAL_NUMBER;
+                } else if (BINARY_NUMBER_PATTERN.matcher(variableNameText)
                         .find()) {
-                    type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_METHOD;
-                } else if (PYTHON_GET_INVOKE_PATTERN.matcher(variableNameText)
+                    type = Number.BINARY_NUMBER;
+                } else if (OCTAL_NUMBER_PATTERN.matcher(variableNameText)
                         .find()) {
-                    type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET;
+                    type = Number.OCTAL_NUMBER;
+                } else if (HEX_NUMBER_PATTERN.matcher(variableNameText).find()) {
+                    type = Number.HEX_NUMBER;
                 } else {
-                    type = GeneralVariableType.NORMAL_TEXT;
+                    if (PYTHON_METHOD_INVOKE_PATTERN.matcher(variableNameText)
+                            .find()) {
+                        type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_METHOD;
+                    } else if (PYTHON_GET_INVOKE_PATTERN.matcher(
+                            variableNameText).find()) {
+                        type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET;
+                    }
                 }
+            }
+
+            if (type == null) {
+                type = GeneralVariableType.NORMAL_TEXT;
             }
         }
 
