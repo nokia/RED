@@ -76,7 +76,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                                 .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
                                 .thenCursorWillStopAtTheEndOfInsertion()
                                 .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(textToInsert)
+                                .displayedLabelShouldBe(keywordName)
                                 .labelShouldBeAugmentedWith(keywordProposal.getLabelDecoration())
                                 .proposalsShouldHaveIcon(ImagesManager.getImage(keywordProposal.getImage()))
                                 .create();
