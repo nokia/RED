@@ -230,7 +230,7 @@ class TestRunnerAgent:
                 if (type(vars[k]) is list) or (isinstance(vars[k], dict)):
                     data[k] = self.fix_unicode(vars[k])
                 else:
-                    data[k] = str(vars[k])
+                    data[k] = str(self.fix_unicode(vars[k]))
             self._send_socket('vars','vars',data)
         except AttributeError:
             self._send_socket('error')
