@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.importer;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -67,8 +68,8 @@ public class VariablesFileImportReference {
             final Object varValue = varsRead.get(varName);
             AVariableImported<?> var;
             if (varValue instanceof List) {
-                final ListVariableImported listVar = new ListVariableImported(""
-                        + varName);
+                final ListVariableImported listVar = new ListVariableImported(
+                        "" + varName);
                 listVar.setValue((List<?>) varValue);
                 var = listVar;
             } else if (varValue instanceof Map) {
@@ -76,6 +77,11 @@ public class VariablesFileImportReference {
                         "" + varName);
                 dictVar.setValue(convert((Map<?, ?>) varValue));
                 var = dictVar;
+            } else if (varValue.getClass().isArray()) {
+                final ListVariableImported arrayAsList = new ListVariableImported(
+                        "" + varName);
+                arrayAsList.setValue(Arrays.asList((Object[]) varValue));
+                var = arrayAsList;
             } else {
                 final ScalarVariableImported scalarVar = new ScalarVariableImported(
                         "" + varName);
@@ -87,6 +93,7 @@ public class VariablesFileImportReference {
         }
     }
 
+
     private Map<String, Object> convert(final Map<?, ?> m) {
         final Map<String, Object> map = new LinkedHashMap<>();
         for (final Object key : m.keySet()) {
@@ -94,6 +101,7 @@ public class VariablesFileImportReference {
         }
         return map;
     }
+
 
     public VariablesFileImportReference copy(
             final VariablesImport importDeclaration) {
