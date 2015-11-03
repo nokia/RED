@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.Te
 public class VariableDeclaration extends AContainerOperation {
 
     private final static Pattern COMPUTATION_PATTERN = Pattern
-            .compile("((?!\\s).)+(\\s)*([+]|[-]|[*]|[/]|[:])(\\s)*((?!\\s).)+");
+            .compile("((?!\\s).)+(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<])[=]*(\\s)*((?!\\s).)+");
     private final static Pattern NUMBER_PATTERN = Pattern
             .compile("^(//s)*([+]|[-])?(([0-9])+)([.]([0-9])+)?(//s)*$");
     private final static Pattern BINARY_NUMBER_PATTERN = Pattern
@@ -25,6 +25,10 @@ public class VariableDeclaration extends AContainerOperation {
             .compile("^(//s)*0[x|X]([0-9]|[a-f]|[A-F])+(//s)*$");
     private final static Pattern EXPONENT_NUMBER_PATTERN = Pattern
             .compile("^(//s)*([+]|[-])?(([0-9])+)[e|E]([+]|[-])?([0-9])+(//s)*$");
+    private final static Pattern PYTHON_METHOD_INVOKE_PATTERN = Pattern
+            .compile("^(//s)*([a-z]|[A-Z]).*[.].+([(].*[)])$");
+    private final static Pattern PYTHON_GET_INVOKE_PATTERN = Pattern
+            .compile("^(//s)*([a-z]|[A-Z]).*[.].+$");
 
     private IElementDeclaration levelUpElement;
     private TextPosition escape;
@@ -154,7 +158,15 @@ public class VariableDeclaration extends AContainerOperation {
             } else if (HEX_NUMBER_PATTERN.matcher(variableNameText).find()) {
                 type = Number.HEX_NUMBER;
             } else {
-                type = GeneralVariableType.NORMAL_TEXT;
+                if (PYTHON_METHOD_INVOKE_PATTERN.matcher(variableNameText)
+                        .find()) {
+                    type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_METHOD;
+                } else if (PYTHON_GET_INVOKE_PATTERN.matcher(variableNameText)
+                        .find()) {
+                    type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET;
+                } else {
+                    type = GeneralVariableType.NORMAL_TEXT;
+                }
             }
         }
         return type;
@@ -165,7 +177,7 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public enum GeneralVariableType implements IVariableType {
-        DYNAMIC, NORMAL_TEXT, COMPUTATION;
+        DYNAMIC, NORMAL_TEXT, PYTHON_SPECIFIC_INVOKE_VALUE_GET, PYTHON_SPECIFIC_INVOKE_METHOD, COMPUTATION;
     }
 
     public enum Number implements IVariableType {
