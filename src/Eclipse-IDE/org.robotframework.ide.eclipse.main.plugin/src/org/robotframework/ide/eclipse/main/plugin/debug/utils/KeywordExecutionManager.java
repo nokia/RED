@@ -50,7 +50,7 @@ public class KeywordExecutionManager {
 
     public IFile extractCurrentSuite(final IPath suiteFilePath) {
         currentSuiteName = suiteFilePath.lastSegment();
-        currentSuiteFile = extractSuiteFile(currentSuiteName, suiteFilePath.removeLastSegments(1).lastSegment(),
+        currentSuiteFile = extractSuiteFile(currentSuiteName, suiteFilePath.removeLastSegments(1),
                 suiteFilesToDebug);
         if (currentSuiteFile != null) {
             currentSuiteParent = currentSuiteFile.getParent();
@@ -153,14 +153,14 @@ public class KeywordExecutionManager {
         return hasHitCountConditionFullfilled;
     }
 
-    private IFile extractSuiteFile(final String suiteName, final String suiteParentName, final List<IResource> resources) {
+    private IFile extractSuiteFile(final String suiteName, final IPath suiteParentPath, final List<IResource> resources) {
         for (final IResource resource : resources) {
             if (resource.getName().equalsIgnoreCase(suiteName) && resource instanceof IFile
-                    && resource.getParent().getName().equalsIgnoreCase(suiteParentName)) {
+                    && isParentsEqual(suiteParentPath, resource)) {
                 return (IFile) resource;
             } else if (resource instanceof IContainer) {
                 try {
-                    final IFile file = extractSuiteFile(suiteName, suiteParentName,
+                    final IFile file = extractSuiteFile(suiteName, suiteParentPath,
                             Arrays.asList(((IContainer) resource).members()));
                     if (file != null) {
                         return file;
@@ -171,6 +171,13 @@ public class KeywordExecutionManager {
             }
         }
         return null;
+    }
+
+    private boolean isParentsEqual(final IPath suiteParentPath, final IResource resource) {
+        return resource.getParent()
+                .getName()
+                .equalsIgnoreCase(
+                        ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(suiteParentPath).getName());
     }
 
     private void extractResourceParent() {
