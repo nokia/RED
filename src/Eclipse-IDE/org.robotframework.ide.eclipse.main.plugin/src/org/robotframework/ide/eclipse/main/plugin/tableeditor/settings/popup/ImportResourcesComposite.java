@@ -134,7 +134,7 @@ public class ImportResourcesComposite {
             public void widgetSelected(final SelectionEvent e) {
                 final Shell newShell = new Shell(shell);
                 final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
-                dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.txt" });
+                dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.tsv", "*.txt" });
                 dialog.setFilterPath(currentProject.getLocation().toOSString());
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
@@ -161,7 +161,7 @@ public class ImportResourcesComposite {
                 final IResource initialProjectSelection = currentProject.findMember(path);
                 if (initialProjectSelection == null) {
                     final FileDialog dialog = new FileDialog(newShell, SWT.OPEN);
-                    dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.txt" });
+                    dialog.setFilterExtensions(new String[] { "*.*", "*.robot", "*.tsv", "*.txt" });
                     final IPath initialExtSelection = ImportSettingFilePathResolver.createFileAbsolutePath(path, currentProject);
                     dialog.setFilterPath(initialExtSelection.removeLastSegments(1).toOSString());
                     dialog.setFileName(initialExtSelection.lastSegment());
