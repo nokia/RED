@@ -65,15 +65,15 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="robot,txt"
+            file-extensions="robot,tsv,txt"
             id="org.robotframework.red.robotfile"
             name="Robot file"
             priority="normal">
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="robot,txt"
-            file-names="__init__.robot,__init__.txt"
+            file-extensions="robot,tsv,txt"
+            file-names="__init__.robot,__init__.tsv,__init__.txt"
             id="org.robotframework.red.robotsuiteinitfile"
             name="Robot suite initialization file"
             priority="normal">
@@ -81,7 +81,7 @@
       <content-type
             base-type="org.eclipse.core.runtime.text"
             describer="org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber"
-            file-extensions="robot,txt"
+            file-extensions="robot,tsv,txt"
             id="org.robotframework.red.robotsuitefile"
             name="Robot suite file"
             priority="normal">
