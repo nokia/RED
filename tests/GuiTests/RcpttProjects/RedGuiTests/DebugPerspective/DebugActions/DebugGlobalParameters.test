@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/28/15 5:18 PM
+Save-Time: 11/3/15 4:24 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -37,9 +37,17 @@ with [get-view Variables | get-tree] {
 }
 //check if all global varaibales are set
 
-try -times 10 -delay 200 -command {
- 
-	get-view Variables | get-tree |get-item "Global Variables" | get-property childCount | equals 21 | verify-true
+//try -times 10 -delay 200 -command {
+// 
+//	get-view Variables | get-tree |get-item "Global Variables" | get-property childCount | equals 21 | verify-true
+//}
+
+if [get-view Variables | get-tree | get-item "Global Variables" | get-property childCount -raw | int |not-eq 19]{
+	get-view Variables | get-tree | select "Global Variables"
+	get-view Variables | get-text-viewer | get-property text 
+    | equals "pokaz" | verify-true
+
+
 }
 
 with [get-view Variables | get-tree] {
