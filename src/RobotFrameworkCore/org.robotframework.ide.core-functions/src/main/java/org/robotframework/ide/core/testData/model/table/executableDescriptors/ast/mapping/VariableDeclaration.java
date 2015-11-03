@@ -169,6 +169,7 @@ public class VariableDeclaration extends AContainerOperation {
                 }
             }
         }
+
         return type;
     }
 
