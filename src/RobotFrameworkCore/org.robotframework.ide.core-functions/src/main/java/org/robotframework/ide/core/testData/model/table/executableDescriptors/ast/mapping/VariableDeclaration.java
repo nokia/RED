@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
+import java.util.List;
+
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 
 
@@ -56,7 +58,43 @@ public class VariableDeclaration extends AContainerOperation {
 
 
     public TextPosition getVariableName() {
-        return null;
+        TextPosition varName = null;
+        if (!isDynamic()) {
+            JoinedTextDeclarations nameJoined = new JoinedTextDeclarations();
+            List<IElementDeclaration> elementsDeclarationInside = super
+                    .getElementsDeclarationInside();
+            for (IElementDeclaration elem : elementsDeclarationInside) {
+                if (elem.isComplex()) {
+                    break;
+                } else {
+                    nameJoined.addElementDeclarationInside(elem);
+                }
+            }
+
+            varName = nameJoined.join();
+        }
+
+        return varName;
+    }
+
+
+    /**
+     * check if variable depends on other variables
+     * 
+     * @return
+     */
+    public boolean isDynamic() {
+        boolean result = false;
+        List<IElementDeclaration> elementsDeclarationInside = super
+                .getElementsDeclarationInside();
+        for (IElementDeclaration iElementDeclaration : elementsDeclarationInside) {
+            if (iElementDeclaration instanceof VariableDeclaration) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
 
