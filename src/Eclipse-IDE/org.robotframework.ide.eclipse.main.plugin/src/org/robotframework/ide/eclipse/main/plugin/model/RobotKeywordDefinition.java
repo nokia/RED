@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -80,7 +81,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         }
         for (final KeywordTimeout timeout : keyword.getTimeouts()) {
             final String name = timeout.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(timeout.getTimeout().getText().toString());
+            final List<String> args = timeout.getTimeout() == null ? new ArrayList<String>()
+                    : newArrayList(timeout.getTimeout().getText().toString());
             args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(timeout);
@@ -88,7 +90,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         }
         for (final KeywordTeardown teardown : keyword.getTeardowns()) {
             final String name = teardown.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(teardown.getKeywordName().getText().toString());
+            final List<String> args = teardown.getKeywordName() == null ? new ArrayList<String>()
+                    : newArrayList(teardown.getKeywordName().getText().toString());
             args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(teardown);
@@ -96,8 +99,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         }
         for (final KeywordReturn returnSetting : keyword.getReturns()) {
             final String name = returnSetting.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(
-                    Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
+            final List<String> args = returnSetting.getReturnValues() == null ? new ArrayList<String>()
+                    : Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString());
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(returnSetting);
             getChildren().add(setting);
