@@ -366,6 +366,10 @@
                 <test
                       property="org.eclipse.core.resources.extension"
                       value="robot">
+                </test>
+                <test
+                      property="org.eclipse.core.resources.extension"
+                      value="tsv">
                 </test></or>
           </and>
        </triggerPoints>
