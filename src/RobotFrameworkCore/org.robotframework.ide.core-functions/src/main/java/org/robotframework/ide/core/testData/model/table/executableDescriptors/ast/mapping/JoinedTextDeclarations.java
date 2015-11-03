@@ -76,6 +76,7 @@ public class JoinedTextDeclarations extends AContainerOperation {
         TextPosition t = null;
         String fullText = null;
         int inside = super.elementsDeclaredInside.size();
+        // get text added for check if text are coherent
         String text = getText();
         if (inside > 0 && !text.isEmpty()) {
             fullText = super.getElementsDeclarationInside().get(0).getStart()
