@@ -12,15 +12,14 @@ public class VariableDeclaration extends AContainerOperation {
 
     private IElementDeclaration levelUpElement;
     private TextPosition escape;
+    private TextPosition variableIdentificator;
     private final TextPosition variableStart;
-    private final TextPosition variableName;
     private final TextPosition variableEnd;
 
 
     public VariableDeclaration(final TextPosition variableStart,
-            final TextPosition variableName, final TextPosition variableEnd) {
+            final TextPosition variableEnd) {
         this.variableStart = variableStart;
-        this.variableName = variableName;
         this.variableEnd = variableEnd;
     }
 
@@ -40,6 +39,16 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
 
+    public TextPosition getTypeIdentficator() {
+        return variableIdentificator;
+    }
+
+
+    public void setTypeIdentificator(final TextPosition variableIdentficator) {
+        this.variableIdentificator = variableIdentficator;
+    }
+
+
     @Override
     public TextPosition getStart() {
         return variableStart;
@@ -47,7 +56,7 @@ public class VariableDeclaration extends AContainerOperation {
 
 
     public TextPosition getVariableName() {
-        return variableName;
+        return null;
     }
 
 

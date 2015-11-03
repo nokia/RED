@@ -99,7 +99,7 @@ public class ContainerMappingHelper {
             if (containerType == ContainerType.INDEX) {
                 dec = new IndexDeclaration(startPos, endPos);
             } else if (containerType == ContainerType.VARIABLE) {
-                dec = new VariableDeclaration(startPos, null, endPos);
+                dec = new VariableDeclaration(startPos, endPos);
             } else {
                 throw new UnsupportedOperationException("Type " + containerType
                         + " is not supported yet!");

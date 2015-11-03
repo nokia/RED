@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container.ContainerType;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
@@ -57,8 +58,8 @@ public class DeclarationMapper {
             mappingResult.addMappedElement(topContainer);
         }
         List<IContainerElement> elements = container.getElements();
-        for (int index = mappingHelper.getContentStart(); index < mappingHelper
-                .getContentEnd(); index++) {
+        int contentEnd = mappingHelper.getContentEnd();
+        for (int index = mappingHelper.getContentStart(); index < contentEnd; index++) {
             IContainerElement containerElement = elements.get(index);
             if (containerElement.isComplex()) {
                 Container subContainer = (Container) containerElement;
@@ -88,23 +89,87 @@ public class DeclarationMapper {
                 IElementDeclaration lastComplex = mappedElements
                         .get(mappedElements.size() - 1);
                 final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
-                if (variableIdentificator != null) {
+                if (lastComplex instanceof VariableDeclaration) {
                     VariableDeclaration variableDec = (VariableDeclaration) lastComplex;
                     List<IElementDeclaration> escape = getEscape(mappedElements);
                     if (!escape.isEmpty()) {
                         if (topContainer != null) {
+                            for (IElementDeclaration d : escape) {
+                                topContainer.removeExactlyTheSameInstance(d);
+                            }
                         } else {
-
+                            for (IElementDeclaration d : escape) {
+                                mappingResult.removeExactlyTheSameInstance(d);
+                            }
                         }
+
+                        variableDec.setEscape(escape.get(0).getStart());
+                    }
+
+                    if (variableIdentificator != null) {
+                        if (topContainer != null) {
+                            topContainer
+                                    .removeExactlyTheSameInstance(variableIdentificator);
+                        } else {
+                            mappingResult
+                                    .removeExactlyTheSameInstance(variableIdentificator);
+                        }
+                        variableDec.setTypeIdentificator(new TextPosition(
+                                variableIdentificator.getStart().getFullText(),
+                                variableIdentificator.getStart().getStart(),
+                                variableIdentificator.getEnd().getEnd()));
                     }
 
                     if (subContainer.isOpenForModification()) {
-
+                        variableDec.getEscape();
+                    } else {
+                        mappingResult.addCorrectVariable(variableDec);
                     }
                 } else {
                     IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
                     if (subContainer.isOpenForModification()) {
+                        TextDeclaration textDec = new TextDeclaration(
+                                indexDec.getStart(),
+                                ContainerElementType.SQUARE_BRACKET_OPEN);
+                        JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
+                        joinedStart.addElementDeclarationInside(textDec);
 
+                        if (topContainer != null) {
+                            topContainer.removeExactlyTheSameInstance(indexDec);
+                            topContainer
+                                    .addElementDeclarationInside(joinedStart);
+                        } else {
+                            mappingResult
+                                    .removeExactlyTheSameInstance(indexDec);
+                            mappingResult.addMappedElement(joinedStart);
+                        }
+                        joinedStart.setLevelUpElement(topContainer);
+
+                        List<IElementDeclaration> elementsDeclarationInside = indexDec
+                                .getElementsDeclarationInside();
+                        for (IElementDeclaration dec : elementsDeclarationInside) {
+                            if (dec.isComplex()) {
+                                if (dec.getEnd() != null) {
+                                    if (topContainer != null) {
+                                        topContainer
+                                                .addElementDeclarationInside(dec);
+                                    } else {
+                                        mappingResult.addMappedElement(dec);
+                                    }
+
+                                    dec.setLevelUpElement(topContainer);
+                                }
+                            } else {
+                                if (topContainer != null) {
+                                    topContainer
+                                            .addElementDeclarationInside(dec);
+                                } else {
+                                    mappingResult.addMappedElement(dec);
+                                }
+
+                                dec.setLevelUpElement(topContainer);
+                            }
+                        }
                     }
                 }
             } else {
@@ -178,7 +243,21 @@ public class DeclarationMapper {
                 IElementDeclaration lastSubContainer = mappedElements
                         .get(numberOfMapped - 1);
                 if (lastSubContainer instanceof VariableDeclaration) {
-                    elem = mappedElements.get(numberOfMapped - 2);
+                    IElementDeclaration previous = mappedElements
+                            .get(numberOfMapped - 2);
+                    JoinedTextDeclarations text = new JoinedTextDeclarations();
+                    text.addElementDeclarationInside(previous);
+                    String idText = text.getText();
+                    if (idText != null) {
+                        String trimmed = idText.trim();
+                        if (trimmed.length() == 1) {
+                            if (ContainerElementType.VARIABLE_TYPE_ID
+                                    .getRepresentation().contains(
+                                            trimmed.charAt(0))) {
+                                elem = previous;
+                            }
+                        }
+                    }
                 }
             }
         }
