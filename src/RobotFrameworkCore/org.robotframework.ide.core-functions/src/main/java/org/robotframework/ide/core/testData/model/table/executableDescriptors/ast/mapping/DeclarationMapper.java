@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.FileRegion;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container.ContainerType;
@@ -63,6 +65,7 @@ public class DeclarationMapper {
             IContainerElement containerElement = elements.get(index);
             if (containerElement.isComplex()) {
                 Container subContainer = (Container) containerElement;
+                FilePosition previousForContainer = currentPosition;
                 MappingResult subResult = map(mappingResult, currentPosition,
                         subContainer, filename);
                 mappingResult.addBuildMessages(subResult.getMessages());
@@ -120,10 +123,83 @@ public class DeclarationMapper {
                                 variableIdentificator.getEnd().getEnd()));
                     }
 
-                    if (subContainer.isOpenForModification()) {
-                        variableDec.getEscape();
-                    } else {
+                    if (seamsToBeCorrectRobotVariable(previousForContainer,
+                            mappingResult, variableDec)) {
                         mappingResult.addCorrectVariable(variableDec);
+                    } else {
+                        JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
+                        if (variableDec.isEscaped()) {
+                            TextDeclaration escapeDec = new TextDeclaration(
+                                    variableDec.getEscape(),
+                                    ContainerElementType.ESCAPE);
+                            joinedStart.addElementDeclarationInside(escapeDec);
+                        }
+                        if (variableDec.getTypeIdentficator() != null) {
+                            TextDeclaration typeId = new TextDeclaration(
+                                    variableDec.getTypeIdentficator(),
+                                    ContainerElementType.VARIABLE_TYPE_ID);
+                            joinedStart.addElementDeclarationInside(typeId);
+                        }
+                        TextDeclaration variableCurrlyBracket = new TextDeclaration(
+                                variableDec.getStart(),
+                                ContainerElementType.CURRLY_BRACKET_OPEN);
+                        joinedStart
+                                .addElementDeclarationInside(variableCurrlyBracket);
+
+                        if (topContainer != null) {
+                            topContainer
+                                    .removeExactlyTheSameInstance(variableDec);
+                            topContainer
+                                    .addElementDeclarationInside(joinedStart);
+                        } else {
+                            mappingResult
+                                    .removeExactlyTheSameInstance(variableDec);
+                            mappingResult.addMappedElement(joinedStart);
+                        }
+                        joinedStart.setLevelUpElement(topContainer);
+
+                        List<IElementDeclaration> elementsDeclarationInside = variableDec
+                                .getElementsDeclarationInside();
+                        for (IElementDeclaration dec : elementsDeclarationInside) {
+                            if (dec.isComplex()) {
+                                if (dec.getEnd() != null) {
+                                    if (topContainer != null) {
+                                        topContainer
+                                                .addElementDeclarationInside(dec);
+                                    } else {
+                                        mappingResult.addMappedElement(dec);
+                                    }
+
+                                    dec.setLevelUpElement(topContainer);
+                                }
+                            } else {
+                                if (topContainer != null) {
+                                    topContainer
+                                            .addElementDeclarationInside(dec);
+                                } else {
+                                    mappingResult.addMappedElement(dec);
+                                }
+
+                                dec.setLevelUpElement(topContainer);
+                            }
+                        }
+
+                        TextPosition end = variableDec.getEnd();
+                        if (end != null) {
+                            JoinedTextDeclarations joinedEnd = new JoinedTextDeclarations();
+                            joinedEnd
+                                    .addElementDeclarationInside(new TextDeclaration(
+                                            end,
+                                            ContainerElementType.CURRLY_BRACKET_CLOSE));
+                            if (topContainer != null) {
+                                topContainer
+                                        .addElementDeclarationInside(joinedEnd);
+                            } else {
+                                mappingResult.addMappedElement(joinedEnd);
+                            }
+
+                            joinedEnd.setLevelUpElement(topContainer);
+                        }
                     }
                 } else {
                     IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
@@ -203,6 +279,45 @@ public class DeclarationMapper {
     }
 
 
+    private boolean seamsToBeCorrectRobotVariable(
+            final FilePosition currentPosition,
+            final MappingResult mappingResult,
+            final VariableDeclaration variableDec) {
+        boolean result = false;
+        if (!variableDec.isEscaped()) {
+            TextPosition typeId = variableDec.getTypeIdentficator();
+            if (typeId != null) {
+                String idText = typeId.getText();
+                if (idText != null && !idText.isEmpty()) {
+                    if (idText.length() == 1) {
+                        if (variableDec.getEnd() != null) {
+                            result = true;
+                        }
+                    } else {
+                        BuildMessage warnMessage = BuildMessage
+                                .createWarnMessage(
+                                        "Incorrect variable id with space between "
+                                                + idText.charAt(0)
+                                                + " and '{'.", getFileMapped());
+                        warnMessage.setFileRegion(new FileRegion(
+                                new FilePosition(currentPosition.getLine(),
+                                        currentPosition.getColumn(),
+                                        currentPosition.getOffset()),
+                                new FilePosition(currentPosition.getLine(),
+                                        currentPosition.getColumn()
+                                                + typeId.getLength(),
+                                        currentPosition.getOffset()
+                                                + typeId.getLength())));
+                        mappingResult.addBuildMessage(warnMessage);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+
     private List<IElementDeclaration> getEscape(
             final List<IElementDeclaration> mappedElements) {
         final List<IElementDeclaration> varElements = new LinkedList<>();
@@ -250,7 +365,7 @@ public class DeclarationMapper {
                     String idText = text.getText();
                     if (idText != null) {
                         String trimmed = idText.trim();
-                        if (trimmed.length() == 1) {
+                        if (trimmed.length() >= 1) {
                             if (ContainerElementType.VARIABLE_TYPE_ID
                                     .getRepresentation().contains(
                                             trimmed.charAt(0))) {
