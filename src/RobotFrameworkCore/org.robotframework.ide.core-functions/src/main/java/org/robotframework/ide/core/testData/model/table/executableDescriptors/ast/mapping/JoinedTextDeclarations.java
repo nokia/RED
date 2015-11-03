@@ -72,6 +72,21 @@ public class JoinedTextDeclarations extends AContainerOperation {
     }
 
 
+    public TextPosition join() {
+        TextPosition t = null;
+        String fullText = null;
+        int inside = super.elementsDeclaredInside.size();
+        String text = getText();
+        if (inside > 0 && !text.isEmpty()) {
+            fullText = super.getElementsDeclarationInside().get(0).getStart()
+                    .getFullText();
+            t = new TextPosition(fullText, getStart().getStart(), getEnd()
+                    .getEnd());
+        }
+        return t;
+    }
+
+
     @Override
     public String toString() {
         return String.format("JoinedTextDeclarations [start=%s, end=%s]",
