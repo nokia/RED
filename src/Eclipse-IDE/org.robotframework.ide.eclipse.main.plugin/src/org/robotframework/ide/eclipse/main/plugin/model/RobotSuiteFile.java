@@ -79,8 +79,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return getSections(new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
-                final List<RobotFileOutput> outputs = getProject().getRobotParser().parse(file.getLocation().toFile());
-                return outputs.isEmpty() ? null : outputs.get(0);
+                if (getProject().getProject().exists()) {
+                    final List<RobotFileOutput> outputs = getProject().getRobotParser()
+                            .parse(file.getLocation().toFile());
+                    return outputs.isEmpty() ? null : outputs.get(0);
+                } else {
+                    // this can happen e.g. when renaming project
+                    return null;
+                }
             }
         });
     }
@@ -135,7 +141,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         getSections(new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
-                return getProject().getRobotParser().parseEditorContent(newContent, file.getLocation().toFile());
+                if (getProject().getProject().exists()) {
+                    return getProject().getRobotParser().parseEditorContent(newContent, file.getLocation().toFile());
+                }
+                // this can happen e.g. when renaming project
+                return null;
             }
         });
     }
