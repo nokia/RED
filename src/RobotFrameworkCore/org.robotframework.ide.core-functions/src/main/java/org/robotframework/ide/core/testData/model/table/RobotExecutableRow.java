@@ -88,7 +88,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     public boolean isExecutable() {
         RobotToken action = getAction();
         return (action != null && !action.getTypes().contains(
-                RobotTokenType.START_HASH_COMMENT));
+                RobotTokenType.START_HASH_COMMENT))
+                && isNotEmptyForContinoue();
+    }
+
+
+    private boolean isNotEmptyForContinoue() {
+        return getElementTokens().size() > 1
+                || !"\\".equals(action.getRaw().toString().trim());
     }
 
 
