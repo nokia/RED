@@ -47,7 +47,8 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
 
         if (mainPage.shouldInitFileBeCreated()) {
             try {
-                final IFile initFile = RobotProjectNature.createRobotInitializationFile(newFolder);
+                final IFile initFile = RobotProjectNature.createRobotInitializationFile(newFolder,
+                        mainPage.getInitFileExtension());
                 selectAndReveal(initFile);
 
                 final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
