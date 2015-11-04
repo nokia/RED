@@ -447,18 +447,14 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         useMapper = false;
                     } else {
                         // FIXME: add warning about incorrect table
-                        robotToken.getTypes().add(0,
-                                RobotTokenType.USER_OWN_TABLE_HEADER);
-
-                        processingState.clear();
-                        processingState.push(ParsingState.TRASH);
-
-                        useMapper = false;
                     }
                 } else {
                     // FIXME: add warning about wrong place
                 }
-            } else if (utility.isUserTableHeader(robotToken)
+            }
+
+            if (text.equals(robotToken.getRaw().toString())
+                    && utility.isUserTableHeader(robotToken)
                     && positionResolvers.isCorrectPosition(
                             PositionExpected.TABLE_HEADER, fileModel,
                             currentLine, robotToken)) {
