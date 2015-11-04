@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -84,6 +85,7 @@ public class KeywordDefinitionLocator {
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
             locateInResourceFiles(nestedResources, detector);
+            locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), detector);
             final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
@@ -95,6 +97,18 @@ public class KeywordDefinitionLocator {
     private RobotSuiteFile getSuiteFile(final IFile resourceFile) {
         return useCommonModel ? RedPlugin.getModelManager().createSuiteFile(resourceFile)
                 : new RobotSuiteFile(null, resourceFile);
+    }
+    
+    private ContinueDecision locateInLibrariesFromResourceFile(final Collection<LibrarySpecification> collection,
+            final KeywordDetector detector) {
+        final List<LibrarySpecification> libSpecsToLocate = new ArrayList<>();
+        for (LibrarySpecification spec : collection) {
+            if (!spec.isAccessibleWithoutImport()) {
+                libSpecsToLocate.add(spec);
+            }
+        }
+        locateInLibraries(libSpecsToLocate, detector);
+        return ContinueDecision.CONTINUE;
     }
 
     private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
