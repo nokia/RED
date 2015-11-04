@@ -19,6 +19,7 @@ In short:
 ## Updates
 - issue #1 - fixed non ascii characters in Document section cause Debug to fail 
 - Resource multilevel inheritance handling
+- Fixed empty sections in resources caused validation NPE
 
 ## What's in the package
 - Robot Perspective & Robot nature (Project,files and other file artefacts)
