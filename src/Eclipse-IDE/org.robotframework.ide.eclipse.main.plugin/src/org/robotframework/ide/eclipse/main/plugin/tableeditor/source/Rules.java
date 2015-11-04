@@ -66,7 +66,8 @@ public class Rules {
     }
 
     static IRule createCommentRule(final IToken token) {
-        return createCombinedRule(new EndOfLineRule("  #", token), new EndOfLineRule("\t#", token));
+        return createCombinedRule(new CommentOnLineBeginRule(token), new EndOfLineRule("  #", token),
+                new EndOfLineRule("\t#", token), new EndOfLineRule("| #", token));
     }
 
     static IRule createSectionHeaderRule(final IToken token) {
@@ -306,5 +307,34 @@ public class Rules {
             return true;
         }
         return false;
+    }
+
+    private static class CommentOnLineBeginRule implements IRule {
+
+        private final IToken token;
+
+        public CommentOnLineBeginRule(final IToken token) {
+            this.token = token;
+        }
+
+        @Override
+        public IToken evaluate(final ICharacterScanner scanner) {
+            if (scanner.getColumn() > 1) {
+                return Token.UNDEFINED;
+            }
+
+            final String commentStart = CharacterScannerUtilities.lookAhead(scanner, 1);
+            if (!commentStart.isEmpty() && "#".equals(commentStart)) {
+                while (true) {
+                    final int ch = scanner.read();
+                    if (ch == EOF || ch == '\r' || ch == '\n') {
+                        scanner.unread();
+                        return token;
+                    }
+                }
+            } else {
+                return Token.UNDEFINED;
+            }
+        }
     }
 }
