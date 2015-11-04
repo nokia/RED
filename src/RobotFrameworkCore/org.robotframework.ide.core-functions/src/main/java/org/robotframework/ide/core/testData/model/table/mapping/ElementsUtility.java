@@ -88,7 +88,10 @@ public class ElementsUtility {
         if (robotTokens.size() > 1) {
             List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(
                     robotTokens, fp);
-            if (tokensExactlyOnPosition.size() != 1) {
+            TableType currentTable = state.getTable();
+            if (tokensExactlyOnPosition.size() != 1
+                    || currentTable == TableType.KEYWORD
+                    || currentTable == TableType.TEST_CASE) {
                 List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
                 if (!headersPossible.isEmpty()) {
                     if (headersPossible.size() == 1) {
@@ -111,9 +114,9 @@ public class ElementsUtility {
 
                     if (correct == null) {
                         if (ParsingState.getSettingsStates().contains(state)
-                                || state.getTable() == TableType.VARIABLES
-                                || state.getTable() == TableType.KEYWORD
-                                || state.getTable() == TableType.TEST_CASE
+                                || currentTable == TableType.VARIABLES
+                                || currentTable == TableType.KEYWORD
+                                || currentTable == TableType.TEST_CASE
                                 || state == ParsingState.COMMENT) {
                             RobotToken newRobotToken = new RobotToken();
                             newRobotToken.setLineNumber(fp.getLine());
