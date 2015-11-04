@@ -15,6 +15,7 @@ import org.robotframework.ide.core.testData.model.RobotFile;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
 import org.robotframework.ide.core.testData.model.mapping.PreviousLineHandler;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
+import org.robotframework.ide.core.testData.model.table.ECompareResult;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ForDescriptorInfo;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
@@ -85,56 +86,70 @@ public class ElementsUtility {
 
         RobotToken correct = null;
         if (robotTokens.size() > 1) {
-            List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
-            if (!headersPossible.isEmpty()) {
-                if (headersPossible.size() == 1) {
-                    correct = headersPossible.get(0);
+            List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(
+                    robotTokens, fp);
+            if (tokensExactlyOnPosition.size() != 1) {
+                List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
+                if (!headersPossible.isEmpty()) {
+                    if (headersPossible.size() == 1) {
+                        correct = headersPossible.get(0);
+                    } else {
+                        // FIXME: error
+                    }
                 } else {
-                    // FIXME: error
+                    RobotToken comment = findCommentToken(robotTokens, text);
+                    if (comment != null) {
+                        correct = comment;
+                    } else {
+                        for (RobotToken rt : robotTokens) {
+                            if (parsingStateHelper.isTypeForState(state, rt)) {
+                                correct = rt;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (correct == null) {
+                        if (ParsingState.getSettingsStates().contains(state)
+                                || state.getTable() == TableType.VARIABLES
+                                || state.getTable() == TableType.KEYWORD
+                                || state.getTable() == TableType.TEST_CASE
+                                || state == ParsingState.COMMENT) {
+                            RobotToken newRobotToken = new RobotToken();
+                            newRobotToken.setLineNumber(fp.getLine());
+                            newRobotToken.setStartColumn(fp.getColumn());
+                            newRobotToken.setText(new StringBuilder(text));
+                            newRobotToken.setRaw(new StringBuilder(text));
+                            newRobotToken.setType(RobotTokenType.UNKNOWN);
+                            correct = newRobotToken;
+                        } else {
+                            // FIXME: info that nothing was found so token will
+                            // be
+                            // treat as UNKNOWN
+                            RobotToken newRobotToken = new RobotToken();
+                            newRobotToken.setLineNumber(fp.getLine());
+                            newRobotToken.setStartColumn(fp.getColumn());
+                            newRobotToken.setText(new StringBuilder(text));
+                            newRobotToken.setRaw(new StringBuilder(text));
+                            newRobotToken.setType(RobotTokenType.UNKNOWN);
+                            List<IRobotTokenType> types = newRobotToken
+                                    .getTypes();
+                            for (RobotToken currentProposal : robotTokens) {
+                                types.addAll(currentProposal.getTypes());
+                            }
+                            correct = newRobotToken;
+                        }
+                    }
                 }
             } else {
-
-                RobotToken comment = findCommentToken(robotTokens, text);
-                if (comment != null) {
-                    correct = comment;
-                } else {
-                    for (RobotToken rt : robotTokens) {
-                        if (parsingStateHelper.isTypeForState(state, rt)) {
-                            correct = rt;
-                            break;
-                        }
+                RobotToken exactlyOnPosition = tokensExactlyOnPosition.get(0);
+                List<IRobotTokenType> types = exactlyOnPosition.getTypes();
+                for (RobotToken currentProposal : robotTokens) {
+                    if (exactlyOnPosition != currentProposal) {
+                        types.addAll(currentProposal.getTypes());
                     }
                 }
-
-                if (correct == null) {
-                    if (ParsingState.getSettingsStates().contains(state)
-                            || state.getTable() == TableType.VARIABLES
-                            || state.getTable() == TableType.KEYWORD
-                            || state.getTable() == TableType.TEST_CASE
-                            || state == ParsingState.COMMENT) {
-                        RobotToken newRobotToken = new RobotToken();
-                        newRobotToken.setLineNumber(fp.getLine());
-                        newRobotToken.setStartColumn(fp.getColumn());
-                        newRobotToken.setText(new StringBuilder(text));
-                        newRobotToken.setRaw(new StringBuilder(text));
-                        newRobotToken.setType(RobotTokenType.UNKNOWN);
-                        correct = newRobotToken;
-                    } else {
-                        // FIXME: info that nothing was found so token will be
-                        // treat as UNKNOWN
-                        RobotToken newRobotToken = new RobotToken();
-                        newRobotToken.setLineNumber(fp.getLine());
-                        newRobotToken.setStartColumn(fp.getColumn());
-                        newRobotToken.setText(new StringBuilder(text));
-                        newRobotToken.setRaw(new StringBuilder(text));
-                        newRobotToken.setType(RobotTokenType.UNKNOWN);
-                        List<IRobotTokenType> types = newRobotToken.getTypes();
-                        for (RobotToken currentProposal : robotTokens) {
-                            types.addAll(currentProposal.getTypes());
-                        }
-                        correct = newRobotToken;
-                    }
-                }
+                correct = exactlyOnPosition;
             }
         } else {
             RobotToken token = robotTokens.get(0);
@@ -178,6 +193,21 @@ public class ElementsUtility {
         }
 
         return correct;
+    }
+
+
+    private List<RobotToken> getTokensExactlyOnPosition(
+            final List<RobotToken> robotTokens,
+            final FilePosition currentPosition) {
+        List<RobotToken> tokens = new LinkedList<>();
+        for (final RobotToken rt : robotTokens) {
+            if (currentPosition.compare(rt.getFilePosition(), false) == ECompareResult.EQUAL_TO
+                    .getValue()) {
+                tokens.add(rt);
+            }
+        }
+
+        return tokens;
     }
 
 

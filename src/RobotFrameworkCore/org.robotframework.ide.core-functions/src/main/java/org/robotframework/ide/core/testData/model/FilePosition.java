@@ -5,15 +5,11 @@
  */
 package org.robotframework.ide.core.testData.model;
 
+import org.robotframework.ide.core.testData.model.table.ECompareResult;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 
 
 public class FilePosition {
-
-    private static final int LESS_THAN = -1;
-    private static final int EQUAL = 0;
-    private static final int GREATER_THAN = 1;
-    private static final int COMPARE_NOT_SET = -2;
 
     public static final int NOT_SET = IRobotLineElement.NOT_SET;
     private final int line;
@@ -61,56 +57,69 @@ public class FilePosition {
 
 
     public boolean isBefore(FilePosition other) {
-        return (compare(other) == LESS_THAN);
+        return (compare(other) == ECompareResult.LESS_THAN.getValue());
     }
 
 
     public boolean isAfter(FilePosition other) {
-        return (compare(other) == GREATER_THAN);
+        return (compare(other) == ECompareResult.GREATER_THAN.getValue());
     }
 
 
     public boolean isSamePlace(FilePosition other) {
-        return (compare(other) == EQUAL);
+        return (compare(other) == ECompareResult.EQUAL_TO.getValue());
     }
 
 
     public int compare(FilePosition other) {
-        int result;
+        return compare(other, true);
+    }
+
+
+    public int compare(FilePosition other, boolean shouldCheckOffset) {
+        ECompareResult result;
         if (other != null) {
             int otherOffset = other.getOffset();
             int otherLine = other.getLine();
             int otherColumn = other.getColumn();
 
-            result = compare(offset, otherOffset);
-            if (result == COMPARE_NOT_SET) {
+            if (shouldCheckOffset) {
+                result = compare(offset, otherOffset);
+            } else {
+                result = ECompareResult.COMPARE_NOT_SET;
+            }
+
+            if (result == ECompareResult.COMPARE_NOT_SET
+                    || result == ECompareResult.EQUAL_TO) {
                 result = compare(line, otherLine);
             }
-            if (result == COMPARE_NOT_SET) {
+            if (result != ECompareResult.COMPARE_NOT_SET
+                    || result == ECompareResult.EQUAL_TO) {
                 result = compare(column, otherColumn);
             }
 
-            if (result == COMPARE_NOT_SET) {
-                result = EQUAL;
+            if (result == ECompareResult.COMPARE_NOT_SET) {
+                result = ECompareResult.EQUAL_TO;
             }
         } else {
-            result = GREATER_THAN;
+            result = ECompareResult.GREATER_THAN;
         }
 
-        return result;
+        return result.getValue();
     }
 
 
-    private int compare(int valuePosO1, int valuePosO2) {
-        int result;
+    private ECompareResult compare(int valuePosO1, int valuePosO2) {
+        ECompareResult result;
         if (valuePosO1 != NOT_SET && valuePosO2 != NOT_SET) {
-            result = Integer.compare(valuePosO1, valuePosO2);
+            result = ECompareResult
+                    .map(Integer.compare(valuePosO1, valuePosO2));
         } else if (valuePosO1 != NOT_SET) {
-            result = GREATER_THAN;
+            result = ECompareResult.GREATER_THAN;
         } else if (valuePosO2 != NOT_SET) {
-            result = LESS_THAN;
+            result = ECompareResult.LESS_THAN;
         } else {
-            result = COMPARE_NOT_SET;
+            result = ECompareResult.COMPARE_NOT_SET;
         }
 
         return result;
