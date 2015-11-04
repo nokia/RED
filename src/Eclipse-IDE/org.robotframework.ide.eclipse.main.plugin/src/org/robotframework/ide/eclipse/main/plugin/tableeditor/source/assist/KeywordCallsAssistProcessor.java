@@ -14,12 +14,14 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 
@@ -67,6 +69,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                     if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())) {
                         final String textToInsert = keywordName + separator;
 
+                        final List<String> args = keywordProposal.getArguments();
+                        final String arguments = args.isEmpty() ? "no arguments" : Joiner.on(" | ").join(args);
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                                 .will(assist.getAcceptanceMode())
                                 .theText(textToInsert)
@@ -74,6 +78,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)
                                 .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
+                                .contextInformationShouldBeShownAfterAccepting(new ContextInformation(keywordName, arguments))
                                 .thenCursorWillStopAtTheEndOfInsertion()
                                 .currentPrefixShouldBeDecorated()
                                 .displayedLabelShouldBe(keywordName)

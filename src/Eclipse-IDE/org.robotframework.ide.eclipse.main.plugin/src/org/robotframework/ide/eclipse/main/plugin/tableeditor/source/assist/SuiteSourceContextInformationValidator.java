@@ -6,26 +6,32 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
 /**
  * @author mmarzec
  *
  */
-public class SuiteSourceContextInformationValidator implements IContextInformationValidator{
+public class SuiteSourceContextInformationValidator
+        implements IContextInformationValidator, IContextInformationPresenter {
 	
 	private ITextViewer viewer;
+    private IContextInformation contextInformation;
 	
 	private int currentLine;
 	private int currentOffset;
+
 	
 	@Override
 	public void install(final IContextInformation contextInformation, final ITextViewer viewer, final int offset) {
 		this.viewer = viewer;
+        this.contextInformation = contextInformation;
 		
-		currentLine = viewer.getTextWidget().getLineAtOffset(offset);
-		currentOffset = offset;
+		this.currentLine = viewer.getTextWidget().getLineAtOffset(offset);
+        this.currentOffset = offset;
 	}
 
 	@Override
@@ -33,4 +39,10 @@ public class SuiteSourceContextInformationValidator implements IContextInformati
         final int line = viewer.getTextWidget().getLineAtOffset(offset);
         return line == currentLine && offset >= currentOffset;
 	}
+
+    @Override
+    public boolean updatePresentation(final int offset, final TextPresentation presentation) {
+        // todo : possibly update context informations
+        return false;
+    }
 }
