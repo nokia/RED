@@ -111,7 +111,11 @@ public class RedKeywordProposal {
     }
 
     public String getArgumentsLabel() {
-        return "[" + Joiner.on(" | ").join(argumentsProvider.provide()) + "]";
+        return "[" + Joiner.on(" | ").join(getArguments()) + "]";
+    }
+
+    public List<String> getArguments() {
+        return argumentsProvider.provide();
     }
 
     private static interface LazyProvider<T> {
