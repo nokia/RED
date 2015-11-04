@@ -6,10 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 
 /**
  * @author Michal Anglart
@@ -50,29 +49,5 @@ public enum SyntaxHighlightingCategory {
 
     public ColoringPreference getDefault() {
         return defaultPref;
-    }
-
-    public static class ColoringPreference {
-
-        private final RGB color;
-
-        private final int fontStyle;
-
-        public ColoringPreference(final RGB color, final int fontStyle) {
-            this.color = color;
-            this.fontStyle = fontStyle;
-        }
-
-        Color getColor() {
-            return ColorsManager.getColor(color);
-        }
-
-        public int getFontStyle() {
-            return fontStyle;
-        }
-
-        public RGB getRgb() {
-            return color;
-        }
     }
 }
