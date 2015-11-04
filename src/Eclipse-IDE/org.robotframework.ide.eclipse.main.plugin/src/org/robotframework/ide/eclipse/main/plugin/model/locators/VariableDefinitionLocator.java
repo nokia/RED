@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -61,7 +64,8 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile), detector);
+        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile),
+                newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
@@ -77,7 +81,8 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile), detector);
+        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile),
+                newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
@@ -101,7 +106,7 @@ public class VariableDefinitionLocator {
             }
             return locateInPreviousCalls(file, detector, parent, call);
         }
-        return ContinueDecision.STOP;
+        return ContinueDecision.CONTINUE;
     }
 
     private ContinueDecision locateInKeywordArguments(final RobotSuiteFile file, final VariableDetector detector,
@@ -147,21 +152,19 @@ public class VariableDefinitionLocator {
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final VariableDetector detector) {
         final Optional<RobotVariablesSection> section = file.findSection(RobotVariablesSection.class);
-        if (!section.isPresent()) {
-            return ContinueDecision.CONTINUE;
-        }
-        for (final RobotVariable var : section.get().getChildren()) {
-            final ContinueDecision shouldContinue = detector.variableDetected(file, var);
+        if (section.isPresent()) {
+            for (final RobotVariable var : section.get().getChildren()) {
+                final ContinueDecision shouldContinue = detector.variableDetected(file, var);
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
+
+            final ContinueDecision shouldContinue = locateInLocalVariableFiles(file, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
         }
-        
-        final ContinueDecision shouldContinue = locateInLocalVariableFiles(file, detector);
-        if (shouldContinue == ContinueDecision.STOP) {
-            return ContinueDecision.STOP;
-        }
-        
         return ContinueDecision.CONTINUE;
     }
     
@@ -185,18 +188,27 @@ public class VariableDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
     
-    private ContinueDecision locateInResourceFiles(final List<IPath> resources, final VariableDetector detector) {
+    private ContinueDecision locateInResourceFiles(final List<IPath> resources, final Set<IFile> alreadyVisited,
+            final VariableDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
             final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
-            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE) {
+            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
+                    || alreadyVisited.contains(resourceFile)) {
                 continue;
             }
+            
+            final Set<IFile> visited = newHashSet(alreadyVisited);
+            visited.add((IFile) resourceFile);
+
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
-            locateInResourceFiles(nestedResources, detector);
-            final ContinueDecision result = locateInCurrentFile(resourceSuiteFile, detector);
-            if(!result.equals(Optional.absent())) {
+            ContinueDecision result = locateInResourceFiles(nestedResources, visited, detector);
+            if (result == ContinueDecision.STOP) {
+                return ContinueDecision.STOP;
+            }
+            result = locateInCurrentFile(resourceSuiteFile, detector);
+            if (result == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
         }
