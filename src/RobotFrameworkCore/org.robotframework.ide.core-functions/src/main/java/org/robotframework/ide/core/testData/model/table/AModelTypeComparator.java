@@ -26,7 +26,7 @@ public abstract class AModelTypeComparator<T extends AModelElement<?>>
 
     @Override
     public int compare(T modelElement1, T modelElement2) {
-        int result = ECompareResult.EQUAL.getValue();
+        int result = ECompareResult.EQUAL_TO.getValue();
         FilePosition filePos1 = modelElement1.getBeginPosition();
         FilePosition filePos2 = modelElement2.getBeginPosition();
 
@@ -35,9 +35,9 @@ public abstract class AModelTypeComparator<T extends AModelElement<?>>
                     position.get(modelElement1.getModelType()),
                     position.get(modelElement2.getModelType()));
         } else if (filePos1.isNotSet()) {
-            result = ECompareResult.LESS.getValue();
+            result = ECompareResult.LESS_THAN.getValue();
         } else if (filePos2.isNotSet()) {
-            result = ECompareResult.GREATER.getValue();
+            result = ECompareResult.GREATER_THAN.getValue();
         } else {
             result = filePos1.compare(filePos2);
         }
