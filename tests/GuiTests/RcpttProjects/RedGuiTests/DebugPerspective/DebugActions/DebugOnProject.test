@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BW-V4B8oEeWYlfCPyvfohw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/26/15 2:32 PM
+Save-Time: 11/4/15 12:55 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -33,130 +33,131 @@ with [get-editor "SecondInsideTest.robot" | get-left-ruler | get-ruler-column An
     double-click-ruler 12
 }
 
-
+exec-with-options -disableJobWaiting -command {
 //run  Debug as on Project
-get-view "Project Explorer" | get-tree | select ScriptWithResource | select ScriptWithResource 
-    | get-menu "Debug As/1 Robot Test" | click
-
-
-try -times 10 -delay 200 -command{
-	//debug stops on first breakpoint
-	with [get-view Debug | get-tree] {
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
-	        | verify-true
+	get-view "Project Explorer" | get-tree | select ScriptWithResource | select ScriptWithResource 
+	    | get-menu "Debug As/1 Robot Test" | click
+	
+	
+	try -times 10 -delay 200 -command{
+		//debug stops on first breakpoint
+		with [get-view Debug | get-tree] {
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
+		        | verify-true
+		}
 	}
-}
-
-//step in
-exec-with-options -disableJobWaiting -command {    
-	get-button "Step Into (F5)" | click
-}
-//will stop on first line in keyword
-with [get-tab-folder -index 2] {
-    get-property "pages[0]" | equals "BigScript.robot" | verify-true
-    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
-    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
-    get-property activePage | equals "my_keywords.robot" | verify-true
-    get-property tabCount | equals 3 | verify-true
-}
-check-debug-marker-on-ruler -line 13 -script_name "my_keywords.robot"
-try -times 5 -delay 200 -command{
-	with [get-view Debug | get-tree] {
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log [line:13]" | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
-	        | verify-true
+	
+	//step in
+ 
+		get-button "Step Into (F5)" | click
+	
+	//will stop on first line in keyword
+	with [get-tab-folder -index 2] {
+	    get-property "pages[0]" | equals "BigScript.robot" | verify-true
+	    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
+	    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
+	    get-property activePage | equals "my_keywords.robot" | verify-true
+	    get-property tabCount | equals 3 | verify-true
 	}
-}
-
-//resume - will stop again on my_keyword but now on breakpoint
-get-button "Resume (F8)" | click
-
-try -times 5 -delay 200 -command{
-	with [get-view Debug | get-tree] {
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
-	        | verify-true
+	check-debug-marker-on-ruler -line 13 -script_name "my_keywords.robot"
+	try -times 5 -delay 200 -command{
+		with [get-view Debug | get-tree] {
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log [line:13]" | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
+		        | verify-true
+		}
 	}
-}
-
-with [get-tab-folder -index 2] {
-    get-property "pages[0]" | equals "BigScript.robot" | verify-true
-    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
-    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
-    get-property activePage | equals "my_keywords.robot" | verify-true
-    get-property tabCount | equals 3 | verify-true
-}
-check-debug-marker-on-ruler -line 14 -script_name "my_keywords.robot"
-
-
-//resume - will stop again on on break point form line 70 from BigScript.robot
-exec-with-options -disableJobWaiting -command {  
+	
+	//resume - will stop again on my_keyword but now on breakpoint
 	get-button "Resume (F8)" | click
-}
-
-try -times 10 -delay 200 -command{
-	with [get-view Debug | get-tree] {
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "my_keywords.Validate string [line:70]" | verify-true
+	
+	try -times 5 -delay 200 -command{
+		with [get-view Debug | get-tree] {
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
+		        | verify-true
+		}
 	}
-}
+	
+	with [get-tab-folder -index 2] {
+	    get-property "pages[0]" | equals "BigScript.robot" | verify-true
+	    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
+	    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
+	    get-property activePage | equals "my_keywords.robot" | verify-true
+	    get-property tabCount | equals 3 | verify-true
+	}
+	check-debug-marker-on-ruler -line 14 -script_name "my_keywords.robot"
+	
+	
+	//resume - will stop again on on break point form line 70 from BigScript.robot
+  
+		get-button "Resume (F8)" | click
+	
+	
+	try -times 10 -delay 200 -command{
+		with [get-view Debug | get-tree] {
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals "my_keywords.Validate string [line:70]" | verify-true
+		}
+	}
+	
+	with [get-tab-folder -index 2] {
+	    get-property "pages[0]" | equals "BigScript.robot" | verify-true
+	    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
+	    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
+	    get-property activePage | equals "my_keywords.robot" | verify-true
+	    get-property tabCount | equals 3 | verify-true
+	}
+	check-debug-marker-on-ruler -line 14 -script_name "my_keywords.robot"
+	
+	
+	//resume - will stop again on SecondTest
 
-with [get-tab-folder -index 2] {
-    get-property "pages[0]" | equals "BigScript.robot" | verify-true
-    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
-    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
-    get-property activePage | equals "my_keywords.robot" | verify-true
-    get-property tabCount | equals 3 | verify-true
-}
-check-debug-marker-on-ruler -line 14 -script_name "my_keywords.robot"
-
-
-//resume - will stop again on SecondTest
-exec-with-options -disableJobWaiting -command { 
+		get-button "Resume (F8)" | click
+	
+	
+	try -times 10 -delay 200 -command{
+		with [get-view Debug | get-tree] {
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
+		        | verify-true
+		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "${count} = BuiltIn.Evaluate [line:12]" | verify-true
+		}
+	}
+	with [get-tab-folder -index 2] {
+	    get-property "pages[0]" | equals "BigScript.robot" | verify-true
+	    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
+	    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
+	    get-property activePage | equals "SecondInsideTest.robot" | verify-true
+	    get-property tabCount | equals 3 | verify-true
+	}
+	check-debug-marker-on-ruler -line 12 -script_name "SecondInsideTest.robot"
+	
+	//Resume - script will end
 	get-button "Resume (F8)" | click
-}
-
-try -times 10 -delay 200 -command{
-	with [get-view Debug | get-tree] {
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
-	        | verify-true
-	    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${count} = BuiltIn.Evaluate [line:12]" | verify-true
+	
+	try -times 5 -delay 200 -command{
+	get-view Debug | get-tree 
+	    | get-item "<terminated>ScriptWithResource \\[Robot\\]/<terminated, exit value: 1>.*" 
+	    | get-property caption | contains "<terminated, exit value: 1" | verify-true
 	}
-}
-with [get-tab-folder -index 2] {
-    get-property "pages[0]" | equals "BigScript.robot" | verify-true
-    get-property "pages[1]" | equals "my_keywords.robot" | verify-true
-    get-property "pages[2]" | equals "SecondInsideTest.robot" | verify-true
-    get-property activePage | equals "SecondInsideTest.robot" | verify-true
-    get-property tabCount | equals 3 | verify-true
-}
-check-debug-marker-on-ruler -line 12 -script_name "SecondInsideTest.robot"
-
-//Resume - script will end
-get-button "Resume (F8)" | click
-
-try -times 5 -delay 200 -command{
-get-view Debug | get-tree 
-    | get-item "<terminated>ScriptWithResource \\[Robot\\]/<terminated, exit value: 1>.*" 
-    | get-property caption | contains "<terminated, exit value: 1" | verify-true
 }
 
 get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
