@@ -453,7 +453,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 }
             }
 
-            if (text.equals(robotToken.getRaw().toString())
+            if (!wasRecognizedCorrectly
+                    && !text.equals(robotToken.getRaw().toString())
                     && utility.isUserTableHeader(robotToken)
                     && positionResolvers.isCorrectPosition(
                             PositionExpected.TABLE_HEADER, fileModel,
