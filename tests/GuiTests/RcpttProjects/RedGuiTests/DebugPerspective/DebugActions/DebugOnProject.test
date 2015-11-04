@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BW-V4B8oEeWYlfCPyvfohw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 12:55 PM
+Save-Time: 11/4/15 3:35 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -39,7 +39,7 @@ exec-with-options -disableJobWaiting -command {
 	    | get-menu "Debug As/1 Robot Test" | click
 	
 	
-	try -times 10 -delay 200 -command{
+	try -times 5-delay 500 -command{
 		//debug stops on first breakpoint
 		with [get-view Debug | get-tree] {
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
