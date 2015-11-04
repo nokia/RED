@@ -27,7 +27,7 @@ public class RobotProjectNature implements IProjectNature {
 
     private static String ROBOT_LIBRARIES_BUILDER = RedPlugin.PLUGIN_ID + ".robotLibrariesBuilder";
 
-    private static String SUITE_INIT_FILE = "__init__.robot";
+    private static String SUITE_INIT_FILE = "__init__";
 
 	private IProject project;
 
@@ -51,19 +51,23 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
     }
 
-    public static IFile createRobotInitializationFile(final IFolder folder) throws CoreException {
-        final IFile initFile = folder.getFile(SUITE_INIT_FILE);
+    public static IFile createRobotInitializationFile(final IFolder folder, final String extension)
+            throws CoreException {
+        final IFile initFile = folder.getFile(SUITE_INIT_FILE + "." + extension);
         initFile.create(new ByteArrayInputStream(new byte[0]), true, new NullProgressMonitor());
         return initFile;
     }
 
     public static boolean isRobotSuiteInitializationFile(final IFile file) {
-        return file.exists() && file.getName().equals(SUITE_INIT_FILE) && hasRobotNature(file.getProject());
+        final String name = file.getName();
+        return file.exists() && (name.equals(SUITE_INIT_FILE + ".robot") || name.equals(SUITE_INIT_FILE + ".tsv"))
+                && hasRobotNature(file.getProject());
     }
 
     public static boolean isRobotSuite(final IFolder folder) {
-        final IFile file = folder.getFile(SUITE_INIT_FILE);
-        return file.exists() && hasRobotNature(folder.getProject());
+        final IFile robotFile = folder.getFile(SUITE_INIT_FILE + ".robot");
+        final IFile tsvFile = folder.getFile(SUITE_INIT_FILE + ".tsv");
+        return (robotFile.exists() || tsvFile.exists()) && hasRobotNature(folder.getProject());
     }
 
     public static boolean hasRobotNature(final IProject project) {
