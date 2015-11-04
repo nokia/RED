@@ -130,10 +130,10 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
                     .getProcessedFile()
                     .getAbsolutePath()))) {
                 resultReferences.add(resourceImportReference);
-            } else {
-                findImportReferencesByFileName(name, resourceImportReference.getReference()
-                        .getResourceImportReferences(), resultReferences);
             }
+            //try to find in nested resource files
+            findImportReferencesByFileName(name, resourceImportReference.getReference().getResourceImportReferences(),
+                    resultReferences);
         }
     }
     
