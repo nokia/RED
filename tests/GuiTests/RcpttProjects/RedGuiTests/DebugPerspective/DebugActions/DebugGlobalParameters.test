@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/3/15 5:52 PM
+Save-Time: 11/4/15 10:45 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -33,6 +33,13 @@ try -times 15 -delay 200 -command{
 }
 
 
+if [get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" -raw| int | gt 19]{
+
+	get-view Variables | get-tree | select "Global Variables"
+	get-view Variables | get-text-viewer | get-property text 
+	    | equals "not" | verify-true
+
+}
 
 get-view Variables | get-tree | select "Global Variables"
 get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" | equals 21| verify-true
