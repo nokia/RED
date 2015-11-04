@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 1:16 PM
+Save-Time: 11/4/15 3:28 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -34,7 +34,11 @@ exec-with-options -disableJobWaiting -command {
 	    | get-property caption | equals "REVERSE MY LIST [line:15]" | verify-true
 	}
 	
-	
+	with [get-tab-folder -index 1] {
+    double-click
+    get-tab-item Variables | click
+	}
+
 	if [get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" -raw| int | gt 19]{
 	
 		get-view Variables | get-tree | select "Global Variables"
