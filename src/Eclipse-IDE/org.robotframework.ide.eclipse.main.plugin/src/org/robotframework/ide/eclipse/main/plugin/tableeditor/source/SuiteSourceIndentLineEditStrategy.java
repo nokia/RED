@@ -11,10 +11,15 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
-
-import com.google.common.base.Strings;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
+
+    private final boolean isTsvFile;
+
+    public SuiteSourceIndentLineEditStrategy(final boolean isTsv) {
+        this.isTsvFile = isTsv;
+    }
 
     @Override
     public void customizeDocumentCommand(final IDocument document, final DocumentCommand command) {
@@ -22,7 +27,7 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
                 && TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
         } else if (command.length == 0 && "\t".equals(command.text)) {
-            command.text = Strings.repeat(" ", 4);
+            command.text = getSeparator();
         }
     }
 
@@ -66,5 +71,9 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
             offset++;
         }
         return end;
+    }
+
+    protected String getSeparator() {
+        return RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
     }
 }
