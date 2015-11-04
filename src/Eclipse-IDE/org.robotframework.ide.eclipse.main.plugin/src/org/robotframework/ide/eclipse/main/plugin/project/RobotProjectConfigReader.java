@@ -43,6 +43,10 @@ public class RobotProjectConfigReader {
 
     public RobotProjectConfig readConfiguration(final IFile file) {
         try {
+            if (file == null || file.getLocation() == null) {
+                throw new CannotReadProjectConfigurationException(
+                        "Project configuration file '" + file.getName() + "' does not exist");
+            }
             return readConfiguration(new FileReader(file.getLocation().toFile()));
         } catch (final FileNotFoundException e) {
             throw new CannotReadProjectConfigurationException("Project configuration file '" + file.getName()
