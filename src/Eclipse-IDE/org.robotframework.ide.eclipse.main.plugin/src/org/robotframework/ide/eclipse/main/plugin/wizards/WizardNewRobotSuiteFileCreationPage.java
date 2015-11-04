@@ -10,10 +10,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 
-class WizardNewRobotSuiteFileCreationPage extends WizardNewFileCreationPage {
+class WizardNewRobotSuiteFileCreationPage extends WizardNewRobotResourceFileCreationPage {
 
     WizardNewRobotSuiteFileCreationPage(final String pageName, final IStructuredSelection selection) {
         super(pageName, selection);

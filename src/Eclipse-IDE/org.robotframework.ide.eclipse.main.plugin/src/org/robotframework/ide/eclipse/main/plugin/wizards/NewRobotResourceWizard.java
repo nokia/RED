@@ -12,13 +12,12 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
-    private WizardNewFileCreationPage mainPage;
+    private WizardNewRobotResourceFileCreationPage mainPage;
 
     @Override
     public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
@@ -31,8 +30,7 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewFileCreationPage("New Robot Resource file", getSelection());
-        mainPage.setFileExtension("robot");
+        mainPage = new WizardNewRobotResourceFileCreationPage("New Robot Resource file", getSelection());
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Resource file");
         mainPage.setDescription("Create new Robot resource file");
@@ -42,6 +40,7 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
     @Override
     public boolean performFinish() {
+        mainPage.setExtension();
         final IFile newFile = mainPage.createNewFile();
         selectAndReveal(newFile);
 
