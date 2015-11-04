@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 1:13 PM
+Save-Time: 11/4/15 3:44 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -22,13 +22,13 @@ get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
-	    
-
-	try -times 10 -delay 300 -command{
-		get-view Debug | get-tree |get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
-	}
-	   
+	    	   
 	repeat [val index] -times 5 -command{
+	
+		try -times 10 -delay 300 -command{
+			get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+    			| get-property childCount | equals 3 | verify-true
+			}
 		//check highlighting
 		check-debug-marker-on-ruler -line 8 -script_name "For200TestSuite.robot"
 		
@@ -59,7 +59,10 @@ exec-with-options -disableJobWaiting -command {
 		//step over - will go to FOR KW
 		get-button "Step Over (F6)" | click
 	
-		wait 200
+		try -times 10 -delay 300 -command{
+		get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+    		| get-property childCount | equals 2 | verify-true
+		}
 	
 		check-debug-marker-on-ruler -line 7 -script_name "For200TestSuite.robot"	
 		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
