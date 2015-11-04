@@ -47,10 +47,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
-        createInsertionGroup(parent);
-    }
 
-    private void createInsertionGroup(final Composite parent) {
         createAutoActivationEditors(parent);
         createAcceptanceModeEditors(parent);
     }
