@@ -58,7 +58,7 @@ public class SuiteSourceAssistantContext {
     }
 
     public String getSeparatorToFollow() {
-        return assistPreferences.getSeparatorToFollow();
+        return assistPreferences.getSeparatorToFollow(getFile().getFileExtension().equals("tsv"));
     }
 
     public AcceptanceMode getAcceptanceMode() {
@@ -122,8 +122,8 @@ public class SuiteSourceAssistantContext {
             acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
         }
 
-        public String getSeparatorToFollow() {
-            return "    ";
+        public String getSeparatorToFollow(final boolean isTsvFile) {
+            return RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
         }
 
         public AcceptanceMode getAcceptanceMode() {
