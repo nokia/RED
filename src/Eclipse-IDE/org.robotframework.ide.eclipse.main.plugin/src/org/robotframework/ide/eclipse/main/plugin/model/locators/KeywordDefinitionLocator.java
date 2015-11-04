@@ -5,9 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -54,7 +57,7 @@ public class KeywordDefinitionLocator {
             return;
         }
         final List<IPath> resources = PathsResolver.getAbsoluteResourceFilesPaths(startingFile);
-        shouldContinue = locateInResourceFiles(resources, detector);
+        shouldContinue = locateInResourceFiles(resources, newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
@@ -75,18 +78,29 @@ public class KeywordDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private ContinueDecision locateInResourceFiles(final List<IPath> resources, final KeywordDetector detector) {
+    private ContinueDecision locateInResourceFiles(final List<IPath> resources, final Set<IFile> alreadyVisited,
+            final KeywordDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
             final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
-            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE) {
+            if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
+                    || alreadyVisited.contains(resourceFile)) {
                 continue;
             }
+            final Set<IFile> visited = newHashSet(alreadyVisited);
+            visited.add((IFile) resourceFile);
+
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
-            locateInResourceFiles(nestedResources, detector);
-            locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), detector);
-            final ContinueDecision shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
+            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, visited, detector);
+            if (shouldContinue == ContinueDecision.STOP) {
+                return ContinueDecision.STOP;
+            }
+            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), detector);
+            if (shouldContinue == ContinueDecision.STOP) {
+                return ContinueDecision.STOP;
+            }
+            shouldContinue = locateInCurrentFile(resourceSuiteFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
@@ -102,7 +116,7 @@ public class KeywordDefinitionLocator {
     private ContinueDecision locateInLibrariesFromResourceFile(final Collection<LibrarySpecification> collection,
             final KeywordDetector detector) {
         final List<LibrarySpecification> libSpecsToLocate = new ArrayList<>();
-        for (LibrarySpecification spec : collection) {
+        for (final LibrarySpecification spec : collection) {
             if (!spec.isAccessibleWithoutImport()) {
                 libSpecsToLocate.add(spec);
             }
