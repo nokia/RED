@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/14/15 11:24 AM
+Save-Time: 11/5/15 5:10 PM
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -94,6 +94,8 @@ with [get-view "Project Explorer" | get-tree] {
         | verify-true
 }
 */
+
+//----------------------------------------------------------------------------------------------------------------------
 //create new normal folder
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Folder" | click
 with [get-window "New Folder"] {
@@ -105,14 +107,31 @@ with [get-window "New Folder"] {
 //check that folder is empty
 get-view "Project Explorer" | get-tree | get-item "New/new_folder" | get-property childCount | equals 0 | verify-true
 
+
+//----------------------------------------------------------------------------------------------------------------------
 //create test suite
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suite" | click
+
+//check if deafult option is selected (.robot)
+with [get-window "New Robot Test Suite"] {
+    with [get-button "as .robot file"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals true | verify-true
+        get-property caption | equals "as .robot file" | verify-true
+    }
+    with [get-button "as .tsv file"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "as .tsv file" | verify-true
+        get-property selected | equals false | verify-true
+    }
+}
+
 with [get-window "New Robot Test Suite"] {
     get-editbox -after [get-label "File name:"] | set-text "new_suite.robot"
     get-button Finish | click
 }
 
-//check it robot suit is open and active
+//check it robot suite is open and active
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "new_suite.robot" | verify-true
     get-property activePage | equals "new_suite.robot" | verify-true
@@ -139,6 +158,38 @@ with [get-view Outline | get-tree] {
     get-property "getItems().TreeItem[0].getText()" | equals "new_suite.robot" | verify-true
 }
 
+
+//-----------------------------------------------------------------------------------------------------------
+//Create test suite with .tsv
+
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "new_tsv_suite"
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//check text and tabs
+with [get-editor "new_tsv_suite.tsv"] {
+    get-text-viewer | get-property text | equals "*** Test Cases ***" | verify-true
+    with [get-tab-folder] {
+        get-property "pages[0]" | equals "Test Cases" | verify-true
+        get-property "pages[1]" | equals Keywords | verify-true
+        get-property "pages[2]" | equals Settings | verify-true
+        get-property "pages[3]" | equals Variables | verify-true
+        get-property "pages[4]" | equals Source | verify-true
+        get-property activePage | equals Source | verify-true
+        get-property tabCount | equals 5 | verify-true
+    }
+}
+
+//Check outline
+with [get-view Outline | get-tree] {
+    get-item "new_tsv_suite.tsv" | get-property childCount | equals 0 | verify-true
+}
+
+
+//--------------------------------------------------------------------------------------------------------------
 //open red.xml normal
 get-view "Project Explorer" | get-tree | select "New/red.xml" | select "New/red.xml" | double-click
 
@@ -228,9 +279,29 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>1.0</configVersion>\n"
     + "</projectConfiguration>" | verify-true
-    
+
+
+//-----------------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder
 get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suites folder" | click
+
+with [get-window "New Robot Test Suites folder"] {
+    get-button "Create suite initialization file" | get-property selected | equals false | verify-true
+    with [get-button "as .robot file"] {
+        get-property enablement | equals false | verify-true
+        get-property caption | equals "as .robot file" | verify-true
+        get-property selected | equals true | verify-true
+        get-property kind | equals Radio | verify-true
+        get-property "getEnabled()" | equals false | verify-true
+    }
+    with [get-button "as .tsv file"] {
+        get-property enablement | equals false | verify-true
+        get-property caption | equals "as .tsv file" | verify-true
+        get-property selected | equals false | verify-true
+    }
+}
+
+
 with [get-window "New Robot Test Suites folder"] {
     with [get-editbox -after [get-label "Folder name:"]] {
         set-text "new_suite_folder"
@@ -239,7 +310,8 @@ with [get-window "New Robot Test Suites folder"] {
 }
 get-view "Project Explorer" | get-tree | get-item "New/new_suite_folder" | get-property childCount | equals 0 
     | verify-true
-    
+ 
+//-------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder with _init_
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suites folder" | click
 with [get-window "New Robot Test Suites folder"] {
@@ -259,10 +331,26 @@ with [get-view "Project Explorer" | get-tree] {
 get-editor "__init__.robot" | get-text-viewer | get-property text | equals "" | verify-true
 
 
+//-----------------------------------------------------------------------------------------------------------
+//add init.tsv
+get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suites folder" | click
+with [get-window "New Robot Test Suites folder"] {
+    get-button "Create suite initialization file" | check
+    get-button "as .tsv file" | click
+    wait 500
+    with [get-editbox -after [get-label "Folder name:"]] {
+        set-text "suite_with_tsv_init"
+    }
+    get-button Finish | click
+}
+get-editor "__init__.tsv" | get-text-viewer | get-property text | equals "" | verify-true
+
+//-----------------------------------------------------------------------------------------------------------------------
 //add Resource file 
-get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Resource file" | click
+get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Resource file" | click
 with [get-window "New Robot Resource file"] {
     with [get-editbox -after [get-label "File name:"]] {
+    	wait 500
         set-text "resource file.robot"
     }
     get-button Finish | click
@@ -279,5 +367,43 @@ with [get-editor "resource file.robot"] {
     get-text-viewer | get-property text | equals "" | verify-true
 }
 
+//-----------------------------------------------------------------------------------------------------
+//add resource as .tsv
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Resource file" | click
+with [get-window "New Robot Resource file"] {
+    with [get-button "as .robot file"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "as .robot file" | verify-true
+        get-property selected | equals true | verify-true
+        get-property kind | equals Radio | verify-true
+    }
+    with [get-button "as .tsv file"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "as .tsv file" | verify-true
+        get-property selected | equals false | verify-true
+        get-property kind | equals Radio | verify-true
+    }
+}
+with [get-window "New Robot Resource file"] {
+    get-button "as .tsv file" | click
+    wait 500
+    with [get-editbox -after [get-label "File name:"]] {
+        set-text "new_tsv_resource.tsv"
+    }
+    get-button Finish | click
+}
 
+//check tab list
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "New/red.xml" | verify-true
+    get-property "pages[3]" | equals "red.xml" | verify-true
+    get-property "pages[4]" | equals "__init__.robot" | verify-true
+    get-property "pages[5]" | equals "__init__.tsv" | verify-true
+    get-property "pages[6]" | equals "resource file.robot" | verify-true
+    get-property "pages[7]" | equals "new_tsv_resource.tsv" | verify-true
+    get-property activePage | equals "new_tsv_resource.tsv" | verify-true
+    get-property tabCount | equals 8 | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
