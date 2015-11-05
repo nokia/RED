@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 3:44 PM
+Save-Time: 11/5/15 11:02 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -31,10 +31,10 @@ exec-with-options -disableJobWaiting -command {
 			}
 		//check highlighting
 		check-debug-marker-on-ruler -line 8 -script_name "For200TestSuite.robot"
-		
+		wait 300
 		//check Variables table
 		with [get-view Variables | get-tree] {
-	    get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
+	    	get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
 	    
 	    //Therad has two items
 	    get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" 
