@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 6:08 PM
+Save-Time: 11/5/15 11:21 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -47,7 +47,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//resume: go to next user keyword
 	get-button "Resume (F8)" | click
-	wait 500
+	wait 1000
 	check-debug-marker-on-ruler -line 42  -script_name "BigScript.robot"
 	get-button "Step Into (F5)" | click
 	check-debug-marker-on-ruler -line 82  -script_name "BigScript.robot"
