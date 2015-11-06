@@ -6,8 +6,9 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/5/15 5:10 PM
+Runtime-Version: 1.5.5.201503020312
+Save-Time: 11/6/15 12:46 PM
+Tags: Unstable
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -22,7 +23,7 @@ proc "compare-menu" [val list_of_items]{
 		get-menu "File/New"|  get-object  | invoke getMenu  | invoke	getItem $index | invoke toString | equals [ $list_of_items| get $index]
 	}
 }
-//this is workaround because RCPPT cannot cklick In File/New in procedure
+//this is workaround because RCPPT cannot click In File/New in procedure
 get-menu "File/New/Project..." | click
 get-window "New Project" | get-button Cancel | click
 
