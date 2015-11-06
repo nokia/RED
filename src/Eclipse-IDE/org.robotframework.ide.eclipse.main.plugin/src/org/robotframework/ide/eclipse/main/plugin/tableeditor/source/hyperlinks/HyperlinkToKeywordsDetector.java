@@ -21,11 +21,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
+import com.google.common.io.Files;
 
 /**
  * @author mmarzec
@@ -67,8 +69,11 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec) {
-                if (kwSpec.getName().equalsIgnoreCase(name)) {
+                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
+                
+                final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
+                if (kwSpec.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
+                        && hasEqualSources(libSpec, libraryAlias, typedKeywordNameSplitter.getKeywordSource())) {
                     hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
                     return ContinueDecision.STOP;
                 } else {
@@ -79,7 +84,10 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file,
                     final RobotKeywordDefinition keyword) {
-                if (keyword.getName().equals(name)) {
+                
+                final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
+                if (keyword.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
+                        && hasEqualSources(file, typedKeywordNameSplitter.getKeywordSource())) {
                     final Position position = keyword.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
                     if (file == suiteFile) {
@@ -92,6 +100,24 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                     return ContinueDecision.CONTINUE;
                 }
             }
+            
+            private boolean hasEqualSources(final LibrarySpecification libSpec, final String libraryAlias,
+                    final String typedKeywordSourceName) {
+                if (!typedKeywordSourceName.isEmpty()) {
+                    return !libraryAlias.isEmpty() ? libraryAlias.equalsIgnoreCase(typedKeywordSourceName)
+                            : libSpec.getName().equalsIgnoreCase(typedKeywordSourceName);
+                }
+                return true;
+            }
+            
+            private boolean hasEqualSources(final RobotSuiteFile file, final String typedKeywordSourceName) {
+                if (!typedKeywordSourceName.isEmpty()) {
+                    return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()).equalsIgnoreCase(
+                            typedKeywordSourceName) : false;
+                }
+                return true;
+            }
+
         };
     }
 
