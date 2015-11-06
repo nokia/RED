@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1GCpAILuEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/4/15 4:31 PM
+Save-Time: 11/6/15 11:39 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -45,6 +45,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 	
 	get-button "Step Into (F5)" | click
+	wait 1000
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -66,6 +67,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-property tabCount | equals 2 | verify-true
 	}
 	get-button "Step Into (F5)" | click
+	wait 1000
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -78,6 +80,7 @@ exec-with-options -disableJobWaiting -command {
 	    + "from res 2\n"
 	    + "    Log  ${a}" | verify-true
 	get-button "Step Into (F5)" | click
+	wait 1000
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -85,6 +88,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-property tabCount | equals 2 | verify-true
 	}
 	get-button "Step Into (F5)" | click
+	wait 1000
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
