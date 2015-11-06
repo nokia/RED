@@ -80,7 +80,7 @@ public class RobotParser {
             final File fileOrDir) {
         final RobotFileOutput robotFile = new RobotFileOutput();
 
-        final IRobotFileParser parserToUse = getParser(fileOrDir);
+        final IRobotFileParser parserToUse = getParser(fileOrDir, true);
 
         if (parserToUse != null) {
             ByteArrayInputStream bais = new ByteArrayInputStream(new byte[0]);
@@ -124,7 +124,7 @@ public class RobotParser {
                     // information
                 }
             } else if (robotProject.shouldBeLoaded(fileOrDir)) {
-                final IRobotFileParser parserToUse = getParser(fileOrDir);
+                final IRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
                     final RobotFileOutput robotFile = new RobotFileOutput();
@@ -167,11 +167,12 @@ public class RobotParser {
     }
 
 
-    private IRobotFileParser getParser(final File fileOrDir) {
+    private IRobotFileParser getParser(final File fileOrDir,
+            final boolean isFromStringContent) {
         IRobotFileParser parserToUse = null;
         for (final IRobotFileParser parser : availableFormatParsers) {
             synchronized (parser) {
-                if (parser.canParseFile(fileOrDir)) {
+                if (parser.canParseFile(fileOrDir, isFromStringContent)) {
                     parserToUse = parser.newInstance();
                     break;
                 }
