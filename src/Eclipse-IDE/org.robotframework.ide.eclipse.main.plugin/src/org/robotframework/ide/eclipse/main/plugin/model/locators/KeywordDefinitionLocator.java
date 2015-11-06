@@ -184,8 +184,6 @@ public class KeywordDefinitionLocator {
                 return new KeywordNameSplitter(split[0], "");
             } else if (split.length == 2) {
                 return new KeywordNameSplitter(split[1], split[0]);
-            } else if (split.length > 2) {
-                return new KeywordNameSplitter(split[split.length - 1], "");
             }
 
             return new KeywordNameSplitter("", "");
