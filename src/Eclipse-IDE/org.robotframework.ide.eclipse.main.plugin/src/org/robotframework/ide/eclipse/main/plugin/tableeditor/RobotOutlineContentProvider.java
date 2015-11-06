@@ -155,7 +155,7 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
     @Inject
     @Optional
     private void whenReconcilationWasDone(
-            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+            @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (viewer != null && !viewer.getTree().isDisposed()) {
             viewer.refresh();
         }

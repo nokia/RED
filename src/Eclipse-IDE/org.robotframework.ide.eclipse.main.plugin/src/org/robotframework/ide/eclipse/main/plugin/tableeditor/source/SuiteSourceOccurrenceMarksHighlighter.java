@@ -54,6 +54,9 @@ class SuiteSourceOccurrenceMarksHighlighter {
     }
 
     void install(final SourceViewer viewer) {
+        if (file == null) {
+            return;
+        }
         viewer.getTextWidget().addCaretListener(new CaretListener() {
             @Override
             public void caretMoved(final CaretEvent event) {

@@ -546,7 +546,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenReconcilationWasDone(
-            @UIEventTopic(RobotModelEvents.RECONCILATION_DONE) final RobotSuiteFile fileModel) {
+            @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
             refreshEverything();
         }
