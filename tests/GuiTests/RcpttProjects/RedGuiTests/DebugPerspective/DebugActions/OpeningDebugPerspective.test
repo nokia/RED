@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g1Ox4HmQEeWIf_WwvRtf3w
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/5/15 11:08 AM
+Save-Time: 11/6/15 12:19 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -83,7 +83,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
 	    
-	wait 4000    
+	wait 5000    
 	// set now to remember decision    
 	with [get-window "Confirm Perspective Switch"] {
 	    get-button "Remember my decision" | check
