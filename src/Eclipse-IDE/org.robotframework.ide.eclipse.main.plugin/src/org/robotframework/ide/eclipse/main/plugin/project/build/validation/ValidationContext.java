@@ -66,19 +66,20 @@ public class ValidationContext {
     public Set<String> getAccessibleKeywords() {
         return ImmutableSet.copyOf(accessibleKeywords.keySet());
     }
+    
+    public KeywordValidationContext findKeywordValidationContext(final String name) {
+        return extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+    }
 
-    public boolean isKeywordAccessible(final String name) {
-        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+    public boolean isKeywordAccessible(final KeywordValidationContext keywordValidationContext) {
         return keywordValidationContext != null;
     }
 
-    public boolean isKeywordDeprecated(final String name) {
-        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+    public boolean isKeywordDeprecated(final KeywordValidationContext keywordValidationContext) {
         return keywordValidationContext != null && keywordValidationContext.isDeprecated();
     }
 
-    public boolean isKeywordFromNestedLibrary(final String name) {
-        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+    public boolean isKeywordFromNestedLibrary(final KeywordValidationContext keywordValidationContext) {
         return keywordValidationContext != null && keywordValidationContext.isFromNestedLibrary();
     }
     

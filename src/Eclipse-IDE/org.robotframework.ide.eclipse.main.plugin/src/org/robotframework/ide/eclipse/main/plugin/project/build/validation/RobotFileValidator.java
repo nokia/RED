@@ -101,7 +101,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(kwSpec.getName()
                         .toLowerCase(), libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
-                addNewAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
+                addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
 
@@ -111,11 +111,11 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
                         keyword.getName().toLowerCase(), extractResourceFileName(file), "", keyword.isDeprecated(),
                         false);
-                addNewAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
+                addAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
             
-            private void addNewAccessibleKeyword(final String keywordName, final KeywordValidationContext keywordValidationContext) {
+            private void addAccessibleKeyword(final String keywordName, final KeywordValidationContext keywordValidationContext) {
                 if(accessibleKeywords.containsKey(keywordName)) {
                     accessibleKeywords.get(keywordName).add(keywordValidationContext);
                 } else {

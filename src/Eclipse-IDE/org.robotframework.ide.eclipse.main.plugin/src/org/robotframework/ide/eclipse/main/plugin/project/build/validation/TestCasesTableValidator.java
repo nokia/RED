@@ -38,6 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.KeywordValidationContext;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -137,7 +138,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final ValidationContext validationContext,
             final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
-
+        
         for (final RobotExecutableRow<?> executable : executables) {
             // FIXME : this disables for loops validating, enable asap
             if (executable.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals(":for")) {
@@ -153,17 +154,24 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText().toString();
-                if (!validationContext.isKeywordAccessible(name)) {
+                final KeywordValidationContext keywordValidationContext = validationContext.findKeywordValidationContext(name);
+                if (!validationContext.isKeywordAccessible(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(name);
                     final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
                 }
-                if (validationContext.isKeywordDeprecated(name)) {
+                if (validationContext.isKeywordDeprecated(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
                             .formatMessageWith(name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
                 }
+                if (validationContext.isKeywordFromNestedLibrary(keywordValidationContext)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
+                            .formatMessageWith(name);
+                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                }
+                
             } else {
 
             }

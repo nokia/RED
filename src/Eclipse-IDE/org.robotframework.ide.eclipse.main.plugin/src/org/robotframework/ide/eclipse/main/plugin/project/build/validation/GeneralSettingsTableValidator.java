@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.KeywordValidationContext;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -144,13 +145,19 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, settingToken);
             } else {
                 final String keywordName = keywordToken.getText().toString();
-                if (!validationContext.isKeywordAccessible(keywordName)) {
+                final KeywordValidationContext keywordValidationContext = validationContext.findKeywordValidationContext(keywordName);
+                if (!validationContext.isKeywordAccessible(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
-                if (validationContext.isKeywordDeprecated(keywordName)) {
+                if (validationContext.isKeywordDeprecated(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
+                }
+                if (validationContext.isKeywordFromNestedLibrary(keywordValidationContext)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
@@ -169,15 +176,21 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, file, settingToken);
             } else {
-
+                
                 final String keywordName = keywordToken.getText().toString();
-                if (!validationContext.isKeywordAccessible(keywordName)) {
+                final KeywordValidationContext keywordValidationContext = validationContext.findKeywordValidationContext(keywordName);
+                if (!validationContext.isKeywordAccessible(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
-                if (validationContext.isKeywordDeprecated(keywordName)) {
+                if (validationContext.isKeywordDeprecated(keywordValidationContext)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
+                            .formatMessageWith(keywordName);
+                    reporter.handleProblem(problem, file, keywordToken);
+                }
+                if (validationContext.isKeywordFromNestedLibrary(keywordValidationContext)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
