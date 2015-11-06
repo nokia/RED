@@ -142,7 +142,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         sections = null;
         fileOutput = null;
 
-        getSections(new ParsingStrategy() {
+        getSections(createReparsingStrategy(newContent));
+    }
+
+    protected ParsingStrategy createReparsingStrategy(final String newContent) {
+        return new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
@@ -151,7 +155,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 // this can happen e.g. when renaming project
                 return null;
             }
-        });
+        };
     }
 
     protected void refreshOnFileChange() {
@@ -244,6 +248,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public IFile getFile() {
         return file;
+    }
+
+    public String getFileExtension() {
+        return file.getFileExtension();
     }
 
     public RobotFile getLinkedElement() {

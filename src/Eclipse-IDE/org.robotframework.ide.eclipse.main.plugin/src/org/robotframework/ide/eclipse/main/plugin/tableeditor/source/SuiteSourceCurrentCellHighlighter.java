@@ -46,6 +46,9 @@ class SuiteSourceCurrentCellHighlighter {
     }
 
     void install(final SourceViewer viewer) {
+        if (file == null) {
+            return;
+        }
         viewer.getTextWidget().addCaretListener(new CaretListener() {
 
             @Override

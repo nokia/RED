@@ -105,7 +105,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IAutoEditStrategy[] getAutoEditStrategies(final ISourceViewer sourceViewer, final String contentType) {
-        final boolean isTsv = "tsv".equals(editor.fileModel.getFile().getFileExtension());
+        final boolean isTsv = "tsv".equals(editor.fileModel.getFileExtension());
         return new IAutoEditStrategy[] { new SuiteSourceIndentLineEditStrategy(isTsv) };
     }
 
