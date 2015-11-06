@@ -5,11 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.eclipse.core.runtime.content.IContentDescriber;
+import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
+import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
@@ -23,6 +28,11 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         this.name = name;
         this.input = input;
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public String getFileExtension() {
+        return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : "";
     }
 
     @Override
@@ -41,13 +51,34 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
             }
         }
         return null;
-    }    
-    
-    @Override
-    protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
-        throw new RuntimeException("Currently there is no API for parsing anything more than files.");
     }
 
+    @Override
+    public List<RobotSuiteFileSection> getSections() {
+        return getSections(new ParsingStrategy() {
+
+            @Override
+            public RobotFileOutput parse() {
+                final RobotParser parser = RobotParser
+                        .create(new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()));
+                return parser.parseEditorContent("", new File(name));
+            }
+        });
+    }
+
+    @Override
+    protected ParsingStrategy createReparsingStrategy(final String newContent) {
+        return new ParsingStrategy() {
+
+            @Override
+            public RobotFileOutput parse() {
+                final RobotParser parser = RobotParser
+                        .create(new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()));
+                return parser.parseEditorContent(newContent, new File(name));
+            }
+        };
+    }
+    
     @Override
     public String getName() {
         return name;

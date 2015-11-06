@@ -27,6 +27,9 @@ class SuiteSourceEditorFoldingSupport {
     }
 
     public void updateFoldingStructure(final List<Position> positions) {
+        if (annotationsModel == null) {
+            return;
+        }
         final HashMap<ProjectionAnnotation, Position> newAnnotations = new HashMap<>();
         for (final Position position : positions) {
             final ProjectionAnnotation annotation = new ProjectionAnnotation();
