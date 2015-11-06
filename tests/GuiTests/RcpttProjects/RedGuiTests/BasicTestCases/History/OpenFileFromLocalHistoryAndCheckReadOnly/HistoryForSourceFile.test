@@ -1,0 +1,229 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: HistoryForSourceFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _pFLdEISMEeWImNPXuPy_LQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/6/15 3:47 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type End
+    key-type Enter
+    type-text "test 1"
+    key-type Enter
+    key-type tab
+    type-text "Log  1"
+     key-type Enter
+    key-type Backspace -times 4
+    key-type Enter -times 1
+    
+    //add variables
+    type-text "*** Variables ***"
+    key-type Enter
+    type-text "${a}  5"
+    key-type "M1+s"
+    key-type Enter
+    type-text "${b}  6"
+    
+    //add keyword
+	key-type Enter -times 2
+    type-text "*** Keywords ***"
+    key-type Enter
+    type-text "kw 1"
+    key-type Enter
+    key-type Tab
+    type-text "log  2"
+    key-type "M1+s"
+}
+  
+
+//open history
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Team/Show Local History" 
+    | click
+    
+with [get-view History | get-tree] {
+    select [get-item ".*" -index 0]  | double-click
+    select [get-item ".*" -index 1]  | double-click
+    select [get-item ".*" -index 2]  | double-click
+}
+
+
+//check that 3 editors are visible
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "TestFile.robot [/RobotProject/TestFile.robot]" | verify-true
+    get-property "pages[2]" | equals "TestFile.robot [/RobotProject/TestFile.robot]" | verify-true
+    get-property activePage | equals "TestFile.robot [/RobotProject/TestFile.robot]" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+
+//check that last file is the oldest
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-text-viewer | get-property text 
+    | equals "*** Test Cases ***" | verify-true
+
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-text-viewer
+    | get-property "getEditable()" | equals false | verify-true
+    
+//check Varaible tab - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Variables | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-table] {
+    get-property linesVisible | equals true | verify-true
+    get-property headerVisible | equals true | verify-true
+    get-property itemCount | equals 0 | verify-true
+}
+
+//check Settings - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Settings | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
+
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-section General | get-editbox -index 1 
+    | get-property "getEditable()" | equals false | verify-true
+    
+    
+//check Keywords - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Keywords | click
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1] {
+    get-label "The file is read-only!" | get-property caption | equals "The file is read-only!" | verify-true
+    with [get-tree] {
+        get-property linesVisible | equals true | verify-true
+        get-property headerVisible | equals true | verify-true
+        get-property itemCount | equals 0 | verify-true
+    }
+}
+
+//check Test cases - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item "Test Cases" | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
+
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tree] {
+    get-property linesVisible | equals true | verify-true
+    get-property headerVisible | equals true | verify-true
+    get-property itemCount | equals 1 | verify-true
+}
+
+
+//-----------------------------------------------------------------------------------------------------
+//check previouse revison
+
+//check source
+get-tab-folder -index 1 | get-tab-item "TestFile.robot [/RobotProject/TestFile.robot]" | click
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-text-viewer] {
+    get-property text | equals "*** Test Cases ***\n"
+        + "test 1\n"
+        + "    Log  1\n\n"
+        + "*** Variables ***\n"
+        + "${a}  5" | verify-true
+    get-property "getEditable()" | equals false | verify-true
+}
+
+//check Variables - one is visible
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-tab-folder | get-tab-item Variables | click
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]"] {
+    get-label "The file is read-only!" | get-property caption | equals "The file is read-only!" | verify-true
+    with [get-table] {
+        get-item "${a}" | get-property "values['Variable']" | equals "${a}" | verify-true
+        //get-item "${a}" | get-property "values['Value']" | equals value | verify-true  //buuuuuuuuuuuuuuuug
+        get-item "${a}" | get-property "values['Comment']" | equals "" | verify-true
+    }
+}
+
+//check Settings - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Settings | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
+
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-section General | get-editbox -index 1 
+    | get-property "getEditable()" | equals false | verify-true
+    
+//check Keywords - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Keywords | click
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1] {
+    get-label "The file is read-only!" | get-property caption | equals "The file is read-only!" | verify-true
+    with [get-tree] {
+        get-property linesVisible | equals true | verify-true
+        get-property headerVisible | equals true | verify-true
+        get-property itemCount | equals 0 | verify-true
+    }
+}    
+
+//check Test cases - one ne case
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-tab-folder] {
+    get-tab-item "Test Cases" | click
+}
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-tree] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "test 1" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "...add new test case" | verify-true
+}
+
+
+//check newst file
+
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Test Cases ***\n"
+        + "test 1\n"
+        + "    Log  1\n\n"
+        + "*** Variables ***\n"
+        + "${a}  5\n"
+        + "${b}  6\n\n"
+        + "*** Keywords ***\n"
+        + "kw 1\n"
+        + "    log  2" | verify-true
+    get-property "getEditable()" | equals true | verify-true
+}
+
+//check variables - now are 2
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+with [get-editor "TestFile.robot" | get-table] {
+    get-property "getItems().length" | equals 3 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
+    //get-property "getItems().TableItem[0].getData().getValue()" | equals value | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
+    //get-property "getItems().TableItem[1].getData().getValue()" | equals value | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "...add new scalar" | verify-true
+}
+
+//check Settings - empty
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Settings | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
+
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-section General | get-editbox -index 1 
+    | get-property "getEditable()" | equals false | verify-true
+    
+    
+//chekc kw
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+with [get-editor "TestFile.robot" | get-tree] {
+    get-item "kw 1" | get-property "getItems().TreeItem[0].getText()" | equals log | verify-true
+    get-item "kw 1" | get-property "getItems().TreeItem[1].getText()" | equals "..." | verify-true
+    get-item "kw 1" | get-property "getText()" | equals "kw 1" | verify-true
+}
+//check test
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-tree] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "test 1" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "...add new test case" | verify-true
+}
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
