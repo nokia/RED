@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BW-V4B8oEeWYlfCPyvfohw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 2:29 PM
+Save-Time: 11/6/15 3:56 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -82,7 +82,7 @@ exec-with-options -disableJobWaiting -command {
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-		        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals [os-specific "${result1} = String.Should Be String [line:14]" "String.Should Be String [line:14]" ]
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
 		        | get-property "getItems().TreeItem[1].getText()" | equals  [os-specific "${res} = my_keywords.Validate string [line:66]" "my_keywords.Validate string [line:66]"] 
@@ -110,7 +110,7 @@ exec-with-options -disableJobWaiting -command {
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 2 
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-		        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals [os-specific "${result1} = String.Should Be String [line:14]" "String.Should Be String [line:14]" ]
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
 		        | get-property "getItems().TreeItem[1].getText()" | equals "my_keywords.Validate string [line:70]" | verify-true
@@ -137,7 +137,7 @@ exec-with-options -disableJobWaiting -command {
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" | get-property childCount | equals 1 
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-		        | get-property "getItems().TreeItem[0].getText()" | equals "${count} = BuiltIn.Evaluate [line:12]" | verify-true
+		        | get-property "getItems().TreeItem[0].getText()" | equals [os-specific "${count} = BuiltIn.Evaluate [line:12]" "BuiltIn.Evaluate [line:12]"]| verify-true
 		}
 	}
 	with [get-tab-folder -index 2] {
