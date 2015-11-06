@@ -34,7 +34,7 @@ public class VersionDependentValidators {
         return newArrayList(Iterables.filter(allValidators, new Predicate<VersionDependentModelUnitValidator>() {
             @Override
             public boolean apply(final VersionDependentModelUnitValidator validator) {
-                return version == null ? false : validator.isApplicableFor(version);
+                return validator.isApplicableFor(version);
             }
         }));
     }
