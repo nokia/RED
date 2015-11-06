@@ -12,6 +12,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Maps.newHashMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,6 +23,7 @@ import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -34,7 +36,7 @@ public class ValidationContext {
 
     private final RobotVersion version;
 
-    private final Map<String, Boolean> accessibleKeywords;
+    private final Map<String, List<KeywordValidationContext>> accessibleKeywords;
 
     private final Map<String, LibrarySpecification> librarySpecifications;
 
@@ -57,7 +59,7 @@ public class ValidationContext {
         return version;
     }
 
-    public void setAccessibleKeywords(final Map<String, Boolean> keywords) {
+    public void setAccessibleKeywords(final Map<String, List<KeywordValidationContext>> keywords) {
         accessibleKeywords.putAll(keywords);
     }
 
@@ -66,13 +68,20 @@ public class ValidationContext {
     }
 
     public boolean isKeywordAccessible(final String name) {
-        return accessibleKeywords.containsKey(name.toLowerCase());
+        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+        return keywordValidationContext != null;
     }
 
     public boolean isKeywordDeprecated(final String name) {
-        return Boolean.TRUE.equals(accessibleKeywords.get(name.toLowerCase()));
+        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+        return keywordValidationContext != null && keywordValidationContext.isDeprecated();
     }
 
+    public boolean isKeywordFromNestedLibrary(final String name) {
+        final KeywordValidationContext keywordValidationContext = extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
+        return keywordValidationContext != null && keywordValidationContext.isFromNestedLibrary();
+    }
+    
     public void setLibrarySpecifications(final Map<String, LibrarySpecification> specs) {
         librarySpecifications.putAll(specs);
     }
@@ -87,6 +96,29 @@ public class ValidationContext {
 
     public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
         return referencedLibrarySpecifications;
+    }
+    
+    private KeywordValidationContext extractKeywordValidationContext(final KeywordNameSplitter typedKeywordNameSplitter) {
+        List<KeywordValidationContext> keywordsContextList = accessibleKeywords.get(typedKeywordNameSplitter.getKeywordName()
+                .toLowerCase());
+        if (keywordsContextList != null) {
+            final String typedKeywordSourceName = typedKeywordNameSplitter.getKeywordSource();
+            for (KeywordValidationContext keywordValidationContext : keywordsContextList) {
+                if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
+                    return keywordValidationContext;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private boolean hasEqualSources(final String typedKeywordSourceName,
+            final KeywordValidationContext keywordValidationContext) {
+        if (!typedKeywordSourceName.isEmpty()) {
+            return !keywordValidationContext.getAlias().isEmpty() ? typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getAlias())
+                    : typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getSourceName());
+        }
+        return true;
     }
 
     public static class RobotVersion implements Comparable<RobotVersion> {
@@ -175,6 +207,48 @@ public class ValidationContext {
             } else {
                 return 1;
             }
+        }
+    }
+    
+    public static class KeywordValidationContext {
+
+        private String keywordName;
+
+        private String sourceName;
+
+        private String alias;
+
+        private boolean isDeprecated;
+
+        private boolean isFromNestedLibrary;
+
+        public KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
+                final boolean isDeprecated, final boolean isFromNestedLibrary) {
+            this.keywordName = keywordName;
+            this.sourceName = sourceName;
+            this.alias = alias;
+            this.isDeprecated = isDeprecated;
+            this.isFromNestedLibrary = isFromNestedLibrary;
+        }
+
+        public String getKeywordName() {
+            return keywordName;
+        }
+
+        public String getSourceName() {
+            return sourceName;
+        }
+
+        public boolean isDeprecated() {
+            return isDeprecated;
+        }
+
+        public boolean isFromNestedLibrary() {
+            return isFromNestedLibrary;
+        }
+
+        public String getAlias() {
+            return alias;
         }
     }
 }

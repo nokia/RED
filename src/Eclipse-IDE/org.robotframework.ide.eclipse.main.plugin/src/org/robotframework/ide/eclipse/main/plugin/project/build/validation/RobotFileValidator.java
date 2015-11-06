@@ -7,7 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,8 +29,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+
+import com.google.common.io.Files;
 
 public abstract class RobotFileValidator implements ModelUnitValidator {
 
@@ -86,23 +91,48 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         return libs;
     }
 
-    private static Map<String, Boolean> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
-        final Map<String, Boolean> accessibleKeywords = newHashMap();
+    private static Map<String, List<KeywordValidationContext>> collectAccessibleKeywordNames(final RobotSuiteFile robotSuiteFile) {
+        final Map<String, List<KeywordValidationContext>> accessibleKeywords = newHashMap();
         new KeywordDefinitionLocator(robotSuiteFile, false).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec) {
-                accessibleKeywords.put(kwSpec.getName().toLowerCase(), kwSpec.isDeprecated());
+                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
+                
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(kwSpec.getName()
+                        .toLowerCase(), libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
+                addNewAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                accessibleKeywords.put(keyword.getName().toLowerCase(), keyword.isDeprecated());
+                
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
+                        keyword.getName().toLowerCase(), extractResourceFileName(file), "", keyword.isDeprecated(),
+                        false);
+                addNewAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
+            }
+            
+            private void addNewAccessibleKeyword(final String keywordName, final KeywordValidationContext keywordValidationContext) {
+                if(accessibleKeywords.containsKey(keywordName)) {
+                    accessibleKeywords.get(keywordName).add(keywordValidationContext);
+                } else {
+                    accessibleKeywords.put(keywordName, newArrayList(keywordValidationContext));
+                }
+            }
+
+            private String extractResourceFileName(final RobotSuiteFile file) {
+                String keywordSourceFileName = "";
+                if (file.isResourceFile()) {
+                    keywordSourceFileName = Files.getNameWithoutExtension(file.getName());
+                }
+                return keywordSourceFileName;
             }
         });
         return accessibleKeywords;
     }
+    
+    
 }

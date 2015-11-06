@@ -5,11 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -61,7 +62,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        locateInLibraries(startingFile.getImportedLibraries(), detector);
+        locateInLibraries(startingFile.getImportedLibraries(), detector, false);
     }
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final KeywordDetector detector) {
@@ -113,23 +114,42 @@ public class KeywordDefinitionLocator {
                 : new RobotSuiteFile(null, resourceFile);
     }
     
-    private ContinueDecision locateInLibrariesFromResourceFile(final Collection<LibrarySpecification> collection,
+    private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,
             final KeywordDetector detector) {
-        final List<LibrarySpecification> libSpecsToLocate = new ArrayList<>();
-        for (final LibrarySpecification spec : collection) {
+        final Map<LibrarySpecification, String> libSpecsToLocate = newHashMap();
+        for (LibrarySpecification spec : librariesMap.keySet()) {
             if (!spec.isAccessibleWithoutImport()) {
-                libSpecsToLocate.add(spec);
+                libSpecsToLocate.put(spec, librariesMap.get(spec));
             }
         }
-        locateInLibraries(libSpecsToLocate, detector);
+        locateInLibraries(libSpecsToLocate, detector, true);
         return ContinueDecision.CONTINUE;
     }
 
     private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
             final KeywordDetector detector) {
+        return locateInLibraries(collection, detector, false);
+    }
+
+    private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
+            final KeywordDetector detector, final boolean isFromNestedLibrary) {
         for (final LibrarySpecification libSpec : collection) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec);
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", isFromNestedLibrary);
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
+        }
+        return ContinueDecision.CONTINUE;
+    }
+    
+    private ContinueDecision locateInLibraries(final Map<LibrarySpecification, String> librariesMap,
+            final KeywordDetector detector, final boolean isFromNestedLibrary) {
+        for (final LibrarySpecification libSpec : librariesMap.keySet()) {
+            for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
+                        librariesMap.get(libSpec), isFromNestedLibrary);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -142,7 +162,41 @@ public class KeywordDefinitionLocator {
 
         ContinueDecision keywordDetected(RobotSuiteFile file, RobotKeywordDefinition keyword);
 
-        ContinueDecision libraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec);
+        ContinueDecision libraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
+                String libraryAlias, boolean isFromNestedLibrary);
 
+    }
+    
+    public static class KeywordNameSplitter {
+
+        private String name;
+
+        private String source;
+
+        public KeywordNameSplitter(final String name, final String source) {
+            this.name = name;
+            this.source = source;
+        }
+
+        public static KeywordNameSplitter splitKeywordName(final String keywordName) {
+            String[] split = keywordName.split("\\.");
+            if (split.length == 1) {
+                return new KeywordNameSplitter(split[0], "");
+            } else if (split.length == 2) {
+                return new KeywordNameSplitter(split[1], split[0]);
+            } else if (split.length > 2) {
+                return new KeywordNameSplitter(split[split.length - 1], "");
+            }
+
+            return new KeywordNameSplitter("", "");
+        }
+
+        public String getKeywordName() {
+            return name;
+        }
+
+        public String getKeywordSource() {
+            return source;
+        }
     }
 }

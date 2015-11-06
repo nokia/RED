@@ -19,13 +19,7 @@ import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -71,24 +65,24 @@ public class RenameInSourceHandler extends DIHandler<E4RenameInSourceHandler> {
             return null;
         }
 
-        private void foo(final RobotSuiteFile fileModel) {
-            new KeywordDefinitionLocator(fileModel).locateKeywordDefinition(new KeywordDetector() {
-
-                @Override
-                public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                        final KeywordSpecification kwSpec) {
-                    return ContinueDecision.CONTINUE;
-                }
-
-                @Override
-                public ContinueDecision keywordDetected(final RobotSuiteFile file,
-                        final RobotKeywordDefinition keyword) {
-                    if (file == fileModel) {
-
-                    }
-                    return null;
-                }
-            });
-        }
+//        private void foo(final RobotSuiteFile fileModel) {
+//            new KeywordDefinitionLocator(fileModel).locateKeywordDefinition(new KeywordDetector() {
+//
+//                @Override
+//                public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+//                        final KeywordSpecification kwSpec) {
+//                    return ContinueDecision.CONTINUE;
+//                }
+//
+//                @Override
+//                public ContinueDecision keywordDetected(final RobotSuiteFile file,
+//                        final RobotKeywordDefinition keyword) {
+//                    if (file == fileModel) {
+//
+//                    }
+//                    return null;
+//                }
+//            });
+//        }
     }
 }
