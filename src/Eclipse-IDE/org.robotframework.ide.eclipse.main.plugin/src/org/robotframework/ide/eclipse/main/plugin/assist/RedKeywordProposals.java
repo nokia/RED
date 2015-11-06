@@ -70,7 +70,7 @@ public class RedKeywordProposals {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec) {
+                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
                 if (kwSpec.getName().toLowerCase().startsWith(prefix.toLowerCase()) && !libSpec.isReserved()) {
                     proposals.add(RedKeywordProposal.create(libSpec, kwSpec));
                 }

@@ -79,7 +79,7 @@ public class SuiteSourceAssistantContext {
     }
 
     public boolean isAlreadyImported(final LibrarySpecification spec) {
-        return suiteModel.getImportedLibraries().contains(spec);
+        return suiteModel.getImportedLibraries().containsKey(spec);
     }
 
     public List<ReferencedVariableFile> getReferencedVariableFiles() {
