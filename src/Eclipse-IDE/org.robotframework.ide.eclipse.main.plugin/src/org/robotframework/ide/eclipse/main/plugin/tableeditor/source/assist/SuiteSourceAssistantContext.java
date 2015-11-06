@@ -64,6 +64,10 @@ public class SuiteSourceAssistantContext {
     public AcceptanceMode getAcceptanceMode() {
         return assistPreferences.getAcceptanceMode();
     }
+    
+    public boolean isKeywordPrefixAutoAdditionEnabled() {
+        return assistPreferences.isKeywordPrefixAutoAdditionEnabled();
+    }
 
     public List<RedVariableProposal> getVariables(final int offset) {
         return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
@@ -113,13 +117,20 @@ public class SuiteSourceAssistantContext {
     public static class AssistPreferences {
 
         private AcceptanceMode acceptanceMode;
+        private boolean isKeywordPrefixAutoAdditionEnabled;
 
         AssistPreferences() {
             this.acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
+            this.isKeywordPrefixAutoAdditionEnabled = RedPlugin.getDefault()
+                    .getPreferences()
+                    .isAssistantKeywordPrefixAutoAdditionEnabled();
         }
 
         void refresh() {
             acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
+            isKeywordPrefixAutoAdditionEnabled = RedPlugin.getDefault()
+                    .getPreferences()
+                    .isAssistantKeywordPrefixAutoAdditionEnabled();
         }
 
         public String getSeparatorToFollow(final boolean isTsvFile) {
@@ -129,5 +140,10 @@ public class SuiteSourceAssistantContext {
         public AcceptanceMode getAcceptanceMode() {
             return acceptanceMode;
         }
+
+        public boolean isKeywordPrefixAutoAdditionEnabled() {
+            return isKeywordPrefixAutoAdditionEnabled;
+        }
+
     }
 }
