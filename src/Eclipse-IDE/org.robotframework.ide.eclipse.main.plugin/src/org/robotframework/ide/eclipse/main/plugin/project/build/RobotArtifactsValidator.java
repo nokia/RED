@@ -41,7 +41,7 @@ public class RobotArtifactsValidator {
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
         final IFile file = suiteModel.getFile();
-        if (!file.exists()) {
+        if (file == null || !file.exists()) {
             return;
         }
 
