@@ -19,6 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.io.Files;
+
 public class RedKeywordProposals {
 
     private final RobotSuiteFile suiteFile;
@@ -72,7 +74,8 @@ public class RedKeywordProposals {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
                 if (kwSpec.getName().toLowerCase().startsWith(prefix.toLowerCase()) && !libSpec.isReserved()) {
-                    proposals.add(RedKeywordProposal.create(libSpec, kwSpec));
+                    proposals.add(RedKeywordProposal.create(libSpec, kwSpec, libraryAlias.isEmpty() ? libSpec.getName()
+                            : libraryAlias));
                 }
                 return ContinueDecision.CONTINUE;
             }
@@ -80,7 +83,8 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
                 if (keyword.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
-                    proposals.add(RedKeywordProposal.create(file, keyword));
+                    proposals.add(RedKeywordProposal.create(file, keyword,
+                            file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()) : ""));
                 }
                 return ContinueDecision.CONTINUE;
             }
