@@ -65,6 +65,17 @@ public enum KeywordsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveKeywordFixer(marker.getAttribute("name", null)));
         }
+    },
+    KEYWORD_FROM_NESTED_LIBRARY {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword '%s' is from a library nested in a resource file";
+        }
     };
 
     @Override
