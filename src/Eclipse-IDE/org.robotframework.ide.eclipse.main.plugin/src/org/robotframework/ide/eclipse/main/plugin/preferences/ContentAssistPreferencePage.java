@@ -50,6 +50,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 
         createAutoActivationEditors(parent);
         createAcceptanceModeEditors(parent);
+        createKeywordPrefixAutoAdditionEditor(parent);
     }
 
     protected void createAutoActivationEditors(final Composite parent) {
@@ -105,6 +106,17 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         final RadioGroupFieldEditor insertionModeEditor = new RadioGroupFieldEditor(
                 RedPreferences.ASSISTANT_COMPLETION_MODE, "Proposals", 2, createModes(), parent, true);
         addField(insertionModeEditor);
+    }
+    
+    private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
+        final Group keywordsGroup = new Group(parent, SWT.NONE);
+        keywordsGroup.setText("Keywords");
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(keywordsGroup);
+        GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
+        final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(
+                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
+                "Automatically add library or resource name to keyword proposal insertion", keywordsGroup);
+        addField(booleanFieldEditor);
     }
 
     private String[][] createModes() {

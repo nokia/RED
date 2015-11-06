@@ -63,6 +63,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         preferences.putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, ".");
+        preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
     }
 
     private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {
