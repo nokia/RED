@@ -25,25 +25,27 @@ public class RedKeywordProposal {
     private final String decoration;
     private final boolean hasDescription;
     private final String documentation;
+    private final String sourcePrefix;
 
     private final LazyProvider<List<String>> argumentsProvider;
     private final LazyProvider<String> htmlDocumentationProvider;
 
     private RedKeywordProposal(final String sourceName, final KeywordType type, final String name,
             final String decoration, final boolean hasDescription, final LazyProvider<List<String>> argumentsProvider,
-            final LazyProvider<String> htmlDocumentationProvider, final String documentation) {
+            final LazyProvider<String> htmlDocumentationProvider, final String documentation, final String sourcePrefix) {
         this.sourceName = sourceName;
         this.type = type;
         this.name = name;
         this.decoration = decoration;
         this.hasDescription = hasDescription;
         this.documentation = documentation;
+        this.sourcePrefix = sourcePrefix;
 
         this.htmlDocumentationProvider = htmlDocumentationProvider;
         this.argumentsProvider = argumentsProvider;
     }
 
-    static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword) {
+    static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword, final String sourcePrefix) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
             @Override
             public String provide() {
@@ -57,10 +59,10 @@ public class RedKeywordProposal {
             }
         };
         return new RedKeywordProposal(spec.getName(), KeywordType.LIBRARY, keyword.getName(), "- " + spec.getName(),
-                true, argsProvider, htmlDocuProvider, keyword.getDocumentation());
+                true, argsProvider, htmlDocuProvider, keyword.getDocumentation(), sourcePrefix);
     }
 
-    static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword) {
+    static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword, final String sourcePrefix) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
             @Override
             public String provide() {
@@ -75,7 +77,7 @@ public class RedKeywordProposal {
         };
         return new RedKeywordProposal("User Defined (" + file.getName() + ")", KeywordType.USER_DEFINED,
                 userKeyword.getName(), "- " + file.getName(), true, argsProvider, htmlDocuProvider,
-                userKeyword.getDocumentation());
+                userKeyword.getDocumentation(), sourcePrefix);
     }
 
     public String getSourceName() {
@@ -125,6 +127,10 @@ public class RedKeywordProposal {
     public String getDocumentation() {
         return String.format("Name: %s\nSource: %s\nArguments: %s\n\n%s", name, sourceName, getArgumentsLabel(),
                 documentation);
+    }
+
+    public String getSourcePrefix() {
+        return sourcePrefix;
     }
 
     public enum KeywordType {
