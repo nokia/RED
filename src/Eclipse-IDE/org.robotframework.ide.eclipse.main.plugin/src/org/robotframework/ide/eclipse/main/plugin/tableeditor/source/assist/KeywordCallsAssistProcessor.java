@@ -61,13 +61,19 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
                 final String separator = getSeparatorToFollow();
+                final boolean shouldAddKeywordPrefix = isKeywordPrefixAutoAdditionEnabled();
 
                 final List<RedCompletionProposal> proposals = newArrayList();
                 for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
                     final String keywordName = keywordProposal.getLabel();
+                    String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
 
-                    if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String textToInsert = keywordName + separator;
+                    if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())
+                            || keywordPrefix.equalsIgnoreCase(prefix)) {
+                        if (!shouldAddKeywordPrefix) {
+                            keywordPrefix = "";
+                        }
+                        final String textToInsert = keywordPrefix + keywordName + separator;
 
                         final List<String> args = keywordProposal.getArguments();
                         final String arguments = args.isEmpty() ? "no arguments" : Joiner.on(" | ").join(args);
@@ -99,6 +105,10 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     protected String getSeparatorToFollow() {
         return assist.getSeparatorToFollow();
+    }
+    
+    protected boolean isKeywordPrefixAutoAdditionEnabled() {
+        return assist.isKeywordPrefixAutoAdditionEnabled();
     }
 
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
