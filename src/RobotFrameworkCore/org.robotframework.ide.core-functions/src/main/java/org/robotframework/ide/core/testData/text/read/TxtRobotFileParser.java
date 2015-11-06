@@ -114,10 +114,10 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public boolean canParseFile(File file) {
+    public boolean canParseFile(File file, boolean isFromStringContent) {
         boolean result = false;
 
-        if (file != null && file.isFile()) {
+        if (file != null && (file.isFile() || isFromStringContent)) {
             String fileName = file.getName().toLowerCase();
             result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
         }

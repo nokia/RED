@@ -13,7 +13,7 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput;
 
 public interface IRobotFileParser {
 
-    boolean canParseFile(final File file);
+    boolean canParseFile(final File file, final boolean isFromStringContent);
 
 
     IRobotFileParser newInstance();
