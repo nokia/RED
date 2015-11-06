@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -185,13 +186,18 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
-
+        final KeywordNameSplitter keywordNameSplitter = KeywordNameSplitter.splitKeywordName(keywordName);
         for (final RedKeywordProposal proposal : keywordProposals) {
-            if (proposal.getLabel().equalsIgnoreCase(keywordName)) {
+            if (proposal.getLabel().equalsIgnoreCase(keywordNameSplitter.getKeywordName())
+                    && hasEqualSources(keywordNameSplitter.getKeywordSource(), proposal.getSourcePrefix())) {
                 return proposal.getDocumentation();
             }
         }
         return null;
+    }
+    
+    private boolean hasEqualSources(final String typedKeywordSourceName, final String sourcePrefix) {
+        return !typedKeywordSourceName.isEmpty() ? typedKeywordSourceName.equalsIgnoreCase(sourcePrefix) : true;
     }
 
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
