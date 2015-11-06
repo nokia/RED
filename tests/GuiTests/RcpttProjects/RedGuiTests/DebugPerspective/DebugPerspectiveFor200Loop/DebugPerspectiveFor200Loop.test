@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/5/15 11:02 AM
+Save-Time: 11/6/15 12:11 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -25,7 +25,7 @@ exec-with-options -disableJobWaiting -command {
 	    	   
 	repeat [val index] -times 5 -command{
 	
-		try -times 10 -delay 300 -command{
+		try -times 10 -delay 500 -command{
 			get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" 
     			| get-property childCount | equals 3 | verify-true
 			}
@@ -65,6 +65,10 @@ exec-with-options -disableJobWaiting -command {
 		}
 	
 		check-debug-marker-on-ruler -line 7 -script_name "For200TestSuite.robot"	
+		
+		try -times 4 -delay 500 -command{
+			get-view Variables | get-tree | get-item "${i}" | get-property index | equals 0 | verify-true
+		}
 		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
 		
 		//Thread has 2 items
