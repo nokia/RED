@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _SdNGkIMLEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 12:04 PM
+Save-Time: 11/6/15 12:17 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -75,6 +75,7 @@ exec-with-options -disableJobWaiting -command {
 
 	//return to res1.robot    
 	get-button "Step Return (F7)" | click
+	wait 1000
 	get-editor "res1.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
 	    + "Resource   res2.robot\n\n"
 	    + "*** Keywords ***\n"
@@ -95,6 +96,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//return to main script
 	get-button "Step Return (F7)" | click
+	wait 1000
 	get-editor "TestWithNestedResources.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
 	    + "Resource    Resources/res1.robot\n\n"
 	    + "*** Test Cases ***\n"
