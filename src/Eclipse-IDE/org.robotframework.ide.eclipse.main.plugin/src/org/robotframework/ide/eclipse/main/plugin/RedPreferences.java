@@ -31,6 +31,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
+    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
@@ -82,6 +83,10 @@ public class RedPreferences {
 
     public char[] getAssistantAutoActivationChars() {
         return store.getString(ASSISTANT_AUTO_ACTIVATION_CHARS).toCharArray();
+    }
+    
+    public boolean isAssistantKeywordPrefixAutoAdditionEnabled() {
+        return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
