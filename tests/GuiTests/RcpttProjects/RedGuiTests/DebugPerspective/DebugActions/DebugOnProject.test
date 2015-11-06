@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BW-V4B8oEeWYlfCPyvfohw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 11:48 AM
+Save-Time: 11/6/15 2:29 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -69,7 +69,7 @@ exec-with-options -disableJobWaiting -command {
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
 		        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log [line:13]" | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-		        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals  [os-specific "${res} = my_keywords.Validate string [line:66]" "my_keywords.Validate string [line:66]"] 
 		        | verify-true
 		}
 	}
@@ -85,7 +85,7 @@ exec-with-options -disableJobWaiting -command {
 		        | get-property "getItems().TreeItem[0].getText()" | equals "${result1} = String.Should Be String [line:14]" 
 		        | verify-true
 		    get-item "ScriptWithResource \\[Robot\\]/Robot Test/Thread \\[main\\]" 
-		        | get-property "getItems().TreeItem[1].getText()" | equals "${res} = my_keywords.Validate string [line:66]" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals  [os-specific "${res} = my_keywords.Validate string [line:66]" "my_keywords.Validate string [line:66]"] 
 		        | verify-true
 		}
 	}
