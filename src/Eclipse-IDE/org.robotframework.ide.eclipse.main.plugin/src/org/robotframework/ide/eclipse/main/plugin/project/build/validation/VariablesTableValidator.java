@@ -28,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
@@ -38,12 +39,23 @@ class VariablesTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotVariablesSection> variablesSection;
 
-    private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
+    private final ProblemsReportingStrategy reporter;
+
+    private final VersionDependentValidators versionDependentValidators;
 
     VariablesTableValidator(final ValidationContext validationContext,
             final Optional<RobotVariablesSection> variablesSection) {
+        this(validationContext, variablesSection, new ProblemsReportingStrategy(), new VersionDependentValidators());
+    }
+
+    @VisibleForTesting
+    VariablesTableValidator(final ValidationContext validationContext,
+            final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy,
+            final VersionDependentValidators versionDependentValidators) {
         this.validationContext = validationContext;
         this.variablesSection = variablesSection;
+        this.reporter = reportingStrategy;
+        this.versionDependentValidators = versionDependentValidators;
     }
 
     @Override
@@ -60,27 +72,10 @@ class VariablesTableValidator implements ModelUnitValidator {
         reportDuplicatedVariables(suiteModel.getFile(), variableTable);
     }
 
-    private void reportInvalidVariableName(IFile file, VariableTable variableTable) {
-    	for (final IVariableHolder variable : variableTable.getVariables()) {
-    		final VariableType varType = variable.getType();
-			if (varType != VariableType.INVALID) {
-				final String variableName = variable.getDeclaration().getRaw().toString();
-				if (variableName != null && variableName.length() >= 2) {
-					if (variableName.charAt(1) != '{') {
-		                final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)
-		                        .formatMessageWith(variableName);
-		                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variableName);
-		                reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
-					}
-				}
-    		}
-    	}
-	}
-
 	private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
             final IProgressMonitor monitor) throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
-            final List<? extends ModelUnitValidator> validators = new VersionDependentValidators()
+            final List<? extends ModelUnitValidator> validators = versionDependentValidators
                     .getVariableValidators(variable, validationContext.getVersion());
             for (final ModelUnitValidator validator : validators) {
                 try {
@@ -89,6 +84,23 @@ class VariablesTableValidator implements ModelUnitValidator {
                     final ProblemPosition position = e.shouldMarkWholeDefinition()
                             ? toPositionOfWholeDefinition(variable) : toPosition(variable);
                     reporter.handleProblem(e.getProblem(), file, position);
+                }
+            }
+        }
+    }
+
+    private void reportInvalidVariableName(final IFile file, final VariableTable variableTable) {
+        for (final IVariableHolder variable : variableTable.getVariables()) {
+            final VariableType varType = variable.getType();
+            if (varType != VariableType.INVALID) {
+                final String variableName = variable.getDeclaration().getRaw().toString();
+                if (variableName != null && variableName.length() >= 2) {
+                    if (variableName.charAt(1) != '{') {
+                        final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)
+                                .formatMessageWith(variableName);
+                        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variableName);
+                        reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
+                    }
                 }
             }
         }
