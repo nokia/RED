@@ -22,12 +22,9 @@ public class PathsConverter {
         if (path.isAbsolute()) {
             throw new IllegalArgumentException("Unable to convert absolute path");
         }
-        try {
-            final URI resolvedPath = resource.getLocation().toFile().toURI().resolve(path.toPortableString());
-            return new Path(resolvedPath.getPath()).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
-        } catch (final IllegalArgumentException e) {
-            return null;
-        }
+        final String pathWithoutSpaces = path.toPortableString().replaceAll(" ", "%20");
+        final URI resolvedPath = resource.getLocation().toFile().toURI().resolve(pathWithoutSpaces);
+        return new Path(resolvedPath.getPath()).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
     }
 
     public static IPath fromWorkspaceRelativeToResourceRelative(final IResource resource, final IPath path) {
