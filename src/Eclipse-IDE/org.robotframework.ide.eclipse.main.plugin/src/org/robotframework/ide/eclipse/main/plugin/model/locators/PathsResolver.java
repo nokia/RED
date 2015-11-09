@@ -48,9 +48,13 @@ public class PathsResolver {
                 } else if (path.isAbsolute()) {
                     return path;
                 } else {
-                    final String pathWithoutSpaces = path.toPortableString().replaceAll(" ", "%20");
-                    final URI resolvedPath = location.toFile().toURI().resolve(pathWithoutSpaces);
-                    return new Path(resolvedPath.getPath());
+                    try {
+                        final String pathWithoutSpaces = path.toPortableString().replaceAll(" ", "%20");
+                        final URI resolvedPath = location.toFile().toURI().resolve(pathWithoutSpaces);
+                        return new Path(resolvedPath.getPath());
+                    } catch (final IllegalArgumentException e) {
+                        return null;
+                    }
                 }
             }
         }), Predicates.notNull()));
