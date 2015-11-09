@@ -92,25 +92,29 @@
 						<arguments>-Pjdk17</arguments>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>2.7.1</version>
 			</plugins>
 		</pluginManagement>
 		
-			<reporting>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>2.7.1</version>
-            <configuration>
-                <linkXRef>false</linkXRef>
-                <targetJdk>1.7</targetJdk>
-                <rulesets>
-                    <ruleset>sources/PMD/pegasus-pmd.xml</ruleset>
-                </rulesets>
-            </configuration>
-        </plugin>
-    </plugins>
-</reporting>
+		<reporting>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>2.7.1</version>
+					<configuration>
+						<linkXRef>false</linkXRef>
+						<targetJdk>1.7</targetJdk>
+						<rulesets>
+							<ruleset>sources/PMD/pegasus-pmd.xml</ruleset>
+						</rulesets>
+					</configuration>
+				</plugin>
+			</plugins>
+		</reporting>
 	</build>
 
 </project>	
