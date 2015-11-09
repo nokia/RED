@@ -69,6 +69,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Suit
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
 import org.robotframework.red.graphics.ColorsManager;
@@ -99,7 +100,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
         final RobotSuiteFile model = editor.getFileModel();
-        return new IHyperlinkDetector[] { new HyperlinkToVariablesDetector(model),
+        return new IHyperlinkDetector[] { new HyperlinkToFilesDetector(model), new HyperlinkToVariablesDetector(model),
                 new HyperlinkToKeywordsDetector(model) };
     }
 
