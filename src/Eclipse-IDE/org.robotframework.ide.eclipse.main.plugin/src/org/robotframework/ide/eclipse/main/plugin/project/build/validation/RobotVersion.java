@@ -22,7 +22,7 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     private final Optional<Integer> patch;
 
     public static RobotVersion from(final String version) {
-        final Matcher matcher = Pattern.compile("^(\\d)\\.(\\d+)(\\.(\\d+))?$").matcher(version);
+        final Matcher matcher = Pattern.compile("(\\d)\\.(\\d+)(\\.(\\d+))?").matcher(version);
         if (matcher.find()) {
             if (matcher.group(4) == null) {
                 return new RobotVersion(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
