@@ -17,6 +17,9 @@ public class RobotVersionTest {
         assertThat(RobotVersion.from("1.2")).isNotEqualTo(new RobotVersion(1, 2, 0));
 
         assertThat(RobotVersion.from("1.2.3")).isEqualTo(new RobotVersion(1, 2, 3));
+
+        assertThat(RobotVersion.from("Robot Framework 2.9.1 (Python 2.7.9 on win32)")
+                .isEqualTo(new RobotVersion(2, 9, 1)));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -26,11 +29,6 @@ public class RobotVersionTest {
 
     @Test(expected = IllegalStateException.class)
     public void parsingProblem_2() {
-        RobotVersion.from("1.2.3.4");
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void parsingProblem_3() {
         RobotVersion.from("version");
     }
 
