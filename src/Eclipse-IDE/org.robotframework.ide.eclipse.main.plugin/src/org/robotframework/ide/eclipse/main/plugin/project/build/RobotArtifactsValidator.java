@@ -46,7 +46,7 @@ public class RobotArtifactsValidator {
         }
 
         final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
-                .createProperValidator(new ValidationContext(file), file);
+                .createProperValidator(ValidationContext.createFor(file), file);
 
         if (validator.isPresent()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
@@ -118,7 +118,7 @@ public class RobotArtifactsValidator {
 
         final IFile file = (IFile) resource;
 
-        final ValidationContext validationContext = new ValidationContext(file);
+        final ValidationContext validationContext = ValidationContext.createFor(file);
         final Optional<? extends ModelUnitValidator> validator = createProperValidator(validationContext, file);
 
         if (validator.isPresent()) {
