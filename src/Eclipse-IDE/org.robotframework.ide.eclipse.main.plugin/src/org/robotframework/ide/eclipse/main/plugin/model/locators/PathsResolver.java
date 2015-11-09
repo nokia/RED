@@ -48,8 +48,12 @@ public class PathsResolver {
                 } else if (path.isAbsolute()) {
                     return path;
                 } else {
-                    final URI resolvedPath = location.toFile().toURI().resolve(path.toPortableString());
-                    return new Path(resolvedPath.getPath());
+                    try {
+                        final URI resolvedPath = location.toFile().toURI().resolve(path.toPortableString());
+                        return new Path(resolvedPath.getPath());
+                    } catch (final IllegalArgumentException e) {
+                        return null;
+                    }
                 }
             }
         }), Predicates.notNull()));
