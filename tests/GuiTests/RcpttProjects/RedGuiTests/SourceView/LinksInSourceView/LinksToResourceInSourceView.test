@@ -1,0 +1,159 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ECH_IISiEeWImNPXuPy_LQ
+Element-Name: LinksToResourceInSourceView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Pko4gIbxEeWrUbOa1Nzguw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/9/15 4:31 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open test
+with [get-view "Project Explorer" | get-tree] {
+    select MediumRobotTest | double-click
+    select "MediumRobotTest/TestFile.robot" | double-click
+}
+
+//open "../SecondProject/res2/res.robot" - file from second project
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 27
+    open-declaration
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "res.robot" | verify-true
+    get-property activePage | equals "res.robot" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${sc_2}  18\n\n"
+    + "*** Keywords ***\n"
+    + "from res 2 second project\n"
+    + "    Log  ${sc_2}" | verify-true
+    
+//open file from the same project: "res2/res.robot"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 21
+    open-declaration
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "res.robot" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property activePage | equals "res.robot" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+get-editor "res.robot" -index 1 | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Resource    ../../SecondProject/res2/res.robot\n"
+    + "Resource    ../res1/res3/res.robot\n\n"
+    + "*** Variables ***\n"
+    + "${a}  5\n"
+    + "${this is duplicate}  22    \n"
+    + "@{list2}  text  text2\n\n"
+    + "*** Keywords ***\n"
+    + "from res 2\n"
+    + "    Log  ${a}\n"
+    + "    Log  ${sc_2} \n"
+    + "    Log  ${c}\n\n"
+    + "kw duplicate\n"
+    + "    Log  this is duplicate from /res2.res.robot" | verify-true
+    
+//open file with spaces: "../SecondProject/res1/res3/second project res.robot"
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 58
+    open-declaration
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "res.robot" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property "pages[3]" | equals "second project res.robot" | verify-true
+    get-property activePage | equals "second project res.robot" | verify-true
+    get-property tabCount | equals 4 | verify-true
+}
+get-editor "second project res.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${var from second project}   0\n"
+    + "@{list form second project}  ${var from second project}   9\n\n"
+    + "*** Keywords ***\n"
+    + "second_project_kw\n"
+    + "    Log  second project kw" | verify-true
+    
+//open .txt file    
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 16 19 -with M1
+    set-caret-pos 16 19
+    open-declaration
+}
+get-editor "text_file.txt" | get-text-viewer | get-property text | equals "" | verify-true
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "res.robot" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property "pages[3]" | equals "second project res.robot" | verify-true
+    get-property "pages[4]" | equals "text_file.txt" | verify-true
+    get-property activePage | equals "text_file.txt" | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+
+//open filie with capital letter: "../SecondProject/res1/res3/RES.ROBOT"
+
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 41
+    open-declaration
+}
+get-editor "RES.ROBOT" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${sc_3}  17\n\n\n"
+    + "*** Keywords ***\n"
+    + "from res 3 second project\n"
+    + "    Log  ${sc_3}" | verify-true
+
+
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "res.robot" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property "pages[3]" | equals "second project res.robot" | verify-true
+    get-property "pages[4]" | equals "text_file.txt" | verify-true
+    get-property "pages[5]" | equals "RES.ROBOT" | verify-true
+    get-property activePage | equals "RES.ROBOT" | verify-true
+    get-property tabCount | equals 6 | verify-true
+}
+
+//open res.robot
+with [get-tab-folder -index 1] {
+    get-tab-item "res.robot" | click
+}
+//set text to file that exist but with capital letters are extension
+get-editor "res.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Resource    ../res1/res3/res.ROBOT" 
+    
+with [get-editor "res.robot" | get-text-viewer] {
+    hover-text 2 24 -with M1
+    set-caret-pos 2 25
+    open-declaration
+}
+
+//editor should not be open
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Resource    ../res1/res3/res.ROBOT" | verify-true
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "*res.robot" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property "pages[3]" | equals "second project res.robot" | verify-true
+    get-property "pages[4]" | equals "text_file.txt" | verify-true
+    get-property "pages[5]" | equals "RES.ROBOT" | verify-true
+    get-property activePage | equals "*res.robot" | verify-true
+    get-property tabCount | equals 6 | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
