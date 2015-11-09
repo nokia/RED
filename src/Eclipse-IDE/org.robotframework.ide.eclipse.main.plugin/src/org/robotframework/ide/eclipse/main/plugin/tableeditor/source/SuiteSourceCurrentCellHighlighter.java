@@ -73,7 +73,9 @@ class SuiteSourceCurrentCellHighlighter {
 
     private void removeCellHighlighting() {
         try {
-            file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
+            if (file.exists()) {
+                file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
+            }
         } catch (final CoreException e) {
             RedPlugin.logError("Unable to remove cell highlight markers", e);
         }
@@ -96,11 +98,13 @@ class SuiteSourceCurrentCellHighlighter {
 
     private void createMarker(final IRegion region, final String selectedText) {
         try {
-            final IMarker marker = file.createMarker(MARKER_ID);
-            marker.setAttribute(IMarker.TRANSIENT, true);
-            marker.setAttribute(IMarker.MESSAGE, "Cell highlight of '" + selectedText + "'");
-            marker.setAttribute(IMarker.CHAR_START, region.getOffset());
-            marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
+            if (file.exists()) {
+                final IMarker marker = file.createMarker(MARKER_ID);
+                marker.setAttribute(IMarker.TRANSIENT, true);
+                marker.setAttribute(IMarker.MESSAGE, "Cell highlight of '" + selectedText + "'");
+                marker.setAttribute(IMarker.CHAR_START, region.getOffset());
+                marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
+            }
         } catch (final CoreException e) {
             RedPlugin.logError("Unable to create cell highlighting marker for '" + selectedText + "'", e);
         }
