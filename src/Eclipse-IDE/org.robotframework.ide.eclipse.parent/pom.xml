@@ -25,7 +25,22 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.version>luna</eclipse.version>
 	</properties>
-
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<linkXref>false</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>100</minimumTokens>
+					<targetJdk>1.8</targetJdk>
+					<excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 	<modules>
 		<module>../org.robotframework.ide.eclipse.target-platform</module>
 	</modules>
@@ -92,29 +107,9 @@
 						<arguments>-Pjdk17</arguments>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>2.7.1</version>
 			</plugins>
 		</pluginManagement>
 		
-		<reporting>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>2.7.1</version>
-					<configuration>
-						<linkXRef>false</linkXRef>
-						<targetJdk>1.7</targetJdk>
-						<rulesets>
-							<ruleset>sources/PMD/pegasus-pmd.xml</ruleset>
-						</rulesets>
-					</configuration>
-				</plugin>
-			</plugins>
-		</reporting>
-	</build>
+
 
 </project>	
