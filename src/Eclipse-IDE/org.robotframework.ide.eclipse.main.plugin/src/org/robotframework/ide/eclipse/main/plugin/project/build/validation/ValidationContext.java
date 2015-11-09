@@ -27,12 +27,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 public class ValidationContext {
 
-    private final RobotRuntimeEnvironment runtimeEnvironment;
+    private final SuiteExecutor executorInUse;
 
     private final RobotVersion version;
 
@@ -42,17 +43,25 @@ public class ValidationContext {
 
     private final Map<ReferencedLibrary, LibrarySpecification> referencedLibrarySpecifications;
 
-    public ValidationContext(final IFile file) {
+    public static ValidationContext createFor(final IFile file) {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-        this.runtimeEnvironment = project.getRuntimeEnvironment();
-        this.version = runtimeEnvironment != null ? RobotVersion.from(project.getVersion()) : null;
+        final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
+        
+        final RobotVersion version = runtimeEnvironment != null ? RobotVersion.from(project.getVersion()) : null;
+        return new ValidationContext(version, runtimeEnvironment.getInterpreter());
+    }
+
+    @VisibleForTesting
+    public ValidationContext(final RobotVersion version, final SuiteExecutor executorInUse) {
+        this.executorInUse = executorInUse;
+        this.version = version;
         this.accessibleKeywords = newHashMap();
         this.librarySpecifications = newHashMap();
         this.referencedLibrarySpecifications = newHashMap();
     }
 
     public SuiteExecutor getExecutorInUse() {
-        return runtimeEnvironment.getInterpreter();
+        return executorInUse;
     }
 
     public RobotVersion getVersion() {
@@ -100,11 +109,11 @@ public class ValidationContext {
     }
     
     private KeywordValidationContext extractKeywordValidationContext(final KeywordNameSplitter typedKeywordNameSplitter) {
-        List<KeywordValidationContext> keywordsContextList = accessibleKeywords.get(typedKeywordNameSplitter.getKeywordName()
+        final List<KeywordValidationContext> keywordsContextList = accessibleKeywords.get(typedKeywordNameSplitter.getKeywordName()
                 .toLowerCase());
         if (keywordsContextList != null) {
             final String typedKeywordSourceName = typedKeywordNameSplitter.getKeywordSource();
-            for (KeywordValidationContext keywordValidationContext : keywordsContextList) {
+            for (final KeywordValidationContext keywordValidationContext : keywordsContextList) {
                 if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
                     return keywordValidationContext;
                 }
@@ -213,15 +222,15 @@ public class ValidationContext {
     
     public static class KeywordValidationContext {
 
-        private String keywordName;
+        private final String keywordName;
 
-        private String sourceName;
+        private final String sourceName;
 
-        private String alias;
+        private final String alias;
 
-        private boolean isDeprecated;
+        private final boolean isDeprecated;
 
-        private boolean isFromNestedLibrary;
+        private final boolean isFromNestedLibrary;
 
         public KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
                 final boolean isDeprecated, final boolean isFromNestedLibrary) {

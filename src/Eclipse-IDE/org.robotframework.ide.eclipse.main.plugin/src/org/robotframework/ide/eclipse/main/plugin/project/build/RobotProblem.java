@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RobotProblem {
 
     public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".robotProblem";
@@ -24,13 +26,18 @@ public class RobotProblem {
     private final IProblemCause cause;
     private Object[] objects;
 
+    public static RobotProblem causedBy(final IProblemCause cause) {
+        return new RobotProblem(cause);
+    }
+
     private RobotProblem(final IProblemCause cause) {
         this.cause = cause;
         this.objects = null;
     }
 
-    public static RobotProblem causedBy(final IProblemCause cause) {
-        return new RobotProblem(cause);
+    @VisibleForTesting
+    public IProblemCause getCause() {
+        return cause;
     }
 
     public RobotProblem formatMessageWith(final Object... objects) {
