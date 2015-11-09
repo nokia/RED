@@ -1,0 +1,157 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistInLastLine
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JPBOsIb7EeWrUbOa1Nzguw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/9/15 5:17 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+
+//check if main section are in Content Assist    
+get-editor "TestFile.robot" | get-text-viewer | get-property "getLineCount()" | equals 1 | verify-true
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type End
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 300
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+}
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type ESC
+}
+
+//check that sections to test cases are in Content Assist
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 1
+    key-type Tab
+    key-type "M1+SPACE"
+    wait 200
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "[Setup]" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "[Tags]" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "[Teardown]" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "[Template]" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "Call Method - BuiltIn" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "Catenate - BuiltIn" | verify-true
+}
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type ESC
+}
+
+
+//--------------
+//remove all and add Variables
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1  1
+    key-type "M1+a"
+    key-type BackSpace
+    wait 500
+    key-type "M1+SPACE"
+    wait 300
+    key-type Down -times 3
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 300
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 7 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "*** Variables ***" | verify-true
+}
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type ESC
+}
+
+//remove all and add Settings
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+a"
+    key-type BackSpace
+    wait 500
+    key-type "M1+SPACE"
+    wait 200
+    key-type Down
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 300
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 17 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals Library | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals Resource | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals Variables | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals Documentation | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals Metadata | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "Suite Setup" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "Suite Teardown" | verify-true
+    get-property "getItems().TableItem[11].getText()" | equals "Force Tags" | verify-true
+    get-property "getItems().TableItem[12].getText()" | equals "Default Tags" | verify-true
+    get-property "getItems().TableItem[13].getText()" | equals "Test Setup" | verify-true
+    get-property "getItems().TableItem[14].getText()" | equals "Test Teardown" | verify-true
+    get-property "getItems().TableItem[15].getText()" | equals "Test Template" | verify-true
+    get-property "getItems().TableItem[16].getText()" | equals "Test Timeout" | verify-true
+}
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type ESC
+}
+
+
+//remove all and add Keywords
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+a"
+    key-type BackSpace
+    key-type "M1+SPACE"
+    wait 200
+    key-type Down
+    key-type Up
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 200
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+}
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type ESC
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
