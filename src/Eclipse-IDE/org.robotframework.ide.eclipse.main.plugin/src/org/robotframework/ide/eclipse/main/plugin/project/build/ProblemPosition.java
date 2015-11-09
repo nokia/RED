@@ -5,10 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import java.util.Objects;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
-public class ProblemPosition {
+public final class ProblemPosition {
 
     private final int line;
 
@@ -41,5 +43,19 @@ public class ProblemPosition {
             return range.get().lowerEndpoint() + ", " + range.get().upperEndpoint();
         }
         return "empty";
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof ProblemPosition) {
+            final ProblemPosition that = (ProblemPosition) obj;
+            return this.line == that.line && Objects.equals(this.range, that.range);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, range);
     }
 }
