@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotVersion;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -24,7 +24,7 @@ import com.google.common.collect.Iterables;
 public class VersionDependentValidators {
 
     public List<? extends ModelUnitValidator> getVariableValidators(final IVariableHolder variable,
-            final ValidationContext.RobotVersion version) {
+            final RobotVersion version) {
         final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
                 new DictionaryExistenceValidator(variable),
                 new ScalarAsListInOlderRobotValidator(variable),
