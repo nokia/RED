@@ -31,6 +31,10 @@ public class DifferentFileHyperlink implements IHyperlink {
 
     private final IFile destinationFile;
 
+    public DifferentFileHyperlink(final IRegion from, final IFile toFile) {
+        this(from, toFile, null);
+    }
+
     public DifferentFileHyperlink(final IRegion from, final IFile toFile, final IRegion to) {
         this.source = from;
         this.destinationFile = toFile;
@@ -63,8 +67,10 @@ public class DifferentFileHyperlink implements IHyperlink {
                 final RobotFormEditor editor = (RobotFormEditor) ed;
                 final SuiteSourceEditor sourcePage = editor.activateSourcePage();
 
-                sourcePage.getSelectionProvider()
-                        .setSelection(new TextSelection(destination.getOffset(), destination.getLength()));
+                if (destination != null) {
+                    sourcePage.getSelectionProvider()
+                            .setSelection(new TextSelection(destination.getOffset(), destination.getLength()));
+                }
             }
         } catch (final PartInitException e) {
             throw new RuntimeException("Unable to open editor for file: " + destinationFile.getName(), e);
