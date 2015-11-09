@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.table.variables.IVariableHolde
 import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
 import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
 
 public class DictionaryExistenceValidatorTest {

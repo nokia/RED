@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotVersion;
 
 public class VersionDependentValidatorsTest {
 
