@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.Range;
@@ -181,7 +180,7 @@ public class VariablesTableValidatorTest {
         return new VersionDependentValidators() {
             @Override
             public List<? extends ModelUnitValidator> getVariableValidators(final IVariableHolder variable,
-                    final ValidationContext.RobotVersion version) {
+                    final RobotVersion version) {
                 return newArrayList(validators);
             }
         };
