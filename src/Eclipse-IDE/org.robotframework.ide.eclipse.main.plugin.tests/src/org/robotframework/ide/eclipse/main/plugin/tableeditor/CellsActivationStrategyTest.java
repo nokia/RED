@@ -61,7 +61,7 @@ public class CellsActivationStrategyTest {
     }
 
     @Theory
-    public void whenNonPrintalbeCharOrNonCRIsTypedIn_editorShouldNotActivateAndKeyEventIsPropagated(
+    public void whenNonPrintableCharOrNonCRIsTypedIn_editorShouldNotActivateAndKeyEventIsPropagated(
             final Character character) {
         assumeFalse(character == '\r' || ' ' <= character.charValue() && character.charValue() <= '~');
 
