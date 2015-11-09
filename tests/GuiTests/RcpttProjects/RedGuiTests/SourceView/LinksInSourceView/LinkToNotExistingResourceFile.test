@@ -1,0 +1,54 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: __If_UHjQEeWYifgNPLzx_Q
+Element-Name: LinkToNotExistingResourceFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _BIoy4Ib6EeWrUbOa1Nzguw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/9/15 4:59 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//read ptah wher this file is on disc
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu Properties | click
+
+get-window "Properties for RobotProject"  | get-editbox -after [get-label "Location:"] | get-property text -raw
+   | let [val path_to_file -input]{
+    
+    get-window "Properties for RobotProject"  | get-button Cancel | click
+   
+    //set absolute path
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+	    | double-click
+	
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    set-caret-pos 2 12
+	    key-type "M2+END"
+	    set-caret-pos 2 30
+	    select-range 2 11 2 30
+	    key-type BackSpace
+	    type-text [concat $path_to_file "/not_esisting.robot"]
+		}
+
+	//check that warning is in Problems
+
+	with [get-view Problems | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-item "Errors \\(1 item\\)" | get-property childCount | equals 1 | verify-true
+    get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "Resource import '%s' is invalid: file does not exist" [concat $path_to_file "/not_esisting.robot"]]
+        | verify-true
+    get-item "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "Path '%s' is absolute. RED prefers relative paths" [concat $path_to_file "/not_esisting.robot"]]
+        | verify-true
+    get-item "Warnings \\(1 item\\)" | get-property "getText()" | equals "Warnings (1 item)" | verify-true
+}
+
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
