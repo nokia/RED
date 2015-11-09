@@ -44,7 +44,7 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
                         ? currentName.substring(currentName.lastIndexOf('.') + 1) : "";
                 final String currentNameWithoutExtension = currentName.contains(".") 
                         ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
-                        
+
                 if (robotFormat.getSelection() && !"robot".equals(currentExtension)) {
                     setFileName(currentNameWithoutExtension + ".robot");
                 } else if (tsvFormat.getSelection() && !"tsv".equals(currentExtension)) {
@@ -62,5 +62,20 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
         } else {
             setFileExtension("tsv");
         }
+    }
+
+    @Override
+    protected boolean validatePage() {
+        final boolean isValid = super.validatePage();
+
+        final String currentName = getFileName();
+        final String currentNameWithoutExtension = currentName.contains(".")
+                ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
+
+        if (currentNameWithoutExtension.isEmpty()) {
+            setErrorMessage("Name cannot be empty");
+            return false;
+        }
+        return isValid;
     }
 }
