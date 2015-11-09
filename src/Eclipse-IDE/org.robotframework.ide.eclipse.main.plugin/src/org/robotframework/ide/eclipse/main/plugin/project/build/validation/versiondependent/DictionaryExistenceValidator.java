@@ -16,7 +16,7 @@ import org.robotframework.ide.core.testData.model.table.variables.AVariable.Vari
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
 
 import com.google.common.collect.Range;
