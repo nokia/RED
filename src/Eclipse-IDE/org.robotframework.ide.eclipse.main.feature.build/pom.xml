@@ -18,7 +18,7 @@
 				<version>3.5</version>
 				<configuration>
 					<rulesets>
-						<ruleset>sources/PMD/pegasus-pmd.xml</ruleset>
+						<ruleset>../../sources/PMD/pegasus-pmd.xml</ruleset>
 					</rulesets>
 					<linkXref>false</linkXref>
 					<sourceEncoding>utf-8</sourceEncoding>
