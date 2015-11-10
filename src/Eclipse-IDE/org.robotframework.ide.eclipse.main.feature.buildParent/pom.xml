@@ -14,7 +14,21 @@
   <properties>
 	<core.functions.dir>../../RobotFrameworkCore</core.functions.dir>
   </properties>
-  
+  <reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<linkXref>true</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>100</minimumTokens>
+					<targetJdk>${jdk.version}</targetJdk>
+				</configuration>
+			</plugin>
+		</plugins>
+  </reporting>
   <modules>
   	<module>${core.functions.dir}/org.robotframework.ide.core-functions</module>
   	<module>../org.robotframework.ide.eclipse.main.plugin</module>
