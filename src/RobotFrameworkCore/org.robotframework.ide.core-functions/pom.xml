@@ -51,7 +51,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.5</version>
 				<configuration>
 					<linkXref>true</linkXref>
 					<sourceEncoding>utf-8</sourceEncoding>
@@ -66,6 +66,9 @@
 					<excludeRoots>
 						<excludeRoot>target/generated-sources/stubs</excludeRoot>
 					</excludeRoots>
+					<rulesets>
+						<ruleset>sources/PMD/pegasus-pmd.xml</ruleset>
+					</rulesets>
 				</configuration>
 			</plugin>
 			<plugin>
