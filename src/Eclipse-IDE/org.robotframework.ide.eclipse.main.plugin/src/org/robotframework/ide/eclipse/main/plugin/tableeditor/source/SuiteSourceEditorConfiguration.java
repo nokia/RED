@@ -31,6 +31,7 @@ import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
+import org.eclipse.jface.text.hyperlink.MultipleHyperlinkPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
@@ -48,6 +49,7 @@ import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -94,7 +96,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IHyperlinkPresenter getHyperlinkPresenter(final ISourceViewer sourceViewer) {
-        return super.getHyperlinkPresenter(sourceViewer);
+        return new MultipleHyperlinkPresenter(new RGB(0, 0, 255));
     }
 
     @Override

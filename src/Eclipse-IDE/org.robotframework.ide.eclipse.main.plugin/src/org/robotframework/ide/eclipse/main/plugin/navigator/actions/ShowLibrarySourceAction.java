@@ -54,9 +54,15 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
         final LibrarySpecification spec = Selections.getSingleElement(
                 selection, LibrarySpecification.class);
+        final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
+
+        openLibrarySource(page, project, spec);
+    }
+
+    public static void openLibrarySource(final IWorkbenchPage page, final IProject project,
+            final LibrarySpecification spec) {
         try {
             final String libName = spec.getName() + ".py";
-            final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
             final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final IFile file = LibspecsFolder.get(project).getFile(libName);
             
@@ -84,7 +90,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
     }
     
-    private Path extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
+    private static Path extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
         if (robotProject.isStandardLibrary(spec)) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());

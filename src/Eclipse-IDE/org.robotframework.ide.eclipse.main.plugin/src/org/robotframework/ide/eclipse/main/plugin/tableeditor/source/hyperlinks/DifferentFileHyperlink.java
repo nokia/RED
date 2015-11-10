@@ -25,20 +25,33 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  */
 public class DifferentFileHyperlink implements IHyperlink {
 
+    private static final String DEFAULT_TEXT = "Open Definition";
+
     private final IRegion source;
 
     private final IRegion destination;
 
     private final IFile destinationFile;
 
+    private final String label;
+
     public DifferentFileHyperlink(final IRegion from, final IFile toFile) {
-        this(from, toFile, null);
+        this(from, toFile, null, DEFAULT_TEXT);
+    }
+
+    public DifferentFileHyperlink(final IRegion from, final IFile toFile, final String label) {
+        this(from, toFile, null, label);
     }
 
     public DifferentFileHyperlink(final IRegion from, final IFile toFile, final IRegion to) {
+        this(from, toFile, to, DEFAULT_TEXT);
+    }
+
+    public DifferentFileHyperlink(final IRegion from, final IFile toFile, final IRegion to, final String label) {
         this.source = from;
         this.destinationFile = toFile;
         this.destination = to;
+        this.label = label;
     }
 
     @Override
@@ -53,7 +66,7 @@ public class DifferentFileHyperlink implements IHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return null;
+        return label;
     }
 
     @Override
