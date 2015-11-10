@@ -74,6 +74,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
                 if (kwSpec.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
                         && hasEqualSources(libSpec, libraryAlias, typedKeywordNameSplitter.getKeywordSource())) {
+                    hyperlinks.add(new LibrarySourceHyperlink(fromRegion, suiteFile.getFile().getProject(), libSpec));
                     hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
                     return ContinueDecision.STOP;
                 } else {
@@ -88,13 +89,16 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
                 if (keyword.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
                         && hasEqualSources(file, typedKeywordNameSplitter.getKeywordSource())) {
+
+                    final KeywordSpecification kwSpec = keyword.createSpecification();
                     final Position position = keyword.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
-                    if (file == suiteFile) {
-                        hyperlinks.add(new RegionsHyperlink(textViewer, fromRegion, destination));
-                    } else {
-                        hyperlinks.add(new DifferentFileHyperlink(fromRegion, file.getFile(), destination));
-                    }
+
+                    final IHyperlink definitionHyperlink = file == suiteFile
+                            ? new RegionsHyperlink(textViewer, fromRegion, destination)
+                            : new DifferentFileHyperlink(fromRegion, file.getFile(), destination);
+                    hyperlinks.add(definitionHyperlink);
+                    hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
                     return ContinueDecision.STOP;
                 } else {
                     return ContinueDecision.CONTINUE;
