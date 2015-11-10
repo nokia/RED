@@ -67,7 +67,7 @@
 						<excludeRoot>target/generated-sources/stubs</excludeRoot>
 					</excludeRoots>
 					<rulesets>
-						<ruleset>/sources/PMD/pegasus-pmd.xml</ruleset>
+						<ruleset>../PMD/pegasus-pmd.xml</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
