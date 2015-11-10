@@ -146,10 +146,15 @@ public class ElementsUtility {
                 }
             } else {
                 RobotToken exactlyOnPosition = tokensExactlyOnPosition.get(0);
-                List<IRobotTokenType> types = exactlyOnPosition.getTypes();
-                for (RobotToken currentProposal : robotTokens) {
-                    if (exactlyOnPosition != currentProposal) {
-                        types.addAll(currentProposal.getTypes());
+                if (state.getPreviousState() != ParsingState.VARIABLE_TABLE_HEADER
+                        && state.getPreviousState() != ParsingState.VARIABLE_TABLE_INSIDE
+                        && state.getPreviousState() != ParsingState.SETTING_TABLE_HEADER
+                        && state.getPreviousState() != ParsingState.SETTING_TABLE_INSIDE) {
+                    List<IRobotTokenType> types = exactlyOnPosition.getTypes();
+                    for (RobotToken currentProposal : robotTokens) {
+                        if (exactlyOnPosition != currentProposal) {
+                            types.addAll(currentProposal.getTypes());
+                        }
                     }
                 }
                 correct = exactlyOnPosition;
