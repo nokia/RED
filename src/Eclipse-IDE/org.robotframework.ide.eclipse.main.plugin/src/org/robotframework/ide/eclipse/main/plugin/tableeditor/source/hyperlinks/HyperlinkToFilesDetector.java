@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.BadLocationException;
@@ -79,8 +80,10 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
                 try {
                     final IContentType textContentType = Platform.getContentTypeManager()
                             .getContentType(IContentTypeManager.CT_TEXT);
-                    final IContentType currentContentType = file.getContentDescription().getContentType();
-                    if (currentContentType.isKindOf(textContentType)) {
+                    final IContentDescription contentDescription = file.getContentDescription();
+                    final IContentType currentContentType = contentDescription == null ? null
+                            : contentDescription.getContentType();
+                    if (currentContentType != null && currentContentType.isKindOf(textContentType)) {
                         return new IHyperlink[] {
                                 new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File") };
                     }
