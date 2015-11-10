@@ -15,44 +15,43 @@ import os
 import tempfile
 import importlib
 
+
 def checkServerAvailability():
     pass
 
+
 def getModulesSearchPaths():
-    import robot    # Robot will add some paths to PYTHONPATH
+    import robot  # Robot will add some paths to PYTHONPATH
+
     return sys.path
-    
+
+
 def getModulePath(moduleName):
     import imp
+
     _, path, _ = imp.find_module(moduleName)
     return path
-    
+
+
 def getVariables(dir, args):
     import robot
+
     vars = robot.variables.Variables()
     try:
-        exec("vars.set_from_file('"+dir+"',"+str(args)+")")
+        exec ("vars.set_from_file('" + dir + "'," + str(args) + ")")
     except:
         pass
-        
+
     try:
         return vars.data
     except AttributeError:  # for robot >2.9
         return vars.store.data._data
 
+
 def getGlobalVariables():
     try:
-    
-        import robot
 
-        globVariables = {}
-        try:
-            from robot.variables import GLOBAL_VARIABLES
-            globVariables = GLOBAL_VARIABLES
-        except ImportError:  # for robot >2.9
-            from robot.conf.settings import RobotSettings
-            from robot.variables.scopes import GlobalVariables
-            globVariables = GlobalVariables(RobotSettings()).as_dict()
+        import robot
 
         # Global variables copied from robot.variables.__init__.py
         global_variables = {
@@ -62,6 +61,7 @@ def getGlobalVariables():
             '${:}': os.pathsep,
             '${SPACE}': ' ',
             '${EMPTY}': '',
+            '@{EMPTY}': list(),
             '${True}': True,
             '${False}': False,
             '${None}': None,
@@ -85,9 +85,22 @@ def getGlobalVariables():
             '${SUITE_STATUS}': '',
             '${SUITE_MESSAGE}': ''
         }
+
+        globVariables = {}
+        try:
+            from robot.variables import GLOBAL_VARIABLES
+
+            globVariables = GLOBAL_VARIABLES
+        except ImportError:  # for robot >2.9
+            global_variables['&{EMPTY}'] = dict()
+            from robot.conf.settings import RobotSettings
+            from robot.variables.scopes import GlobalVariables
+
+            globVariables = GlobalVariables(RobotSettings()).as_dict()
+
         data = {}
         for k in globVariables.keys():
-            if not (k.startswith('${') or k.startswith('@{')):
+            if not (k.startswith('${') or k.startswith('@{') or k.startswith('&{')):
                 key = '${' + k + '}'
             else:
                 key = k
@@ -99,9 +112,11 @@ def getGlobalVariables():
     except:
         return dict()
 
+
 def getStandardLibrariesNames():
     try:
         import robot
+
         try:
             return list(robot.running.namespace.STDLIB_NAMES)
         except:
@@ -110,57 +125,66 @@ def getStandardLibrariesNames():
     except:
         return []
 
+
 def getStandardLibraryPath(libName):
     try:
-        module=importlib.import_module("robot.libraries." + libName)
+        module = importlib.import_module("robot.libraries." + libName)
         return module.__file__
     except:
         return None
+
 
 def getRobotVersion():
     try:
         import robot
         from robot import version as RobotVersion
+
         return 'Robot Framework ' + RobotVersion.get_full_version()
     except:
         return None
 
+
 def getRunModulePath():
     try:
         import robot
+
         return robot.__file__
     except:
         return None
+
 
 def createLibdoc(resultFilePath, libName, libPath):
     try:
         import robot
         from robot import pythonpathsetter
         from robot import libdoc
-        if(libPath != ''):
+
+        if (libPath != ''):
             pythonpathsetter.add_path(libPath)
         robot.libdoc.libdoc(libName, resultFilePath, format='XML')
-        if(libPath != ''):
+        if (libPath != ''):
             pythonpathsetter.remove_path(libPath)
         return True
     except:
         return False
 
+
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
     import sys
-    
+
     # this causes the function to block on readline() call; parent process which 
     # started this script shouldn't write anything to the input, so this function will
     # be blocked until parent process will be closed/killed; this will cause readline()
     # to read EOF and hence proceed to server.shutdown() which will terminate whole script
     sys.stdin.readline()
     server.shutdown()
-    
+
+
 if __name__ == "__main__":
     IP = '127.0.0.1'
     PORT = int(sys.argv[1])
-    
-    server = SimpleXMLRPCServer((IP, PORT),allow_none=True)
+
+    server = SimpleXMLRPCServer((IP, PORT), allow_none=True)
     server.register_function(getModulesSearchPaths, "getModulesSearchPaths")
     server.register_function(getModulePath, "getModulePath")
     server.register_function(getVariables, "getVariables")
@@ -171,10 +195,11 @@ if __name__ == "__main__":
     server.register_function(getRunModulePath, "getRunModulePath")
     server.register_function(createLibdoc, "createLibdoc")
     server.register_function(checkServerAvailability, "checkServerAvailability")
-    
+
     from threading import Thread
-    redCheckingThread = Thread(target = __shutdown_server_when_parent_process_becomes_unavailable, args = {server})
+
+    redCheckingThread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args={server})
     redCheckingThread.setDaemon(True)
     redCheckingThread.start()
-    
+
     server.serve_forever()
