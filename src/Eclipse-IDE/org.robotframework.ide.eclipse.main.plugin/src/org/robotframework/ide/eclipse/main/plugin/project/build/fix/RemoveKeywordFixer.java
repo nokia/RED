@@ -77,6 +77,8 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
                 ch = document.getChar(offset + length + shift);
                 shift++;
             }
+        } else {
+            shift = document.getLength() - length - offset + 1;
         }
 
         final ICompletionProposal proposal = new CompletionProposal("", offset, length + shift - 1, offset,
