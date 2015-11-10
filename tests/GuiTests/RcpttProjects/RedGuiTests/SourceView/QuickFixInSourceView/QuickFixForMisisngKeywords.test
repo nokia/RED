@@ -1,0 +1,123 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: QuickFixForMisisngKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _7MvNcIb_EeWrUbOa1Nzguw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/9/15 6:28 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" | double-click
+}
+//add new test with not-existing keyword
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type End
+    set-caret-pos 1 19
+    key-type Enter
+    type-text "test 1"
+    key-type Enter
+    key-type Tab
+    type-text "new keyword"
+    key-type "M1+s"
+}
+//check Problems
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    select "Errors (1 item)" | select "Errors \\(1 item\\)" | double-click
+    select "Errors (1 item)/Unknown keyword 'new keyword'" | get-menu "Quick Fix" | click
+}
+
+//use Quick Fix
+with [get-window "Quick Fix" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create 'new keyword' keyword" | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+
+//check caret position
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 3 | verify-true
+    get-property "caretPosition.column" | equals 16 | verify-true
+}
+
+//check that new keyword was added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    new keyword\n\n"
+    + "*** Keywords ***\n"
+    + "new keyword" | verify-true
+    
+//add new keyword    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 12
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Tab
+    type-text "Log  1"
+    set-caret-pos 3 16
+    key-type Enter
+    type-text "keyword with args  ${a}"
+    key-type "M1+s"
+}
+
+//use quickfix
+get-view Problems | get-tree | select "Errors (2 items)/Unknown keyword 'keyword with args'" 
+    | select "Errors (2 items)/Unknown keyword 'keyword with args'" | get-menu "Quick Fix" | click
+with [get-window "Quick Fix" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create 'keyword with args' keyword" | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+
+//check if keyword was added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    new keyword\n"
+    + "    keyword with args  ${a}\n\n"
+    + "*** Keywords ***\n"
+    + "keyword with args\n"
+    + "    \n\n"
+    + "new keyword\n"
+    + "    Log  1" | verify-true
+    
+//add second test with keyword
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    type-text "test 2"
+    key-type Enter
+    key-type Tab
+    type-text "another keyword"
+    key-type Enter
+    key-type "M1+s"
+}
+get-view Problems | get-tree | select "Errors (3 items)/Unknown keyword 'another keyword'" 
+    | select "Errors (3 items)/Unknown keyword 'another keyword'" | get-menu "Quick Fix" | click
+with [get-window "Quick Fix" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create 'another keyword' keyword" | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    new keyword\n"
+    + "    keyword with args  ${a}\n"
+    + "test 2\n"
+    + "    another keyword\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "another keyword\n"
+    + "    \n\n"
+    + "keyword with args\n"
+    + "    \n\n"
+    + "new keyword\n"
+    + "    Log  1" | verify-true    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
