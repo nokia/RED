@@ -6,6 +6,7 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -34,7 +35,8 @@ public class RobotProjectHolder {
         this.robotRuntime = robotRuntime;
         initGlobalVariables();
     }
-    
+
+
     /**
      * Design for test.
      */
@@ -62,7 +64,8 @@ public class RobotProjectHolder {
     }
 
 
-    private List<ARobotInternalVariable<?>> map(final Map<String, Object> varsRead) {
+    private List<ARobotInternalVariable<?>> map(
+            final Map<String, Object> varsRead) {
         final List<ARobotInternalVariable<?>> variables = new LinkedList<>();
         for (final String varName : varsRead.keySet()) {
             final Object varValue = varsRead.get(varName);
@@ -72,9 +75,16 @@ public class RobotProjectHolder {
                 variables.add(new ListRobotInternalVariable(varName, value));
             } else if (varValue instanceof Map) {
                 final Map<String, Object> value = convert((Map<?, ?>) varValue);
-                variables.add(new DictionaryRobotInternalVariable(varName, value));
+                variables.add(new DictionaryRobotInternalVariable(varName,
+                        value));
+            } else if (varValue != null && varValue.getClass().isArray()) {
+                final List<Object> value = new LinkedList<>();
+                Object[] array = ((Object[]) varValue);
+                value.addAll(Arrays.asList(array));
+                variables.add(new ListRobotInternalVariable(varName, value));
             } else {
-                variables.add(new ScalarRobotInternalVariable(varName, "" + varValue));
+                variables.add(new ScalarRobotInternalVariable(varName, ""
+                        + varValue));
             }
         }
         return variables;
