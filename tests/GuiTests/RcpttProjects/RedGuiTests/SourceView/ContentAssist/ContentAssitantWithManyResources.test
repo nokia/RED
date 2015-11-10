@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6IIcwHjQEeWYifgNPLzx_Q
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/9/15 4:24 PM
+Save-Time: 11/9/15 5:30 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,20 +70,39 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+SPACE"
     wait 300
 }
+
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "${c}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "${not used var}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "${n}" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "${sc_1}" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "${sc_2}" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "${sc_3}" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "${scalar from simple res}" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "${this is duplicate}" | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals "${var from second project}" | verify-true
+		
+	}
+}-else{
+
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "${c}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "${not used var}" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "${n}" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "${sc_1}" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "${sc_2}" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "${sc_3}" | verify-true
-    get-property "getItems().TableItem[8].getText()" | equals "${scalar from simple res}" | verify-true
-    get-property "getItems().TableItem[9].getText()" | equals "${this is duplicate}" | verify-true
-    get-property "getItems().TableItem[10].getText()" | equals "${var from second project}" | verify-true
-	
+	    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "${c}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "${not used var}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "${sc_1}" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "${sc_2}" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "${sc_3}" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "${scalar from simple res}" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "${this is duplicate}" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "${var from second project}" | verify-true	
+	}
+
 }
+
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
 	key-type Esc
@@ -168,15 +187,29 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    from res 1    \n"
     + "    Log  @{list3}" | verify-true
     
-with [get-view Problems | get-tree] {
-    get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "Errors (2 items)" | verify-true
-}
-with [get-view Problems | get-tree] {
-    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "Resource import 'text_file.txt' is invalid: given file is not a Resource file" | verify-true
-    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-}
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{    
+	with [get-view Problems | get-tree] {
+	    get-property itemCount | equals 1 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "Errors (2 items)" | verify-true
+	}
+	with [get-view Problems | get-tree] {
+	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Resource import 'text_file.txt' is invalid: given file is not a Resource file" | verify-true
+	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+	}
+}-else{
 
+	with [get-view Problems | get-tree] {
+	    get-property itemCount | equals 1 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "Errors (3 items)" | verify-true
+	}
+	with [get-view Problems | get-tree] {
+	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Resource import 'text_file.txt' is invalid: given file is not a Resource file" | verify-true
+	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+	}
+
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

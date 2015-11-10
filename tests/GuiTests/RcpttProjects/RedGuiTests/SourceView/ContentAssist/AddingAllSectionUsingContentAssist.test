@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _0soLkHJoEeWGwMKsQg8irg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/9/15 12:03 PM
+Save-Time: 11/10/15 10:30 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -66,8 +66,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Down -times 7
     key-type Enter
     key-type "M1+SPACE"
-    type-text "@"
     wait 300
+    type-text "@"
+    wait 500
     key-type Enter
     wait 200
     key-type Enter
@@ -76,7 +77,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 10 17
     key-type Enter -times 2
     
-    //ad new keyword
+    //add new keyword
     key-type "M1+SPACE"
     key-type Down -times 3
     key-type Enter
