@@ -5,11 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -69,7 +74,19 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             }
             final IResource resource = wsRoot.findMember(wsRelativePath);
             if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
-                return new IHyperlink[] { new DifferentFileHyperlink(fromRegion, (IFile) resource) };
+                final IFile file = (IFile) resource;
+                
+                try {
+                    final IContentType textContentType = Platform.getContentTypeManager()
+                            .getContentType(IContentTypeManager.CT_TEXT);
+                    final IContentType currentContentType = file.getContentDescription().getContentType();
+                    if (currentContentType.isKindOf(textContentType)) {
+                        return new IHyperlink[] {
+                                new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File") };
+                    }
+                } catch (final CoreException e) {
+                    // nothing, we'll return null if so
+                }
             }
             return null;
         } catch (final BadLocationException e) {

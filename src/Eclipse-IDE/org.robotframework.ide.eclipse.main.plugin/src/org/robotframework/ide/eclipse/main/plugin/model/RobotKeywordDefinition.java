@@ -26,6 +26,7 @@ import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
 import com.google.common.collect.Lists;
 
@@ -237,5 +238,14 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         final int length = keyword.getKeywordName().getText().length();
 
         return new Position(begin, length);
+    }
+
+    public KeywordSpecification createSpecification() {
+        final KeywordSpecification keywordSpecification = new KeywordSpecification();
+        keywordSpecification.setName(getName());
+        keywordSpecification.setArguments(getArguments());
+        keywordSpecification.setFormat("ROBOT");
+        keywordSpecification.setDocumentation(getDocumentation());
+        return keywordSpecification;
     }
 }
