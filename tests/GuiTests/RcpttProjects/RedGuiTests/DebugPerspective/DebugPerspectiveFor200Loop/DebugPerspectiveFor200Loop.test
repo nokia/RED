@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 2:23 PM
+Save-Time: 11/10/15 3:04 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -71,7 +71,12 @@ exec-with-options -disableJobWaiting -command {
 		try -times 4 -delay 500 -command{
 			get-view Variables | get-tree | get-item "${i}" | get-property index | equals 0 | verify-true
 		}
-		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
+		
+		if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {
+			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals [plus $index 1] | verify-true
+		}-else{
+			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
+		}
 		
 		//Thread has 2 items
 		with [get-view Debug | get-tree] {
