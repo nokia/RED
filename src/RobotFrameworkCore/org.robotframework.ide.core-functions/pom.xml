@@ -15,12 +15,12 @@
 	
 	<reporting>
 		<plugins>
-			<plugin>
+			<!--plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>emma-maven-plugin</artifactId>
 				<version>1.0-alpha-3</version>
 				<inherited>true</inherited>
-			</plugin>
+			</plugin-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
@@ -274,7 +274,7 @@
 										<execute></execute>
 									</action>
 								</pluginExecution>
-								<pluginExecution>
+								<!--pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
 											org.codehaus.mojo
@@ -309,7 +309,7 @@
 									<action>
 										<ignore></ignore>
 									</action>
-								</pluginExecution>
+								</pluginExecution-->
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
