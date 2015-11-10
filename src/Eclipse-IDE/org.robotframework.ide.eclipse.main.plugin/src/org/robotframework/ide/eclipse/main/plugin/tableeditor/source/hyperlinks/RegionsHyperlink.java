@@ -39,7 +39,7 @@ public class RegionsHyperlink implements IHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return null;
+        return "Open Definition";
     }
 
     @Override
