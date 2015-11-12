@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 
 
 /**
@@ -39,5 +40,10 @@ public class RegexValidatedStringFieldEditor extends StringFieldEditor {
             showErrorMessage(getErrorMessage());
             return false;
         }
+    }
+
+    @Override
+    protected Text getTextControl() { // making it available for tests plugin
+        return super.getTextControl();
     }
 }
