@@ -88,12 +88,11 @@ public class KeywordDefinitionLocator {
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
             }
-            final Set<IFile> visited = newHashSet(alreadyVisited);
-            visited.add((IFile) resourceFile);
+            alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
-            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, visited, detector);
+            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
@@ -117,7 +116,7 @@ public class KeywordDefinitionLocator {
     private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,
             final KeywordDetector detector) {
         final Map<LibrarySpecification, String> libSpecsToLocate = newHashMap();
-        for (LibrarySpecification spec : librariesMap.keySet()) {
+        for (final LibrarySpecification spec : librariesMap.keySet()) {
             if (!spec.isAccessibleWithoutImport()) {
                 libSpecsToLocate.put(spec, librariesMap.get(spec));
             }
@@ -169,9 +168,9 @@ public class KeywordDefinitionLocator {
     
     public static class KeywordNameSplitter {
 
-        private String name;
+        private final String name;
 
-        private String source;
+        private final String source;
 
         public KeywordNameSplitter(final String name, final String source) {
             this.name = name;
@@ -179,7 +178,7 @@ public class KeywordDefinitionLocator {
         }
 
         public static KeywordNameSplitter splitKeywordName(final String keywordName) {
-            String[] split = keywordName.split("\\.");
+            final String[] split = keywordName.split("\\.");
             if (split.length == 1) {
                 return new KeywordNameSplitter(split[0], "");
             } else if (split.length == 2) {
