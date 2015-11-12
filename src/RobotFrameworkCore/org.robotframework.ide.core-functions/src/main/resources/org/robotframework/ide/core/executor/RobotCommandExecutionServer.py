@@ -35,18 +35,26 @@ def getModulePath(moduleName):
 
 def getVariables(dir, args):
     import robot
+    import inspect
 
     vars = robot.variables.Variables()
     try:
-        exec ("vars.set_from_file('" + dir + "'," + str(args) + ")")
+        exec ("vars.set_from_file('" + dir + "'," + str(args.encode('utf-8')) + ")")
     except:
         pass
 
+    varsFromFile = {}
     try:
-        return vars.data
+        varsFromFile = vars.data
     except AttributeError:  # for robot >2.9
-        return vars.store.data._data
+        varsFromFile = vars.store.data._data
 
+    filteredVars = {}
+    for k in varsFromFile.keys():
+        value = varsFromFile[k]
+        if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
+            filteredVars[k] = value
+    return filteredVars
 
 def getGlobalVariables():
     try:
