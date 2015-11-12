@@ -197,13 +197,12 @@ public class VariableDefinitionLocator {
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
             }
-            
-            final Set<IFile> visited = newHashSet(alreadyVisited);
-            visited.add((IFile) resourceFile);
+
+            alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
-            ContinueDecision result = locateInResourceFiles(nestedResources, visited, detector);
+            ContinueDecision result = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (result == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
