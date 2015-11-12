@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -68,7 +69,8 @@ public class RobotCase extends RobotCodeHoldingElement {
         }
         for (final TestCaseSetup setup : testCase.getSetups()) {
             final String name = setup.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(setup.getKeywordName().getText().toString());
+            final List<String> args = setup.getKeywordName() == null ? new ArrayList<String>()
+                    : newArrayList(setup.getKeywordName().getText().toString());
             args.addAll(Lists.transform(setup.getArguments(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(setup);
@@ -76,14 +78,16 @@ public class RobotCase extends RobotCodeHoldingElement {
         }
         for (final TestCaseTemplate template : testCase.getTemplates()) {
             final String name = template.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(template.getKeywordName().getText().toString());
+            final List<String> args = template.getKeywordName() == null ? new ArrayList<String>()
+                    : newArrayList(template.getKeywordName().getText().toString());
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(template);
             getChildren().add(setting);
         }
         for (final TestCaseTimeout timeout : testCase.getTimeouts()) {
             final String name = timeout.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(timeout.getTimeout().getText().toString());
+            final List<String> args = timeout.getTimeout() == null ? new ArrayList<String>()
+                    : newArrayList(timeout.getTimeout().getText().toString());
             args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(timeout);
@@ -91,7 +95,8 @@ public class RobotCase extends RobotCodeHoldingElement {
         }
         for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
             final String name = teardown.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(teardown.getKeywordName().getText().toString());
+            final List<String> args = teardown.getKeywordName() == null ? new ArrayList<String>()
+                    : newArrayList(teardown.getKeywordName().getText().toString());
             args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(teardown);
