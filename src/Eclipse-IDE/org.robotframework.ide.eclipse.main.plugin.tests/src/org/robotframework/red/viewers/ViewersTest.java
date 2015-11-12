@@ -40,7 +40,8 @@ public class ViewersTest {
         final ColumnViewer viewer = new TreeViewer(shellProvider.getShell());
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
-        viewer.getControl().forceFocus();
+        final boolean focused = viewer.getControl().forceFocus();
+        assertThat(focused).isTrue();
 
         verify(contextService, times(1)).activateContext("contextId");
     }
@@ -60,8 +61,11 @@ public class ViewersTest {
 
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
-        viewer.getControl().forceFocus();
-        label.forceFocus();
+        boolean focused = viewer.getControl().forceFocus();
+        assertThat(focused).isTrue();
+
+        focused = label.forceFocus();
+        assertThat(focused).isTrue();
 
         verify(contextService, times(1)).activateContext("contextId");
         verify(contextService, times(1)).deactivateContext(activationToken);
