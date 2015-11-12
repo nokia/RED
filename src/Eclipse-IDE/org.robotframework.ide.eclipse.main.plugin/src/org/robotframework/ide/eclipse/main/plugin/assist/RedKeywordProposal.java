@@ -75,9 +75,9 @@ public class RedKeywordProposal {
                 return userKeyword.getArguments();
             }
         };
-        return new RedKeywordProposal("User Defined (" + file.getName() + ")", KeywordType.USER_DEFINED,
-                userKeyword.getName(), "- " + file.getName(), true, argsProvider, htmlDocuProvider,
-                userKeyword.getDocumentation(), sourcePrefix);
+        return new RedKeywordProposal("User Defined (" + file.getFile().getFullPath().toPortableString() + ")",
+                KeywordType.USER_DEFINED, userKeyword.getName(), "- " + file.getName(), true, argsProvider,
+                htmlDocuProvider, userKeyword.getDocumentation(), sourcePrefix);
     }
 
     public String getSourceName() {
