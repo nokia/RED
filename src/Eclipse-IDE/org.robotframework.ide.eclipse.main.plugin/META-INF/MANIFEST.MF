@@ -14,16 +14,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.editors,
  org.eclipse.ui.forms,
  org.eclipse.ui.ide,
- org.eclipse.e4.core.commands,
  org.eclipse.debug.ui,
  org.eclipse.ui.navigator,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.e4.core.services,
  org.eclipse.core.expressions,
- org.eclipse.osgi.services,
  org.eclipse.ui.views,
- org.eclipse.team.ui,
  org.eclipse.search
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
