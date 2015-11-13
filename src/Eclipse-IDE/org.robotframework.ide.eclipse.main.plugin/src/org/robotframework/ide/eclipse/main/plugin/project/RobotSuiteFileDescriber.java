@@ -42,10 +42,7 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
     private static boolean hasContentType(final IFile resource, final String id) {
         try {
             final IContentDescription contentDescription = resource.getContentDescription();
-            if (contentDescription != null) {
-                return id.equals(contentDescription.getContentType().getId());
-            }
-            return false;
+            return contentDescription != null && id.equals(contentDescription.getContentType().getId());
         } catch (final CoreException e) {
             return false;
         }

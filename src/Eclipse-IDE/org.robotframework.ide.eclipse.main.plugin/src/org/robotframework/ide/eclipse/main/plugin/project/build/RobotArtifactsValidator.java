@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
@@ -41,7 +42,7 @@ public class RobotArtifactsValidator {
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
         final IFile file = suiteModel.getFile();
-        if (file == null || !file.exists()) {
+        if (file == null || !file.exists() || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return;
         }
 
