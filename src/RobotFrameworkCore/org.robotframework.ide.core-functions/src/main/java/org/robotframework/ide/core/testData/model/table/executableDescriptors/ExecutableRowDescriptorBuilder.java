@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.ForLoopContinueRowDescriptorBuilder;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.ForLoopDeclarationRowDescriptorBuilder;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.SimpleRowDescriptor;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.SimpleRowDescriptorBuilder;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -23,7 +25,8 @@ public class ExecutableRowDescriptorBuilder {
 
 
     public ExecutableRowDescriptorBuilder() {
-
+        builders.add(new ForLoopDeclarationRowDescriptorBuilder());
+        builders.add(new ForLoopContinueRowDescriptorBuilder());
     }
 
 
