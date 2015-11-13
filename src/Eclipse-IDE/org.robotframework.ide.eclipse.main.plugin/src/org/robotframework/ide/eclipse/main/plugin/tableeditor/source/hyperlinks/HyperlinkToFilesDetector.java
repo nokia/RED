@@ -23,10 +23,13 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -61,7 +64,7 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
 
             final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
             final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
-            final Path path = new Path(pathAsString);
+            final Path path = new Path(RobotExpressions.resolve(Maps.<String, String> newHashMap(), pathAsString));
 
             IPath wsRelativePath = null;
             if (path.isAbsolute()) {
@@ -74,26 +77,29 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
                 wsRelativePath = PathsConverter.fromResourceRelativeToWorkspaceRelative(suiteFile.getFile(), path);
             }
             final IResource resource = wsRoot.findMember(wsRelativePath);
-            if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
-                final IFile file = (IFile) resource;
-                
-                try {
-                    final IContentType textContentType = Platform.getContentTypeManager()
-                            .getContentType(IContentTypeManager.CT_TEXT);
-                    final IContentDescription contentDescription = file.getContentDescription();
-                    final IContentType currentContentType = contentDescription == null ? null
-                            : contentDescription.getContentType();
-                    if (currentContentType != null && currentContentType.isKindOf(textContentType)) {
-                        return new IHyperlink[] {
-                                new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File") };
-                    }
-                } catch (final CoreException e) {
-                    // nothing, we'll return null if so
-                }
+            if (resource != null && resource.exists() && resource.getType() == IResource.FILE
+                    && isRobotFile((IFile) resource)) {
+                return new IHyperlink[] { new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File") };
             }
             return null;
         } catch (final BadLocationException e) {
             return null;
+        }
+    }
+
+    protected boolean isRobotFile(final IFile file) {
+        try {
+            final IContentType textContentType = Platform.getContentTypeManager()
+                    .getContentType(IContentTypeManager.CT_TEXT);
+            final IContentType robotContentType = Platform.getContentTypeManager()
+                    .getContentType(RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID);
+            final IContentDescription contentDescription = file.getContentDescription();
+            final IContentType currentContentType = contentDescription == null ? null
+                    : contentDescription.getContentType();
+            return currentContentType != null
+                    && (currentContentType.isKindOf(textContentType) || currentContentType.isKindOf(robotContentType));
+        } catch (final CoreException e) {
+            return false;
         }
     }
 

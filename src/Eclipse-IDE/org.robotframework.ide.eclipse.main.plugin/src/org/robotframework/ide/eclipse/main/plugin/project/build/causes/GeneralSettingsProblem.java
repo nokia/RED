@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineVariableFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -48,6 +49,17 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The library name/path '%s' is parameterized. RED currently does not support such imports";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String nameOrPath = marker.getAttribute("name", null);
+            return DefineVariableFixer.createFixers(nameOrPath);
         }
     },
     ABSOLUTE_IMPORT_PATH {

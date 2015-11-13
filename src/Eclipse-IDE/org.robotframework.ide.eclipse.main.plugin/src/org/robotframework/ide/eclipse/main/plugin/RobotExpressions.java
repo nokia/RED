@@ -5,10 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Range;
 
 public class RobotExpressions {
@@ -29,6 +34,36 @@ public class RobotExpressions {
             }
         }
         return ranges;
+    }
+
+    public static List<String> getVariables(final String expression) {
+        final List<Range<Integer>> positions = getVariablesPositions(expression);
+        return newArrayList(transform(positions, new Function<Range<Integer>, String>() {
+
+            @Override
+            public String apply(final Range<Integer> range) {
+                return expression.substring(range.lowerEndpoint(), range.upperEndpoint() + 1);
+            }
+        }));
+    }
+
+    public static String resolve(final Map<String, String> knownVariables, final String expression) {
+        final List<Range<Integer>> positions = getVariablesPositions(expression);
+        Collections.sort(positions, new Comparator<Range<Integer>>() {
+            @Override
+            public int compare(final Range<Integer> o1, final Range<Integer> o2) {
+                return o2.lowerEndpoint().compareTo(o1.lowerEndpoint());
+            }
+        });
+        
+        final StringBuilder resolved = new StringBuilder(expression);
+        for (final Range<Integer> position : positions) {
+            final String variable = expression.substring(position.lowerEndpoint(), position.upperEndpoint() + 1);
+            if (knownVariables.containsKey(variable)) {
+                resolved.replace(position.lowerEndpoint(), position.upperEndpoint() + 1, knownVariables.get(variable));
+            }
+        }
+        return resolved.toString();
     }
 
     private static Character lookahead(final String expression, final int index) {
