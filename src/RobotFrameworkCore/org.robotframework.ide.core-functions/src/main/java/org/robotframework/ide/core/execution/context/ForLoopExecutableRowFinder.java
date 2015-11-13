@@ -27,6 +27,8 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     private LinkedList<RobotExecutableRow<?>> forLoopExecutableRows;
 
     private int forLoopExecutableRowsCounter = 0;
+    
+    private int currentKeywordsSizeAtLoopStart = 0;
 
     public ForLoopExecutableRowFinder(final TestCase currentTestCase,
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
@@ -39,6 +41,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     public RobotExecutableRow<?> findExecutableRow(final LinkedList<KeywordContext> currentKeywords) {
 
         if (forLoopExecutableRows.isEmpty()) {
+            currentKeywordsSizeAtLoopStart = currentKeywords.size();
             KeywordContext parentKeywordContext = null;
             final int forLoopParentKeywordContextPosition = getForLoopParentKeywordContextPosition(currentKeywords);
             if (forLoopParentKeywordContextPosition >= 0) {
@@ -59,6 +62,10 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
             }
             return forLoopExecutableRows.getFirst();
         }
+        
+        if(currentKeywords.size() > (currentKeywordsSizeAtLoopStart+1)) {
+            return null;    // cannot step into the keyword placed inside a for loop
+        }
 
         forLoopExecutableRowsCounter++;
         if (hasReachedNextForLoopIteration()) {
@@ -72,6 +79,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     public void clear() {
         forLoopExecutableRows.clear();
         forLoopExecutableRowsCounter = 0;
+        currentKeywordsSizeAtLoopStart = 0;
     }
 
     private void incrementExecutionRowCounterInsideForLoop(final KeywordContext parentKeywordContext) {
