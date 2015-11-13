@@ -36,10 +36,10 @@ public class RobotResourceFileValidator extends RobotFileValidator {
 
     @Override
     public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
+        super.validate(fileModel, monitor);
+
         final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
         validateIfThereAreNoForbiddenSettings(settingsSection);
-
-        super.validate(fileModel, monitor);
     }
 
     private void validateIfThereAreNoForbiddenSettings(final Optional<RobotSettingsSection> settingsSection) {
