@@ -30,9 +30,9 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
 
     @Override
     public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        validateFileName(fileModel, monitor);
-
         super.validate(fileModel, monitor);
+
+        validateFileName(fileModel, monitor);
     }
 
     private void validateFileName(final RobotSuiteFile fileModel, final IProgressMonitor monitor) {
