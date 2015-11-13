@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +64,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      */
     public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
         // TODO : check output status and parsing messages
+        monitor.setTaskName(file.getFullPath().toPortableString());
 
         validationContext.setLibrarySpecifications(collectLibraries(fileModel));
         validationContext.setReferencedLibrarySpecifications(fileModel.getProject().getReferencedLibraries());

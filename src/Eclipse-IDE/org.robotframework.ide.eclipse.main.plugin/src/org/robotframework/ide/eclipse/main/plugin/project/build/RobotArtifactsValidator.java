@@ -5,6 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+import java.util.Queue;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -18,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -31,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Robot
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
 
@@ -70,11 +77,28 @@ public class RobotArtifactsValidator {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 try {
+                    final Queue<ModelUnitValidator> unitValidators = Queues.newArrayDeque();
+
                     if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
-                        validateWholeProject(monitor);
+                        unitValidators.addAll(createValidationUnitsForWholeProject());
                     } else if (delta != null) {
-                        validateChangedFiles(delta, monitor);
+                        unitValidators.addAll(createValidationUnitsForChangedFiles(delta));
                     }
+
+                    final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+                    subMonitor.beginTask("Validating files", 100);
+                    subMonitor.setWorkRemaining(unitValidators.size());
+
+                    while (!unitValidators.isEmpty()) {
+                        if (monitor.isCanceled()) {
+                            monitor.setCanceled(true);
+                            break;
+                        }
+                        final ModelUnitValidator validator = unitValidators.poll();
+                        validator.validate(monitor);
+                        subMonitor.worked(1);
+                    }
+
                     return Status.OK_STATUS;
                 } catch (final CoreException e) {
                     RedPlugin.logError("Project validation was corrupted", e);
@@ -86,48 +110,63 @@ public class RobotArtifactsValidator {
         };
     }
 
-    private void validateWholeProject(final IProgressMonitor monitor) throws CoreException {
-        project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-
+    private List<ModelUnitValidator> createValidationUnitsForWholeProject()
+            throws CoreException {
+        final List<ModelUnitValidator> validators = newArrayList();
+        validators.add(new ModelUnitValidator() {
+            @Override
+            public void validate(final IProgressMonitor monitor) throws CoreException {
+                project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+            }
+        });
         project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(final IResource resource) throws CoreException {
-                validateResource(resource, monitor, false);
+                final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(resource);
+                if (validationUnit.isPresent()) {
+                    final ModelUnitValidator unit = validationUnit.get();
+                    validators.add(unit);
+                }
                 return true;
             }
         });
+        return validators;
     }
 
-    private void validateChangedFiles(final IResourceDelta delta, final IProgressMonitor monitor) throws CoreException {
+    private List<ModelUnitValidator> createValidationUnitsForChangedFiles(final IResourceDelta delta)
+            throws CoreException {
+        final List<ModelUnitValidator> validators = newArrayList();
         delta.accept(new IResourceDeltaVisitor() {
 
             @Override
             public boolean visit(final IResourceDelta delta) throws CoreException {
                 if (delta.getKind() != IResourceDelta.REMOVED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-                    validateResource(delta.getResource(), monitor, true);
+                    final IResource file = delta.getResource();
+                    final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(file);
+                    if (validationUnit.isPresent()) {
+                        validators.add(new ModelUnitValidator() {
+                            @Override
+                            public void validate(final IProgressMonitor monitor) throws CoreException {
+                                file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+                                validationUnit.get().validate(monitor);
+                            }
+                        });
+                    }
                 }
                 return true;
             }
         });
+        return validators;
     }
 
-    private void validateResource(final IResource resource, final IProgressMonitor monitor, final boolean removeMarkers)
+    private Optional<? extends ModelUnitValidator> createValidationUnits(final IResource resource)
             throws CoreException {
         if (resource.getType() != IResource.FILE) {
-            return;
+            return Optional.absent();
         }
-
         final IFile file = (IFile) resource;
-
         final ValidationContext validationContext = ValidationContext.createFor(file);
-        final Optional<? extends ModelUnitValidator> validator = createProperValidator(validationContext, file);
-
-        if (validator.isPresent()) {
-            if (removeMarkers) {
-                file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-            }
-            validator.get().validate(monitor);
-        }
+        return createProperValidator(validationContext, file);
     }
 
     public static Optional<? extends ModelUnitValidator> createProperValidator(
