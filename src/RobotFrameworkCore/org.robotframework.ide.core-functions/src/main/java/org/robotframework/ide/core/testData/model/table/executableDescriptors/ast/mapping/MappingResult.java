@@ -61,6 +61,18 @@ public class MappingResult {
     }
 
 
+    public List<IElementDeclaration> getTextElements() {
+        List<IElementDeclaration> texts = new LinkedList<>();
+        for (IElementDeclaration e : mappedElements) {
+            if (!e.isComplex()) {
+                texts.add(e);
+            }
+        }
+
+        return texts;
+    }
+
+
     public List<IElementDeclaration> getMappedElements() {
         return Collections.unmodifiableList(mappedElements);
     }
