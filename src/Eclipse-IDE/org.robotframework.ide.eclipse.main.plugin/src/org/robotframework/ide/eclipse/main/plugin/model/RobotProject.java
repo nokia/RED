@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -26,6 +27,7 @@ import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -351,5 +353,10 @@ public class RobotProject extends RobotContainer {
             return referencedVariableFiles;
         }
         return newArrayList();
+    }
+
+    public String resolve(final String expression) {
+        final Map<String, String> knownVariables = newHashMap();
+        return RobotExpressions.resolve(knownVariables, expression);
     }
 }
