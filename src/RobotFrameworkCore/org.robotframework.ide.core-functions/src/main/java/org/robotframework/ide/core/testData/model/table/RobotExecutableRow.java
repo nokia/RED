@@ -12,6 +12,8 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ExecutableRowDescriptorBuilder;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
@@ -99,71 +101,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
 
-    public ExecutionLineDescriptor buildLineDescription() {
-        ExecutionLineDescriptor execLine = new ExecutionLineDescriptor();
-        if (isExecutable()) {
-            boolean isAfterTheFirstAction = false;
-
-            List<RobotToken> elementTokens = getElementTokens();
-            for (RobotToken token : elementTokens) {
-                if (isAfterTheFirstAction) {
-                    execLine.addRestParameter(token);
-                } else {
-                    if (token.isVariableDeclaration()) {
-                        execLine.addAssignment(token);
-                    } else {
-                        execLine.setTheFirstAction(token);
-                        isAfterTheFirstAction = true;
-                    }
-                }
-            }
-        }
-
-        return execLine;
-    }
-
-    public static class ExecutionLineDescriptor {
-
-        private List<RobotToken> assignments = new LinkedList<>();
-        private RobotToken theFirstAction = new RobotToken();
-        private List<RobotToken> restParameters = new LinkedList<>();
-
-
-        private void addAssignment(final RobotToken token) {
-            this.assignments.add(token);
-        }
-
-
-        public List<RobotToken> getAssignments() {
-            return assignments;
-        }
-
-
-        private void setTheFirstAction(final RobotToken token) {
-            this.theFirstAction = token;
-        }
-
-
-        public RobotToken getFirstAction() {
-            return theFirstAction;
-        }
-
-
-        private void addRestParameter(final RobotToken token) {
-            this.restParameters.add(token);
-        }
-
-
-        public List<RobotToken> getParameters() {
-            return restParameters;
-        }
-
-
-        @Override
-        public String toString() {
-            return String
-                    .format("ExecutionLineDescriptor [assignments=%s, theFirstAction=%s, restParameters=%s]",
-                            assignments, theFirstAction, restParameters);
-        }
+    public IExecutableRowDescriptor<T> buildLineDescription() {
+        return new ExecutableRowDescriptorBuilder().buildLineDescriptor(this);
     }
 }
