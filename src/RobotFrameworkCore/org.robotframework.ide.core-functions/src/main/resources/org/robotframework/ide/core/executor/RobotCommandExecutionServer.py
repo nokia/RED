@@ -53,8 +53,13 @@ def getVariables(dir, args):
     for k in varsFromFile.keys():
         value = varsFromFile[k]
         if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
-            filteredVars[k] = value
+            filteredVars[k] = escape_unicode(value)
     return filteredVars
+
+def escape_unicode(data):
+   if isinstance(data, basestring):
+       return data.encode('unicode_escape')
+   return data
 
 def getGlobalVariables():
     try:
