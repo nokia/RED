@@ -157,7 +157,7 @@ public class RobotDebugExecutionContext {
     }
 
     private boolean isForLoopEnd(final String keywordType) {
-        return isForLoopStarted && !keywordType.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE);
+        return isForLoopStarted && !keywordType.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE) && !keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE);
     }
 
     private boolean isSetupTeardownStart(final String keywordType) {
