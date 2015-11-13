@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.content.IContentDescription;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -99,9 +98,7 @@ public class SuiteSourceAssistantContext {
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE) {
                         final IFile file = (IFile) resource;
-                        final IContentDescription contentDescription = file.getContentDescription();
-                        if (contentDescription != null && RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID
-                                .equals(contentDescription.getContentType().getId())) {
+                        if (RobotSuiteFileDescriber.isResourceFile(file)) {
                             resourceFiles.add(file);
                         }
                     }

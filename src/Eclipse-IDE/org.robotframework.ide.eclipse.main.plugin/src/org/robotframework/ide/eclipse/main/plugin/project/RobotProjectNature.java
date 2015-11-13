@@ -66,8 +66,9 @@ public class RobotProjectNature implements IProjectNature {
 
     public static boolean isRobotSuite(final IFolder folder) {
         final IFile robotFile = folder.getFile(SUITE_INIT_FILE + ".robot");
+        final IFile txtFile = folder.getFile(SUITE_INIT_FILE + ".txt");
         final IFile tsvFile = folder.getFile(SUITE_INIT_FILE + ".tsv");
-        return (robotFile.exists() || tsvFile.exists()) && hasRobotNature(folder.getProject());
+        return (robotFile.exists() || tsvFile.exists() || txtFile.exists()) && hasRobotNature(folder.getProject());
     }
 
     public static boolean hasRobotNature(final IProject project) {

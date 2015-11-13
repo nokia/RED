@@ -17,13 +17,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.content.IContentDescription;
 import org.robotframework.ide.core.testData.model.table.setting.AImported;
 import org.robotframework.ide.core.testData.model.table.setting.LibraryImport;
 import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -39,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * @author Michal Anglart
@@ -78,29 +79,32 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final String pathOrName = pathOrNameToken.getText().toString();
 
             if (isParameterized(pathOrName)) {
-                reportParameterizedImport(pathOrNameToken);
+                final String resolved = RobotExpressions.resolve(Maps.<String, String> newHashMap(), pathOrName);
+                if (isParameterized(resolved)) {
+                    reportParameterizedImport(pathOrNameToken);
+                } else {
+                    validateSpecifiedImport(imported, resolved, pathOrNameToken, monitor);
+                }
             } else {
-                validateSpecifiedImport(imported, pathOrNameToken, monitor);
+                validateSpecifiedImport(imported, pathOrName, pathOrNameToken, monitor);
             }
         }
     }
 
-    private void validateSpecifiedImport(final AImported imported, final RobotToken pathOrNameToken,
-            final IProgressMonitor monitor) throws CoreException {
-        final String pathOrName = pathOrNameToken.getText().toString();
+    private void validateSpecifiedImport(final AImported imported, final String pathOrName,
+            final RobotToken pathOrNameToken, final IProgressMonitor monitor) throws CoreException {
         if (isPathImport(pathOrName)) {
-            validatePathImport(imported, pathOrNameToken, monitor);
+            validatePathImport(imported, pathOrName, pathOrNameToken, monitor);
         } else {
-            validateNameImport(imported, pathOrNameToken, monitor);
+            validateNameImport(imported, pathOrName, pathOrNameToken, monitor);
         }
     }
 
     protected abstract boolean isPathImport(String pathOrName);
 
     @SuppressWarnings("unused")
-    protected void validatePathImport(final AImported imported, final RobotToken pathToken,
+    protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
             final IProgressMonitor monitor) throws CoreException {
-        final String path = pathToken.getText().toString();
         final Path resPath = new Path(path);
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
 
@@ -124,17 +128,18 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             reporter.handleProblem(RobotProblem.causedBy(getCauseForInvalidPathImport())
                     .formatMessageWith(path, ": file does not exist"), suiteFile.getFile(), pathToken);
         } else {
-            validateExistingResource(resource, pathToken);
+            validateExistingResource(resource, path, pathToken);
         }
     }
 
     @SuppressWarnings("unused")
-    protected void validateExistingResource(final IResource resource, final RobotToken pathToken) {
+    protected void validateExistingResource(final IResource resource, final String path, final RobotToken pathToken) {
         // nothing to do; override if needed
     }
 
     @SuppressWarnings("unused")
-    protected void validateNameImport(final AImported imported, final RobotToken pathOrNameToken,
+    protected void validateNameImport(final AImported imported, final String pathOrName,
+            final RobotToken pathOrNameToken,
             final IProgressMonitor monitor) throws CoreException {
         // nothing to do; override if needed
     }
@@ -146,8 +151,11 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void reportParameterizedImport(final RobotToken pathOrNameToken) {
-        reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.PARAMETERIZED_IMPORT_PATH)
-                .formatMessageWith(pathOrNameToken.getText().toString()), suiteFile.getFile(), pathOrNameToken);
+        final String path = pathOrNameToken.getText().toString();
+        final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", path);
+        reporter.handleProblem(
+                RobotProblem.causedBy(GeneralSettingsProblem.PARAMETERIZED_IMPORT_PATH).formatMessageWith(path),
+                suiteFile.getFile(), pathOrNameToken, additional);
     }
 
     protected abstract IProblemCause getCauseForMissingImportArguments();
@@ -184,13 +192,12 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected void validatePathImport(final AImported imported, final RobotToken path,
+        protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
                 final IProgressMonitor monitor) throws CoreException {
             LibrarySpecification specification = null;
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
-                for (final IPath p : PathsResolver.resolveToAbsolutePossiblePaths(suiteFile,
-                        path.getText().toString())) {
+                for (final IPath p : PathsResolver.resolveToAbsolutePossiblePaths(suiteFile, path)) {
                     final IPath entryPath = entry.getKey().getFilepath();
                     if (p.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath))) {
                         specification = entry.getValue();
@@ -200,19 +207,18 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                     }
                 }
             }
-            validateWithSpec(imported, specification, path, monitor, true);
+            validateWithSpec(imported, specification, path, pathToken, monitor, true);
         }
 
         @Override
-        protected void validateNameImport(final AImported imported, final RobotToken name,
+        protected void validateNameImport(final AImported imported, final String name, final RobotToken nameToken,
                 final IProgressMonitor monitor) throws CoreException {
             final String libName = createLibName(name, ((LibraryImport) imported).getArguments());
-            validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(libName),
-                    name, monitor, false);
+            validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(libName), name, nameToken,
+                    monitor, false);
         }
 
-        private String createLibName(final RobotToken nameToken, final List<RobotToken> arguments) {
-            final String name = nameToken.getText().toString();
+        private String createLibName(final String name, final List<RobotToken> arguments) {
             if ("Remote".equals(name)) {
                 // TODO : raise problem when there are no arguments for remote
                 return name + " "
@@ -222,7 +228,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         private void validateWithSpec(final AImported imported, final LibrarySpecification specification,
-                final RobotToken pathOrNameToken, final IProgressMonitor monitor, final boolean isPath)
+                final String pathOrName, final RobotToken pathOrNameToken, final IProgressMonitor monitor,
+                final boolean isPath)
                         throws CoreException {
             if (specification != null) {
                 final List<RobotToken> arguments = ((LibraryImport) imported).getArguments();
@@ -233,7 +240,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 new KeywordCallArgumentsValidator(suiteFile.getFile(), pathOrNameToken, reporter, descriptor, arguments)
                         .validate(monitor);
             } else {
-                final String pathOrName = pathOrNameToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_LIBRARY)
                         .formatMessageWith(pathOrName);
                 final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", pathOrName, "isPath",
@@ -266,8 +272,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected void validateExistingResource(final IResource resource, final RobotToken pathToken) {
-            final String path = pathToken.getText().toString();
+        protected void validateExistingResource(final IResource resource, final String path,
+                final RobotToken pathToken) {
             if (resource.getType() != IResource.FILE) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_VARIABLES_IMPORT)
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
@@ -299,24 +305,16 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected void validateExistingResource(final IResource resource, final RobotToken pathToken) {
-            final String path = pathToken.getText().toString();
+        protected void validateExistingResource(final IResource resource, final String path,
+                final RobotToken pathToken) {
             if (resource.getType() != IResource.FILE) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
                         pathToken);
-            } else {
-                try {
-                    final IContentDescription contentDescription = ((IFile) resource).getContentDescription();
-                    final String id = contentDescription == null ? "" : contentDescription.getContentType().getId();
-                    if (!RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(id)) {
-                        reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
-                                .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
-                                pathToken);
-                    }
-                } catch (final CoreException e) {
-                    // this shouldn't happen
-                }
+            } else if (!RobotSuiteFileDescriber.isResourceFile((IFile) resource)) {
+                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
+                        .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
+                        pathToken);
             }
         }
     }
