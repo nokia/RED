@@ -23,7 +23,6 @@ import org.robotframework.ide.core.testData.model.table.setting.ResourceImport;
 import org.robotframework.ide.core.testData.model.table.setting.VariablesImport;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -39,7 +38,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 /**
  * @author Michal Anglart
@@ -79,7 +77,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final String pathOrName = pathOrNameToken.getText().toString();
 
             if (isParameterized(pathOrName)) {
-                final String resolved = RobotExpressions.resolve(Maps.<String, String> newHashMap(), pathOrName);
+                final String resolved = suiteFile.getProject().resolve(pathOrName);
                 if (isParameterized(resolved)) {
                     reportParameterizedImport(pathOrNameToken);
                 } else {
