@@ -23,13 +23,11 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 
 
 /**
@@ -64,7 +62,7 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
 
             final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
             final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
-            final Path path = new Path(RobotExpressions.resolve(Maps.<String, String> newHashMap(), pathAsString));
+            final Path path = new Path(suiteFile.getProject().resolve(pathAsString));
 
             IPath wsRelativePath = null;
             if (path.isAbsolute()) {
