@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Function;
@@ -29,29 +30,29 @@ import com.google.common.collect.Lists;
 public class PathsResolver {
 
     static List<IPath> getAbsoluteVariableFilesPaths(final RobotSuiteFile file) {
-        return getNormalizedPaths(file.getVariablesPaths(), file.getFile().getLocation());
+        return getNormalizedPaths(file.getVariablesPaths(), file.getProject(), file.getFile().getLocation());
     }
 
     static List<IPath> getAbsoluteResourceFilesPaths(final RobotSuiteFile file) {
-        return getNormalizedPaths(file.getResourcesPaths(), file.getFile().getLocation());
+        return getNormalizedPaths(file.getResourcesPaths(), file.getProject(), file.getFile().getLocation());
     }
 
-    private static List<IPath> getNormalizedPaths(final List<IPath> relativePaths, final IPath location) {
-        // FIXME : those paths can be parameterized (which is unfortunately
-        // recommended by UG :( ) and additionally can point to python module search path
+    private static List<IPath> getNormalizedPaths(final List<IPath> relativePaths, final RobotProject project, 
+            final IPath location) {
+        // FIXME : those paths can point to python module search path
         return newArrayList(Iterables.filter(Lists.transform(relativePaths, new Function<IPath, IPath>() {
-
             @Override
             public IPath apply(final IPath path) {
-                if (isParameterized(path)) {
+                final IPath resolvedPath = Path.fromPortableString(project.resolve(path.toPortableString()));
+                if (isParameterized(resolvedPath)) {
                     return null;
-                } else if (path.isAbsolute()) {
-                    return path;
+                } else if (resolvedPath.isAbsolute()) {
+                    return resolvedPath;
                 } else {
                     try {
-                        final String pathWithoutSpaces = path.toPortableString().replaceAll(" ", "%20");
-                        final URI resolvedPath = location.toFile().toURI().resolve(pathWithoutSpaces);
-                        return new Path(resolvedPath.getPath());
+                        final String pathWithoutSpaces = resolvedPath.toPortableString().replaceAll(" ", "%20");
+                        final URI normalizedPath = location.toFile().toURI().resolve(pathWithoutSpaces);
+                        return new Path(normalizedPath.getPath());
                     } catch (final IllegalArgumentException e) {
                         return null;
                     }
