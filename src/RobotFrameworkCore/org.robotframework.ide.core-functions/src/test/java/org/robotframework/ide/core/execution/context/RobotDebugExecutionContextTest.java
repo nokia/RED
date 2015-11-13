@@ -37,6 +37,8 @@ public class RobotDebugExecutionContextTest {
     private int[] test7_lines = new int[] { 6, 30, 7, 8, 13, 9 };
     
     private int[] test8_lines = new int[] { 7, 8, 3, 9, 26, 27, 10, 8, 9 };
+    
+    private int[] test9_lines = new int[] { 6, 6, 7, 8, -1, -1, -1, -1, -1, 9, 11 };
 
     @Test
     public void test_MultipleUserKeywordsAndResources() throws URISyntaxException {
@@ -350,6 +352,39 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endTest();
     }
     
+    @Test
+    public void test_ForLoopWithUserKeyword() throws URISyntaxException {
+        linesCounter = 0;
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_9.robot");
+        
+        debugExecutionContext = new RobotDebugExecutionContext();
+        debugExecutionContext.startSuite(modelFile.getParent());
+        debugExecutionContext.startTest("test a");
+        
+            debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
+            checkKeywordLine9();
+                debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));checkKeywordLine9();
+                    startBuiltInLogKeyword9();
+                    debugExecutionContext.startKeyword("testFor", "Test Foritem", Arrays.asList(""));
+                    checkKeywordLine9();
+                        startBuiltInLogKeyword9();
+                        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
+                        checkKeywordLine9();
+                            debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));checkKeywordLine9();
+                                startBuiltInLogKeyword9();
+                            debugExecutionContext.endKeyword();
+                        debugExecutionContext.endKeyword();
+                        startBuiltInLogKeyword9();
+                    debugExecutionContext.endKeyword();
+                    startBuiltInLogKeyword9();
+                debugExecutionContext.endKeyword();
+            debugExecutionContext.endKeyword();
+            
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("end"));checkKeywordLine9();debugExecutionContext.endKeyword();  
+            
+        debugExecutionContext.endTest();
+    }
+    
     private void startBuiltInLogKeyword1() {
         debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine1();debugExecutionContext.endKeyword();
     }
@@ -364,6 +399,10 @@ public class RobotDebugExecutionContextTest {
     
     private void startBuiltInLogKeyword4() {
         debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));checkKeywordLine4();debugExecutionContext.endKeyword();
+    }
+    
+    private void startBuiltInLogKeyword9() {
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Foritem", Arrays.asList("${i}"));checkKeywordLine9();debugExecutionContext.endKeyword();  
     }
     
     private void startKey1Keyword() {
@@ -455,6 +494,11 @@ public class RobotDebugExecutionContextTest {
     
     private void checkKeywordLine8() {
         Assert.assertEquals(test8_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
+        linesCounter++;
+    }
+    
+    private void checkKeywordLine9() {
+        Assert.assertEquals(test9_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
         linesCounter++;
     }
 }
