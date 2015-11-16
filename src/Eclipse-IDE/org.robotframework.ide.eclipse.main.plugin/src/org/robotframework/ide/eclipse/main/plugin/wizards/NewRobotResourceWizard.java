@@ -14,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
@@ -46,9 +47,7 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
         selectAndReveal(newFile);
 
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        final IEditorDescriptor desc = PlatformUI.getWorkbench()
-                .getEditorRegistry()
-                .getDefaultEditor(newFile.getName());
+        final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().findEditor(RobotFormEditor.ID);
         try {
             page.openEditor(new FileEditorInput(newFile), desc.getId());
         } catch (final PartInitException e) {
