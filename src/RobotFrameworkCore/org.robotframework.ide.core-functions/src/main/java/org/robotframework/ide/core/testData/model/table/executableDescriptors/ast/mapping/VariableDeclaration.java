@@ -110,6 +110,22 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
 
+    public TextPosition getObjectName() {
+        TextPosition objectName = null;
+        if (getVariableType() == GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET) {
+            TextPosition variableName = getVariableName();
+            String variableText = variableName.getText();
+            int dotCharPos = variableText.indexOf('.');
+            if (dotCharPos >= 0) {
+                objectName = new TextPosition(variableName.getFullText(),
+                        variableName.getStart(), variableName.getStart()
+                                + dotCharPos - 1);
+            }
+        }
+        return objectName;
+    }
+
+
     /**
      * check if variable depends on other variables
      * 
