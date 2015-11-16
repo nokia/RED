@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -14,14 +17,22 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFolderMainPage;
 
+import com.google.common.collect.Maps;
+
 public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
     private Button initializationFileButton;
-    private Button robotFormat;
-    private Button tsvFormat;
 
-    public WizardNewRobotFolderMainPage(final String pageName, final IStructuredSelection selection) {
+    private final Map<String, Button> extensionButtons;
+
+    public WizardNewRobotFolderMainPage(final String pageName, final IStructuredSelection selection,
+            final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
+        extensionButtons = Maps.<String, Button> newLinkedHashMap();
+        extensionButtons.put(firstExtension, null);
+        for (final String extension : restExtensions) {
+            extensionButtons.put(extension, null);
+        }
     }
 
     @Override
@@ -29,22 +40,26 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
         initializationFileButton = new Button(parent, SWT.CHECK);
         initializationFileButton.setText("Create suite initialization file");
 
-        robotFormat = new Button(parent, SWT.RADIO);
-        robotFormat.setText("as .robot file");
-        robotFormat.setSelection(true);
-        robotFormat.setEnabled(false);
-        GridDataFactory.fillDefaults().indent(20, 0).applyTo(robotFormat);
 
-        tsvFormat = new Button(parent, SWT.RADIO);
-        tsvFormat.setText("as .tsv file");
-        tsvFormat.setEnabled(false);
-        GridDataFactory.fillDefaults().indent(20, 0).applyTo(tsvFormat);
+        boolean isFirst = true;
+        for (final String extension : extensionButtons.keySet()) {
+            final Button button = new Button(parent, SWT.RADIO);
+            button.setText("as ." + extension + " file");
+            button.setSelection(isFirst);
+            button.setEnabled(false);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(button);
+
+            extensionButtons.put(extension, button);
+
+            isFirst = false;
+        }
 
         initializationFileButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                robotFormat.setEnabled(initializationFileButton.getSelection());
-                tsvFormat.setEnabled(initializationFileButton.getSelection());
+                for (final Button button : extensionButtons.values()) {
+                    button.setEnabled(initializationFileButton.getSelection());
+                }
             }
         });
         super.createAdvancedControls(parent);
@@ -55,6 +70,11 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
     }
 
     String getInitFileExtension() {
-        return robotFormat.getSelection() ? "robot" : "tsv";
+        for (final Entry<String, Button> entry : extensionButtons.entrySet()) {
+            if (entry.getValue().getSelection()) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalStateException("There should be extension chosen!");
     }
 }
