@@ -12,13 +12,15 @@ import java.util.List;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.ModelType;
+import org.robotframework.ide.core.testData.model.table.IExecutableStepsHolder;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.RobotTokenPositionComparator;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
-public class UserKeyword extends AModelElement<KeywordTable> {
+public class UserKeyword extends AModelElement<KeywordTable> implements
+        IExecutableStepsHolder<UserKeyword> {
 
     private RobotToken keywordName;
     private final List<KeywordDocumentation> documentation = new LinkedList<>();
@@ -54,6 +56,11 @@ public class UserKeyword extends AModelElement<KeywordTable> {
 
     public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
         return Collections.unmodifiableList(keywordContext);
+    }
+
+
+    public List<RobotExecutableRow<UserKeyword>> getExecutionContext() {
+        return getKeywordExecutionRows();
     }
 
 
