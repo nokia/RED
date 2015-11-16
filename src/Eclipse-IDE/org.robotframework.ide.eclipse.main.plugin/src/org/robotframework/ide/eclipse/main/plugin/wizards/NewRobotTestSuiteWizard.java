@@ -30,7 +30,8 @@ public class NewRobotTestSuiteWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotSuiteFileCreationPage("New Robot Test Suite", getSelection());
+        mainPage = new WizardNewRobotSuiteFileCreationPage("New Robot Test Suite", getSelection(), "robot", "txt",
+                "tsv");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Test Suite");
         mainPage.setDescription("Create new Robot test suite file");
