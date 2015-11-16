@@ -23,6 +23,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.core.testData.model.AModelElement;
+import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -88,7 +90,12 @@ public class RobotOutlineContentProvider implements ITreeContentProvider {
 
                 @Override
                 public boolean apply(final RobotElement element) {
-                    return element.getClass() == RobotKeywordCall.class;
+                    if (element instanceof RobotKeywordCall) {
+                        final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
+                        return linkedElement != null && linkedElement instanceof RobotExecutableRow<?>
+                                && ((RobotExecutableRow<?>) linkedElement).isExecutable();
+                    }
+                    return false;
                 }
             })).toArray();
         } else if (parentElement instanceof RobotElement) {
