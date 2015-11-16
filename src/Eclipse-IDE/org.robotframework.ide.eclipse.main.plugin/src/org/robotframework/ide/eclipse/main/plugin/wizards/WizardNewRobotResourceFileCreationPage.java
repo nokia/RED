@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -14,53 +17,64 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
+import com.google.common.collect.Maps;
 
 class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
 
-    private Button robotFormat;
+    private final Map<String, Button> extensionButtons;
 
-    private Button tsvFormat;
-
-    WizardNewRobotResourceFileCreationPage(final String pageName, final IStructuredSelection selection) {
+    WizardNewRobotResourceFileCreationPage(final String pageName, final IStructuredSelection selection,
+            final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
+        extensionButtons = Maps.<String, Button> newLinkedHashMap();
+        extensionButtons.put(firstExtension, null);
+        for (final String extension : restExtensions) {
+            extensionButtons.put(extension, null);
+        }
     }
 
     @Override
     protected void createAdvancedControls(final Composite parent) {
-        robotFormat = new Button(parent, SWT.RADIO);
-        robotFormat.setText("as .robot file");
-        robotFormat.setSelection(true);
-        GridDataFactory.fillDefaults().indent(20, 0).applyTo(robotFormat);
+        boolean isFirst = true;
+        for (final String extension : extensionButtons.keySet()) {
+            final Button button = new Button(parent, SWT.RADIO);
+            button.setText("as ." + extension + " file");
+            button.setSelection(isFirst);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(button);
 
-        tsvFormat = new Button(parent, SWT.RADIO);
-        tsvFormat.setText("as .tsv file");
-        GridDataFactory.fillDefaults().indent(20, 0).applyTo(tsvFormat);
+            button.addSelectionListener(new SelectionAdapter() {
 
-        robotFormat.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final String currentName = getFileName();
-                final String currentExtension = currentName.contains(".")
-                        ? currentName.substring(currentName.lastIndexOf('.') + 1) : "";
-                final String currentNameWithoutExtension = currentName.contains(".") 
-                        ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
+                @Override
+                public void widgetSelected(final SelectionEvent e) {
+                    if (e.getSource() == button && button.getSelection()) {
+                        final String currentName = getFileName();
+                        final String currentNameWithoutExtension = currentName.contains(".")
+                                ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
 
-                if (robotFormat.getSelection() && !"robot".equals(currentExtension)) {
-                    setFileName(currentNameWithoutExtension + ".robot");
-                } else if (tsvFormat.getSelection() && !"tsv".equals(currentExtension)) {
-                    setFileName(currentNameWithoutExtension + ".tsv");
+                        for (final Entry<String, Button> entry : extensionButtons.entrySet()) {
+                            if (entry.getValue() == button) {
+                                setFileName(currentNameWithoutExtension + "." + entry.getKey());
+                                break;
+                            }
+                        }
+                    }
                 }
-            }
-        });
+            });
+
+            extensionButtons.put(extension, button);
+
+            isFirst = false;
+        }
 
         super.createAdvancedControls(parent);
     }
 
     public void setExtension() {
-        if (robotFormat.getSelection()) {
-            setFileExtension("robot");
-        } else {
-            setFileExtension("tsv");
+        for (final Entry<String, Button> entry : extensionButtons.entrySet()) {
+            if (entry.getValue().getSelection()) {
+                setFileExtension(entry.getKey());
+                break;
+            }
         }
     }
 

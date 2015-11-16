@@ -30,7 +30,8 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotResourceFileCreationPage("New Robot Resource file", getSelection());
+        mainPage = new WizardNewRobotResourceFileCreationPage("New Robot Resource file", getSelection(), "robot", "txt",
+                "tsv");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Resource file");
         mainPage.setDescription("Create new Robot resource file");
