@@ -14,8 +14,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 class WizardNewRobotSuiteFileCreationPage extends WizardNewRobotResourceFileCreationPage {
 
-    WizardNewRobotSuiteFileCreationPage(final String pageName, final IStructuredSelection selection) {
-        super(pageName, selection);
+    WizardNewRobotSuiteFileCreationPage(final String pageName, final IStructuredSelection selection,
+            final String firstExtension, final String... restExtensions) {
+        super(pageName, selection, firstExtension, restExtensions);
     }
 
     @Override
