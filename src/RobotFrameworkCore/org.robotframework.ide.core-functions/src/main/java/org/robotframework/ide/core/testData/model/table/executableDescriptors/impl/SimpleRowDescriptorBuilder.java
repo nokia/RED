@@ -24,14 +24,15 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     @Override
-    public <T> boolean acceptable(RobotExecutableRow<T> execRowLine) {
-        return true;
+    public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
+        return new AcceptResult(true);
     }
 
 
     @Override
     public <T> IExecutableRowDescriptor<T> buildDescription(
-            RobotExecutableRow<T> execRowLine) {
+            final RobotExecutableRow<T> execRowLine,
+            final AcceptResult acceptResult) {
         final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(
                 execRowLine);
         final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine
