@@ -32,7 +32,7 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotFolderMainPage("New Robot Suites Folder", getSelection());
+        mainPage = new WizardNewRobotFolderMainPage("New Robot Suites Folder", getSelection(), "robot", "txt", "tsv");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Suites Folder");
         mainPage.setDescription("Create new Robot test suites folder");
