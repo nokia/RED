@@ -10,9 +10,25 @@ import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 
 public interface IRowDescriptorBuilder {
 
-    <T> boolean acceptable(final RobotExecutableRow<T> execRowLine);
+    <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine);
 
 
     <T> IExecutableRowDescriptor<T> buildDescription(
-            final RobotExecutableRow<T> execRowLine);
+            final RobotExecutableRow<T> execRowLine,
+            final AcceptResult acceptResult);
+
+    public class AcceptResult {
+
+        private final boolean shouldAccept;
+
+
+        public AcceptResult(final boolean shouldAccept) {
+            this.shouldAccept = shouldAccept;
+        }
+
+
+        public boolean shouldAccept() {
+            return shouldAccept;
+        }
+    }
 }

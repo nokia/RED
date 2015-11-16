@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IRowDescriptorBuilder.AcceptResult;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.ForLoopContinueRowDescriptorBuilder;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.ForLoopDeclarationRowDescriptorBuilder;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.SimpleRowDescriptor;
@@ -46,18 +47,21 @@ public class ExecutableRowDescriptorBuilder {
             List<RobotToken> elementTokens = execRowLine.getElementTokens();
             if (!elementTokens.isEmpty()) {
                 IRowDescriptorBuilder builderToUse = new SimpleRowDescriptorBuilder();
+                AcceptResult acceptResult = new AcceptResult(true);
                 for (IRowDescriptorBuilder builder : builders) {
-                    if (builder.acceptable(execRowLine)) {
+                    acceptResult = builder.acceptable(execRowLine);
+                    if (acceptResult.shouldAccept()) {
                         builderToUse = builder;
                         break;
                     }
                 }
 
-                rowDesc = builderToUse.buildDescription(execRowLine);
+                rowDesc = builderToUse.buildDescription(execRowLine,
+                        acceptResult);
             }
         } else {
-            rowDesc = new SimpleRowDescriptorBuilder()
-                    .buildDescription(execRowLine);
+            rowDesc = new SimpleRowDescriptorBuilder().buildDescription(
+                    execRowLine, new AcceptResult(true));
         }
 
         return rowDesc;
