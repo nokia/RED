@@ -1,0 +1,308 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: adding_content
+Element-Type: context
+Element-Version: 2.0
+Id: _wdMmkIk5EeWHhtZu19MBKw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/12/15 2:43 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "add-init-content" [val file_name] [val is_tsv]{
+	///check content assist for __init__.robot file
+	get-tab-folder -index 1 | get-tab-item $file_name| click
+	
+	get-editor $file_name| get-text-viewer | key-type "M1+SPACE"
+	
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 3 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Variables ***" | verify-true
+	}
+	//add kewyword
+	with [get-editor $file_name| get-text-viewer] {
+	    key-type "M1+SPACE"
+	    key-type Enter
+	    type-text kw1
+	    key-type Enter
+	    key-type Tab
+	    key-type "M1+SPACE"
+	}
+	
+	//check proposal for keywords
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "[Arguments]" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "[Documentation]" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "[Return]" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "[Tags]" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "[Teardown]" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "Call Method - BuiltIn" | verify-true
+	}
+	get-editor $file_name| get-text-viewer | key-type ESC
+	
+	//add documentation and Catenate keyword
+	with [get-editor $file_name| get-text-viewer] {
+	        //add Documentation
+	        set-caret-pos 3 5
+	        key-type "M1+SPACE"
+	        key-type Down
+	        key-type Enter
+	        type-text text
+	        key-type Enter
+	        //add kw
+	        key-type "M1+SPACE"
+	        key-type Down -times 7
+	        key-type Enter
+	        type-text "a  b"
+	        key-type Enter -times 2
+	        wait 200
+	        if [$is_tsv | eq "true"]{
+	        	key-type BackSpace
+	        }-else{
+	        	key-type BackSpace -times 4
+	        }
+	        wait 200
+	        
+	        //add Variables
+	        key-type "M1+SPACE"
+	        key-type Down -times 2
+	        key-type Enter
+	        key-type "M1+SPACE"
+	}
+	//check propsoal for Variables  
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 6 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+	}
+	
+	get-editor $file_name| get-text-viewer |key-type Esc
+	
+	//check proposal fo Settings
+	with [get-editor $file_name | get-text-viewer] {
+	    key-type "M1+SPACE"
+	    key-type Down -times 4
+	    key-type Enter
+	    key-type "M1+SPACE"
+	}
+	
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 16 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals Library | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals Resource | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals Variables | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals Documentation | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals Metadata | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "Suite Setup" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "Suite Teardown" | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals "Force Tags" | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals "Default Tags" | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Test Setup" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "Test Teardown" | verify-true
+	    get-property "getItems().TableItem[14].getGrayed()" | equals false | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Test Timeout" | verify-true
+	}
+	
+	get-editor $file_name| get-text-viewer |key-type Esc
+	
+	if [$is_tsv |eq true]{
+		get-editor $file_name | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+		    + "kw1\n"
+		    + "\t[Documentation]\ttext\n"
+		    + "\tCatenate\ta  b\n"
+		    + "\t\n"
+		    + "*** Variables ***\n"
+		    + "*** Settings ***" | verify-true
+	}-else{
+		get-editor "__init__.robot" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+		    + "kw1\n"
+		    + "    [Documentation]    text\n"
+		    + "    Catenate    a  b\n"
+		    + "    \n"
+		    + "*** Variables ***\n"
+		    + "*** Settings ***" | verify-true
+	
+	}
+}
+
+//------------------------------------------------------------------------------------------------
+
+
+proc "add-resource-content" [val file_name]{
+	get-tab-folder -index 1 | get-tab-item $file_name | click
+	
+	get-editor $file_name | get-text-viewer | key-type "M1+SPACE"
+	
+	//check proposal for empty file
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 3 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Variables ***" | verify-true
+	}
+	get-editor $file_name| get-text-viewer | key-type ESC
+	
+	//add Keywords and Settings
+	with [get-editor $file_name | get-text-viewer] {
+	    key-type "M1+SPACE"
+	    key-type Enter
+	    key-type "M1+SPACE"
+	    key-type Down
+	    key-type Enter
+	    key-type "M1+SPACE"
+	}
+	//check proposal for Settings
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 16 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals Library | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals Resource | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals Variables | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals Documentation | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals Metadata | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "Suite Setup" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "Suite Teardown" | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals "Force Tags" | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals "Default Tags" | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Test Setup" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "Test Teardown" | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Test Template" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Test Timeout" | verify-true
+	}
+	get-editor $file_name | get-text-viewer | key-type ESC
+	
+	//check proposal for Variables
+	with [get-editor $file_name| get-text-viewer] {
+	    key-type "M1+SPACE"
+	    key-type Down -times 2
+	    key-type Enter
+	    key-type "M1+SPACE"
+	}
+
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 6 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+	}
+	
+	get-editor $file_name | get-text-viewer |key-type Esc
+	get-button "Save (M1+S)" | click
+	get-editor $file_name | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+    	+ "*** Settings ***\n"
+    	+ "*** Variables ***" | verify-true
+
+}
+
+
+//---------------------------------------------------------------------------------------
+
+proc "add-content-to-test" [val file_name]{
+	get-tab-folder -index 1 | get-tab-item  $file_name | click
+	with [get-editor $file_name | get-text-viewer] {
+		set-caret-pos 1 1
+	    key-type End
+	    key-type Enter
+	    key-type "M1+SPACE"
+	}
+	//check proposal 
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 4 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+	}
+	get-editor $file_name| get-text-viewer |key-type Esc
+	//select keywords
+	
+	with [get-editor $file_name | get-text-viewer] {
+	    key-type "M1+SPACE"
+	}
+	
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Keywords \\*\\*\\*" 
+	    | click -default
+	//select Settings
+	with [get-editor $file_name | get-text-viewer] {
+	    key-type "M1+SPACE"
+	}
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Settings \\*\\*\\*" 
+	    | click -default
+	    
+	    
+	with [get-editor $file_name | get-text-viewer] {
+	    key-type "M1+SPACE"
+	}
+	
+	//check proposal for Settings
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 17 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals Library | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals Resource | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals Variables | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals Documentation | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals Metadata | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "Suite Setup" | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals "Suite Teardown" | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals "Force Tags" | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Default Tags" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "Test Setup" | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Test Teardown" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Test Template" | verify-true
+	    get-property "getItems().TableItem[16].getText()" | equals "Test Timeout" | verify-true
+	}
+	get-editor $file_name| get-text-viewer |key-type Esc
+	
+	//check Variables
+	with [get-editor $file_name | get-text-viewer] {
+	    set-caret-pos 4 1
+	    key-type "M1+SPACE"
+	    key-type Down -times 3
+	    key-type Enter
+	    key-type "M1+SPACE"
+	}
+	
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 7 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "*** Variables ***" | verify-true
+	}
+	get-editor $file_name| get-text-viewer |key-type Esc
+	
+	get-button "Save (M1+S)" | click
+	
+	get-editor $file_name| get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Settings ***\n"
+    + "*** Variables ***" | verify-true
+}
+
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
