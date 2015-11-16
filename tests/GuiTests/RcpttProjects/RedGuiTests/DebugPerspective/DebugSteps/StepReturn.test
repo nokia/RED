@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 12:17 PM
+Save-Time: 11/16/15 11:36 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -39,28 +39,28 @@ exec-with-options -disableJobWaiting -command {
 	
 	//go to keyword
 	get-button "Step Into (F5)" | click
-	wait 100
+	wait 200
 	check-debug-marker-on-ruler -line 97 -script_name "BigScript.robot"
 	
 	//return to test (this is last line so go back to Teardown)
 	get-button "Step Return (F7)" | click
-	wait 100
+	wait 200
 	check-debug-marker-on-ruler -line 6  -script_name "BigScript.robot"
 	
 	//resume: go to next user keyword
 	get-button "Resume (F8)" | click
-	wait 1000
+	wait 2000
 	check-debug-marker-on-ruler -line 42  -script_name "BigScript.robot"
 	get-button "Step Into (F5)" | click
-	wait 100
+	wait 500
 	check-debug-marker-on-ruler -line 82  -script_name "BigScript.robot"
 	
 	//return - will go back to last line of test
 	get-button "Step Return (F7)" | click
-	wait 100
+	wait 200
 	check-debug-marker-on-ruler -line 43  -script_name "BigScript.robot"
 	
-	//check tah Return is disabled
+	//check that Return is disabled
 	get-button "Step Return (F7)" | get-property enablement | equals false | verify-true
 
 	get-button "Resume (F8)" | click
