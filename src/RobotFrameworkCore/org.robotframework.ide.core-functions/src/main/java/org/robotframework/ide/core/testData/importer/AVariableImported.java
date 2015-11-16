@@ -27,12 +27,28 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     public AVariableImported(final String name, final VariableType type) {
         this.name = name;
         this.type = type;
-        if (!this.name.startsWith(type.getIdentificator())) {
+        if (shouldWrapName(name, type)) {
             this.robotRepresentation = type.getIdentificator() + '{' + name
                     + '}';
         } else {
             this.robotRepresentation = name;
         }
+    }
+
+
+    private boolean shouldWrapName(final String name, final VariableType type) {
+        boolean result = true;
+
+        if (name != null && !name.trim().isEmpty()) {
+            result = !name.startsWith(type.getIdentificator());
+            if (!result) {
+                VariableType varType = VariableType.getTypeByChar(name.trim()
+                        .charAt(0));
+                result = (varType != null && varType != VariableType.INVALID);
+            }
+        }
+
+        return result;
     }
 
 
