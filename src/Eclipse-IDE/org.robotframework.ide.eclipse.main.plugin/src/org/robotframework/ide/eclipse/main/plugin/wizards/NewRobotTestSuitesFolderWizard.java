@@ -16,6 +16,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
 
@@ -52,8 +53,9 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
                 selectAndReveal(initFile);
 
                 final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
-                        .getDefaultEditor(initFile.getName());
+                final IEditorDescriptor desc = PlatformUI.getWorkbench()
+                        .getEditorRegistry()
+                        .findEditor(RobotFormEditor.ID);
                 page.openEditor(new FileEditorInput(initFile), desc.getId());
 
             } catch (final CoreException e) {
