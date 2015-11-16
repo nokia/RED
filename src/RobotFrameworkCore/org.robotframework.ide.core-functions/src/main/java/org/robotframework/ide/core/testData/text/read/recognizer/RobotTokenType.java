@@ -430,7 +430,8 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    IN_TOKEN(TableType.NOT_STRICTLY_BELONGS, "IN", "IN RANGE"),
+    IN_TOKEN(TableType.NOT_STRICTLY_BELONGS, "IN", "IN RANGE", "IN ENUMERATE",
+            "IN ZIP"),
     /**
      * 
      */
