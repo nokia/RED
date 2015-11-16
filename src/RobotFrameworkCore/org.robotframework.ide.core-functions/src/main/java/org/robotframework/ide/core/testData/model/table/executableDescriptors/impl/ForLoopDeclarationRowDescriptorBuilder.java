@@ -29,14 +29,16 @@ public class ForLoopDeclarationRowDescriptorBuilder implements
         IRowDescriptorBuilder {
 
     @Override
-    public <T> boolean acceptable(final RobotExecutableRow<T> execRowLine) {
-        return ForDescriptorInfo.isForToken(execRowLine.getAction());
+    public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
+        return new AcceptResult(ForDescriptorInfo.isForToken(execRowLine
+                .getAction()));
     }
 
 
     @Override
     public <T> IExecutableRowDescriptor<T> buildDescription(
-            final RobotExecutableRow<T> execRowLine) {
+            final RobotExecutableRow<T> execRowLine,
+            final AcceptResult acceptResult) {
         ForLoopDeclarationRowDescriptor<T> loopDescriptor = new ForLoopDeclarationRowDescriptor<>(
                 execRowLine);
 
