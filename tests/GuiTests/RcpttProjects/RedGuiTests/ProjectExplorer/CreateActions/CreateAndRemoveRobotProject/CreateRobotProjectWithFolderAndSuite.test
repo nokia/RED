@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:46 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/16/15 2:27 PM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
@@ -67,34 +67,35 @@ with [get-view "Project Explorer" | get-tree] {
 get-view "Project Explorer" | get-tree 
     | select [format "New/Robot Standard libraries [%s]" $robot_version] | double-click
 
-/*    
-with [get-view "Project Explorer" | get-tree] {
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | matches "BuiltIn \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | matches "Collections \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | matches "DateTime \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" | matches "Dialogs \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[4].getText()" | matches "Easter \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[5].getText()" 
-        | matches "OperatingSystem \(\\d+\)" | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[6].getText()" | matches "Process \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[7].getText()" | matches "Reserved \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[8].getText()" | matches "Screenshot \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[9].getText()" | matches "String \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[10].getText()" | matches "Telnet \(\\d+\)" 
-        | verify-true
-    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[11].getText()" | matches "XML \(\\d+\)" 
-        | verify-true
+if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {    
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | matches "BuiltIn \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | matches "Collections \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | matches "DateTime \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" | matches "Dialogs \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[4].getText()" | matches "Easter \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[5].getText()" 
+	        | matches "OperatingSystem \(\\d+\)" | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[6].getText()" | matches "Process \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[7].getText()" | matches "Reserved \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[8].getText()" | matches "Screenshot \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[9].getText()" | matches "String \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[10].getText()" | matches "Telnet \(\\d+\)" 
+	        | verify-true
+	    get-item New | get-property "getItems().TreeItem[0].getItems().TreeItem[11].getText()" | matches "XML \(\\d+\)" 
+	        | verify-true
+	}
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 //create new normal folder
@@ -110,36 +111,49 @@ get-view "Project Explorer" | get-tree | get-item "New/new_folder" | get-propert
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//create test suite
+//create test suite as .robot file
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suite" | click
 
 //check if deafult option is selected (.robot)
-with [get-window "New Robot Test Suite"] {
-    with [get-button "as .robot file"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals true | verify-true
-        get-property caption | equals "as .robot file" | verify-true
-    }
-    with [get-button "as .tsv file"] {
-        get-property enablement | equals true | verify-true
-        get-property caption | equals "as .tsv file" | verify-true
-        get-property selected | equals false | verify-true
-    }
+with [get-window "New Robot Test Suite"| get-control Any -index 2] {
+    //robot
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getSelection()" 
+        | equals true | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getText()" 
+        | equals "as .robot file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].isEnabled()" | equals true 
+        | verify-true
+    //txt    
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getSelection()" 
+        | equals false | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" 
+        | equals "as .txt file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].isEnabled()" | equals true 
+        | verify-true
+    //tsv    
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getSelection()" 
+        | equals false | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
+        | equals "as .tsv file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getEnabled()" 
+        | equals true | verify-true
 }
+
+
 
 with [get-window "New Robot Test Suite"] {
     get-editbox -after [get-label "File name:"] | set-text "new_suite.robot"
     get-button Finish | click
 }
 
-//check it robot suite is open and active
+//check if robot suite is open and active
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "new_suite.robot" | verify-true
     get-property activePage | equals "new_suite.robot" | verify-true
     get-property tabCount | equals 1 | verify-true
 }
 
-//check if has all pages
+//check if it has all pages
 with [get-editor "new_suite.robot"] {
     get-text-viewer | get-property text | equals "*** Test Cases ***" | verify-true
     with [get-tab-folder] {
@@ -184,11 +198,54 @@ with [get-editor "new_tsv_suite.tsv"] {
     }
 }
 
-//Check outline
+Check outline
 with [get-view Outline | get-tree] {
-    get-item "new_tsv_suite.tsv" | get-property childCount | equals 0 | verify-true
+    get-item "new_tsv_suite.tsv" | get-property childCount | equals 1 | verify-true
 }
 
+//check if robot suite is open and active
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property activePage | equals "new_tsv_suite.tsv" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+//-----------------------------------------------------------------------------------------------------------
+//Create test suite with .txt
+
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "new_txt_suite"
+    get-button "as .txt file" | click
+    get-button Finish | click
+}
+
+//check text and tabs
+with [get-editor "new_txt_suite.txt"] {
+    get-text-viewer | get-property text | equals "*** Test Cases ***" | verify-true
+    with [get-tab-folder] {
+        get-property "pages[0]" | equals "Test Cases" | verify-true
+        get-property "pages[1]" | equals Keywords | verify-true
+        get-property "pages[2]" | equals Settings | verify-true
+        get-property "pages[3]" | equals Variables | verify-true
+        get-property "pages[4]" | equals Source | verify-true
+        get-property activePage | equals Source | verify-true
+        get-property tabCount | equals 5 | verify-true
+    }
+}
+
+//Check outline
+with [get-view Outline | get-tree] {
+    get-item "new_txt_suite.txt" | get-property childCount | equals 1 | verify-true
+}
+//check if txt file is open and active
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property activePage | equals "new_txt_suite.txt" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
 
 //--------------------------------------------------------------------------------------------------------------
 //open red.xml normal
@@ -286,20 +343,21 @@ get-editor "red.xml" | get-text-viewer | get-property text
 //add Robot test suite folder
 get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suites folder" | click
 
-with [get-window "New Robot Test Suites folder"] {
-    get-button "Create suite initialization file" | get-property selected | equals false | verify-true
-    with [get-button "as .robot file"] {
-        get-property enablement | equals false | verify-true
-        get-property caption | equals "as .robot file" | verify-true
-        get-property selected | equals true | verify-true
-        get-property kind | equals Radio | verify-true
-        get-property "getEnabled()" | equals false | verify-true
-    }
-    with [get-button "as .tsv file"] {
-        get-property enablement | equals false | verify-true
-        get-property caption | equals "as .tsv file" | verify-true
-        get-property selected | equals false | verify-true
-    }
+with [get-window "New Robot Test Suites folder" | get-control Any -index 5] {
+    get-property "getChildren().Control[1].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[1].getText()" | equals "Create suite initialization file" | verify-true
+    
+    get-property "getChildren().Control[2].getSelection()" | equals true | verify-true
+    get-property "getChildren().Control[2].getText()" | equals "as .robot file" | verify-true
+    get-property "getChildren().Control[2].isEnabled()" | equals false | verify-true
+    
+    get-property "getChildren().Control[3].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[3].getText()" | equals "as .txt file" | verify-true
+    get-property "getChildren().Control[3].isEnabled()" | equals false | verify-true
+    
+    get-property "getChildren().Control[4].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[4].getText()" | equals "as .tsv file" | verify-true
+    get-property "getChildren().Control[4].isEnabled()" | equals false | verify-true
 }
 
 
@@ -331,8 +389,19 @@ with [get-view "Project Explorer" | get-tree] {
 //check if _init_ is empty
 get-editor "__init__.robot" | get-text-viewer | get-property text | equals "" | verify-true
 
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property activePage | equals "__init__.robot" | verify-true
+    get-property tabCount | equals 6 | verify-true
+}
 
-//-----------------------------------------------------------------------------------------------------------
+
+////-----------------------------------------------------------------------------------------------------------
 //add init.tsv
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suites folder" | click
 with [get-window "New Robot Test Suites folder"] {
@@ -346,16 +415,99 @@ with [get-window "New Robot Test Suites folder"] {
 }
 get-editor "__init__.tsv" | get-text-viewer | get-property text | equals "" | verify-true
 
+//check tab folder
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property "pages[6]" | equals "__init__.tsv" | verify-true
+    get-property activePage | equals "__init__.tsv" | verify-true
+    get-property tabCount | equals 7 | verify-true
+}
+//--------------------------------------------------------------------------------------------------------------------------
+//add suite folder with .txt init
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suites folder" | click
+with [get-window "New Robot Test Suites folder"] {
+    with [get-editbox -after [get-label "Folder name:"]] {
+        set-text "new_txt_suite_fo"
+        set-text "new_txt_suite_fol"
+        set-text "new_txt_suite_fold"
+        set-text "new_txt_suite_folde"
+        set-text "new_txt_suite_folder"
+    }
+    get-button "Create suite initialization file" | check
+    get-button "as .txt file" | click
+    get-button Finish | click
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property "pages[6]" | equals "__init__.tsv" | verify-true
+    get-property "pages[7]" | equals "__init__.txt" | verify-true
+    get-property activePage | equals "__init__.txt" | verify-true
+    get-property tabCount | equals 8 | verify-true
+}
+
+
 //-----------------------------------------------------------------------------------------------------------------------
-//add Resource file 
+//add Resource file .robot
 get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Resource file" | click
+
+with [get-window "New Robot Resource file" | get-control Any -index 2] {
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 5 | verify-true
+    //robot
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getSelection()" 
+        | equals true | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getText()" 
+        | equals "as .robot file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].isEnabled()" | equals true 
+        | verify-true
+    //txt    
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getSelection()" 
+        | equals false | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" 
+        | equals "as .txt file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].isEnabled()" | equals true 
+        | verify-true
+    //tsv    
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getSelection()" 
+        | equals false | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
+        | equals "as .tsv file" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getEnabled()" 
+        | equals true | verify-true
+}
+
 with [get-window "New Robot Resource file"] {
     with [get-editbox -after [get-label "File name:"]] {
-    	wait 500
+    	wait 1000
         set-text "resource file.robot"
     }
     get-button Finish | click
 }
+wait 1000
+//check tabs
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property "pages[6]" | equals "__init__.tsv" | verify-true
+    get-property "pages[7]" | equals "__init__.txt" | verify-true
+    get-property "pages[8]" | equals "resource file.robot" | verify-true
+    get-property activePage | equals "resource file.robot" | verify-true
+    get-property tabCount | equals 9 | verify-true
+}
+//check tabs in editor
 with [get-editor "resource file.robot"] {
     with [get-tab-folder] {
         get-property "pages[0]" | equals Keywords | verify-true
@@ -371,20 +523,7 @@ with [get-editor "resource file.robot"] {
 //-----------------------------------------------------------------------------------------------------
 //add resource as .tsv
 get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Resource file" | click
-with [get-window "New Robot Resource file"] {
-    with [get-button "as .robot file"] {
-        get-property enablement | equals true | verify-true
-        get-property caption | equals "as .robot file" | verify-true
-        get-property selected | equals true | verify-true
-        get-property kind | equals Radio | verify-true
-    }
-    with [get-button "as .tsv file"] {
-        get-property enablement | equals true | verify-true
-        get-property caption | equals "as .tsv file" | verify-true
-        get-property selected | equals false | verify-true
-        get-property kind | equals Radio | verify-true
-    }
-}
+
 with [get-window "New Robot Resource file"] {
     get-button "as .tsv file" | click
     wait 500
@@ -398,13 +537,45 @@ with [get-window "New Robot Resource file"] {
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "new_suite.robot" | verify-true
     get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
-    get-property "pages[2]" | equals "New/red.xml" | verify-true
-    get-property "pages[3]" | equals "red.xml" | verify-true
-    get-property "pages[4]" | equals "__init__.robot" | verify-true
-    get-property "pages[5]" | equals "__init__.tsv" | verify-true
-    get-property "pages[6]" | equals "resource file.robot" | verify-true
-    get-property "pages[7]" | equals "new_tsv_resource.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property "pages[6]" | equals "__init__.tsv" | verify-true
+    get-property "pages[7]" | equals "__init__.txt" | verify-true
+    get-property "pages[8]" | equals "resource file.robot" | verify-true
+    get-property "pages[9]" | equals "new_tsv_resource.tsv" | verify-true
     get-property activePage | equals "new_tsv_resource.tsv" | verify-true
-    get-property tabCount | equals 8 | verify-true
+    get-property tabCount | equals 10 | verify-true
+}
+
+//-----------------------------------------------------------------------------------------------------
+//add resource as .txt
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Resource file" | click
+
+with [get-window "New Robot Resource file"] {
+    get-button "as .txt file" | click
+    wait 500
+    with [get-editbox -after [get-label "File name:"]] {
+        set-text "new_txt_resource.txt"
+    }
+    get-button Finish | click
+}
+
+//check tab list
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "new_suite.robot" | verify-true
+    get-property "pages[1]" | equals "new_tsv_suite.tsv" | verify-true
+    get-property "pages[2]" | equals "new_txt_suite.txt" | verify-true
+    get-property "pages[3]" | equals "New/red.xml" | verify-true
+    get-property "pages[4]" | equals "red.xml" | verify-true
+    get-property "pages[5]" | equals "__init__.robot" | verify-true
+    get-property "pages[6]" | equals "__init__.tsv" | verify-true
+    get-property "pages[7]" | equals "__init__.txt" | verify-true
+    get-property "pages[8]" | equals "resource file.robot" | verify-true
+    get-property "pages[9]" | equals "new_tsv_resource.tsv" | verify-true
+    get-property "pages[10]" | equals "new_txt_resource.txt" | verify-true
+    get-property activePage | equals "new_txt_resource.txt" | verify-true
+    get-property tabCount | equals 11 | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
