@@ -72,11 +72,28 @@ public class ForDescriptorInfo {
 
     private static void tryToFindFor(ForDescriptorInfo info, int elementIndex,
             RobotToken token) {
-        String text = trimWhitespaces(token.getText()
-                .toString());
-        if (":for".equalsIgnoreCase(text)) {
+        if (isForToken(token)) {
             info.setForStartIndex(elementIndex);
         }
+    }
+
+
+    public static boolean isForToken(final RobotToken token) {
+        String text = trimWhitespaces(token.getText().toString());
+        return ":for".equalsIgnoreCase(text);
+    }
+
+
+    public static boolean isInToken(final RobotToken token) {
+        String text = token.getText().toString();
+        text = text.trim().toLowerCase();
+        return isInToken(text);
+    }
+
+
+    private static boolean isInToken(final String text) {
+        return text.startsWith("in ")
+                || (text.endsWith("in") && text.length() == 2);
     }
 
 
@@ -85,8 +102,7 @@ public class ForDescriptorInfo {
         boolean shouldBreak = false;
         if (text != null) {
             text = text.trim().toLowerCase();
-            if (text.startsWith("in ")
-                    || (text.endsWith("in") && text.length() == 2)) {
+            if (isInToken(text)) {
                 info.setForInIndex(elementIndex);
                 shouldBreak = true;
             } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE
