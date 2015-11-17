@@ -63,7 +63,22 @@ public class TestCaseNameMapper implements IParsingMapper {
         if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
                 robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInTestCaseTable(currentLine, processingState)) {
-                result = true;
+                boolean wasUpdated = false;
+                List<IRobotTokenType> types = rt.getTypes();
+                if (types.size() == 1
+                        && types.contains(RobotTokenType.START_HASH_COMMENT)) {
+                    String testCaseName = rt.getRaw().toString();
+                    if (testCaseName != null) {
+                        result = !testCaseName.trim().equals(
+                                RobotTokenType.START_HASH_COMMENT
+                                        .getRepresentation().get(0));
+                        wasUpdated = true;
+                    }
+                }
+
+                if (!wasUpdated) {
+                    result = true;
+                }
             } else {
                 // FIXME: it is in wrong place means no keyword table
                 // declaration
