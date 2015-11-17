@@ -37,6 +37,10 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     protected String getContentTypeId() {
+        final String id = super.getContentTypeId();
+        if (id != null) {
+            return id;
+        }
         if (input != null) {
             int validationResult;
             try {

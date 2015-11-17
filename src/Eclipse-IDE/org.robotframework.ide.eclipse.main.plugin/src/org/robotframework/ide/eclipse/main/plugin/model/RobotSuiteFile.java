@@ -48,6 +48,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private final IFile file;
 
+    private String contentTypeId;
+
     private RobotFileOutput fileOutput;
     
     private List<RobotSuiteFileSection> sections = null;
@@ -134,11 +136,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public void dispose() {
+        contentTypeId = null;
         sections = null;
         fileOutput = null;
     }
 
     public void reparseEverything(final String newContent) {
+        contentTypeId = null;
         sections = null;
         fileOutput = null;
 
@@ -159,6 +163,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     protected void refreshOnFileChange() {
+        contentTypeId = null;
         sections = null;
         fileOutput = null;
         getSections();
@@ -185,9 +190,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     protected String getContentTypeId() {
+        if (contentTypeId != null) {
+            return contentTypeId;
+        }
         if (file != null) {
             try {
-                return file.getContentDescription().getContentType().getId();
+                contentTypeId = file.getContentDescription().getContentType().getId();
+                return contentTypeId;
             } catch (final CoreException e) {
                 return null;
             }
