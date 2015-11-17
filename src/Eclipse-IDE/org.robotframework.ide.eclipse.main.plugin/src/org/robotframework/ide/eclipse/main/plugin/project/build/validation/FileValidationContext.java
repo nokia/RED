@@ -82,9 +82,11 @@ public class FileValidationContext {
         final List<KeywordValidationContext> keywordsContextList = getAccessibleKeywords()
                 .get(typedKeywordNameSplitter.getKeywordName().toLowerCase());
         final String typedKeywordSourceName = typedKeywordNameSplitter.getKeywordSource();
-        for (final KeywordValidationContext keywordValidationContext : keywordsContextList) {
-            if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
-                return keywordValidationContext;
+        if (keywordsContextList != null) {
+            for (final KeywordValidationContext keywordValidationContext : keywordsContextList) {
+                if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
+                    return keywordValidationContext;
+                }
             }
         }
         return null;
@@ -99,7 +101,7 @@ public class FileValidationContext {
         return true;
     }
 
-    public static class KeywordValidationContext {
+    static class KeywordValidationContext {
 
         private final String keywordName;
 
@@ -111,7 +113,7 @@ public class FileValidationContext {
 
         private final boolean isFromNestedLibrary;
 
-        public KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
+        KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
                 final boolean isDeprecated, final boolean isFromNestedLibrary) {
             this.keywordName = keywordName;
             this.sourceName = sourceName;
@@ -120,23 +122,23 @@ public class FileValidationContext {
             this.isFromNestedLibrary = isFromNestedLibrary;
         }
 
-        public String getKeywordName() {
+        String getKeywordName() {
             return keywordName;
         }
 
-        public String getSourceName() {
+        String getSourceName() {
             return sourceName;
         }
 
-        public boolean isDeprecated() {
+        boolean isDeprecated() {
             return isDeprecated;
         }
 
-        public boolean isFromNestedLibrary() {
+        boolean isFromNestedLibrary() {
             return isFromNestedLibrary;
         }
 
-        public String getAlias() {
+        String getAlias() {
             return alias;
         }
     }

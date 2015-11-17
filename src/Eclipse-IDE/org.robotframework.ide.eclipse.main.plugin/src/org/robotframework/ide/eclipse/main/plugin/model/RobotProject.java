@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Lib
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -356,11 +357,13 @@ public class RobotProject extends RobotContainer {
     }
 
     public String resolve(final String expression) {
+        readProjectConfigurationIfNeeded();
         final Map<String, String> knownVariables = newHashMap();
-        knownVariables.put("${REL}", "FZM");
-        knownVariables.put("${DEPL}", "SingleBoard");
-        knownVariables.put("${PROD}", "tdd");
-        knownVariables.put("${L2DEPL}", "L2SCT");
+        if (configuration != null) {
+            for (final VariableMapping mapping : configuration.getVariableMappings()) {
+                knownVariables.put(mapping.getName(), mapping.getValue());
+            }
+        }
         return RobotExpressions.resolve(knownVariables, expression);
     }
 }
