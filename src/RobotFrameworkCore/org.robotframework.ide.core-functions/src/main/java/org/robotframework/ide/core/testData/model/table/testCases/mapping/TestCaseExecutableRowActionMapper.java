@@ -72,8 +72,11 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
             Stack<ParsingState> processingState) {
         ParsingState state = stateHelper.getCurrentStatus(processingState);
         return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION)
-                && posResolver.isCorrectPosition(
+                && (posResolver.isCorrectPosition(
                         PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
-                        robotFileOutput.getFileModel(), currentLine, rt);
+                        robotFileOutput.getFileModel(), currentLine, rt) || (posResolver
+                        .isCorrectPosition(PositionExpected.TEST_CASE_NAME,
+                                robotFileOutput.getFileModel(), currentLine, rt) && RobotTokenType.START_HASH_COMMENT
+                        .getRepresentation().get(0).equals(text.trim())));
     }
 }
