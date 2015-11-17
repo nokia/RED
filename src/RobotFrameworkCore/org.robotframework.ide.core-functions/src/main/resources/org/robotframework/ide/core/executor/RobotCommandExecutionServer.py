@@ -35,6 +35,7 @@ def getModulePath(moduleName):
 
 def getVariables(dir, args):
     import robot
+    from robot.utils.dotdict import DotDict
     import inspect
 
     vars = robot.variables.Variables()
@@ -42,25 +43,33 @@ def getVariables(dir, args):
         exec ("vars.set_from_file('" + dir + "'," + args.encode('utf-8') + ")")
     except:
         pass
-
+    
     varsFromFile = {}
     try:
         varsFromFile = vars.data
     except AttributeError:  # for robot >2.9
         varsFromFile = vars.store.data._data
-
+    
     filteredVars = {}
     for k in varsFromFile.keys():
         value = varsFromFile[k]
-        if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
+        if isinstance(value, DotDict):
+            filteredVars[k] = extractDotDict(value)
+        elif not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
             filteredVars[k] = escape_unicode(value)
+           
     return filteredVars
+
+def extractDotDict(dict):
+    mapFromDotDict = {}
+    for k in dict.keys():
+        mapFromDotDict[k] = escape_unicode(dict.get(k))
+    return mapFromDotDict
 
 def escape_unicode(data):
    if isinstance(data, basestring):
        return data.encode('unicode_escape')
-   return data
-
+   return data
 def getGlobalVariables():
     try:
 
