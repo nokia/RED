@@ -67,7 +67,7 @@ public class ContainerMappingHelper {
         int contentStart = 1;
         int contentEnd;
         IElementDeclaration dec = null;
-        ContainerElement startElement = (ContainerElement) elements.get(0);
+        IContainerElement startElement = elements.get(0);
         TextPosition startPos = startElement.getPosition();
         int textLength = (startPos.getEnd() - startPos.getStart());
         FilePosition newPosition = currentPosition;
@@ -115,7 +115,7 @@ public class ContainerMappingHelper {
 
     private static String createWarningAboutMissingClose(
             final ContainerType containerType,
-            final ContainerElement startElement) {
+            final IContainerElement startElement) {
 
         return String.format(
                 "Missing closing \'%s\' for type %s in %s.",

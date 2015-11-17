@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast;
 
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
+
+
 public interface IContainerElement {
 
     boolean isComplex();
@@ -14,4 +17,7 @@ public interface IContainerElement {
 
 
     String prettyPrint(int deepLevel);
+
+
+    TextPosition getPosition();
 }
