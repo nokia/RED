@@ -58,10 +58,13 @@ def getVariables(dir, args):
     filteredVars = {}
     for k in varsFromFile.keys():
         value = varsFromFile[k]
-        if isinstance(value, DotDict):
-            filteredVars[k] = extractDotDict(value)
-        elif not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
-            filteredVars[k] = escape_unicode(value)
+        try:
+            if isinstance(value, DotDict):
+                filteredVars[k] = extractDotDict(value)
+            elif not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
+                filteredVars[k] = escape_unicode(value)
+        except:
+            filteredVars[k] = 'None'
            
     return filteredVars
 
