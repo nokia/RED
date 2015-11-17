@@ -71,6 +71,8 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
         
         private VariableFilesFormFragment variablesFragment;
 
+        private VariableMappingsFormFragment variableMappingsFragment;
+
         private Form form;
 
         @Inject
@@ -125,10 +127,12 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
 
         private List<? extends ISectionFormFragment> createFormFragments() {
             frameworksFragment = new FrameworksSectionFormFragment();
+            variableMappingsFragment = new VariableMappingsFormFragment();
             referencedFragment = new ReferencedLibrariesFormFragment();
             remoteFragment = new RemoteLibraryLocationsFormFragment();
             variablesFragment = new VariableFilesFormFragment();
-            return newArrayList(frameworksFragment, referencedFragment, remoteFragment, variablesFragment);
+            return newArrayList(frameworksFragment, referencedFragment, remoteFragment, variableMappingsFragment,
+                    variablesFragment);
         }
 
         private void injectToFormParts(final IEclipseContext context,
@@ -238,6 +242,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                 @Override
                 public void run() {
                     frameworksFragment.whenConfigurationFileChanged();
+                    variableMappingsFragment.whenConfigurationFileChanged();
                     referencedFragment.whenConfigurationFileChanged();
                     remoteFragment.whenConfigurationFileChanged();
                     variablesFragment.whenConfigurationFileChanged();
@@ -250,6 +255,7 @@ class RedProjectConfigurationEditorPart extends DIEditorPart<ProjectConfiguratio
                 @Override
                 public void run() {
                     frameworksFragment.whenEnvironmentWasLoaded(env, allEnvironments);
+                    variableMappingsFragment.whenEnvironmentWasLoaded();
                     referencedFragment.whenEnvironmentWasLoaded(env);
                     remoteFragment.whenEnvironmentWasLoaded();
                     variablesFragment.whenEnvironmentWasLoaded();

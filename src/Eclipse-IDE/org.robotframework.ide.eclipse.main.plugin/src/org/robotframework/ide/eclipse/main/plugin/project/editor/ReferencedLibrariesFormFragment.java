@@ -76,7 +76,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         section.setText("Referenced libraries");
         section.setDescription("In this section referenced libraries can be specified. Those libraries will "
                 + "be available for all suites within project.");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
 
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
