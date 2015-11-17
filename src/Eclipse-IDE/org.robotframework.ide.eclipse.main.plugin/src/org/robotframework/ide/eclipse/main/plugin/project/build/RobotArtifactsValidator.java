@@ -73,10 +73,16 @@ public class RobotArtifactsValidator {
         }
     }
 
-    public Job createValidationJob(final IResourceDelta delta, final int kind) {
+    public Job createValidationJob(final Job dependentJob, final IResourceDelta delta, final int kind) {
         return new Job("Validating") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
+                try {
+                    dependentJob.join();
+                } catch (final InterruptedException e) {
+                    RedPlugin.logError("Project validation was corrupted", e);
+                    return Status.CANCEL_STATUS;
+                }
                 final long start = System.currentTimeMillis();
                 try {
 
@@ -91,7 +97,9 @@ public class RobotArtifactsValidator {
 
                     final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
                     subMonitor.beginTask("Validating files", 100);
-                    subMonitor.setWorkRemaining(unitValidators.size());
+
+                    final SubMonitor validationSubMonitor = subMonitor.newChild(100);
+                    validationSubMonitor.setWorkRemaining(unitValidators.size());
 
                     while (!unitValidators.isEmpty()) {
                         if (monitor.isCanceled()) {
@@ -100,7 +108,7 @@ public class RobotArtifactsValidator {
                         }
                         final ModelUnitValidator validator = unitValidators.poll();
                         validator.validate(monitor);
-                        subMonitor.worked(1);
+                        validationSubMonitor.worked(1);
                     }
 
                     return Status.OK_STATUS;
