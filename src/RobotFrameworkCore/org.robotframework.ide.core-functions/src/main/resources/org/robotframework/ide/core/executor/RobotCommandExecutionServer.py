@@ -35,7 +35,12 @@ def getModulePath(moduleName):
 
 def getVariables(dir, args):
     import robot
-    from robot.utils.dotdict import DotDict
+    try:
+        from robot.utils.dotdict import DotDict
+    except:  # for robot <2.9
+        class DotDict:
+            pass
+        pass
     import inspect
 
     vars = robot.variables.Variables()
