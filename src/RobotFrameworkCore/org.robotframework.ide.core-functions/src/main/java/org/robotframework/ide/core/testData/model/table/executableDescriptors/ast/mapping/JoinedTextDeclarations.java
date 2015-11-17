@@ -5,12 +5,25 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 
 
 public class JoinedTextDeclarations extends AContainerOperation {
 
     private IElementDeclaration parent;
+    private FilePosition robotTokenPosition;
+
+
+    @Override
+    public void setRobotTokenPosition(final FilePosition robotTokenPosition) {
+        this.robotTokenPosition = robotTokenPosition;
+    }
+
+
+    private FilePosition getRobotTokenPosition() {
+        return robotTokenPosition;
+    }
 
 
     @Override
@@ -25,6 +38,16 @@ public class JoinedTextDeclarations extends AContainerOperation {
 
 
     @Override
+    public FilePosition getStartFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + getStart().getStart(), position.getOffset()
+                + getStart().getStart());
+        return position;
+    }
+
+
+    @Override
     public TextPosition getEnd() {
         TextPosition pos = null;
         if (!super.elementsDeclaredInside.isEmpty()) {
@@ -33,6 +56,31 @@ public class JoinedTextDeclarations extends AContainerOperation {
         }
 
         return pos;
+    }
+
+
+    @Override
+    public FilePosition getEndFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + getEnd().getEnd(), position.getOffset() + getEnd().getEnd());
+        return position;
+    }
+
+
+    @Override
+    public FilePosition findRobotTokenPosition() {
+        FilePosition position = getRobotTokenPosition();
+        if (position == null) {
+            for (IElementDeclaration dec : elementsDeclaredInside) {
+                position = dec.findRobotTokenPosition();
+                if (position != null) {
+                    break;
+                }
+            }
+        }
+
+        return position;
     }
 
 
