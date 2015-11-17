@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.KeywordTable;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.VariableExtractor;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -108,20 +109,22 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private void reportUnknownVariables(final RobotSuiteFile suiteModel, final List<UserKeyword> keywords) {
         final Set<String> variables = validationContext.getAccessibleVariables();
+        final VariableExtractor variableExtractor = new VariableExtractor();
+        final String fileName = suiteModel.getName();
 
         for (final UserKeyword keyword : keywords) {
             final Set<String> allVariables = newHashSet(variables);
-            allVariables.addAll(extractArgumentVariables(keyword));
+            allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
             TestCasesTableValidator.reportUnknownVariables(suiteModel.getFile(), reporter,
                     keyword.getKeywordExecutionRows(), allVariables);
         }
     }
 
-    private Collection<String> extractArgumentVariables(final UserKeyword keyword) {
+    private Collection<String> extractArgumentVariables(final UserKeyword keyword, final VariableExtractor extractor, final String fileName) {
         final Set<String> arguments = newHashSet();
         for (final KeywordArguments argument : keyword.getArguments()) {
-            arguments.addAll(TestCasesTableValidator.extractVariableNames(argument.getArguments()));
+            arguments.addAll(TestCasesTableValidator.extractVariableNames(argument.getArguments(), extractor, fileName));
         }
         return arguments;
     }
