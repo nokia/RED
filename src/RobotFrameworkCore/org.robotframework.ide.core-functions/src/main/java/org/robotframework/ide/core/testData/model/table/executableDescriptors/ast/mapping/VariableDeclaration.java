@@ -8,6 +8,7 @@ package org.robotframework.ide.core.testData.model.table.executableDescriptors.a
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 
@@ -36,6 +37,7 @@ public class VariableDeclaration extends AContainerOperation {
     private TextPosition variableIdentificator;
     private final TextPosition variableStart;
     private final TextPosition variableEnd;
+    private FilePosition robotTokenPosition;
 
 
     public VariableDeclaration(final TextPosition variableStart,
@@ -80,6 +82,27 @@ public class VariableDeclaration extends AContainerOperation {
 
     public void setTypeIdentificator(final TextPosition variableIdentficator) {
         this.variableIdentificator = variableIdentficator;
+    }
+
+
+    @Override
+    public void setRobotTokenPosition(final FilePosition robotTokenPosition) {
+        this.robotTokenPosition = robotTokenPosition;
+    }
+
+
+    private FilePosition getRobotTokenPosition() {
+        return robotTokenPosition;
+    }
+
+
+    @Override
+    public FilePosition getStartFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + variableIdentificator.getStart(), position.getOffset()
+                + variableIdentificator.getStart());
+        return position;
     }
 
 
@@ -149,6 +172,27 @@ public class VariableDeclaration extends AContainerOperation {
     @Override
     public TextPosition getEnd() {
         return variableEnd;
+    }
+
+
+    @Override
+    public FilePosition getEndFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + variableEnd.getEnd(), position.getOffset()
+                + variableEnd.getEnd());
+        return position;
+    }
+
+
+    @Override
+    public FilePosition findRobotTokenPosition() {
+        FilePosition position = getRobotTokenPosition();
+        if (position == null) {
+            position = this.levelUpElement.findRobotTokenPosition();
+        }
+
+        return position;
     }
 
 

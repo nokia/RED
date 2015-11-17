@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
@@ -20,6 +21,7 @@ public class TextDeclaration implements IElementDeclaration {
     private final List<IElementDeclaration> elementsDeclaredInside = new LinkedList<>();
     private TextPosition text;
     private ContainerElementType mappedType;
+    private FilePosition robotTokenPosition;
 
 
     public TextDeclaration(final TextPosition text,
@@ -35,14 +37,54 @@ public class TextDeclaration implements IElementDeclaration {
 
 
     @Override
+    public void setRobotTokenPosition(final FilePosition robotTokenPosition) {
+        this.robotTokenPosition = robotTokenPosition;
+    }
+
+
+    private FilePosition getRobotTokenPosition() {
+        return robotTokenPosition;
+    }
+
+
+    @Override
     public TextPosition getStart() {
         return text;
     }
 
 
     @Override
+    public FilePosition getStartFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + text.getStart(), position.getOffset() + text.getStart());
+        return position;
+    }
+
+
+    @Override
     public TextPosition getEnd() {
         return text;
+    }
+
+
+    @Override
+    public FilePosition getEndFromFile() {
+        FilePosition position = findRobotTokenPosition();
+        position = new FilePosition(position.getLine(), position.getColumn()
+                + text.getEnd(), position.getOffset() + text.getEnd());
+        return position;
+    }
+
+
+    @Override
+    public FilePosition findRobotTokenPosition() {
+        FilePosition position = getRobotTokenPosition();
+        if (position == null) {
+            position = this.levelUpElement.findRobotTokenPosition();
+        }
+
+        return position;
     }
 
 
