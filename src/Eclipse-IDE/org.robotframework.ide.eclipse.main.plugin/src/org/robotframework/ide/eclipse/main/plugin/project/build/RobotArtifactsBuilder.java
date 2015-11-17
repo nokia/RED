@@ -91,14 +91,14 @@ public class RobotArtifactsBuilder {
         subMonitor.subTask("checking Robot execution environment");
 
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        final SubMonitor configCreationMonitor = subMonitor.newChild(10);
+        final SubMonitor configCreationMonitor = subMonitor.newChild(15);
         final RobotProjectConfig configuration = provideConfiguration(robotProject, reporter);
         configCreationMonitor.done();
         if (subMonitor.isCanceled()) {
             return;
         }
 
-        final SubMonitor runtimeEnvCreationMonitor = subMonitor.newChild(10);
+        final SubMonitor runtimeEnvCreationMonitor = subMonitor.newChild(15);
         final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(robotProject, configuration,
                 reporter);
         runtimeEnvCreationMonitor.done();
@@ -106,7 +106,7 @@ public class RobotArtifactsBuilder {
             return;
         }
 
-        new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(40));
+        new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(70));
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,
