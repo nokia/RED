@@ -73,9 +73,12 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         boolean result = false;
         ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION)
-                && posResolver.isCorrectPosition(
+                && (posResolver.isCorrectPosition(
                         PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME,
-                        robotFileOutput.getFileModel(), currentLine, rt);
+                        robotFileOutput.getFileModel(), currentLine, rt) || (posResolver
+                        .isCorrectPosition(PositionExpected.USER_KEYWORD_NAME,
+                                robotFileOutput.getFileModel(), currentLine, rt) && RobotTokenType.START_HASH_COMMENT
+                        .getRepresentation().get(0).equals(text.trim())));
 
         return result;
     }

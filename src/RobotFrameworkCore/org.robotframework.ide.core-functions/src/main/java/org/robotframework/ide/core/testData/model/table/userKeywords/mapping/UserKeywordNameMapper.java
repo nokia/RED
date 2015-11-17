@@ -65,7 +65,22 @@ public class UserKeywordNameMapper implements IParsingMapper {
                 PositionExpected.USER_KEYWORD_NAME,
                 robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInKeywordTable(currentLine, processingState)) {
-                result = true;
+                boolean wasUpdated = false;
+                List<IRobotTokenType> types = rt.getTypes();
+                if (types.size() == 1
+                        && types.contains(RobotTokenType.START_HASH_COMMENT)) {
+                    String keywordName = rt.getRaw().toString();
+                    if (keywordName != null) {
+                        result = !keywordName.trim().equals(
+                                RobotTokenType.START_HASH_COMMENT
+                                        .getRepresentation().get(0));
+                        wasUpdated = true;
+                    }
+                }
+
+                if (!wasUpdated) {
+                    result = true;
+                }
             } else {
                 // FIXME: it is in wrong place means no keyword table
                 // declaration
