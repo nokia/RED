@@ -44,7 +44,7 @@ class PythonLibStructureBuilder {
             this.qualifiedName = qualifiedName;
         }
 
-        private static PythonClass create(final String name) {
+        static PythonClass create(final String name) {
             final List<String> splitted = newArrayList(Splitter.on('.').splitToList(name));
             if (splitted.size() > 1) {
                 final String last = splitted.get(splitted.size() - 1);
