@@ -30,7 +30,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
-@XmlType(propOrder = { "version", "executionEnvironment", "libraries", "remoteLocations", "referencedVariableFiles" })
+@XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
+        "referencedVariableFiles" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -52,6 +53,9 @@ public class RobotProjectConfig {
     
     @XmlElement(name = "variableFiles", required = false)
     private List<ReferencedVariableFile> referencedVariableFiles = new ArrayList<>();
+
+    @XmlElement(name = "variable", required = false)
+    private List<VariableMapping> variableMappings = new ArrayList<>();
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -98,13 +102,17 @@ public class RobotProjectConfig {
         return remoteLocations;
     }
 
-    public void addReferencedLibraryInPython(final String name, final IPath path) {
-        addReferencedLibrary(LibraryType.PYTHON.toString(), name, path);
+    public void setVariableMappings(final List<VariableMapping> variableMappings) {
+        this.variableMappings = variableMappings;
     }
 
-    private void addReferencedLibrary(final String type, final String name, final IPath path) {
+    public List<VariableMapping> getVariableMappings() {
+        return variableMappings;
+    }
+
+    public void addReferencedLibraryInPython(final String name, final IPath path) {
         final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setType(type);
+        referencedLibrary.setType(LibraryType.PYTHON.toString());
         referencedLibrary.setName(name);
         referencedLibrary.setPath(path.toPortableString());
         addReferencedLibrary(referencedLibrary);
@@ -119,6 +127,10 @@ public class RobotProjectConfig {
         }
     }
 
+    public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
+        libraries.removeAll(selectedLibs);
+    }
+
     public void addRemoteLocation(final RemoteLocation remoteLocation) {
         if (remoteLocations == null) {
             remoteLocations = newArrayList();
@@ -126,12 +138,20 @@ public class RobotProjectConfig {
         remoteLocations.add(remoteLocation);
     }
 
-    public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
-        libraries.removeAll(selectedLibs);
-    }
 
     public void removeRemoteLocations(final List<RemoteLocation> locations) {
         remoteLocations.removeAll(locations);
+    }
+
+    public void addVariableMapping(final VariableMapping mapping) {
+        if (variableMappings == null) {
+            variableMappings = newArrayList();
+        }
+        variableMappings.add(mapping);
+    }
+
+    public void removeVariableMappings(final List<VariableMapping> mappings) {
+        variableMappings.removeAll(mappings);
     }
 
     public boolean usesPreferences() {
@@ -433,6 +453,47 @@ public class RobotProjectConfig {
         @Override
         public int hashCode() {
             return Objects.hash(name, path);
+        }
+    }
+
+    @XmlRootElement(name = "variable")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class VariableMapping {
+
+        @XmlAttribute(required = true)
+        private String name;
+
+        @XmlAttribute(required = true)
+        private String value;
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setValue(final String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof VariableMapping) {
+                final VariableMapping that = (VariableMapping) obj;
+                return Objects.equals(this.name, that.name) && Objects.equals(this.value, that.value);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value);
         }
     }
 }

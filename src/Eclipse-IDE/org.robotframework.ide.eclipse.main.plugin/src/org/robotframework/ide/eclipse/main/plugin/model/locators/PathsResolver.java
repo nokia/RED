@@ -43,7 +43,8 @@ public class PathsResolver {
         return newArrayList(Iterables.filter(Lists.transform(relativePaths, new Function<IPath, IPath>() {
             @Override
             public IPath apply(final IPath path) {
-                final IPath resolvedPath = Path.fromPortableString(project.resolve(path.toPortableString()));
+                final IPath resolvedPath = isParameterized(path)
+                        ? Path.fromPortableString(project.resolve(path.toPortableString())) : path;
                 if (isParameterized(resolvedPath)) {
                     return null;
                 } else if (resolvedPath.isAbsolute()) {
