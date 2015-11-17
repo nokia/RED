@@ -67,11 +67,10 @@ public class UserKeywordNameMapper implements IParsingMapper {
             if (isIncludedInKeywordTable(currentLine, processingState)) {
                 boolean wasUpdated = false;
                 List<IRobotTokenType> types = rt.getTypes();
-                if (types.size() == 1
-                        && types.contains(RobotTokenType.START_HASH_COMMENT)) {
+                if (types.contains(RobotTokenType.START_HASH_COMMENT)) {
                     String keywordName = rt.getRaw().toString();
                     if (keywordName != null) {
-                        result = !keywordName.trim().equals(
+                        result = !keywordName.trim().startsWith(
                                 RobotTokenType.START_HASH_COMMENT
                                         .getRepresentation().get(0));
                         wasUpdated = true;
