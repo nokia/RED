@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Optional;
@@ -21,19 +22,19 @@ public class TestCasesDefinitionLocator {
 
     private final IFile file;
 
-    private final boolean useCommonModel;
+    private final RobotModel model;
 
     public TestCasesDefinitionLocator(final IFile file) {
-        this(file, true);
+        this(file, RedPlugin.getModelManager().getModel());
     }
 
-    public TestCasesDefinitionLocator(final IFile file, final boolean useCommonModel) {
+    public TestCasesDefinitionLocator(final IFile file, final RobotModel model) {
         this.file = file;
-        this.useCommonModel = useCommonModel;
+        this.model = model;
     }
 
     public void locateTestCaseDefinition(final TestCaseDetector detector) {
-        final RobotSuiteFile suiteFile = getSuiteFile();
+        final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Optional<RobotCasesSection> section = suiteFile.findSection(RobotCasesSection.class);
         if (!section.isPresent()) {
             return;
@@ -44,10 +45,6 @@ public class TestCasesDefinitionLocator {
                 break;
             }
         }
-    }
-
-    private RobotSuiteFile getSuiteFile() {
-        return useCommonModel ? RedPlugin.getModelManager().createSuiteFile(file) : new RobotSuiteFile(null, file);
     }
 
     public interface TestCaseDetector {

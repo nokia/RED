@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -42,20 +43,22 @@ import com.google.common.base.Optional;
  */
 public class VariableDefinitionLocator {
 
-    private final RobotSuiteFile startingFile;
+    private final IFile file;
 
-    private final boolean useCommonModel;
+    private final RobotModel model;
 
-    public VariableDefinitionLocator(final RobotSuiteFile file) {
-        this(file, true);
+    public VariableDefinitionLocator(final IFile file) {
+        this(file, RedPlugin.getModelManager().getModel());
     }
 
-    public VariableDefinitionLocator(final RobotSuiteFile file, final boolean useCommonModel) {
-        this.startingFile = file;
-        this.useCommonModel = useCommonModel;
+    public VariableDefinitionLocator(final IFile file, final RobotModel model) {
+        this.file = file;
+        this.model = model;
     }
-    
+
     public void locateVariableDefinitionWithLocalScope(final VariableDetector detector, final int offset) {
+        final RobotSuiteFile startingFile = model.createSuiteFile(file);
+
         ContinueDecision shouldContinue = locateInLocalScope(startingFile, detector, offset);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -77,6 +80,7 @@ public class VariableDefinitionLocator {
     }
 
     public void locateVariableDefinition(final VariableDetector detector) {
+        final RobotSuiteFile startingFile = model.createSuiteFile(file);
         ContinueDecision shouldContinue = locateInCurrentFile(startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -192,7 +196,7 @@ public class VariableDefinitionLocator {
             final VariableDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
-            final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
+            final IResource resourceFile = file.getWorkspace().getRoot().findMember(wsRelative);
             if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
@@ -200,7 +204,7 @@ public class VariableDefinitionLocator {
 
             alreadyVisited.add((IFile) resourceFile);
 
-            final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
+            final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
             ContinueDecision result = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (result == ContinueDecision.STOP) {
@@ -214,15 +218,10 @@ public class VariableDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private RobotSuiteFile getSuiteFile(final IFile resourceFile) {
-        return useCommonModel ? RedPlugin.getModelManager().createSuiteFile(resourceFile)
-                : new RobotSuiteFile(null, resourceFile);
-    }
-
     private ContinueDecision locateInVariableFiles(final List<IPath> absoluteVariablePaths,
             final VariableDetector detector) {
 
-        final List<ReferencedVariableFile> knownParamFiles = startingFile.getProject()
+        final List<ReferencedVariableFile> knownParamFiles = model.createRobotProject(file.getProject())
                 .getVariablesFromReferencedFiles();
         for (final IPath importedFilePath : absoluteVariablePaths) {
             for (final ReferencedVariableFile knownFile : knownParamFiles) {

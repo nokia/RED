@@ -3,58 +3,85 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-/*
- * Copyright 2015 Nokia Solutions and Networks
- * Licensed under the Apache License, Version 2.0,
- * see license.txt file for details.
- */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Files;
 
+/**
+ * @author Michal Anglart
+ *
+ */
 public class ValidationContext {
 
-    private final SuiteExecutor executorInUse;
+    private final RobotModel model;
 
+    private final SuiteExecutor executorInUse;
     private final RobotVersion version;
 
-    private final Map<String, List<KeywordValidationContext>> accessibleKeywords;
+    private final Map<String, LibrarySpecification> accessibleLibraries;
+    private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
 
-    private final Map<String, LibrarySpecification> librarySpecifications;
+    public ValidationContext(final IProject project) {
+        this(RedPlugin.getModelManager().getModel(), project);
+    }
 
-    private final Map<ReferencedLibrary, LibrarySpecification> referencedLibrarySpecifications;
+    public ValidationContext(final RobotModel model, final IProject project) {
+        this.model = model;
+        final RobotProject robotProject = model.createRobotProject(project);
+        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
-    public static ValidationContext createFor(final IFile file) {
-        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-        final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
-        
-        final RobotVersion version = runtimeEnvironment != null ? RobotVersion.from(project.getVersion()) : null;
-        return new ValidationContext(version, runtimeEnvironment.getInterpreter());
+        this.version = runtimeEnvironment != null ? RobotVersion.from(robotProject.getVersion()) : null;
+        this.executorInUse = runtimeEnvironment.getInterpreter();
+
+        this.accessibleLibraries = collectLibraries(robotProject);
+        this.referencedAccessibleLibraries = newHashMap(robotProject.getReferencedLibraries());
     }
 
     @VisibleForTesting
-    public ValidationContext(final RobotVersion version, final SuiteExecutor executorInUse) {
-        this.executorInUse = executorInUse;
+    public ValidationContext(final RobotModel model, final RobotVersion version, final SuiteExecutor executor,
+            final Map<String, LibrarySpecification> libs, final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
+        this.model = model;
         this.version = version;
-        this.accessibleKeywords = newHashMap();
-        this.librarySpecifications = newHashMap();
-        this.referencedLibrarySpecifications = newHashMap();
+        this.executorInUse = executor;
+        this.accessibleLibraries = libs;
+        this.referencedAccessibleLibraries = refLibs;
+    }
+
+    RobotModel getModel() {
+        return model;
     }
 
     public SuiteExecutor getExecutorInUse() {
@@ -65,108 +92,98 @@ public class ValidationContext {
         return version;
     }
 
-    public void setAccessibleKeywords(final Map<String, List<KeywordValidationContext>> keywords) {
-        accessibleKeywords.putAll(keywords);
-    }
-
-    public Set<String> getAccessibleKeywords() {
-        return ImmutableSet.copyOf(accessibleKeywords.keySet());
-    }
-    
-    public KeywordValidationContext findKeywordValidationContext(final String name) {
-        return extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
-    }
-
-    public boolean isKeywordAccessible(final KeywordValidationContext keywordValidationContext) {
-        return keywordValidationContext != null;
-    }
-
-    public boolean isKeywordDeprecated(final KeywordValidationContext keywordValidationContext) {
-        return keywordValidationContext != null && keywordValidationContext.isDeprecated();
-    }
-
-    public boolean isKeywordFromNestedLibrary(final KeywordValidationContext keywordValidationContext) {
-        return keywordValidationContext != null && keywordValidationContext.isFromNestedLibrary();
-    }
-    
-    public void setLibrarySpecifications(final Map<String, LibrarySpecification> specs) {
-        librarySpecifications.putAll(specs);
-    }
-
-    public Map<String, LibrarySpecification> getLibrarySpecificationsAsMap() {
-        return librarySpecifications;
-    }
-
-    public void setReferencedLibrarySpecifications(final Map<ReferencedLibrary, LibrarySpecification> mapping) {
-        referencedLibrarySpecifications.putAll(mapping);
+    public LibrarySpecification getLibrarySpecification(final String libName) {
+        return accessibleLibraries.get(libName);
     }
 
     public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
-        return referencedLibrarySpecifications;
+        return referencedAccessibleLibraries;
     }
-    
-    private KeywordValidationContext extractKeywordValidationContext(final KeywordNameSplitter typedKeywordNameSplitter) {
-        final List<KeywordValidationContext> keywordsContextList = accessibleKeywords.get(typedKeywordNameSplitter.getKeywordName()
-                .toLowerCase());
-        if (keywordsContextList != null) {
-            final String typedKeywordSourceName = typedKeywordNameSplitter.getKeywordSource();
-            for (final KeywordValidationContext keywordValidationContext : keywordsContextList) {
-                if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
-                    return keywordValidationContext;
+
+    public FileValidationContext createUnitContext(final IFile file) {
+        return new FileValidationContext(this, file);
+    }
+
+    private static Map<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
+        final Map<String, LibrarySpecification> libs = newLinkedHashMap();
+        libs.putAll(robotProject.getStandardLibraries());
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
+                .entrySet()) {
+            libs.put(entry.getKey().getName(), entry.getValue());
+        }
+        return libs;
+    }
+
+    public Set<String> collectAccessibleVariables(final IFile file) {
+        final Set<String> variables = newHashSet();
+        new VariableDefinitionLocator(file, model).locateVariableDefinition(new VariableDetector() {
+
+            @Override
+            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+                variables.add((variable.getPrefix() + variable.getName() + variable.getSuffix()).toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
+                // local variables will be added to context during validation
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision globalVariableDetected(final String name, final Object value) {
+                variables.add(name.toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file, final String name,
+                    final Object value) {
+                variables.add(name.toLowerCase());
+                return ContinueDecision.CONTINUE;
+            }
+        });
+        return variables;
+    }
+
+    public Map<String, List<KeywordValidationContext>> collectAccessibleKeywordNames(final IFile file) {
+        final Map<String, List<KeywordValidationContext>> accessibleKeywords = newHashMap();
+        new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
+
+            @Override
+            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
+
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
+                        kwSpec.getName().toLowerCase(), libSpec.getName(), libraryAlias, kwSpec.isDeprecated(),
+                        isFromNestedLibrary);
+                addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
+                        keyword.getName().toLowerCase(), extractResourceFileName(file), "", keyword.isDeprecated(),
+                        false);
+                addAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
+                return ContinueDecision.CONTINUE;
+            }
+
+            private void addAccessibleKeyword(final String keywordName,
+                    final KeywordValidationContext keywordValidationContext) {
+                if (accessibleKeywords.containsKey(keywordName)) {
+                    accessibleKeywords.get(keywordName).add(keywordValidationContext);
+                } else {
+                    accessibleKeywords.put(keywordName, newArrayList(keywordValidationContext));
                 }
             }
-        }
-        return null;
-    }
-    
-    private boolean hasEqualSources(final String typedKeywordSourceName,
-            final KeywordValidationContext keywordValidationContext) {
-        if (!typedKeywordSourceName.isEmpty()) {
-            return !keywordValidationContext.getAlias().isEmpty() ? typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getAlias())
-                    : typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getSourceName());
-        }
-        return true;
+
+            private String extractResourceFileName(final RobotSuiteFile file) {
+                return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()) : "";
+            }
+        });
+        return accessibleKeywords;
     }
 
-    public static class KeywordValidationContext {
-
-        private final String keywordName;
-
-        private final String sourceName;
-
-        private final String alias;
-
-        private final boolean isDeprecated;
-
-        private final boolean isFromNestedLibrary;
-
-        public KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
-                final boolean isDeprecated, final boolean isFromNestedLibrary) {
-            this.keywordName = keywordName;
-            this.sourceName = sourceName;
-            this.alias = alias;
-            this.isDeprecated = isDeprecated;
-            this.isFromNestedLibrary = isFromNestedLibrary;
-        }
-
-        public String getKeywordName() {
-            return keywordName;
-        }
-
-        public String getSourceName() {
-            return sourceName;
-        }
-
-        public boolean isDeprecated() {
-            return isDeprecated;
-        }
-
-        public boolean isFromNestedLibrary() {
-            return isFromNestedLibrary;
-        }
-
-        public String getAlias() {
-            return alias;
-        }
-    }
 }

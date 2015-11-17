@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
@@ -54,7 +55,7 @@ public class RobotArtifactsValidator {
         }
 
         final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
-                .createProperValidator(ValidationContext.createFor(file), file);
+                .createProperValidator(new ValidationContext(file.getProject()), file);
 
         if (validator.isPresent()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
@@ -76,13 +77,16 @@ public class RobotArtifactsValidator {
         return new Job("Validating") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
+                final long start = System.currentTimeMillis();
                 try {
+
                     final Queue<ModelUnitValidator> unitValidators = Queues.newArrayDeque();
+                    final ValidationContext context = new ValidationContext(new RobotModel(), project);
 
                     if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
-                        unitValidators.addAll(createValidationUnitsForWholeProject());
+                        unitValidators.addAll(createValidationUnitsForWholeProject(context));
                     } else if (delta != null) {
-                        unitValidators.addAll(createValidationUnitsForChangedFiles(delta));
+                        unitValidators.addAll(createValidationUnitsForChangedFiles(context, delta));
                     }
 
                     final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
@@ -104,13 +108,18 @@ public class RobotArtifactsValidator {
                     RedPlugin.logError("Project validation was corrupted", e);
                     return Status.CANCEL_STATUS;
                 } finally {
+                    final long end = System.currentTimeMillis();
+
+                    System.out.println(
+                            "Finished validation. Took " + Double.toString((end - start) / 1000.0) + " seconds");
+
                     monitor.done();
                 }
             }
         };
     }
 
-    private List<ModelUnitValidator> createValidationUnitsForWholeProject()
+    private List<ModelUnitValidator> createValidationUnitsForWholeProject(final ValidationContext context)
             throws CoreException {
         final List<ModelUnitValidator> validators = newArrayList();
         validators.add(new ModelUnitValidator() {
@@ -122,7 +131,7 @@ public class RobotArtifactsValidator {
         project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(final IResource resource) throws CoreException {
-                final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(resource);
+                final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, resource);
                 if (validationUnit.isPresent()) {
                     final ModelUnitValidator unit = validationUnit.get();
                     validators.add(unit);
@@ -133,8 +142,8 @@ public class RobotArtifactsValidator {
         return validators;
     }
 
-    private List<ModelUnitValidator> createValidationUnitsForChangedFiles(final IResourceDelta delta)
-            throws CoreException {
+    private List<ModelUnitValidator> createValidationUnitsForChangedFiles(final ValidationContext context,
+            final IResourceDelta delta) throws CoreException {
         final List<ModelUnitValidator> validators = newArrayList();
         delta.accept(new IResourceDeltaVisitor() {
 
@@ -142,7 +151,7 @@ public class RobotArtifactsValidator {
             public boolean visit(final IResourceDelta delta) throws CoreException {
                 if (delta.getKind() != IResourceDelta.REMOVED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
                     final IResource file = delta.getResource();
-                    final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(file);
+                    final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, file);
                     if (validationUnit.isPresent()) {
                         validators.add(new ModelUnitValidator() {
                             @Override
@@ -159,26 +168,23 @@ public class RobotArtifactsValidator {
         return validators;
     }
 
-    private Optional<? extends ModelUnitValidator> createValidationUnits(final IResource resource)
-            throws CoreException {
-        if (resource.getType() != IResource.FILE) {
-            return Optional.absent();
-        }
-        final IFile file = (IFile) resource;
-        final ValidationContext validationContext = ValidationContext.createFor(file);
-        return createProperValidator(validationContext, file);
+    private Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
+            final IResource resource) throws CoreException {
+        return resource.getType() == IResource.FILE ? createProperValidator(context, (IFile) resource)
+                : Optional.<ModelUnitValidator> absent();
     }
 
-    public static Optional<? extends ModelUnitValidator> createProperValidator(
-            final ValidationContext validationContext, final IFile file) {
+    public static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
+            final IFile file) {
+
         if (RobotSuiteFileDescriber.isSuiteFile(file)) {
-            return Optional.of(new RobotSuiteFileValidator(validationContext, file));
+            return Optional.of(new RobotSuiteFileValidator(context, file));
         } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
-            return Optional.of(new RobotResourceFileValidator(validationContext, file));
+            return Optional.of(new RobotResourceFileValidator(context, file));
         } else if (RobotSuiteFileDescriber.isInitializationFile(file)) {
-            return Optional.of(new RobotInitFileValidator(validationContext, file));
+            return Optional.of(new RobotInitFileValidator(context, file));
         } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
-            return Optional.of(new RobotProjectConfigFileValidator(validationContext, file));
+            return Optional.of(new RobotProjectConfigFileValidator(context, file));
         }
         return Optional.absent();
     }
