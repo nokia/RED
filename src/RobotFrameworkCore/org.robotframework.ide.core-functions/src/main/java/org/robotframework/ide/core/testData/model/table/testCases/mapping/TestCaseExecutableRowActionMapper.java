@@ -77,6 +77,6 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
                         robotFileOutput.getFileModel(), currentLine, rt) || (posResolver
                         .isCorrectPosition(PositionExpected.TEST_CASE_NAME,
                                 robotFileOutput.getFileModel(), currentLine, rt) && RobotTokenType.START_HASH_COMMENT
-                        .getRepresentation().get(0).equals(text.trim())));
+                        .getRepresentation().get(0).startsWith(text.trim())));
     }
 }
