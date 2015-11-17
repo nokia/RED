@@ -28,20 +28,28 @@ public class VariableExtractor {
 
     public MappingResult extract(final FilePosition fp, final String text,
             final String fileName) {
-        Container mainContainer = structureExtractor.buildStructureTree(text);
+        try {
+            Container mainContainer = structureExtractor
+                    .buildStructureTree(text);
 
-        String extractionInsideFile = fileName;
-        if (fileName == null) {
-            extractionInsideFile = "<NOT_SET>";
+            String extractionInsideFile = fileName;
+            if (fileName == null) {
+                extractionInsideFile = "<NOT_SET>";
+            }
+
+            MappingResult result = mapper.map(fp, mainContainer,
+                    extractionInsideFile);
+            for (IElementDeclaration dec : result.getMappedElements()) {
+                dec.setRobotTokenPosition(fp);
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "An exception occures during variable extraction in file "
+                            + fileName + " at position " + fp + " for text "
+                            + text, e);
         }
-
-        MappingResult result = mapper.map(fp, mainContainer,
-                extractionInsideFile);
-        for (IElementDeclaration dec : result.getMappedElements()) {
-            dec.setRobotTokenPosition(fp);
-        }
-
-        return result;
     }
 
 
