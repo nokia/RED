@@ -30,7 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 class KeywordTableValidator implements ModelUnitValidator {
 
@@ -38,9 +37,9 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    private final ValidationContext validationContext;
+    private final FileValidationContext validationContext;
 
-    KeywordTableValidator(final ValidationContext validationContext,
+    KeywordTableValidator(final FileValidationContext validationContext,
             final Optional<RobotKeywordsSection> keywordSection) {
         this.validationContext = validationContext;
         this.keywordSection = keywordSection;
@@ -108,13 +107,11 @@ class KeywordTableValidator implements ModelUnitValidator {
     }
 
     private void reportUnknownVariables(final RobotSuiteFile suiteModel, final List<UserKeyword> keywords) {
-        final ImmutableSet<String> variables = TestCasesTableValidator.collectAccessibleVariables(suiteModel);
+        final Set<String> variables = validationContext.getAccessibleVariables();
 
         for (final UserKeyword keyword : keywords) {
-            final ImmutableSet<String> allVariables = ImmutableSet.<String> builder()
-                    .addAll(variables)
-                    .addAll(extractArgumentVariables(keyword))
-                    .build();
+            final Set<String> allVariables = newHashSet(variables);
+            allVariables.addAll(extractArgumentVariables(keyword));
 
             TestCasesTableValidator.reportUnknownVariables(suiteModel.getFile(), reporter,
                     keyword.getKeywordExecutionRows(), allVariables);

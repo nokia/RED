@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.table.SettingTable;
 import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
@@ -28,8 +27,9 @@ public class RobotInitFileValidator extends RobotFileValidator {
     }
 
     @Override
-    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        super.validate(fileModel, monitor);
+    public void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
+            throws CoreException {
+        super.validate(fileModel, validationContext);
 
         final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
         validateIfThereAreNoForbiddenSettings(settingsSection);

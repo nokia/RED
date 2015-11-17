@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableMap;
  */
 abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
-    protected final ValidationContext validationContext;
+    protected final FileValidationContext validationContext;
 
     protected final RobotSuiteFile suiteFile;
 
@@ -54,7 +54,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected final ProblemsReportingStrategy reporter;
 
 
-    public GeneralSettingsImportsValidator(final ValidationContext validationContext, final RobotSuiteFile suiteFile,
+    public GeneralSettingsImportsValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
             final List<? extends AImported> imports, final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.suiteFile = suiteFile;
@@ -167,7 +167,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     static class LibraryImportValidator extends GeneralSettingsImportsValidator {
 
-        public LibraryImportValidator(final ValidationContext validationContext, final RobotSuiteFile suiteFile,
+        public LibraryImportValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
                 final List<LibraryImport> imports, final ProblemsReportingStrategy reporter) {
             super(validationContext, suiteFile, imports, reporter);
         }
@@ -212,7 +212,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         protected void validateNameImport(final AImported imported, final String name, final RobotToken nameToken,
                 final IProgressMonitor monitor) throws CoreException {
             final String libName = createLibName(name, ((LibraryImport) imported).getArguments());
-            validateWithSpec(imported, validationContext.getLibrarySpecificationsAsMap().get(libName), name, nameToken,
+            validateWithSpec(imported, validationContext.getLibrarySpecifications(libName), name, nameToken,
                     monitor, false);
         }
 
@@ -249,7 +249,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     static class VariablesImportValidator extends GeneralSettingsImportsValidator {
 
-        public VariablesImportValidator(final ValidationContext validationContext, final RobotSuiteFile suiteFile,
+        public VariablesImportValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
                 final List<VariablesImport> imports, final ProblemsReportingStrategy reporter) {
             super(validationContext, suiteFile, imports, reporter);
         }
@@ -282,7 +282,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     static class ResourcesImportValidator extends GeneralSettingsImportsValidator {
 
-        public ResourcesImportValidator(final ValidationContext validationContext, final RobotSuiteFile suiteFile,
+        public ResourcesImportValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
                 final List<ResourceImport> imports, final ProblemsReportingStrategy reporter) {
             super(validationContext, suiteFile, imports, reporter);
         }

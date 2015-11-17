@@ -25,11 +25,6 @@ import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -38,14 +33,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext.KeywordValidationContext;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 
@@ -53,13 +45,13 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private static final String VARIABLE_PATTERN = "[@$&%]\\{[^\\}]+\\}";
 
-    private final ValidationContext validationContext;
+    private final FileValidationContext validationContext;
 
     private final Optional<RobotCasesSection> testCaseSection;
 
     private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
 
-    TestCasesTableValidator(final ValidationContext validationContext, final Optional<RobotCasesSection> section) {
+    TestCasesTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section) {
         this.validationContext = validationContext;
         this.testCaseSection = section;
     }
@@ -136,7 +128,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return executables;
     }
 
-    static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final ValidationContext validationContext,
+    static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final FileValidationContext validationContext,
             final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
         
         for (final RobotExecutableRow<?> executable : executables) {
@@ -154,19 +146,19 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText().toString();
-                final KeywordValidationContext keywordValidationContext = validationContext.findKeywordValidationContext(name);
-                if (!validationContext.isKeywordAccessible(keywordValidationContext)) {
+
+                if (!validationContext.isKeywordAccessible(name)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(name);
                     final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
                 }
-                if (validationContext.isKeywordDeprecated(keywordValidationContext)) {
+                if (validationContext.isKeywordDeprecated(name)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
                             .formatMessageWith(name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
                 }
-                if (validationContext.isKeywordFromNestedLibrary(keywordValidationContext)) {
+                if (validationContext.isKeywordFromNestedLibrary(name)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
                             .formatMessageWith(name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
@@ -180,46 +172,15 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private void reportUnknownVariables(final RobotSuiteFile suiteModel,
             final List<TestCase> cases) {        
-        final ImmutableSet<String> variables = collectAccessibleVariables(suiteModel);
+        final Set<String> variables = validationContext.getAccessibleVariables();
 
         for (final TestCase testCase : cases) {
             reportUnknownVariables(suiteModel.getFile(), reporter, testCase.getTestExecutionRows(), variables);
         }
     }
 
-    static ImmutableSet<String> collectAccessibleVariables(final RobotSuiteFile suiteModel) {
-        final Builder<String> setBuilder = ImmutableSet.builder();
-        new VariableDefinitionLocator(suiteModel).locateVariableDefinition(new VariableDetector() {
-            @Override
-            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
-                setBuilder.add((variable.getPrefix() + variable.getName() + variable.getSuffix()).toLowerCase());
-                return ContinueDecision.CONTINUE;
-            }
-
-            @Override
-            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
-                // local variables will be added to context during validation
-                return ContinueDecision.CONTINUE;
-            }
-
-            @Override
-            public ContinueDecision globalVariableDetected(final String name, final Object value) {
-                setBuilder.add(name.toLowerCase());
-                return ContinueDecision.CONTINUE;
-            }
-
-            @Override
-            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file, final String name,
-                    final Object value) {
-                setBuilder.add(name.toLowerCase());
-                return ContinueDecision.CONTINUE;
-            }
-        });
-        return setBuilder.build();
-    }
-
     static void reportUnknownVariables(final IFile file, final ProblemsReportingStrategy reporter,
-            final List<? extends RobotExecutableRow<?>> executables, final ImmutableSet<String> variables) {
+            final List<? extends RobotExecutableRow<?>> executables, final Set<String> variables) {
         final Set<String> definedVariables = newHashSet(variables);
 
         for (final RobotExecutableRow<?> row : executables) {

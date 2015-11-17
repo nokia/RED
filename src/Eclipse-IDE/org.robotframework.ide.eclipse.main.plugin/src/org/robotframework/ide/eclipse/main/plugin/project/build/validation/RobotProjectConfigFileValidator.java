@@ -43,12 +43,12 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
-    private final ValidationContext validationContext;
+    private final ValidationContext context;
 
     private final IFile configFile;
 
-    public RobotProjectConfigFileValidator(final ValidationContext validationContext, final IFile configFile) {
-        this.validationContext = validationContext;
+    public RobotProjectConfigFileValidator(final ValidationContext context, final IFile configFile) {
+        this.context = context;
         this.configFile = configFile;
     }
 
@@ -151,9 +151,9 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                     .formatMessageWith(libraryPath, libName));
         }
 
-        if (validationContext.getExecutorInUse() != SuiteExecutor.Jython) {
+        if (context.getExecutorInUse() != SuiteExecutor.Jython) {
             javaLibProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_IN_NON_JAVA_ENV)
-                    .formatMessageWith(libraryPath, validationContext.getExecutorInUse().toString()));
+                    .formatMessageWith(libraryPath, context.getExecutorInUse().toString()));
         }
         return javaLibProblems;
     }

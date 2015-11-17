@@ -357,6 +357,10 @@ public class RobotProject extends RobotContainer {
 
     public String resolve(final String expression) {
         final Map<String, String> knownVariables = newHashMap();
+        knownVariables.put("${REL}", "FZM");
+        knownVariables.put("${DEPL}", "SingleBoard");
+        knownVariables.put("${PROD}", "tdd");
+        knownVariables.put("${L2DEPL}", "L2SCT");
         return RobotExpressions.resolve(knownVariables, expression);
     }
 }
