@@ -64,45 +64,49 @@ public class ContainerMappingHelper {
         ContainerType containerType = container.getContainerType();
         List<IContainerElement> elements = container.getElements();
 
-        int contentStart = 1;
-        int contentEnd;
-        IElementDeclaration dec = null;
-        IContainerElement startElement = elements.get(0);
-        TextPosition startPos = startElement.getPosition();
-        int textLength = (startPos.getEnd() - startPos.getStart());
         FilePosition newPosition = currentPosition;
-        TextPosition endPos = null;
-        if (containerType == ContainerType.MIX) {
-            contentStart = 0;
-            contentEnd = elements.size();
-        } else {
-            newPosition = new FilePosition(currentPosition.getLine(),
-                    currentPosition.getColumn() + textLength,
-                    currentPosition.getOffset() + textLength);
-
-            if (container.isOpenForModification()) {
-                if (container.getParent() != null) {
-                    BuildMessage warn = BuildMessage.createWarnMessage(
-                            createWarningAboutMissingClose(containerType,
-                                    startElement), mappingResult.getFilename());
-                    warn.setFileRegion(new FileRegion(currentPosition,
-                            newPosition));
-                    mappingResult.addBuildMessage(warn);
-                }
+        IElementDeclaration dec = null;
+        int contentStart = -1;
+        int contentEnd = -1;
+        if (!elements.isEmpty()) {
+            contentStart = 1;
+            IContainerElement startElement = elements.get(0);
+            TextPosition startPos = startElement.getPosition();
+            int textLength = (startPos.getEnd() - startPos.getStart());
+            TextPosition endPos = null;
+            if (containerType == ContainerType.MIX) {
+                contentStart = 0;
                 contentEnd = elements.size();
             } else {
-                endPos = ((ContainerElement) elements.get(elements.size() - 1))
-                        .getPosition();
-                contentEnd = elements.size() - 1;
-            }
+                newPosition = new FilePosition(currentPosition.getLine(),
+                        currentPosition.getColumn() + textLength,
+                        currentPosition.getOffset() + textLength);
 
-            if (containerType == ContainerType.INDEX) {
-                dec = new IndexDeclaration(startPos, endPos);
-            } else if (containerType == ContainerType.VARIABLE) {
-                dec = new VariableDeclaration(startPos, endPos);
-            } else {
-                throw new UnsupportedOperationException("Type " + containerType
-                        + " is not supported yet!");
+                if (container.isOpenForModification()) {
+                    if (container.getParent() != null) {
+                        BuildMessage warn = BuildMessage.createWarnMessage(
+                                createWarningAboutMissingClose(containerType,
+                                        startElement), mappingResult
+                                        .getFilename());
+                        warn.setFileRegion(new FileRegion(currentPosition,
+                                newPosition));
+                        mappingResult.addBuildMessage(warn);
+                    }
+                    contentEnd = elements.size();
+                } else {
+                    endPos = ((ContainerElement) elements
+                            .get(elements.size() - 1)).getPosition();
+                    contentEnd = elements.size() - 1;
+                }
+
+                if (containerType == ContainerType.INDEX) {
+                    dec = new IndexDeclaration(startPos, endPos);
+                } else if (containerType == ContainerType.VARIABLE) {
+                    dec = new VariableDeclaration(startPos, endPos);
+                } else {
+                    throw new UnsupportedOperationException("Type "
+                            + containerType + " is not supported yet!");
+                }
             }
         }
 
