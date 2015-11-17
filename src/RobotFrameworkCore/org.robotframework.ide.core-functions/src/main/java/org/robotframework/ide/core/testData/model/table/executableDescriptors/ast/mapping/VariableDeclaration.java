@@ -113,7 +113,8 @@ public class VariableDeclaration extends AContainerOperation {
 
 
     public TextPosition getVariableName() {
-        TextPosition varName = null;
+        TextPosition varName = new TextPosition(variableStart.getFullText(),
+                variableStart.getEnd() + 1, variableEnd.getStart() - 1);
         if (!isDynamic()) {
             JoinedTextDeclarations nameJoined = new JoinedTextDeclarations();
             List<IElementDeclaration> elementsDeclarationInside = super
@@ -126,7 +127,10 @@ public class VariableDeclaration extends AContainerOperation {
                 }
             }
 
-            varName = nameJoined.join();
+            TextPosition joined = nameJoined.join();
+            if (joined != null) {
+                varName = nameJoined.join();
+            }
         }
 
         return varName;
