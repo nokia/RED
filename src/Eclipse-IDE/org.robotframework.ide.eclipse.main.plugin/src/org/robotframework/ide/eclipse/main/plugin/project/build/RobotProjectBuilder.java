@@ -29,19 +29,14 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(getDelta(project), kind);
 
             final Job buildJob = new RobotArtifactsBuilder(getProject()).createBuildJob(rebuildNeeded);
-            final Job validationJob = new RobotArtifactsValidator(getProject()).createValidationJob(getDelta(project),
-                    kind);
-            final IProgressMonitor progressMonitor = Job.getJobManager().createProgressGroup();
+            final Job validationJob = new RobotArtifactsValidator(getProject()).createValidationJob(buildJob,
+                    getDelta(project), kind);
             try {
                 final String projectPath = project.getFullPath().toString();
 
-                progressMonitor.beginTask("Building and validating " + projectPath + " project", 200);
-
-                buildJob.setProgressGroup(progressMonitor, 100);
-                validationJob.setProgressGroup(progressMonitor, 100);
-
                 monitor.subTask("waiting for project " + projectPath + " build end");
                 buildJob.schedule();
+                validationJob.schedule();
                 buildJob.join();
 
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL
@@ -49,21 +44,19 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                     RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
+                        validationJob.cancel();
                         return null;
                     }
                 }
                 RedPlugin.getModelManager().getModel().createRobotProject(project).clearConfiguration();
-                project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+                project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
                 if (!monitor.isCanceled()) {
-                    monitor.subTask("waiting for project validation end");
-                    validationJob.schedule();
+                    monitor.subTask("waiting for project " + projectPath + " validation end");
                     validationJob.join();
                 }
             } catch (final InterruptedException e) {
                 throw new CoreException(Status.CANCEL_STATUS);
-            } finally {
-                progressMonitor.done();
             }
             return null;
         } finally {
