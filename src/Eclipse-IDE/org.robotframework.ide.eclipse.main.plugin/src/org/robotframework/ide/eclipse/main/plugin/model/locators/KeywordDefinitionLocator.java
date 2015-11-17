@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
@@ -32,17 +33,17 @@ import com.google.common.base.Optional;
  */
 public class KeywordDefinitionLocator {
 
-    private final RobotSuiteFile startingFile;
+    private final IFile file;
 
-    private final boolean useCommonModel;
+    private final RobotModel model;
 
-    public KeywordDefinitionLocator(final RobotSuiteFile file) {
-        this(file, true);
+    public KeywordDefinitionLocator(final IFile file) {
+        this(file, RedPlugin.getModelManager().getModel());
     }
 
-    public KeywordDefinitionLocator(final RobotSuiteFile file, final boolean useCommonModel) {
-        this.startingFile = file;
-        this.useCommonModel = useCommonModel;
+    public KeywordDefinitionLocator(final IFile file, final RobotModel model) {
+        this.file = file;
+        this.model = model;
     }
 
     public void locateKeywordDefinitionInLibraries(final RobotProject project, final KeywordDetector detector) {
@@ -53,6 +54,7 @@ public class KeywordDefinitionLocator {
     }
 
     public void locateKeywordDefinition(final KeywordDetector detector) {
+        final RobotSuiteFile startingFile = model.createSuiteFile(file);
         ContinueDecision shouldContinue = locateInCurrentFile(startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -83,14 +85,14 @@ public class KeywordDefinitionLocator {
             final KeywordDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
-            final IResource resourceFile = startingFile.getFile().getWorkspace().getRoot().findMember(wsRelative);
+            final IResource resourceFile = file.getWorkspace().getRoot().findMember(wsRelative);
             if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
             }
             alreadyVisited.add((IFile) resourceFile);
 
-            final RobotSuiteFile resourceSuiteFile = getSuiteFile((IFile) resourceFile);
+            final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
             ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (shouldContinue == ContinueDecision.STOP) {
@@ -106,11 +108,6 @@ public class KeywordDefinitionLocator {
             }
         }
         return ContinueDecision.CONTINUE;
-    }
-
-    private RobotSuiteFile getSuiteFile(final IFile resourceFile) {
-        return useCommonModel ? RedPlugin.getModelManager().createSuiteFile(resourceFile)
-                : new RobotSuiteFile(null, resourceFile);
     }
     
     private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,

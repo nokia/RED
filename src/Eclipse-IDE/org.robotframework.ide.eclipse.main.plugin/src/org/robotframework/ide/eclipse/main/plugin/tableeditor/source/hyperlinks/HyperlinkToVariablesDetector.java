@@ -48,12 +48,12 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             if (!variableRegion.isPresent()) {
                 return null;
             }
-            IRegion fromRegion = variableRegion.get();
+            final IRegion fromRegion = variableRegion.get();
             final String fullVariableName = textViewer.getDocument().get(fromRegion.getOffset(),
                     fromRegion.getLength());
 
             final List<IHyperlink> hyperlinks = newArrayList();
-            new VariableDefinitionLocator(suiteFile).locateVariableDefinitionWithLocalScope(
+            new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(
                     createDetector(textViewer, fromRegion, fullVariableName, hyperlinks),
                     region.getOffset());
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);

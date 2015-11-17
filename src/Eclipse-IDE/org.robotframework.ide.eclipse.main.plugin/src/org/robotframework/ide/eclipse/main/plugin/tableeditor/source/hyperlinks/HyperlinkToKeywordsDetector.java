@@ -54,7 +54,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             final String keywordName = textViewer.getDocument().get(fromRegion.getOffset(), fromRegion.getLength());
 
             final List<IHyperlink> hyperlinks = newArrayList();
-            new KeywordDefinitionLocator(suiteFile)
+            new KeywordDefinitionLocator(suiteFile.getFile())
                     .locateKeywordDefinition(createDetector(textViewer, keywordName, fromRegion, hyperlinks));
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
 
