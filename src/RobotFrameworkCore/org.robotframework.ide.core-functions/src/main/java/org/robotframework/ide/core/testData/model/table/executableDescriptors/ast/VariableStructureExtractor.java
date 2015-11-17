@@ -103,10 +103,12 @@ public class VariableStructureExtractor {
                 }
 
                 if (cont == null) {
-                    if (type == ContainerElementType
-                            .getCloseContainerType(currentContainer
-                                    .getElements().get(0).getType())) {
-                        cont = currentContainer;
+                    if (!currentContainer.getElements().isEmpty()) {
+                        if (type == ContainerElementType
+                                .getCloseContainerType(currentContainer
+                                        .getElements().get(0).getType())) {
+                            cont = currentContainer;
+                        }
                     }
                 }
             }
