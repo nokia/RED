@@ -78,7 +78,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
                         robotFileOutput.getFileModel(), currentLine, rt) || (posResolver
                         .isCorrectPosition(PositionExpected.USER_KEYWORD_NAME,
                                 robotFileOutput.getFileModel(), currentLine, rt) && RobotTokenType.START_HASH_COMMENT
-                        .getRepresentation().get(0).equals(text.trim())));
+                        .getRepresentation().get(0).startsWith(text.trim())));
 
         return result;
     }
