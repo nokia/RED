@@ -68,7 +68,7 @@ public class RedKeywordProposals {
 
         final List<RedKeywordProposal> proposals = newArrayList();
 
-        new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
+        new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,

@@ -22,6 +22,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -49,7 +50,7 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
 
         final Set<String> libs = newLinkedHashSet();
-        new KeywordDefinitionLocator(new RobotSuiteFile(null, file), false)
+        new KeywordDefinitionLocator(file, new RobotModel())
                 .locateKeywordDefinitionInLibraries(project,
                 new KeywordDetector() {
 

@@ -19,10 +19,6 @@ public class RobotModel implements RobotElement {
 
     private final List<RobotElement> projects = new ArrayList<>();
 
-    RobotModel() {
-        // reducing visibility
-    }
-
     public RobotProject createRobotProject(final IProject project) {
         if (project == null) {
             return null;
@@ -47,7 +43,7 @@ public class RobotModel implements RobotElement {
         }
     }
 
-    RobotSuiteFile createSuiteFile(final IFile file) {
+    public RobotSuiteFile createSuiteFile(final IFile file) {
         if (file == null) {
             return null;
         }

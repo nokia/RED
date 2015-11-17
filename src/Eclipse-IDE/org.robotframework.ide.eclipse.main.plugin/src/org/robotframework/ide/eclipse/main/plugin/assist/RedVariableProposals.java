@@ -42,7 +42,7 @@ public class RedVariableProposals {
             final int offset) {
         final Set<RedVariableProposal> proposals = newLinkedHashSet();
 
-        final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile);
+        final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile());
         final VariableDetector detector = createDetector(proposals);
         if (offset == -1) {
             locator.locateVariableDefinition(detector);

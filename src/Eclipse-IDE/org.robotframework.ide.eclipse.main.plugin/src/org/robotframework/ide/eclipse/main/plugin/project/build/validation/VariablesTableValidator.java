@@ -35,7 +35,7 @@ import com.google.common.collect.Range;
 
 class VariablesTableValidator implements ModelUnitValidator {
 
-    private final ValidationContext validationContext;
+    private final FileValidationContext validationContext;
 
     private final Optional<RobotVariablesSection> variablesSection;
 
@@ -43,13 +43,13 @@ class VariablesTableValidator implements ModelUnitValidator {
 
     private final VersionDependentValidators versionDependentValidators;
 
-    VariablesTableValidator(final ValidationContext validationContext,
+    VariablesTableValidator(final FileValidationContext validationContext,
             final Optional<RobotVariablesSection> variablesSection) {
         this(validationContext, variablesSection, new ProblemsReportingStrategy(), new VersionDependentValidators());
     }
 
     @VisibleForTesting
-    VariablesTableValidator(final ValidationContext validationContext,
+    VariablesTableValidator(final FileValidationContext validationContext,
             final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy,
             final VersionDependentValidators versionDependentValidators) {
         this.validationContext = validationContext;

@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.TableHeader;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
@@ -29,18 +28,18 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     }
 
     @Override
-    public void validate(final RobotSuiteFile fileModel, final IProgressMonitor monitor) throws CoreException {
-        super.validate(fileModel, monitor);
+    public void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
+            throws CoreException {
+        super.validate(fileModel, validationContext);
 
-        validateFileName(fileModel, monitor);
+        validateFileName(fileModel);
     }
 
-    private void validateFileName(final RobotSuiteFile fileModel, final IProgressMonitor monitor) {
+    private void validateFileName(final RobotSuiteFile fileModel) {
         if ("__init__".equals(getSimpleName(file))) {
             final ProblemPosition position = getTestCaseTableHeaderPosition(
                     fileModel.findSection(RobotCasesSection.class));
-            reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_IS_NAMED_INIT), file,
-                    position);
+            reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_IS_NAMED_INIT), file, position);
         }
     }
 
