@@ -54,6 +54,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         boolean wasFor = false;
         boolean wasIn = false;
+        boolean wasElementsToIterate = false;
         for (RobotToken elem : lineElements) {
             MappingResult mappingResult = varExtractor.extract(elem, fileName);
             loopDescriptor.addMessages(mappingResult.getMessages());
@@ -70,6 +71,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements
                     loopDescriptor.addUsedVariables(correctVariables);
                     loopDescriptor.addTextParameters(mappingResult
                             .getTextElements());
+                    wasElementsToIterate = true;
                 } else {
                     if (ForDescriptorInfo.isInToken(elem)) {
                         loopDescriptor.setInAction(new RobotAction(elem,
@@ -94,7 +96,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements
                                             + elem.getText().length());
                             errorMessage.setFileRegion(new FileRegion(
                                     startFilePosition, end));
-                            mappingResult.addBuildMessage(errorMessage);
+                            loopDescriptor.addMessage(errorMessage);
                         }
                     }
                 }
@@ -108,6 +110,16 @@ public class ForLoopDeclarationRowDescriptorBuilder implements
                             "Internal problem - :FOR should be the first token.");
                 }
             }
+        }
+
+        if (!wasIn || !wasElementsToIterate) {
+            BuildMessage errorMessage = BuildMessage.createErrorMessage(
+                    "Invalid FOR loop - missing values to iterate", fileName);
+            FilePosition startFilePosition = keywordOrTestcase
+                    .getBeginPosition();
+            errorMessage.setFileRegion(new FileRegion(startFilePosition,
+                    execRowLine.getEndPosition()));
+            loopDescriptor.addMessage(errorMessage);
         }
 
         return loopDescriptor;
