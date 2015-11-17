@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -67,10 +68,8 @@ public class ReferencedLibraryImporter {
             }
 
             if (pythonClasses.isEmpty()) {
-                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                    "RED was unable to find classes inside '" + fullLibraryPath + "' module"), 
-                        StatusManager.SHOW);
-                return null;
+                final String name = new File(fullLibraryPath).getName();
+                pythonClasses.add(PythonClass.create(name.substring(0, name.lastIndexOf('.'))));
             }
             final ElementListSelectionDialog classesDialog = ClassesSelectionDialog.create(shellForDialogs,
                     pythonClasses, new PythonClassesLabelProvider());
