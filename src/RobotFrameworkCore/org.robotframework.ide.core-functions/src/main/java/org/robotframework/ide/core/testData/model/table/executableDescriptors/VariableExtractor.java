@@ -9,6 +9,7 @@ import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.Container;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.VariableStructureExtractor;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.DeclarationMapper;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.IElementDeclaration;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.MappingResult;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
@@ -34,7 +35,13 @@ public class VariableExtractor {
             extractionInsideFile = "<NOT_SET>";
         }
 
-        return mapper.map(fp, mainContainer, extractionInsideFile);
+        MappingResult result = mapper.map(fp, mainContainer,
+                extractionInsideFile);
+        for (IElementDeclaration dec : result.getMappedElements()) {
+            dec.setRobotTokenPosition(fp);
+        }
+
+        return result;
     }
 
 

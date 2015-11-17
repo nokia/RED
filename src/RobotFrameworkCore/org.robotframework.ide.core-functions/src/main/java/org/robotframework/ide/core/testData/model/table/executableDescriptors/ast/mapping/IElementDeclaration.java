@@ -7,6 +7,7 @@ package org.robotframework.ide.core.testData.model.table.executableDescriptors.a
 
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
 
@@ -16,7 +17,19 @@ public interface IElementDeclaration {
     TextPosition getStart();
 
 
+    FilePosition getStartFromFile();
+
+
     TextPosition getEnd();
+
+
+    FilePosition getEndFromFile();
+
+
+    void setRobotTokenPosition(final FilePosition robotTokenPosition);
+
+
+    FilePosition findRobotTokenPosition();
 
 
     void addElementDeclarationInside(final IElementDeclaration elementToAdd);
