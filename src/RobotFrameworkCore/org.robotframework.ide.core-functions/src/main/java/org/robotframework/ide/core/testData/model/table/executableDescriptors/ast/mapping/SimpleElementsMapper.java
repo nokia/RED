@@ -24,6 +24,10 @@ public class SimpleElementsMapper {
 
     public SimpleElementsMapper() {
         mappers.put(ContainerElementType.TEXT, new TextDeclarationMapper());
+        mappers.put(ContainerElementType.CURRLY_BRACKET_CLOSE,
+                new TextDeclarationMapper());
+        mappers.put(ContainerElementType.SQUARE_BRACKET_CLOSE,
+                new TextDeclarationMapper());
         mappers.put(ContainerElementType.WHITESPACE, new WhitespaceMapper());
         mappers.put(ContainerElementType.ESCAPE, new EscapeMapper());
         mappers.put(ContainerElementType.VARIABLE_TYPE_ID,
