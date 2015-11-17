@@ -221,9 +221,9 @@ public class DeclarationMapper {
                     variableDec.getEscape(), ContainerElementType.ESCAPE);
             joinedStart.addElementDeclarationInside(escapeDec);
         }
-        if (variableDec.getTypeIdentficator() != null) {
+        if (variableDec.getTypeIdentificator() != null) {
             TextDeclaration typeId = new TextDeclaration(
-                    variableDec.getTypeIdentficator(),
+                    variableDec.getTypeIdentificator(),
                     ContainerElementType.VARIABLE_TYPE_ID);
             joinedStart.addElementDeclarationInside(typeId);
         }
@@ -287,7 +287,7 @@ public class DeclarationMapper {
             final VariableDeclaration variableDec) {
         boolean result = false;
         if (!variableDec.isEscaped()) {
-            TextPosition typeId = variableDec.getTypeIdentficator();
+            TextPosition typeId = variableDec.getTypeIdentificator();
             if (typeId != null) {
                 String idText = typeId.getText();
                 if (idText != null && !idText.isEmpty()) {

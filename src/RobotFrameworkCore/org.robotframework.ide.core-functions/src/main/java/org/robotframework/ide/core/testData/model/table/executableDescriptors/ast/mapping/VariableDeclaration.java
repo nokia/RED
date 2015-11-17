@@ -62,14 +62,14 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
 
-    public TextPosition getTypeIdentficator() {
+    public TextPosition getTypeIdentificator() {
         return variableIdentificator;
     }
 
 
     public VariableType getRobotType() {
         char c = (char) -1;
-        String text = getTypeIdentficator().getText();
+        String text = getTypeIdentificator().getText();
         if (!text.isEmpty()) {
             c = text.charAt(0);
         }
