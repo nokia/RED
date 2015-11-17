@@ -18,8 +18,10 @@ import org.junit.Test;
 import org.robotframework.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -27,26 +29,25 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 public class VariablesTableValidatorTest {
 
     private MockReporter reporter;
 
-    private ValidationContext context;
-
     @Before
     public void beforeTest() {
         reporter = new MockReporter();
-
-        context = new ValidationContext(RobotVersion.from("1.0"), SuiteExecutor.Python);
     }
 
     @Test
     public void nothingIsReported_whenThereIsNoVariablesSection() throws CoreException {
         final RobotSuiteFile file = RobotSuiteFileCreator.createModel("");
         
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -62,6 +63,7 @@ public class VariablesTableValidatorTest {
                 "@{list}  1",
                 "&{dict}  1");
 
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -97,6 +99,7 @@ public class VariablesTableValidatorTest {
         final VersionDependentValidators versionValidators = createVersionDependentValidators(
                 alwaysFailingVersionDepValidator_1, alwaysFailingVersionDepValidator_2,
                 alwaysPassingVersionDepValidator);
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, versionValidators);
         validator.validate(null);
@@ -113,6 +116,7 @@ public class VariablesTableValidatorTest {
                 "*** Variables ***", 
                 "var  1");
 
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -128,6 +132,7 @@ public class VariablesTableValidatorTest {
                 "*** Variables ***", 
                 "$ {var}  1");
 
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -144,6 +149,7 @@ public class VariablesTableValidatorTest {
                 "${var}  1",
                 "@{var}  2");
 
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -163,6 +169,7 @@ public class VariablesTableValidatorTest {
                 "${var}  1",
                 "@{var}  2");
 
+        final FileValidationContext context = prepareContext(file);
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -184,5 +191,13 @@ public class VariablesTableValidatorTest {
                 return newArrayList(validators);
             }
         };
+    }
+
+    private static FileValidationContext prepareContext(final RobotSuiteFile file) {
+        final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
+                SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
+                Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
+        final FileValidationContext context = new FileValidationContext(parentContext, file.getFile());
+        return context;
     }
 }
