@@ -54,6 +54,8 @@ public class RobotProject extends RobotContainer {
     
     private RobotProjectConfig configuration;
 
+    private List<File> modulesSearchPath;
+
     RobotProject(final IProject project) {
         super(null, project);
     }
@@ -250,8 +252,12 @@ public class RobotProject extends RobotContainer {
         return getProject().getFile(filename);
     }
 
-    public List<File> getModuleSearchPaths() {
-        return getRuntimeEnvironment().getModuleSearchPaths();
+    public synchronized List<File> getModuleSearchPaths() {
+        if (modulesSearchPath != null) {
+            return modulesSearchPath;
+        }
+        modulesSearchPath = getRuntimeEnvironment().getModuleSearchPaths();
+        return modulesSearchPath;
     }
     
     public synchronized List<String> getPythonpath() {
