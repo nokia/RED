@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
+
 
 public class Container implements IContainerElement {
 
@@ -131,5 +133,11 @@ public class Container implements IContainerElement {
         public ContainerElementType getOpenType() {
             return openType;
         }
+    }
+
+
+    @Override
+    public TextPosition getPosition() {
+        return elements.get(0).getPosition();
     }
 }
