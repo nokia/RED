@@ -53,7 +53,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         RobotToken token;
         if (linkedElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            token = row.buildLineDescription().getFirstAction();
+            token = row.buildLineDescription().getAction().getToken();
         } else {
             token = linkedElement.getElementTokens().get(0);
         }
@@ -131,7 +131,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         RobotToken token;
         if (linkedElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            token = row.buildLineDescription().getFirstAction();
+            token = row.buildLineDescription().getAction().getToken();
         } else {
             token = linkedElement.getElementTokens().get(0);
         }
