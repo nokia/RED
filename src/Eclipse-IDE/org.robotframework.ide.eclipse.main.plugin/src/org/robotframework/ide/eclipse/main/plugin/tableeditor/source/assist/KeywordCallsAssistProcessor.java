@@ -70,7 +70,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
                     if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())
                             || keywordPrefix.equalsIgnoreCase(prefix)) {
-                        if (!shouldAddKeywordPrefix) {
+                        if (!shouldAddKeywordPrefix || keywordPrefix.length() == 1) {
                             keywordPrefix = "";
                         }
                         final String textToInsert = keywordPrefix + keywordName + separator;
