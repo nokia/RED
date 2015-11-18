@@ -250,4 +250,24 @@ public class DocumentUtilities {
                 Platform.PREF_LINE_SEPARATOR, null, context);
         return delimiter != null ? delimiter : System.lineSeparator();
     }
+
+    public static Optional<IRegion> getSnippet(final IDocument document, final int offset, final int noOfLinesBeforeAndAfter) {
+        if (noOfLinesBeforeAndAfter < 0) {
+            return Optional.absent();
+        }
+        try {
+            final int line = document.getLineOfOffset(offset);
+            final int firstLine = Math.max(0, line - noOfLinesBeforeAndAfter);
+            final int lastLine = Math.min(document.getNumberOfLines() - 1, line + noOfLinesBeforeAndAfter);
+
+            final IRegion firstLineRegion = document.getLineInformation(firstLine);
+            final IRegion lastLineRegion = document.getLineInformation(lastLine);
+
+            return Optional.<IRegion> of(new Region(firstLineRegion.getOffset(),
+                    lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
+            
+        } catch (final BadLocationException e) {
+            return Optional.absent();
+        }
+    }
 }
