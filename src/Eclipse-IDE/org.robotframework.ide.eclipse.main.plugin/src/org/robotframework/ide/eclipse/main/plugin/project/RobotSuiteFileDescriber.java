@@ -88,6 +88,7 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
 						currentToken)) {
 					if (newFullComplex.matcher(currentToken.getRaw().toString()).find()) {
 						describedResult = VALID;
+						break;
 					}
 				}
 			}
