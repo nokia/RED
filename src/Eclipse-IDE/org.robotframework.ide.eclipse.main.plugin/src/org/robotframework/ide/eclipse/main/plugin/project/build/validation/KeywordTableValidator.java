@@ -124,7 +124,7 @@ class KeywordTableValidator implements ModelUnitValidator {
     private Collection<String> extractArgumentVariables(final UserKeyword keyword, final VariableExtractor extractor, final String fileName) {
         final Set<String> arguments = newHashSet();
         for (final KeywordArguments argument : keyword.getArguments()) {
-            arguments.addAll(TestCasesTableValidator.extractVariableNames(argument.getArguments(), extractor, fileName));
+            arguments.addAll(TestCasesTableValidator.extractVariableNamesFromArguments(argument.getArguments(), extractor, fileName));
         }
         return arguments;
     }
