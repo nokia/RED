@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
 public class VariableDeclaration extends AContainerOperation {
@@ -96,6 +97,16 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
 
+    public TextPosition getVariableText() {
+        int start = variableStart.getStart();
+        if (variableIdentificator != null) {
+            start = variableIdentificator.getStart();
+        }
+        int end = variableEnd.getEnd();
+        return new TextPosition(variableStart.getFullText(), start, end);
+    }
+
+
     @Override
     public FilePosition getStartFromFile() {
         FilePosition position = findRobotTokenPosition();
@@ -150,6 +161,21 @@ public class VariableDeclaration extends AContainerOperation {
             }
         }
         return objectName;
+    }
+
+
+    public RobotToken asToken() {
+        RobotToken token = new RobotToken();
+        String text = getVariableText().getText();
+        token.setRaw(new StringBuilder(text));
+        token.setText(new StringBuilder(text));
+        token.setType(getRobotType().getType());
+        FilePosition fp = getStartFromFile();
+        token.setLineNumber(fp.getLine());
+        token.setStartColumn(fp.getColumn());
+        token.setStartOffset(fp.getOffset());
+
+        return token;
     }
 
 
