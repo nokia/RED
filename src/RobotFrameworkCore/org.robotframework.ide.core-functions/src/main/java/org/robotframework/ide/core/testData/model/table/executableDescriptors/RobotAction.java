@@ -29,6 +29,13 @@ public class RobotAction {
     }
 
 
+    public boolean isPresent() {
+        return (originalToken != null && !originalToken.getFilePosition()
+                .isNotSet())
+                && (elementsOfToken != null && !elementsOfToken.isEmpty());
+    }
+
+
     public RobotToken getToken() {
         RobotToken tokenToReturn = originalToken;
         if (tokenToReturn == null) {
