@@ -101,7 +101,7 @@ public class ForLoopContinueRowDescriptorBuilder implements
         rowWithoutLoopContinue.setAction(lineElements.get(1));
         rowWithoutLoopContinue.setParent(execRowLine.getParent());
         int size = lineElements.size();
-        for (int index = 2; index > size; index++) {
+        for (int index = 2; index < size; index++) {
             rowWithoutLoopContinue.addArgument(lineElements.get(index));
         }
         IExecutableRowDescriptor<T> buildDescription = new SimpleRowDescriptorBuilder()
