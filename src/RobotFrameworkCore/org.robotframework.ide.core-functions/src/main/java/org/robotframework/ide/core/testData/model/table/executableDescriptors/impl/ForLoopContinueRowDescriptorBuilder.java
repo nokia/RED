@@ -13,6 +13,8 @@ import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
 import org.robotframework.ide.core.testData.model.table.IExecutableStepsHolder;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor.ERowType;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor.IRowType;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.IRowDescriptorBuilder;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.RobotAction;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.VariableExtractor;
@@ -128,24 +130,23 @@ public class ForLoopContinueRowDescriptorBuilder implements
             for (int lineNumber = myLineNumber - 1; lineNumber >= 0; lineNumber--) {
                 RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> row = executionContext
                         .get(lineNumber);
-                // IExecutableRowDescriptor<AModelElement<? extends
-                // ARobotSectionTable>> lineDescription = row
-                // .buildLineDescription();
-                // IRowType rowType = lineDescription.getRowType();
-                // if (rowType == ERowType.FOR) {
-                // forLine = lineNumber;
-                // break;
-                // } else if (rowType == ERowType.FOR_CONTINUE) {
-                // forLine = ((ForLoopContinueRowDescriptor<T>) lineDescription)
-                // .getForLoopStartRowIndex();
-                // break;
-                // } else if (rowType == ERowType.COMMENTED_HASH
-                // || !row.isExecutable()) {
-                // continue;
-                // } else {
-                // // is not for
-                // break;
-                // }
+                IExecutableRowDescriptor<AModelElement<? extends ARobotSectionTable>> lineDescription = row
+                        .buildLineDescription();
+                IRowType rowType = lineDescription.getRowType();
+                if (rowType == ERowType.FOR) {
+                    forLine = lineNumber;
+                    break;
+                } else if (rowType == ERowType.FOR_CONTINUE) {
+                    forLine = ((ForLoopContinueRowDescriptor<T>) lineDescription)
+                            .getForLoopStartRowIndex();
+                    break;
+                } else if (rowType == ERowType.COMMENTED_HASH
+                        || !row.isExecutable()) {
+                    continue;
+                } else {
+                    // is not for
+                    break;
+                }
             }
         }
 
