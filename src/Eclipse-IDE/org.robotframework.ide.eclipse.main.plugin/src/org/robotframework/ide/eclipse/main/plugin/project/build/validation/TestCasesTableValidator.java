@@ -15,12 +15,15 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor.ERowType;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.VariableExtractor;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.MappingResult;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.VariableDeclaration;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.impl.ForLoopContinueRowDescriptor;
 import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -128,21 +131,32 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
         
         for (final RobotExecutableRow<?> executable : executables) {
-            // FIXME : this disables for loops validating, enable asap
-            if (executable.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals(":for")) {
-                continue;
-            } else if (executable.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals("\\")) {
-                continue;
-            }
-            // remove this thing up from here
-
+            
             if (!executable.isExecutable()) {
                 continue;
             }
-            final RobotToken keywordName = executable.buildLineDescription().getAction().getToken();
+            
+            final IExecutableRowDescriptor<?> executableRowDescriptor = executable.buildLineDescription();
+            RobotToken keywordName = executableRowDescriptor.getAction().getToken();
+            
+            if (executableRowDescriptor.getRowType() == ERowType.FOR) {
+                final List<BuildMessage> messages = executableRowDescriptor.getMessages();
+                for (final BuildMessage buildMessage : messages) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                            .formatMessageWith(buildMessage.getMessage());
+                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                }
+                continue;
+            }
+            
+            if (executableRowDescriptor.getRowType() == ERowType.FOR_CONTINUE) {
+                final ForLoopContinueRowDescriptor<?> loopContinueRowDescriptor = (ForLoopContinueRowDescriptor<?>) executable.buildLineDescription();
+                keywordName = loopContinueRowDescriptor.getKeywordAction().getToken();
+            }
+            
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText().toString();
-
+                
                 if (!validationContext.isKeywordAccessible(name)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(name);
@@ -159,9 +173,6 @@ class TestCasesTableValidator implements ModelUnitValidator {
                             .formatMessageWith(name);
                     reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
                 }
-                
-            } else {
-
             }
         }
     }
