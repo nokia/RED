@@ -20,6 +20,7 @@ import org.robotframework.ide.core.testData.importer.VariablesFileImportReferenc
 import org.robotframework.ide.core.testData.model.AModelElement;
 import org.robotframework.ide.core.testData.model.RobotProjectHolder;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.VariableDeclaration;
 import org.robotframework.ide.core.testData.model.table.userKeywords.KeywordArguments;
 import org.robotframework.ide.core.testData.robotImported.ARobotInternalVariable;
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -143,8 +144,8 @@ public class VariableDefinitionLocator {
             if (linkedElement instanceof RobotExecutableRow<?>) {
                 final RobotExecutableRow<?> executableRow = (RobotExecutableRow<?>) linkedElement;
                 
-                for (final RobotToken token : executableRow.buildLineDescription().getAssignments()) {
-                    final ContinueDecision shouldContinue = detector.localVariableDetected(file, token);
+                for (final VariableDeclaration variableDeclaration : executableRow.buildLineDescription().getCreatedVariables()) {
+                    final ContinueDecision shouldContinue = detector.localVariableDetected(file, variableDeclaration.asToken());
                     if (shouldContinue == ContinueDecision.STOP) {
                         return ContinueDecision.STOP;
                     }

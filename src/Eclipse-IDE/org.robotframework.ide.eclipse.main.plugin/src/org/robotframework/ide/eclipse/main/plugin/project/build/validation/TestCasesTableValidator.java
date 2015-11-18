@@ -16,8 +16,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
-import org.robotframework.ide.core.testData.model.table.RobotExecutableRow.ExecutionLineDescriptor;
 import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.robotframework.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.VariableExtractor;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.MappingResult;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.VariableDeclaration;
@@ -139,7 +139,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (!executable.isExecutable()) {
                 continue;
             }
-            final RobotToken keywordName = executable.buildLineDescription().getFirstAction();
+            final RobotToken keywordName = executable.buildLineDescription().getAction().getToken();
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText().toString();
 
@@ -178,42 +178,31 @@ class TestCasesTableValidator implements ModelUnitValidator {
     static void reportUnknownVariables(final IFile file, final ProblemsReportingStrategy reporter,
             final List<? extends RobotExecutableRow<?>> executables, final Set<String> variables) {
         
-        final VariableExtractor extractor = new VariableExtractor();
         final Set<String> definedVariables = newHashSet(variables);
 
         for (final RobotExecutableRow<?> row : executables) {
-            // FIXME : this disables for loops validating, enable asap
-            if (row.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals(":for")) {
-                continue;
-            } else if (row.getAction().getText().toString().toLowerCase().replaceAll(" ", "").equals("\\")) {
-                continue;
-            }
-            // remove this thing up from here
 
-            final ExecutionLineDescriptor lineDescription = row.buildLineDescription();
+            final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
             
-            for (RobotToken token : lineDescription.getParameters()) {
-                final MappingResult mappingResult = extractor.extract(token, file.getName());
-                for (VariableDeclaration variableDeclaration : mappingResult.getCorrectVariables()) {
-                    if (!isDefinedVariable(variableDeclaration, definedVariables)) {
-                        final String variableName = variableDeclaration.getVariableName().getText();
-                        final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                                .formatMessageWith(variableName);
-                        final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
-                        final ProblemPosition position = new ProblemPosition(lineDescription.getFirstAction()
-                                .getLineNumber(), Range.closed(variableOffset, variableOffset
-                                + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
-                        final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
-                                variableName);
-                        reporter.handleProblem(problem, file, position, additionalArguments);
-                    }
+            for (VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
+                if (!isDefinedVariable(variableDeclaration, definedVariables)) {
+                    final String variableName = variableDeclaration.getVariableName().getText();
+                    final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                            .formatMessageWith(variableName);
+                    final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
+                    final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()
+                            .getLine(), Range.closed(variableOffset, variableOffset
+                            + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
+                    final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
+                            variableName);
+                    reporter.handleProblem(problem, file, position, additionalArguments);
                 }
             }
-            definedVariables.addAll(extractVariableNames(lineDescription.getAssignments(), extractor, file.getName()));
+            definedVariables.addAll(extractVariableNames(lineDescription.getCreatedVariables()));
         }
     }
     
-    private static boolean isDefinedVariable(VariableDeclaration variableDeclaration, final Set<String> definedVariables) {
+    private static boolean isDefinedVariable(final VariableDeclaration variableDeclaration, final Set<String> definedVariables) {
         final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
         final String varNameWithBrackets = createVariableNameWithBrackets(variableDeclaration.getVariableName()
                 .getText()
@@ -238,27 +227,25 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return varNameWithBrackets.split("\\.")[0] + "}";
     }
     
-    
     @VisibleForTesting
-    static List<String> extractVariableNames(final List<RobotToken> assignments, final VariableExtractor extractor, final String fileName) {
+    static List<String> extractVariableNames(final List<VariableDeclaration> assignments) {
         final List<String> vars = newArrayList();
-        for (RobotToken token : assignments) {
-            final MappingResult mappingResult = extractor.extract(token, fileName);
-            for (VariableDeclaration variableDeclaration : mappingResult.getCorrectVariables()) {
-                vars.add(createVariableRepresentation(variableDeclaration).toLowerCase());
-            }
+        for (final VariableDeclaration variableDeclaration : assignments) {
+            vars.add(variableDeclaration.asToken().getText().toString().toLowerCase());
         }
         return vars;
     }
     
-    private static String createVariableRepresentation(final VariableDeclaration variableDeclaration) {
-        final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
-        final String varNameWithBrackets = createVariableNameWithBrackets(variableDeclaration.getVariableName()
-                .getText()
-                .toLowerCase());
-        return varTypeIdentificator + varNameWithBrackets;
+    static List<String> extractVariableNamesFromArguments(final List<RobotToken> assignments,
+            final VariableExtractor extractor, final String fileName) {
+        final List<String> vars = newArrayList();
+        for (RobotToken token : assignments) {
+            final MappingResult mappingResult = extractor.extract(token, fileName);
+            vars.addAll(extractVariableNames(mappingResult.getCorrectVariables()));
+        }
+        return vars;
     }
-
+    
     private static String createVariableNameWithBrackets(final String varName) {
         return "{" + varName + "}";
     }
