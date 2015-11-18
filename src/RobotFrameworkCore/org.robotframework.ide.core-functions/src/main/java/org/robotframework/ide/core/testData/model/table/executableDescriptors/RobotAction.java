@@ -30,6 +30,10 @@ public class RobotAction {
 
 
     public RobotToken getToken() {
-        return originalToken;
+        RobotToken tokenToReturn = originalToken;
+        if (tokenToReturn == null) {
+            tokenToReturn = new RobotToken();
+        }
+        return tokenToReturn;
     }
 }
