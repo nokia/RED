@@ -123,8 +123,11 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
         final IResource resource = wsRoot.findMember(wsRelativePath);
         if (resource == null || !resource.exists()) {
-            reporter.handleProblem(RobotProblem.causedBy(getCauseForInvalidPathImport())
-                    .formatMessageWith(path, ": file does not exist"), suiteFile.getFile(), pathToken);
+            final Map<String, Object> attributes = ImmutableMap.<String, Object> of("path",
+                    wsRelativePath.toPortableString());
+            reporter.handleProblem(
+                    RobotProblem.causedBy(getCauseForNonExistingResourceImport()).formatMessageWith(path),
+                    suiteFile.getFile(), pathToken, attributes);
         } else {
             validateExistingResource(resource, path, pathToken);
         }
@@ -158,7 +161,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     protected abstract IProblemCause getCauseForMissingImportArguments();
 
-    protected abstract GeneralSettingsProblem getCauseForInvalidPathImport();
+    protected abstract GeneralSettingsProblem getCauseForNonExistingResourceImport();
 
     private boolean isParameterized(final String pathOrName) {
         return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(pathOrName).find();
@@ -178,7 +181,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected GeneralSettingsProblem getCauseForInvalidPathImport() {
+        protected GeneralSettingsProblem getCauseForNonExistingResourceImport() {
             throw new IllegalStateException("This method shouldn't be called for library validators");
         }
 
@@ -260,8 +263,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected GeneralSettingsProblem getCauseForInvalidPathImport() {
-            return GeneralSettingsProblem.INVALID_VARIABLES_IMPORT;
+        protected GeneralSettingsProblem getCauseForNonExistingResourceImport() {
+            return GeneralSettingsProblem.NON_EXISTING_VARIABLES_IMPORT;
         }
 
         @Override
@@ -293,8 +296,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         @Override
-        protected GeneralSettingsProblem getCauseForInvalidPathImport() {
-            return GeneralSettingsProblem.INVALID_RESOURCE_IMPORT;
+        protected GeneralSettingsProblem getCauseForNonExistingResourceImport() {
+            return GeneralSettingsProblem.NON_EXISTING_RESOURCE_IMPORT;
         }
 
         @Override

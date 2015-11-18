@@ -9,9 +9,13 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineVariableFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
@@ -48,7 +52,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
     PARAMETERIZED_IMPORT_PATH {
         @Override
         public String getProblemDescription() {
-            return "The library name/path '%s' is parameterized. RED currently does not support such imports";
+            return "The library name/path '%s' is parameterized. Some of used parameters cannot be resolved";
         }
 
         @Override
@@ -103,15 +107,36 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Setting '%s' is not applicable for arguments: %s. %s";
         }
     },
-    INVALID_RESOURCE_IMPORT {
+    NON_EXISTING_RESOURCE_IMPORT {
+        @Override
+        public String getProblemDescription() {
+            return "Resource import '%s' is invalid: file does not exist";
+        }
 
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final IPath path = Path.fromPortableString(marker.getAttribute("path", null));
+            return ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path);
+        }
+    },
+    INVALID_RESOURCE_IMPORT {
         @Override
         public String getProblemDescription() {
             return "Resource import '%s' is invalid%s";
         }
     },
+    NON_EXISTING_VARIABLES_IMPORT {
+        @Override
+        public String getProblemDescription() {
+            return "Resource import '%s' is invalid: file does not exist";
+        }
+    },
     INVALID_VARIABLES_IMPORT {
-
         @Override
         public String getProblemDescription() {
             return "Variable import '%s' is invalid%s";
