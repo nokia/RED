@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/18/15 10:08 AM
+Save-Time: 11/18/15 11:36 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -47,9 +47,6 @@ exec-with-options -disableJobWaiting -command {
 	
 	get-view Variables | get-tree | select "Global Variables"
 	
-	try -times 5 -delay 1000 -command {
-		get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" | equals 19| verify-true
-	}
 	
 	if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {
 			try -times 5 -delay 1000 -command {
