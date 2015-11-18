@@ -15,14 +15,17 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.IE
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.RobotAction;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.IElementDeclaration;
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping.VariableDeclaration;
+import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 
 public class ForLoopContinueRowDescriptor<T> implements
         IExecutableRowDescriptor<T> {
 
     private final List<VariableDeclaration> createdVariables = new LinkedList<>();
-    private RobotAction continueAction;
-    private RobotAction keywordAction;
+    private RobotAction continueAction = new RobotAction(new RobotToken(),
+            new LinkedList<IElementDeclaration>());
+    private RobotAction keywordAction = new RobotAction(new RobotToken(),
+            new LinkedList<IElementDeclaration>());;
     private final List<VariableDeclaration> usedVariables = new LinkedList<>();
     private final List<IElementDeclaration> textParameters = new LinkedList<>();
     private int forLoopStartRowIndex = -1;
