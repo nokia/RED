@@ -144,6 +144,7 @@ public abstract class ALineSeparator {
 
 
     public List<IRobotLineElement> getSplittedLine() {
+        init();
         return Collections.unmodifiableList(lineElements);
     }
 
