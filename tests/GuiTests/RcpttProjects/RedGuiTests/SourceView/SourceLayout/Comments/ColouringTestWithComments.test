@@ -6,9 +6,9 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LssiYIPXEeWImNPXuPy_LQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 11:19 AM
+Save-Time: 11/19/15 5:33 PM
 Testcase-Type: ecl
-Verifications: _Z93QAIPZEeWImNPXuPy_LQ
+Verifications: _Z93QAIPZEeWImNPXuPy_LQ,_YOOasI7XEeWetPU-dn-gxQ
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -17,23 +17,25 @@ Entry-Name: .content
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot" | double-click
 }
-
-get-editor "TestFile.robot" | get-text-viewer |set-text "*** Settings ***\n"
+get-editor "TestFile.robot" | get-text-viewer  |set-text "*** Settings ***\n"
     + "Library  String\n"
     + "#comment in settings\n"
     + "Library  Collections\n"
     + "Resource  my_keywords.robot\n"
+    + "#Resource  not.robot\n"
     + "Test Setup  simple case\n"
     + "Test Teardown  simple case\n"
     + "Metadata    text\n"
     + "# Default Tags    def\n"
     + "Default Tags    abc\n"
     + "Suite Teardown    Append To List\n"
-    + "Test Timeout    100\n\n\n"
+    + "Test Timeout    100\n"
+    + "#     Test Timeout    100\n\n\n"
     + "*** Variables ***\n"
-    + "${x}    5\n"
+    + "${x}    6\n"
     + "@{list}  1  2  3\n"
-    + "#comment in variable\n\n"
+    + "#comment in variable\n"
+    + "#${new}  99\n\n"
     + "*** Test Cases ***\n"
     + "#comment at the beginning of test case\n"
     + "CAPITAL LETTER\n"
@@ -44,13 +46,15 @@ get-editor "TestFile.robot" | get-text-viewer |set-text "*** Settings ***\n"
     + "\tSet Global Variable  ${x}  made by test\n"
     + "\tShould Be Equal  @{list}  made by test\n"
     + "\tREVERSE MY LIST  #missing keyword\n"
-    + "\t# comment\n\n\n"
+    + "\t# comment\n"
+    + "\t#${new_var}=  Set Variable    5\n\n\n"
     + "double loop\n"
     + "    Comment    This is built in comment\n"
     + "\t:FOR  ${item}  in range  3\n"
     + "\t\\\n"
     + "\t\\ \tLog  ${item}\n"
     + "\t\\\tMy loop\n"
+    + "\t#\\   ${a}\n"
     + "\t\n"
     + "\t\n"
     + "# test 2\n"
@@ -62,13 +66,27 @@ get-editor "TestFile.robot" | get-text-viewer |set-text "*** Settings ***\n"
     + "    [Arguments]    ${expression}    ${expected}\n"
     + "    [Documentation]    Keyword documentation  #comment in section\n"
     + "    [Tags]    abc\n"
-    + "    [Timeout]    15\n"
+    + "    # [Timeout]    15\n"
     + "    [Teardown]    Log    7\n"
-    + "    ${a}=    Set Variable    inna\n"
+    + "    Log   ${expression}\n"
+    + "    # ${a}=    Set Variable    inna\n"
+    + "    #@{dict}=  Create Dictionary    j=1  k=3\n"
     + "    #comment in keyword\n"
+    + "    # Convert To String    6\n"
     + "  \t[Return]  ${a}\n\n"
     + "simple case\n"
-    + "    Log 123"
+    + "    # [Arguments]    ${expression}    ${expected}\n"
+    + "    Log  ${expression} \n"
+    + "    Log  ${expected} \n"
+    + "    \n"
+    + "    \n"
+    + "My loop\n"
+    + "    Should Be Equal    5  5\n"
+    + "    \n"
+    + "#keyword 1\n"
+    + "#    Log  67"
     
 wait 2000
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
