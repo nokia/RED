@@ -70,13 +70,23 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
             RobotLine currentLine, RobotToken rt, String text,
             Stack<ParsingState> processingState) {
+        boolean result = false;
         ParsingState state = stateHelper.getCurrentStatus(processingState);
-        return (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION)
-                && (posResolver.isCorrectPosition(
-                        PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
-                        robotFileOutput.getFileModel(), currentLine, rt) || (posResolver
-                        .isCorrectPosition(PositionExpected.TEST_CASE_NAME,
-                                robotFileOutput.getFileModel(), currentLine, rt) && RobotTokenType.START_HASH_COMMENT
-                        .getRepresentation().get(0).startsWith(text.trim())));
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE
+                || state == ParsingState.TEST_CASE_DECLARATION) {
+            if (posResolver.isCorrectPosition(
+                    PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
+                    robotFileOutput.getFileModel(), currentLine, rt)) {
+                result = true;
+            } else if (posResolver.isCorrectPosition(
+                    PositionExpected.TEST_CASE_NAME,
+                    robotFileOutput.getFileModel(), currentLine, rt)) {
+                result = (text.trim()
+                        .startsWith(RobotTokenType.START_HASH_COMMENT
+                                .getRepresentation().get(0)));
+            }
+        }
+
+        return result;
     }
 }

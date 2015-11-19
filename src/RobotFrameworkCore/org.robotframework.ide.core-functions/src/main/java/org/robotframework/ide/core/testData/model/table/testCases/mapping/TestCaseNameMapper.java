@@ -64,15 +64,13 @@ public class TestCaseNameMapper implements IParsingMapper {
                 robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInTestCaseTable(currentLine, processingState)) {
                 boolean wasUpdated = false;
-                List<IRobotTokenType> types = rt.getTypes();
-                if (types.contains(RobotTokenType.START_HASH_COMMENT)) {
-                    String testCaseName = rt.getRaw().toString();
-                    if (testCaseName != null) {
-                        result = !testCaseName.trim().startsWith(
-                                RobotTokenType.START_HASH_COMMENT
-                                        .getRepresentation().get(0));
-                        wasUpdated = true;
-                    }
+                String testCaseName = rt.getRaw().toString();
+                if (testCaseName != null) {
+                    result = !testCaseName.trim().startsWith(
+                            RobotTokenType.START_HASH_COMMENT
+                                    .getRepresentation().get(0));
+                    wasUpdated = true;
+
                 }
 
                 if (!wasUpdated) {
