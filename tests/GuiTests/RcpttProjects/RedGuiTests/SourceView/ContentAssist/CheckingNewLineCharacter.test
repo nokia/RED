@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2zK2oHZgEeWYifgNPLzx_Q
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/9/15 3:30 PM
+Save-Time: 11/19/15 11:43 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,7 +21,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     type-text "test 1"
     key-type Enter
-    key-type Tab
     type-text  "Log  1"
     key-type "M1+s"
 }
@@ -48,7 +47,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     type-text "test 2"
     key-type Enter
-    key-type Tab
     type-text "log  2"
 }
 
@@ -80,7 +78,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     type-text "kw 1"
     key-type Enter
-    key-type Tab
     type-text "Log  8"
 }
 with [get-editor "TestFile.robot" | get-text-viewer] {
