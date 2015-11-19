@@ -31,17 +31,17 @@ public class MetadataValueMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_METADATA_VALUE);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable settings = robotFileOutput.getFileModel()
+        final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<Metadata> metadatas = settings.getMetadatas();
+        final List<Metadata> metadatas = settings.getMetadatas();
         if (!metadatas.isEmpty()) {
             metadatas.get(metadatas.size() - 1).addValue(rt);
         } else {
@@ -54,11 +54,11 @@ public class MetadataValueMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentStatus(processingState);
         if (state == ParsingState.SETTING_METADATA_KEY
                 || state == ParsingState.SETTING_METADATA_VALUE) {
             result = true;

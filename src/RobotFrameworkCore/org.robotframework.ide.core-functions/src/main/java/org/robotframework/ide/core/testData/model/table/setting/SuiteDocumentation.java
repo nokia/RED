@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -28,7 +28,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     }
 
 
-    public void addDocumentationText(RobotToken token) {
+    public void addDocumentationText(final RobotToken token) {
         text.add(token);
     }
 
@@ -73,7 +73,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getDocumentationText());

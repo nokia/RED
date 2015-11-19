@@ -20,7 +20,7 @@ public class RobotLine implements IChildElement<RobotFile> {
 
     private final RobotFile parent;
     private int lineNumber = -1;
-    private List<IRobotLineElement> lineElements = new ArrayList<>();
+    private List<IRobotLineElement> lineElements = new ArrayList<>(0);
     private Optional<SeparatorType> separatorForLine = Optional.absent();
 
     private IRobotLineElement eol = EndOfLineBuilder.newInstance()
@@ -29,7 +29,7 @@ public class RobotLine implements IChildElement<RobotFile> {
             .setStartOffset(IRobotLineElement.NOT_SET).buildEOL();
 
 
-    public RobotLine(int lineNumber, final RobotFile parent) {
+    public RobotLine(final int lineNumber, final RobotFile parent) {
         this.lineNumber = lineNumber;
         this.parent = parent;
     }
@@ -49,6 +49,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
 
+    @Override
     public RobotFile getParent() {
         return parent;
     }
@@ -59,17 +60,17 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
 
-    public void setLineElements(List<IRobotLineElement> lineElements) {
+    public void setLineElements(final List<IRobotLineElement> lineElements) {
         this.lineElements = lineElements;
     }
 
 
-    public void addLineElement(IRobotLineElement lineElement) {
+    public void addLineElement(final IRobotLineElement lineElement) {
         this.lineElements.add(lineElement);
     }
 
 
-    public void addLineElementAt(int position, IRobotLineElement lineElement) {
+    public void addLineElementAt(final int position, final IRobotLineElement lineElement) {
         this.lineElements.add(position, lineElement);
     }
 
@@ -84,8 +85,8 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
 
-    public void setEndOfLine(final List<Constant> endOfLine, int currentOffset,
-            int currentColumn) {
+    public void setEndOfLine(final List<Constant> endOfLine, final int currentOffset,
+            final int currentColumn) {
         this.eol = EndOfLineBuilder.newInstance().setEndOfLines(endOfLine)
                 .setStartColumn(currentColumn).setStartOffset(currentOffset)
                 .setLineNumber(lineNumber).buildEOL();

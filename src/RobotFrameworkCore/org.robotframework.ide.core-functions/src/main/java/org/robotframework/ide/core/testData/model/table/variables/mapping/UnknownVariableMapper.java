@@ -37,20 +37,20 @@ public class UnknownVariableMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
         rt.setStartColumn(fp.getColumn());
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        VariableTable varTable = robotFileOutput.getFileModel()
+        final VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        UnknownVariable varUnknown = new UnknownVariable(
+        final UnknownVariable varUnknown = new UnknownVariable(
                 rt.getRaw().toString(), rt, VariableScope.TEST_SUITE);
         varTable.addVariable(varUnknown);
 
@@ -61,11 +61,11 @@ public class UnknownVariableMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState currentState = stateHelper
+        final ParsingState currentState = stateHelper
                 .getCurrentStatus(processingState);
 
         if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {

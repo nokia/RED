@@ -24,7 +24,7 @@ public class PipeSeparator extends ALineSeparator {
     private final Matcher matcher;
 
 
-    public PipeSeparator(int lineNumber, String line) {
+    public PipeSeparator(final int lineNumber, final String line) {
         super(lineNumber, line);
         this.matcher = PIPE_SEPARATOR.matcher(line);
     }
@@ -32,13 +32,13 @@ public class PipeSeparator extends ALineSeparator {
 
     @Override
     protected Separator nextSeparator() {
-        int start = matcher.start();
-        int end = matcher.end();
-        Separator s = new Separator();
+        final int start = matcher.start();
+        final int end = matcher.end();
+        final Separator s = new Separator();
         s.setType(TYPE);
         s.setStartColumn(start);
-        s.setText(new StringBuilder().append(line.substring(start, end)));
-        s.setRaw(new StringBuilder(s.getText()));
+        s.setText(line.substring(start, end));
+        s.setRaw(s.getText());
         s.setLineNumber(getLineNumber());
 
         return s;
@@ -51,6 +51,7 @@ public class PipeSeparator extends ALineSeparator {
     }
 
 
+    @Override
     public SeparatorType getProducedType() {
         return TYPE;
     }

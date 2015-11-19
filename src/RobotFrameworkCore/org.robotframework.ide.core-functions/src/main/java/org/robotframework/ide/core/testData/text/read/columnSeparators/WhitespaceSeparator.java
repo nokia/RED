@@ -19,7 +19,7 @@ public class WhitespaceSeparator extends ALineSeparator {
     private final Matcher matcher;
 
 
-    public WhitespaceSeparator(int lineNumber, String line) {
+    public WhitespaceSeparator(final int lineNumber, final String line) {
         super(lineNumber, line);
         this.matcher = WHITESPACE_SEPARATOR.matcher(line);
     }
@@ -27,14 +27,14 @@ public class WhitespaceSeparator extends ALineSeparator {
 
     @Override
     protected Separator nextSeparator() {
-        int start = matcher.start();
-        int end = matcher.end();
+        final int start = matcher.start();
+        final int end = matcher.end();
 
-        Separator s = new Separator();
+        final Separator s = new Separator();
         s.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
         s.setStartColumn(start);
-        s.setText(new StringBuilder().append(line.substring(start, end)));
-        s.setRaw(new StringBuilder(s.getText()));
+        s.setText(line.substring(start, end));
+        s.setRaw(s.getText());
         s.setLineNumber(getLineNumber());
 
         return s;
@@ -47,6 +47,7 @@ public class WhitespaceSeparator extends ALineSeparator {
     }
 
 
+    @Override
     public SeparatorType getProducedType() {
         return TYPE;
     }

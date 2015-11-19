@@ -35,17 +35,17 @@ public class TestTimeoutMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.setType(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         if (setting.getTestTimeouts().isEmpty()) {
-            TestTimeout timeout = new TestTimeout(rt);
+            final TestTimeout timeout = new TestTimeout(rt);
             setting.addTestTimeout(timeout);
         }
         processingState.push(ParsingState.SETTING_TEST_TIMEOUT);
@@ -55,11 +55,11 @@ public class TestTimeoutMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1
                 && types.get(0) == RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION) {
             if (positionResolver.isCorrectPosition(

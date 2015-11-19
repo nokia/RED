@@ -34,22 +34,22 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE);
 
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        List<TestCase> testCases = robotFileOutput.getFileModel()
+        final List<TestCase> testCases = robotFileOutput.getFileModel()
                 .getTestCaseTable().getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseTimeout> timeouts = testCase.getTimeouts();
-        TestCaseTimeout testCaseTimeout = timeouts.get(timeouts.size() - 1);
+        final TestCase testCase = testCases.get(testCases.size() - 1);
+        final List<TestCaseTimeout> timeouts = testCase.getTimeouts();
+        final TestCaseTimeout testCaseTimeout = timeouts.get(timeouts.size() - 1);
         testCaseTimeout.addMessagePart(rt);
 
         processingState
@@ -60,20 +60,20 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = stateHelper
+            final ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
                     || currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
                 result = true;
             } else if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
-                List<TestCase> testCases = robotFileOutput.getFileModel()
+                final List<TestCase> testCases = robotFileOutput.getFileModel()
                         .getTestCaseTable().getTestCases();
-                List<TestCaseTimeout> timeouts = testCases.get(
+                final List<TestCaseTimeout> timeouts = testCases.get(
                         testCases.size() - 1).getTimeouts();
                 result = checkIfHasAlreadyValue(timeouts);
             } else {
@@ -88,9 +88,9 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean checkIfHasAlreadyValue(
-            List<TestCaseTimeout> testCaseTimeouts) {
+            final List<TestCaseTimeout> testCaseTimeouts) {
         boolean result = false;
-        for (TestCaseTimeout setting : testCaseTimeouts) {
+        for (final TestCaseTimeout setting : testCaseTimeouts) {
             result = (setting.getTimeout() != null);
             result = result || !setting.getMessage().isEmpty();
             if (result) {

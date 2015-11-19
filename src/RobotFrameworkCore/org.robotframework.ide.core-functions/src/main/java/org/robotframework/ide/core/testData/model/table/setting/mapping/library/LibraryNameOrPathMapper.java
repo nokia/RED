@@ -30,13 +30,13 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_NAME);
-        rt.setText(new StringBuilder(text));
-        AImported imported = utility.getNearestImport(robotFileOutput);
+        rt.setText(text);
+        final AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
         if (imported instanceof LibraryImport) {
             lib = (LibraryImport) imported;
@@ -54,9 +54,9 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_LIBRARY_IMPORT);

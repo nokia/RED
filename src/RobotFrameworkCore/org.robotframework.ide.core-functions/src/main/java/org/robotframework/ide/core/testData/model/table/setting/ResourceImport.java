@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -40,10 +40,10 @@ public class ResourceImport extends AImported {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
-            RobotToken pathOrName = getPathOrName();
+            final RobotToken pathOrName = getPathOrName();
             if (pathOrName != null) {
                 tokens.add(pathOrName);
             }

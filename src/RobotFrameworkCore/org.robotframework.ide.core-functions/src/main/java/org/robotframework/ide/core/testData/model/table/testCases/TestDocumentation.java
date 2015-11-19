@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.testCases;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -27,7 +27,7 @@ public class TestDocumentation extends AModelElement<TestCase> {
     }
 
 
-    public void addDocumentationText(RobotToken token) {
+    public void addDocumentationText(final RobotToken token) {
         text.add(token);
     }
 
@@ -72,7 +72,7 @@ public class TestDocumentation extends AModelElement<TestCase> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getDocumentationText());

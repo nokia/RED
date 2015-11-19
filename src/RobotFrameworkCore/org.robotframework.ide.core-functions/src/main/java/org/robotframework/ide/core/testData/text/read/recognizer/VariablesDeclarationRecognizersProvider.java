@@ -26,9 +26,9 @@ public class VariablesDeclarationRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
+        final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
-            for (ATokenRecognizer rec : recognized) {
+            for (final ATokenRecognizer rec : recognized) {
                 recognizersProvided.add(rec.newInstance());
             }
         }

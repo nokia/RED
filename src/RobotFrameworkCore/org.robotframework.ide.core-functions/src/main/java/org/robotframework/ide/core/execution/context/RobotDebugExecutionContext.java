@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.execution.context;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
@@ -39,17 +39,17 @@ public class RobotDebugExecutionContext {
     
     private RobotFile currentModel;
     
-    private LinkedList<KeywordContext> currentKeywords;
+    private final List<KeywordContext> currentKeywords;
     
-    private TestCaseExecutionRowCounter testCaseExecutionRowCounter;
+    private final TestCaseExecutionRowCounter testCaseExecutionRowCounter;
     
-    private ExecutableRowFindersManager executableRowFindersManager;
+    private final ExecutableRowFindersManager executableRowFindersManager;
     
     private boolean isSetupTeardownKeywordStarted;
     private boolean isForLoopStarted;
     
     public RobotDebugExecutionContext() {
-        currentKeywords = new LinkedList<>();
+        currentKeywords = new ArrayList<>();
         testCaseExecutionRowCounter = new TestCaseExecutionRowCounter();
         executableRowFindersManager = new ExecutableRowFindersManager();
     }
@@ -79,7 +79,7 @@ public class RobotDebugExecutionContext {
     }
 
     public void endKeyword() {
-        currentKeywords.removeLast();
+        currentKeywords.remove(currentKeywords.size() - 1);
     }
     
     public void endTest() {
@@ -87,8 +87,8 @@ public class RobotDebugExecutionContext {
     }
     
     public KeywordPosition findKeywordPosition() {
-        IRobotExecutableRowFinder executableRowFinder = getExecutableRowFinder();
-        RobotExecutableRow<?> executableRow = findExecutableRow(executableRowFinder);
+        final IRobotExecutableRowFinder executableRowFinder = getExecutableRowFinder();
+        final RobotExecutableRow<?> executableRow = findExecutableRow(executableRowFinder);
         return createNewKeywordPosition(executableRow);
     }
   
@@ -120,7 +120,7 @@ public class RobotDebugExecutionContext {
     private KeywordPosition createNewKeywordPosition(final RobotExecutableRow<?> executableRow) {
 
         final KeywordPosition keywordPosition = new KeywordPosition();
-        KeywordContext parentKeywordContext = getParentKeywordContext();
+        final KeywordContext parentKeywordContext = getParentKeywordContext();
         if (parentKeywordContext != null && parentKeywordContext.getResourceImportReference() != null) {
             keywordPosition.setFilePath(parentKeywordContext.getResourceImportReference()
                     .getReference()
@@ -177,9 +177,9 @@ public class RobotDebugExecutionContext {
 
     protected static class KeywordContext {
 
-        private String name;
+        private final String name;
         
-        private String type;
+        private final String type;
         
         private int keywordExecutableRowCounter = 0;
         

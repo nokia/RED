@@ -35,17 +35,17 @@ public class ForceTagsMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.setType(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         if (setting.getForceTags().isEmpty()) {
-            ForceTags forceTags = new ForceTags(rt);
+            final ForceTags forceTags = new ForceTags(rt);
             setting.addForceTags(forceTags);
         }
         processingState.push(ParsingState.SETTING_FORCE_TAGS);
@@ -54,11 +54,11 @@ public class ForceTagsMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1
                 && types.get(0) == RobotTokenType.SETTING_FORCE_TAGS_DECLARATION) {
             if (positionResolver.isCorrectPosition(

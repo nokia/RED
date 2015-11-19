@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.text.read;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 
 public class EndOfLineBuilder {
 
-    private List<Constant> constant = new ArrayList<>();
+    private List<Constant> constant = new ArrayList<>(0);
     private int lineNumber = IRobotLineElement.NOT_SET;
     private int startColumn = IRobotLineElement.NOT_SET;
     private int startOffset = IRobotLineElement.NOT_SET;
@@ -28,7 +28,7 @@ public class EndOfLineBuilder {
 
     public EndOfLineBuilder setEndOfLines(final List<Constant> constant) {
         if (constant == null) {
-            this.constant = new ArrayList<>();
+            this.constant = new ArrayList<>(0);
         } else {
             this.constant.clear();
             this.constant.addAll(constant);
@@ -74,7 +74,7 @@ public class EndOfLineBuilder {
     public IRobotLineElement buildEOL() {
         IRobotLineElement eol = null;
         if (constant.size() == 1) {
-            Constant myEol = constant.get(0);
+            final Constant myEol = constant.get(0);
             if (myEol == Constant.CR) {
                 eol = new CarritageReturnEndOfLine(startOffset, lineNumber,
                         startColumn);
@@ -85,8 +85,8 @@ public class EndOfLineBuilder {
                 eol = new EndOfFile(startOffset, lineNumber, startColumn);
             }
         } else if (constant.size() == 2) {
-            Constant myEol1 = constant.get(0);
-            Constant myEol2 = constant.get(1);
+            final Constant myEol1 = constant.get(0);
+            final Constant myEol2 = constant.get(1);
 
             if (myEol1 == Constant.CR && myEol2 == Constant.LF) {
                 eol = new CRLFEndOfLine(startOffset, lineNumber, startColumn);
@@ -104,29 +104,29 @@ public class EndOfLineBuilder {
 
     private class LFCREndOfLine extends AEndOfLine {
 
-        public LFCREndOfLine(int startOffset, int lineNumber, int startColumn) {
+        public LFCREndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.LFCR, startOffset, lineNumber, startColumn);
         }
     }
 
     private class CRLFEndOfLine extends AEndOfLine {
 
-        public CRLFEndOfLine(int startOffset, int lineNumber, int startColumn) {
+        public CRLFEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CRLF, startOffset, lineNumber, startColumn);
         }
     }
 
     private class EndOfFile extends AEndOfLine {
 
-        public EndOfFile(int startOffset, int lineNumber, int startColumn) {
+        public EndOfFile(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.EOF, startOffset, lineNumber, startColumn);
         }
     }
 
     private class LineFeedEndOfLine extends AEndOfLine {
 
-        public LineFeedEndOfLine(int startOffset, int lineNumber,
-                int startColumn) {
+        public LineFeedEndOfLine(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.LF, startOffset, lineNumber, startColumn);
         }
 
@@ -134,8 +134,8 @@ public class EndOfLineBuilder {
 
     private class CarritageReturnEndOfLine extends AEndOfLine {
 
-        public CarritageReturnEndOfLine(int startOffset, int lineNumber,
-                int startColumn) {
+        public CarritageReturnEndOfLine(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.CR, startOffset, lineNumber, startColumn);
         }
 
@@ -143,8 +143,8 @@ public class EndOfLineBuilder {
 
     private class UndeclaredEndOfLine extends AEndOfLine {
 
-        public UndeclaredEndOfLine(int startOffset, int lineNumber,
-                int startColumn) {
+        public UndeclaredEndOfLine(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.NON, startOffset, lineNumber, startColumn);
         }
 
@@ -152,18 +152,18 @@ public class EndOfLineBuilder {
 
     private abstract class AEndOfLine implements IRobotLineElement {
 
-        private int lineNumber;
-        private int startColumn;
-        private int startOffset;
+        private final int lineNumber;
+        private final int startColumn;
+        private final int startOffset;
         private final List<IRobotTokenType> types;
 
 
-        public AEndOfLine(EndOfLineTypes type, int startOffset, int lineNumber,
-                int startColumn) {
+        public AEndOfLine(final EndOfLineTypes type, final int startOffset, final int lineNumber,
+                final int startColumn) {
             this.lineNumber = lineNumber;
             this.startColumn = startColumn;
             this.startOffset = startOffset;
-            this.types = new ArrayList<>();
+            this.types = new ArrayList<>(0);
             this.types.add(type);
         }
 
@@ -200,16 +200,14 @@ public class EndOfLineBuilder {
 
 
         @Override
-        public StringBuilder getText() {
-            return new StringBuilder(getTypes().get(0).getRepresentation()
-                    .get(0));
+        public String getText() {
+            return getTypes().get(0).getRepresentation().get(0);
         }
 
 
         @Override
-        public StringBuilder getRaw() {
-            return new StringBuilder(getTypes().get(0).getRepresentation()
-                    .get(0));
+        public String getRaw() {
+            return getTypes().get(0).getRepresentation().get(0);
         }
 
 
@@ -245,8 +243,7 @@ public class EndOfLineBuilder {
 
         EOF;
 
-        private List<String> representation = new ArrayList<>();
-
+        private final List<String> representation = new ArrayList<>(0);
 
         private EndOfLineTypes(final String... representations) {
             representation.addAll(Arrays.asList(representations));

@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
@@ -18,7 +18,7 @@ public abstract class AContainerOperation implements IElementDeclaration {
 
 
     @Override
-    public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
+    public void addElementDeclarationInside(final IElementDeclaration elementToAdd) {
         elementsDeclaredInside.add(elementToAdd);
     }
 
@@ -33,7 +33,7 @@ public abstract class AContainerOperation implements IElementDeclaration {
     public void removeExactlyTheSameInstance(
             final IElementDeclaration elementToRemove) {
         for (int i = 0; i < elementsDeclaredInside.size(); i++) {
-            IElementDeclaration d = elementsDeclaredInside.get(i);
+            final IElementDeclaration d = elementsDeclaredInside.get(i);
             if (d == elementToRemove) {
                 elementsDeclaredInside.remove(i);
                 i--;
@@ -44,8 +44,8 @@ public abstract class AContainerOperation implements IElementDeclaration {
 
     @Override
     public List<ContainerElementType> getTypes() {
-        List<ContainerElementType> types = new ArrayList<>();
-        for (IElementDeclaration dec : elementsDeclaredInside) {
+        final List<ContainerElementType> types = new ArrayList<>();
+        for (final IElementDeclaration dec : elementsDeclaredInside) {
             types.addAll(dec.getTypes());
         }
         return types;

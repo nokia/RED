@@ -35,20 +35,20 @@ public class KeywordTeardownArgumentMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT);
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
-        List<UserKeyword> keywords = robotFileOutput.getFileModel()
+        rt.setText(text);
+        rt.setRaw(text);
+        final List<UserKeyword> keywords = robotFileOutput.getFileModel()
                 .getKeywordTable().getKeywords();
-        UserKeyword keyword = keywords.get(keywords.size() - 1);
-        List<KeywordTeardown> teardowns = keyword.getTeardowns();
-        KeywordTeardown teardown = teardowns.get(teardowns.size() - 1);
+        final UserKeyword keyword = keywords.get(keywords.size() - 1);
+        final List<KeywordTeardown> teardowns = keyword.getTeardowns();
+        final KeywordTeardown teardown = teardowns.get(teardowns.size() - 1);
         teardown.addArgument(rt);
 
         processingState
@@ -59,15 +59,15 @@ public class KeywordTeardownArgumentMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.KEYWORD_SETTING_TEARDOWN) {
-            List<UserKeyword> keywords = robotFileOutput.getFileModel()
+            final List<UserKeyword> keywords = robotFileOutput.getFileModel()
                     .getKeywordTable().getKeywords();
-            List<KeywordTeardown> teardowns = keywords.get(keywords.size() - 1)
+            final List<KeywordTeardown> teardowns = keywords.get(keywords.size() - 1)
                     .getTeardowns();
             result = utility.checkIfHasAlreadyKeywordName(teardowns);
         } else if (state == ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD

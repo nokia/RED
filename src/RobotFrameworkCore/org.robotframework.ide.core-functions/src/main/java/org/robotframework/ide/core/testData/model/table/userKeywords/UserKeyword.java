@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -59,6 +59,7 @@ public class UserKeyword extends AModelElement<KeywordTable> implements
     }
 
 
+    @Override
     public List<RobotExecutableRow<UserKeyword>> getExecutionContext() {
         return getKeywordExecutionRows();
     }
@@ -150,37 +151,37 @@ public class UserKeyword extends AModelElement<KeywordTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             if (getKeywordName() != null) {
                 tokens.add(getKeywordName());
             }
 
-            for (KeywordDocumentation doc : documentation) {
+            for (final KeywordDocumentation doc : documentation) {
                 tokens.addAll(doc.getElementTokens());
             }
 
-            for (KeywordArguments arguments : keywordArguments) {
+            for (final KeywordArguments arguments : keywordArguments) {
                 tokens.addAll(arguments.getElementTokens());
             }
 
-            for (RobotExecutableRow<UserKeyword> row : keywordContext) {
+            for (final RobotExecutableRow<UserKeyword> row : keywordContext) {
                 tokens.addAll(row.getElementTokens());
             }
 
-            for (KeywordReturn returns : keywordReturns) {
+            for (final KeywordReturn returns : keywordReturns) {
                 tokens.addAll(returns.getElementTokens());
             }
 
-            for (KeywordTags tag : tags) {
+            for (final KeywordTags tag : tags) {
                 tokens.addAll(tag.getElementTokens());
             }
 
-            for (KeywordTeardown teardown : teardowns) {
+            for (final KeywordTeardown teardown : teardowns) {
                 tokens.addAll(teardown.getElementTokens());
             }
 
-            for (KeywordTimeout timeout : timeouts) {
+            for (final KeywordTimeout timeout : timeouts) {
                 tokens.addAll(timeout.getElementTokens());
             }
 

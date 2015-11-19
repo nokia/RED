@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,7 +19,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public abstract class ALineSeparator {
 
-    private AtomicBoolean wasInitialized = new AtomicBoolean(false);
+    private final AtomicBoolean wasInitialized = new AtomicBoolean(false);
     private int prevElementIndex = -1;
     private int elementIndex = -1;
     protected final int lineNumber;
@@ -38,22 +38,22 @@ public abstract class ALineSeparator {
             if (!wasInitialized.get()) {
                 wasInitialized.set(true);
                 int lastColumnProcessed = 0;
-                int textLength = line.length();
+                final int textLength = line.length();
 
                 if (textLength > 0) {
                     while(lastColumnProcessed < textLength) {
                         if (hasNextSeparator()) {
-                            Separator currentSeparator = nextSeparator();
-                            int startColumn = currentSeparator.getStartColumn();
-                            int remainingData = startColumn
+                            final Separator currentSeparator = nextSeparator();
+                            final int startColumn = currentSeparator.getStartColumn();
+                            final int remainingData = startColumn
                                     - lastColumnProcessed;
-                            String rawText = line.substring(
+                            final String rawText = line.substring(
                                     lastColumnProcessed, startColumn);
                             if (remainingData > 0 || !lineElements.isEmpty()) {
-                                RobotToken token = new RobotToken();
+                                final RobotToken token = new RobotToken();
                                 token.setLineNumber(lineNumber);
-                                token.setRaw(new StringBuilder(rawText));
-                                token.setText(new StringBuilder(rawText));
+                                token.setRaw(rawText);
+                                token.setText(rawText);
                                 token.setStartColumn(lastColumnProcessed);
                                 token.setType(RobotTokenType.UNKNOWN);
 
@@ -64,12 +64,12 @@ public abstract class ALineSeparator {
                             lastColumnProcessed = currentSeparator
                                     .getEndColumn();
                         } else {
-                            String rawText = line
+                            final String rawText = line
                                     .substring(lastColumnProcessed);
-                            RobotToken token = new RobotToken();
+                            final RobotToken token = new RobotToken();
                             token.setLineNumber(lineNumber);
-                            token.setRaw(new StringBuilder(rawText));
-                            token.setText(new StringBuilder(rawText));
+                            token.setRaw(rawText);
+                            token.setText(rawText);
                             token.setStartColumn(lastColumnProcessed);
                             token.setType(RobotTokenType.UNKNOWN);
 
@@ -113,7 +113,7 @@ public abstract class ALineSeparator {
 
 
     private void updateIndex() {
-        int elementsSize = lineElements.size();
+        final int elementsSize = lineElements.size();
         if (prevElementIndex < elementsSize && elementIndex <= prevElementIndex) {
             for (int index = elementIndex + 1; index < elementsSize; index++) {
                 if (isSeparator(lineElements.get(index))) {
@@ -127,8 +127,8 @@ public abstract class ALineSeparator {
 
     private boolean isSeparator(final IRobotLineElement elem) {
         boolean result = false;
-        List<IRobotTokenType> types = elem.getTypes();
-        for (IRobotTokenType type : types) {
+        final List<IRobotTokenType> types = elem.getTypes();
+        for (final IRobotTokenType type : types) {
             if (type == SeparatorType.PIPE
                     || type == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
                 result = true;

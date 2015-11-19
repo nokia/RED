@@ -444,7 +444,7 @@ public enum ParsingState {
 
     public static List<ParsingState> getSettingsStates() {
         if (settingsStatuses.isEmpty()) {
-            for (ParsingState s : ParsingState.values()) {
+            for (final ParsingState s : ParsingState.values()) {
                 if (isSettingTableInside(s.previousState)) {
                     settingsStatuses.add(s);
                 }
@@ -455,7 +455,7 @@ public enum ParsingState {
     }
 
 
-    private static boolean isSettingTableInside(ParsingState state) {
+    private static boolean isSettingTableInside(final ParsingState state) {
         return (state == ParsingState.SETTING_TABLE_INSIDE
                 || state == ParsingState.KEYWORD_DECLARATION
                 || state == ParsingState.VARIABLE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION);

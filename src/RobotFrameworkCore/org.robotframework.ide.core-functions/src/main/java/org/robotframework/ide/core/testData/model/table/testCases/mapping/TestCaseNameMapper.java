@@ -35,19 +35,19 @@ public class TestCaseNameMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_NAME);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
+        final TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
-        TestCase testCase = new TestCase(rt);
+        final TestCase testCase = new TestCase(rt);
         testCaseTable.addTest(testCase);
         processingState.push(ParsingState.TEST_CASE_DECLARATION);
 
@@ -56,15 +56,15 @@ public class TestCaseNameMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
         if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
                 robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInTestCaseTable(currentLine, processingState)) {
                 boolean wasUpdated = false;
-                String testCaseName = rt.getRaw().toString();
+                final String testCaseName = rt.getRaw().toString();
                 if (testCaseName != null) {
                     result = !testCaseName.trim().startsWith(
                             RobotTokenType.START_HASH_COMMENT
