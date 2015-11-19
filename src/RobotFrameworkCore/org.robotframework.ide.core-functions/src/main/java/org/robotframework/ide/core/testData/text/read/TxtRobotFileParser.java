@@ -114,7 +114,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public boolean canParseFile(final File file, final boolean isFromStringContent) {
+    public boolean canParseFile(final File file,
+            final boolean isFromStringContent) {
         boolean result = false;
 
         if (file != null && (file.isFile() || isFromStringContent)) {
@@ -221,7 +222,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         if (separator.hasNext()) {
                             // iterate column-by-column in robot file
                             final Separator currentSeparator = separator.next();
-                            final int startColumn = currentSeparator.getStartColumn();
+                            final int startColumn = currentSeparator
+                                    .getStartColumn();
                             final int remainingData = startColumn
                                     - lastColumnProcessed;
                             // {$a} | {$b} in this case we check if {$a} was
@@ -294,15 +296,17 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 alignUtility.fixOnlyPrettyAlignLinesInVariables(line,
                         processingState);
 
-                final List<IRobotLineElement> lineElements = line.getLineElements();
+                final List<IRobotLineElement> lineElements = line
+                        .getLineElements();
                 if (!lineElements.isEmpty()) {
-                    final IRobotLineElement lineElem = lineElements.get(lineElements
-                            .size() - 1);
+                    final IRobotLineElement lineElem = lineElements
+                            .get(lineElements.size() - 1);
                     currentOffset = lineElem.getStartOffset()
                             + lineElem.getText().length();
                 }
 
-                final List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
+                final List<Constant> endOfLine = lineHolder
+                        .getLineEnd(currentOffset);
                 line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
                 currentOffset += utility.getEndOfLineLength(endOfLine);
                 lineNumber++;
@@ -428,7 +432,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                         robotToken)) {
                     if (wasRecognizedCorrectly) {
                         @SuppressWarnings("rawtypes")
-                        final TableHeader<?> header = new TableHeader(robotToken);
+                        final TableHeader<?> header = new TableHeader(
+                                robotToken);
                         ARobotSectionTable table = null;
                         if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
                             table = fileModel.getSettingTable();
@@ -490,7 +495,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     private RobotToken mapToCorrectTokenAndPutInCorrectPlaceInModel(
-            final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
             final String text, final String fileName, RobotToken robotToken) {
         final List<IParsingMapper> matchedMappers = new ArrayList<>();
@@ -526,7 +532,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected List<RobotToken> recognize(final FilePosition fp, final String text) {
+    protected List<RobotToken> recognize(final FilePosition fp,
+            final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
         final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : recognized) {
