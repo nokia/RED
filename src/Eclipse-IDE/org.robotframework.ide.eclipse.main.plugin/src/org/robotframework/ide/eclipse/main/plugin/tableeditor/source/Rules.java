@@ -98,11 +98,7 @@ public class Rules {
             }
             header.deleteCharAt(header.length() - 1);
             scanner.unread();
-            if (next == '\n' || next == '\r' || next == '#') {
-                return header.toString();
-            } else {
-                return "";
-            }
+            return header.toString();
         } else {
             scanner.unread();
             return "";
