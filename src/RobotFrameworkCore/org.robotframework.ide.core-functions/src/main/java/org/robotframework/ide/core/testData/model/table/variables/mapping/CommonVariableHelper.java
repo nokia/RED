@@ -29,24 +29,24 @@ public class CommonVariableHelper {
             .compile("((\\s)*[=]+)+(\\s)*$");
 
 
-    public void extractVariableAssignmentPart(RobotLine line) {
-        List<IRobotLineElement> lineElements = line.getLineElements();
+    public void extractVariableAssignmentPart(final RobotLine line) {
+        final List<IRobotLineElement> lineElements = line.getLineElements();
         boolean wasNotVariableElement = false;
         for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
-            IRobotLineElement element = lineElements.get(elementIndex);
+            final IRobotLineElement element = lineElements.get(elementIndex);
             if (element instanceof RobotToken) {
-                RobotToken token = (RobotToken) element;
+                final RobotToken token = (RobotToken) element;
                 if (isVariable(token) && !wasNotVariableElement) {
-                    String variableText = token.getRaw().toString();
-                    RobotToken assignment = extractAssignmentPart(
+                    final String variableText = token.getRaw().toString();
+                    final RobotToken assignment = extractAssignmentPart(
                             token.getFilePosition(), variableText);
                     if (!assignment.getFilePosition().isNotSet()) {
                         final String variable = variableText.substring(
                                 0,
                                 assignment.getStartColumn()
                                         - token.getStartColumn());
-                        token.setRaw(new StringBuilder(variable));
-                        token.setText(new StringBuilder(variable));
+                        token.setText(variable);
+                        token.setRaw(variable);
                         line.addLineElementAt(elementIndex + 1, assignment);
                         elementIndex++;
                     }
@@ -60,8 +60,8 @@ public class CommonVariableHelper {
 
     public boolean isVariable(final RobotToken token) {
         boolean isVar = false;
-        List<IRobotTokenType> types = token.getTypes();
-        for (IRobotTokenType type : types) {
+        final List<IRobotTokenType> types = token.getTypes();
+        for (final IRobotTokenType type : types) {
             if (type == RobotTokenType.START_HASH_COMMENT
                     || type == RobotTokenType.COMMENT_CONTINUE) {
                 isVar = false;
@@ -70,9 +70,9 @@ public class CommonVariableHelper {
                     || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
                     || type == RobotTokenType.VARIABLES_LIST_DECLARATION
                     || type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) {
-                String text = token.getText().toString();
+                final String text = token.getText().toString();
                 if (text != null && !text.isEmpty()) {
-                    VariableType varType = VariableType
+                    final VariableType varType = VariableType
                             .getTypeByTokenType(type);
                     if (varType != null) {
                         isVar = (text.startsWith(varType.getIdentificator()));
@@ -91,21 +91,21 @@ public class CommonVariableHelper {
 
     private RobotToken extractAssignmentPart(final FilePosition startPossition,
             final String text) {
-        RobotToken assignToken = new RobotToken();
+        final RobotToken assignToken = new RobotToken();
 
-        Matcher matcher = NAME.matcher(text);
+        final Matcher matcher = NAME.matcher(text);
         if (matcher.find()) {
-            int assignPart = matcher.end();
-            String assignmentText = text.substring(assignPart);
-            Matcher assignMatcher = ASSIGN.matcher(assignmentText);
+            final int assignPart = matcher.end();
+            final String assignmentText = text.substring(assignPart);
+            final Matcher assignMatcher = ASSIGN.matcher(assignmentText);
             if (assignMatcher.find()) {
                 assignToken.setLineNumber(startPossition.getLine());
                 assignToken.setStartColumn(startPossition.getColumn()
                         + assignPart);
                 assignToken.setStartOffset(startPossition.getOffset()
                         + assignPart);
-                assignToken.setRaw(new StringBuilder(assignmentText));
-                assignToken.setText(new StringBuilder(assignmentText));
+                assignToken.setText(assignmentText);
+                assignToken.setRaw(assignmentText);
                 assignToken.setType(RobotTokenType.ASSIGNMENT);
             }
         }
@@ -114,9 +114,9 @@ public class CommonVariableHelper {
     }
 
 
-    public String extractVariableName(String text) {
+    public String extractVariableName(final String text) {
         String name = null;
-        Matcher matcher = NAME.matcher(text);
+        final Matcher matcher = NAME.matcher(text);
         if (matcher.find()) {
             name = matcher.group(1);
         }
@@ -130,12 +130,12 @@ public class CommonVariableHelper {
 
 
     @VisibleForTesting
-    protected String mergeNotEscapedVariableWhitespaces(String text) {
-        StringBuilder replaced = new StringBuilder();
+    protected String mergeNotEscapedVariableWhitespaces(final String text) {
+        final StringBuilder replaced = new StringBuilder();
 
         boolean wasWhitespace = false;
-        char cText[] = text.toCharArray();
-        for (char c : cText) {
+        final char cText[] = text.toCharArray();
+        for (final char c : cText) {
             char toUse = c;
             if (c == '\t') {
                 toUse = ' ';
@@ -156,17 +156,17 @@ public class CommonVariableHelper {
     }
 
 
-    public boolean isCorrectVariable(String text) {
+    public boolean isCorrectVariable(final String text) {
         return (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text,
                 '}') == 1);
     }
 
 
     @VisibleForTesting
-    protected int countNumberOfChars(String text, char expected) {
+    protected int countNumberOfChars(final String text, final char expected) {
         int count = 0;
-        char[] cArray = text.toCharArray();
-        for (char c : cArray) {
+        final char[] cArray = text.toCharArray();
+        for (final char c : cArray) {
             if (c == expected) {
                 count++;
             }

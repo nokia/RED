@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
@@ -43,9 +43,9 @@ public class SettingsRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
+        final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
-            for (ATokenRecognizer rec : recognized) {
+            for (final ATokenRecognizer rec : recognized) {
                 recognizersProvided.add(rec.newInstance());
             }
         }

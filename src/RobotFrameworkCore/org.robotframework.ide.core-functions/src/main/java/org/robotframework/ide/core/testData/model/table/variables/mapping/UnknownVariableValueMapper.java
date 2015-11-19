@@ -31,18 +31,18 @@ public class UnknownVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        rt.setText(text);
+        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        List<AVariable> variables = robotFileOutput.getFileModel()
+        final List<AVariable> variables = robotFileOutput.getFileModel()
                 .getVariableTable().getVariables();
         if (!variables.isEmpty()) {
-            UnknownVariable var = (UnknownVariable) variables.get(variables
+            final UnknownVariable var = (UnknownVariable) variables.get(variables
                     .size() - 1);
             var.addItem(rt);
         } else {
@@ -55,10 +55,10 @@ public class UnknownVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
-        ParsingState currentState = utility.getCurrentStatus(processingState);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
+        final ParsingState currentState = utility.getCurrentStatus(processingState);
 
         return (currentState == ParsingState.VARIABLE_UNKNOWN || currentState == ParsingState.VARIABLE_UNKNOWN_VALUE);
     }

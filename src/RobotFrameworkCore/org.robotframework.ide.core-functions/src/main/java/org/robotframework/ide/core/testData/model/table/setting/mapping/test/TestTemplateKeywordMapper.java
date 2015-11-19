@@ -33,17 +33,17 @@ public class TestTemplateKeywordMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable settings = robotFileOutput.getFileModel()
+        final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<TestTemplate> templates = settings.getTestTemplates();
+        final List<TestTemplate> templates = settings.getTestTemplates();
         if (!templates.isEmpty()) {
             templates.get(templates.size() - 1).setKeywordName(rt);
         } else {
@@ -56,14 +56,14 @@ public class TestTemplateKeywordMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
 
         if (state == ParsingState.SETTING_TEST_TEMPLATE) {
-            List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
+            final List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
                     .getSettingTable().getTestTemplates();
             result = !checkIfHasAlreadyKeywordName(testTemplates);
         }
@@ -73,9 +73,9 @@ public class TestTemplateKeywordMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean checkIfHasAlreadyKeywordName(
-            List<TestTemplate> testTemplates) {
+            final List<TestTemplate> testTemplates) {
         boolean result = false;
-        for (TestTemplate setting : testTemplates) {
+        for (final TestTemplate setting : testTemplates) {
             result = (setting.getKeywordName() != null);
             result = result || !setting.getUnexpectedTrashArguments().isEmpty();
             if (result) {

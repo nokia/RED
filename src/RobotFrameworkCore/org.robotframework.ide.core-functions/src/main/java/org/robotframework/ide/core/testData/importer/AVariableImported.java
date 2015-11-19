@@ -42,7 +42,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
         if (name != null && !name.trim().isEmpty()) {
             result = !name.startsWith(type.getIdentificator());
             if (!result) {
-                VariableType varType = VariableType.getTypeByChar(name.trim()
+                final VariableType varType = VariableType.getTypeByChar(name.trim()
                         .charAt(0));
                 result = (varType != null && varType != VariableType.INVALID);
             }
@@ -52,11 +52,13 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     }
 
 
+    @Override
     public String getName() {
         return name;
     }
 
 
+    @Override
     public VariableType getType() {
         return type;
     }
@@ -67,7 +69,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     }
 
 
-    public void setValue(T value) {
+    public void setValue(final T value) {
         this.value = value;
     }
 
@@ -77,6 +79,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     }
 
 
+    @Override
     public VariableScope getScope() {
         return scope;
     }
@@ -97,7 +100,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
 
 
     @Override
-    public void addCommentPart(RobotToken rt) {
+    public void addCommentPart(final RobotToken rt) {
         // nothing to do
     }
 

@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.core.execution.context;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
@@ -30,7 +29,7 @@ public class TestCaseExecutableRowFinder implements IRobotExecutableRowFinder {
     }
 
     @Override
-    public RobotExecutableRow<?> findExecutableRow(LinkedList<KeywordContext> currentKeywords) {
+    public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
         final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getTestExecutionRows();
         if (testCaseExecutionRowCounter.getCounter() < executionRows.size()) {
             final RobotExecutableRow<TestCase> executionRow = executionRows.get(testCaseExecutionRowCounter.getCounter());
@@ -45,11 +44,11 @@ public class TestCaseExecutableRowFinder implements IRobotExecutableRowFinder {
         return null;
     }
 
-    public void setTestCaseExecutionRowCounter(TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
+    public void setTestCaseExecutionRowCounter(final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         this.testCaseExecutionRowCounter = testCaseExecutionRowCounter;
     }
 
-    public void setCurrentTestCase(TestCase currentTestCase) {
+    public void setCurrentTestCase(final TestCase currentTestCase) {
         this.currentTestCase = currentTestCase;
     }
 

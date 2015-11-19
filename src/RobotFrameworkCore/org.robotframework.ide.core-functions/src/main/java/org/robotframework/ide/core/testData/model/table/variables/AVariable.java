@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.variables;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -37,31 +37,37 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
     }
 
 
+    @Override
     public VariableType getType() {
         return type;
     }
 
 
+    @Override
     public VariableScope getScope() {
         return scope;
     }
 
 
+    @Override
     public String getName() {
         return name;
     }
 
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
 
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
@@ -128,9 +134,9 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
         }
 
 
-        public static VariableType getTypeByTokenType(IRobotTokenType type) {
+        public static VariableType getTypeByTokenType(final IRobotTokenType type) {
             VariableType varType = null;
-            for (VariableType vt : values()) {
+            for (final VariableType vt : values()) {
                 if (vt.getType() == type) {
                     varType = vt;
                     break;
@@ -140,10 +146,10 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
         }
 
 
-        public static VariableType getTypeByChar(char varId) {
+        public static VariableType getTypeByChar(final char varId) {
             VariableType varType = null;
             final String varIdText = "" + varId;
-            for (VariableType vt : values()) {
+            for (final VariableType vt : values()) {
                 if (vt.getIdentificator().equals(varIdText)) {
                     varType = vt;
                     break;

@@ -35,19 +35,19 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME);
         types.remove(RobotTokenType.UNKNOWN);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable settings = robotFileOutput.getFileModel()
+        final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<SuiteSetup> setups = settings.getSuiteSetups();
+        final List<SuiteSetup> setups = settings.getSuiteSetups();
         if (!setups.isEmpty()) {
             setups.get(setups.size() - 1).setKeywordName(rt);
         } else {
@@ -60,14 +60,14 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
 
         if (state == ParsingState.SETTING_SUITE_SETUP) {
-            List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
+            final List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel()
                     .getSettingTable().getSuiteSetups();
             result = !utility.checkIfHasAlreadyKeywordName(suiteSetups);
         }

@@ -35,14 +35,14 @@ public class LibraryAliasMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
-        rt.setText(new StringBuilder(text));
+        rt.setText(text);
 
-        AImported imported = utility.getNearestImport(robotFileOutput);
+        final AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
         if (imported instanceof LibraryImport) {
             lib = (LibraryImport) imported;
@@ -61,17 +61,17 @@ public class LibraryAliasMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
 
-        ParsingState status = parsingStateHelper
+        final ParsingState status = parsingStateHelper
                 .getCurrentStatus(processingState);
         if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             result = true;
         } else if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
-            AImported imported = utility.getNearestImport(robotFileOutput);
+            final AImported imported = utility.getNearestImport(robotFileOutput);
             LibraryImport lib;
             if (imported instanceof LibraryImport) {
                 lib = (LibraryImport) imported;

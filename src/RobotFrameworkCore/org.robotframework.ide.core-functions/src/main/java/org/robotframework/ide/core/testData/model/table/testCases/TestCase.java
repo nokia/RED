@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.testCases;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -63,6 +63,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements
     }
 
 
+    @Override
     public List<RobotExecutableRow<TestCase>> getExecutionContext() {
         return getTestExecutionRows();
     }
@@ -154,37 +155,37 @@ public class TestCase extends AModelElement<TestCaseTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             if (getTestName() != null) {
                 tokens.add(getTestName());
             }
 
-            for (TestDocumentation doc : documentation) {
+            for (final TestDocumentation doc : documentation) {
                 tokens.addAll(doc.getElementTokens());
             }
 
-            for (TestCaseSetup setup : setups) {
+            for (final TestCaseSetup setup : setups) {
                 tokens.addAll(setup.getElementTokens());
             }
 
-            for (TestCaseTags tag : tags) {
+            for (final TestCaseTags tag : tags) {
                 tokens.addAll(tag.getElementTokens());
             }
 
-            for (TestCaseTeardown teardown : teardowns) {
+            for (final TestCaseTeardown teardown : teardowns) {
                 tokens.addAll(teardown.getElementTokens());
             }
 
-            for (TestCaseTemplate template : templates) {
+            for (final TestCaseTemplate template : templates) {
                 tokens.addAll(template.getElementTokens());
             }
 
-            for (RobotExecutableRow<TestCase> row : testContext) {
+            for (final RobotExecutableRow<TestCase> row : testContext) {
                 tokens.addAll(row.getElementTokens());
             }
 
-            for (TestCaseTimeout timeout : timeouts) {
+            for (final TestCaseTimeout timeout : timeouts) {
                 tokens.addAll(timeout.getElementTokens());
             }
 
@@ -203,7 +204,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements
     public String getTemplateKeywordName() {
         String keywordName = getRobotViewAboutTestTemplate();
         if (keywordName == null) {
-            SettingTable settingTable = getParent().getParent()
+            final SettingTable settingTable = getParent().getParent()
                     .getSettingTable();
             if (settingTable.isPresent()) {
                 keywordName = settingTable.getRobotViewAboutTestTemplate();

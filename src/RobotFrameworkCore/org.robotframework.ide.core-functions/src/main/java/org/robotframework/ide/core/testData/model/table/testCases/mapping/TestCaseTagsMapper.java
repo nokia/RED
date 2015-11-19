@@ -27,19 +27,19 @@ public class TestCaseTagsMapper extends ATestCaseSettingDeclarationMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
+        final TestCase testCase = finder.findOrCreateNearestTestCase(currentLine,
                 processingState, robotFileOutput, rt, fp);
         if (testCase.getTags().isEmpty()) {
-            TestCaseTags tags = new TestCaseTags(rt);
+            final TestCaseTags tags = new TestCaseTags(rt);
             testCase.addTag(tags);
         }
         processingState.push(ParsingState.TEST_CASE_SETTING_TAGS);

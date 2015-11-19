@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -42,7 +42,7 @@ public class DeclarationMapper {
     private MappingResult map(final MappingResult topLevel,
             final FilePosition fp, final Container container,
             final String filename) {
-        MappingResult mappingResult = new MappingResult(fp, filename);
+        final MappingResult mappingResult = new MappingResult(fp, filename);
         FilePosition currentPosition = fp;
 
         if (container.getContainerType() == ContainerType.MIX) {
@@ -52,29 +52,29 @@ public class DeclarationMapper {
             }
         }
 
-        ContainerMappingHelper mappingHelper = ContainerMappingHelper
+        final ContainerMappingHelper mappingHelper = ContainerMappingHelper
                 .createDeclaration(container, currentPosition, mappingResult);
-        IElementDeclaration topContainer = mappingHelper
+        final IElementDeclaration topContainer = mappingHelper
                 .getContainerDeclarationHolder();
         if (topContainer != null) {
             mappingResult.addMappedElement(topContainer);
         }
-        List<IContainerElement> elements = container.getElements();
-        int contentEnd = mappingHelper.getContentEnd();
+        final List<IContainerElement> elements = container.getElements();
+        final int contentEnd = mappingHelper.getContentEnd();
         for (int index = mappingHelper.getContentStart(); index < contentEnd; index++) {
-            IContainerElement containerElement = elements.get(index);
+            final IContainerElement containerElement = elements.get(index);
             if (containerElement.isComplex()) {
-                Container subContainer = (Container) containerElement;
-                FilePosition previousForContainer = currentPosition;
-                MappingResult subResult = map(mappingResult, currentPosition,
+                final Container subContainer = (Container) containerElement;
+                final FilePosition previousForContainer = currentPosition;
+                final MappingResult subResult = map(mappingResult, currentPosition,
                         subContainer, filename);
                 mappingResult.addCorrectVariables(subResult
                         .getCorrectVariables());
                 mappingResult.addBuildMessages(subResult.getMessages());
                 if (topContainer != null) {
-                    List<IElementDeclaration> mappedElements = subResult
+                    final List<IElementDeclaration> mappedElements = subResult
                             .getMappedElements();
-                    for (IElementDeclaration dec : mappedElements) {
+                    for (final IElementDeclaration dec : mappedElements) {
                         topContainer.addElementDeclarationInside(dec);
                         dec.setLevelUpElement(topContainer);
                     }
@@ -91,19 +91,19 @@ public class DeclarationMapper {
                     mappedElements = mappingResult.getMappedElements();
                 }
 
-                IElementDeclaration lastComplex = mappedElements
+                final IElementDeclaration lastComplex = mappedElements
                         .get(mappedElements.size() - 1);
                 final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
                 if (lastComplex instanceof VariableDeclaration) {
-                    VariableDeclaration variableDec = (VariableDeclaration) lastComplex;
-                    List<IElementDeclaration> escape = getEscape(mappedElements);
+                    final VariableDeclaration variableDec = (VariableDeclaration) lastComplex;
+                    final List<IElementDeclaration> escape = getEscape(mappedElements);
                     if (!escape.isEmpty()) {
                         if (topContainer != null) {
-                            for (IElementDeclaration d : escape) {
+                            for (final IElementDeclaration d : escape) {
                                 topContainer.removeExactlyTheSameInstance(d);
                             }
                         } else {
-                            for (IElementDeclaration d : escape) {
+                            for (final IElementDeclaration d : escape) {
                                 mappingResult.removeExactlyTheSameInstance(d);
                             }
                         }
@@ -133,27 +133,27 @@ public class DeclarationMapper {
                                 topContainer, variableDec);
                     }
                 } else {
-                    IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
+                    final IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
                     if (subContainer.isOpenForModification()) {
                         convertIncorrectIndexElementBackToText(mappingResult,
                                 topContainer, indexDec);
                     }
                 }
             } else {
-                ContainerElementType type = containerElement.getType();
-                IElementMapper mapper = mapperFactory.getMapperFor(type);
+                final ContainerElementType type = containerElement.getType();
+                final IElementMapper mapper = mapperFactory.getMapperFor(type);
                 if (mapper == null) {
                     throw new UnsupportedOperationException(
                             "ContainerElementType \'" + type
                                     + "\' is not supported yet!");
                 }
 
-                MappingResult subResult = mapper.map(mappingResult,
+                final MappingResult subResult = mapper.map(mappingResult,
                         containerElement, currentPosition, filename);
                 if (topContainer != null) {
-                    List<IElementDeclaration> mappedElements = subResult
+                    final List<IElementDeclaration> mappedElements = subResult
                             .getMappedElements();
-                    for (IElementDeclaration dec : mappedElements) {
+                    for (final IElementDeclaration dec : mappedElements) {
                         topContainer.addElementDeclarationInside(dec);
                         dec.setLevelUpElement(topContainer);
                     }
@@ -171,11 +171,11 @@ public class DeclarationMapper {
 
 
     private void convertIncorrectIndexElementBackToText(
-            MappingResult mappingResult, IElementDeclaration topContainer,
-            IndexDeclaration indexDec) {
-        TextDeclaration textDec = new TextDeclaration(indexDec.getStart(),
+            final MappingResult mappingResult, final IElementDeclaration topContainer,
+            final IndexDeclaration indexDec) {
+        final TextDeclaration textDec = new TextDeclaration(indexDec.getStart(),
                 ContainerElementType.SQUARE_BRACKET_OPEN);
-        JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
+        final JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
         joinedStart.addElementDeclarationInside(textDec);
 
         if (topContainer != null) {
@@ -187,9 +187,9 @@ public class DeclarationMapper {
         }
         joinedStart.setLevelUpElement(topContainer);
 
-        List<IElementDeclaration> elementsDeclarationInside = indexDec
+        final List<IElementDeclaration> elementsDeclarationInside = indexDec
                 .getElementsDeclarationInside();
-        for (IElementDeclaration dec : elementsDeclarationInside) {
+        for (final IElementDeclaration dec : elementsDeclarationInside) {
             if (dec.isComplex()) {
                 if (dec.getEnd() != null) {
                     if (topContainer != null) {
@@ -213,21 +213,21 @@ public class DeclarationMapper {
 
 
     private void convertIncorrectVariableBackToText(
-            MappingResult mappingResult, IElementDeclaration topContainer,
-            VariableDeclaration variableDec) {
-        JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
+            final MappingResult mappingResult, final IElementDeclaration topContainer,
+            final VariableDeclaration variableDec) {
+        final JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
         if (variableDec.isEscaped()) {
-            TextDeclaration escapeDec = new TextDeclaration(
+            final TextDeclaration escapeDec = new TextDeclaration(
                     variableDec.getEscape(), ContainerElementType.ESCAPE);
             joinedStart.addElementDeclarationInside(escapeDec);
         }
         if (variableDec.getTypeIdentificator() != null) {
-            TextDeclaration typeId = new TextDeclaration(
+            final TextDeclaration typeId = new TextDeclaration(
                     variableDec.getTypeIdentificator(),
                     ContainerElementType.VARIABLE_TYPE_ID);
             joinedStart.addElementDeclarationInside(typeId);
         }
-        TextDeclaration variableCurrlyBracket = new TextDeclaration(
+        final TextDeclaration variableCurrlyBracket = new TextDeclaration(
                 variableDec.getStart(),
                 ContainerElementType.CURRLY_BRACKET_OPEN);
         joinedStart.addElementDeclarationInside(variableCurrlyBracket);
@@ -241,9 +241,9 @@ public class DeclarationMapper {
         }
         joinedStart.setLevelUpElement(topContainer);
 
-        List<IElementDeclaration> elementsDeclarationInside = variableDec
+        final List<IElementDeclaration> elementsDeclarationInside = variableDec
                 .getElementsDeclarationInside();
-        for (IElementDeclaration dec : elementsDeclarationInside) {
+        for (final IElementDeclaration dec : elementsDeclarationInside) {
             if (dec.isComplex()) {
                 if (dec.getEnd() != null) {
                     if (topContainer != null) {
@@ -265,9 +265,9 @@ public class DeclarationMapper {
             }
         }
 
-        TextPosition end = variableDec.getEnd();
+        final TextPosition end = variableDec.getEnd();
         if (end != null) {
-            JoinedTextDeclarations joinedEnd = new JoinedTextDeclarations();
+            final JoinedTextDeclarations joinedEnd = new JoinedTextDeclarations();
             joinedEnd.addElementDeclarationInside(new TextDeclaration(end,
                     ContainerElementType.CURRLY_BRACKET_CLOSE));
             if (topContainer != null) {
@@ -287,16 +287,16 @@ public class DeclarationMapper {
             final VariableDeclaration variableDec) {
         boolean result = false;
         if (!variableDec.isEscaped()) {
-            TextPosition typeId = variableDec.getTypeIdentificator();
+            final TextPosition typeId = variableDec.getTypeIdentificator();
             if (typeId != null) {
-                String idText = typeId.getText();
+                final String idText = typeId.getText();
                 if (idText != null && !idText.isEmpty()) {
                     if (idText.length() == 1) {
                         if (variableDec.getEnd() != null) {
                             result = true;
                         }
                     } else {
-                        BuildMessage warnMessage = BuildMessage
+                        final BuildMessage warnMessage = BuildMessage
                                 .createWarnMessage(
                                         "Incorrect variable id with space between "
                                                 + idText.charAt(0)
@@ -329,7 +329,7 @@ public class DeclarationMapper {
         final List<IElementDeclaration> varElements = new ArrayList<>();
 
         if (mappedElements != null) {
-            int nrOfMapped = mappedElements.size();
+            final int nrOfMapped = mappedElements.size();
             if (nrOfMapped >= 3) {
                 final IElementDeclaration possibleEscape = mappedElements
                         .get(nrOfMapped - 3);
@@ -337,10 +337,10 @@ public class DeclarationMapper {
                     final JoinedTextDeclarations joined = (JoinedTextDeclarations) possibleEscape;
                     if (mapperFactory.containsOnly(joined,
                             Arrays.asList(ContainerElementType.ESCAPE))) {
-                        List<IElementDeclaration> elementsInside = joined
+                        final List<IElementDeclaration> elementsInside = joined
                                 .getElementsDeclarationInside();
                         if (elementsInside.size() == 1) {
-                            TextDeclaration dec = (TextDeclaration) elementsInside
+                            final TextDeclaration dec = (TextDeclaration) elementsInside
                                     .get(0);
                             if (dec.getLength() == 1) {
                                 varElements.add(possibleEscape);
@@ -359,18 +359,18 @@ public class DeclarationMapper {
             final List<IElementDeclaration> mappedElements) {
         IElementDeclaration elem = null;
         if (mappedElements != null) {
-            int numberOfMapped = mappedElements.size();
+            final int numberOfMapped = mappedElements.size();
             if (numberOfMapped >= 2) {
-                IElementDeclaration lastSubContainer = mappedElements
+                final IElementDeclaration lastSubContainer = mappedElements
                         .get(numberOfMapped - 1);
                 if (lastSubContainer instanceof VariableDeclaration) {
-                    IElementDeclaration previous = mappedElements
+                    final IElementDeclaration previous = mappedElements
                             .get(numberOfMapped - 2);
-                    JoinedTextDeclarations text = new JoinedTextDeclarations();
+                    final JoinedTextDeclarations text = new JoinedTextDeclarations();
                     text.addElementDeclarationInside(previous);
-                    String idText = text.getText();
+                    final String idText = text.getText();
                     if (idText != null) {
-                        String trimmed = idText.trim();
+                        final String trimmed = idText.trim();
                         if (trimmed.length() >= 1) {
                             if (ContainerElementType.VARIABLE_TYPE_ID
                                     .getRepresentation().contains(

@@ -6,10 +6,10 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +79,7 @@ public class RobotProjectHolder {
                         value));
             } else if (varValue != null && varValue.getClass().isArray()) {
                 final List<Object> value = new ArrayList<>();
-                Object[] array = ((Object[]) varValue);
+                final Object[] array = ((Object[]) varValue);
                 value.addAll(Arrays.asList(array));
                 variables.add(new ListRobotInternalVariable(varName, value));
             } else {

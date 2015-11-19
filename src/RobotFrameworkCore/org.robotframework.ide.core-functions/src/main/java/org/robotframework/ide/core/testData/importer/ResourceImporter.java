@@ -24,28 +24,28 @@ public class ResourceImporter {
 
     public List<ResourceImportReference> importResources(
             final RobotParser parser, final RobotFileOutput robotFile) {
-        List<ResourceImportReference> importedReferences = new ArrayList<>();
+        final List<ResourceImportReference> importedReferences = new ArrayList<>();
 
-        SettingTable settingTable = robotFile.getFileModel().getSettingTable();
+        final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {
-            List<AImported> imports = settingTable.getImports();
-            for (AImported imported : imports) {
-                Type type = imported.getType();
+            final List<AImported> imports = settingTable.getImports();
+            for (final AImported imported : imports) {
+                final Type type = imported.getType();
                 if (type == Type.RESOURCE) {
                     String path = imported.getPathOrName().getRaw().toString();
 
-                    File currentFile = robotFile.getProcessedFile()
+                    final File currentFile = robotFile.getProcessedFile()
                             .getAbsoluteFile();
                     if (currentFile.exists()) {
-                        Path joinPath = Paths
+                        final Path joinPath = Paths
                                 .get(currentFile.getAbsolutePath())
                                 .resolveSibling(path);
                         path = joinPath.toAbsolutePath().toFile()
                                 .getAbsolutePath();
                     }
 
-                    File toImport = new File(path);
-                    List<RobotFileOutput> parsed = parser.parse(toImport);
+                    final File toImport = new File(path);
+                    final List<RobotFileOutput> parsed = parser.parse(toImport);
                     if (parsed.isEmpty()) {
                         robotFile.addBuildMessage(BuildMessage
                                 .createErrorMessage(

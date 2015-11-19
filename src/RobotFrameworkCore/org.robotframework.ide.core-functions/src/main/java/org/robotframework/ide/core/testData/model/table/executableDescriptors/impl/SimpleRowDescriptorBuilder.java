@@ -39,22 +39,22 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 .getParent();
         final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase
                 .getParent();
-        final RobotFile robotFile = (RobotFile) table.getParent();
+        final RobotFile robotFile = table.getParent();
         final String fileName = robotFile.getParent().getProcessedFile()
                 .getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         boolean isAfterFirstAction = false;
-        for (RobotToken elem : lineElements) {
-            MappingResult mappingResult = varExtractor.extract(elem, fileName);
+        for (final RobotToken elem : lineElements) {
+            final MappingResult mappingResult = varExtractor.extract(elem, fileName);
             simple.addMessages(mappingResult.getMessages());
 
             // value is keyword if is on the first place and have in it nested
             // variables and when contains text on the beginning or end of field
-            List<VariableDeclaration> correctVariables = mappingResult
+            final List<VariableDeclaration> correctVariables = mappingResult
                     .getCorrectVariables();
-            List<IElementDeclaration> mappedElements = mappingResult
+            final List<IElementDeclaration> mappedElements = mappingResult
                     .getMappedElements();
             if (isAfterFirstAction) {
                 simple.addUsedVariables(correctVariables);

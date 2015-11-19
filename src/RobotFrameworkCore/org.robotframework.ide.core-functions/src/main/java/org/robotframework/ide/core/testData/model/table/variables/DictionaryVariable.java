@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.variables;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -17,8 +17,8 @@ public class DictionaryVariable extends AVariable {
     private final List<DictionaryKeyValuePair> items = new ArrayList<>();
 
 
-    public DictionaryVariable(String name, RobotToken declaration,
-            VariableScope scope) {
+    public DictionaryVariable(final String name, final RobotToken declaration,
+            final VariableScope scope) {
         super(VariableType.DICTIONARY, name, declaration, scope);
     }
 
@@ -59,7 +59,7 @@ public class DictionaryVariable extends AVariable {
         }
 
 
-        public void setKey(RobotToken key) {
+        public void setKey(final RobotToken key) {
             this.key = key;
         }
 
@@ -69,7 +69,7 @@ public class DictionaryVariable extends AVariable {
         }
 
 
-        public void setValue(RobotToken value) {
+        public void setValue(final RobotToken value) {
             this.value = value;
         }
 
@@ -79,7 +79,7 @@ public class DictionaryVariable extends AVariable {
         }
 
 
-        public void setRaw(RobotToken raw) {
+        public void setRaw(final RobotToken raw) {
             this.raw = raw;
         }
 
@@ -88,10 +88,10 @@ public class DictionaryVariable extends AVariable {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
-            for (DictionaryKeyValuePair p : items) {
+            for (final DictionaryKeyValuePair p : items) {
                 if (p.getRaw() != null) {
                     tokens.add(p.getRaw());
                 }

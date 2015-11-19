@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -19,8 +19,8 @@ public class TextDeclaration implements IElementDeclaration {
 
     private IElementDeclaration levelUpElement;
     private final List<IElementDeclaration> elementsDeclaredInside = new ArrayList<>();
-    private TextPosition text;
-    private ContainerElementType mappedType;
+    private final TextPosition text;
+    private final ContainerElementType mappedType;
     private FilePosition robotTokenPosition;
 
 
@@ -31,6 +31,7 @@ public class TextDeclaration implements IElementDeclaration {
     }
 
 
+    @Override
     public void setLevelUpElement(final IElementDeclaration levelUpElement) {
         this.levelUpElement = levelUpElement;
     }
@@ -110,7 +111,7 @@ public class TextDeclaration implements IElementDeclaration {
 
 
     @Override
-    public void addElementDeclarationInside(IElementDeclaration elementToAdd) {
+    public void addElementDeclarationInside(final IElementDeclaration elementToAdd) {
         throw new UnsupportedOperationException(
                 "Adding elements to TEXT declaration is not allowed please use container class for it.");
     }
@@ -125,7 +126,7 @@ public class TextDeclaration implements IElementDeclaration {
 
 
     @Override
-    public void removeExactlyTheSameInstance(IElementDeclaration elementToRemove) {
+    public void removeExactlyTheSameInstance(final IElementDeclaration elementToRemove) {
         throw new UnsupportedOperationException(
                 "Removing elements to TEXT declaration is not allowed please use container class for it.");
 

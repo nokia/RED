@@ -27,19 +27,19 @@ public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
 
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
+        final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
-        KeywordArguments arguments = new KeywordArguments(rt);
+        final KeywordArguments arguments = new KeywordArguments(rt);
         keyword.addArguments(arguments);
 
         processingState.push(ParsingState.KEYWORD_SETTING_ARGUMENTS);

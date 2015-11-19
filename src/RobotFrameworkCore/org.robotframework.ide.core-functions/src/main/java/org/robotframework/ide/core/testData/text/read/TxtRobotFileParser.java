@@ -114,11 +114,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @Override
-    public boolean canParseFile(File file, boolean isFromStringContent) {
+    public boolean canParseFile(final File file, final boolean isFromStringContent) {
         boolean result = false;
 
         if (file != null && (file.isFile() || isFromStringContent)) {
-            String fileName = file.getName().toLowerCase();
+            final String fileName = file.getName().toLowerCase();
             result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
         }
 
@@ -139,7 +139,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         try {
             parse(parsingOutput, robotFile, new InputStreamReader(inputStream,
                     Charset.forName("UTF-8")));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Unknown problem during reading file " + robotFile
                             + ".\nStack:" + e, "File " + robotFile));
@@ -162,15 +162,15 @@ public class TxtRobotFileParser implements IRobotFileParser {
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         boolean wasProcessingError = false;
         try {
-            FileInputStream fis = new FileInputStream(robotFile);
+            final FileInputStream fis = new FileInputStream(robotFile);
             parse(parsingOutput, fis, robotFile);
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
                     "File " + robotFile));
             wasProcessingError = true;
             // FIXME: position should be more descriptive
-        } catch (Exception e) {
+        } catch (final Exception e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Unknown problem during reading file " + robotFile
                             + ".\nStack:" + e, "File " + robotFile));
@@ -194,8 +194,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
 
-        LineReader lineHolder = new LineReader(reader);
-        BufferedReader lineReader = new BufferedReader(lineHolder);
+        final LineReader lineHolder = new LineReader(reader);
+        final BufferedReader lineReader = new BufferedReader(lineHolder);
         int lineNumber = 1;
         int currentOffset = 0;
         String currentLineText = null;
@@ -203,26 +203,26 @@ public class TxtRobotFileParser implements IRobotFileParser {
         boolean isNewLine = false;
         try {
             while((currentLineText = lineReader.readLine()) != null) {
-                RobotLine line = new RobotLine(lineNumber,
+                final RobotLine line = new RobotLine(lineNumber,
                         parsingOutput.getFileModel());
-                StringBuilder text = new StringBuilder(currentLineText);
+                final StringBuilder text = new StringBuilder(currentLineText);
                 int lastColumnProcessed = 0;
                 // get separator for this line
-                ALineSeparator separator = tokenSeparatorBuilder
+                final ALineSeparator separator = tokenSeparatorBuilder
                         .createSeparator(lineNumber, currentLineText);
                 line.setSeparatorType(separator.getProducedType());
                 RobotToken rt = null;
 
-                int textLength = currentLineText.length();
+                final int textLength = currentLineText.length();
                 // check if is any data to process
                 if (textLength > 0) {
                     // consume all data
                     while(lastColumnProcessed < textLength) {
                         if (separator.hasNext()) {
                             // iterate column-by-column in robot file
-                            Separator currentSeparator = separator.next();
-                            int startColumn = currentSeparator.getStartColumn();
-                            int remainingData = startColumn
+                            final Separator currentSeparator = separator.next();
+                            final int startColumn = currentSeparator.getStartColumn();
+                            final int remainingData = startColumn
                                     - lastColumnProcessed;
                             // {$a} | {$b} in this case we check if {$a} was
                             // before
@@ -232,7 +232,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                             parsingOutput, separator,
                                             currentSeparator, line,
                                             processingState)) {
-                                String rawText = text.substring(
+                                final String rawText = text.substring(
                                         lastColumnProcessed, startColumn);
 
                                 rt = processLineElement(line, processingState,
@@ -266,7 +266,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
                                         .remove(ParsingState.KEYWORD_DECLARATION);
                             }
 
-                            String rawText = text
+                            final String rawText = text
                                     .substring(lastColumnProcessed);
 
                             rt = processLineElement(
@@ -294,15 +294,15 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 alignUtility.fixOnlyPrettyAlignLinesInVariables(line,
                         processingState);
 
-                List<IRobotLineElement> lineElements = line.getLineElements();
+                final List<IRobotLineElement> lineElements = line.getLineElements();
                 if (!lineElements.isEmpty()) {
-                    IRobotLineElement lineElem = lineElements.get(lineElements
+                    final IRobotLineElement lineElem = lineElements.get(lineElements
                             .size() - 1);
                     currentOffset = lineElem.getStartOffset()
                             + lineElem.getText().length();
                 }
 
-                List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
+                final List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
                 line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
                 currentOffset += utility.getEndOfLineLength(endOfLine);
                 lineNumber++;
@@ -327,18 +327,18 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 parsingStateHelper.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "File " + robotFile + " was not found.\nStack:" + e,
                     "File " + robotFile));
             wasProcessingError = true;
             // FIXME: position should be more descriptive
-        } catch (IOException e) {
+        } catch (final IOException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Problem during file " + robotFile + " reading.\nStack:"
                             + e.getLocalizedMessage(), "File " + robotFile));
             wasProcessingError = true;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Unknown problem during reading file " + robotFile
                             + ".\nStack:" + e, "File " + robotFile));
@@ -348,7 +348,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         } finally {
             try {
                 lineReader.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                         "Error occured, when file was closing. Stack trace\n\t"
                                 + e, robotFile.getAbsolutePath()));
@@ -366,16 +366,16 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected RobotToken processLineElement(RobotLine currentLine,
+    protected RobotToken processLineElement(final RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, String fileName, boolean isNewLine) {
-        List<RobotToken> robotTokens = recognize(fp, text);
+            final String text, final String fileName, final boolean isNewLine) {
+        final List<RobotToken> robotTokens = recognize(fp, text);
         RobotToken robotToken = utility.computeCorrectRobotToken(currentLine,
                 processingState, robotFileOutput, fp, text, isNewLine,
                 robotTokens, fileName);
 
-        LineContinueType lineContinueType = previousLineHandler
+        final LineContinueType lineContinueType = previousLineHandler
                 .computeLineContinue(processingState, isNewLine,
                         robotFileOutput.getFileModel(), currentLine, robotToken);
 
@@ -399,11 +399,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
                     wasRecognizedCorrectly = false;
                     // FIXME: add information that type is incorrect missing
                     // separator
-                    RobotToken newRobotToken = new RobotToken();
+                    final RobotToken newRobotToken = new RobotToken();
                     newRobotToken.setLineNumber(fp.getLine());
                     newRobotToken.setStartColumn(fp.getColumn());
-                    newRobotToken.setText(new StringBuilder(text));
-                    newRobotToken.setRaw(new StringBuilder(text));
+                    newRobotToken.setText(text);
+                    newRobotToken.setRaw(text);
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                     newRobotToken.getTypes().addAll(robotToken.getTypes());
                     robotToken = newRobotToken;
@@ -413,22 +413,22 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 robotToken = new RobotToken();
                 robotToken.setLineNumber(fp.getLine());
                 robotToken.setStartColumn(fp.getColumn());
-                robotToken.setText(new StringBuilder(text));
-                robotToken.setRaw(new StringBuilder(text));
+                robotToken.setText(text);
+                robotToken.setRaw(text);
                 robotToken.setType(RobotTokenType.UNKNOWN);
 
                 newStatus = ParsingState.UNKNOWN;
             }
 
             boolean useMapper = true;
-            RobotFile fileModel = robotFileOutput.getFileModel();
+            final RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (positionResolvers.isCorrectPosition(
                         PositionExpected.TABLE_HEADER, fileModel, currentLine,
                         robotToken)) {
                     if (wasRecognizedCorrectly) {
                         @SuppressWarnings("rawtypes")
-                        TableHeader header = new TableHeader(robotToken);
+                        final TableHeader<?> header = new TableHeader(robotToken);
                         ARobotSectionTable table = null;
                         if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
                             table = fileModel.getSettingTable();
@@ -490,11 +490,11 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     private RobotToken mapToCorrectTokenAndPutInCorrectPlaceInModel(
-            RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            String text, String fileName, RobotToken robotToken) {
-        List<IParsingMapper> matchedMappers = new ArrayList<>();
-        for (IParsingMapper mapper : mappers) {
+            final String text, final String fileName, RobotToken robotToken) {
+        final List<IParsingMapper> matchedMappers = new ArrayList<>();
+        for (final IParsingMapper mapper : mappers) {
             if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
                     robotToken, text, processingState)) {
                 matchedMappers.add(mapper);
@@ -504,7 +504,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
         // check for unknown setting
         int size = matchedMappers.size();
         if (size == 0) {
-            for (IParsingMapper mapper : unknownTableElementsMapper) {
+            for (final IParsingMapper mapper : unknownTableElementsMapper) {
                 if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
                         robotToken, text, processingState)) {
                     matchedMappers.add(mapper);
@@ -526,22 +526,22 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
 
     @VisibleForTesting
-    protected List<RobotToken> recognize(final FilePosition fp, String text) {
-        List<RobotToken> possibleRobotTokens = new ArrayList<>();
-        StringBuilder sb = new StringBuilder(text);
-        for (ATokenRecognizer rec : recognized) {
+    protected List<RobotToken> recognize(final FilePosition fp, final String text) {
+        final List<RobotToken> possibleRobotTokens = new ArrayList<>();
+        final StringBuilder sb = new StringBuilder(text);
+        for (final ATokenRecognizer rec : recognized) {
             if (rec.hasNext(sb, fp.getLine())) {
-                RobotToken t = rec.next();
+                final RobotToken t = rec.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);
             }
         }
 
         if (possibleRobotTokens.isEmpty()) {
-            RobotToken rt = new RobotToken();
+            final RobotToken rt = new RobotToken();
             rt.setLineNumber(fp.getLine());
-            rt.setText(new StringBuilder(text));
-            rt.setRaw(new StringBuilder(text));
+            rt.setText(text);
+            rt.setRaw(text);
             rt.setStartColumn(fp.getColumn());
 
             possibleRobotTokens.add(rt);

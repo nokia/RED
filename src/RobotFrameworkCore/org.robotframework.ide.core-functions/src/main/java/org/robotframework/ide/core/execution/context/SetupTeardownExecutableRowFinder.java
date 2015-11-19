@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.core.execution.context;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
@@ -32,7 +31,7 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
     }
 
     @Override
-    public RobotExecutableRow<?> findExecutableRow(final LinkedList<KeywordContext> currentKeywords) {
+    public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
         final KeywordContext currentKeywordContext = currentKeywords.get(0);
         if (isKeywordType(RobotDebugExecutionContext.TESTCASE_SETUP_KEYWORD_TYPE, currentKeywordContext)) {
             return extractExecutableRowFromTestCase(currentTestCase.getSetups(), currentModel.getSettingTable()
@@ -77,11 +76,11 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         return currentKeywordContext.getType().equals(keywordType);
     }
 
-    public void setCurrentTestCase(TestCase currentTestCase) {
+    public void setCurrentTestCase(final TestCase currentTestCase) {
         this.currentTestCase = currentTestCase;
     }
 
-    public void setCurrentModel(RobotFile currentModel) {
+    public void setCurrentModel(final RobotFile currentModel) {
         this.currentModel = currentModel;
     }
 
