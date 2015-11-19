@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -25,7 +25,7 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
     protected VariableScope scope = VariableScope.LOCAL;
     private final RobotToken declaration;
     private final String name;
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     protected AVariable(final VariableType type, final String name,

@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.Te
 public class Container implements IContainerElement {
 
     private Container parent;
-    private List<IContainerElement> elements = new LinkedList<>();
+    private List<IContainerElement> elements = new ArrayList<>();
     private boolean isOpenForModification = true;
 
 

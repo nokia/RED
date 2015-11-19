@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword
 
 public class KeywordTable extends ARobotSectionTable {
 
-    private final List<UserKeyword> userKeywords = new LinkedList<>();
+    private final List<UserKeyword> userKeywords = new ArrayList<>();
 
 
     public KeywordTable(final RobotFile parent) {

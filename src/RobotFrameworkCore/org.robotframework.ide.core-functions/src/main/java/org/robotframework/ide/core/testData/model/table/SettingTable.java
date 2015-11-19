@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -27,18 +27,18 @@ import org.robotframework.ide.core.testData.model.table.setting.UnknownSetting;
 
 public class SettingTable extends ARobotSectionTable {
 
-    private final List<AImported> imports = new LinkedList<>();
-    private final List<SuiteDocumentation> documentations = new LinkedList<>();
-    private final List<Metadata> metadatas = new LinkedList<>();
-    private final List<SuiteSetup> suiteSetups = new LinkedList<>();
-    private final List<SuiteTeardown> suiteTeardowns = new LinkedList<>();
-    private final List<ForceTags> forceTags = new LinkedList<>();
-    private final List<DefaultTags> defaultTags = new LinkedList<>();
-    private final List<TestSetup> testSetups = new LinkedList<>();
-    private final List<TestTeardown> testTeardowns = new LinkedList<>();
-    private final List<TestTemplate> testTemplates = new LinkedList<>();
-    private final List<TestTimeout> testTimeouts = new LinkedList<>();
-    private final List<UnknownSetting> unknownSettings = new LinkedList<>();
+    private final List<AImported> imports = new ArrayList<>();
+    private final List<SuiteDocumentation> documentations = new ArrayList<>();
+    private final List<Metadata> metadatas = new ArrayList<>();
+    private final List<SuiteSetup> suiteSetups = new ArrayList<>();
+    private final List<SuiteTeardown> suiteTeardowns = new ArrayList<>();
+    private final List<ForceTags> forceTags = new ArrayList<>();
+    private final List<DefaultTags> defaultTags = new ArrayList<>();
+    private final List<TestSetup> testSetups = new ArrayList<>();
+    private final List<TestTeardown> testTeardowns = new ArrayList<>();
+    private final List<TestTemplate> testTemplates = new ArrayList<>();
+    private final List<TestTimeout> testTimeouts = new ArrayList<>();
+    private final List<UnknownSetting> unknownSettings = new ArrayList<>();
 
     private final DataDrivenKeywordName<TestTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 

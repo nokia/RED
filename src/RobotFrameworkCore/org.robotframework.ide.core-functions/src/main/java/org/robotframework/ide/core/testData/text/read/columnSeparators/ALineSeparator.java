@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +24,7 @@ public abstract class ALineSeparator {
     private int elementIndex = -1;
     protected final int lineNumber;
     protected final String line;
-    private final List<IRobotLineElement> lineElements = new LinkedList<>();
+    private final List<IRobotLineElement> lineElements = new ArrayList<>();
 
 
     protected ALineSeparator(final int lineNumber, final String line) {

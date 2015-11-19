@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -207,7 +207,7 @@ public class ElementsUtility {
     private List<RobotToken> getTokensExactlyOnPosition(
             final List<RobotToken> robotTokens,
             final FilePosition currentPosition) {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         for (final RobotToken rt : robotTokens) {
             if (currentPosition.compare(rt.getFilePosition(), false) == ECompareResult.EQUAL_TO
                     .getValue()) {
@@ -237,7 +237,7 @@ public class ElementsUtility {
 
 
     public List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
-        List<RobotToken> found = new LinkedList<>();
+        List<RobotToken> found = new ArrayList<>();
         for (RobotToken t : tokens) {
             if (isTableHeader(t)) {
                 found.add(t);
@@ -304,7 +304,7 @@ public class ElementsUtility {
     public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(
             final RobotFileOutput robotFileOutput,
             final ParsingState tableHeaderState) {
-        List<TableHeader<? extends ARobotSectionTable>> tableKnownHeaders = new LinkedList<>();
+        List<TableHeader<? extends ARobotSectionTable>> tableKnownHeaders = new ArrayList<>();
         RobotFile fileModel = robotFileOutput.getFileModel();
         if (tableHeaderState == ParsingState.SETTING_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getSettingTable().getHeaders();
@@ -547,8 +547,8 @@ public class ElementsUtility {
 
     private static class LineTokenInfo {
 
-        private final List<Integer> positionsOfNotEmptyElements = new LinkedList<>();
-        private final List<Integer> positionsOfLineContinoue = new LinkedList<>();
+        private final List<Integer> positionsOfNotEmptyElements = new ArrayList<>();
+        private final List<Integer> positionsOfLineContinoue = new ArrayList<>();
         private boolean isLineContinoue;
         private int dataStartIndex = -1;
         private int dataEndIndex = -1;

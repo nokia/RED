@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -18,7 +18,7 @@ public class RobotToken implements IRobotLineElement {
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
     private StringBuilder raw = new StringBuilder();
     private StringBuilder text = new StringBuilder();
-    private List<IRobotTokenType> types = new LinkedList<>();
+    private List<IRobotTokenType> types = new ArrayList<>();
     private boolean isDirty = false;
     private boolean wasFirstInit = false;
 

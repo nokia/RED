@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -27,7 +27,7 @@ public class Separator implements IRobotLineElement {
         TABULATOR_OR_DOUBLE_SPACE("\t", "  "), PIPE("| ", " | ", "\t|", "|\t",
                 "\t|\t");
 
-        private final List<String> representationForNew = new LinkedList<>();
+        private final List<String> representationForNew = new ArrayList<>();
 
 
         public List<String> getRepresentation() {
@@ -117,7 +117,7 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public List<IRobotTokenType> getTypes() {
-        List<IRobotTokenType> s = new LinkedList<>();
+        List<IRobotTokenType> s = new ArrayList<>();
         s.add(type);
         return s;
     }

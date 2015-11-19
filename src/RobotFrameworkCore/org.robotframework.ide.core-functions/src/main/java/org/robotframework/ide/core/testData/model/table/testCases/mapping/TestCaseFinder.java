@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.testCases.mapping;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -95,7 +95,7 @@ public class TestCaseFinder {
 
     public List<TestCase> filterByTestCasesAfterLastHeader(
             final TestCaseTable testCaseTable) {
-        List<TestCase> testCases = new LinkedList<>();
+        List<TestCase> testCases = new ArrayList<>();
 
         List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
                 .getHeaders();

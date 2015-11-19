@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
 
 public class TestCaseTable extends ARobotSectionTable {
 
-    private final List<TestCase> testCases = new LinkedList<>();
+    private final List<TestCase> testCases = new ArrayList<>();
 
 
     public TestCaseTable(final RobotFile parent) {

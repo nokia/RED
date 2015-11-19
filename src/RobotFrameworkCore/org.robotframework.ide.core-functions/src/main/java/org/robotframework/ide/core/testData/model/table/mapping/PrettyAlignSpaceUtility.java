@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.mapping;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -50,7 +50,7 @@ public class PrettyAlignSpaceUtility {
 
     private void removeTokenWithoutTextFromSimpleTableLine(final RobotLine line) {
         boolean containsAnyValuableToken = false;
-        List<Integer> emptyStrings = new LinkedList<>();
+        List<Integer> emptyStrings = new ArrayList<>();
         List<IRobotLineElement> lineElements = line.getLineElements();
         int length = lineElements.size();
         for (int lineElementIndex = 0; lineElementIndex < length; lineElementIndex++) {
