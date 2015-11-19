@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +22,7 @@ public class SpecialEscapedCharactersExtractor {
 
     @VisibleForTesting
     public List<Special> extract(final StringBuilder text) {
-        List<Special> extracted = new LinkedList<>();
+        List<Special> extracted = new ArrayList<>();
 
         int currentPos = 0;
         Matcher matcher = PATTERN.matcher(text.toString());
@@ -169,7 +169,7 @@ public class SpecialEscapedCharactersExtractor {
 
 
         public static List<NamedSpecial> expected() {
-            List<NamedSpecial> spec = new LinkedList<>();
+            List<NamedSpecial> spec = new ArrayList<>();
             for (NamedSpecial ns : NamedSpecial.values()) {
                 if (ns != NamedSpecial.UNKNOWN_TEXT) {
                     spec.add(ns);

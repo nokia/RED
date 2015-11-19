@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
@@ -19,7 +19,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.testCases.TestD
 
 public class TestCaseRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new LinkedList<>();
+    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
     static {
         recognized.add(new TestCasesTableHeaderRecognizer());
         recognized.add(new TestDocumentationRecognizer());
@@ -32,7 +32,7 @@ public class TestCaseRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        List<ATokenRecognizer> recognizersProvided = new LinkedList<>();
+        List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
             for (ATokenRecognizer rec : recognized) {
                 recognizersProvided.add(rec.newInstance());

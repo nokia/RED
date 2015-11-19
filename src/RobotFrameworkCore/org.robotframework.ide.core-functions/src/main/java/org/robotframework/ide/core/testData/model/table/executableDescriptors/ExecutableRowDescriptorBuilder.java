@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class ExecutableRowDescriptorBuilder {
 
-    private final List<IRowDescriptorBuilder> builders = new LinkedList<>();
+    private final List<IRowDescriptorBuilder> builders = new ArrayList<>();
 
 
     public ExecutableRowDescriptorBuilder() {

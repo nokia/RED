@@ -8,8 +8,8 @@ package org.robotframework.ide.core.testHelpers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.After;
@@ -161,7 +161,7 @@ public class CombinationGeneratorTest {
 
     @Test
     public void test_convertTo_emptyList() {
-        assertThat(combiner.convertTo(new LinkedList<StringBuilder>()))
+        assertThat(combiner.convertTo(new ArrayList<StringBuilder>()))
                 .isEmpty();
     }
 

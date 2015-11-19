@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.IChildElement;
@@ -20,7 +20,7 @@ public class RobotLine implements IChildElement<RobotFile> {
 
     private final RobotFile parent;
     private int lineNumber = -1;
-    private List<IRobotLineElement> lineElements = new LinkedList<>();
+    private List<IRobotLineElement> lineElements = new ArrayList<>();
     private Optional<SeparatorType> separatorForLine = Optional.absent();
 
     private IRobotLineElement eol = EndOfLineBuilder.newInstance()

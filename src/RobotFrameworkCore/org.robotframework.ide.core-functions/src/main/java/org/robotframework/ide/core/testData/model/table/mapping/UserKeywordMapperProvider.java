@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.KeywordArgumentsMapper;
@@ -27,7 +27,7 @@ import org.robotframework.ide.core.testData.model.table.userKeywords.mapping.Use
 
 public class UserKeywordMapperProvider {
 
-    private static final List<IParsingMapper> mappers = new LinkedList<>();
+    private static final List<IParsingMapper> mappers = new ArrayList<>();
 
     static {
         mappers.add(new UserKeywordNameMapper());

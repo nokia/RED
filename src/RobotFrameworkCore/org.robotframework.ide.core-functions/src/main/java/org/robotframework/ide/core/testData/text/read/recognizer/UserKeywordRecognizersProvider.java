@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
@@ -19,7 +19,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.userKeywords.Ke
 
 public class UserKeywordRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new LinkedList<>();
+    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
     static {
         recognized.add(new KeywordsTableHeaderRecognizer());
         recognized.add(new KeywordDocumentationRecognizer());
@@ -32,7 +32,7 @@ public class UserKeywordRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        List<ATokenRecognizer> recognizersProvided = new LinkedList<>();
+        List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
             for (ATokenRecognizer rec : recognized) {
                 recognizersProvided.add(rec.newInstance());

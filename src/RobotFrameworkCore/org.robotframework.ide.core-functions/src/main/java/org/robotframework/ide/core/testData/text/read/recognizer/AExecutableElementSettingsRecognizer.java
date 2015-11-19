@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +27,7 @@ public abstract class AExecutableElementSettingsRecognizer extends
 
     @VisibleForTesting
     protected static List<String> buildVariants(final RobotTokenType type) {
-        List<String> variants = new LinkedList<>();
+        List<String> variants = new ArrayList<>();
 
         List<String> representations = type.getRepresentation();
         for (String r : representations) {

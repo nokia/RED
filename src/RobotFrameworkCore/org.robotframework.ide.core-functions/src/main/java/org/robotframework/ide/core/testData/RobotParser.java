@@ -8,7 +8,8 @@ package org.robotframework.ide.core.testData;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImporter;
@@ -23,7 +24,7 @@ import org.robotframework.ide.core.testData.text.read.TxtRobotFileParser;
 
 public class RobotParser {
 
-    private static final List<IRobotFileParser> availableFormatParsers = new LinkedList<>();
+    private static final List<IRobotFileParser> availableFormatParsers = new ArrayList<>();
     static {
         availableFormatParsers.add(new TxtRobotFileParser());
     }
@@ -102,7 +103,7 @@ public class RobotParser {
 
 
     public List<RobotFileOutput> parse(final File fileOrDir) {
-        final List<RobotFileOutput> output = new LinkedList<>();
+        final List<RobotFileOutput> output = new ArrayList<>();
         parse(fileOrDir, output);
         return output;
     }

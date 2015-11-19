@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -20,8 +20,8 @@ public class Metadata extends AModelElement<SettingTable> {
 
     private final RobotToken declaration;
     private RobotToken key;
-    private final List<RobotToken> values = new LinkedList<>();
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> values = new ArrayList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     public Metadata(final RobotToken declaration) {
@@ -84,7 +84,7 @@ public class Metadata extends AModelElement<SettingTable> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKey() != null) {

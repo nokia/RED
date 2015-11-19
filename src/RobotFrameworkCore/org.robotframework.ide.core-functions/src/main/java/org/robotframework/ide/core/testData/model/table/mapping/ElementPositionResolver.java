@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFile;
@@ -24,7 +24,7 @@ public class ElementPositionResolver {
             final RobotLine currentLine, final RobotToken currentToken) {
         PositionInformation posInfo = new PositionInformation();
 
-        List<IRobotLineElement> lineElements = new LinkedList<>(
+        List<IRobotLineElement> lineElements = new ArrayList<>(
                 currentLine.getLineElements());
         lineElements.add(currentToken);
         int numberOfElements = lineElements.size();
@@ -55,10 +55,10 @@ public class ElementPositionResolver {
     public static class PositionInformation {
 
         private SeparatorType lineSeparator = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
-        private final List<Integer> robotTokensPosIndexes = new LinkedList<>();
-        private final List<Integer> previousLineContinuePosIndexes = new LinkedList<>();
-        private final List<Integer> prettyAlignPosIndexes = new LinkedList<>();
-        private final List<Integer> separatorsPosIndexes = new LinkedList<>();
+        private final List<Integer> robotTokensPosIndexes = new ArrayList<>();
+        private final List<Integer> previousLineContinuePosIndexes = new ArrayList<>();
+        private final List<Integer> prettyAlignPosIndexes = new ArrayList<>();
+        private final List<Integer> separatorsPosIndexes = new ArrayList<>();
         private boolean wasLastSeparator = false;
         private boolean isFirstSeparator = false;
 
@@ -277,7 +277,7 @@ public class ElementPositionResolver {
                     final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
                 boolean isInlined = false;
-                List<IRobotLineElement> elements = new LinkedList<>(
+                List<IRobotLineElement> elements = new ArrayList<>(
                         currentLine.getLineElements());
                 if (currentToken != null) {
                     elements.add(currentToken);

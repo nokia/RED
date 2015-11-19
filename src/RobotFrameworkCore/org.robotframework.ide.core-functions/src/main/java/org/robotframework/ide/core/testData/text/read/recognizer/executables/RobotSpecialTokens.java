@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer.executables;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -17,7 +17,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class RobotSpecialTokens {
 
-    private static final List<ATokenRecognizer> specialRecognizers = new LinkedList<>();
+    private static final List<ATokenRecognizer> specialRecognizers = new ArrayList<>();
     static {
         specialRecognizers.add(new CommentActionLiteral());
         specialRecognizers.add(new ForActionLiteral());
@@ -84,7 +84,7 @@ public class RobotSpecialTokens {
 
 
     public List<RobotToken> recognize(final FilePosition fp, String text) {
-        List<RobotToken> possibleRobotTokens = new LinkedList<>();
+        List<RobotToken> possibleRobotTokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder(text);
         for (ATokenRecognizer rec : specialRecognizers) {
             ATokenRecognizer newInstance = rec.newInstance();

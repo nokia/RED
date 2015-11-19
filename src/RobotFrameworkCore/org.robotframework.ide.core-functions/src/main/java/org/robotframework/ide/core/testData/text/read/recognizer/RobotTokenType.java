@@ -6,12 +6,12 @@
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 
-import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ArrayListMultimap;
 
 
 public enum RobotTokenType implements IRobotTokenType {
@@ -437,9 +437,9 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_CONTINUE_TOKEN(TableType.NOT_STRICTLY_BELONGS, "\\");
 
-    private final List<String> representationForNew = new LinkedList<>();
+    private final List<String> representationForNew = new ArrayList<>();
     private final TableType type;
-    private static final LinkedListMultimap<TableType, RobotTokenType> TYPE_TO_TABLE = LinkedListMultimap
+    private static final ArrayListMultimap<TableType, RobotTokenType> TYPE_TO_TABLE = ArrayListMultimap
             .create();
     static {
         RobotTokenType[] values = RobotTokenType.values();
@@ -490,7 +490,7 @@ public enum RobotTokenType implements IRobotTokenType {
 
 
     private List<RobotTokenType> getTypes(final TableType type) {
-        List<RobotTokenType> p = new LinkedList<>(TYPE_TO_TABLE.get(type));
+        List<RobotTokenType> p = new ArrayList<>(TYPE_TO_TABLE.get(type));
 
         return p;
     }

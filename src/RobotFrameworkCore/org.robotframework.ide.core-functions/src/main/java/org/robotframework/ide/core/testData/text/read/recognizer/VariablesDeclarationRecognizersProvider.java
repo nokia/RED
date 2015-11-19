@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
@@ -16,7 +16,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.variables.Scala
 
 public class VariablesDeclarationRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new LinkedList<>();
+    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
     static {
         recognized.add(new VariablesTableHeaderRecognizer());
         recognized.add(new ScalarVariableDeclarationRecognizer());
@@ -26,7 +26,7 @@ public class VariablesDeclarationRecognizersProvider {
 
 
     public List<ATokenRecognizer> getRecognizers() {
-        List<ATokenRecognizer> recognizersProvided = new LinkedList<>();
+        List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
             for (ATokenRecognizer rec : recognized) {
                 recognizersProvided.add(rec.newInstance());

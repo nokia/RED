@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -15,8 +15,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public abstract class ATags<T> extends AModelElement<T> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> tags = new LinkedList<>();
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> tags = new ArrayList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     protected ATags(final RobotToken declaration) {
@@ -63,7 +63,7 @@ public abstract class ATags<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getTags());

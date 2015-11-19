@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -22,9 +22,9 @@ public class TestTemplate extends AModelElement<SettingTable> implements
 
     private final RobotToken declaration;
     private RobotToken keywordName;
-    private final List<RobotToken> unexpectedTrashArguments = new LinkedList<>();
+    private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
 
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     public TestTemplate(final RobotToken declaration) {
@@ -91,7 +91,7 @@ public class TestTemplate extends AModelElement<SettingTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {

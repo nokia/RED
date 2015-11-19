@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -28,7 +28,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     private TestCaseTable testCaseTable;
     private KeywordTable keywordTable;
 
-    private final List<RobotLine> fileContent = new LinkedList<>();
+    private final List<RobotLine> fileContent = new ArrayList<>();
 
 
     public RobotFile(final RobotFileOutput parentFileOutput) {
