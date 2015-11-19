@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
@@ -60,11 +59,11 @@ public class KeywordDefinitionLocator {
             return;
         }
         final List<IPath> resources = PathsResolver.getAbsoluteResourceFilesPaths(startingFile);
-        shouldContinue = locateInResourceFiles(resources, newHashSet(startingFile.getFile()), detector);
+        shouldContinue = locateInResourceFiles(resources, newHashSet(startingFile.getFile()), startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        locateInLibraries(startingFile.getImportedLibraries(), detector, false);
+        locateInLibraries(startingFile.getImportedLibraries(), detector);
     }
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final KeywordDetector detector) {
@@ -82,7 +81,7 @@ public class KeywordDefinitionLocator {
     }
 
     private ContinueDecision locateInResourceFiles(final List<IPath> resources, final Set<IFile> alreadyVisited,
-            final KeywordDetector detector) {
+            final RobotSuiteFile startingFile, final KeywordDetector detector) {
         for (final IPath path : resources) {
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
             final IResource resourceFile = file.getWorkspace().getRoot().findMember(wsRelative);
@@ -94,11 +93,11 @@ public class KeywordDefinitionLocator {
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
-            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, detector);
+            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
-            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), detector);
+            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), startingFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
@@ -111,27 +110,30 @@ public class KeywordDefinitionLocator {
     }
     
     private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,
-            final KeywordDetector detector) {
-        final Map<LibrarySpecification, String> libSpecsToLocate = newHashMap();
+            final RobotSuiteFile startingFile, final KeywordDetector detector) {
         for (final LibrarySpecification spec : librariesMap.keySet()) {
             if (!spec.isAccessibleWithoutImport()) {
-                libSpecsToLocate.put(spec, librariesMap.get(spec));
+                boolean isFromNestedLibrary = true;
+                if (startingFile.getImportedLibraries().containsKey(spec)) {
+                    isFromNestedLibrary = false;
+                }
+                for (final KeywordSpecification kwSpec : spec.getKeywords()) {
+                    final ContinueDecision shouldContinue = detector.libraryKeywordDetected(spec, kwSpec,
+                            librariesMap.get(spec), isFromNestedLibrary);
+                    if (shouldContinue == ContinueDecision.STOP) {
+                        return ContinueDecision.STOP;
+                    }
+                }
             }
         }
-        locateInLibraries(libSpecsToLocate, detector, true);
         return ContinueDecision.CONTINUE;
     }
 
     private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
             final KeywordDetector detector) {
-        return locateInLibraries(collection, detector, false);
-    }
-
-    private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
-            final KeywordDetector detector, final boolean isFromNestedLibrary) {
         for (final LibrarySpecification libSpec : collection) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", isFromNestedLibrary);
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", false);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -141,11 +143,11 @@ public class KeywordDefinitionLocator {
     }
     
     private ContinueDecision locateInLibraries(final Map<LibrarySpecification, String> librariesMap,
-            final KeywordDetector detector, final boolean isFromNestedLibrary) {
+            final KeywordDetector detector) {
         for (final LibrarySpecification libSpec : librariesMap.keySet()) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
                 final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
-                        librariesMap.get(libSpec), isFromNestedLibrary);
+                        librariesMap.get(libSpec), false);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
