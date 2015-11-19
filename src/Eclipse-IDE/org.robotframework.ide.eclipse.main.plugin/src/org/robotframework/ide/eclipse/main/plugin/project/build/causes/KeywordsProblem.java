@@ -58,7 +58,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' is empty";
+            return "Keyword '%s' contains no keywords to execute";
         }
 
         @Override
