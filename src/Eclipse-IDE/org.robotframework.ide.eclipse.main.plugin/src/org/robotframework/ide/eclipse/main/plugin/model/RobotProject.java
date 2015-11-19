@@ -365,6 +365,7 @@ public class RobotProject extends RobotContainer {
     public String resolve(final String expression) {
         readProjectConfigurationIfNeeded();
         final Map<String, String> knownVariables = newHashMap();
+        knownVariables.put("${/}", File.separator);
         if (configuration != null) {
             for (final VariableMapping mapping : configuration.getVariableMappings()) {
                 knownVariables.put(mapping.getName(), mapping.getValue());
