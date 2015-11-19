@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.impl;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
@@ -22,10 +22,10 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
     private RobotAction action = new RobotAction(new RobotToken(),
-            new ArrayList<IElementDeclaration>());;
+            new ArrayList<IElementDeclaration>());
     private final List<VariableDeclaration> usedVariables = new ArrayList<>();
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
-    private IRowType type = ERowType.UNKONWN;
+    private final IRowType type = ERowType.UNKONWN;
     private final List<BuildMessage> messages = new ArrayList<>();
     private final RobotExecutableRow<T> row;
 
@@ -69,7 +69,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
 
     public void addUsedVariables(final List<VariableDeclaration> usedVars) {
-        for (VariableDeclaration usedVar : usedVars) {
+        for (final VariableDeclaration usedVar : usedVars) {
             addUsedVariable(usedVar);
         }
     }
@@ -87,7 +87,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
 
     public void addTextParameters(final List<IElementDeclaration> texts) {
-        for (IElementDeclaration text : texts) {
+        for (final IElementDeclaration text : texts) {
             addTextParameter(text);
         }
     }
@@ -100,7 +100,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
 
     public void addMessages(final List<BuildMessage> msgs) {
-        for (BuildMessage bm : msgs) {
+        for (final BuildMessage bm : msgs) {
             addMessage(bm);
         }
     }

@@ -8,8 +8,8 @@ package org.robotframework.ide.core.testData.model;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
@@ -23,11 +23,11 @@ public class RobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
     private File processedFile;
-    private RobotFile fileModel;
+    private final RobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
-    private List<ResourceImportReference> resourceReferences = new ArrayList<>();
-    private List<VariablesFileImportReference> variablesReferenced = new ArrayList<>();
-    private List<BuildMessage> buildingMessages = new ArrayList<>();
+    private final List<ResourceImportReference> resourceReferences = new ArrayList<>();
+    private final List<VariablesFileImportReference> variablesReferenced = new ArrayList<>();
+    private final List<BuildMessage> buildingMessages = new ArrayList<>();
     private Status status = Status.FAILED;
 
 
@@ -39,13 +39,13 @@ public class RobotFileOutput {
     public String getFileLineSeparator() {
         String result = "";
 
-        List<RobotLine> fileContent = fileModel.getFileContent();
+        final List<RobotLine> fileContent = fileModel.getFileContent();
         if (!fileContent.isEmpty()) {
-            IRobotLineElement endOfLine = fileContent.get(0).getEndOfLine();
-            List<IRobotTokenType> types = endOfLine.getTypes();
+            final IRobotLineElement endOfLine = fileContent.get(0).getEndOfLine();
+            final List<IRobotTokenType> types = endOfLine.getTypes();
             if (!types.isEmpty()) {
-                IRobotTokenType eolType = types.get(0);
-                List<String> representation = eolType.getRepresentation();
+                final IRobotTokenType eolType = types.get(0);
+                final List<String> representation = eolType.getRepresentation();
                 if (!representation.isEmpty()) {
                     result = representation.get(0);
                 }
@@ -61,7 +61,7 @@ public class RobotFileOutput {
     }
 
 
-    public void setProcessedFile(File processedFile) {
+    public void setProcessedFile(final File processedFile) {
         this.processedFile = processedFile;
         this.lastModificationEpoch = processedFile.lastModified();
     }
@@ -94,14 +94,14 @@ public class RobotFileOutput {
 
     public void addResourceReferences(
             final List<ResourceImportReference> references) {
-        for (ResourceImportReference resourceImportReference : references) {
+        for (final ResourceImportReference resourceImportReference : references) {
             addResourceReference(resourceImportReference);
         }
     }
 
 
     public void addResourceReference(final ResourceImportReference ref) {
-        int positionToSet = findResourceReferencePositionToReplace(ref);
+        final int positionToSet = findResourceReferencePositionToReplace(ref);
 
         if (positionToSet == -1) {
             resourceReferences.add(ref);
@@ -115,17 +115,17 @@ public class RobotFileOutput {
             final ResourceImportReference ref) {
         int positionToSet = -1;
 
-        int numberOfReferences = resourceReferences.size();
+        final int numberOfReferences = resourceReferences.size();
         for (int i = 0; i < numberOfReferences; i++) {
-            ResourceImportReference reference = resourceReferences.get(i);
-            File file = reference.getReference().getProcessedFile();
-            File thisFile = ref.getReference().getProcessedFile();
+            final ResourceImportReference reference = resourceReferences.get(i);
+            final File file = reference.getReference().getProcessedFile();
+            final File thisFile = ref.getReference().getProcessedFile();
             boolean isSameFile = false;
             try {
                 if (Files.isSameFile(file.toPath(), thisFile.toPath())) {
                     isSameFile = true;
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 if (file.toPath().normalize().toAbsolutePath()
                         .equals(thisFile.toPath().normalize().toAbsolutePath())) {
                     isSameFile = true;
@@ -149,7 +149,7 @@ public class RobotFileOutput {
 
     public void addVariablesReferenced(
             final List<VariablesFileImportReference> varsImported) {
-        for (VariablesFileImportReference variablesFileImportReference : varsImported) {
+        for (final VariablesFileImportReference variablesFileImportReference : varsImported) {
             addVariablesReference(variablesFileImportReference);
         }
     }
@@ -177,7 +177,7 @@ public class RobotFileOutput {
                 final String fileName) {
             this.type = level;
             this.message = message;
-            this.fileName = fileName;
+            this.fileName = fileName.intern();
         }
 
 
@@ -204,7 +204,7 @@ public class RobotFileOutput {
         }
 
 
-        public void setFileName(String fileName) {
+        public void setFileName(final String fileName) {
             this.fileName = fileName;
         }
 
@@ -214,7 +214,7 @@ public class RobotFileOutput {
         }
 
 
-        public void setFileRegion(FileRegion fileRegion) {
+        public void setFileRegion(final FileRegion fileRegion) {
             this.fileRegion = fileRegion;
         }
 
@@ -247,7 +247,7 @@ public class RobotFileOutput {
     }
 
 
-    public void setStatus(Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
@@ -260,7 +260,7 @@ public class RobotFileOutput {
         RobotFileType judgedType = RobotFileType.UNKNOWN;
         if (fileModel != null) {
             if (processedFile.isFile()) {
-                String name = processedFile.getName().toLowerCase();
+                final String name = processedFile.getName().toLowerCase();
                 if (name.startsWith("__init__")) {
                     judgedType = RobotFileType.TEST_SUITE_INIT;
                 } else {

@@ -8,6 +8,7 @@ package org.robotframework.ide.core.testData.text.read.recognizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public abstract class ATokenRecognizer {
 
@@ -15,7 +16,8 @@ public abstract class ATokenRecognizer {
     private Matcher m;
     private int lineNumber = -1;
     private final RobotTokenType type;
-    private StringBuilder text;
+
+    private String text;
 
 
     protected ATokenRecognizer(final Pattern p, final RobotTokenType type) {
@@ -27,9 +29,13 @@ public abstract class ATokenRecognizer {
     public abstract ATokenRecognizer newInstance();
 
 
-    public boolean hasNext(StringBuilder newText, int currentLineNumber) {
-        if (m == null || lineNumber != currentLineNumber
-                || !text.toString().equals(newText.toString())) {
+    @VisibleForTesting
+    public boolean hasNext(final StringBuilder newText, final int currentLineNumber) {
+        return hasNext(newText.toString(), currentLineNumber);
+    }
+
+    public boolean hasNext(final String newText, final int currentLineNumber) {
+        if (m == null || lineNumber != currentLineNumber || !text.equals(newText)) {
             m = pattern.matcher(newText);
             this.text = newText;
             this.lineNumber = currentLineNumber;
@@ -40,14 +46,14 @@ public abstract class ATokenRecognizer {
 
 
     public RobotToken next() {
-        RobotToken t = new RobotToken();
+        final RobotToken t = new RobotToken();
         t.setLineNumber(lineNumber);
-        int start = m.start();
+        final int start = m.start();
         t.setStartColumn(start);
-        int end = m.end();
+        final int end = m.end();
 
-        t.setText(new StringBuilder().append(text.substring(start, end)));
-        t.setRaw(new StringBuilder().append(t.getText()));
+        t.setText(text.substring(start, end));
+        t.setRaw(t.getText());
         t.setType(getProducedType());
         return t;
     }
@@ -59,14 +65,14 @@ public abstract class ATokenRecognizer {
 
 
     public static String createUpperLowerCaseWord(final String text) {
-        StringBuilder str = new StringBuilder();
+        final StringBuilder str = new StringBuilder();
         if (text != null && text.length() > 0) {
 
-            char[] ca = text.toCharArray();
-            int size = ca.length;
+            final char[] ca = text.toCharArray();
+            final int size = ca.length;
             for (int i = 0; i < size; i++) {
                 str.append('[');
-                char c = ca[i];
+                final char c = ca[i];
                 if (Character.isLetter(c)) {
                     str.append(Character.toUpperCase(c)).append('|')
                             .append(Character.toLowerCase(c));

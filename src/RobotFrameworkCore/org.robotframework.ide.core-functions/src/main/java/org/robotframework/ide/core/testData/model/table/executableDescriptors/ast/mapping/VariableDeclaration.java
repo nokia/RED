@@ -70,12 +70,12 @@ public class VariableDeclaration extends AContainerOperation {
 
     public VariableType getRobotType() {
         char c = (char) -1;
-        String text = getTypeIdentificator().getText();
+        final String text = getTypeIdentificator().getText();
         if (!text.isEmpty()) {
             c = text.charAt(0);
         }
 
-        VariableType robotType = VariableType.getTypeByChar(c);
+        final VariableType robotType = VariableType.getTypeByChar(c);
 
         return robotType;
     }
@@ -102,7 +102,7 @@ public class VariableDeclaration extends AContainerOperation {
         if (variableIdentificator != null) {
             start = variableIdentificator.getStart();
         }
-        int end = variableEnd.getEnd();
+        final int end = variableEnd.getEnd();
         return new TextPosition(variableStart.getFullText(), start, end);
     }
 
@@ -127,10 +127,10 @@ public class VariableDeclaration extends AContainerOperation {
         TextPosition varName = new TextPosition(variableStart.getFullText(),
                 variableStart.getEnd() + 1, variableEnd.getStart() - 1);
         if (!isDynamic()) {
-            JoinedTextDeclarations nameJoined = new JoinedTextDeclarations();
-            List<IElementDeclaration> elementsDeclarationInside = super
+            final JoinedTextDeclarations nameJoined = new JoinedTextDeclarations();
+            final List<IElementDeclaration> elementsDeclarationInside = super
                     .getElementsDeclarationInside();
-            for (IElementDeclaration elem : elementsDeclarationInside) {
+            for (final IElementDeclaration elem : elementsDeclarationInside) {
                 if (elem.isComplex()) {
                     break;
                 } else {
@@ -138,7 +138,7 @@ public class VariableDeclaration extends AContainerOperation {
                 }
             }
 
-            TextPosition joined = nameJoined.join();
+            final TextPosition joined = nameJoined.join();
             if (joined != null) {
                 varName = nameJoined.join();
             }
@@ -151,9 +151,9 @@ public class VariableDeclaration extends AContainerOperation {
     public TextPosition getObjectName() {
         TextPosition objectName = null;
         if (getVariableType() == GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET) {
-            TextPosition variableName = getVariableName();
-            String variableText = variableName.getText();
-            int dotCharPos = variableText.indexOf('.');
+            final TextPosition variableName = getVariableName();
+            final String variableText = variableName.getText();
+            final int dotCharPos = variableText.indexOf('.');
             if (dotCharPos >= 0) {
                 objectName = new TextPosition(variableName.getFullText(),
                         variableName.getStart(), variableName.getStart()
@@ -165,12 +165,12 @@ public class VariableDeclaration extends AContainerOperation {
 
 
     public RobotToken asToken() {
-        RobotToken token = new RobotToken();
-        String text = getVariableText().getText();
-        token.setRaw(new StringBuilder(text));
-        token.setText(new StringBuilder(text));
+        final RobotToken token = new RobotToken();
+        final String text = getVariableText().getText();
+        token.setRaw(text);
+        token.setText(text);
         token.setType(getRobotType().getType());
-        FilePosition fp = getStartFromFile();
+        final FilePosition fp = getStartFromFile();
         token.setLineNumber(fp.getLine());
         token.setStartColumn(fp.getColumn());
         token.setStartOffset(fp.getOffset());
@@ -186,9 +186,9 @@ public class VariableDeclaration extends AContainerOperation {
      */
     public boolean isDynamic() {
         boolean result = false;
-        List<IElementDeclaration> elementsDeclarationInside = super
+        final List<IElementDeclaration> elementsDeclarationInside = super
                 .getElementsDeclarationInside();
-        for (IElementDeclaration iElementDeclaration : elementsDeclarationInside) {
+        for (final IElementDeclaration iElementDeclaration : elementsDeclarationInside) {
             if (iElementDeclaration instanceof VariableDeclaration) {
                 result = true;
                 break;
@@ -226,6 +226,7 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
 
+    @Override
     public void setLevelUpElement(final IElementDeclaration levelUpElement) {
         this.levelUpElement = levelUpElement;
     }
@@ -248,8 +249,8 @@ public class VariableDeclaration extends AContainerOperation {
         if (isDynamic()) {
             type = GeneralVariableType.DYNAMIC;
         } else {
-            String variableNameText = getVariableName().getText();
-            VariableType varType = getRobotType();
+            final String variableNameText = getVariableName().getText();
+            final VariableType varType = getRobotType();
             if (varType == VariableType.SCALAR
                     || varType == VariableType.SCALAR_AS_LIST) {
                 if (EXPONENT_NUMBER_PATTERN.matcher(variableNameText).find()) {

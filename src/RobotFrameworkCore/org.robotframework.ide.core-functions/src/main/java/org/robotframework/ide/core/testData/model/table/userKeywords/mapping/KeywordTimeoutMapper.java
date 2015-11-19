@@ -27,21 +27,21 @@ public class KeywordTimeoutMapper extends AKeywordSettingDeclarationMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
 
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
+        final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         if (keyword.getTimeouts().isEmpty()) {
-            KeywordTimeout timeout = new KeywordTimeout(rt);
+            final KeywordTimeout timeout = new KeywordTimeout(rt);
             keyword.addTimeout(timeout);
         }
 

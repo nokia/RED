@@ -41,20 +41,20 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        VariableTable variableTable = robotFileOutput.getFileModel()
+        final VariableTable variableTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        List<AVariable> variables = variableTable.getVariables();
+        final List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
-            IVariableHolder var = variables.get(variables.size() - 1);
-            KeyValuePair keyValPair = splitKeyNameFromValue(rt);
+            final IVariableHolder var = variables.get(variables.size() - 1);
+            final KeyValuePair keyValPair = splitKeyNameFromValue(rt);
 
             ((DictionaryVariable) var).put(rt, keyValPair.getKey(),
                     keyValPair.getValue());
@@ -69,26 +69,26 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected KeyValuePair splitKeyNameFromValue(final RobotToken raw) {
-        List<Special> extract = escapedExtractor.extract(raw.getText());
+        final List<Special> extract = escapedExtractor.extract(raw.getText());
 
         boolean isValue = false;
-        StringBuilder keyText = new StringBuilder();
-        StringBuilder keyTextRaw = new StringBuilder();
-        StringBuilder valueText = new StringBuilder();
-        StringBuilder valueTextRaw = new StringBuilder();
+        final StringBuilder keyText = new StringBuilder();
+        final StringBuilder keyTextRaw = new StringBuilder();
+        final StringBuilder valueText = new StringBuilder();
+        final StringBuilder valueTextRaw = new StringBuilder();
 
-        for (Special special : extract) {
-            String specialRawText = special.getText();
+        for (final Special special : extract) {
+            final String specialRawText = special.getText();
             if (special.getType() == NamedSpecial.UNKNOWN_TEXT) {
                 if (isValue) {
                     valueText.append(specialRawText);
                     valueTextRaw.append(specialRawText);
                 } else {
-                    int equalsIndex = specialRawText.indexOf('=');
+                    final int equalsIndex = specialRawText.indexOf('=');
                     if (equalsIndex > -1) {
-                        String keyPart = specialRawText.substring(0,
+                        final String keyPart = specialRawText.substring(0,
                                 equalsIndex);
-                        String valuePart = specialRawText
+                        final String valuePart = specialRawText
                                 .substring(equalsIndex + 1);
                         keyText.append(keyPart);
                         keyTextRaw.append(keyPart);
@@ -112,22 +112,22 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
             }
         }
 
-        RobotToken key = new RobotToken();
+        final RobotToken key = new RobotToken();
         key.setLineNumber(raw.getLineNumber());
         key.setStartColumn(raw.getStartColumn());
-        key.setRaw(keyTextRaw);
-        key.setText(keyText);
+        key.setRaw(keyTextRaw.toString());
+        key.setText(keyText.toString());
         key.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
-        RobotToken value = new RobotToken();
+        final RobotToken value = new RobotToken();
         value.setLineNumber(raw.getLineNumber());
         if (valueText.length() > 0) {
             value.setStartColumn(key.getEndColumn() + 1);
         } else {
             value.setStartColumn(key.getEndColumn());
         }
-        value.setRaw(valueTextRaw);
-        value.setText(valueText);
+        value.setRaw(valueTextRaw.toString());
+        value.setText(valueText.toString());
         value.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
         return new KeyValuePair(key, value);
@@ -157,10 +157,10 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
     }
 }

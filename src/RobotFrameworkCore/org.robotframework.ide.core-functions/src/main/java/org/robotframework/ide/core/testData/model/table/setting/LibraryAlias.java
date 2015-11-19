@@ -30,7 +30,7 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
     }
 
 
-    public void setLibraryAlias(RobotToken libraryAlias) {
+    public void setLibraryAlias(final RobotToken libraryAlias) {
         this.libraryAlias = libraryAlias;
     }
 
@@ -60,7 +60,7 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getLibraryAliasDeclaration());
             if (getLibraryAlias() != null) {

@@ -24,7 +24,7 @@ public class RobotFileDumper {
     public void dump(final File file, final RobotFileOutput output)
             throws Exception {
         IRobotFileDumper dumperToUse = null;
-        for (IRobotFileDumper dumper : availableFormatDumpers) {
+        for (final IRobotFileDumper dumper : availableFormatDumpers) {
             if (dumper.canDumpFile(file)) {
                 dumperToUse = dumper;
                 break;

@@ -91,12 +91,12 @@ public class HashCommentMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         boolean addToStack = false;
-        rt.setRaw(new StringBuilder(text));
+        rt.setRaw(text);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             addToStack = true;
         } else {
@@ -104,9 +104,9 @@ public class HashCommentMapper implements IParsingMapper {
             rt.getTypes().add(0, RobotTokenType.COMMENT_CONTINUE);
         }
 
-        ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
-        RobotFile fileModel = robotFileOutput.getFileModel();
-        IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
+        final ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
+        final RobotFile fileModel = robotFileOutput.getFileModel();
+        final IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
         if (commentHolder != ParsingState.TRASH || commentMapper != null) {
             commentMapper.map(rt, commentHolder, fileModel);
         }
@@ -120,9 +120,9 @@ public class HashCommentMapper implements IParsingMapper {
 
 
     @VisibleForTesting
-    public IHashCommentMapper findApplicableMapper(ParsingState state) {
+    public IHashCommentMapper findApplicableMapper(final ParsingState state) {
         IHashCommentMapper mapperApplicable = null;
-        for (IHashCommentMapper mapper : commentMappers) {
+        for (final IHashCommentMapper mapper : commentMappers) {
             if (mapper.isApplicable(state)) {
                 mapperApplicable = mapper;
                 break;
@@ -134,12 +134,12 @@ public class HashCommentMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        ParsingState nearestState = stateHelper
+        final ParsingState nearestState = stateHelper
                 .getCurrentStatus(processingState);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
@@ -149,7 +149,7 @@ public class HashCommentMapper implements IParsingMapper {
                 result = true;
             }
         } else if (!processingState.isEmpty()) {
-            ParsingState state = processingState.peek();
+            final ParsingState state = processingState.peek();
             result = (state == ParsingState.COMMENT);
         }
 
@@ -173,12 +173,12 @@ public class HashCommentMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected ParsingState findNearestCommentDeclaringModelElement(
-            Stack<ParsingState> processingState) {
+            final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.TRASH;
 
-        int capacity = processingState.size();
+        final int capacity = processingState.size();
         for (int i = capacity - 1; i >= 0; i--) {
-            ParsingState s = processingState.get(i);
+            final ParsingState s = processingState.get(i);
             if (ParsingState.getSettingsStates().contains(s)) {
                 state = s;
                 break;

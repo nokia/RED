@@ -33,13 +33,13 @@ public class LibraryArgumentsMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
-        rt.setText(new StringBuilder(text));
-        AImported imported = utility.getNearestImport(robotFileOutput);
+        rt.setText(text);
+        final AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
         if (imported instanceof LibraryImport) {
             lib = (LibraryImport) imported;
@@ -59,12 +59,12 @@ public class LibraryArgumentsMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = stateHelper
+            final ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || currentState == ParsingState.SETTING_LIBRARY_ARGUMENTS) {

@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public enum ContainerElementType {
 
     private ContainerElementType(final ContainerSettings settings,
             final char... cs) {
-        for (char c : cs) {
+        for (final char c : cs) {
             representation.add(c);
         }
         this.settings = settings;
@@ -63,8 +63,8 @@ public enum ContainerElementType {
             final ContainerElementType containerElementType) {
         synchronized (openTypesToCloseTypes) {
             if (openTypesToCloseTypes.isEmpty()) {
-                for (ContainerElementType cet : values()) {
-                    ContainerElementType openType = cet.getCloseContainer();
+                for (final ContainerElementType cet : values()) {
+                    final ContainerElementType openType = cet.getCloseContainer();
                     if (openType != null) {
                         openTypesToCloseTypes.put(openType, cet);
                     }
@@ -76,7 +76,7 @@ public enum ContainerElementType {
     }
 
 
-    public static ContainerElementType getTypeFor(char c) {
+    public static ContainerElementType getTypeFor(final char c) {
         synchronized (mapping) {
             if (mapping.isEmpty()) {
                 initMappingCharToType();
@@ -93,9 +93,9 @@ public enum ContainerElementType {
 
 
     private static void initMappingCharToType() {
-        for (ContainerElementType cet : values()) {
-            for (char representationChar : cet.getRepresentation()) {
-                ContainerElementType checkType = mapping
+        for (final ContainerElementType cet : values()) {
+            for (final char representationChar : cet.getRepresentation()) {
+                final ContainerElementType checkType = mapping
                         .get(representationChar);
                 if (checkType == null) {
                     mapping.put(representationChar, cet);
@@ -135,7 +135,7 @@ public enum ContainerElementType {
 
 
         public ContainerSettings setNewContainerOpener(
-                boolean isNewContainerOpener) {
+                final boolean isNewContainerOpener) {
             this.isNewContainerOpener = isNewContainerOpener;
 
             return this;
@@ -147,7 +147,7 @@ public enum ContainerElementType {
         }
 
 
-        public ContainerSettings setCanBeMerged(boolean canBeMerged) {
+        public ContainerSettings setCanBeMerged(final boolean canBeMerged) {
             this.canBeMerged = canBeMerged;
 
             return this;
@@ -160,7 +160,7 @@ public enum ContainerElementType {
 
 
         public ContainerSettings setCloseForType(
-                ContainerElementType closeForType) {
+                final ContainerElementType closeForType) {
             this.closeForType = closeForType;
 
             return this;

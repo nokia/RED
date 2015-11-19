@@ -33,21 +33,21 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TAGS);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        TestCaseTable testCaseTable = robotFileOutput.getFileModel()
+        final TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
-        List<TestCase> testCases = testCaseTable.getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseTags> tags = testCase.getTags();
-        TestCaseTags testCaseTags = tags.get(tags.size() - 1);
+        final List<TestCase> testCases = testCaseTable.getTestCases();
+        final TestCase testCase = testCases.get(testCases.size() - 1);
+        final List<TestCaseTags> tags = testCase.getTags();
+        final TestCaseTags testCaseTags = tags.get(tags.size() - 1);
         testCaseTags.addTag(rt);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME);
@@ -57,11 +57,11 @@ public class TestCaseTagsTagNameMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.TEST_CASE_SETTING_TAGS || state == ParsingState.TEST_CASE_SETTING_TAGS_TAG_NAME);
 
         return result;

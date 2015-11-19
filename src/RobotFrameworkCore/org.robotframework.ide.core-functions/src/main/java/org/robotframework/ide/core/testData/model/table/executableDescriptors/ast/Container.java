@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.TextPosition;
@@ -14,8 +14,8 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.Te
 
 public class Container implements IContainerElement {
 
-    private Container parent;
-    private List<IContainerElement> elements = new ArrayList<>();
+    private final Container parent;
+    private final List<IContainerElement> elements = new ArrayList<>();
     private boolean isOpenForModification = true;
 
 
@@ -75,13 +75,13 @@ public class Container implements IContainerElement {
 
 
     @Override
-    public String prettyPrint(int deepLevel) {
-        StringBuilder text = new StringBuilder();
+    public String prettyPrint(final int deepLevel) {
+        final StringBuilder text = new StringBuilder();
         text.append(formatWithSpaces(deepLevel, String.format(
                 "Container [hasParent=%s, isOpenForModification=%s",
                 (parent != null), isOpenForModification)));
-        int childDeepLevel = deepLevel + 1;
-        for (IContainerElement elem : elements) {
+        final int childDeepLevel = deepLevel + 1;
+        for (final IContainerElement elem : elements) {
             text.append("\n");
             text.append(elem.prettyPrint(childDeepLevel));
             text.append(",");
@@ -92,7 +92,7 @@ public class Container implements IContainerElement {
     }
 
 
-    private String formatWithSpaces(int deepLevel, String text) {
+    private String formatWithSpaces(final int deepLevel, final String text) {
         String result;
         if (deepLevel > 0) {
             result = String.format("%" + deepLevel + "s%s", " ", text);
@@ -107,7 +107,7 @@ public class Container implements IContainerElement {
     public ContainerType getContainerType() {
         ContainerType type = ContainerType.MIX;
         if (!getElements().isEmpty()) {
-            IContainerElement element = getElements().get(0);
+            final IContainerElement element = getElements().get(0);
             if (element.getType() == ContainerElementType.CURRLY_BRACKET_OPEN) {
                 type = ContainerType.VARIABLE;
             } else if (element.getType() == ContainerElementType.SQUARE_BRACKET_OPEN) {

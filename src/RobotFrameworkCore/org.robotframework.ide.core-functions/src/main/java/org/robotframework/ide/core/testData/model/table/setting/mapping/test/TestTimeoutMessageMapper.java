@@ -33,17 +33,17 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable settings = robotFileOutput.getFileModel()
+        final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<TestTimeout> timeouts = settings.getTestTimeouts();
+        final List<TestTimeout> timeouts = settings.getTestTimeouts();
         if (!timeouts.isEmpty()) {
             timeouts.get(timeouts.size() - 1).addMessageArgument(rt);
         } else {
@@ -57,18 +57,18 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
+            final ParsingState currentState = utility
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_TEST_TIMEOUT_VALUE
                     || currentState == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
                 result = true;
             } else if (currentState == ParsingState.SETTING_TEST_TIMEOUT) {
-                List<TestTimeout> testTimeouts = robotFileOutput.getFileModel()
+                final List<TestTimeout> testTimeouts = robotFileOutput.getFileModel()
                         .getSettingTable().getTestTimeouts();
                 result = checkIfHasAlreadyValue(testTimeouts);
             } else {
@@ -82,9 +82,9 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
 
 
     @VisibleForTesting
-    protected boolean checkIfHasAlreadyValue(List<TestTimeout> testTimeouts) {
+    protected boolean checkIfHasAlreadyValue(final List<TestTimeout> testTimeouts) {
         boolean result = false;
-        for (TestTimeout setting : testTimeouts) {
+        for (final TestTimeout setting : testTimeouts) {
             result = (setting.getTimeout() != null);
             result = result || !setting.getMessageArguments().isEmpty();
             if (result) {

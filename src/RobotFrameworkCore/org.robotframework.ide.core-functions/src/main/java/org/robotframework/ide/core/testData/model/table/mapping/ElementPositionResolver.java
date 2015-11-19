@@ -22,14 +22,14 @@ public class ElementPositionResolver {
 
     public PositionInformation buildPositionDescription(final RobotFile model,
             final RobotLine currentLine, final RobotToken currentToken) {
-        PositionInformation posInfo = new PositionInformation();
+        final PositionInformation posInfo = new PositionInformation();
 
-        List<IRobotLineElement> lineElements = new ArrayList<>(
+        final List<IRobotLineElement> lineElements = new ArrayList<>(
                 currentLine.getLineElements());
         lineElements.add(currentToken);
-        int numberOfElements = lineElements.size();
+        final int numberOfElements = lineElements.size();
         for (int elemIndex = 0; elemIndex < numberOfElements; elemIndex++) {
-            IRobotLineElement elem = lineElements.get(elemIndex);
+            final IRobotLineElement elem = lineElements.get(elemIndex);
             if (elem instanceof Separator) {
                 if (posInfo.getSeparatorsPosIndexes().isEmpty()) {
                     posInfo.setLineSeparator((SeparatorType) elem.getTypes()
@@ -63,7 +63,7 @@ public class ElementPositionResolver {
         private boolean isFirstSeparator = false;
 
 
-        private void setLineSeparator(SeparatorType lineSeparator) {
+        private void setLineSeparator(final SeparatorType lineSeparator) {
             this.lineSeparator = lineSeparator;
         }
 
@@ -122,9 +122,9 @@ public class ElementPositionResolver {
         public boolean isContinuePreviousLineTheFirstToken() {
             boolean result = false;
             if (!previousLineContinuePosIndexes.isEmpty()) {
-                int theFirstContinue = previousLineContinuePosIndexes.get(0);
+                final int theFirstContinue = previousLineContinuePosIndexes.get(0);
                 if (!robotTokensPosIndexes.isEmpty()) {
-                    int theFirstToken = robotTokensPosIndexes.get(0);
+                    final int theFirstToken = robotTokensPosIndexes.get(0);
                     result = theFirstContinue < theFirstToken;
                 } else {
                     result = true;
@@ -138,7 +138,7 @@ public class ElementPositionResolver {
             int column = 0;
             if (!robotTokensPosIndexes.isEmpty()
                     || !separatorsPosIndexes.isEmpty()) {
-                int numberOfSeparators = separatorsPosIndexes.size();
+                final int numberOfSeparators = separatorsPosIndexes.size();
                 if (getLineSeparator() == SeparatorType.PIPE) {
                     if (wasLastSeparator) {
                         column = numberOfSeparators - 1;
@@ -277,12 +277,12 @@ public class ElementPositionResolver {
                     final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
                 boolean isInlined = false;
-                List<IRobotLineElement> elements = new ArrayList<>(
+                final List<IRobotLineElement> elements = new ArrayList<>(
                         currentLine.getLineElements());
                 if (currentToken != null) {
                     elements.add(currentToken);
                 }
-                ForDescriptorInfo forDescInfo = ForDescriptorInfo
+                final ForDescriptorInfo forDescInfo = ForDescriptorInfo
                         .build(elements);
                 if (forDescInfo.getForStartIndex() > -1) {
                     if (forDescInfo.getForLineContinueInlineIndex() == currentLine
@@ -317,17 +317,17 @@ public class ElementPositionResolver {
             boolean result = false;
             if (posInfo.getPreviousLineContinuePosIndexes().size() == 1
                     && posInfo.getRobotTokensPosIndexes().size() == 1) {
-                int theFirstPreviousContinue = posInfo
+                final int theFirstPreviousContinue = posInfo
                         .getPreviousLineContinuePosIndexes().get(0);
-                int theFirstToken = posInfo.getRobotTokensPosIndexes().get(0);
+                final int theFirstToken = posInfo.getRobotTokensPosIndexes().get(0);
                 if (theFirstToken < theFirstPreviousContinue) {
-                    SeparatorType separatorType = posInfo.getLineSeparator();
-                    List<Integer> separatorsPosIndexes = posInfo
+                    final SeparatorType separatorType = posInfo.getLineSeparator();
+                    final List<Integer> separatorsPosIndexes = posInfo
                             .getSeparatorsPosIndexes();
                     if (separatorType == SeparatorType.PIPE) {
                         if (separatorsPosIndexes.size() >= 2) {
-                            int theFirstSeparator = separatorsPosIndexes.get(0);
-                            int theSecondSeparator = separatorsPosIndexes
+                            final int theFirstSeparator = separatorsPosIndexes.get(0);
+                            final int theSecondSeparator = separatorsPosIndexes
                                     .get(1);
                             result = theFirstSeparator < theFirstToken
                                     && theFirstToken < theSecondSeparator
@@ -335,7 +335,7 @@ public class ElementPositionResolver {
                         }
                     } else {
                         if (separatorsPosIndexes.size() == 1) {
-                            int theFirstSeparator = separatorsPosIndexes.get(0);
+                            final int theFirstSeparator = separatorsPosIndexes.get(0);
                             result = theFirstToken < theFirstSeparator
                                     && theFirstSeparator < theFirstPreviousContinue;
                         }
@@ -350,7 +350,7 @@ public class ElementPositionResolver {
         private static boolean isReallyFirstElement(
                 final PositionInformation posInfo, final RobotToken currentToken) {
             boolean result = false;
-            SeparatorType separator = posInfo.getLineSeparator();
+            final SeparatorType separator = posInfo.getLineSeparator();
             if (separator == SeparatorType.PIPE) {
                 if (posInfo.getSeparatorsPosIndexes().size() == 1
                         && (posInfo.getRobotTokensPosIndexes().size() == 1 || posInfo
@@ -372,7 +372,7 @@ public class ElementPositionResolver {
     public boolean isCorrectPosition(final PositionExpected expected,
             final RobotFile model, final RobotLine currentLine,
             final RobotToken currentToken) {
-        PositionInformation posInfo = buildPositionDescription(model,
+        final PositionInformation posInfo = buildPositionDescription(model,
                 currentLine, currentToken);
         return expected.isExpectedPosition(posInfo, model, currentLine,
                 currentToken);

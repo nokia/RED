@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -20,8 +20,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class TableHeader<T> extends AModelElement<T> {
 
     private final RobotToken tableHeader;
-    private List<RobotToken> columnNames = new ArrayList<>();
-    private List<RobotToken> comment = new ArrayList<>();
+    private final List<RobotToken> columnNames = new ArrayList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     public TableHeader(final RobotToken tableHeader) {
@@ -29,7 +29,7 @@ public class TableHeader<T> extends AModelElement<T> {
     }
 
 
-    public void addColumnName(RobotToken columnName) {
+    public void addColumnName(final RobotToken columnName) {
         columnNames.add(columnName);
     }
 
@@ -49,7 +49,7 @@ public class TableHeader<T> extends AModelElement<T> {
     }
 
 
-    public void addComment(RobotToken commentWord) {
+    public void addComment(final RobotToken commentWord) {
         this.comment.add(commentWord);
     }
 
@@ -64,7 +64,7 @@ public class TableHeader<T> extends AModelElement<T> {
     public ModelType getModelType() {
         ModelType type = ModelType.UNKNOWN;
         if (isPresent()) {
-            IRobotTokenType tokenType = tableHeader.getTypes().get(0);
+            final IRobotTokenType tokenType = tableHeader.getTypes().get(0);
             if (tokenType == RobotTokenType.SETTINGS_TABLE_HEADER) {
                 type = ModelType.SETTINGS_TABLE_HEADER;
             } else if (tokenType == RobotTokenType.VARIABLES_TABLE_HEADER) {
@@ -92,7 +92,7 @@ public class TableHeader<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getTableHeader());
             tokens.addAll(getColumnNames());

@@ -30,10 +30,10 @@ public interface IRobotLineElement {
     FilePosition getFilePosition();
 
 
-    StringBuilder getText();
+    String getText();
 
 
-    StringBuilder getRaw();
+    String getRaw();
 
 
     List<IRobotTokenType> getTypes();

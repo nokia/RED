@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.impl;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
@@ -25,11 +25,11 @@ public class ForLoopContinueRowDescriptor<T> implements
     private RobotAction continueAction = new RobotAction(new RobotToken(),
             new ArrayList<IElementDeclaration>());
     private RobotAction keywordAction = new RobotAction(new RobotToken(),
-            new ArrayList<IElementDeclaration>());;
+ new ArrayList<IElementDeclaration>());
     private final List<VariableDeclaration> usedVariables = new ArrayList<>();
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
     private int forLoopStartRowIndex = -1;
-    private IRowType type = ERowType.FOR_CONTINUE;
+    private final IRowType type = ERowType.FOR_CONTINUE;
     private final List<BuildMessage> messages = new ArrayList<>();
     private final RobotExecutableRow<T> row;
 
@@ -46,7 +46,7 @@ public class ForLoopContinueRowDescriptor<T> implements
 
 
     public void addCreatedVariables(final List<VariableDeclaration> variables) {
-        for (VariableDeclaration var : variables) {
+        for (final VariableDeclaration var : variables) {
             addCreatedVariable(var);
         }
     }
@@ -95,7 +95,7 @@ public class ForLoopContinueRowDescriptor<T> implements
 
 
     public void addUsedVariables(final List<VariableDeclaration> variables) {
-        for (VariableDeclaration var : variables) {
+        for (final VariableDeclaration var : variables) {
             addUsedVariable(var);
         }
     }
@@ -113,7 +113,7 @@ public class ForLoopContinueRowDescriptor<T> implements
 
 
     public void addTextParameters(final List<IElementDeclaration> textParams) {
-        for (IElementDeclaration tP : textParams) {
+        for (final IElementDeclaration tP : textParams) {
             addTextParameter(tP);
         }
     }
@@ -131,7 +131,7 @@ public class ForLoopContinueRowDescriptor<T> implements
 
 
     public void addMessages(final List<BuildMessage> msgs) {
-        for (BuildMessage bm : msgs) {
+        for (final BuildMessage bm : msgs) {
             addMessage(bm);
         }
     }

@@ -30,18 +30,18 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        rt.setText(new StringBuilder(text));
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_UNKNOWN_ARGUMENT);
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        List<UnknownSetting> unknownSettings = robotFileOutput.getFileModel()
+        final List<UnknownSetting> unknownSettings = robotFileOutput.getFileModel()
                 .getSettingTable().getUnknownSettings();
         if (!unknownSettings.isEmpty()) {
-            UnknownSetting unknownSetting = unknownSettings.get(unknownSettings
+            final UnknownSetting unknownSetting = unknownSettings.get(unknownSettings
                     .size() - 1);
             unknownSetting.addTrash(rt);
         } else {
@@ -54,10 +54,10 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
-        ParsingState currentState = utility.getCurrentStatus(processingState);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
+        final ParsingState currentState = utility.getCurrentStatus(processingState);
 
         return (currentState == ParsingState.SETTING_UNKNOWN || currentState == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
     }

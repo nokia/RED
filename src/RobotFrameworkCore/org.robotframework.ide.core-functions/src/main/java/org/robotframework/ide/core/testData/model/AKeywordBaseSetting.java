@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -41,7 +41,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
 
-    public void setKeywordName(RobotToken keywordName) {
+    public void setKeywordName(final RobotToken keywordName) {
         this.keywordName = keywordName;
     }
 
@@ -74,7 +74,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {

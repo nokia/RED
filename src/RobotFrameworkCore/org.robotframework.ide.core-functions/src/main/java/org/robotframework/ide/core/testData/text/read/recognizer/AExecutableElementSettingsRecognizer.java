@@ -20,22 +20,22 @@ public abstract class AExecutableElementSettingsRecognizer extends
             .compile("(?!\\[)([^\\]])+(?!\\\\])");
 
 
-    protected AExecutableElementSettingsRecognizer(RobotTokenType type) {
+    protected AExecutableElementSettingsRecognizer(final RobotTokenType type) {
         super(build(buildVariants(type)), type);
     }
 
 
     @VisibleForTesting
     protected static List<String> buildVariants(final RobotTokenType type) {
-        List<String> variants = new ArrayList<>();
+        final List<String> variants = new ArrayList<>();
 
-        List<String> representations = type.getRepresentation();
-        for (String r : representations) {
-            Matcher matcher = BRACKET_EXTRACTION.matcher(r);
+        final List<String> representations = type.getRepresentation();
+        for (final String r : representations) {
+            final Matcher matcher = BRACKET_EXTRACTION.matcher(r);
             String toAdd = r;
             if (matcher.find()) {
-                int start = matcher.start();
-                int end = matcher.end();
+                final int start = matcher.start();
+                final int end = matcher.end();
 
                 if (start == 1 && end == r.length() - 1) {
                     toAdd = r.substring(start, end);
@@ -51,8 +51,8 @@ public abstract class AExecutableElementSettingsRecognizer extends
 
     @VisibleForTesting
     protected static Pattern build(final List<String> settingNameVariants) {
-        StringBuilder patternText = new StringBuilder();
-        int numOfVariants = settingNameVariants.size();
+        final StringBuilder patternText = new StringBuilder();
+        final int numOfVariants = settingNameVariants.size();
         if (numOfVariants > 0) {
             patternText.append("[ ]?(");
             for (int i = 0; i < numOfVariants; i++) {
