@@ -192,24 +192,25 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> definedVariables = newHashSet(variables);
 
         for (final RobotExecutableRow<?> row : executables) {
+            if (row.isExecutable()) {
+                final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
-            final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
-            
-            for (VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
-                if (!isDefinedVariable(variableDeclaration, definedVariables)) {
-                    final String variableName = variableDeclaration.getVariableName().getText();
-                    final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                            .formatMessageWith(variableName);
-                    final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
-                    final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()
-                            .getLine(), Range.closed(variableOffset, variableOffset
-                            + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
-                    final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
-                            variableName);
-                    reporter.handleProblem(problem, file, position, additionalArguments);
+                for (VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
+                    if (!isDefinedVariable(variableDeclaration, definedVariables)) {
+                        final String variableName = variableDeclaration.getVariableName().getText();
+                        final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                                .formatMessageWith(variableName);
+                        final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
+                        final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()
+                                .getLine(), Range.closed(variableOffset, variableOffset
+                                + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
+                        final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
+                                variableName);
+                        reporter.handleProblem(problem, file, position, additionalArguments);
+                    }
                 }
+                definedVariables.addAll(extractVariableNames(lineDescription.getCreatedVariables()));
             }
-            definedVariables.addAll(extractVariableNames(lineDescription.getCreatedVariables()));
         }
     }
     
