@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,9 +143,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (executableRowDescriptor.getRowType() == ERowType.FOR) {
                 final List<BuildMessage> messages = executableRowDescriptor.getMessages();
                 for (final BuildMessage buildMessage : messages) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
-                            .formatMessageWith(buildMessage.getMessage());
-                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                    reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, buildMessage.getMessage(),
+                            robotSuiteFile.getFile(), keywordName);
                 }
                 continue;
             }
@@ -158,23 +158,34 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 final String name = keywordName.getText().toString();
                 
                 if (!validationContext.isKeywordAccessible(name)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
-                            .formatMessageWith(name);
-                    final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
-                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName, additionalArguments);
+                    reportKeywordProblemWithArguments(reporter, KeywordsProblem.UNKNOWN_KEYWORD, name,
+                            robotSuiteFile.getFile(), keywordName, ImmutableMap.<String, Object> of("name", name));
                 }
                 if (validationContext.isKeywordDeprecated(name)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
-                            .formatMessageWith(name);
-                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                    reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, name,
+                            robotSuiteFile.getFile(), keywordName);
                 }
                 if (validationContext.isKeywordFromNestedLibrary(name)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
-                            .formatMessageWith(name);
-                    reporter.handleProblem(problem, robotSuiteFile.getFile(), keywordName);
+                    reportKeywordProblem(reporter, KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY, name,
+                            robotSuiteFile.getFile(), keywordName);
                 }
+            } else {
+                reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, executable.getAction().getText().toString(), 
+                        robotSuiteFile.getFile(), executable.getAction());
             }
         }
+    }
+    
+    private static void reportKeywordProblem(final ProblemsReportingStrategy reporter, final IProblemCause cause,
+            final String message, final IFile file, final RobotToken token) {
+        reportKeywordProblemWithArguments(reporter, cause, message, file, token, new HashMap<String, Object>());
+    }
+
+    private static void reportKeywordProblemWithArguments(final ProblemsReportingStrategy reporter,
+            final IProblemCause cause, final String message, final IFile file, final RobotToken token,
+            final Map<String, Object> arguments) {
+        final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(message);
+        reporter.handleProblem(problem, file, token, arguments);
     }
 
     private void reportUnknownVariables(final RobotSuiteFile suiteModel,
