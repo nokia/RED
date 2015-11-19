@@ -122,12 +122,11 @@ public class ContainerMappingHelper {
             final IContainerElement startElement) {
 
         return String.format(
-                "Missing closing \'%s\' for type %s in %s.",
+                "Missing closing \'%s\' for type %s.",
                 ""
                         + ContainerElementType.getCloseContainerType(
                                 containerType.getOpenType())
-                                .getRepresentation(), containerType,
-                startElement);
+                                .getRepresentation(), containerType);
     }
 
 
