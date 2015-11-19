@@ -49,13 +49,13 @@ public class RobotProblem {
             final Map<String, Object> additionalAttributes) {
         try {
             final IMarker marker = file.createMarker(TYPE_ID);
-            marker.setAttribute(IMarker.MESSAGE, getMessage());
+            marker.setAttribute(IMarker.MESSAGE, getMessage().intern());
             marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
             if (position.getLine() >= 0) {
-                marker.setAttribute(IMarker.LOCATION, "line " + position.getLine());
+                marker.setAttribute(IMarker.LOCATION, ("line " + position.getLine()).intern());
                 marker.setAttribute(IMarker.LINE_NUMBER, position.getLine());
             } else {
-                marker.setAttribute(IMarker.LOCATION, "unknown line");
+                marker.setAttribute(IMarker.LOCATION, "unknown line".intern());
             }
             if (position.getRange().isPresent() && position.getRange().get().hasLowerBound()
                     && position.getRange().get().hasUpperBound()) {
@@ -63,10 +63,14 @@ public class RobotProblem {
                 marker.setAttribute(IMarker.CHAR_END, position.getRange().get().upperEndpoint());
             }
 
-            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName());
-            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString());
+            marker.setAttribute(CAUSE_ENUM_CLASS, cause.getEnumClassName().intern());
+            marker.setAttribute(CAUSE_ATTRIBUTE, cause.toString().intern());
             for (final Entry<String, Object> entry : additionalAttributes.entrySet()) {
-                marker.setAttribute(entry.getKey(), entry.getValue());
+                Object toPut = entry.getValue();
+                if (entry.getValue() instanceof String) {
+                    toPut = ((String) entry.getValue()).intern();
+                }
+                marker.setAttribute(entry.getKey(), toPut);
             }
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create marker!", e);
