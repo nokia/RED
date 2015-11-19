@@ -39,7 +39,7 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
 	private static final TokenSeparatorBuilder tokenSeparatorBuilder = new TokenSeparatorBuilder();
 	private static final ElementPositionResolver positionResolver = new ElementPositionResolver();
 	private static final Pattern newFullComplex = Pattern
-			.compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "((\\s){2,})?$");
+			.compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)?$");
 
 	public static boolean isSuiteFile(final IFile resource) {
 		return hasContentType(resource, SUITE_FILE_CONTENT_ID);
