@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7MvNcIb_EeWrUbOa1Nzguw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/13/15 10:09 AM
+Save-Time: 11/19/15 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,7 +25,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     type-text "test 1"
     key-type Enter
-    key-type Tab
     type-text "new keyword"
     key-type "M1+s"
 }
@@ -60,11 +59,11 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 6 12
     key-type "NUMPAD_ENTER" "\\u000D"
-    key-type Tab
     type-text "Log  1"
     set-caret-pos 3 16
     key-type Enter
     type-text "keyword with args  ${a}"
+    wait 1000
     key-type "M1+s"
 }
 wait 2000
@@ -93,9 +92,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 5 1
     type-text "test 2"
     key-type Enter
-    key-type Tab
     type-text "another keyword"
     key-type Enter
+    wait 1000
     key-type "M1+s"
 }
 wait 2000
