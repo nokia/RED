@@ -32,7 +32,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Test case '%s' is empty";
+            return "Test case '%s' contains no keywords to execute";
         }
 
         @Override
