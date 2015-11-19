@@ -5,9 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ByY7YPrdEeSnR8gxEs97XQ
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:34 PM
-Tags: Unstable
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/19/15 2:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,82 +15,172 @@ Entry-Name: .content
 
 // open file
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-// click on variable,settings,testcases tab and create sections
-with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Variables | click
-    get-link "Section is not yet defined, do you want to create it?" | click
-    get-tab-folder | get-tab-item Settings | click
-    get-link "Section is not yet defined, do you want to create it?" | click
-//    get-tab-folder | get-tab-item "Test Cases" | click
-//    with [get-link "Section is not yet defined, do you want to create it?"] {
-//        click
-//    }
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
+    key-type "M1+s"
 }
+
+
+
 //check if sections are present in outline
 with [get-view Outline | get-tree] {
-    get-item "TestFile.robot" | get-property childCount | equals 3 | verify-true
-    get-item "TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Variables | verify-true
-    get-item "TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals Settings | verify-true
-    get-item "TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals "Test Cases" | verify-true
+    get-item "TestFile.robot" | get-property childCount | equals 4 | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Keywords | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals "Test Cases"| verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals  Settings | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[3].getText()" | equals  Variables | verify-true
 }
 //check if sections are present in project explorer
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/TestFile.robot" | get-property childCount | equals 3 | verify-true
-    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Settings 
-        | verify-true
-    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals "Test Cases" 
-        | verify-true
-    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals Variables 
-        | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property childCount | equals 4 | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Keywords         | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals Settings         | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals "Test Cases"     | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[3].getText()" | equals Variables        | verify-true
 }
 
-// create variable
-CreateVariablesInTableEditor "TestFile.robot"
-    
-//create one metadata entry
-Create2MetadataInTableEditor "TestFile.robot"
-
-
-// check if variable is present in outline
-with [get-view Outline | get-tree] {
-    get-item "TestFile.robot/Variables" | get-property childCount | equals 2 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    type-text "${testVariable}"
 }
 
-//remove one metadata one variable
-get-editor "TestFile.robot" | get-section Metadata | get-table | select data2 | get-menu "Row/Delete row" | click
-
+//add Keyword Test1
 with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Variables | click
-    with [get-table] {
-        get-cell 1 0 | mouse down Right -count 1
-        get-cell 1 0 | mouse up Right -count 1
-        get-menu "Row/Delete row" | click
-        //get-editor "TestFile.robot" | get-table | select "${}" | get-menu "Row/Delete row" | click
+    with [get-text-viewer] {
+        set-caret-pos 2 17
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text TestKeyword
+        key-type Enter
+        type-text "Log  1"
     }
+   }
+//add sample Test Case
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    type-text TestTestCase
+    key-type Enter
+    type-text TestKeyword
 }
+// added sample Setting - Documentation
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 17
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE" -times 2
+    key-type Down -times 3
+    key-type Enter
+    type-text TestDoc
+    key-type Enter
 
-//check if outline is updated for Variables and Metadata
+}
+get-eclipse-window | key-type "M1+s"
+
+// delay to allow eclipse to build outline tree
+wait 5000
+
+// check outline if contains added items
+// check Keyword
 with [get-view Outline | get-tree] {
-    get-item "TestFile.robot/Variables" | get-property "getItems().length" | equals 1 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
-    get-item "TestFile.robot/Settings/Metadata" | get-property "getItems().length" | equals 1 | verify-true
-    get-item "TestFile.robot/Settings/Metadata" | get-property "getItems().TreeItem[0].getText()" | equals data1 
+    get-item "TestFile.robot/Keywords" | get-property childCount | equals 1 | verify-true
+    get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[0].getText()" | equals TestKeyword 
         | verify-true
 }
-
-//check if FileStructure is updated for Variables and Metadata
-
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Settings"
-
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/TestFile.robot/Settings/Metadata" | get-property "getItems().length" | equals 1 | verify-true
-    get-item "RobotProject/TestFile.robot/Settings/Metadata" | get-property "getItems().TreeItem[0].getText()" 
-        | equals data1 | verify-true
+// check Test Case , Settings , Variables in Outline
+with [get-view Outline | get-tree] {
+    get-item "TestFile.robot/Test Cases" | get-property childCount | equals 1 | verify-true
+    get-item "TestFile.robot/Test Cases" | get-property "getItems().TreeItem[0].getText()" | equals TestTestCase 
+        | verify-true
+    get-item "TestFile.robot/Settings" | get-property childCount | equals 1 | verify-true
+    get-item "TestFile.robot/Settings" | get-property "getItems().TreeItem[0].getText()" | equals Documentation 
+        | verify-true
+    get-item "TestFile.robot/Variables" | get-property childCount | equals 1 | verify-true
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals testVariable | verify-true
 }
+
+
+
+
+// check Project Explorer file content tree 
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().length" | equals 1 | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var 
+	// Keywords
+    get-item "RobotProject/TestFile.robot/Keywords" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/TestFile.robot/Keywords" | get-property "getItems().TreeItem[0].getText()" 
+        | equals TestKeyword | verify-true
+    // Settings
+    get-item "RobotProject/TestFile.robot/Settings" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/TestFile.robot/Settings" | get-property "getItems().TreeItem[0].getText()" 
+        | equals Documentation | verify-true
+    // Test Cases
+    get-item "RobotProject/TestFile.robot/Test Cases" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/TestFile.robot/Test Cases" | get-property "getItems().TreeItem[0].getText()" 
+        | equals TestTestCase | verify-true
+    // Variables
+    get-item "RobotProject/TestFile.robot/Variables" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" 
+        | equals testVariable | verify-true
+}
+
+// remove Settings Documentation entry and variable entry
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 25
+    key-type BackSpace -times 24
+
+    set-caret-pos 11 16
+    key-type BackSpace -times 15
+
+}
+get-eclipse-window | key-type "M1+s"
+// delay to allow eclipse to build outline tree
+wait 2000
+
+// check if Setting Documentation is not present in Outline
+with [get-view Outline | get-tree] {
+    get-item "TestFile.robot/Settings" | get-property childCount | equals 0 | verify-true
+    get-item "TestFile.robot/Variables" | get-property childCount | equals 0 | verify-true
+}
+// check if Setting Documentation is not present in Project Explorer
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/TestFile.robot/Settings" | get-property childCount | equals 0 | verify-true
+    get-item "RobotProject/TestFile.robot/Variables" | get-property childCount | equals 0 | verify-true
+}
+
+// remove Variable group
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 10 18
+    key-type BackSpace -times 17
+
+}
+
+get-eclipse-window | key-type "M1+s"
+// delay to allow eclipse to build outline tree
+wait 2000
+
+// check if Variables group is not present in Outline
+with [get-view Outline | get-tree] {
+    get-item "TestFile.robot" | get-property childCount | equals 3 | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Keywords | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals "Test Cases" | verify-true
+    get-item "TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals Settings | verify-true
+}
+
+// check if Variables group is not present in Project Explorer 
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/TestFile.robot" | get-property childCount | equals 3 | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[0].getText()" | equals Keywords 
+        | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[1].getText()" | equals Settings 
+        | verify-true
+    get-item "RobotProject/TestFile.robot" | get-property "getItems().TreeItem[2].getText()" | equals "Test Cases" 
         | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
