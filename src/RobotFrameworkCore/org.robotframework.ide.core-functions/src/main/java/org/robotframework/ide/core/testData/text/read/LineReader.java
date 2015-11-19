@@ -8,7 +8,7 @@ package org.robotframework.ide.core.testData.text.read;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class LineReader extends Reader {
 
 
     public List<Constant> getLineEnd(int currentOffset) {
-        List<Constant> endOfLine = new LinkedList<>();
+        List<Constant> endOfLine = new ArrayList<>();
         Constant c1 = eOLs.get(currentOffset);
         Constant c2 = eOLs.get(currentOffset + 1);
 

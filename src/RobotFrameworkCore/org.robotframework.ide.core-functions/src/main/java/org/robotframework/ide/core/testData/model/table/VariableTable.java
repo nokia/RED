@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +23,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class VariableTable extends ARobotSectionTable {
 
-    private List<AVariable> variables = new LinkedList<>();
+    private List<AVariable> variables = new ArrayList<>();
 
 
     public VariableTable(final RobotFile parent) {

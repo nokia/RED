@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -21,7 +21,7 @@ public class ParsingStateHelper {
         RobotTokenType robotType = RobotTokenType.UNKNOWN;
         boolean result = false;
 
-        List<RobotTokenType> typesForState = new LinkedList<>();
+        List<RobotTokenType> typesForState = new ArrayList<>();
         if (state == ParsingState.TEST_CASE_TABLE_INSIDE
                 || state == ParsingState.TEST_CASE_DECLARATION) {
             typesForState = robotType.getTypesForTestCasesTable();

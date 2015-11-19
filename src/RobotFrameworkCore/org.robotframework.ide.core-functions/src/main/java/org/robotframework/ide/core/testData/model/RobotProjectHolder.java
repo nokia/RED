@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +27,8 @@ import com.google.common.annotations.VisibleForTesting;
 public class RobotProjectHolder {
 
     private final RobotRuntimeEnvironment robotRuntime;
-    private final List<RobotFileOutput> readableProjectFiles = new LinkedList<>();
-    private final List<ARobotInternalVariable<?>> globalVariables = new LinkedList<>();
+    private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
+    private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
 
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
@@ -66,7 +66,7 @@ public class RobotProjectHolder {
 
     private List<ARobotInternalVariable<?>> map(
             final Map<String, Object> varsRead) {
-        final List<ARobotInternalVariable<?>> variables = new LinkedList<>();
+        final List<ARobotInternalVariable<?>> variables = new ArrayList<>();
         for (final String varName : varsRead.keySet()) {
             final Object varValue = varsRead.get(varName);
 
@@ -78,7 +78,7 @@ public class RobotProjectHolder {
                 variables.add(new DictionaryRobotInternalVariable(varName,
                         value));
             } else if (varValue != null && varValue.getClass().isArray()) {
-                final List<Object> value = new LinkedList<>();
+                final List<Object> value = new ArrayList<>();
                 Object[] array = ((Object[]) varValue);
                 value.addAll(Arrays.asList(array));
                 variables.add(new ListRobotInternalVariable(varName, value));
@@ -147,7 +147,7 @@ public class RobotProjectHolder {
 
     public List<RobotFileOutput> findFilesWithImportedVariableFile(
             final File variableFile) {
-        final List<RobotFileOutput> found = new LinkedList<>();
+        final List<RobotFileOutput> found = new ArrayList<>();
         final List<Integer> foundFiles = findFile(new SearchByVariablesImport(
                 variableFile));
         for (final Integer fileId : foundFiles) {
@@ -215,7 +215,7 @@ public class RobotProjectHolder {
 
 
     protected List<Integer> findFile(final ISearchCriteria criteria) {
-        final List<Integer> foundFiles = new LinkedList<>();
+        final List<Integer> foundFiles = new ArrayList<>();
         final int size = readableProjectFiles.size();
         for (int i = 0; i < size; i++) {
             final RobotFileOutput robotFile = readableProjectFiles.get(i);

@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords.mapping;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -96,7 +96,7 @@ public class KeywordFinder {
 
     public List<UserKeyword> filterByKeywordAfterLastHeader(
             final KeywordTable keywordTable) {
-        List<UserKeyword> keywords = new LinkedList<>();
+        List<UserKeyword> keywords = new ArrayList<>();
 
         List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
                 .getHeaders();

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.robotImported;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
@@ -18,7 +18,7 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
 
     private final String name;
     private final VariableType type;
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
     private final VariableScope scope = VariableScope.GLOBAL;
     private final String robotRepresentation;
     private final T value;

@@ -8,7 +8,7 @@ package org.robotframework.ide.core.testData.importer;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class VariablesImporter {
             final RobotRuntimeEnvironment robotRunEnv,
             final RobotProjectHolder robotProject,
             final RobotFileOutput robotFile) {
-        final List<VariablesFileImportReference> varsImported = new LinkedList<>();
+        final List<VariablesFileImportReference> varsImported = new ArrayList<>();
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {
             final List<AImported> imports = settingTable.getImports();
@@ -166,7 +166,7 @@ public class VariablesImporter {
     @VisibleForTesting
     protected List<String> convertTokensToArguments(
             final VariablesImport varImport) {
-        final List<String> arguments = new LinkedList<>();
+        final List<String> arguments = new ArrayList<>();
         for (final RobotToken rtArgument : varImport.getArguments()) {
             arguments.add(rtArgument.getRaw().toString());
         }

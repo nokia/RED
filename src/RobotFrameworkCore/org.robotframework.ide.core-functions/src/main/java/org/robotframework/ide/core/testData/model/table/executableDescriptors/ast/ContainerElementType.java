@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public enum ContainerElementType {
     private static final Map<Character, ContainerElementType> mapping = new HashMap<>();
     private static final Map<ContainerElementType, ContainerElementType> openTypesToCloseTypes = new HashMap<>();
 
-    private final List<Character> representation = new LinkedList<>();
+    private final List<Character> representation = new ArrayList<>();
     private final ContainerSettings settings;
 
 

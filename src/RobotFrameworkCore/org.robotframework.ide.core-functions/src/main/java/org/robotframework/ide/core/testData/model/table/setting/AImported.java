@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -21,7 +21,7 @@ public abstract class AImported extends AModelElement<SettingTable> {
     private final Type type;
     private final RobotToken declaration;
     private RobotToken pathOrName;
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     protected AImported(final Type type, final RobotToken declaration) {

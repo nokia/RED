@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class LibraryImport extends AImported {
 
-    private final List<RobotToken> arguments = new LinkedList<>();
+    private final List<RobotToken> arguments = new ArrayList<>();
     private LibraryAlias alias = new LibraryAlias(null);
 
 
@@ -52,7 +52,7 @@ public class LibraryImport extends AImported {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             RobotToken pathOrName = getPathOrName();

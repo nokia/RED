@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.setting;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -19,8 +19,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class SuiteDocumentation extends AModelElement<SettingTable> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> text = new LinkedList<>();
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> text = new ArrayList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     public SuiteDocumentation(final RobotToken declaration) {
@@ -73,7 +73,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getDocumentationText());

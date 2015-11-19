@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -23,13 +23,13 @@ public class UserKeyword extends AModelElement<KeywordTable> implements
         IExecutableStepsHolder<UserKeyword> {
 
     private RobotToken keywordName;
-    private final List<KeywordDocumentation> documentation = new LinkedList<>();
-    private final List<KeywordTags> tags = new LinkedList<>();
-    private final List<KeywordArguments> keywordArguments = new LinkedList<>();
-    private final List<KeywordReturn> keywordReturns = new LinkedList<>();
-    private final List<KeywordTeardown> teardowns = new LinkedList<>();
-    private final List<KeywordTimeout> timeouts = new LinkedList<>();
-    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new LinkedList<>();
+    private final List<KeywordDocumentation> documentation = new ArrayList<>();
+    private final List<KeywordTags> tags = new ArrayList<>();
+    private final List<KeywordArguments> keywordArguments = new ArrayList<>();
+    private final List<KeywordReturn> keywordReturns = new ArrayList<>();
+    private final List<KeywordTeardown> teardowns = new ArrayList<>();
+    private final List<KeywordTimeout> timeouts = new ArrayList<>();
+    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
 
     public UserKeyword(final RobotToken keywordName) {
@@ -150,7 +150,7 @@ public class UserKeyword extends AModelElement<KeywordTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             if (getKeywordName() != null) {
                 tokens.add(getKeywordName());

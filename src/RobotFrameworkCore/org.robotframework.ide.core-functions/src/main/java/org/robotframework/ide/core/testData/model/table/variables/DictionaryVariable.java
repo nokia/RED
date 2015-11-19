@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class DictionaryVariable extends AVariable {
 
-    private final List<DictionaryKeyValuePair> items = new LinkedList<>();
+    private final List<DictionaryKeyValuePair> items = new ArrayList<>();
 
 
     public DictionaryVariable(String name, RobotToken declaration,
@@ -88,7 +88,7 @@ public class DictionaryVariable extends AVariable {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             for (DictionaryKeyValuePair p : items) {

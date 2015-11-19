@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.as
 
 public abstract class AContainerOperation implements IElementDeclaration {
 
-    protected final List<IElementDeclaration> elementsDeclaredInside = new LinkedList<>();
+    protected final List<IElementDeclaration> elementsDeclaredInside = new ArrayList<>();
 
 
     @Override
@@ -44,7 +44,7 @@ public abstract class AContainerOperation implements IElementDeclaration {
 
     @Override
     public List<ContainerElementType> getTypes() {
-        List<ContainerElementType> types = new LinkedList<>();
+        List<ContainerElementType> types = new ArrayList<>();
         for (IElementDeclaration dec : elementsDeclaredInside) {
             types.addAll(dec.getTypes());
         }

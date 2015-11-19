@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -15,9 +15,9 @@ import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
 
 public class MappingResult {
 
-    private final List<BuildMessage> messages = new LinkedList<>();
-    private final List<IElementDeclaration> mappedElements = new LinkedList<>();
-    private final List<VariableDeclaration> correctVariables = new LinkedList<>();
+    private final List<BuildMessage> messages = new ArrayList<>();
+    private final List<IElementDeclaration> mappedElements = new ArrayList<>();
+    private final List<VariableDeclaration> correctVariables = new ArrayList<>();
     private final String fileName;
     private FilePosition fp;
 
@@ -62,7 +62,7 @@ public class MappingResult {
 
 
     public List<IElementDeclaration> getTextElements() {
-        List<IElementDeclaration> texts = new LinkedList<>();
+        List<IElementDeclaration> texts = new ArrayList<>();
         for (IElementDeclaration e : mappedElements) {
             if (!e.isComplex()) {
                 texts.add(e);

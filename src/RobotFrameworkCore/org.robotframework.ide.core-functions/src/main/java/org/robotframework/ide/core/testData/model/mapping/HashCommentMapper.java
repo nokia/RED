@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -53,7 +53,7 @@ public class HashCommentMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
 
-    private static final List<IHashCommentMapper> commentMappers = new LinkedList<>();
+    private static final List<IHashCommentMapper> commentMappers = new ArrayList<>();
     static {
         commentMappers.add(new TableHeaderCommentMapper());
         commentMappers.add(new SettingLibraryCommentMapper());

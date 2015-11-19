@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.testCases;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -25,13 +25,13 @@ public class TestCase extends AModelElement<TestCaseTable> implements
         IExecutableStepsHolder<TestCase> {
 
     private RobotToken testName;
-    private final List<TestDocumentation> documentation = new LinkedList<>();
-    private final List<TestCaseTags> tags = new LinkedList<>();
-    private final List<TestCaseSetup> setups = new LinkedList<>();
-    private final List<TestCaseTeardown> teardowns = new LinkedList<>();
-    private final List<TestCaseTemplate> templates = new LinkedList<>();
-    private final List<TestCaseTimeout> timeouts = new LinkedList<>();
-    private final List<RobotExecutableRow<TestCase>> testContext = new LinkedList<>();
+    private final List<TestDocumentation> documentation = new ArrayList<>();
+    private final List<TestCaseTags> tags = new ArrayList<>();
+    private final List<TestCaseSetup> setups = new ArrayList<>();
+    private final List<TestCaseTeardown> teardowns = new ArrayList<>();
+    private final List<TestCaseTemplate> templates = new ArrayList<>();
+    private final List<TestCaseTimeout> timeouts = new ArrayList<>();
+    private final List<RobotExecutableRow<TestCase>> testContext = new ArrayList<>();
 
     private final DataDrivenKeywordName<TestCaseTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
@@ -154,7 +154,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             if (getTestName() != null) {
                 tokens.add(getTestName());

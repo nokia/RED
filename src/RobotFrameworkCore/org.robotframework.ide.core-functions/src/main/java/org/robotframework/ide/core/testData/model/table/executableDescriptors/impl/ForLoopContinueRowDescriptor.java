@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.impl;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput.BuildMessage;
@@ -21,16 +21,16 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class ForLoopContinueRowDescriptor<T> implements
         IExecutableRowDescriptor<T> {
 
-    private final List<VariableDeclaration> createdVariables = new LinkedList<>();
+    private final List<VariableDeclaration> createdVariables = new ArrayList<>();
     private RobotAction continueAction = new RobotAction(new RobotToken(),
-            new LinkedList<IElementDeclaration>());
+            new ArrayList<IElementDeclaration>());
     private RobotAction keywordAction = new RobotAction(new RobotToken(),
-            new LinkedList<IElementDeclaration>());;
-    private final List<VariableDeclaration> usedVariables = new LinkedList<>();
-    private final List<IElementDeclaration> textParameters = new LinkedList<>();
+            new ArrayList<IElementDeclaration>());;
+    private final List<VariableDeclaration> usedVariables = new ArrayList<>();
+    private final List<IElementDeclaration> textParameters = new ArrayList<>();
     private int forLoopStartRowIndex = -1;
     private IRowType type = ERowType.FOR_CONTINUE;
-    private final List<BuildMessage> messages = new LinkedList<>();
+    private final List<BuildMessage> messages = new ArrayList<>();
     private final RobotExecutableRow<T> row;
 
 

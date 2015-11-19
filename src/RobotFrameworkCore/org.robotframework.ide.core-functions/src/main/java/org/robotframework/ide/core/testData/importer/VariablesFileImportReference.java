@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class VariablesFileImportReference {
     private final VariablesImport importDeclaration;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
     private File variablesFile;
-    private List<AVariableImported<?>> variables = new LinkedList<>();
+    private List<AVariableImported<?>> variables = new ArrayList<>();
 
 
     public VariablesFileImportReference(final VariablesImport importDeclaration) {
