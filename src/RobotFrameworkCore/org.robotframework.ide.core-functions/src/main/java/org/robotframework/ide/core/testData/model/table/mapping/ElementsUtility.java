@@ -157,7 +157,21 @@ public class ElementsUtility {
                         }
                     }
                 }
-                correct = exactlyOnPosition;
+                if (exactlyOnPosition.getRaw().toString().equals(text)) {
+                    correct = exactlyOnPosition;
+                } else {
+                    RobotToken newRobotToken = new RobotToken();
+                    newRobotToken.setLineNumber(fp.getLine());
+                    newRobotToken.setStartColumn(fp.getColumn());
+                    newRobotToken.setText(new StringBuilder(text));
+                    newRobotToken.setRaw(new StringBuilder(text));
+                    newRobotToken.setType(RobotTokenType.UNKNOWN);
+                    List<IRobotTokenType> types = newRobotToken.getTypes();
+                    for (RobotToken rt : robotTokens) {
+                        types.addAll(rt.getTypes());
+                    }
+                    correct = newRobotToken;
+                }
             }
         } else {
             RobotToken token = robotTokens.get(0);
