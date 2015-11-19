@@ -5,9 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _dHtZwPlIEeSwj_Vn8GNP0w
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:35 PM
-Tags: Unstable
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/19/15 3:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,38 +15,36 @@ Entry-Name: .content
 
 // Edit file
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 
 
-get-editor "TestFile.robot" | get-link "Section is not yet defined, do you want to create it?" | click
 // Create files
+// add Keywords section and save
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Enter
+}
 
-with [get-editor "TestFile.robot" | get-table] {
-    get-cell 0 0 | double-click
-    get-cell 0 0 | mouse down -count 2
-    double-click
-    select "${var}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 6
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
+// add Variables section and save 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	set-caret-pos 3 1
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
     key-type "M1+s"
 }
 
-
-with [get-editor "TestFile.robot" | get-table] {
-    get-cell 1 0 | double-click
-    get-cell 1 0 | mouse down -count 2
-    double-click
-    select "${var1}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 7
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
+// add settings and save
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 1
+    key-type "M1+SPACE"
+    key-type Down -times 4
+    key-type Enter
     key-type "M1+s"
 }
+
 // Open history
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Team/Show Local History" 
     | click
@@ -60,17 +57,20 @@ get-view History | get-tree | select [get-item ".*" -index 2] | double-click
 get-view History | get-tree | select [get-item ".*" -index 0] | double-click
 
 
+// open each revision file and check file content
 
-get-editor "TestFile.robot" | get-table | get-property itemCount | equals 3 | verify-true
-
+get-editor "TestFile.robot" | get-editbox | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Variables ***\n"
+    + "*** Settings ***" | verify-true
+    
 get-view History | get-tree | select [get-item ".*" -index 1] | double-click
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-tab-folder | get-tab-item Variables | click
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table | get-property itemCount | equals 2 | verify-true
-
-get-view History | get-tree | select [get-item ".*" -index 2] | double-click
-with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1] {
-    get-tab-folder | get-tab-item Variables | click
-}
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-table | get-property itemCount | equals 0 
-    | verify-true
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-text-viewer | get-property text 
+    | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Variables ***" | verify-true
+    
+get-view History | get-tree | select [get-item  ".*" -index 2] | double-click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-text-viewer | get-property text 
+    | equals "*** Test Cases ***" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
