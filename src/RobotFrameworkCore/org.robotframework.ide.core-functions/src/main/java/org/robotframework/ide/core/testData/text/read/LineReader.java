@@ -7,8 +7,8 @@ package org.robotframework.ide.core.testData.text.read;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public class LineReader extends Reader {
 
     private final Reader reader;
     private int positionInFile = 0;
-    private Map<Integer, Constant> eOLs = new LinkedHashMap<>();
+    private final Map<Integer, Constant> eOLs = new LinkedHashMap<>();
 
 
     public LineReader(final Reader reader) {
@@ -25,10 +25,10 @@ public class LineReader extends Reader {
     }
 
 
-    public List<Constant> getLineEnd(int currentOffset) {
-        List<Constant> endOfLine = new ArrayList<>();
-        Constant c1 = eOLs.get(currentOffset);
-        Constant c2 = eOLs.get(currentOffset + 1);
+    public List<Constant> getLineEnd(final int currentOffset) {
+        final List<Constant> endOfLine = new ArrayList<>();
+        final Constant c1 = eOLs.get(currentOffset);
+        final Constant c2 = eOLs.get(currentOffset + 1);
 
         if (c1 != null) {
             endOfLine.add(c1);
@@ -43,10 +43,10 @@ public class LineReader extends Reader {
 
 
     @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
-        int read = reader.read(cbuf, off, len);
+    public int read(final char[] cbuf, final int off, final int len) throws IOException {
+        final int read = reader.read(cbuf, off, len);
         for (int i = 0; i < read; i++) {
-            Constant mapped = Constant.get(cbuf[i]);
+            final Constant mapped = Constant.get(cbuf[i]);
             if (mapped != null) {
                 int index = i;
                 if (positionInFile > 0) {
@@ -80,7 +80,7 @@ public class LineReader extends Reader {
         private final char c;
 
 
-        private Constant(char c) {
+        private Constant(final char c) {
             this.c = c;
         }
 
@@ -90,10 +90,10 @@ public class LineReader extends Reader {
         }
 
 
-        public static Constant get(char c) {
+        public static Constant get(final char c) {
             Constant me = null;
-            Constant[] values = Constant.values();
-            for (Constant constant : values) {
+            final Constant[] values = Constant.values();
+            for (final Constant constant : values) {
                 if (constant.getChar() == c) {
                     me = constant;
                     break;

@@ -34,15 +34,15 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-        rt.setText(new StringBuilder(text));
+        rt.setText(text);
 
-        LibraryImport lib = getNearestLibraryImport(robotFileOutput);
-        LibraryAlias alias = new LibraryAlias(rt);
+        final LibraryImport lib = getNearestLibraryImport(robotFileOutput);
+        final LibraryAlias alias = new LibraryAlias(rt);
         lib.setAlias(alias);
 
         processingState.push(ParsingState.SETTING_LIBRARY_IMPORT_ALIAS);
@@ -54,10 +54,10 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
     protected LibraryImport getNearestLibraryImport(
             final RobotFileOutput robotFileOutput) {
         LibraryImport library = null;
-        List<AImported> imports = robotFileOutput.getFileModel()
+        final List<AImported> imports = robotFileOutput.getFileModel()
                 .getSettingTable().getImports();
         if (!imports.isEmpty()) {
-            AImported aImported = imports.get(imports.size() - 1);
+            final AImported aImported = imports.get(imports.size() - 1);
             if (aImported instanceof LibraryImport) {
                 library = (LibraryImport) aImported;
             } else {
@@ -73,12 +73,12 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
-            ParsingState state = utility.getCurrentStatus(processingState);
+            final ParsingState state = utility.getCurrentStatus(processingState);
             if (state == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
                 result = true;

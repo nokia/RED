@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.userKeywords.mapping;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -26,19 +26,19 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class KeywordFinder {
 
-    public UserKeyword findOrCreateNearestKeyword(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
-        RobotFile fileModel = robotFileOutput.getFileModel();
-        KeywordTable keywordTable = fileModel.getKeywordTable();
+    public UserKeyword findOrCreateNearestKeyword(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp) {
+        final RobotFile fileModel = robotFileOutput.getFileModel();
+        final KeywordTable keywordTable = fileModel.getKeywordTable();
 
         UserKeyword keyword;
-        List<UserKeyword> lastHeaderKeyword = filterByKeywordAfterLastHeader(keywordTable);
+        final List<UserKeyword> lastHeaderKeyword = filterByKeywordAfterLastHeader(keywordTable);
         if (lastHeaderKeyword.isEmpty()) {
             keyword = createArtificialKeyword(robotFileOutput, keywordTable);
             keywordTable.addKeyword(keyword);
 
-            RobotLine lineToModification = findRobotLineInModel(fileModel,
+            final RobotLine lineToModification = findRobotLineInModel(fileModel,
                     keyword, currentLine);
             lineToModification.addLineElementAt(0, keyword.getKeywordName());
         } else {
@@ -49,13 +49,13 @@ public class KeywordFinder {
     }
 
 
-    private RobotLine findRobotLineInModel(RobotFile fileModel,
-            UserKeyword userKeyword, RobotLine currentLine) {
+    private RobotLine findRobotLineInModel(final RobotFile fileModel,
+            final UserKeyword userKeyword, final RobotLine currentLine) {
         RobotLine foundLine = currentLine;
         if (foundLine.getLineNumber() != userKeyword.getBeginPosition()
                 .getLine()) {
-            List<RobotLine> fileContent = fileModel.getFileContent();
-            for (RobotLine line : fileContent) {
+            final List<RobotLine> fileContent = fileModel.getFileContent();
+            for (final RobotLine line : fileContent) {
                 if (userKeyword.getBeginPosition().getLine() == line
                         .getLineNumber()) {
                     foundLine = line;
@@ -69,21 +69,20 @@ public class KeywordFinder {
 
 
     private UserKeyword createArtificialKeyword(
-            RobotFileOutput robotFileOutput, KeywordTable keywordTable) {
+            final RobotFileOutput robotFileOutput, final KeywordTable keywordTable) {
         UserKeyword keyword;
-        List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
+        final List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
                 .getHeaders();
-        @SuppressWarnings("rawtypes")
-        TableHeader tableHeader = headers.get(headers.size() - 1);
-        RobotToken artificialNameToken = new RobotToken();
+        final TableHeader<?> tableHeader = headers.get(headers.size() - 1);
+        final RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
                 .getLineNumber() + 1);
-        artificialNameToken.setRaw(new StringBuilder());
-        artificialNameToken.setText(new StringBuilder());
+        artificialNameToken.setRaw("");
+        artificialNameToken.setText("");
         artificialNameToken.setStartColumn(0);
-        RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
+        final RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
                 .get(tableHeader.getTableHeader().getLineNumber() - 1);
-        IRobotLineElement endOfLine = robotLine.getEndOfLine();
+        final IRobotLineElement endOfLine = robotLine.getEndOfLine();
         artificialNameToken.setStartOffset(endOfLine.getStartOffset()
                 + endOfLine.getRaw().length());
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
@@ -96,19 +95,18 @@ public class KeywordFinder {
 
     public List<UserKeyword> filterByKeywordAfterLastHeader(
             final KeywordTable keywordTable) {
-        List<UserKeyword> keywords = new ArrayList<>();
+        final List<UserKeyword> keywords = new ArrayList<>();
 
-        List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
+        final List<TableHeader<? extends ARobotSectionTable>> headers = keywordTable
                 .getHeaders();
         if (!headers.isEmpty()) {
-            List<UserKeyword> keywordsAvail = keywordTable.getKeywords();
-            @SuppressWarnings("rawtypes")
-            TableHeader tableHeader = headers.get(headers.size() - 1);
-            int tableHeaderLineNumber = tableHeader.getTableHeader()
+            final List<UserKeyword> keywordsAvail = keywordTable.getKeywords();
+            final TableHeader<?> tableHeader = headers.get(headers.size() - 1);
+            final int tableHeaderLineNumber = tableHeader.getTableHeader()
                     .getLineNumber();
-            int numberOfTestCases = keywordsAvail.size();
+            final int numberOfTestCases = keywordsAvail.size();
             for (int i = numberOfTestCases - 1; i >= 0; i--) {
-                UserKeyword keyword = keywordsAvail.get(i);
+                final UserKeyword keyword = keywordsAvail.get(i);
                 if (keyword.getKeywordName().getLineNumber() > tableHeaderLineNumber) {
                     keywords.add(keyword);
                 }

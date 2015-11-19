@@ -33,23 +33,23 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(
                 0,
                 RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
 
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
-        List<TestCase> testCases = robotFileOutput.getFileModel()
+        rt.setText(text);
+        rt.setRaw(text);
+        final List<TestCase> testCases = robotFileOutput.getFileModel()
                 .getTestCaseTable().getTestCases();
-        TestCase testCase = testCases.get(testCases.size() - 1);
-        List<TestCaseTemplate> templates = testCase.getTemplates();
-        TestCaseTemplate template = templates.get(templates.size() - 1);
+        final TestCase testCase = testCases.get(testCases.size() - 1);
+        final List<TestCaseTemplate> templates = testCase.getTemplates();
+        final TestCaseTemplate template = templates.get(templates.size() - 1);
         template.addUnexpectedTrashArgument(rt);
 
         processingState
@@ -60,12 +60,12 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = stateHelper
+            final ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD
                     || currentState == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {

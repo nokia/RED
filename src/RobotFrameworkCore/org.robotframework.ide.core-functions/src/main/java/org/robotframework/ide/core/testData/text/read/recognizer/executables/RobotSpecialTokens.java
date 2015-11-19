@@ -83,13 +83,13 @@ public class RobotSpecialTokens {
     }
 
 
-    public List<RobotToken> recognize(final FilePosition fp, String text) {
-        List<RobotToken> possibleRobotTokens = new ArrayList<>();
-        StringBuilder sb = new StringBuilder(text);
-        for (ATokenRecognizer rec : specialRecognizers) {
-            ATokenRecognizer newInstance = rec.newInstance();
+    public List<RobotToken> recognize(final FilePosition fp, final String text) {
+        final List<RobotToken> possibleRobotTokens = new ArrayList<>();
+        final StringBuilder sb = new StringBuilder(text);
+        for (final ATokenRecognizer rec : specialRecognizers) {
+            final ATokenRecognizer newInstance = rec.newInstance();
             if (newInstance.hasNext(sb, fp.getLine())) {
-                RobotToken t = newInstance.next();
+                final RobotToken t = newInstance.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);
             }

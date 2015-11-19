@@ -36,17 +36,17 @@ public class DictionaryVariableMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        VariableTable varTable = robotFileOutput.getFileModel()
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final VariableTable varTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
 
-        DictionaryVariable var = new DictionaryVariable(
+        final DictionaryVariable var = new DictionaryVariable(
                 varHelper.extractVariableName(text), rt,
                 VariableScope.TEST_SUITE);
         varTable.addVariable(var);
@@ -58,12 +58,12 @@ public class DictionaryVariableMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1
                 && types.get(0) == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) {
             if (positionResolver.isCorrectPosition(

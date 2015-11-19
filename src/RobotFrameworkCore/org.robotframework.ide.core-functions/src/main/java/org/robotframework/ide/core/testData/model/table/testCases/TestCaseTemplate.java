@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.testCases;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -21,8 +21,8 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements
 
     private final RobotToken declaration;
     private RobotToken keywordName;
-    private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
 
+    private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
     private final List<RobotToken> comment = new ArrayList<>();
 
 
@@ -49,7 +49,7 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements
     }
 
 
-    public void setKeywordName(RobotToken keywordName) {
+    public void setKeywordName(final RobotToken keywordName) {
         this.keywordName = keywordName;
     }
 
@@ -90,7 +90,7 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {

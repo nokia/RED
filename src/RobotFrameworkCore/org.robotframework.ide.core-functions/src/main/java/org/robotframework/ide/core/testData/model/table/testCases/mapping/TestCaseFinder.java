@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.testCases.mapping;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -26,19 +26,19 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class TestCaseFinder {
 
-    public TestCase findOrCreateNearestTestCase(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp) {
-        RobotFile fileModel = robotFileOutput.getFileModel();
-        TestCaseTable testCaseTable = fileModel.getTestCaseTable();
+    public TestCase findOrCreateNearestTestCase(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp) {
+        final RobotFile fileModel = robotFileOutput.getFileModel();
+        final TestCaseTable testCaseTable = fileModel.getTestCaseTable();
 
         TestCase testCase;
-        List<TestCase> lastHeaderTestCases = filterByTestCasesAfterLastHeader(testCaseTable);
+        final List<TestCase> lastHeaderTestCases = filterByTestCasesAfterLastHeader(testCaseTable);
         if (lastHeaderTestCases.isEmpty()) {
             testCase = createArtificialTestCase(robotFileOutput, testCaseTable);
             testCaseTable.addTest(testCase);
 
-            RobotLine lineToModify = findRobotLineInModel(fileModel, testCase,
+            final RobotLine lineToModify = findRobotLineInModel(fileModel, testCase,
                     currentLine);
             lineToModify.addLineElementAt(0, testCase.getTestName());
         } else {
@@ -49,13 +49,13 @@ public class TestCaseFinder {
     }
 
 
-    private RobotLine findRobotLineInModel(RobotFile fileModel,
-            TestCase testCase, RobotLine currentLine) {
+    private RobotLine findRobotLineInModel(final RobotFile fileModel,
+            final TestCase testCase, final RobotLine currentLine) {
         RobotLine foundLine = currentLine;
         if (currentLine.getLineNumber() != testCase.getBeginPosition()
                 .getLine()) {
-            List<RobotLine> fileContent = fileModel.getFileContent();
-            for (RobotLine line : fileContent) {
+            final List<RobotLine> fileContent = fileModel.getFileContent();
+            for (final RobotLine line : fileContent) {
                 if (testCase.getBeginPosition().getLine() == line
                         .getLineNumber()) {
                     foundLine = line;
@@ -68,22 +68,21 @@ public class TestCaseFinder {
     }
 
 
-    private TestCase createArtificialTestCase(RobotFileOutput robotFileOutput,
-            TestCaseTable testCaseTable) {
+    private TestCase createArtificialTestCase(final RobotFileOutput robotFileOutput,
+            final TestCaseTable testCaseTable) {
         TestCase testCase;
-        List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
+        final List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
                 .getHeaders();
-        @SuppressWarnings("rawtypes")
-        TableHeader tableHeader = headers.get(headers.size() - 1);
-        RobotToken artificialNameToken = new RobotToken();
+        final TableHeader<?> tableHeader = headers.get(headers.size() - 1);
+        final RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
                 .getLineNumber() + 1);
-        artificialNameToken.setRaw(new StringBuilder());
-        artificialNameToken.setText(new StringBuilder());
+        artificialNameToken.setRaw("");
+        artificialNameToken.setText("");
         artificialNameToken.setStartColumn(0);
-        RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
+        final RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
                 .get(tableHeader.getTableHeader().getLineNumber() - 1);
-        IRobotLineElement endOfLine = robotLine.getEndOfLine();
+        final IRobotLineElement endOfLine = robotLine.getEndOfLine();
         artificialNameToken.setStartOffset(endOfLine.getStartOffset()
                 + endOfLine.getRaw().length());
         artificialNameToken.setType(RobotTokenType.TEST_CASE_NAME);
@@ -95,19 +94,18 @@ public class TestCaseFinder {
 
     public List<TestCase> filterByTestCasesAfterLastHeader(
             final TestCaseTable testCaseTable) {
-        List<TestCase> testCases = new ArrayList<>();
+        final List<TestCase> testCases = new ArrayList<>();
 
-        List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
+        final List<TableHeader<? extends ARobotSectionTable>> headers = testCaseTable
                 .getHeaders();
         if (!headers.isEmpty()) {
-            List<TestCase> testCasesAvail = testCaseTable.getTestCases();
-            @SuppressWarnings("rawtypes")
-            TableHeader tableHeader = headers.get(headers.size() - 1);
-            int tableHeaderLineNumber = tableHeader.getTableHeader()
+            final List<TestCase> testCasesAvail = testCaseTable.getTestCases();
+            final TableHeader<?> tableHeader = headers.get(headers.size() - 1);
+            final int tableHeaderLineNumber = tableHeader.getTableHeader()
                     .getLineNumber();
-            int numberOfTestCases = testCasesAvail.size();
+            final int numberOfTestCases = testCasesAvail.size();
             for (int i = numberOfTestCases - 1; i >= 0; i--) {
-                TestCase test = testCasesAvail.get(i);
+                final TestCase test = testCasesAvail.get(i);
                 if (test.getTestName().getLineNumber() > tableHeaderLineNumber) {
                     testCases.add(test);
                 }

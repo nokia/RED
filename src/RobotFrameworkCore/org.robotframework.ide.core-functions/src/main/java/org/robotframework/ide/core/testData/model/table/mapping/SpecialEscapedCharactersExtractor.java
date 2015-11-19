@@ -21,14 +21,14 @@ public class SpecialEscapedCharactersExtractor {
 
 
     @VisibleForTesting
-    public List<Special> extract(final StringBuilder text) {
-        List<Special> extracted = new ArrayList<>();
+    public List<Special> extract(final String text) {
+        final List<Special> extracted = new ArrayList<>();
 
         int currentPos = 0;
-        Matcher matcher = PATTERN.matcher(text.toString());
+        final Matcher matcher = PATTERN.matcher(text.toString());
         while(matcher.find()) {
-            int start_t = matcher.start();
-            int end_t = matcher.end();
+            final int start_t = matcher.start();
+            final int end_t = matcher.end();
             if (start_t - currentPos > 0) {
                 extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text
                         .substring(currentPos, start_t)));
@@ -39,7 +39,7 @@ public class SpecialEscapedCharactersExtractor {
             currentPos = end_t;
         }
 
-        int length = text.length();
+        final int length = text.length();
         if (currentPos < length) {
             extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text
                     .substring(currentPos, length)));
@@ -73,9 +73,9 @@ public class SpecialEscapedCharactersExtractor {
 
 
     @VisibleForTesting
-    protected static String build(List<NamedSpecial> specials) {
-        StringBuilder pattern = new StringBuilder();
-        int size = specials.size();
+    protected static String build(final List<NamedSpecial> specials) {
+        final StringBuilder pattern = new StringBuilder();
+        final int size = specials.size();
         for (int i = 0; i < size; i++) {
             pattern.append("([\\\\]")
                     .append(specials.get(i).getPatternSuffix()).append(")");
@@ -169,8 +169,8 @@ public class SpecialEscapedCharactersExtractor {
 
 
         public static List<NamedSpecial> expected() {
-            List<NamedSpecial> spec = new ArrayList<>();
-            for (NamedSpecial ns : NamedSpecial.values()) {
+            final List<NamedSpecial> spec = new ArrayList<>();
+            for (final NamedSpecial ns : NamedSpecial.values()) {
                 if (ns != NamedSpecial.UNKNOWN_TEXT) {
                     spec.add(ns);
                 }

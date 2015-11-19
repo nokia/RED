@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.testCases;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -20,7 +20,6 @@ public class TestCaseTimeout extends AModelElement<TestCase> {
     private final RobotToken declaration;
     private RobotToken timeout;
     private final List<RobotToken> message = new ArrayList<>();
-
     private final List<RobotToken> comment = new ArrayList<>();
 
 
@@ -45,7 +44,7 @@ public class TestCaseTimeout extends AModelElement<TestCase> {
     }
 
 
-    public void setTimeout(RobotToken timeout) {
+    public void setTimeout(final RobotToken timeout) {
         this.timeout = timeout;
     }
 
@@ -84,7 +83,7 @@ public class TestCaseTimeout extends AModelElement<TestCase> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getTimeout() != null) {

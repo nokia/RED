@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -49,7 +49,7 @@ public class MappingResult {
 
 
     public void addMappedElements(final List<IElementDeclaration> mapped) {
-        for (IElementDeclaration elemDec : mapped) {
+        for (final IElementDeclaration elemDec : mapped) {
             addMappedElement(elemDec);
         }
     }
@@ -62,8 +62,8 @@ public class MappingResult {
 
 
     public List<IElementDeclaration> getTextElements() {
-        List<IElementDeclaration> texts = new ArrayList<>();
-        for (IElementDeclaration e : mappedElements) {
+        final List<IElementDeclaration> texts = new ArrayList<>();
+        for (final IElementDeclaration e : mappedElements) {
             if (!e.isComplex()) {
                 texts.add(e);
             }
@@ -89,7 +89,7 @@ public class MappingResult {
 
 
     public void addCorrectVariables(final List<VariableDeclaration> variables) {
-        for (VariableDeclaration variable : variables) {
+        for (final VariableDeclaration variable : variables) {
             addCorrectVariable(variable);
         }
     }
@@ -123,7 +123,7 @@ public class MappingResult {
 
     public void removeExactlyTheSameInstance(final IElementDeclaration elem) {
         for (int i = 0; i < mappedElements.size(); i++) {
-            IElementDeclaration d = mappedElements.get(i);
+            final IElementDeclaration d = mappedElements.get(i);
             if (d == elem) {
                 mappedElements.remove(i);
                 i--;

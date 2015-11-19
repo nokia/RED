@@ -20,13 +20,13 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         // nothing to do
-        rt.setText(new StringBuilder(text));
-        List<IRobotTokenType> types = rt.getTypes();
+        rt.setText(text);
+        final List<IRobotTokenType> types = rt.getTypes();
         if (!types.contains(RobotTokenType.START_HASH_COMMENT)
                 && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
             rt.setType(RobotTokenType.UNKNOWN);
@@ -37,14 +37,14 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (processingState.isEmpty()) {
                 result = true;
             } else {
-                ParsingState state = processingState.peek();
+                final ParsingState state = processingState.peek();
                 result = (state == ParsingState.UNKNOWN || state == ParsingState.TRASH);
             }
         }

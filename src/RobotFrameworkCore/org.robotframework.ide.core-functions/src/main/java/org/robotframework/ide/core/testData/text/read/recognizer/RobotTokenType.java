@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.text.read.recognizer;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -442,19 +442,20 @@ public enum RobotTokenType implements IRobotTokenType {
     private static final ArrayListMultimap<TableType, RobotTokenType> TYPE_TO_TABLE = ArrayListMultimap
             .create();
     static {
-        RobotTokenType[] values = RobotTokenType.values();
-        for (RobotTokenType type : values) {
+        final RobotTokenType[] values = RobotTokenType.values();
+        for (final RobotTokenType type : values) {
             TYPE_TO_TABLE.put(type.type, type);
         }
     }
 
 
+    @Override
     public List<String> getRepresentation() {
         return representationForNew;
     }
 
 
-    private RobotTokenType(TableType type, String... representation) {
+    private RobotTokenType(final TableType type, final String... representation) {
         this.type = type;
         representationForNew.addAll(Arrays.asList(representation));
     }
@@ -490,8 +491,6 @@ public enum RobotTokenType implements IRobotTokenType {
 
 
     private List<RobotTokenType> getTypes(final TableType type) {
-        List<RobotTokenType> p = new ArrayList<>(TYPE_TO_TABLE.get(type));
-
-        return p;
+        return new ArrayList<>(TYPE_TO_TABLE.get(type));
     }
 }

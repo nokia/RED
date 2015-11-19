@@ -6,7 +6,6 @@
 package org.robotframework.ide.core.execution.context;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
@@ -24,7 +23,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
 
     private TestCaseExecutionRowCounter testCaseExecutionRowCounter;
 
-    private LinkedList<RobotExecutableRow<?>> forLoopExecutableRows;
+    private final List<RobotExecutableRow<?>> forLoopExecutableRows;
 
     private int forLoopExecutableRowsCounter = 0;
     
@@ -34,11 +33,11 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         this.currentTestCase = currentTestCase;
         this.testCaseExecutionRowCounter = testCaseExecutionRowCounter;
-        forLoopExecutableRows = new LinkedList<>();
+        forLoopExecutableRows = new ArrayList<>();
     }
 
     @Override
-    public RobotExecutableRow<?> findExecutableRow(final LinkedList<KeywordContext> currentKeywords) {
+    public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
 
         if (forLoopExecutableRows.isEmpty()) {
             currentKeywordsSizeAtLoopStart = currentKeywords.size();
@@ -48,7 +47,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
                 parentKeywordContext = currentKeywords.get(forLoopParentKeywordContextPosition);
             }
             final List<RobotExecutableRow<?>> executableRows = extractAllExecutableRows(parentKeywordContext);
-            int forLoopStartPosition = extractForLoopStartPosition(parentKeywordContext);
+            final int forLoopStartPosition = extractForLoopStartPosition(parentKeywordContext);
             forLoopExecutableRows.add(executableRows.get(forLoopStartPosition));
             for (int i = forLoopStartPosition + 1; i < executableRows.size(); i++) {
                 if (executableRows.get(i).isExecutable()) {
@@ -60,7 +59,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
                 }
                 incrementExecutionRowCounterInsideForLoop(parentKeywordContext);
             }
-            return forLoopExecutableRows.getFirst();
+            return forLoopExecutableRows.get(0);
         }
         
         if(currentKeywords.size() > (currentKeywordsSizeAtLoopStart+1)) {
@@ -70,7 +69,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         forLoopExecutableRowsCounter++;
         if (hasReachedNextForLoopIteration()) {
             forLoopExecutableRowsCounter = 0;
-            return forLoopExecutableRows.getFirst();
+            return forLoopExecutableRows.get(0);
         }
 
         return forLoopExecutableRows.get(forLoopExecutableRowsCounter);
@@ -83,18 +82,19 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     }
 
     private void incrementExecutionRowCounterInsideForLoop(final KeywordContext parentKeywordContext) {
-        if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null)
+        if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null) {
             parentKeywordContext.incrementKeywordExecutableRowCounter();
-        else
+        } else {
             testCaseExecutionRowCounter.increment();
+        }
         ;
     }
 
-    private int getForLoopParentKeywordContextPosition(final LinkedList<KeywordContext> currentKeywords) {
+    private int getForLoopParentKeywordContextPosition(final List<KeywordContext> currentKeywords) {
         return currentKeywords.size() - 3;
     }
 
-    private List<RobotExecutableRow<?>> extractAllExecutableRows(KeywordContext parentKeywordContext) {
+    private List<RobotExecutableRow<?>> extractAllExecutableRows(final KeywordContext parentKeywordContext) {
         final List<RobotExecutableRow<?>> executableRows = new ArrayList<>();
         if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null) {
             executableRows.addAll(parentKeywordContext.getUserKeyword().getKeywordExecutionRows());
@@ -104,7 +104,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         return executableRows;
     }
 
-    private int extractForLoopStartPosition(KeywordContext parentKeywordContext) {
+    private int extractForLoopStartPosition(final KeywordContext parentKeywordContext) {
         int counter;
         if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null) {
             counter = parentKeywordContext.getKeywordExecutableRowCounter() - 1;
@@ -114,7 +114,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         return counter;
     }
 
-    private boolean isForLoopItem(RobotExecutableRow<?> executableRow) {
+    private boolean isForLoopItem(final RobotExecutableRow<?> executableRow) {
         return executableRow.getAction().getText().toString().equals("\\");
     }
 
@@ -122,11 +122,11 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         return forLoopExecutableRowsCounter == forLoopExecutableRows.size();
     }
 
-    public void setCurrentTestCase(TestCase currentTestCase) {
+    public void setCurrentTestCase(final TestCase currentTestCase) {
         this.currentTestCase = currentTestCase;
     }
 
-    public void setTestCaseExecutionRowCounter(TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
+    public void setTestCaseExecutionRowCounter(final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         this.testCaseExecutionRowCounter = testCaseExecutionRowCounter;
     }
 

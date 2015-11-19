@@ -32,20 +32,20 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        KeywordTable keywordTable = robotFileOutput.getFileModel()
+        final KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
-        List<UserKeyword> keywords = keywordTable.getKeywords();
-        UserKeyword keyword = keywords.get(keywords.size() - 1);
-        List<KeywordTags> tags = keyword.getTags();
-        KeywordTags keywordTags = tags.get(tags.size() - 1);
+        final List<UserKeyword> keywords = keywordTable.getKeywords();
+        final UserKeyword keyword = keywords.get(keywords.size() - 1);
+        final List<KeywordTags> tags = keyword.getTags();
+        final KeywordTags keywordTags = tags.get(tags.size() - 1);
         keywordTags.addTag(rt);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TAGS_TAG_NAME);
@@ -55,11 +55,11 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentStatus(processingState);
         result = (state == ParsingState.KEYWORD_SETTING_TAGS || state == ParsingState.KEYWORD_SETTING_TAGS_TAG_NAME);
 
         return result;

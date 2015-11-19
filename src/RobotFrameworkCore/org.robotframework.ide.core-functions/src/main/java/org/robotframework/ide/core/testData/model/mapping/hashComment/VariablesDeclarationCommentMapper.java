@@ -26,7 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
     @Override
-    public boolean isApplicable(ParsingState state) {
+    public boolean isApplicable(final ParsingState state) {
         return (state == ParsingState.VARIABLE_UNKNOWN
                 || state == ParsingState.VARIABLE_UNKNOWN_VALUE
                 || state == ParsingState.SCALAR_VARIABLE_DECLARATION
@@ -39,21 +39,21 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
 
     @Override
-    public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
-        VariableTable variableTable = fileModel.getVariableTable();
+    public void map(final RobotToken rt, final ParsingState currentState,
+            final RobotFile fileModel) {
+        final VariableTable variableTable = fileModel.getVariableTable();
         if (variableTable.isEmpty()) {
-            ListVariable var = new ListVariable(null,
+            final ListVariable var = new ListVariable(null,
                     createArtifactalListVariable(rt), VariableScope.TEST_SUITE);
             var.addCommentPart(rt);
             variableTable.addVariable(var);
         } else {
-            List<AVariable> variables = variableTable.getVariables();
-            IVariableHolder var = variables.get(variables.size() - 1);
+            final List<AVariable> variables = variableTable.getVariables();
+            final IVariableHolder var = variables.get(variables.size() - 1);
             if (isInTheSameLine(rt, var)) {
                 var.addCommentPart(rt);
             } else {
-                ListVariable newVar = new ListVariable(null,
+                final ListVariable newVar = new ListVariable(null,
                         createArtifactalListVariable(rt),
                         VariableScope.TEST_SUITE);
                 newVar.addCommentPart(rt);
@@ -69,10 +69,10 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         boolean result = false;
 
         if (var instanceof AVariable) {
-            AVariable aVar = (AVariable) var;
-            List<RobotToken> tokens = aVar.getElementTokens();
+            final AVariable aVar = (AVariable) var;
+            final List<RobotToken> tokens = aVar.getElementTokens();
             Collections.sort(tokens, new RobotTokenPositionComparator());
-            int size = tokens.size();
+            final int size = tokens.size();
             for (int i = size - 1; i >= 0; i--) {
                 if (tokens.get(i).getLineNumber() == rt.getLineNumber()) {
                     result = true;
@@ -87,11 +87,11 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
     @VisibleForTesting
     protected RobotToken createArtifactalListVariable(final RobotToken rt) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         token.setLineNumber(rt.getLineNumber());
         token.setStartColumn(rt.getStartColumn());
-        token.setText(new StringBuilder());
-        token.setRaw(new StringBuilder());
+        token.setText("");
+        token.setRaw("");
         token.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
 
         return token;

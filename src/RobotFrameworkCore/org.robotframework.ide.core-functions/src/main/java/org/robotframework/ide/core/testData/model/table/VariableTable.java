@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +23,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 
 public class VariableTable extends ARobotSectionTable {
 
-    private List<AVariable> variables = new ArrayList<>();
+    private final List<AVariable> variables = new ArrayList<>();
 
 
     public VariableTable(final RobotFile parent) {
@@ -44,11 +44,11 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createScalarVariable(final int index, final String name,
             final List<String> values, final String comment) {
-        ScalarVariable scalar = new ScalarVariable(name, null,
+        final ScalarVariable scalar = new ScalarVariable(name, null,
                 VariableScope.TEST_SUITE);
-        for (String v : values) {
-            RobotToken t = new RobotToken();
-            t.setText(new StringBuilder(v));
+        for (final String v : values) {
+            final RobotToken t = new RobotToken();
+            t.setText(v);
             t.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
             scalar.addValue(t);
         }
@@ -60,11 +60,11 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createListVariable(final int index, final String name,
             final List<String> values, final String comment) {
-        ListVariable list = new ListVariable(name, null,
+        final ListVariable list = new ListVariable(name, null,
                 VariableScope.TEST_SUITE);
-        for (String v : values) {
-            RobotToken t = new RobotToken();
-            t.setText(new StringBuilder(v));
+        for (final String v : values) {
+            final RobotToken t = new RobotToken();
+            t.setText(v);
             t.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
             list.addItem(t);
         }
@@ -76,17 +76,17 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createDictionaryVariable(final int index, final String name,
             final Map<String, String> items, final String comment) {
-        DictionaryVariable dict = new DictionaryVariable(name, null,
+        final DictionaryVariable dict = new DictionaryVariable(name, null,
                 VariableScope.TEST_SUITE);
-        Set<String> keySet = items.keySet();
-        for (String key : keySet) {
-            RobotToken keyT = new RobotToken();
-            keyT.setText(new StringBuilder(key));
+        final Set<String> keySet = items.keySet();
+        for (final String key : keySet) {
+            final RobotToken keyT = new RobotToken();
+            keyT.setText(key);
             keyT.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
-            String value = items.get(key);
-            RobotToken valueT = new RobotToken();
-            valueT.setText(new StringBuilder(value));
+            final String value = items.get(key);
+            final RobotToken valueT = new RobotToken();
+            valueT.setText(value);
             valueT.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
             dict.put(null, keyT, valueT);

@@ -6,10 +6,8 @@
 package org.robotframework.ide.core.execution.context;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.robotframework.ide.core.execution.context.IRobotExecutableRowFinder;
 import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
 import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
@@ -34,7 +32,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     }
 
     @Override
-    public RobotExecutableRow<?> findExecutableRow(final LinkedList<KeywordContext> currentKeywords) {
+    public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
         RobotExecutableRow<UserKeyword> executionRow = null;
         final KeywordContext parentKeywordContext = currentKeywords.get(currentKeywords.size() - 2);
         // search in keywords from Keywords section
@@ -142,7 +140,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         if (references.size() == 1) {
             return references.get(0);
         } else { //resource files with the same name
-            for (ResourceImportReference resourceImportReference : references) {
+            for (final ResourceImportReference resourceImportReference : references) {
                 if (findResourceKeyword(resourceImportReference, new KeywordContext(name, "")) != null) {
                     return resourceImportReference;
                 }
@@ -152,7 +150,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     }
 
     private ResourceImportReference findLastResourceImportReferenceInCurrentKeywords(
-            final LinkedList<KeywordContext> currentKeywords) {
+            final List<KeywordContext> currentKeywords) {
         for (int i = currentKeywords.size() - 1; i >= 0; i--) {
             if (currentKeywords.get(i).getResourceImportReference() != null) {
                 return currentKeywords.get(i).getResourceImportReference();
@@ -186,11 +184,11 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return null;
     }
 
-    public void setUserKeywords(List<UserKeyword> userKeywords) {
+    public void setUserKeywords(final List<UserKeyword> userKeywords) {
         this.userKeywords = userKeywords;
     }
 
-    public void setResourceImportReferences(List<ResourceImportReference> resourceImportReferences) {
+    public void setResourceImportReferences(final List<ResourceImportReference> resourceImportReferences) {
         this.resourceImportReferences = resourceImportReferences;
     }
 

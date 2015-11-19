@@ -31,18 +31,18 @@ public class TestTemplateTrashDataMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
         rt.getTypes().add(0,
                 RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable settings = robotFileOutput.getFileModel()
+        final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
-        List<TestTemplate> templates = settings.getTestTemplates();
+        final List<TestTemplate> templates = settings.getTestTemplates();
         if (!templates.isEmpty()) {
             templates.get(templates.size() - 1).addUnexpectedTrashArgument(rt);
         } else {
@@ -56,21 +56,21 @@ public class TestTemplateTrashDataMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = stateHelper
+            final ParsingState currentState = stateHelper
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
                     || currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
                 result = true;
             } else if (currentState == ParsingState.SETTING_TEST_TEMPLATE) {
-                List<TestTemplate> testTemplates = robotFileOutput
+                final List<TestTemplate> testTemplates = robotFileOutput
                         .getFileModel().getSettingTable().getTestTemplates();
                 if (testTemplates.size() == 1) {
-                    TestTemplate template = testTemplates.get(0);
+                    final TestTemplate template = testTemplates.get(0);
                     result = (template.getKeywordName() != null);
                 } else {
                     result = true;

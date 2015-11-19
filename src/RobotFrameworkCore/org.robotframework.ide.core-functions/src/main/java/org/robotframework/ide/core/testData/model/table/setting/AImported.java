@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -50,7 +50,7 @@ public abstract class AImported extends AModelElement<SettingTable> {
     }
 
 
-    public void setPathOrName(RobotToken pathOrName) {
+    public void setPathOrName(final RobotToken pathOrName) {
         this.pathOrName = pathOrName;
     }
 
@@ -64,6 +64,7 @@ public abstract class AImported extends AModelElement<SettingTable> {
     }
 
 
+    @Override
     public ModelType getModelType() {
         ModelType modelType = ModelType.UNKNOWN;
 

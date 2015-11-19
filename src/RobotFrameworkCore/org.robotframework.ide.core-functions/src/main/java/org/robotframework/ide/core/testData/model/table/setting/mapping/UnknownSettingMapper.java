@@ -36,19 +36,19 @@ public class UnknownSettingMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.SETTING_UNKNOWN);
         rt.setStartColumn(fp.getColumn());
-        rt.setText(new StringBuilder(text));
-        rt.setRaw(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
-        UnknownSetting unknownSetting = new UnknownSetting(rt);
+        final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
+        final UnknownSetting unknownSetting = new UnknownSetting(rt);
         setting.addUnknownSetting(unknownSetting);
 
         processingState.push(ParsingState.SETTING_UNKNOWN);
@@ -58,11 +58,11 @@ public class UnknownSettingMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState currentState = utility.getCurrentStatus(processingState);
+        final ParsingState currentState = utility.getCurrentStatus(processingState);
 
         if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
             if (text != null) {

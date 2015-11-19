@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.variables;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -17,8 +17,8 @@ public class UnknownVariable extends AVariable {
     private final List<RobotToken> items = new ArrayList<>();
 
 
-    public UnknownVariable(String name, RobotToken declaration,
-            VariableScope scope) {
+    public UnknownVariable(final String name, final RobotToken declaration,
+            final VariableScope scope) {
         super(VariableType.INVALID, name, declaration, scope);
     }
 
@@ -41,7 +41,7 @@ public class UnknownVariable extends AVariable {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             if (getDeclaration() != null) {
                 tokens.add(getDeclaration());

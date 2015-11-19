@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
@@ -41,6 +41,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
 
+    @Override
     public RobotFileOutput getParent() {
         return parentFileOutput;
     }
@@ -117,8 +118,8 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
 
 
     private boolean includeTableSection(final RobotTokenType typeOfTable) {
-        boolean wasAdded = false;
-        ARobotSectionTable sectionTable = getSectionTable(typeOfTable);
+        final boolean wasAdded = false;
+        final ARobotSectionTable sectionTable = getSectionTable(typeOfTable);
         if (sectionTable != null) {
             if (!sectionTable.isPresent()) {
                 sectionTable.addHeader(createHeader(typeOfTable));
@@ -131,11 +132,10 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
 
     @SuppressWarnings("rawtypes")
     private TableHeader createHeader(final RobotTokenType type) {
-        RobotToken tableHeaderToken = new RobotToken();
-        tableHeaderToken.setText(new StringBuilder("*** ").append(
-                type.getRepresentation().get(0)).append(" ***"));
+        final RobotToken tableHeaderToken = new RobotToken();
+        tableHeaderToken.setText("*** " + type.getRepresentation().get(0) + " ***");
         tableHeaderToken.setType(type);
-        TableHeader header = new TableHeader(tableHeaderToken);
+        final TableHeader header = new TableHeader(tableHeaderToken);
 
         return header;
     }

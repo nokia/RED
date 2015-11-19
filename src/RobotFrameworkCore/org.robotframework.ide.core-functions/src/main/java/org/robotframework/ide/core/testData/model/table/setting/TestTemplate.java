@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table.setting;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -23,7 +23,6 @@ public class TestTemplate extends AModelElement<SettingTable> implements
     private final RobotToken declaration;
     private RobotToken keywordName;
     private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
-
     private final List<RobotToken> comment = new ArrayList<>();
 
 
@@ -50,7 +49,7 @@ public class TestTemplate extends AModelElement<SettingTable> implements
     }
 
 
-    public void setKeywordName(RobotToken keywordName) {
+    public void setKeywordName(final RobotToken keywordName) {
         this.keywordName = keywordName;
     }
 
@@ -91,7 +90,7 @@ public class TestTemplate extends AModelElement<SettingTable> implements
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {

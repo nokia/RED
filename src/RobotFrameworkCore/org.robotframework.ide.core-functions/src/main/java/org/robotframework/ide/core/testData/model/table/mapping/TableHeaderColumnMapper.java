@@ -36,26 +36,24 @@ public class TableHeaderColumnMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TABLE_HEADER_COLUMN);
-        rt.setText(new StringBuilder(text));
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        rt.setText(text);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state != ParsingState.TABLE_HEADER_COLUMN) {
             processingState.push(ParsingState.TABLE_HEADER_COLUMN);
         }
-        ParsingState tableHeaderState = stateHelper
+        final ParsingState tableHeaderState = stateHelper
                 .getNearestTableHeaderState(processingState);
-        List<TableHeader<? extends ARobotSectionTable>> headersForTable = utility
+        final List<TableHeader<? extends ARobotSectionTable>> headersForTable = utility
                 .getKnownHeadersForTable(robotFileOutput, tableHeaderState);
         if (!headersForTable.isEmpty()) {
-            @SuppressWarnings("rawtypes")
-            TableHeader lastHeader = headersForTable
-                    .get(headersForTable.size() - 1);
+            final TableHeader<?> lastHeader = headersForTable.get(headersForTable.size() - 1);
             lastHeader.addColumnName(rt);
         } else {
             // FIXME: error to log
@@ -66,17 +64,17 @@ public class TableHeaderColumnMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState currentState = stateHelper
+        final ParsingState currentState = stateHelper
                 .getCurrentStatus(processingState);
         if (!processingState.isEmpty()
                 && !stateHelper.isTableInsideStateInHierarchy(currentState)
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 && isNotExistLineContinueAfterHeader(currentLine)) {
-            ParsingState state = processingState.peek();
+            final ParsingState state = processingState.peek();
             result = (stateHelper.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
         }
 
@@ -88,10 +86,10 @@ public class TableHeaderColumnMapper implements IParsingMapper {
     protected boolean isNotExistLineContinueAfterHeader(
             final RobotLine currentLine) {
         boolean result = true;
-        List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         for (int i = 0; i < lineElements.size() || i == 2; i++) {
-            IRobotLineElement element = lineElements.get(i);
-            List<IRobotTokenType> types = element.getTypes();
+            final IRobotLineElement element = lineElements.get(i);
+            final List<IRobotTokenType> types = element.getTypes();
             if (types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
                 result = false;
                 break;

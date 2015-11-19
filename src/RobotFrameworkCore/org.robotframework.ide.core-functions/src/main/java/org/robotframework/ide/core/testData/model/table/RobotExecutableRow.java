@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.core.testData.model.table;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -35,7 +35,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
 
-    public void setAction(RobotToken action) {
+    public void setAction(final RobotToken action) {
         this.action = action;
     }
 
@@ -60,7 +60,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     public ModelType getModelType() {
         ModelType type = ModelType.UNKNOWN;
 
-        List<IRobotTokenType> types = getAction().getTypes();
+        final List<IRobotTokenType> types = getAction().getTypes();
         if (types.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
             type = ModelType.TEST_CASE_EXECUTABLE_ROW;
         } else if (types.contains(RobotTokenType.KEYWORD_ACTION_NAME)) {
@@ -79,7 +79,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new ArrayList<>();
+        final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
         tokens.addAll(getArguments());
 
@@ -88,7 +88,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
 
     public boolean isExecutable() {
-        RobotToken action = getAction();
+        final RobotToken action = getAction();
         return (action != null && !action.getTypes().contains(
                 RobotTokenType.START_HASH_COMMENT))
                 && isNotEmptyForContinoue();

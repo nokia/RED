@@ -35,22 +35,22 @@ public class KeywordTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE);
-        rt.setRaw(new StringBuilder(text));
-        rt.setText(new StringBuilder(text));
+        rt.setText(text);
+        rt.setRaw(text);
 
-        KeywordTable keywordTable = robotFileOutput.getFileModel()
+        final KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
-        List<UserKeyword> keywords = keywordTable.getKeywords();
-        UserKeyword keyword = keywords.get(keywords.size() - 1);
-        List<KeywordTimeout> timeouts = keyword.getTimeouts();
-        KeywordTimeout keywordTimeout = timeouts.get(timeouts.size() - 1);
+        final List<UserKeyword> keywords = keywordTable.getKeywords();
+        final UserKeyword keyword = keywords.get(keywords.size() - 1);
+        final List<KeywordTimeout> timeouts = keyword.getTimeouts();
+        final KeywordTimeout keywordTimeout = timeouts.get(timeouts.size() - 1);
         keywordTimeout.addMessagePart(rt);
 
         processingState
@@ -61,20 +61,20 @@ public class KeywordTimeoutMessageMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            ParsingState currentState = utility
+            final ParsingState currentState = utility
                     .getCurrentStatus(processingState);
             if (currentState == ParsingState.KEYWORD_SETTING_TIMEOUT_VALUE
                     || currentState == ParsingState.KEYWORD_SETTING_TIMEOUT_MESSAGE_ARGUMENTS) {
                 result = true;
             } else if (currentState == ParsingState.KEYWORD_SETTING_TIMEOUT) {
-                List<UserKeyword> keywords = robotFileOutput.getFileModel()
+                final List<UserKeyword> keywords = robotFileOutput.getFileModel()
                         .getKeywordTable().getKeywords();
-                List<KeywordTimeout> keywordTimeouts = keywords.get(
+                final List<KeywordTimeout> keywordTimeouts = keywords.get(
                         keywords.size() - 1).getTimeouts();
                 result = checkIfHasAlreadyValue(keywordTimeouts);
             } else {
@@ -89,9 +89,9 @@ public class KeywordTimeoutMessageMapper implements IParsingMapper {
 
     @VisibleForTesting
     protected boolean checkIfHasAlreadyValue(
-            List<KeywordTimeout> keywordTimeouts) {
+            final List<KeywordTimeout> keywordTimeouts) {
         boolean result = false;
-        for (KeywordTimeout setting : keywordTimeouts) {
+        for (final KeywordTimeout setting : keywordTimeouts) {
             result = (setting.getTimeout() != null);
             result = result || !setting.getMessage().isEmpty();
             if (result) {

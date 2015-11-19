@@ -7,6 +7,7 @@ package org.robotframework.ide.core.testData.text.read.recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
@@ -16,9 +17,9 @@ import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
 public class RobotToken implements IRobotLineElement {
 
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
-    private StringBuilder raw = new StringBuilder();
-    private StringBuilder text = new StringBuilder();
-    private List<IRobotTokenType> types = new ArrayList<>();
+    private String raw = "";
+    private String text = "";
+    private final List<IRobotTokenType> types = new ArrayList<>(0);
     private boolean isDirty = false;
     private boolean wasFirstInit = false;
 
@@ -34,7 +35,7 @@ public class RobotToken implements IRobotLineElement {
     }
 
 
-    public void setLineNumber(int lineNumber) {
+    public void setLineNumber(final int lineNumber) {
         fp = new FilePosition(lineNumber, fp.getColumn(), fp.getOffset());
     }
 
@@ -45,7 +46,7 @@ public class RobotToken implements IRobotLineElement {
     }
 
 
-    public void setStartColumn(int startColumn) {
+    public void setStartColumn(final int startColumn) {
         fp = new FilePosition(fp.getLine(), startColumn, fp.getOffset());
     }
 
@@ -62,7 +63,7 @@ public class RobotToken implements IRobotLineElement {
     }
 
 
-    public void setStartOffset(int startOffset) {
+    public void setStartOffset(final int startOffset) {
         fp = new FilePosition(fp.getLine(), fp.getColumn(), startOffset);
     }
 
@@ -74,31 +75,29 @@ public class RobotToken implements IRobotLineElement {
 
 
     @Override
-    public StringBuilder getText() {
+    public String getText() {
         return text;
     }
 
-
-    public void setText(StringBuilder text) {
-        if ((text != null && !text.toString().equals(this.text.toString()))
-                || (this.text != null && text == null)) {
+    public void setText(final String text) {
+        if (!Objects.equals(this.text, text)) {
             if (wasFirstInit) {
                 isDirty = true;
             }
         }
         wasFirstInit = true;
-        this.text = text;
+        this.text = text.intern();
     }
 
 
     @Override
-    public StringBuilder getRaw() {
+    public String getRaw() {
         return raw;
     }
 
 
-    public void setRaw(StringBuilder raw) {
-        this.raw = raw;
+    public void setRaw(final String raw) {
+        this.raw = raw.intern();
     }
 
 
@@ -136,9 +135,9 @@ public class RobotToken implements IRobotLineElement {
 
     public boolean isVariableDeclaration() {
         boolean result = false;
-        for (IRobotTokenType type : types) {
+        for (final IRobotTokenType type : types) {
             if (type instanceof RobotTokenType) {
-                RobotTokenType robotType = (RobotTokenType) type;
+                final RobotTokenType robotType = (RobotTokenType) type;
                 result = (robotType == RobotTokenType.VARIABLES_SCALAR_DECLARATION)
                         || (robotType == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION)
                         || (robotType == RobotTokenType.VARIABLES_LIST_DECLARATION)

@@ -18,7 +18,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class ParsingStateHelper {
 
     public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
-        RobotTokenType robotType = RobotTokenType.UNKNOWN;
+        final RobotTokenType robotType = RobotTokenType.UNKNOWN;
         boolean result = false;
 
         List<RobotTokenType> typesForState = new ArrayList<>();
@@ -34,8 +34,8 @@ public class ParsingStateHelper {
             typesForState = robotType.getTypesForKeywordsTable();
         }
 
-        List<IRobotTokenType> types = rt.getTypes();
-        for (IRobotTokenType type : types) {
+        final List<IRobotTokenType> types = rt.getTypes();
+        for (final IRobotTokenType type : types) {
             if (typesForState.contains(type)) {
                 result = true;
                 break;
@@ -59,7 +59,7 @@ public class ParsingStateHelper {
     public ParsingState findNearestNotCommentState(
             final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
-        for (ParsingState s : processingState) {
+        for (final ParsingState s : processingState) {
             if (s != ParsingState.COMMENT) {
                 state = s;
             }
@@ -73,7 +73,7 @@ public class ParsingStateHelper {
 
         boolean clean = true;
         while(clean) {
-            ParsingState status = getCurrentStatus(processingState);
+            final ParsingState status = getCurrentStatus(processingState);
             if (isTableHeader(status)) {
                 processingState.pop();
                 if (status == ParsingState.SETTING_TABLE_HEADER) {
@@ -102,12 +102,12 @@ public class ParsingStateHelper {
     }
 
 
-    public boolean isTestCaseExecution(ParsingState status) {
+    public boolean isTestCaseExecution(final ParsingState status) {
         return (status == ParsingState.TEST_CASE_DECLARATION);
     }
 
 
-    public boolean isKeywordExecution(ParsingState status) {
+    public boolean isKeywordExecution(final ParsingState status) {
         return (status == ParsingState.KEYWORD_DECLARATION);
     }
 
@@ -132,7 +132,7 @@ public class ParsingStateHelper {
     }
 
 
-    public boolean isTableState(ParsingState state) {
+    public boolean isTableState(final ParsingState state) {
         return state == ParsingState.TEST_CASE_TABLE_HEADER
                 || state == ParsingState.SETTING_TABLE_HEADER
                 || state == ParsingState.VARIABLE_TABLE_HEADER
@@ -140,7 +140,7 @@ public class ParsingStateHelper {
     }
 
 
-    public boolean isTableInsideState(ParsingState state) {
+    public boolean isTableInsideState(final ParsingState state) {
         return state == ParsingState.SETTING_TABLE_INSIDE
                 || state == ParsingState.TEST_CASE_TABLE_INSIDE
                 || state == ParsingState.KEYWORD_TABLE_INSIDE
@@ -148,7 +148,7 @@ public class ParsingStateHelper {
     }
 
 
-    public boolean isTableHeader(ParsingState state) {
+    public boolean isTableHeader(final ParsingState state) {
         boolean result = false;
         if (state == ParsingState.SETTING_TABLE_HEADER
                 || state == ParsingState.VARIABLE_TABLE_HEADER
@@ -161,7 +161,7 @@ public class ParsingStateHelper {
     }
 
 
-    public ParsingState getCurrentStatus(Stack<ParsingState> processingState) {
+    public ParsingState getCurrentStatus(final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
 
         if (!processingState.isEmpty()) {
@@ -172,9 +172,9 @@ public class ParsingStateHelper {
     }
 
 
-    public ParsingState getStatus(RobotToken t) {
+    public ParsingState getStatus(final RobotToken t) {
         ParsingState status = ParsingState.UNKNOWN;
-        List<IRobotTokenType> types = t.getTypes();
+        final List<IRobotTokenType> types = t.getTypes();
         if (types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
             status = ParsingState.SETTING_TABLE_HEADER;
         } else if (types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
@@ -190,9 +190,9 @@ public class ParsingStateHelper {
 
 
     public ParsingState getNearestTableHeaderState(
-            Stack<ParsingState> processingState) {
+            final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
-        for (ParsingState s : processingState) {
+        for (final ParsingState s : processingState) {
             if (isTableState(s)) {
                 state = s;
                 break;
