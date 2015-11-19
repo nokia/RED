@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -66,9 +66,9 @@ import com.google.common.annotations.VisibleForTesting;
 public class TxtRobotFileParser implements IRobotFileParser {
 
     private final TokenSeparatorBuilder tokenSeparatorBuilder;
-    private final List<ATokenRecognizer> recognized = new LinkedList<>();
-    private final List<IParsingMapper> mappers = new LinkedList<>();
-    private final List<IParsingMapper> unknownTableElementsMapper = new LinkedList<>();
+    private final List<ATokenRecognizer> recognized = new ArrayList<>();
+    private final List<IParsingMapper> mappers = new ArrayList<>();
+    private final List<IParsingMapper> unknownTableElementsMapper = new ArrayList<>();
     private final ElementsUtility utility;
     private final PrettyAlignSpaceUtility alignUtility;
     private final ParsingStateHelper parsingStateHelper;
@@ -493,7 +493,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
             RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
             String text, String fileName, RobotToken robotToken) {
-        List<IParsingMapper> matchedMappers = new LinkedList<>();
+        List<IParsingMapper> matchedMappers = new ArrayList<>();
         for (IParsingMapper mapper : mappers) {
             if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine,
                     robotToken, text, processingState)) {
@@ -527,7 +527,7 @@ public class TxtRobotFileParser implements IRobotFileParser {
 
     @VisibleForTesting
     protected List<RobotToken> recognize(final FilePosition fp, String text) {
-        List<RobotToken> possibleRobotTokens = new LinkedList<>();
+        List<RobotToken> possibleRobotTokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder(text);
         for (ATokenRecognizer rec : recognized) {
             if (rec.hasNext(sb, fp.getLine())) {

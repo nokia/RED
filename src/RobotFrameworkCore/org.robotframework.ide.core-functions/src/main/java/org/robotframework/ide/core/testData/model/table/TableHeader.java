@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -20,8 +20,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class TableHeader<T> extends AModelElement<T> {
 
     private final RobotToken tableHeader;
-    private List<RobotToken> columnNames = new LinkedList<>();
-    private List<RobotToken> comment = new LinkedList<>();
+    private List<RobotToken> columnNames = new ArrayList<>();
+    private List<RobotToken> comment = new ArrayList<>();
 
 
     public TableHeader(final RobotToken tableHeader) {
@@ -92,7 +92,7 @@ public class TableHeader<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getTableHeader());
             tokens.addAll(getColumnNames());

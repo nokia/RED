@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.IChildElement;
@@ -18,7 +18,7 @@ public abstract class ARobotSectionTable implements IOptional,
         IChildElement<RobotFile> {
 
     private RobotFile parent;
-    private List<TableHeader<? extends ARobotSectionTable>> headers = new LinkedList<>();
+    private List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>();
 
 
     public ARobotSectionTable(final RobotFile parent) {

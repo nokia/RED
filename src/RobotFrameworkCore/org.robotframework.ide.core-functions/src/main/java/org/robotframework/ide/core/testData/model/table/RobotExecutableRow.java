@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -22,7 +22,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotTokenType;
 public class RobotExecutableRow<T> extends AModelElement<T> {
 
     private RobotToken action;
-    private final List<RobotToken> arguments = new LinkedList<>();
+    private final List<RobotToken> arguments = new ArrayList<>();
 
 
     public RobotExecutableRow() {
@@ -79,7 +79,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
         tokens.addAll(getArguments());
 

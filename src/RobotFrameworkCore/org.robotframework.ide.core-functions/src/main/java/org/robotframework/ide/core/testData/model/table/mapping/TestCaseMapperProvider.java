@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.model.table.mapping;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestCaseNameMapper;
@@ -29,7 +29,7 @@ import org.robotframework.ide.core.testData.model.table.testCases.mapping.TestDo
 
 public class TestCaseMapperProvider {
 
-    private static final List<IParsingMapper> mappers = new LinkedList<>();
+    private static final List<IParsingMapper> mappers = new ArrayList<>();
     static {
         mappers.add(new TestCaseNameMapper());
         mappers.add(new TestCaseSetupMapper());

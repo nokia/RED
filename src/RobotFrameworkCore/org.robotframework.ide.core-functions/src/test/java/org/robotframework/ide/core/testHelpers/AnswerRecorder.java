@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testHelpers;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.invocation.InvocationOnMock;
@@ -25,7 +25,7 @@ import org.mockito.stubbing.Answer;
  */
 public class AnswerRecorder<T> implements Answer<T> {
 
-    private List<InvocationOnMock> invocations = new LinkedList<>();
+    private List<InvocationOnMock> invocations = new ArrayList<>();
     private final Answer<T> otherAnswer;
 
 

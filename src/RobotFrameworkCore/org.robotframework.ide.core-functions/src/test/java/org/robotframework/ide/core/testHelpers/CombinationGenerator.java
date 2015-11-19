@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testHelpers;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,10 +28,10 @@ public class CombinationGenerator {
      *         as upper, lower case format
      */
     public List<String> combinations(String text) {
-        List<String> possibilities = new LinkedList<>();
+        List<String> possibilities = new ArrayList<>();
 
         if (text != null && !text.isEmpty()) {
-            List<StringBuilder> temp = new LinkedList<>();
+            List<StringBuilder> temp = new ArrayList<>();
             char[] chars = text.toCharArray();
             List<char[]> lowerUpperCaseArray = buildUpperLowerCaseTemplateList(chars);
             // initialization of temp list with possible elements
@@ -89,7 +89,7 @@ public class CombinationGenerator {
 
 
     private List<char[]> buildUpperLowerCaseTemplateList(char[] chars) {
-        List<char[]> lowerUpperCaseArray = new LinkedList<>();
+        List<char[]> lowerUpperCaseArray = new ArrayList<>();
         for (char c : chars) {
             if (Character.isLetter(c)) {
                 lowerUpperCaseArray.add(new char[] { Character.toLowerCase(c),
@@ -106,7 +106,7 @@ public class CombinationGenerator {
 
 
     public List<String> convertTo(List<StringBuilder> temp) {
-        List<String> converted = new LinkedList<>();
+        List<String> converted = new ArrayList<>();
 
         for (StringBuilder strBuilder : temp) {
             converted.add(strBuilder.toString());

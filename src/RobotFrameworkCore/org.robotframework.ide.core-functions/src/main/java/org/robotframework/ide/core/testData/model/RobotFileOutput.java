@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.importer.ResourceImportReference;
@@ -25,9 +25,9 @@ public class RobotFileOutput {
     private File processedFile;
     private RobotFile fileModel;
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
-    private List<ResourceImportReference> resourceReferences = new LinkedList<>();
-    private List<VariablesFileImportReference> variablesReferenced = new LinkedList<>();
-    private List<BuildMessage> buildingMessages = new LinkedList<>();
+    private List<ResourceImportReference> resourceReferences = new ArrayList<>();
+    private List<VariablesFileImportReference> variablesReferenced = new ArrayList<>();
+    private List<BuildMessage> buildingMessages = new ArrayList<>();
     private Status status = Status.FAILED;
 
 

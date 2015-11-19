@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.executableDescriptors.ast.mapping;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -326,7 +326,7 @@ public class DeclarationMapper {
 
     private List<IElementDeclaration> getEscape(
             final List<IElementDeclaration> mappedElements) {
-        final List<IElementDeclaration> varElements = new LinkedList<>();
+        final List<IElementDeclaration> varElements = new ArrayList<>();
 
         if (mappedElements != null) {
             int nrOfMapped = mappedElements.size();

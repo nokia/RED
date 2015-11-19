@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.userKeywords;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.AModelElement;
@@ -18,8 +18,8 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 public class KeywordReturn extends AModelElement<UserKeyword> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> values = new LinkedList<>();
-    private final List<RobotToken> comment = new LinkedList<>();
+    private final List<RobotToken> values = new ArrayList<>();
+    private final List<RobotToken> comment = new ArrayList<>();
 
 
     public KeywordReturn(final RobotToken declaration) {
@@ -72,7 +72,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getReturnValues());

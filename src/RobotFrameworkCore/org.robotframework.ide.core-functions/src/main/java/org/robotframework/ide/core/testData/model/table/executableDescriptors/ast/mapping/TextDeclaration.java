@@ -7,7 +7,7 @@ package org.robotframework.ide.core.testData.model.table.executableDescriptors.a
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -18,7 +18,7 @@ import org.robotframework.ide.core.testData.model.table.executableDescriptors.as
 public class TextDeclaration implements IElementDeclaration {
 
     private IElementDeclaration levelUpElement;
-    private final List<IElementDeclaration> elementsDeclaredInside = new LinkedList<>();
+    private final List<IElementDeclaration> elementsDeclaredInside = new ArrayList<>();
     private TextPosition text;
     private ContainerElementType mappedType;
     private FilePosition robotTokenPosition;

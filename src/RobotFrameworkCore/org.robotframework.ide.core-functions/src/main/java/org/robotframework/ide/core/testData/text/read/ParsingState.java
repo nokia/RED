@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.core.testData.text.read;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -423,7 +423,7 @@ public enum ParsingState {
 
     private final TableType table;
     private final ParsingState previousState;
-    private static final List<ParsingState> settingsStatuses = new LinkedList<>();
+    private static final List<ParsingState> settingsStatuses = new ArrayList<>();
 
 
     private ParsingState(final TableType type, final ParsingState previousState) {

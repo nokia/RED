@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.RobotFileOutput;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.write.TxtRobotFileDumper;
 
 public class RobotFileDumper {
 
-    private static final List<IRobotFileDumper> availableFormatDumpers = new LinkedList<>();
+    private static final List<IRobotFileDumper> availableFormatDumpers = new ArrayList<>();
     static {
         availableFormatDumpers.add(new TxtRobotFileDumper());
     }

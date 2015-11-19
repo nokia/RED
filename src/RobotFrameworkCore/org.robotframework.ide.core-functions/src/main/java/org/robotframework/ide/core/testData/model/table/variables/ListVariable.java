@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.model.table.variables;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
@@ -14,7 +14,7 @@ import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
 
 public class ListVariable extends AVariable {
 
-    private final List<RobotToken> items = new LinkedList<>();
+    private final List<RobotToken> items = new ArrayList<>();
 
 
     public ListVariable(String name, RobotToken declaration, VariableScope scope) {
@@ -40,7 +40,7 @@ public class ListVariable extends AVariable {
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> tokens = new LinkedList<>();
+        List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
             tokens.addAll(getItems());

@@ -8,7 +8,7 @@ package org.robotframework.ide.core.testData.importer;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.RobotParser;
@@ -24,7 +24,7 @@ public class ResourceImporter {
 
     public List<ResourceImportReference> importResources(
             final RobotParser parser, final RobotFileOutput robotFile) {
-        List<ResourceImportReference> importedReferences = new LinkedList<>();
+        List<ResourceImportReference> importedReferences = new ArrayList<>();
 
         SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {

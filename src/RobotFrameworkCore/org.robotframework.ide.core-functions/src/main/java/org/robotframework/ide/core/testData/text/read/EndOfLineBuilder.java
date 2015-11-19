@@ -6,7 +6,7 @@
 package org.robotframework.ide.core.testData.text.read;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
@@ -15,7 +15,7 @@ import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 
 public class EndOfLineBuilder {
 
-    private List<Constant> constant = new LinkedList<>();
+    private List<Constant> constant = new ArrayList<>();
     private int lineNumber = IRobotLineElement.NOT_SET;
     private int startColumn = IRobotLineElement.NOT_SET;
     private int startOffset = IRobotLineElement.NOT_SET;
@@ -28,7 +28,7 @@ public class EndOfLineBuilder {
 
     public EndOfLineBuilder setEndOfLines(final List<Constant> constant) {
         if (constant == null) {
-            this.constant = new LinkedList<>();
+            this.constant = new ArrayList<>();
         } else {
             this.constant.clear();
             this.constant.addAll(constant);
@@ -163,7 +163,7 @@ public class EndOfLineBuilder {
             this.lineNumber = lineNumber;
             this.startColumn = startColumn;
             this.startOffset = startOffset;
-            this.types = new LinkedList<>();
+            this.types = new ArrayList<>();
             this.types.add(type);
         }
 
@@ -245,7 +245,7 @@ public class EndOfLineBuilder {
 
         EOF;
 
-        private List<String> representation = new LinkedList<>();
+        private List<String> representation = new ArrayList<>();
 
 
         private EndOfLineTypes(final String... representations) {
