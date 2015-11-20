@@ -323,7 +323,8 @@ public class TxtRobotFileParser implements IRobotFileParser {
                  * </pre>
                  */
                 if (utility.isNotOnlySeparatorOrEmptyLine(line)) {
-                    variableHelper.extractVariableAssignmentPart(line);
+                    variableHelper.extractVariableAssignmentPart(line,
+                            processingState);
                     previousLineHandler.flushNew(processingState);
                 }
                 parsingOutput.getFileModel().addNewLine(line);
