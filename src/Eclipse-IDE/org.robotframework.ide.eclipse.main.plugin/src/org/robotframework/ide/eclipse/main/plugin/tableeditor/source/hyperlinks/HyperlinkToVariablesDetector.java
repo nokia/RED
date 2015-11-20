@@ -41,7 +41,8 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
     }
 
     @Override
-    public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region, final boolean canShowMultipleHyperlinks) {
+    public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region,
+            final boolean canShowMultipleHyperlinks) {
         try {
             final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(textViewer.getDocument(),
                     region.getOffset());
@@ -56,6 +57,10 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(
                     createDetector(textViewer, fromRegion, fullVariableName, hyperlinks),
                     region.getOffset());
+            if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
+                throw new IllegalStateException(
+                        "Cannot provide more than one hyperlink, but there were " + hyperlinks.size() + " found");
+            }
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;

@@ -6,6 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -77,7 +81,15 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             final IResource resource = wsRoot.findMember(wsRelativePath);
             if (resource != null && resource.exists() && resource.getType() == IResource.FILE
                     && isRobotFile((IFile) resource)) {
-                return new IHyperlink[] { new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File") };
+
+                final List<IHyperlink> hyperlinks = newArrayList();
+                hyperlinks.add(new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File"));
+
+                if (canShowMultipleHyperlinks && hyperlinks.size() > 1) {
+                    throw new IllegalStateException(
+                            "Cannot provide more than one hyperlink, but there were " + hyperlinks.size() + " found");
+                }
+                return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
             }
             return null;
         } catch (final BadLocationException e) {
