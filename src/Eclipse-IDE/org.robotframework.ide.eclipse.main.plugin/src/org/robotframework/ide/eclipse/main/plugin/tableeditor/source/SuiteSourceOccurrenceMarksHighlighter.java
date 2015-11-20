@@ -27,6 +27,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Optional;
@@ -60,26 +62,37 @@ class SuiteSourceOccurrenceMarksHighlighter {
         viewer.getTextWidget().addCaretListener(new CaretListener() {
             @Override
             public void caretMoved(final CaretEvent event) {
-                if (refreshingJob != null && refreshingJob.getState() == Job.SLEEPING) {
-                    refreshingJob.cancel();
-                }
-                refreshingJob = new Job("") {
-
-                    @Override
-                    protected IStatus run(final IProgressMonitor monitor) {
-                        refreshOccurences(event);
-                        return Status.OK_STATUS;
-                    }
-                };
-                refreshingJob.setSystem(true);
-                refreshingJob.schedule(50);
+                scheduleRefresh(event.caretOffset);
+            }
+        });
+        viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                scheduleRefresh(-1);
             }
         });
     }
 
-    private void refreshOccurences(final CaretEvent event) {
+    private void scheduleRefresh(final int offset) {
+        if (refreshingJob != null && refreshingJob.getState() == Job.SLEEPING) {
+            refreshingJob.cancel();
+        }
+        refreshingJob = new Job("") {
+
+            @Override
+            protected IStatus run(final IProgressMonitor monitor) {
+                refreshOccurences(offset);
+                return Status.OK_STATUS;
+            }
+        };
+        refreshingJob.setSystem(true);
+        refreshingJob.schedule(50);
+    }
+
+    private void refreshOccurences(final int offset) {
         try {
-            final Optional<IRegion> currentRegion = getCurrentRegion(event.caretOffset);
+            final Optional<IRegion> currentRegion = offset == -1 ? Optional.<IRegion> absent()
+                    : getCurrentRegion(offset);
             if (!currentRegion.isPresent()) {
                 removeOccurencesHighlighting();
                 occurencesRegions = newHashSet();
@@ -152,7 +165,6 @@ class SuiteSourceOccurrenceMarksHighlighter {
         try {
             final IMarker marker = file.createMarker(MARKER_ID);
             marker.setAttribute(IMarker.TRANSIENT, true);
-            marker.setAttribute(IMarker.MESSAGE, "Occurrence of '" + selectedText + "'");
             marker.setAttribute(IMarker.CHAR_START, region.getOffset());
             marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
         } catch (final CoreException e) {
