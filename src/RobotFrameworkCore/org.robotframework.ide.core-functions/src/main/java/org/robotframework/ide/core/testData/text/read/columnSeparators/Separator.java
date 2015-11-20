@@ -13,6 +13,7 @@ import java.util.Objects;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
 
 
 public class Separator implements IRobotLineElement {
@@ -23,6 +24,7 @@ public class Separator implements IRobotLineElement {
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
     private boolean isDirty = false;
     private boolean wasFirstInit = false;
+    private static final List<DeprecatedInfo> DEPRECATED = new ArrayList<>(0);
 
     public static enum SeparatorType implements IRobotTokenType {
         TABULATOR_OR_DOUBLE_SPACE("\t", "  "), PIPE("| ", " | ", "\t|", "|\t",
@@ -39,6 +41,12 @@ public class Separator implements IRobotLineElement {
 
         private SeparatorType(final String... representation) {
             representationForNew.addAll(Arrays.asList(representation));
+        }
+
+
+        @Override
+        public List<DeprecatedInfo> getDeprecatedRepresentations() {
+            return DEPRECATED;
         }
     }
 
@@ -145,5 +153,17 @@ public class Separator implements IRobotLineElement {
     @Override
     public boolean isDirty() {
         return isDirty;
+    }
+
+
+    @Override
+    public boolean isDeprecated() {
+        return false;
+    }
+
+
+    @Override
+    public DeprecatedInfo findApplicableDeprecatedInfo() {
+        return null;
     }
 }
