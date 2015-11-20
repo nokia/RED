@@ -12,11 +12,11 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.robotframework.ide.core.testData.model.RobotVersion;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
 
 import com.google.common.collect.Range;
