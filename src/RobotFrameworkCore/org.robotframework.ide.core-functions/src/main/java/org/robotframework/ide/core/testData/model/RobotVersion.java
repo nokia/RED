@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
+package org.robotframework.ide.core.testData.model;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -12,9 +12,6 @@ import java.util.regex.Pattern;
 import com.google.common.base.Optional;
 
 public final class RobotVersion implements Comparable<RobotVersion> {
-
-    // TODO : consider moving to core project
-
     private final int major;
 
     private final int minor;
