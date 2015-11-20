@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _l1Pm8P1AEeSShP_1X3jgkw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/20/15 1:01 PM
+Save-Time: 11/20/15 2:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -14,10 +14,20 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+// add Variable section in Source 
 with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type "NUMPAD_ENTER" "\\u000D"
+        key-type "M1+SPACE"
+        key-type Down -times 3
+        key-type Enter
+    }
     get-tab-folder | get-tab-item Variables | click
-    get-link "Section is not yet defined, do you want to create it?" | click
 }
+
 
 
 // add Variable section in Source editor as it is workaround of misssing sync Table with Source
