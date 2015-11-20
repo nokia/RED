@@ -32,7 +32,8 @@ public class PrettyAlignSpaceUtility {
 
     public void fixOnlyPrettyAlignLinesInSettings(final RobotLine line,
             final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper
+                .getCurrentStatus(processingState);
         if (state == ParsingState.SETTING_TABLE_INSIDE) {
             removeTokenWithoutTextFromSimpleTableLine(line);
         }
@@ -41,7 +42,8 @@ public class PrettyAlignSpaceUtility {
 
     public void fixOnlyPrettyAlignLinesInVariables(final RobotLine line,
             final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper
+                .getCurrentStatus(processingState);
         if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
             removeTokenWithoutTextFromSimpleTableLine(line);
         }
@@ -85,8 +87,8 @@ public class PrettyAlignSpaceUtility {
     }
 
 
-    public void extractPrettyAlignWhitespaces(final RobotLine line, final RobotToken rt,
-            final String rawText) {
+    public void extractPrettyAlignWhitespaces(final RobotLine line,
+            final RobotToken rt, final String rawText) {
         final boolean isNotPrettyAlign = !rt.getTypes().contains(
                 RobotTokenType.PRETTY_ALIGN_SPACE);
         String correctedString = rawText;
@@ -129,10 +131,12 @@ public class PrettyAlignSpaceUtility {
     }
 
 
-    public RobotToken applyPrettyAlignTokenIfIsValid(final RobotLine currentLine,
+    public RobotToken applyPrettyAlignTokenIfIsValid(
+            final RobotLine currentLine,
             final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp,
-            final String text, final String fileName, final RobotToken robotToken) {
+            final String text, final String fileName,
+            final RobotToken robotToken) {
         if (" ".equals(text)) {
             boolean isPrettyAlign = false;
 
