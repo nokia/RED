@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.core.testData.model.RobotVersion;
 import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
