@@ -12,7 +12,7 @@ import java.util.Objects;
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
+import org.robotframework.ide.core.testData.text.read.VersionAvailabilityInfo;
 
 
 public class RobotToken implements IRobotLineElement {
@@ -156,23 +156,11 @@ public class RobotToken implements IRobotLineElement {
 
 
     @Override
-    public boolean isDeprecated() {
-        return (findApplicableDeprecatedInfo() != null);
-    }
-
-
-    @Override
-    public DeprecatedInfo findApplicableDeprecatedInfo() {
-        DeprecatedInfo depInfo = null;
-        if (!types.isEmpty()) {
-            IRobotTokenType mainType = types.get(0);
-            for (DeprecatedInfo di : mainType.getDeprecatedRepresentations()) {
-                if (di.getRepresentation().equals(raw)) {
-                    depInfo = di;
-                    break;
-                }
-            }
+    public VersionAvailabilityInfo getVersionInformation() {
+        VersionAvailabilityInfo vai = null;
+        if (types != null && !types.isEmpty()) {
+            vai = types.get(0).findVersionAvailablilityInfo(getRaw());
         }
-        return depInfo;
+        return vai;
     }
 }

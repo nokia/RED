@@ -6,14 +6,14 @@
 package org.robotframework.ide.core.testData.text.read.columnSeparators;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
-import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
+import org.robotframework.ide.core.testData.text.read.VersionAvailabilityInfo;
+import org.robotframework.ide.core.testData.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
 
 
 public class Separator implements IRobotLineElement {
@@ -24,29 +24,63 @@ public class Separator implements IRobotLineElement {
     private SeparatorType type = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
     private boolean isDirty = false;
     private boolean wasFirstInit = false;
-    private static final List<DeprecatedInfo> DEPRECATED = new ArrayList<>(0);
 
     public static enum SeparatorType implements IRobotTokenType {
-        TABULATOR_OR_DOUBLE_SPACE("\t", "  "), PIPE("| ", " | ", "\t|", "|\t",
-                "\t|\t");
+        /**
+         * 
+         */
+        TABULATOR_OR_DOUBLE_SPACE(VersionAvailabilityInfoBuilder.create()
+                .addRepresentation("\t").build(),
+                VersionAvailabilityInfoBuilder.create().addRepresentation("  ")
+                        .build()),
+        /**
+         *
+         */
+        PIPE(VersionAvailabilityInfoBuilder.create().addRepresentation("| ")
+                .build(), VersionAvailabilityInfoBuilder.create()
+                .addRepresentation(" | ").build(),
+                VersionAvailabilityInfoBuilder.create()
+                        .addRepresentation("\t|").build(),
+                VersionAvailabilityInfoBuilder.create()
+                        .addRepresentation("|\t").build(),
+                VersionAvailabilityInfoBuilder.create()
+                        .addRepresentation("\t|\t").build());
 
-        private final List<String> representationForNew = new ArrayList<>();
+        private final List<String> text = new ArrayList<>(0);
+        private final List<VersionAvailabilityInfo> representation = new ArrayList<>(
+                0);
 
 
         @Override
         public List<String> getRepresentation() {
-            return representationForNew;
+            return text;
         }
 
 
-        private SeparatorType(final String... representation) {
-            representationForNew.addAll(Arrays.asList(representation));
+        private SeparatorType(final VersionAvailabilityInfo... representations) {
+            for (VersionAvailabilityInfo vInfo : representations) {
+                representation.add(vInfo);
+                text.add(vInfo.getRepresentation());
+            }
         }
 
 
         @Override
-        public List<DeprecatedInfo> getDeprecatedRepresentations() {
-            return DEPRECATED;
+        public List<VersionAvailabilityInfo> getVersionAvailabilityInfos() {
+            return representation;
+        }
+
+
+        @Override
+        public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
+            VersionAvailabilityInfo vaiResult = null;
+            for (VersionAvailabilityInfo vInfo : representation) {
+                if (vInfo.getRepresentation().equals(text)) {
+                    vaiResult = vInfo;
+                    break;
+                }
+            }
+            return vaiResult;
         }
     }
 
@@ -157,13 +191,11 @@ public class Separator implements IRobotLineElement {
 
 
     @Override
-    public boolean isDeprecated() {
-        return false;
-    }
-
-
-    @Override
-    public DeprecatedInfo findApplicableDeprecatedInfo() {
-        return null;
+    public VersionAvailabilityInfo getVersionInformation() {
+        VersionAvailabilityInfo vai = null;
+        if (type != null) {
+            type.getVersionAvailabilityInfos();
+        }
+        return vai;
     }
 }
