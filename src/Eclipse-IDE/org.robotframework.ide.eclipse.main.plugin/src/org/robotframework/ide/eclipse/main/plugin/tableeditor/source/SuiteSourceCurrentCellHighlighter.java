@@ -21,6 +21,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Optional;
@@ -53,22 +55,33 @@ class SuiteSourceCurrentCellHighlighter {
 
             @Override
             public void caretMoved(final CaretEvent event) {
-                try {
-                    final Optional<IRegion> newRegion = DocumentUtilities.findCellRegion(document, event.caretOffset);
-                    if (!newRegion.isPresent()) {
-                        removeCellHighlighting();
-                        currentCell = null;
-                    } else if (!Objects.equals(currentCell, newRegion.get())) {
-                        removeCellHighlighting();
-                        highlightCell(newRegion.get());
-                        currentCell = newRegion.get();
-                    }
-                } catch (final BadLocationException | InterruptedException e) {
-                    RedPlugin.logError("Unable to create cell highlight markers", e);
-                }
-
+                refreshCurrentCell(event.caretOffset);
             }
         });
+        viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                refreshCurrentCell(-1);
+            }
+        });
+    }
+
+    private void refreshCurrentCell(final int offset) {
+        try {
+            final Optional<IRegion> newRegion = offset == -1 ? Optional.<IRegion> absent()
+                    : DocumentUtilities.findCellRegion(document, offset);
+            if (!newRegion.isPresent()) {
+                removeCellHighlighting();
+                currentCell = null;
+            } else if (!Objects.equals(currentCell, newRegion.get())) {
+                removeCellHighlighting();
+                highlightCell(newRegion.get());
+                currentCell = newRegion.get();
+            }
+        } catch (final BadLocationException | InterruptedException e) {
+            RedPlugin.logError("Unable to create cell highlight markers", e);
+        }
     }
 
     private void removeCellHighlighting() {
@@ -101,7 +114,6 @@ class SuiteSourceCurrentCellHighlighter {
             if (file.exists()) {
                 final IMarker marker = file.createMarker(MARKER_ID);
                 marker.setAttribute(IMarker.TRANSIENT, true);
-                marker.setAttribute(IMarker.MESSAGE, "Cell highlight of '" + selectedText + "'");
                 marker.setAttribute(IMarker.CHAR_START, region.getOffset());
                 marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
             }
