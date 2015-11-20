@@ -11,4 +11,29 @@ import java.util.List;
 public interface IRobotTokenType {
 
     List<String> getRepresentation();
+
+
+    List<DeprecatedInfo> getDeprecatedRepresentations();
+
+    public class DeprecatedInfo {
+
+        private final String representation;
+        private final String info;
+
+
+        public DeprecatedInfo(final String representation, final String info) {
+            this.representation = representation;
+            this.info = info;
+        }
+
+
+        public String getRepresentation() {
+            return representation;
+        }
+
+
+        public String getInfo() {
+            return info;
+        }
+    }
 }

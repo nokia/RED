@@ -128,7 +128,7 @@ public enum RobotTokenType implements IRobotTokenType {
      * 
      */
     SETTING_DOCUMENTATION_DECLARATION(TableType.SETTINGS, "Documentation",
-            "Documentation:"),
+            "Documentation:", "Document", "Document:"),
     /**
      * 
      */
@@ -136,7 +136,8 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    SETTING_METADATA_DECLARATION(TableType.SETTINGS, "Metadata", "Metadata:"),
+    SETTING_METADATA_DECLARATION(TableType.SETTINGS, "Metadata", "Metadata:",
+            "Meta", "Meta:"),
     /**
      * 
      */
@@ -276,7 +277,8 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      * 
      */
-    TEST_CASE_SETTING_DOCUMENTATION(TableType.TEST_CASES, "[Documentation]"),
+    TEST_CASE_SETTING_DOCUMENTATION(TableType.TEST_CASES, "[Documentation]",
+            "[Document]"),
     /**
      * 
      */
@@ -492,5 +494,11 @@ public enum RobotTokenType implements IRobotTokenType {
 
     private List<RobotTokenType> getTypes(final TableType type) {
         return new ArrayList<>(TYPE_TO_TABLE.get(type));
+    }
+
+
+    @Override
+    public List<DeprecatedInfo> getDeprecatedRepresentations() {
+        return new ArrayList<>(0);
     }
 }
