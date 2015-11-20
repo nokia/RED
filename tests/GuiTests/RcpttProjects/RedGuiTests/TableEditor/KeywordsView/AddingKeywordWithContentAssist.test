@@ -6,9 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kvQxgD0WEeWUyZKiCzynFQ
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:55 PM
-Tags: Unstable
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/20/15 2:47 PM
 Testcase-Type: ecl
 Verifications: _fNsf0D9aEeW20a8v9jefTQ
 
@@ -18,11 +17,24 @@ Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | double-click
+
+// add Keywords section in Source 
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type Enter
+		type-text "*** Keywords ***"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
     
 //add new keyword using assist and save file
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click    
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Keywords | click
-    get-link "Section is not yet defined, do you want to create it?" | click
     with [get-tree] {
     	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
         get-item "...add new keyword"  | double-click
@@ -35,22 +47,17 @@ with [get-editor "TestFile.robot"] {
         get-item "New Keyword/..." |double-click
         select "New Keyword/" | activate-cell-edit
         with [get-editbox] {
+			
             key-type "M1+SPACE"
-            key-type Down -times 18
+            set-text "C"
+            key-type Down -times 3
             key-type Enter
         }
         apply-cell-edit -deactivate
-        key-type Right
-        set-text 55
-        select "New Keyword/Convert To Hex" | activate-cell-edit -column 1
-        with [get-editbox] {
-            set-text 55
-            key-type "NUMPAD_ENTER" "\\u000D"
-        }
-        apply-cell-edit -deactivate
+       
     }
 }
-get-menu "File/Save" | click
+
 wait 1000
 //check if keyword was added
 with [get-editor "TestFile.robot" | get-tree] {
@@ -58,13 +65,8 @@ with [get-editor "TestFile.robot" | get-tree] {
     get-property "getItems().TreeItem[0].getText()" | equals "New Keyword"  | verify-true
     get-property "getItems().TreeItem[1].getText()" | equals "...add new keyword" | verify-true
     get-item "New Keyword" | get-property childCount | equals 2 | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[0]" | equals "Convert To Hex" | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[1]" | equals 55 | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[2]" | equals "   " | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[3]" | equals "" | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[4]" | equals "" | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[5]" | equals "" | verify-true
-    get-item "New Keyword/Convert To Hex" | get-property "columns[6]" | equals "" | verify-true
+    get-item "New Keyword/Continue For Loop" | get-property "columns[0]" | equals "Continue For Loop" | verify-true
+
 }
 
 //add 2 keywords
