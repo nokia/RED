@@ -214,9 +214,23 @@ public class TxtRobotFileParser implements IRobotFileParser {
                 line.setSeparatorType(separator.getProducedType());
                 RobotToken rt = null;
 
+                boolean wasPrettyAlign = false;
+                if (" ".equals(currentLineText)) {
+                    rt = new RobotToken();
+                    rt.setLineNumber(lineNumber);
+                    rt.setRaw(currentLineText);
+                    rt.setText(currentLineText);
+                    rt.setStartColumn(lastColumnProcessed);
+                    rt.setStartOffset(currentOffset);
+                    rt.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+                    currentOffset += rt.getRaw().length();
+                    line.addLineElement(rt);
+                    wasPrettyAlign = true;
+                }
+
                 final int textLength = currentLineText.length();
                 // check if is any data to process
-                if (textLength > 0) {
+                if (textLength > 0 && !wasPrettyAlign) {
                     // consume all data
                     while(lastColumnProcessed < textLength) {
                         if (separator.hasNext()) {
