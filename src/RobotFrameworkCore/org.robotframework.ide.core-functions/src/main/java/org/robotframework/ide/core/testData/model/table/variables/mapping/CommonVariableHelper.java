@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.model.table.mapping.ParsingStateHelper;
 import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
 import org.robotframework.ide.core.testData.text.read.IRobotTokenType;
@@ -27,9 +28,16 @@ public class CommonVariableHelper {
     private static final Pattern NAME = Pattern.compile("[{](.+?)[}]");
     private static final Pattern ASSIGN = Pattern
             .compile("((\\s)*[=]+)+(\\s)*$");
+    private final ParsingStateHelper stateHelper;
 
 
-    public void extractVariableAssignmentPart(final RobotLine line) {
+    public CommonVariableHelper() {
+        this.stateHelper = new ParsingStateHelper();
+    }
+
+
+    public void extractVariableAssignmentPart(final RobotLine line,
+            final Stack<ParsingState> state) {
         final List<IRobotLineElement> lineElements = line.getLineElements();
         boolean wasNotVariableElement = false;
         for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
@@ -51,6 +59,12 @@ public class CommonVariableHelper {
                         elementIndex++;
                     }
                 } else {
+                    if (element.getTypes().contains(
+                            RobotTokenType.FOR_CONTINUE_TOKEN)) {
+                        ParsingState currentStatus = stateHelper
+                                .getCurrentStatus(state);
+                        System.out.println("C: " + element);
+                    }
                     wasNotVariableElement = true;
                 }
             }
