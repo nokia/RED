@@ -1840,6 +1840,15 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler"
+          commandId="org.robotframework.ide.eclipse.openDeclaration">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -1922,6 +1931,12 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+M2+R">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.openDeclaration"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="F3">
     </key>
  </extension>
  <extension
@@ -2703,6 +2718,18 @@
    </extension>
    <extension
          point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextEditorContext?before=group.undo">
+         <command
+               commandId="org.robotframework.ide.eclipse.openDeclaration"
+               label="Open declaration"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
+      </menuContribution>
       <menuContribution
             allPopups="false"
             locationURI="popup:#TextEditorContext?after=additions">
