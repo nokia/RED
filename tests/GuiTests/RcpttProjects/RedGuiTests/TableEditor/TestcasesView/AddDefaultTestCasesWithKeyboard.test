@@ -6,9 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9W8Z4EGgEeWXJ6PeevPh_Q
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:56 PM
-Tags: Unstable
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/20/15 1:30 PM
 Testcase-Type: ecl
 Verifications: _K4_2IETBEeWk59QkNYuGqQ
 
@@ -17,10 +16,10 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item "Test Cases" | click
-    //get-link "Section is not yet defined, do you want to create it?" | click
-}
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+
 add-testcases-with-keyboard
 
 
@@ -28,4 +27,5 @@ add-testcases-with-keyboard
 get-eclipse-window | key-type "M1+s"
 get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
