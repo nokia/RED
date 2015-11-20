@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
+import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
 
 
@@ -104,21 +105,24 @@ public class EndOfLineBuilder {
 
     private class LFCREndOfLine extends AEndOfLine {
 
-        public LFCREndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
+        public LFCREndOfLine(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.LFCR, startOffset, lineNumber, startColumn);
         }
     }
 
     private class CRLFEndOfLine extends AEndOfLine {
 
-        public CRLFEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
+        public CRLFEndOfLine(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.CRLF, startOffset, lineNumber, startColumn);
         }
     }
 
     private class EndOfFile extends AEndOfLine {
 
-        public EndOfFile(final int startOffset, final int lineNumber, final int startColumn) {
+        public EndOfFile(final int startOffset, final int lineNumber,
+                final int startColumn) {
             super(EndOfLineTypes.EOF, startOffset, lineNumber, startColumn);
         }
     }
@@ -134,8 +138,8 @@ public class EndOfLineBuilder {
 
     private class CarritageReturnEndOfLine extends AEndOfLine {
 
-        public CarritageReturnEndOfLine(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public CarritageReturnEndOfLine(final int startOffset,
+                final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CR, startOffset, lineNumber, startColumn);
         }
 
@@ -158,8 +162,8 @@ public class EndOfLineBuilder {
         private final List<IRobotTokenType> types;
 
 
-        public AEndOfLine(final EndOfLineTypes type, final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public AEndOfLine(final EndOfLineTypes type, final int startOffset,
+                final int lineNumber, final int startColumn) {
             this.lineNumber = lineNumber;
             this.startColumn = startColumn;
             this.startOffset = startOffset;
@@ -230,6 +234,18 @@ public class EndOfLineBuilder {
                             this.getClass(), lineNumber, startColumn,
                             startOffset, types);
         }
+
+
+        @Override
+        public boolean isDeprecated() {
+            return false;
+        }
+
+
+        @Override
+        public DeprecatedInfo findApplicableDeprecatedInfo() {
+            return null;
+        }
     }
 
     public static enum EndOfLineTypes implements IRobotTokenType {
@@ -243,7 +259,10 @@ public class EndOfLineBuilder {
 
         EOF;
 
+        private static final List<DeprecatedInfo> DEPRACATED = new ArrayList<>(
+                0);
         private final List<String> representation = new ArrayList<>(0);
+
 
         private EndOfLineTypes(final String... representations) {
             representation.addAll(Arrays.asList(representations));
@@ -253,6 +272,12 @@ public class EndOfLineBuilder {
         @Override
         public List<String> getRepresentation() {
             return representation;
+        }
+
+
+        @Override
+        public List<DeprecatedInfo> getDeprecatedRepresentations() {
+            return DEPRACATED;
         }
     }
 }
