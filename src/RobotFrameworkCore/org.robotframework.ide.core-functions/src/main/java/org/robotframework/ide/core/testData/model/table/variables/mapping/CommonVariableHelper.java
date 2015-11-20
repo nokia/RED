@@ -63,7 +63,6 @@ public class CommonVariableHelper {
                             RobotTokenType.FOR_CONTINUE_TOKEN)) {
                         ParsingState currentStatus = stateHelper
                                 .getCurrentStatus(state);
-                        System.out.println("C: " + element);
                     }
                     wasNotVariableElement = true;
                 }
