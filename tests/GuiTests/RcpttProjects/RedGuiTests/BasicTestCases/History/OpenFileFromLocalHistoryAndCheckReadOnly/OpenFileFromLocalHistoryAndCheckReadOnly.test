@@ -6,8 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9jiRMPofEeSBeM10W7Y1ng
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 2:43 PM
-Tags: Unstable
+Save-Time: 11/20/15 8:45 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,50 +36,21 @@ get-view History | get-tree | select [get-item ".*" -index 0] | double-click
 get-view History | get-tree | select [get-item ".*" -index 1] | double-click
 get-view History | get-tree | select [get-item ".*" -index 2] | double-click
 
-// Set each revision to Variable tab
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 0| get-tab-folder | get-tab-item Variables | click
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1| get-tab-folder | get-tab-item Variables | click
 
-//try to add variable in read only
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 0 | get-table | double-click
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 0 | get-table | get-property itemCount | equals 2 
-    | verify-true
-    
 
-//check if read only message is present
-get-editor "TestFile.robot" | get-canvas | get-property "getMessage()" | equals "" | verify-true
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-canvas | get-property "getMessage()" 
-    | equals "The file is read-only!" | verify-true
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-canvas | get-property "getMessage()" 
-    | equals "The file is read-only!" | verify-true
-
-// try to add new variable on rev2 file and check if still there is only one variable
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table | select "...add new scalar" | double-click
-with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table] {
-    get-cell 1 0 | double-click
-    get-cell 1 0 | mouse down -count 2
-    double-click
-    apply-cell-edit -deactivate
+//Try to add anything to read only file in Source
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
 }
+// verify that there is no change
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-text-viewer | get-property text 
+    | equals "*** Test Cases ***" | verify-true
+// verify that read-only info is present in Variable tab
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-tab-folder | get-tab-item Variables | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-label "The file is read-only!" 
+    | get-property caption | equals "The file is read-only!" | verify-true
 
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-table | get-property itemCount | equals 2 | verify-true
-
-// add new variable in current file and save. 
-with [get-editor "TestFile.robot" | get-table] {
-    get-cell 2 0 | double-click
-    get-cell 2 0 | mouse down -count 2
-    double-click
-    select "${var2}" | activate-cell-edit
-    with [get-editbox] {
-        click-text 3 7
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    apply-cell-edit -deactivate
-    key-type "M1+s"
-}
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
-get-editor "TestFile.robot" | get-table | get-property itemCount | equals 4 | verify-true
-
-// check if new revision is added
-get-view History | get-tree | get-property itemCount | equals 4 | verify-true
+// verify that 3 revisions are present in History view
+get-view History | get-tree | get-property itemCount | equals 3 | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
