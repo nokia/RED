@@ -54,8 +54,13 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             final String keywordName = textViewer.getDocument().get(fromRegion.getOffset(), fromRegion.getLength());
 
             final List<IHyperlink> hyperlinks = newArrayList();
-            new KeywordDefinitionLocator(suiteFile.getFile())
-                    .locateKeywordDefinition(createDetector(textViewer, keywordName, fromRegion, hyperlinks));
+            new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(
+                    createDetector(textViewer, keywordName, fromRegion, hyperlinks, canShowMultipleHyperlinks));
+
+            if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
+                throw new IllegalStateException(
+                        "Cannot provide more than one hyperlink, but there were " + hyperlinks.size() + " found");
+            }
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
 
         } catch (final BadLocationException e) {
@@ -64,7 +69,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
     }
 
     private KeywordDetector createDetector(final ITextViewer textViewer, final String name, final IRegion fromRegion,
-            final List<IHyperlink> hyperlinks) {
+            final List<IHyperlink> hyperlinks, final boolean canShowMultipleHyperlinks) {
         return new KeywordDetector() {
 
             @Override
@@ -75,7 +80,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 if (kwSpec.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
                         && hasEqualSources(libSpec, libraryAlias, typedKeywordNameSplitter.getKeywordSource())) {
                     hyperlinks.add(new LibrarySourceHyperlink(fromRegion, suiteFile.getFile().getProject(), libSpec));
-                    hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
+                    if (canShowMultipleHyperlinks) {
+                        hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
+                    }
                     return ContinueDecision.STOP;
                 } else {
                     return ContinueDecision.CONTINUE;
@@ -98,7 +105,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                             ? new RegionsHyperlink(textViewer, fromRegion, destination)
                             : new DifferentFileHyperlink(fromRegion, file.getFile(), destination);
                     hyperlinks.add(definitionHyperlink);
-                    hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
+                    if (canShowMultipleHyperlinks) {
+                        hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
+                    }
                     return ContinueDecision.STOP;
                 } else {
                     return ContinueDecision.CONTINUE;
