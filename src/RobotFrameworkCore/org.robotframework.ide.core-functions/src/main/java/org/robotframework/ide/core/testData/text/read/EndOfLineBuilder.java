@@ -6,12 +6,11 @@
 package org.robotframework.ide.core.testData.text.read;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
 import org.robotframework.ide.core.testData.text.read.LineReader.Constant;
+import org.robotframework.ide.core.testData.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
 
 
 public class EndOfLineBuilder {
@@ -237,47 +236,75 @@ public class EndOfLineBuilder {
 
 
         @Override
-        public boolean isDeprecated() {
-            return false;
-        }
+        public VersionAvailabilityInfo getVersionInformation() {
+            VersionAvailabilityInfo var = null;
+            if (!types.isEmpty()) {
+                var = types.get(0).findVersionAvailablilityInfo(getRaw());
+            }
 
-
-        @Override
-        public DeprecatedInfo findApplicableDeprecatedInfo() {
-            return null;
+            return var;
         }
     }
 
     public static enum EndOfLineTypes implements IRobotTokenType {
-        NON, CR("\r"),
-
-        LF("\n"),
-
-        CRLF("\r\n"),
-
-        LFCR("\n\r"),
-
+        /**
+         */
+        NON,
+        /**
+         */
+        CR(VersionAvailabilityInfoBuilder.create().addRepresentation("\r")
+                .build()),
+        /**
+         */
+        LF(VersionAvailabilityInfoBuilder.create().addRepresentation("\n")
+                .build()),
+        /**
+         */
+        CRLF(VersionAvailabilityInfoBuilder.create().addRepresentation("\r\n")
+                .build()),
+        /**
+         */
+        LFCR(VersionAvailabilityInfoBuilder.create().addRepresentation("\n\r")
+                .build()),
+        /**
+         */
         EOF;
 
-        private static final List<DeprecatedInfo> DEPRACATED = new ArrayList<>(
+        private final List<String> text = new ArrayList<>(0);
+        private final List<VersionAvailabilityInfo> representation = new ArrayList<>(
                 0);
-        private final List<String> representation = new ArrayList<>(0);
 
 
-        private EndOfLineTypes(final String... representations) {
-            representation.addAll(Arrays.asList(representations));
+        private EndOfLineTypes(final VersionAvailabilityInfo... representations) {
+            for (VersionAvailabilityInfo vInfo : representations) {
+                representation.add(vInfo);
+                text.add(vInfo.getRepresentation());
+            }
         }
 
 
         @Override
         public List<String> getRepresentation() {
+            return text;
+        }
+
+
+        @Override
+        public List<VersionAvailabilityInfo> getVersionAvailabilityInfos() {
             return representation;
         }
 
 
         @Override
-        public List<DeprecatedInfo> getDeprecatedRepresentations() {
-            return DEPRACATED;
+        public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
+            VersionAvailabilityInfo vaiResult = null;
+            for (VersionAvailabilityInfo vai : representation) {
+                if (vai.getRepresentation().equals(text)) {
+                    vaiResult = vai;
+                    break;
+                }
+            }
+            return vaiResult;
         }
     }
 }
