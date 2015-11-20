@@ -8,7 +8,6 @@ package org.robotframework.ide.core.testData.text.read;
 import java.util.List;
 
 import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.text.read.IRobotTokenType.DeprecatedInfo;
 
 
 public interface IRobotLineElement {
@@ -43,8 +42,5 @@ public interface IRobotLineElement {
     boolean isDirty();
 
 
-    boolean isDeprecated();
-
-
-    DeprecatedInfo findApplicableDeprecatedInfo();
+    VersionAvailabilityInfo getVersionInformation();
 }
