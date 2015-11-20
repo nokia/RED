@@ -52,7 +52,10 @@ import os
 import sys
 import socket
 import threading
-import SocketServer
+if sys.version_info < (3,0,0):
+    import SocketServer as socketserver
+else:
+    import socketserver
 
 from robot.running.signalhandler import STOP_SIGNAL_MONITOR
 from robot.errors import ExecutionFailed
@@ -85,7 +88,10 @@ except ImportError:
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    if sys.version_info < (3,0,0):
+        from StringIO import StringIO
+    else:
+        from io import StringIO
 
 HOST = "localhost"
 
@@ -214,7 +220,7 @@ class TestRunnerAgent:
     def _wait_for_resume(self):
         data = ''
         while data != 'resume' and data != 'interrupt':
-            data = self.sock.recv(4096)
+            data = self.sock.recv(4096).decode('utf-8')
             if self._is_debug_enabled:
                 self._check_changed_variable(data)
         if data == 'interrupt':
@@ -236,12 +242,15 @@ class TestRunnerAgent:
             self._send_socket('error')
 
     def fix_unicode(self,data):
-       if isinstance(data, unicode):
+       if sys.version_info < (3,0,0) and isinstance(data, unicode):
            return data.encode('utf-8')
+       elif sys.version_info >= (3,0,0) and isinstance(data, str):
+           return data
        elif isinstance(data, dict):
            data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
        elif isinstance(data, list):
-           for i in xrange(0, len(data)):
+           range_fun = xrange if sys.version_info < (3,0,0) else range
+           for i in range_fun(0, len(data)):
                data[i] = self.fix_unicode(data[i])
        return data
 
@@ -249,7 +258,7 @@ class TestRunnerAgent:
         data = ''
         self._send_socket('check_condition')
         while data != 'stop' and data != 'continue' and data != 'interrupt':
-            data = self.sock.recv(4096)
+            data = self.sock.recv(4096).decode('utf-8')
             if data != 'stop' and data != 'continue' and data != 'interrupt':
                 self._run_keyword(data)
         if data == 'stop':
@@ -273,7 +282,7 @@ class TestRunnerAgent:
                 from robot.libraries.BuiltIn import BuiltIn
                 result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
                 self._send_socket('condition_result', result)
-            except Exception, e:
+            except Exception as e:
                 self._send_socket('condition_error', str(e))
                 pass
         self._send_socket('condition_checked')
@@ -354,7 +363,7 @@ class TestRunnerAgent:
             # Iron python does not return right object type if not binary mode
             self.filehandler = self.sock.makefile('wb')
             self.streamhandler = StreamHandler(self.filehandler)
-        except socket.error, e:
+        except socket.error as e:
             print('unable to open socket to "%s:%s" error: %s'
                   % (self.host, self.port, str(e)))
             self.sock = None
@@ -427,15 +436,15 @@ class RobotDebugger(object):
         return self._state == 'pause'
 
 
-class RobotKillerServer(SocketServer.TCPServer):
+class RobotKillerServer(socketserver.TCPServer):
     allow_reuse_address = True
 
     def __init__(self, debugger):
-        SocketServer.TCPServer.__init__(self, ("", 0), RobotKillerHandler)
+        socketserver.TCPServer.__init__(self, ("", 0), RobotKillerHandler)
         self.debugger = debugger
 
 
-class RobotKillerHandler(SocketServer.StreamRequestHandler):
+class RobotKillerHandler(socketserver.StreamRequestHandler):
     def handle(self):
         data = self.request.makefile('r').read().strip()
         if data == 'kill':
@@ -601,7 +610,10 @@ class StreamHandler(object):
             write_list.append('P')
             s = pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
             write_list.extend([str(len(s)), '|', s])
-        self.fp.write(''.join(write_list))
+        if sys.version_info < (3,0,0):
+            self.fp.write(''.join(write_list))
+        else:
+            self.fp.write(bytes(''.join(write_list), 'UTF-8'))
         #self.fp.flush()
 
 
@@ -632,7 +644,7 @@ def load(self):
             return pickle.loads(buff.getvalue())
         else:
             raise DecodeError("Message type %r not supported" % msgtype)
-    except DecodeError.wrapped_exceptions, e:
+    except DecodeError.wrapped_exceptions as e:
         raise DecodeError(str(e))
 
 
