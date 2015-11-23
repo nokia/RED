@@ -27,8 +27,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.core.execution.ExecutionElementsParser;
-import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext;
-import org.robotframework.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
+import org.robotframework.ide.context.RobotDebugExecutionContext;
+import org.robotframework.ide.context.RobotDebugExecutionContext.KeywordPosition;
 import org.robotframework.ide.core.testData.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
  * 
  * @author mmarzec
  */
+@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotDebugEventDispatcher extends Job {
 
     private final RobotDebugTarget target;
