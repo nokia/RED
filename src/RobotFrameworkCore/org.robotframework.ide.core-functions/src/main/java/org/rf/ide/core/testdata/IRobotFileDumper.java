@@ -3,11 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData;
+package org.rf.ide.core.testdata;
 
 import java.io.File;
 
-import org.rf.ide.core.testData.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFile;
 
 
 public interface IRobotFileDumper {

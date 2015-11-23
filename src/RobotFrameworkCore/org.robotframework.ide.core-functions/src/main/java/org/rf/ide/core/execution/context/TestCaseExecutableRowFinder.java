@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.TestCaseExecutionRowCounter;
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
-import org.rf.ide.core.testData.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
 
 /**
  * @author mmarzec

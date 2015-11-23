@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.importer;
+package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -11,13 +11,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.RobotParser;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.model.table.setting.AImported;
-import org.rf.ide.core.testData.model.table.setting.ResourceImport;
-import org.rf.ide.core.testData.model.table.setting.AImported.Type;
+import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
+import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
 
 
 public class ResourceImporter {

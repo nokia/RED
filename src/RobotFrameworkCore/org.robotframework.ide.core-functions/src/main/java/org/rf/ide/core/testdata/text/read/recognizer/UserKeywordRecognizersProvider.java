@@ -3,18 +3,18 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.recognizer;
+package org.rf.ide.core.testdata.text.read.recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordArgumentsRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordDocumentationRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordReturnRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordTagsRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordTeardownRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.userKeywords.KeywordTimeoutRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordArgumentsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordReturnRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTagsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTimeoutRecognizer;
 
 
 public class UserKeywordRecognizersProvider {

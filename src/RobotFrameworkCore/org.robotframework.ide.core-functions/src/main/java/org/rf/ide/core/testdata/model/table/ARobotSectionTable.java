@@ -3,15 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.IChildElement;
-import org.rf.ide.core.testData.model.IOptional;
-import org.rf.ide.core.testData.model.RobotFile;
+import org.rf.ide.core.testdata.model.IChildElement;
+import org.rf.ide.core.testdata.model.IOptional;
+import org.rf.ide.core.testdata.model.RobotFile;
 
 
 public abstract class ARobotSectionTable implements IOptional,

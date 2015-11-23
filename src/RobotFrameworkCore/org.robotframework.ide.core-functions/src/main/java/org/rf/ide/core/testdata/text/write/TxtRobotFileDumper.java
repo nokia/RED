@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.write;
+package org.rf.ide.core.testdata.text.write;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,8 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.rf.ide.core.testData.IRobotFileDumper;
-import org.rf.ide.core.testData.model.RobotFile;
+import org.rf.ide.core.testdata.IRobotFileDumper;
+import org.rf.ide.core.testdata.model.RobotFile;
 
 
 public class TxtRobotFileDumper implements IRobotFileDumper {

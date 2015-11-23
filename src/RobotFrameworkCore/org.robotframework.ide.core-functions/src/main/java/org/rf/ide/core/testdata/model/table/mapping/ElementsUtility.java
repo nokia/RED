@@ -3,34 +3,34 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.mapping;
+package org.rf.ide.core.testdata.model.table.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.AKeywordBaseSetting;
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.mapping.PreviousLineHandler;
-import org.rf.ide.core.testData.model.table.ARobotSectionTable;
-import org.rf.ide.core.testData.model.table.ECompareResult;
-import org.rf.ide.core.testData.model.table.TableHeader;
-import org.rf.ide.core.testData.model.table.executableDescriptors.ForDescriptorInfo;
-import org.rf.ide.core.testData.model.table.setting.AImported;
-import org.rf.ide.core.testData.model.table.setting.LibraryImport;
-import org.rf.ide.core.testData.text.read.IRobotLineElement;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.LineReader.Constant;
-import org.rf.ide.core.testData.text.read.ParsingState.TableType;
-import org.rf.ide.core.testData.text.read.columnSeparators.ALineSeparator;
-import org.rf.ide.core.testData.text.read.columnSeparators.Separator;
-import org.rf.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.mapping.PreviousLineHandler;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.ECompareResult;
+import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.ForDescriptorInfo;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.LineReader.Constant;
+import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
+import org.rf.ide.core.testdata.text.read.columnSeparators.ALineSeparator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class ElementsUtility {

@@ -3,15 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.recognizer;
+package org.rf.ide.core.testdata.text.read.recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.variables.DictionaryVariableDeclarationRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.variables.ListVariableDeclarationRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.variables.ScalarVariableDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.variables.DictionaryVariableDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.variables.ListVariableDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.variables.ScalarVariableDeclarationRecognizer;
 
 
 public class VariablesDeclarationRecognizersProvider {

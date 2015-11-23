@@ -3,13 +3,13 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors.ast.mapping;
+package org.rf.ide.core.testdata.model.table.executableDescriptors.ast.mapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.ast.ContainerElementType;
 
 
 public abstract class AContainerOperation implements IElementDeclaration {

@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotDebugExecutableLineChecker;
-import org.rf.ide.core.testData.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFile;
 
 public class RobotDebugExecutableLineCheckerTest {
 

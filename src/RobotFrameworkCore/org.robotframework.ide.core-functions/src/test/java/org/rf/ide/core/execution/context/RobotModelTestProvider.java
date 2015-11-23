@@ -10,10 +10,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.rf.ide.core.testData.RobotParser;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 
 public class RobotModelTestProvider {
 

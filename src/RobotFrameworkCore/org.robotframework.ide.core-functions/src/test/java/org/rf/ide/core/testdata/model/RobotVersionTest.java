@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model;
+package org.rf.ide.core.testdata.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.testData.model.RobotVersion;
+import org.rf.ide.core.testdata.model.RobotVersion;
 
 public class RobotVersionTest {
 

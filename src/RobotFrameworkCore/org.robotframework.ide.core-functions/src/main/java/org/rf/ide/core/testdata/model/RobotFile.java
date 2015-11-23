@@ -3,21 +3,21 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model;
+package org.rf.ide.core.testdata.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.table.ARobotSectionTable;
-import org.rf.ide.core.testData.model.table.KeywordTable;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.model.table.TableHeader;
-import org.rf.ide.core.testData.model.table.TestCaseTable;
-import org.rf.ide.core.testData.model.table.VariableTable;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class RobotFile implements IChildElement<RobotFileOutput> {
@@ -133,7 +133,8 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     @SuppressWarnings("rawtypes")
     private TableHeader createHeader(final RobotTokenType type) {
         final RobotToken tableHeaderToken = new RobotToken();
-        tableHeaderToken.setText("*** " + type.getRepresentation().get(0) + " ***");
+        tableHeaderToken.setText("*** " + type.getRepresentation().get(0)
+                + " ***");
         tableHeaderToken.setType(type);
         final TableHeader header = new TableHeader(tableHeaderToken);
 
