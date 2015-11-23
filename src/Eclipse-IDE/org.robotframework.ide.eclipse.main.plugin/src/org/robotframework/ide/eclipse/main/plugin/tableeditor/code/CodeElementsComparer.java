@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken
 class CodeElementsComparer implements IElementComparer {
 
     @Override
-    public boolean equals(final Object a, final Object b) {
+    public boolean equals(final Object a, final Object b) { // NOPMD this has to be named this way
         if (a == null && b == null) {
             return true;
         } else if (a instanceof RobotElement && b instanceof RobotElement) {
