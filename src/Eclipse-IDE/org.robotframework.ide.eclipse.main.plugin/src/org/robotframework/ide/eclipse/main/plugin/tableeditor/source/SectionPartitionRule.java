@@ -11,10 +11,10 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.SettingsTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 
 
 /**

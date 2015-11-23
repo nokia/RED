@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.TestCaseTable;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
 
 public class RobotCasesSection extends RobotSuiteFileSection {
 

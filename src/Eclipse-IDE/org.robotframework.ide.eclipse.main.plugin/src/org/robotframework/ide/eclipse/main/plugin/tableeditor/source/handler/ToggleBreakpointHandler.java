@@ -20,7 +20,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.core.execution.context.RobotDebugExecutableLineChecker;
+import org.rf.ide.core.execution.context.RobotDebugExecutableLineChecker;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

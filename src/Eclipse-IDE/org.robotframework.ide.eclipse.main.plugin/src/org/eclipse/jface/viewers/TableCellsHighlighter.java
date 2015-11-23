@@ -5,9 +5,6 @@
  */
 package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.viewers.FocusCellHighlighter;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;

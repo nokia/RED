@@ -9,13 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
-import org.robotframework.ide.core.testData.model.RobotVersion;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableScope;
-import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
-import org.robotframework.ide.core.testData.model.table.variables.ListVariable;
-import org.robotframework.ide.core.testData.model.table.variables.ScalarVariable;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
+import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
 
 public class DictionaryExistenceValidatorTest {

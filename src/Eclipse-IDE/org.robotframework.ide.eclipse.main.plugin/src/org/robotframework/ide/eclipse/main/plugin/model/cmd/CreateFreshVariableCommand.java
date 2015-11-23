@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;

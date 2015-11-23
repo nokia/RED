@@ -9,9 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.KeywordTable;
-import org.robotframework.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
 
 public class RobotKeywordsSection extends RobotSuiteFileSection {
 

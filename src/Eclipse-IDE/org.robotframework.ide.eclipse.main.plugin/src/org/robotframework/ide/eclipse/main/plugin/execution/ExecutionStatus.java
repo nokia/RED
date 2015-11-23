@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.execution;
 
 import java.util.List;
 
-import org.robotframework.ide.core.execution.ExecutionElement.ExecutionElementType;
+import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 
 public class ExecutionStatus {
 
