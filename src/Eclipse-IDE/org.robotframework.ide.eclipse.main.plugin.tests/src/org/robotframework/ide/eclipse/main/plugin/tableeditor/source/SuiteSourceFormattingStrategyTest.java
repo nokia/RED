@@ -27,7 +27,7 @@ public class SuiteSourceFormattingStrategyTest {
     }
 
     @Test
-    public void trailingSpacesAreRemoved() throws Exception {
+    public void trailingSpacesAreRemoved() {
         final String beforeFormatting = createContent("Keyword    ");
         final String expected = createContent("Keyword");
 
