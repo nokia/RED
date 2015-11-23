@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 
 public class TestCaseTableElementsComparator extends
