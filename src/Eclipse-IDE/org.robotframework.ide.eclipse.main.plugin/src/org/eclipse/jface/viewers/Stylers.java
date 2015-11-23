@@ -23,13 +23,21 @@ public class Stylers {
 
     public static class Common {
 
-        public static Styler MARKED_PREFIX_STYLER = new Styler() {
+        public static final Styler MARKED_PREFIX_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle style) {
                 style.foreground = ColorsManager.getColor(135, 150, 255);
                 style.background = ColorsManager.getColor(230, 240, 255);
                 style.borderColor = ColorsManager.getColor(135, 150, 255);
                 style.borderStyle = SWT.BORDER_DOT;
+            }
+        };
+
+        public static final Styler MATCH_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.background = new Color(Display.getCurrent(), 255, 255, 175);
+                textStyle.borderStyle = SWT.BORDER_DOT;
             }
         };
     }
