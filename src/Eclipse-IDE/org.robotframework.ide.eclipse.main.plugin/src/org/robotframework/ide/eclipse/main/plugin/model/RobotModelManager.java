@@ -43,7 +43,7 @@ public final class RobotModelManager {
     }
 
     private static class InstanceHolder {
-        private static RobotModelManager INSTANCE = new RobotModelManager();
+        private static final RobotModelManager INSTANCE = new RobotModelManager();
     }
 
     private RobotModel model = new RobotModel();
