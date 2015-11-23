@@ -23,11 +23,11 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class RobotProjectNature implements IProjectNature {
 
-    public static String ROBOT_NATURE = RedPlugin.PLUGIN_ID + ".robotNature";
+    public static final String ROBOT_NATURE = RedPlugin.PLUGIN_ID + ".robotNature";
 
-    private static String ROBOT_LIBRARIES_BUILDER = RedPlugin.PLUGIN_ID + ".robotLibrariesBuilder";
+    private static final String ROBOT_LIBRARIES_BUILDER = RedPlugin.PLUGIN_ID + ".robotLibrariesBuilder";
 
-    private static String SUITE_INIT_FILE = "__init__";
+    private static final String SUITE_INIT_FILE = "__init__";
 
 	private IProject project;
 
