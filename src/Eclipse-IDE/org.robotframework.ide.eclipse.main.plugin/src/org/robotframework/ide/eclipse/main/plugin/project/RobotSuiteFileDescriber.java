@@ -18,15 +18,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.ITextContentDescriber;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver;
-import org.robotframework.ide.core.testData.model.table.mapping.ElementPositionResolver.PositionExpected;
-import org.robotframework.ide.core.testData.text.read.IRobotLineElement;
-import org.robotframework.ide.core.testData.text.read.RobotLine;
-import org.robotframework.ide.core.testData.text.read.columnSeparators.ALineSeparator;
-import org.robotframework.ide.core.testData.text.read.columnSeparators.Separator;
-import org.robotframework.ide.core.testData.text.read.columnSeparators.TokenSeparatorBuilder;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
-import org.robotframework.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.model.table.mapping.ElementPositionResolver;
+import org.rf.ide.core.testdata.model.table.mapping.ElementPositionResolver.PositionExpected;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.columnSeparators.ALineSeparator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.TokenSeparatorBuilder;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 
 public class RobotSuiteFileDescriber implements ITextContentDescriber {
 

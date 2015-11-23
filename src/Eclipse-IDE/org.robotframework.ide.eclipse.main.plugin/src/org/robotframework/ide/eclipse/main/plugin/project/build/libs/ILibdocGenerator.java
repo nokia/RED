@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 interface ILibdocGenerator {
 

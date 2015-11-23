@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;

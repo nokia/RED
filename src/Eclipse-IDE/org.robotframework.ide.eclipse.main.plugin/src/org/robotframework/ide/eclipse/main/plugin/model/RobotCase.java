@@ -12,15 +12,15 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.robotframework.ide.core.testData.model.FilePosition;
-import org.robotframework.ide.core.testData.model.table.RobotExecutableRow;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCase;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseSetup;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTags;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTeardown;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTemplate;
-import org.robotframework.ide.core.testData.model.table.testCases.TestCaseTimeout;
-import org.robotframework.ide.core.testData.model.table.testCases.TestDocumentation;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseSetup;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseTags;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseTeardown;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseTemplate;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseTimeout;
+import org.rf.ide.core.testdata.model.table.testCases.TestDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.collect.Lists;
