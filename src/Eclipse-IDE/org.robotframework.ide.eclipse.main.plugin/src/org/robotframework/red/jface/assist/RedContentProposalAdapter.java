@@ -1188,13 +1188,13 @@ public class RedContentProposalAdapter {
      * popup is open should also be propagated to the control. Default value is
      * true.
      */
-    private boolean propagateKeys = true;
+    private final boolean propagateKeys = true;
 
     /*
      * Integer that indicates the filtering style. One of FILTER_CHARACTER,
      * FILTER_CUMULATIVE, FILTER_NONE.
      */
-    private int filterStyle = FILTER_NONE;
+    private final int filterStyle = FILTER_NONE;
 
     /*
      * The listener we install on the control.
@@ -1446,103 +1446,6 @@ public class RedContentProposalAdapter {
      */
     public void setProposalAcceptanceStyle(final int acceptance) {
         proposalAcceptanceStyle = acceptance;
-    }
-
-    /**
-     * Return the integer style that indicates how keystrokes affect the content
-     * of the proposal popup while it is open.
-     * 
-     * @return a constant indicating how keystrokes in the proposal popup affect
-     *         filtering of the proposals shown. <code>FILTER_NONE</code>
-     *         specifies that no filtering will occur in the content proposal
-     *         list as keys are typed. <code>FILTER_CHARACTER</code> specifies
-     *         the content of the popup will be filtered by the most recently
-     *         typed character. <code>FILTER_CUMULATIVE</code> is deprecated and
-     *         no longer recommended. It specifies that the content of the popup
-     *         will be filtered by a string containing all the characters typed
-     *         since the popup has been open. The default is
-     *         <code>FILTER_NONE</code>.
-     */
-    public int getFilterStyle() {
-        return filterStyle;
-    }
-
-    /**
-     * Set the integer style that indicates how keystrokes affect the content of
-     * the proposal popup while it is open. Popup-based filtering is useful for
-     * narrowing and navigating the list of proposals provided once the popup is
-     * open. Filtering of the proposals will occur even when the control content
-     * is not affected by user typing. Note that automatic filtering is not used
-     * to achieve content-sensitive filtering such as auto-completion. Filtering
-     * that is sensitive to changes in the control content should be performed
-     * by the supplied {@link IContentProposalProvider}.
-     * 
-     * @param filterStyle
-     *            a constant indicating how keystrokes received in the proposal
-     *            popup affect filtering of the proposals shown.
-     *            <code>FILTER_NONE</code> specifies that no automatic filtering
-     *            of the content proposal list will occur as keys are typed in
-     *            the popup. <code>FILTER_CHARACTER</code> specifies that the
-     *            content of the popup will be filtered by the most recently
-     *            typed character. <code>FILTER_CUMULATIVE</code> is deprecated
-     *            and no longer recommended. It specifies that the content of
-     *            the popup will be filtered by a string containing all the
-     *            characters typed since the popup has been open.
-     */
-    public void setFilterStyle(final int filterStyle) {
-        this.filterStyle = filterStyle;
-    }
-
-    /**
-     * Return the size, in pixels, of the content proposal popup.
-     * 
-     * @return a Point specifying the last width and height, in pixels, of the
-     *         content proposal popup.
-     */
-    public Point getPopupSize() {
-        return popupSize;
-    }
-
-    /**
-     * Set the size, in pixels, of the content proposal popup. This size will be
-     * used the next time the content proposal popup is opened.
-     * 
-     * @param size
-     *            a Point specifying the desired width and height, in pixels, of
-     *            the content proposal popup.
-     */
-    public void setPopupSize(final Point size) {
-        popupSize = size;
-    }
-
-    /**
-     * Get the boolean that indicates whether key events (including
-     * auto-activation characters) received by the content proposal popup should
-     * also be propagated to the adapted control when the proposal popup is
-     * open.
-     * 
-     * @return a boolean that indicates whether key events (including
-     *         auto-activation characters) should be propagated to the adapted
-     *         control when the proposal popup is open. Default value is
-     *         <code>true</code>.
-     */
-    public boolean getPropagateKeys() {
-        return propagateKeys;
-    }
-
-    /**
-     * Set the boolean that indicates whether key events (including
-     * auto-activation characters) received by the content proposal popup should
-     * also be propagated to the adapted control when the proposal popup is
-     * open.
-     * 
-     * @param propagateKeys
-     *            a boolean that indicates whether key events (including
-     *            auto-activation characters) should be propagated to the
-     *            adapted control when the proposal popup is open.
-     */
-    public void setPropagateKeys(final boolean propagateKeys) {
-        this.propagateKeys = propagateKeys;
     }
 
     /**
