@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 public enum ECompareResult {
     LESS_THAN(-1), EQUAL_TO(0), GREATER_THAN(1), COMPARE_NOT_SET(-2);

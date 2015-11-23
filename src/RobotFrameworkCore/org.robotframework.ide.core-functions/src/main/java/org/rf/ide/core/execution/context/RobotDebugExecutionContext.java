@@ -8,13 +8,13 @@ package org.rf.ide.core.execution.context;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.importer.ResourceImportReference;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
-import org.rf.ide.core.testData.model.table.TestCaseTable;
-import org.rf.ide.core.testData.model.table.testCases.TestCase;
-import org.rf.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
 
 
 /**

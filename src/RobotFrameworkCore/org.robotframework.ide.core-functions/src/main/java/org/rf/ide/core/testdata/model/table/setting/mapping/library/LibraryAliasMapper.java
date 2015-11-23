@@ -3,21 +3,21 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.setting.mapping.library;
+package org.rf.ide.core.testdata.model.table.setting.mapping.library;
 
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.mapping.ElementsUtility;
-import org.rf.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.rf.ide.core.testData.model.table.mapping.ParsingStateHelper;
-import org.rf.ide.core.testData.model.table.setting.AImported;
-import org.rf.ide.core.testData.model.table.setting.LibraryImport;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.mapping.ElementsUtility;
+import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
+import org.rf.ide.core.testdata.model.table.mapping.ParsingStateHelper;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class LibraryAliasMapper implements IParsingMapper {

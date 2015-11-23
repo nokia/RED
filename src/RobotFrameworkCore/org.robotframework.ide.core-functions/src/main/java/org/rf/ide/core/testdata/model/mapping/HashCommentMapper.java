@@ -3,48 +3,48 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.mapping;
+package org.rf.ide.core.testdata.model.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.mapping.hashComment.TableHeaderCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.VariablesDeclarationCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingDefaultTagsCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingDocumentationCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingForceTagsCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingLibraryCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingMetadataCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingResourceCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingSuiteSetupCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingSuiteTeardownCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingTestSetupCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingTestTeardownCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingTestTemplateCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingTestTimeoutCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableSetting.SettingVariableCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingDocumentationCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingSetupCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingTagsCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingTeardownCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingTemplateCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableTestCase.TestCaseSettingTimeoutCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingArgumentsCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingDocumentationCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingReturnCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTagsCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTeardownCommentMapper;
-import org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTimeoutCommentMapper;
-import org.rf.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.rf.ide.core.testData.model.table.mapping.ParsingStateHelper;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.mapping.hashComment.TableHeaderCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.VariablesDeclarationCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingDefaultTagsCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingDocumentationCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingForceTagsCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingLibraryCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingMetadataCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingResourceCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingSuiteSetupCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingSuiteTeardownCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingTestSetupCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingTestTeardownCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingTestTemplateCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingTestTimeoutCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableSetting.SettingVariableCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingDocumentationCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingSetupCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingTagsCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingTeardownCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingTemplateCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableTestCase.TestCaseSettingTimeoutCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingArgumentsCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingDocumentationCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingReturnCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTagsCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTeardownCommentMapper;
+import org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword.UserKeywordSettingTimeoutCommentMapper;
+import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
+import org.rf.ide.core.testdata.model.table.mapping.ParsingStateHelper;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 

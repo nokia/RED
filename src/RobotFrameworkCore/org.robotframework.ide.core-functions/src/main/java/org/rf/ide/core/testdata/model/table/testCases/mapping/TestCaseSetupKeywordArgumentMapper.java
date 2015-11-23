@@ -3,23 +3,23 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.testCases.mapping;
+package org.rf.ide.core.testdata.model.table.testCases.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.mapping.ElementsUtility;
-import org.rf.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.rf.ide.core.testData.model.table.mapping.ParsingStateHelper;
-import org.rf.ide.core.testData.model.table.testCases.TestCase;
-import org.rf.ide.core.testData.model.table.testCases.TestCaseSetup;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.mapping.ElementsUtility;
+import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
+import org.rf.ide.core.testdata.model.table.mapping.ParsingStateHelper;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testCases.TestCaseSetup;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class TestCaseSetupKeywordArgumentMapper implements IParsingMapper {

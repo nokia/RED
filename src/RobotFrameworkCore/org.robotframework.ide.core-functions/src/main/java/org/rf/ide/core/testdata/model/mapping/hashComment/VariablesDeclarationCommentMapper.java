@@ -3,22 +3,22 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.mapping.hashComment;
+package org.rf.ide.core.testdata.model.mapping.hashComment;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.mapping.IHashCommentMapper;
-import org.rf.ide.core.testData.model.table.RobotTokenPositionComparator;
-import org.rf.ide.core.testData.model.table.VariableTable;
-import org.rf.ide.core.testData.model.table.variables.AVariable;
-import org.rf.ide.core.testData.model.table.variables.IVariableHolder;
-import org.rf.ide.core.testData.model.table.variables.ListVariable;
-import org.rf.ide.core.testData.model.table.variables.AVariable.VariableScope;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.mapping.IHashCommentMapper;
+import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 

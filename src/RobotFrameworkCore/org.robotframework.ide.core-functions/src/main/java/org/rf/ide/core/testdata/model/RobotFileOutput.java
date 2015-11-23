@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model;
+package org.rf.ide.core.testdata.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.importer.ResourceImportReference;
-import org.rf.ide.core.testData.importer.VariablesFileImportReference;
-import org.rf.ide.core.testData.text.read.IRobotLineElement;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.RobotLine;
+import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 
 
 public class RobotFileOutput {
@@ -41,7 +41,8 @@ public class RobotFileOutput {
 
         final List<RobotLine> fileContent = fileModel.getFileContent();
         if (!fileContent.isEmpty()) {
-            final IRobotLineElement endOfLine = fileContent.get(0).getEndOfLine();
+            final IRobotLineElement endOfLine = fileContent.get(0)
+                    .getEndOfLine();
             final List<IRobotTokenType> types = endOfLine.getTypes();
             if (!types.isEmpty()) {
                 final IRobotTokenType eolType = types.get(0);

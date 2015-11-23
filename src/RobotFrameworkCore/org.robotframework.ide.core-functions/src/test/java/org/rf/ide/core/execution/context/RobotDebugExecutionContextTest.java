@@ -11,7 +11,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
-import org.rf.ide.core.testData.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFile;
 
 
 public class RobotDebugExecutionContextTest {

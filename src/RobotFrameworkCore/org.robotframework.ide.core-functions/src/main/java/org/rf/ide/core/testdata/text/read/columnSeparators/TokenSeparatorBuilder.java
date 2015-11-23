@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.columnSeparators;
+package org.rf.ide.core.testdata.text.read.columnSeparators;
 
 import java.util.regex.Pattern;
 

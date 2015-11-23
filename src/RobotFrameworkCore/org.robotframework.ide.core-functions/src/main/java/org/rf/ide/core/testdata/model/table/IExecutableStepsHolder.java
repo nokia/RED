@@ -3,11 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.AModelElement;
+import org.rf.ide.core.testdata.model.AModelElement;
 
 
 public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobotSectionTable>> {

@@ -3,18 +3,18 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.recognizer;
+package org.rf.ide.core.testdata.text.read.recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestCaseSetupRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestCaseTagsRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestCaseTeardownRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestCaseTemplateRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestCaseTimeoutRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.testCases.TestDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestCaseSetupRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestCaseTagsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestCaseTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestCaseTemplateRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestCaseTimeoutRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testCases.TestDocumentationRecognizer;
 
 
 public class TestCaseRecognizersProvider {
