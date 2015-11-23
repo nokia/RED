@@ -66,6 +66,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+@SuppressWarnings("PMD.GodClass")
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
         ILaunchConfigurationDelegate, ILaunchShortcut {
 
