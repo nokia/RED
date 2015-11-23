@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.custom.CaretEvent;
@@ -203,6 +204,10 @@ public class SuiteSourceEditor extends TextEditor {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    public SourceViewerConfiguration getViewerConfiguration() {
+        return super.getSourceViewerConfiguration();
     }
 
     public IDocument getDocument() {
