@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _hbZKECGYEeWIFM1C_X1kYg
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:56 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/23/15 12:20 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -19,10 +19,17 @@ with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot" | double-click
 }
 
+
 with [get-editor "TestFile.robot"] {
-	    get-tab-folder | get-tab-item Variables | click
-	    get-link "Section is not yet defined, do you want to create it?" | click
-}	
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type Enter
+        type-text "*** Variables ***"
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Variables | click
+}
+
 
 //add all kinds of variables
 add-variable -list_of_variables [list "${scalar}" "@{tab}" "&{dict}" "${scalar2}" "@{tab2}" "&{dict2}"] -script_name  "TestFile.robot"
@@ -202,6 +209,7 @@ with [get-editor "TestFile.robot" | get-section "Edit Variable" | get-table] {
     get-item 4 | get-property "values['No.']" | equals 4 | verify-true
     get-item 4 | get-property "values['Value']" | equals 4 | verify-true
 }
+
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
