@@ -102,8 +102,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
         final RobotSuiteFile model = editor.getFileModel();
-        return new IHyperlinkDetector[] { new HyperlinkToFilesDetector(model), new HyperlinkToVariablesDetector(model),
-                new HyperlinkToKeywordsDetector(model) };
+        return new IHyperlinkDetector[] { new HyperlinkToVariablesDetector(model),
+                new HyperlinkToKeywordsDetector(model), new HyperlinkToFilesDetector(model) };
     }
 
     @Override
