@@ -26,7 +26,7 @@ import com.google.common.base.Splitter;
  */
 public class Rules {
 
-    private static int EOF = -1;
+    private static final int EOF = -1;
 
     private static IRule createCombinedRule(final IRule... rules) {
         return new IRule() {
