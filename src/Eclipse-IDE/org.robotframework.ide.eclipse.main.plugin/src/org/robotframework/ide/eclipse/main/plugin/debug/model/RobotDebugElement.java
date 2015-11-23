@@ -41,7 +41,6 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         return getDebugTarget().getLaunch();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IDebugElement.class) {

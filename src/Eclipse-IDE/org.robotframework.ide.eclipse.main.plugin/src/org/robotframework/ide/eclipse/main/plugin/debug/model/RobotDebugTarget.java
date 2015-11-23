@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 /**
  * @author mmarzec
  */
+@SuppressWarnings({ "PMD.TooManyFields", "PMD.TooManyMethods", "PMD.GodClass" })
 public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget {
 
     // associated system process (Robot)
