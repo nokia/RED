@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.AVariablesTokenRecognizer;
-import org.rf.ide.core.testHelpers.ClassFieldCleaner;
+import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 
 
 public class AVariablesTokenRecognizerTest {

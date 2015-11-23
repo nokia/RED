@@ -28,6 +28,8 @@ import org.rf.ide.core.testdata.model.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.model.mapping.PreviousLineHandler.LineContinueType;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.keywords.mapping.KeywordExecutableRowActionMapper;
+import org.rf.ide.core.testdata.model.table.keywords.mapping.KeywordExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.model.table.mapping.ElementPositionResolver;
 import org.rf.ide.core.testdata.model.table.mapping.ElementsUtility;
 import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
@@ -43,15 +45,10 @@ import org.rf.ide.core.testdata.model.table.setting.mapping.UnknownSettingMapper
 import org.rf.ide.core.testdata.model.table.setting.mapping.library.LibraryAliasFixer;
 import org.rf.ide.core.testdata.model.table.testCases.mapping.TestCaseExecutableRowActionMapper;
 import org.rf.ide.core.testdata.model.table.testCases.mapping.TestCaseExecutableRowArgumentMapper;
-import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordExecutableRowActionMapper;
-import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.model.table.variables.mapping.CommonVariableHelper;
 import org.rf.ide.core.testdata.model.table.variables.mapping.UnknownVariableMapper;
 import org.rf.ide.core.testdata.model.table.variables.mapping.UnknownVariableValueMapper;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
-import org.rf.ide.core.testdata.text.read.columnSeparators.ALineSeparator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.TokenSeparatorBuilder;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -59,6 +56,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.SettingsRecognizersProvider
 import org.rf.ide.core.testdata.text.read.recognizer.TestCaseRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.UserKeywordRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.VariablesDeclarationRecognizersProvider;
+import org.rf.ide.core.testdata.text.read.separators.ALineSeparator;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 
