@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 
 public class TestCaseTable extends ARobotSectionTable {
