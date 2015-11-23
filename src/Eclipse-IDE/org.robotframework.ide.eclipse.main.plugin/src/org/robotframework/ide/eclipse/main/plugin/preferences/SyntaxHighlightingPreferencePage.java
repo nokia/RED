@@ -119,7 +119,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
 
         previewText = new StyledText(parent, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(previewText);
-        previewText.setText(SyntaxHighlightingPreferencePageSource.SOURCE);
+        previewText.setText(SyntaxHighlightingPreferencePageSource.source);
         previewText.setEditable(false);
         previewText.setFont(RedTheme.getTextEditorFont());
 
