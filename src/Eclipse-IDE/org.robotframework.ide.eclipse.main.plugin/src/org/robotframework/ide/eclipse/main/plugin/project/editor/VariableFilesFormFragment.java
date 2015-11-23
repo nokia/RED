@@ -55,6 +55,7 @@ import org.robotframework.red.viewers.Selections;
 /**
  * @author mmarzec
  */
+@SuppressWarnings("PMD.TooManyMethods")
 class VariableFilesFormFragment implements ISectionFormFragment {
 
     @Inject
