@@ -80,13 +80,14 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
                 desc = editorRegistry.findEditor("org.eclipse.ui.DefaultTextEditor");
                 if (desc == null) {
-                    throw new RuntimeException("Unable to open editor for library: " + spec.getName()
+                    throw new SourceOpeningException(
+                            "Unable to open editor for library: " + spec.getName()
                             + ". No suitable editor.");
                 }
             }
             page.openEditor(new FileEditorInput(file), desc.getId());
         } catch (final CoreException e) {
-            throw new RuntimeException("Unable to open editor for library: " + spec.getName(), e);
+            throw new SourceOpeningException("Unable to open editor for library: " + spec.getName(), e);
         }
     }
     
@@ -103,5 +104,16 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
 
         return null;
+    }
+
+    private static class SourceOpeningException extends RuntimeException {
+
+        public SourceOpeningException(final String message) {
+            super(message);
+        }
+
+        public SourceOpeningException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 }

@@ -128,7 +128,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     private static class EditorInitalizationException extends RuntimeException {
 
-        public EditorInitalizationException(final String message, final CoreException cause) {
+        public EditorInitalizationException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }
