@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 
 /**
