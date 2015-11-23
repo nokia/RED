@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
+import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
+import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
+import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
-import org.rf.ide.core.testdata.robotImported.ARobotInternalVariable;
-import org.rf.ide.core.testdata.robotImported.DictionaryRobotInternalVariable;
-import org.rf.ide.core.testdata.robotImported.ListRobotInternalVariable;
-import org.rf.ide.core.testdata.robotImported.ScalarRobotInternalVariable;
 
 import com.google.common.annotations.VisibleForTesting;
 
