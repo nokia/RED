@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.mapping.IHashCommentMapper;
-import org.rf.ide.core.testdata.model.table.userKeywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 

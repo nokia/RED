@@ -10,8 +10,8 @@ import java.util.List;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.TestCaseExecutionRowCounter;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testCases.TestCase;
-import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
 
 
 /**

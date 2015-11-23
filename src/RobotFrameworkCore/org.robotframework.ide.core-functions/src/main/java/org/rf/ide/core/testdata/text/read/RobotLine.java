@@ -11,7 +11,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 import com.google.common.base.Optional;
 
