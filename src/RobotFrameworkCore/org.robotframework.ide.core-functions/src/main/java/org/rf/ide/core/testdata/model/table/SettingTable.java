@@ -3,26 +3,26 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.presenter.DataDrivenKeywordName;
-import org.rf.ide.core.testData.model.table.setting.AImported;
-import org.rf.ide.core.testData.model.table.setting.DefaultTags;
-import org.rf.ide.core.testData.model.table.setting.ForceTags;
-import org.rf.ide.core.testData.model.table.setting.Metadata;
-import org.rf.ide.core.testData.model.table.setting.SuiteDocumentation;
-import org.rf.ide.core.testData.model.table.setting.SuiteSetup;
-import org.rf.ide.core.testData.model.table.setting.SuiteTeardown;
-import org.rf.ide.core.testData.model.table.setting.TestSetup;
-import org.rf.ide.core.testData.model.table.setting.TestTeardown;
-import org.rf.ide.core.testData.model.table.setting.TestTemplate;
-import org.rf.ide.core.testData.model.table.setting.TestTimeout;
-import org.rf.ide.core.testData.model.table.setting.UnknownSetting;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
+import org.rf.ide.core.testdata.model.table.setting.ForceTags;
+import org.rf.ide.core.testdata.model.table.setting.Metadata;
+import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TestSetup;
+import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
+import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
+import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
 
 
 public class SettingTable extends ARobotSectionTable {

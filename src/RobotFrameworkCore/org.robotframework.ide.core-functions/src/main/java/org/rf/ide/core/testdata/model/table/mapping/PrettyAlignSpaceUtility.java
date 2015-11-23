@@ -3,21 +3,21 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.mapping;
+package org.rf.ide.core.testdata.model.table.mapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.text.read.IRobotLineElement;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class PrettyAlignSpaceUtility {

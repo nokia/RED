@@ -3,9 +3,9 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors;
+package org.rf.ide.core.testdata.model.table.executableDescriptors;
 
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 
 
 public interface IRowDescriptorBuilder {

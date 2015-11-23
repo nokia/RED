@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model;
+package org.rf.ide.core.testdata.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.testData.importer.ResourceImportReference;
-import org.rf.ide.core.testData.importer.VariablesFileImportReference;
-import org.rf.ide.core.testData.robotImported.ARobotInternalVariable;
-import org.rf.ide.core.testData.robotImported.DictionaryRobotInternalVariable;
-import org.rf.ide.core.testData.robotImported.ListRobotInternalVariable;
-import org.rf.ide.core.testData.robotImported.ScalarRobotInternalVariable;
+import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.robotImported.ARobotInternalVariable;
+import org.rf.ide.core.testdata.robotImported.DictionaryRobotInternalVariable;
+import org.rf.ide.core.testdata.robotImported.ListRobotInternalVariable;
+import org.rf.ide.core.testdata.robotImported.ScalarRobotInternalVariable;
 
 import com.google.common.annotations.VisibleForTesting;
 

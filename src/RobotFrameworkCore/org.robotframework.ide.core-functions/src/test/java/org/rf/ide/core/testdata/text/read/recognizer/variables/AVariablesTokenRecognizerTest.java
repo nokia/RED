@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.recognizer.variables;
+package org.rf.ide.core.testdata.text.read.recognizer.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Test;
-import org.rf.ide.core.testData.model.table.variables.AVariable.VariableType;
-import org.rf.ide.core.testData.text.read.recognizer.ATokenRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.variables.AVariablesTokenRecognizer;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.variables.AVariablesTokenRecognizer;
 import org.rf.ide.core.testHelpers.ClassFieldCleaner;
 
 

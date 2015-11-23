@@ -8,7 +8,7 @@ package org.rf.ide.core.execution.context;
 import java.util.List;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 
 /**
  * @author mmarzec

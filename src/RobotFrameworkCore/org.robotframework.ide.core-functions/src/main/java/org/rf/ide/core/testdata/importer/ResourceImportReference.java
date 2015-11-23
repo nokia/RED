@@ -3,10 +3,10 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.importer;
+package org.rf.ide.core.testdata.importer;
 
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.setting.ResourceImport;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 
 
 public class ResourceImportReference {

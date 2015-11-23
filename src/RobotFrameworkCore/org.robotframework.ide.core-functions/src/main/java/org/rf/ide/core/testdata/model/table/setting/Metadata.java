@@ -3,17 +3,17 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.setting;
+package org.rf.ide.core.testdata.model.table.setting;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.AModelElement;
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.ModelType;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
 public class Metadata extends AModelElement<SettingTable> {

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData;
+package org.rf.ide.core.testdata;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -11,14 +11,14 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.importer.ResourceImporter;
-import org.rf.ide.core.testData.importer.VariablesFileImportReference;
-import org.rf.ide.core.testData.importer.VariablesImporter;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.RobotProjectHolder;
-import org.rf.ide.core.testData.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testData.model.RobotFileOutput.Status;
-import org.rf.ide.core.testData.text.read.TxtRobotFileParser;
+import org.rf.ide.core.testdata.importer.ResourceImporter;
+import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.importer.VariablesImporter;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
+import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
 
 
 public class RobotParser {

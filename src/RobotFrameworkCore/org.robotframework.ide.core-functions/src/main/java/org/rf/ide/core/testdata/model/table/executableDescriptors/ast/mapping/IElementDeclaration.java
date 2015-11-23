@@ -3,13 +3,13 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors.ast.mapping;
+package org.rf.ide.core.testdata.model.table.executableDescriptors.ast.mapping;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.table.executableDescriptors.TextPosition;
-import org.rf.ide.core.testData.model.table.executableDescriptors.ast.ContainerElementType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.TextPosition;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.ast.ContainerElementType;
 
 
 public interface IElementDeclaration {

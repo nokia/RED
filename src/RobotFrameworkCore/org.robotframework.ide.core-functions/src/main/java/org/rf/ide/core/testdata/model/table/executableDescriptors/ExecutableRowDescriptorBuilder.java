@@ -3,19 +3,19 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors;
+package org.rf.ide.core.testdata.model.table.executableDescriptors;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
-import org.rf.ide.core.testData.model.table.executableDescriptors.IRowDescriptorBuilder.AcceptResult;
-import org.rf.ide.core.testData.model.table.executableDescriptors.impl.ForLoopContinueRowDescriptorBuilder;
-import org.rf.ide.core.testData.model.table.executableDescriptors.impl.ForLoopDeclarationRowDescriptorBuilder;
-import org.rf.ide.core.testData.model.table.executableDescriptors.impl.SimpleRowDescriptor;
-import org.rf.ide.core.testData.model.table.executableDescriptors.impl.SimpleRowDescriptorBuilder;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.IRowDescriptorBuilder.AcceptResult;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.impl.ForLoopContinueRowDescriptorBuilder;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.impl.ForLoopDeclarationRowDescriptorBuilder;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.impl.SimpleRowDescriptor;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.impl.SimpleRowDescriptorBuilder;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 

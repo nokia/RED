@@ -3,18 +3,18 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.write;
+package org.rf.ide.core.testdata.text.write;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.AModelElement;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.table.ARobotSectionTable;
-import org.rf.ide.core.testData.model.table.TableHeader;
-import org.rf.ide.core.testData.model.table.TableHeaderComparator;
-import org.rf.ide.core.testData.text.read.RobotLine;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 
 import com.google.common.annotations.VisibleForTesting;
 

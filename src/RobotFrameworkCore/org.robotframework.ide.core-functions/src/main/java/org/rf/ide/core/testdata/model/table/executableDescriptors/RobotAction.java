@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors;
+package org.rf.ide.core.testdata.model.table.executableDescriptors;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.table.executableDescriptors.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
 public class RobotAction {

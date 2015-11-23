@@ -3,14 +3,14 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
 
 
 public class KeywordTable extends ARobotSectionTable {

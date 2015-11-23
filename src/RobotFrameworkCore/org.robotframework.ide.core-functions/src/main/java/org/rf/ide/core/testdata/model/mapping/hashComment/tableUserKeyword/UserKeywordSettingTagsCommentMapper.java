@@ -3,16 +3,16 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.mapping.hashComment.tableUserKeyword;
+package org.rf.ide.core.testdata.model.mapping.hashComment.tableUserKeyword;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.mapping.IHashCommentMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.KeywordTags;
-import org.rf.ide.core.testData.model.table.userKeywords.UserKeyword;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.mapping.IHashCommentMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.KeywordTags;
+import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
 public class UserKeywordSettingTagsCommentMapper implements IHashCommentMapper {

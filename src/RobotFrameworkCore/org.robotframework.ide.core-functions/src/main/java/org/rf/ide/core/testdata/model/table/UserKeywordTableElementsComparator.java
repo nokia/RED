@@ -3,14 +3,14 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.rf.ide.core.testData.model.AModelElement;
-import org.rf.ide.core.testData.model.ModelType;
-import org.rf.ide.core.testData.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
 
 
 public class UserKeywordTableElementsComparator extends
