@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
 
 public class KeywordTable extends ARobotSectionTable {

@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordArgumentsRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordDocumentationRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordReturnRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTagsRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTeardownRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.userKeywords.KeywordTimeoutRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordArgumentsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordReturnRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTagsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTimeoutRecognizer;
 
 
 public class UserKeywordRecognizersProvider {

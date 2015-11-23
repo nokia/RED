@@ -26,11 +26,11 @@ import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
-import org.rf.ide.core.testdata.text.read.columnSeparators.ALineSeparator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.ALineSeparator;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 
 public class ElementsUtility {

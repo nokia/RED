@@ -11,8 +11,8 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 /**
  * @author mmarzec
