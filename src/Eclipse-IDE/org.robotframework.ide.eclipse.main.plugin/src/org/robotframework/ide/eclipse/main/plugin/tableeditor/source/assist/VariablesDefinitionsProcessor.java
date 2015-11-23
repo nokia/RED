@@ -31,7 +31,7 @@ import com.google.common.base.Optional;
  */
 public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
 
-    private static Collection<VarDef> VARIABLE_DEFS = EnumSet.allOf(VarDef.class);
+    private static final Collection<VarDef> VARIABLE_DEFS = EnumSet.allOf(VarDef.class);
 
     private final SuiteSourceAssistantContext assist;
 
