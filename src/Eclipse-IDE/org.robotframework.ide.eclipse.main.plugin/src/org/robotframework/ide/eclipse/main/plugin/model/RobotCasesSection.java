@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 public class RobotCasesSection extends RobotSuiteFileSection {
 

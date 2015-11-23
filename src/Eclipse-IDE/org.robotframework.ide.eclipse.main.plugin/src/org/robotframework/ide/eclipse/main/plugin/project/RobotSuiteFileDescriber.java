@@ -18,13 +18,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.ITextContentDescriber;
-import org.rf.ide.core.testdata.model.table.mapping.ElementPositionResolver;
-import org.rf.ide.core.testdata.model.table.mapping.ElementPositionResolver.PositionExpected;
+import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
+import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
-import org.rf.ide.core.testdata.text.read.columnSeparators.ALineSeparator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
-import org.rf.ide.core.testdata.text.read.columnSeparators.TokenSeparatorBuilder;
+import org.rf.ide.core.testdata.text.read.separators.ALineSeparator;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 
