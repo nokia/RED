@@ -8,32 +8,23 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.TextStyle;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 
 import com.google.common.collect.Range;
 
 public abstract class MatchesHighlightingLabelProvider extends StylersDisposingLabelProvider {
 
     private final MatchesProvider matchesProvider;
-    private final DisposeNeededStyler styler;
+
+    private final Styler styler;
 
     public MatchesHighlightingLabelProvider(final MatchesProvider matchesProvider) {
         this.matchesProvider = matchesProvider;
-        this.styler = addDisposeNeededStyler(new DisposeNeededStyler() {
-            @Override
-            public void applyStyles(final TextStyle textStyle) {
-                textStyle.background = new Color(Display.getCurrent(), 255, 255, 175);
-                textStyle.borderStyle = SWT.BORDER_DOT;
-                markForDisposal(textStyle.background);
-            }
-        });
+        this.styler = Stylers.Common.MATCH_STYLER;
     }
 
     protected final StyledString highlightMatches(final StyledString label) {
