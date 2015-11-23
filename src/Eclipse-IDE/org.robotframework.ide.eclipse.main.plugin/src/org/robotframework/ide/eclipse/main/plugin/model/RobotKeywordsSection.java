@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.userKeywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
 public class RobotKeywordsSection extends RobotSuiteFileSection {
 
