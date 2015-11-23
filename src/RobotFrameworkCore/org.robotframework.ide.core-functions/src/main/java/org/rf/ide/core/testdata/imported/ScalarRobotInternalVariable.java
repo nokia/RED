@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testdata.robotImported;
+package org.rf.ide.core.testdata.imported;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
