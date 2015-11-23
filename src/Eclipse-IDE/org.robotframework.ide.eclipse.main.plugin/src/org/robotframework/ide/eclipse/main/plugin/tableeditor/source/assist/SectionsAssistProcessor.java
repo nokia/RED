@@ -30,7 +30,7 @@ import com.google.common.base.Optional;
  */
 public class SectionsAssistProcessor extends RedContentAssistProcessor {
 
-    private static List<String> SECTION_NAMES = newArrayList("*** Keywords ***", "*** Settings ***",
+    private static final List<String> SECTION_NAMES = newArrayList("*** Keywords ***", "*** Settings ***",
             "*** Test Cases ***", "*** Variables ***");
 
     private final SuiteSourceAssistantContext assist;

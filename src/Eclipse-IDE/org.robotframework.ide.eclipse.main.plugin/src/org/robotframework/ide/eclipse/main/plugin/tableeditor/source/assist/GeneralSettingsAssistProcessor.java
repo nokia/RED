@@ -29,7 +29,7 @@ import com.google.common.base.Optional;
  */
 public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
-    private static List<String> SETTING_NAMES = newArrayList("Library", "Resource", "Variables", "Documentation",
+    private static final List<String> SETTING_NAMES = newArrayList("Library", "Resource", "Variables", "Documentation",
             "Metadata", "Suite Setup", "Suite Teardown", "Force Tags", "Default Tags", "Test Setup", "Test Teardown",
             "Test Template", "Test Timeout");
 
