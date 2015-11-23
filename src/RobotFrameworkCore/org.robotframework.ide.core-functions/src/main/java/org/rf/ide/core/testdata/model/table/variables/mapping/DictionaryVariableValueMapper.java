@@ -3,27 +3,27 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.variables.mapping;
+package org.rf.ide.core.testdata.model.table.variables.mapping;
 
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.VariableTable;
-import org.rf.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.rf.ide.core.testData.model.table.mapping.ParsingStateHelper;
-import org.rf.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor;
-import org.rf.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.NamedSpecial;
-import org.rf.ide.core.testData.model.table.mapping.SpecialEscapedCharactersExtractor.Special;
-import org.rf.ide.core.testData.model.table.variables.AVariable;
-import org.rf.ide.core.testData.model.table.variables.DictionaryVariable;
-import org.rf.ide.core.testData.model.table.variables.IVariableHolder;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
+import org.rf.ide.core.testdata.model.table.mapping.ParsingStateHelper;
+import org.rf.ide.core.testdata.model.table.mapping.SpecialEscapedCharactersExtractor;
+import org.rf.ide.core.testdata.model.table.mapping.SpecialEscapedCharactersExtractor.NamedSpecial;
+import org.rf.ide.core.testdata.model.table.mapping.SpecialEscapedCharactersExtractor.Special;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 

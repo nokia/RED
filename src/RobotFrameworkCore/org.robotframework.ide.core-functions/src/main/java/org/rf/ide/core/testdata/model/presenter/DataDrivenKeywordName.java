@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.presenter;
+package org.rf.ide.core.testdata.model.presenter;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.IDataDrivenSetting;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.IDataDrivenSetting;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
 public class DataDrivenKeywordName<T extends IDataDrivenSetting> {

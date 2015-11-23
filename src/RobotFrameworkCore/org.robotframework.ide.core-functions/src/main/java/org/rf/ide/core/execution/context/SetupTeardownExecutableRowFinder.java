@@ -8,12 +8,12 @@ package org.rf.ide.core.execution.context;
 import java.util.List;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
-import org.rf.ide.core.testData.model.AKeywordBaseSetting;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.model.table.testCases.TestCase;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 /**
  * @author mmarzec

@@ -3,16 +3,16 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.recognizer.executables;
+package org.rf.ide.core.testdata.text.read.recognizer.executables;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.text.read.recognizer.ATokenRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class RobotSpecialTokens {

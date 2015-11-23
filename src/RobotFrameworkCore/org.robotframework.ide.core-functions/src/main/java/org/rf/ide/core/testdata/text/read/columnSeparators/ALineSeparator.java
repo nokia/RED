@@ -3,18 +3,18 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.columnSeparators;
+package org.rf.ide.core.testdata.text.read.columnSeparators;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.rf.ide.core.testData.text.read.IRobotLineElement;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public abstract class ALineSeparator {

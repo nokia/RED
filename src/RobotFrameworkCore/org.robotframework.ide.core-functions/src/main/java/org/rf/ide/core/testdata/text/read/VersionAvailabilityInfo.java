@@ -3,9 +3,9 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read;
+package org.rf.ide.core.testdata.text.read;
 
-import org.rf.ide.core.testData.model.RobotVersion;
+import org.rf.ide.core.testdata.model.RobotVersion;
 
 
 public class VersionAvailabilityInfo {

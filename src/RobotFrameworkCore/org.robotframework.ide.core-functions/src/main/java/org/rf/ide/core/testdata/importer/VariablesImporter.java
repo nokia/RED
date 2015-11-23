@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.importer;
+package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.RobotProjectHolder;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.model.table.setting.AImported;
-import org.rf.ide.core.testData.model.table.setting.VariablesImport;
-import org.rf.ide.core.testData.model.table.setting.AImported.Type;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
+import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 

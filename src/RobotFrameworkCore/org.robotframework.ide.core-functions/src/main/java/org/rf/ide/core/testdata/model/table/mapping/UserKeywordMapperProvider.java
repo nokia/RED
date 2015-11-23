@@ -3,26 +3,26 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.mapping;
+package org.rf.ide.core.testdata.model.table.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordArgumentsMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordArgumentsValueMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordDocumentationMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordDocumentationTextMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordReturnMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordReturnValueMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTagsMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTagsTagNameMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTeardownArgumentMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTeardownMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTeardownNameMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTimeoutMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTimeoutMessageMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.KeywordTimeoutValueMapper;
-import org.rf.ide.core.testData.model.table.userKeywords.mapping.UserKeywordNameMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordArgumentsMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordArgumentsValueMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordDocumentationMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordDocumentationTextMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordReturnMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordReturnValueMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTagsMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTagsTagNameMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTeardownArgumentMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTeardownMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTeardownNameMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTimeoutMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTimeoutMessageMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.KeywordTimeoutValueMapper;
+import org.rf.ide.core.testdata.model.table.userKeywords.mapping.UserKeywordNameMapper;
 
 
 public class UserKeywordMapperProvider {

@@ -3,15 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.columnSeparators;
+package org.rf.ide.core.testdata.text.read.columnSeparators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Test;
-import org.rf.ide.core.testData.text.read.columnSeparators.PipeSeparator;
-import org.rf.ide.core.testData.text.read.columnSeparators.Separator;
-import org.rf.ide.core.testData.text.read.columnSeparators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.columnSeparators.PipeSeparator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
+import org.rf.ide.core.testdata.text.read.columnSeparators.Separator.SeparatorType;
 import org.rf.ide.core.testHelpers.ClassFieldCleaner;
 import org.rf.ide.core.testHelpers.ClassFieldCleaner.ForClean;
 

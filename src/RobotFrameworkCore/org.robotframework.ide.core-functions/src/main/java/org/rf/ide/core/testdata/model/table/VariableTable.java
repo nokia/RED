@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table;
+package org.rf.ide.core.testdata.model.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.table.variables.AVariable;
-import org.rf.ide.core.testData.model.table.variables.DictionaryVariable;
-import org.rf.ide.core.testData.model.table.variables.ListVariable;
-import org.rf.ide.core.testData.model.table.variables.ScalarVariable;
-import org.rf.ide.core.testData.model.table.variables.AVariable.VariableScope;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
+import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class VariableTable extends ARobotSectionTable {

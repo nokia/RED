@@ -3,11 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.testCases;
+package org.rf.ide.core.testdata.model.table.testCases;
 
-import org.rf.ide.core.testData.model.AKeywordBaseSetting;
-import org.rf.ide.core.testData.model.ModelType;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
 public class TestCaseTeardown extends AKeywordBaseSetting<TestCase> {

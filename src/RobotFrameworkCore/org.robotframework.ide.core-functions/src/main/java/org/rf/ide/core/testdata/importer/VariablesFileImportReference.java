@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.importer;
+package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.rf.ide.core.testData.model.table.setting.VariablesImport;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 
 
 public class VariablesFileImportReference {

@@ -3,17 +3,17 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.reader.recognizer;
+package org.rf.ide.core.testdata.text.reader.recognizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testData.text.read.recognizer.ATokenRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.PreviousLineContinueRecognizer;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.PreviousLineContinueRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testHelpers.ClassFieldCleaner;
 import org.rf.ide.core.testHelpers.ClassFieldCleaner.ForClean;
 

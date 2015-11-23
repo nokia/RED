@@ -3,17 +3,17 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.text.read.columnSeparators;
+package org.rf.ide.core.testdata.text.read.columnSeparators;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.text.read.IRobotLineElement;
-import org.rf.ide.core.testData.text.read.IRobotTokenType;
-import org.rf.ide.core.testData.text.read.VersionAvailabilityInfo;
-import org.rf.ide.core.testData.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
+import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
 
 
 public class Separator implements IRobotLineElement {

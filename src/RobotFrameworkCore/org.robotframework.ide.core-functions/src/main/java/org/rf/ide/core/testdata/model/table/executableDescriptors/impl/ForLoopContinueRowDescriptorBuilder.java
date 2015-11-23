@@ -3,24 +3,24 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.executableDescriptors.impl;
+package org.rf.ide.core.testdata.model.table.executableDescriptors.impl;
 
 import java.util.List;
 
-import org.rf.ide.core.testData.model.AModelElement;
-import org.rf.ide.core.testData.model.RobotFile;
-import org.rf.ide.core.testData.model.table.ARobotSectionTable;
-import org.rf.ide.core.testData.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testData.model.table.RobotExecutableRow;
-import org.rf.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor;
-import org.rf.ide.core.testData.model.table.executableDescriptors.IRowDescriptorBuilder;
-import org.rf.ide.core.testData.model.table.executableDescriptors.RobotAction;
-import org.rf.ide.core.testData.model.table.executableDescriptors.VariableExtractor;
-import org.rf.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor.ERowType;
-import org.rf.ide.core.testData.model.table.executableDescriptors.IExecutableRowDescriptor.IRowType;
-import org.rf.ide.core.testData.model.table.executableDescriptors.ast.mapping.MappingResult;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.IRowDescriptorBuilder;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.RobotAction;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.IExecutableRowDescriptor.ERowType;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.IExecutableRowDescriptor.IRowType;
+import org.rf.ide.core.testdata.model.table.executableDescriptors.ast.mapping.MappingResult;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class ForLoopContinueRowDescriptorBuilder implements

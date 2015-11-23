@@ -3,21 +3,21 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testData.model.table.setting.mapping.test;
+package org.rf.ide.core.testdata.model.table.setting.mapping.test;
 
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testData.model.FilePosition;
-import org.rf.ide.core.testData.model.RobotFileOutput;
-import org.rf.ide.core.testData.model.table.SettingTable;
-import org.rf.ide.core.testData.model.table.mapping.IParsingMapper;
-import org.rf.ide.core.testData.model.table.mapping.ParsingStateHelper;
-import org.rf.ide.core.testData.model.table.setting.TestTimeout;
-import org.rf.ide.core.testData.text.read.ParsingState;
-import org.rf.ide.core.testData.text.read.RobotLine;
-import org.rf.ide.core.testData.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testData.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.mapping.IParsingMapper;
+import org.rf.ide.core.testdata.model.table.mapping.ParsingStateHelper;
+import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
+import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
