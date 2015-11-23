@@ -31,7 +31,7 @@ public class DeleteRobotElementAction extends Action implements IEnablementUpdat
         SafeRunner.run(new SafeRunnable() {
             @Override
             public void run() {
-                throw new RuntimeException("Not yet implemented!");
+                throw new IllegalStateException("Not yet implemented!");
             }
         });
     }
