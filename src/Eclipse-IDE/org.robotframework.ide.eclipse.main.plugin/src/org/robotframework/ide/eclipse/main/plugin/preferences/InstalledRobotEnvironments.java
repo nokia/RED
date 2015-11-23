@@ -23,8 +23,8 @@ import com.google.common.collect.Iterables;
 public class InstalledRobotEnvironments {
 
     // active environment is cached, since its retrieval can take a little bit
-    private static RobotRuntimeEnvironment ACTIVE = null;
-    private static List<RobotRuntimeEnvironment> ALL = null;
+    private static RobotRuntimeEnvironment active = null;
+    private static List<RobotRuntimeEnvironment> all = null;
     static {
         InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(
                 new IPreferenceChangeListener() {
@@ -34,26 +34,26 @@ public class InstalledRobotEnvironments {
                         if (event == null) {
                             return;
                         } else if (RedPreferences.ACTIVE_RUNTIME.equals(event.getKey())) {
-                            ACTIVE = createRuntimeEnvironment((String) event.getNewValue());
+                            active = createRuntimeEnvironment((String) event.getNewValue());
                         } else if (RedPreferences.OTHER_RUNTIMES.equals(event.getKey())) {
-                            ALL = createRuntimeEnvironments((String) event.getNewValue());
+                            all = createRuntimeEnvironments((String) event.getNewValue());
                         }
                     }
                 });
     }
 
     public static RobotRuntimeEnvironment getActiveRobotInstallation(final RedPreferences preferences) {
-        if (ACTIVE == null) {
-            ACTIVE = readActiveFromPreferences(preferences);
+        if (active == null) {
+            active = readActiveFromPreferences(preferences);
         }
-        return ACTIVE;
+        return active;
     }
 
     public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
-        if (ALL == null) {
-            ALL = readALLFromPreferences(preferences);
+        if (all == null) {
+            all = readALLFromPreferences(preferences);
         }
-        return ALL;
+        return all;
     }
 
     private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
