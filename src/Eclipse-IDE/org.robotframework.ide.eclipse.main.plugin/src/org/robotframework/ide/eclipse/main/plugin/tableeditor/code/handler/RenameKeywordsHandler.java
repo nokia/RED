@@ -23,7 +23,7 @@ public class RenameKeywordsHandler extends DIHandler<E4RenameKeywordsHandler> {
 
         @Execute
         public Object renameKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            throw new RuntimeException("Not yet implemented!");
+            throw new IllegalStateException("Not yet implemented!");
         }
     }
 }
