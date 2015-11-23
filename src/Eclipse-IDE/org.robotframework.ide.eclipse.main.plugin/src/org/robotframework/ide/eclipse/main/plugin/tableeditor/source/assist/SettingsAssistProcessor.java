@@ -29,11 +29,11 @@ import com.google.common.base.Optional;
  */
 public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
-    private static List<String> KW_SETTING_NAMES = newArrayList("[Arguments]", "[Documentation]", "[Return]", "[Tags]",
-            "[Teardown]", "[Timeout]");
+    private static final List<String> KW_SETTING_NAMES = newArrayList("[Arguments]", "[Documentation]", "[Return]",
+            "[Tags]", "[Teardown]", "[Timeout]");
 
-    private static List<String> TC_SETTING_NAMES = newArrayList("[Documentation]", "[Setup]", "[Tags]", "[Teardown]",
-            "[Template]", "[Timeout]");
+    private static final List<String> TC_SETTING_NAMES = newArrayList("[Documentation]", "[Setup]", "[Tags]",
+            "[Teardown]", "[Template]", "[Timeout]");
 
     private final SuiteSourceAssistantContext assist;
 
