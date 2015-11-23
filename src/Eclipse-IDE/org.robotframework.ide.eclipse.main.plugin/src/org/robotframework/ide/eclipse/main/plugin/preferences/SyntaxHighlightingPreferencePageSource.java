@@ -19,5 +19,5 @@ public class SyntaxHighlightingPreferencePageSource extends NLS {
                 SyntaxHighlightingPreferencePageSource.class);
     }
 
-    public static String SOURCE;
+    public static String source;
 }
