@@ -23,7 +23,7 @@ public class AssignToVariableHandler extends DIHandler<E4AssignToVariableHandler
 
         @Execute
         public Object assignToVariable(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            throw new RuntimeException("Not yet implemented!");
+            throw new IllegalStateException("Not yet implemented!");
         }
     }
 }
