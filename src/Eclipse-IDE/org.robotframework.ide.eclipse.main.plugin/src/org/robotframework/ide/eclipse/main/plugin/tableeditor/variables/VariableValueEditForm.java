@@ -45,6 +45,7 @@ import org.robotframework.red.forms.RedFormToolkit;
 /**
  * @author mmarzec
  */
+@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class VariableValueEditForm {
     
     private static final String COLLECTION_SEPARATOR_REGEX = "(\\s{2,}|\t)"; // two or more spaces or tab
