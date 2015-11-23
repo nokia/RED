@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Image;
  * @author Michal Anglart
  *
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class RedCompletionBuilder {
 
     public static interface ProposalAcceptanceModeStep {
