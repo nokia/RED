@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.executableDescriptors.ForDescriptorInfo;
+import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.columnSeparators.Separator;
