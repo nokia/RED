@@ -12,7 +12,7 @@ import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.testCases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 /**
