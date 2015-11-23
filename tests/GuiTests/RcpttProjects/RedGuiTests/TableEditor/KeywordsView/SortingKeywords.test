@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1s4yIED5EeW20a8v9jefTQ
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:56 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/23/15 1:27 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -19,35 +19,48 @@ Entry-Name: .content
 proc "check-outline-and-project-expolrer" [val added_keyword ""] {
 	get-view Outline | get-tree | select "TestFile.robot/Keywords/.*"
 	if [$added_keyword | eq ""]{
+	
+			with [get-view Outline | get-tree] {
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().length" | equals 6 | verify-true
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[0].getText()" | equals Keyword | verify-true
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[1].getText()" | equals A | verify-true
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[2].getText()" | equals "new kw" | verify-true
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[3].getText()" | equals "_last_" | verify-true
+    			get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[4].getText()" | equals "1 keyword" | verify-true
+			    get-item "TestFile.robot/Keywords" | get-property "getItems().TreeItem[5].getText()" | equals "space here" | verify-true
+				}
+	
+	
+	/*
 		with [get-view Outline | get-tree] {
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItemCount()" | equals 6| verify-true
-		    get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Keywords | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Keyword 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItemCount()" | equals 6| verify-true
+		    get-property "getItems().TreeItem[1].getText()" | equals "TestFile.robot" | verify-true
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Keywords | verify-true
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Keyword 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getExpanded()" | equals false 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getExpanded()" | equals false 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals A 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals A 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getExpanded()" | equals false 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getExpanded()" | equals false 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "new kw" 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "new kw" 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getExpanded()" | equals false 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getExpanded()" | equals false 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[3].getText()" | equals "_last_" 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[3].getText()" | equals "_last_" 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[3].getExpanded()" | equals false 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[3].getExpanded()" | equals false 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[4].getText()" | equals "1 keyword" 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[4].getText()" | equals "1 keyword" 
 		        | verify-true
-		    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[4].getExpanded()" | equals false 
+		    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[4].getExpanded()" | equals false 
 		        | verify-true
-	    	get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[5].getText()" 
+	    	get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[5].getText()" 
 	    	| equals "space here" | verify-true
-	    	get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[5].getExpanded()" | equals false 
+	    	get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[5].getExpanded()" | equals false 
 	    	
-		}
+		}*/
 	}-else{
 		get-view Outline | get-tree 
     	| get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[6].getText()" 
@@ -121,6 +134,9 @@ get-editor "TestFile.robot" | get-tree | select A | select A | get-menu "Table/E
 //check not sorted
 get-editor "TestFile.robot" | get-tree | get-table-data | eq [read-csv-file [uri-from-path  [format "%s/TableEditor/KeywordsView/Verification/KeywordsNotSorted.csv" $RCPTT_project_path] ] ]|
 		 assert-true -message "Data in table does not match input file"
+
+
+
 	
 check-outline-and-project-expolrer 
 
@@ -224,6 +240,7 @@ get-menu "File/Save" | click
 
 //check after sorting (should be not sorted)
 check-outline-and-project-expolrer -added_keyword "keyword 1"
+
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

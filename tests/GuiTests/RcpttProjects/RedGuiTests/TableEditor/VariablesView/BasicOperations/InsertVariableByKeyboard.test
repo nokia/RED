@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _JmrNgP1CEeSShP_1X3jgkw
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 11/6/15 12:57 PM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/23/15 12:26 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -15,9 +15,15 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
 with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type Enter
+        type-text "*** Variables ***"
+        key-type "M1+s"
+    }
     get-tab-folder | get-tab-item Variables | click
-    get-link "Section is not yet defined, do you want to create it?" | click
 }
 
 // create 2 variables with keyboard - activate add new variables with Enter
@@ -42,4 +48,7 @@ with [get-editor "TestFile.robot" | get-table] {
 // check if inserted
 get-editor "TestFile.robot" | get-table | get-property "getItems().TableItem[1].getText()" | equals "${var2}" 
     | verify-true
+    
+    
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
