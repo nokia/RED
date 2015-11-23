@@ -44,6 +44,7 @@ import org.robotframework.red.viewers.Selections;
  * @author mmarzec
  *
  */
+@SuppressWarnings("PMD.GodClass")
 public class LaunchElementsTreeViewer {
 
     private CheckboxTreeViewer treeViewer;

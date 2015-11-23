@@ -39,6 +39,7 @@ import com.google.common.base.Optional;
  * @author mmarzec
  *
  */
+@SuppressWarnings("PMD.GodClass")
 public class TagsContentProposalsManager {
 
     private static Map<String, String> proposals;
