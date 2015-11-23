@@ -36,9 +36,11 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
 
 	public static final String INIT_FILE_CONTENT_ID = "org.robotframework.red.robotsuiteinitfile";
 
-	private static final TokenSeparatorBuilder tokenSeparatorBuilder = new TokenSeparatorBuilder();
-	private static final ElementPositionResolver positionResolver = new ElementPositionResolver();
-	private static final Pattern newFullComplex = Pattern
+    private final TokenSeparatorBuilder tokenSeparatorBuilder = new TokenSeparatorBuilder();
+
+    private final ElementPositionResolver positionResolver = new ElementPositionResolver();
+
+    private final Pattern newFullComplex = Pattern
 			.compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)?$");
 
 	public static boolean isSuiteFile(final IFile resource) {
@@ -79,10 +81,10 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
 		final BufferedReader br = new BufferedReader(contents);
 		String line = null;
 		while ((line = br.readLine()) != null) {
-			ALineSeparator separator = tokenSeparatorBuilder.createSeparator(-1, line);
-			List<IRobotLineElement> splittedLine = separator.getSplittedLine();
-			RobotLine currentLine = new RobotLine(0, null);
-			RobotToken currentToken = packSeparatorsUntilRobotTokenFound(currentLine, splittedLine);
+            final ALineSeparator separator = tokenSeparatorBuilder.createSeparator(-1, line);
+			final List<IRobotLineElement> splittedLine = separator.getSplittedLine();
+			final RobotLine currentLine = new RobotLine(0, null);
+			final RobotToken currentToken = packSeparatorsUntilRobotTokenFound(currentLine, splittedLine);
 			if (currentToken != null) {
 				if (positionResolver.isCorrectPosition(PositionExpected.TABLE_HEADER, null, currentLine,
 						currentToken)) {
@@ -100,7 +102,7 @@ public class RobotSuiteFileDescriber implements ITextContentDescriber {
 	private RobotToken packSeparatorsUntilRobotTokenFound(final RobotLine currentLine,
 			final List<IRobotLineElement> splittedLine) {
 		RobotToken currentToken = null;
-		for (IRobotLineElement elem : splittedLine) {
+		for (final IRobotLineElement elem : splittedLine) {
 			if (elem instanceof Separator) {
 				currentLine.addLineElement(elem);
 			} else {
