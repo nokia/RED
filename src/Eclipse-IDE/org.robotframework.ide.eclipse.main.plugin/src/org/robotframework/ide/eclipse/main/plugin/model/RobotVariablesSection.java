@@ -8,10 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.util.HashMap;
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.VariableTable;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 
 import com.google.common.collect.Lists;
 

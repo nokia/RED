@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.robotframework.ide.core.execution.ExecutionElement;
+import org.rf.ide.core.execution.ExecutionElement;
 
 public class RobotEventBroker {
 

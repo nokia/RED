@@ -11,9 +11,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.eclipse.core.runtime.content.IContentDescriber;
-import org.robotframework.ide.core.testData.RobotParser;
-import org.robotframework.ide.core.testData.model.RobotFileOutput;
-import org.robotframework.ide.core.testData.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 

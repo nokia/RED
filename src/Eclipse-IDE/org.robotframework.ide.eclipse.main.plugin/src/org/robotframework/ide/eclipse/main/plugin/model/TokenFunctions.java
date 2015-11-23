@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import org.robotframework.ide.core.testData.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Function;
 

@@ -13,10 +13,10 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Joiner;
