@@ -55,7 +55,14 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
                 }
             }
         } catch (final PartInitException e) {
-            throw new RuntimeException("Unable to open editor for file: " + file.getName(), e);
+            throw new EditorOpeningException("Unable to open editor for file: " + file.getName(), e);
+        }
+    }
+
+    public static class EditorOpeningException extends RuntimeException {
+
+        public EditorOpeningException(final String message, final PartInitException cause) {
+            super(message, cause);
         }
     }
 }
