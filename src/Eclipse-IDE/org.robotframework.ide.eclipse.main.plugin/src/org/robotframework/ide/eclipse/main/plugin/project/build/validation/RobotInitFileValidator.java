@@ -7,10 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.core.testData.model.AModelElement;
-import org.robotframework.ide.core.testData.model.table.SettingTable;
-import org.robotframework.ide.core.testData.model.table.setting.DefaultTags;
-import org.robotframework.ide.core.testData.model.table.setting.TestTemplate;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
+import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;

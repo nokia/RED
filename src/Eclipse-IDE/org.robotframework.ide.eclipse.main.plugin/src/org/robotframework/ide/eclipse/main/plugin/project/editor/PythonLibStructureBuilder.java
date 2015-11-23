@@ -11,8 +11,8 @@ import static com.google.common.collect.Lists.transform;
 import java.io.File;
 import java.util.List;
 
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

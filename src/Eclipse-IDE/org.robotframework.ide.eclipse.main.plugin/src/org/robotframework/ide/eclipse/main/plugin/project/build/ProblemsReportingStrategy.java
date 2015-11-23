@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.collect.Range;
 

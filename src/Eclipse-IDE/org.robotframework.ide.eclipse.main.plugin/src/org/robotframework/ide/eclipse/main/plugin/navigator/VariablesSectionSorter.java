@@ -10,7 +10,7 @@ import java.util.EnumSet;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 public class VariablesSectionSorter extends ViewerSorter {

@@ -10,7 +10,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import org.robotframework.ide.core.testData.model.RobotVersion;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 
 import com.google.common.collect.Range;

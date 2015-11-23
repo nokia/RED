@@ -14,8 +14,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.robotframework.ide.core.testData.model.RobotVersion;
-import org.robotframework.ide.core.testData.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 
 import com.google.common.base.Predicate;

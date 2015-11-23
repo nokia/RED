@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.robotframework.ide.core.execution.ExecutionElement.ExecutionElementType;
+import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;

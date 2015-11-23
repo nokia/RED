@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.core.testData.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
@@ -18,6 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHan
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler.E4InsertNewHandler;
 import org.robotframework.red.viewers.Selections;
+import static org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class InsertNewVariableHandler extends DIParameterizedHandler<E4InsertNewHandler> {
 

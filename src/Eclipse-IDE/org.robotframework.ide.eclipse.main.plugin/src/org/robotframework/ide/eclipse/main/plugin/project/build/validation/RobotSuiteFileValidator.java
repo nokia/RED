@@ -9,9 +9,9 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.core.testData.model.table.ARobotSectionTable;
-import org.robotframework.ide.core.testData.model.table.TableHeader;
-import org.robotframework.ide.core.testData.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;

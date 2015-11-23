@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.robotframework.ide.core.testData.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
