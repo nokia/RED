@@ -27,7 +27,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
-import org.rf.ide.core.testdata.robotImported.ARobotInternalVariable;
+import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
