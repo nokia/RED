@@ -75,7 +75,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             final int index = addPage(projectConfigPart, getEditorInput());
             setPageText(index, "RED Project");
         } catch (final PartInitException e) {
-            throw new RuntimeException("Unable to initialize editor", e);
+            throw new EditorInitalizationException("Unable to initialize editor", e);
         }
     }
 
@@ -122,6 +122,13 @@ public class RedProjectEditor extends MultiPageEditorPart {
         }
 
         public IllegalProjectConfigurationEditorInputException(final String message, final CoreException cause) {
+            super(message, cause);
+        }
+    }
+
+    private static class EditorInitalizationException extends RuntimeException {
+
+        public EditorInitalizationException(final String message, final CoreException cause) {
             super(message, cause);
         }
     }
