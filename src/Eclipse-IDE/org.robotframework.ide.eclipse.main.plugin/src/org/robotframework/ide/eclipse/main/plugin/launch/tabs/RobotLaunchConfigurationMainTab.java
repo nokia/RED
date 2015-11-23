@@ -65,6 +65,7 @@ import com.google.common.collect.Collections2;
  * @author mmarzec
  *
  */
+@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private Combo comboExecutorName;

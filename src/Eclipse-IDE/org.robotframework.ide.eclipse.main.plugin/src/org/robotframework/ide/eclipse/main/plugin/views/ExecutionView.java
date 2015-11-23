@@ -78,6 +78,7 @@ import org.robotframework.red.graphics.ImagesManager;
  * @author mmarzec
  *
  */
+@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class ExecutionView {
     
     @Inject
