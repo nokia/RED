@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable
 /**
  * @author mmarzec
  */
+@SuppressWarnings("PMD.GodClass")
 public class RobotDebugVariablesManager {
 
     public static final String GLOBAL_VARIABLE_NAME = "Global Variables";

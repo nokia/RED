@@ -18,7 +18,7 @@ public class RobotSourceLookupDirector extends AbstractSourceLookupDirector {
     public void initializeParticipants() {
         addParticipants(new ISourceLookupParticipant[] { createParticipant() });
     }
-
+    
     private static ISourceLookupParticipant createParticipant() {
         return new AbstractSourceLookupParticipant() {
 
