@@ -23,7 +23,7 @@ public class ExtractKeywordHandler extends DIHandler<E4ExtractKeywordHandler> {
 
         @Execute
         public Object extractKeyword(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            throw new RuntimeException("Not yet implemented!");
+            throw new IllegalStateException("Not yet implemented!");
         }
     }
 }
