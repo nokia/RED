@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken
 class VariableElementsComparer implements IElementComparer {
 
     @Override
-    public boolean equals(final Object a, final Object b) {
+    public boolean equals(final Object a, final Object b) { // NOPMD we have to implement this method
         if (a instanceof RobotElement && b instanceof RobotElement) {
             return getPositionInTable((RobotElement) a).equals(getPositionInTable((RobotElement) b));
         }
