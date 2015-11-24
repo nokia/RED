@@ -26,8 +26,18 @@ public class Document implements IDocument {
 
     private StringBuilder documentText;
 
-    public Document(final String string) {
-        this.documentText = new StringBuilder(string);
+    public Document(final String content) {
+        this.documentText = new StringBuilder(content);
+    }
+
+    public Document(final String firstLine, final String... lines) {
+        this.documentText = new StringBuilder(firstLine);
+        this.documentText.append("\n");
+
+        for (final String line : lines) {
+            this.documentText.append(line);
+            this.documentText.append("\n");
+        }
     }
 
     private void assertOffsetWithinLimits(final int offset) throws BadLocationException {
@@ -221,7 +231,7 @@ public class Document implements IDocument {
         assertOffsetWithinLimits(offset);
 
         int noOfLines = 0;
-        for (int i = 0; i < offset; i++) {
+        for (int i = 0; i <= offset; i++) {
             if (documentText.charAt(i) == '\n') {
                 noOfLines++;
             }
@@ -244,7 +254,7 @@ public class Document implements IDocument {
 
         int noOfLines = 0;
         for (int i = 0; i < documentText.length(); i++) {
-            if (documentText.charAt(i) == '\n') {
+            if (documentText.charAt(i) == '\n' || i == documentText.length() - 1) {
                 if (noOfLines == line) {
                     return new Region(currentLineStart, i - currentLineStart);
                 }
