@@ -22,6 +22,8 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleCommentHandler.E4ToggleCommentHandler;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  */
@@ -37,9 +39,15 @@ public class ToggleCommentHandler extends DIHandler<E4ToggleCommentHandler> {
         public Object toggleComment(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
             final IDocument document = viewer.getDocument();
-
             final ITextSelection selection = (ITextSelection) viewer.getSelection();
 
+            toggleComment(document, selection);
+
+            return null;
+        }
+
+        @VisibleForTesting
+        void toggleComment(final IDocument document, final ITextSelection selection) {
             final int selectionStartLine = selection.getStartLine();
             final int selectionEndLine = selection.getEndLine();
 
@@ -62,7 +70,6 @@ public class ToggleCommentHandler extends DIHandler<E4ToggleCommentHandler> {
             } catch (final BadLocationException e) {
                 // we'll do nothing then
             }
-            return null;
         }
 
         private boolean shouldAddCommentMarks(final String affectedRegionContent) {
