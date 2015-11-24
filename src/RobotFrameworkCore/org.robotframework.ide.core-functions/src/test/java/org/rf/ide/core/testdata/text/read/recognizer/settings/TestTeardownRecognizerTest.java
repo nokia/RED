@@ -18,15 +18,15 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.rf.ide.core.test.helpers.ClassFieldCleaner;
+import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
+import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.TestTeardownRecognizer;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.CombinationGenerator;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 
 
+@SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class TestTeardownRecognizerTest {
 
     @ForClean

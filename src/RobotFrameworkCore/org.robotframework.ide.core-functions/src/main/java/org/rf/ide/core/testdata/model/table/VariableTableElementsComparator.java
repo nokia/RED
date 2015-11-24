@@ -15,19 +15,19 @@ import org.rf.ide.core.testdata.model.ModelType;
 public class VariableTableElementsComparator extends
         AModelTypeComparator<AModelElement<VariableTable>> {
 
-    private final static Map<ModelType, Integer> position = new LinkedHashMap<>();
+    private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
     static {
         int startPosition = 1;
-        position.put(ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE,
+        POSITION.put(ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE,
                 startPosition);
-        position.put(ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE,
+        POSITION.put(ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE,
                 ++startPosition);
-        position.put(ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE,
+        POSITION.put(ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE,
                 ++startPosition);
     }
 
 
     public VariableTableElementsComparator() {
-        super(position);
+        super(POSITION);
     }
 }

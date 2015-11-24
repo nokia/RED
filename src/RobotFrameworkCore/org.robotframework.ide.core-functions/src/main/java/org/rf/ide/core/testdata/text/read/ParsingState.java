@@ -423,7 +423,7 @@ public enum ParsingState {
 
     private final TableType table;
     private final ParsingState previousState;
-    private static final List<ParsingState> settingsStatuses = new ArrayList<>();
+    private static final List<ParsingState> SETTINGS_STATUSES = new ArrayList<>();
 
 
     private ParsingState(final TableType type, final ParsingState previousState) {
@@ -443,15 +443,15 @@ public enum ParsingState {
 
 
     public static List<ParsingState> getSettingsStates() {
-        if (settingsStatuses.isEmpty()) {
+        if (SETTINGS_STATUSES.isEmpty()) {
             for (final ParsingState s : ParsingState.values()) {
                 if (isSettingTableInside(s.previousState)) {
-                    settingsStatuses.add(s);
+                    SETTINGS_STATUSES.add(s);
                 }
             }
         }
 
-        return settingsStatuses;
+        return SETTINGS_STATUSES;
     }
 
 

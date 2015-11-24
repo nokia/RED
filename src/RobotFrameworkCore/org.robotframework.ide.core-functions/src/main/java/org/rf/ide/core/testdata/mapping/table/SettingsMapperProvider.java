@@ -51,7 +51,7 @@ import org.rf.ide.core.testdata.mapping.setting.variables.VariablesImportPathMap
 
 public class SettingsMapperProvider {
 
-    private static final List<IParsingMapper> mappers = Arrays.asList(
+    private static final List<IParsingMapper> MAPPERS = Arrays.asList(
             new GarbageBeforeFirstTableMapper(), new TableHeaderColumnMapper(),
             new HashCommentMapper(),
 
@@ -86,6 +86,6 @@ public class SettingsMapperProvider {
 
 
     public List<IParsingMapper> getMappers() {
-        return mappers;
+        return MAPPERS;
     }
 }

@@ -9,13 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Test;
-import org.rf.ide.core.testdata.text.read.separators.PipeSeparator;
-import org.rf.ide.core.testdata.text.read.separators.Separator;
-import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class PipeSeparatorTest {
 
     @ForClean

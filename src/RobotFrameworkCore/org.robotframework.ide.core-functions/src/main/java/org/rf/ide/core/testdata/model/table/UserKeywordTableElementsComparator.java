@@ -16,21 +16,21 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 public class UserKeywordTableElementsComparator extends
         AModelTypeComparator<AModelElement<UserKeyword>> {
 
-    private final static Map<ModelType, Integer> position = new LinkedHashMap<>();
+    private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
     static {
         int startPosition = 1;
-        position.put(ModelType.USER_KEYWORD, startPosition);
-        position.put(ModelType.USER_KEYWORD_ARGUMENTS, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_DOCUMENTATION, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_TAGS, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_TIMEOUT, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_EXECUTABLE_ROW, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_TEARDOWN, ++startPosition);
-        position.put(ModelType.USER_KEYWORD_RETURN, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD, startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_ARGUMENTS, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_DOCUMENTATION, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_TAGS, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_TIMEOUT, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_EXECUTABLE_ROW, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_TEARDOWN, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_RETURN, ++startPosition);
     }
 
 
     public UserKeywordTableElementsComparator() {
-        super(position);
+        super(POSITION);
     }
 }

@@ -14,12 +14,13 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container.ContainerType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.IContainerElement;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container.ContainerType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.SimpleElementsMapper.IElementMapper;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class DeclarationMapper {
 
     private String fileMapped;
@@ -66,8 +67,8 @@ public class DeclarationMapper {
             if (containerElement.isComplex()) {
                 final Container subContainer = (Container) containerElement;
                 final FilePosition previousForContainer = currentPosition;
-                final MappingResult subResult = map(mappingResult, currentPosition,
-                        subContainer, filename);
+                final MappingResult subResult = map(mappingResult,
+                        currentPosition, subContainer, filename);
                 mappingResult.addCorrectVariables(subResult
                         .getCorrectVariables());
                 mappingResult.addBuildMessages(subResult.getMessages());
@@ -171,10 +172,11 @@ public class DeclarationMapper {
 
 
     private void convertIncorrectIndexElementBackToText(
-            final MappingResult mappingResult, final IElementDeclaration topContainer,
+            final MappingResult mappingResult,
+            final IElementDeclaration topContainer,
             final IndexDeclaration indexDec) {
-        final TextDeclaration textDec = new TextDeclaration(indexDec.getStart(),
-                ContainerElementType.SQUARE_BRACKET_OPEN);
+        final TextDeclaration textDec = new TextDeclaration(
+                indexDec.getStart(), ContainerElementType.SQUARE_BRACKET_OPEN);
         final JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
         joinedStart.addElementDeclarationInside(textDec);
 
@@ -213,7 +215,8 @@ public class DeclarationMapper {
 
 
     private void convertIncorrectVariableBackToText(
-            final MappingResult mappingResult, final IElementDeclaration topContainer,
+            final MappingResult mappingResult,
+            final IElementDeclaration topContainer,
             final VariableDeclaration variableDec) {
         final JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
         if (variableDec.isEscaped()) {

@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     @Override
     public void dump(final File destFile, final RobotFile model)
             throws Exception {
