@@ -23,9 +23,9 @@ import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
 
 public class RobotParser {
 
-    private static final List<IRobotFileParser> availableFormatParsers = new ArrayList<>();
+    private static final List<IRobotFileParser> AVAIL_FORMAT_PARSERS = new ArrayList<>();
     static {
-        availableFormatParsers.add(new TxtRobotFileParser());
+        AVAIL_FORMAT_PARSERS.add(new TxtRobotFileParser());
     }
 
     private final boolean shouldEagerImport;
@@ -170,7 +170,7 @@ public class RobotParser {
     private IRobotFileParser getParser(final File fileOrDir,
             final boolean isFromStringContent) {
         IRobotFileParser parserToUse = null;
-        for (final IRobotFileParser parser : availableFormatParsers) {
+        for (final IRobotFileParser parser : AVAIL_FORMAT_PARSERS) {
             synchronized (parser) {
                 if (parser.canParseFile(fileOrDir, isFromStringContent)) {
                     parserToUse = parser.newInstance();

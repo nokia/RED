@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class ParsingStateHelper {
 
     public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
@@ -161,7 +162,8 @@ public class ParsingStateHelper {
     }
 
 
-    public ParsingState getCurrentStatus(final Stack<ParsingState> processingState) {
+    public ParsingState getCurrentStatus(
+            final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
 
         if (!processingState.isEmpty()) {

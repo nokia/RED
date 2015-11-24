@@ -28,7 +28,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.settings.VariableDeclaratio
 
 public class SettingsRecognizersProvider {
 
-    private static final List<ATokenRecognizer> recognized = Arrays.asList(
+    private static final List<ATokenRecognizer> RECOGNIZED = Arrays.asList(
             new SettingsTableHeaderRecognizer(), new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
             new LibraryDeclarationRecognizer(), new LibraryAliasRecognizer(),
@@ -44,8 +44,8 @@ public class SettingsRecognizersProvider {
 
     public List<ATokenRecognizer> getRecognizers() {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
-        synchronized (recognized) {
-            for (final ATokenRecognizer rec : recognized) {
+        synchronized (RECOGNIZED) {
+            for (final ATokenRecognizer rec : RECOGNIZED) {
                 recognizersProvided.add(rec.newInstance());
             }
         }

@@ -21,6 +21,7 @@ import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
  * 
  * @see ClassFieldCleaner
  */
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class TestClassFieldCleaner {
 
     private NullableSetHelperClass testObject;

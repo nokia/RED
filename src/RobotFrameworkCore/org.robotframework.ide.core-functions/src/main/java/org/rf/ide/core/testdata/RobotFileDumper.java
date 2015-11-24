@@ -15,16 +15,17 @@ import org.rf.ide.core.testdata.text.write.TxtRobotFileDumper;
 
 public class RobotFileDumper {
 
-    private static final List<IRobotFileDumper> availableFormatDumpers = new ArrayList<>();
+    private static final List<IRobotFileDumper> AVAILABLE_FORMAT_DUMPERS = new ArrayList<>();
     static {
-        availableFormatDumpers.add(new TxtRobotFileDumper());
+        AVAILABLE_FORMAT_DUMPERS.add(new TxtRobotFileDumper());
     }
 
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public void dump(final File file, final RobotFileOutput output)
             throws Exception {
         IRobotFileDumper dumperToUse = null;
-        for (final IRobotFileDumper dumper : availableFormatDumpers) {
+        for (final IRobotFileDumper dumper : AVAILABLE_FORMAT_DUMPERS) {
             if (dumper.canDumpFile(file)) {
                 dumperToUse = dumper;
                 break;

@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.mapping.setting.UnknownSettingArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.UnknownSettingMapper;
 import org.rf.ide.core.testdata.mapping.setting.library.LibraryAliasFixer;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
+import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
@@ -35,7 +36,6 @@ import org.rf.ide.core.testdata.mapping.table.SettingsMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.TestCaseMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.UserKeywordMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.VariablesDeclarationMapperProvider;
-import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowActionMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
@@ -63,6 +63,7 @@ import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 import com.google.common.annotations.VisibleForTesting;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class TxtRobotFileParser implements IRobotFileParser {
 
     private final TokenSeparatorBuilder tokenSeparatorBuilder;

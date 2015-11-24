@@ -17,12 +17,12 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class RobotSpecialTokens {
 
-    private static final List<ATokenRecognizer> specialRecognizers = new ArrayList<>();
+    private static final List<ATokenRecognizer> SPECIAL_RECOGNIZERS = new ArrayList<>();
     static {
-        specialRecognizers.add(new CommentActionLiteral());
-        specialRecognizers.add(new ForActionLiteral());
-        specialRecognizers.add(new ForInActionLiteral());
-        specialRecognizers.add(new ForContinueToken());
+        SPECIAL_RECOGNIZERS.add(new CommentActionLiteral());
+        SPECIAL_RECOGNIZERS.add(new ForActionLiteral());
+        SPECIAL_RECOGNIZERS.add(new ForInActionLiteral());
+        SPECIAL_RECOGNIZERS.add(new ForContinueToken());
     }
 
     private static class ForContinueToken extends ATokenRecognizer {
@@ -86,7 +86,7 @@ public class RobotSpecialTokens {
     public List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
         final StringBuilder sb = new StringBuilder(text);
-        for (final ATokenRecognizer rec : specialRecognizers) {
+        for (final ATokenRecognizer rec : SPECIAL_RECOGNIZERS) {
             final ATokenRecognizer newInstance = rec.newInstance();
             if (newInstance.hasNext(sb, fp.getLine())) {
                 final RobotToken t = newInstance.next();
