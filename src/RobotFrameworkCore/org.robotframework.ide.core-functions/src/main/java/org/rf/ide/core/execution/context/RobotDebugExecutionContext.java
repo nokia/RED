@@ -15,6 +15,8 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.execution.context.ExecutableRowFindersManager;
+import org.rf.ide.core.execution.context.IRobotExecutableRowFinder;
 
 
 /**
@@ -26,8 +28,6 @@ public class RobotDebugExecutionContext {
     public static final String MAIN_KEYWORD_TYPE = "Keyword";
 
     public static final String LOOP_KEYWORD_TYPE = "Test For";
-
-    public static final String LOOP_ITEM_KEYWORD_TYPE = "Test Foritem";
 
     public static final String TESTCASE_SETUP_KEYWORD_TYPE = "Test Setup";
     
@@ -47,6 +47,7 @@ public class RobotDebugExecutionContext {
     
     private boolean isSetupTeardownKeywordStarted;
     private boolean isForLoopStarted;
+    private int forLoopsCounter = 0;
     
     public RobotDebugExecutionContext() {
         currentKeywords = new ArrayList<>();
@@ -75,13 +76,14 @@ public class RobotDebugExecutionContext {
 
     public void startKeyword(final String name, final String type, final List<String> arguments) {
         currentKeywords.add(new KeywordContext(name, type));
-        checkKeywordType(type);
+        checkStartKeywordType(type);
     }
 
-    public void endKeyword() {
+    public void endKeyword(final String type) {
         currentKeywords.remove(currentKeywords.size() - 1);
+        checkEndKeywordType(type);
     }
-    
+
     public void endTest() {
         testCaseExecutionRowCounter.reset();
     }
@@ -139,36 +141,37 @@ public class RobotDebugExecutionContext {
         return parentKeywordContext;
     }
 
-    private void checkKeywordType(final String type) {
-        if (isForLoopStart(type)) {
+    private void checkStartKeywordType(final String type) {
+        if(type.equalsIgnoreCase(LOOP_KEYWORD_TYPE)) {
+            forLoopsCounter++;
+        } else if (forLoopsCounter > 0) {
             isForLoopStarted = true;
         } else if (isForLoopEnd(type)) {
             isForLoopStarted = false;
             executableRowFindersManager.clearForLoopState();
-        } else if (isSetupTeardownEnd(type)) {
-            isSetupTeardownKeywordStarted = false;
         } else if (isSetupTeardownStart(type)) {
             isSetupTeardownKeywordStarted = true;
         }
     }
-    
-    private boolean isForLoopStart(final String keywordType) {
-        return keywordType.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE);
-    }
 
     private boolean isForLoopEnd(final String keywordType) {
-        return isForLoopStarted && !keywordType.equalsIgnoreCase(LOOP_ITEM_KEYWORD_TYPE) && !keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE);
+        return isForLoopStarted && forLoopsCounter == 0;
     }
 
     private boolean isSetupTeardownStart(final String keywordType) {
         return !keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE) && !keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE);
     }
 
-    private boolean isSetupTeardownEnd(final String keywordType) {
-        return isSetupTeardownKeywordStarted && !keywordType.equalsIgnoreCase(TESTCASE_SETUP_KEYWORD_TYPE)
-                && !keywordType.equalsIgnoreCase(TESTCASE_TEARDOWN_KEYWORD_TYPE)
-                && !keywordType.equalsIgnoreCase(SUITE_SETUP_KEYWORD_TYPE)
-                && !keywordType.equalsIgnoreCase(SUITE_TEARDOWN_KEYWORD_TYPE);
+    private void checkEndKeywordType(final String keywordType) {
+        if (keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE)) {
+            forLoopsCounter--;
+        }
+        if (keywordType.equalsIgnoreCase(TESTCASE_SETUP_KEYWORD_TYPE)
+                || keywordType.equalsIgnoreCase(TESTCASE_TEARDOWN_KEYWORD_TYPE)
+                || keywordType.equalsIgnoreCase(SUITE_SETUP_KEYWORD_TYPE)
+                || keywordType.equalsIgnoreCase(SUITE_TEARDOWN_KEYWORD_TYPE)) {
+            isSetupTeardownKeywordStarted = false;
+        }
     }
     
     private boolean isKeywordDirectlyFromTestCase() {
