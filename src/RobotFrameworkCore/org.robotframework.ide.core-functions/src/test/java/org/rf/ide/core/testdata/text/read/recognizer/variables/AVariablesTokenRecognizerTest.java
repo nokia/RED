@@ -11,12 +11,12 @@ import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Test;
+import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.variables.AVariablesTokenRecognizer;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 
 
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class AVariablesTokenRecognizerTest {
 
     private static final VariableType TYPE = VariableType.INVALID;

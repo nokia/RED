@@ -27,6 +27,8 @@ import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
  * @see CombinationGenerator#convertTo(java.util.List)
  * @see CombinationGenerator#combinations(String)
  */
+@SuppressWarnings({ "PMD.MethodNamingConventions",
+        "PMD.VariableNamingConventions" })
 public class CombinationGeneratorTest {
 
     @ForClean

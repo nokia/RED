@@ -12,13 +12,14 @@ import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Test;
+import org.rf.ide.core.test.helpers.ClassFieldCleaner;
+import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.CombinationGenerator;
 
 
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class ATokenRecognizerTest {
 
     @Test

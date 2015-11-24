@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.mapping.variables.ScalarVariableValueMapper;
 
 public class VariablesDeclarationMapperProvider {
 
-    private static final List<IParsingMapper> mappers = Arrays
+    private static final List<IParsingMapper> MAPPERS = Arrays
             .asList(new ScalarVariableMapper(),
                     new ScalarVariableValueMapper(), new ListVariableMapper(),
                     new ListVariableValueMapper(),
@@ -27,6 +27,6 @@ public class VariablesDeclarationMapperProvider {
 
 
     public List<IParsingMapper> getMappers() {
-        return mappers;
+        return MAPPERS;
     }
 }

@@ -24,6 +24,7 @@ import org.mockito.invocation.InvocationOnMock;
  * 
  * @see AnswerRecorder
  */
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class TestAnswerRecorder {
 
     @Test

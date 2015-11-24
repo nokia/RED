@@ -15,6 +15,7 @@ public interface IRobotFileDumper {
     boolean canDumpFile(final File file);
 
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     void dump(final File robotFile, final RobotFile model) throws Exception;
 
 
