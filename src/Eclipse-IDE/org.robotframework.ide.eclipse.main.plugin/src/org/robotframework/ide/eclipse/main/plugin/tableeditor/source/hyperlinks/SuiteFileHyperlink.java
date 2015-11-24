@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -16,6 +15,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
@@ -23,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  * @author Michal Anglart
  *
  */
-public class DifferentFileHyperlink implements IHyperlink {
+public class SuiteFileHyperlink implements IHyperlink {
 
     private static final String DEFAULT_TEXT = "Open Definition";
 
@@ -31,23 +31,24 @@ public class DifferentFileHyperlink implements IHyperlink {
 
     private final IRegion destination;
 
-    private final IFile destinationFile;
+    private final RobotSuiteFile destinationFile;
 
     private final String label;
 
-    public DifferentFileHyperlink(final IRegion from, final IFile toFile) {
+    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile) {
         this(from, toFile, null, DEFAULT_TEXT);
     }
 
-    public DifferentFileHyperlink(final IRegion from, final IFile toFile, final String label) {
+    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final String label) {
         this(from, toFile, null, label);
     }
 
-    public DifferentFileHyperlink(final IRegion from, final IFile toFile, final IRegion to) {
+    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to) {
         this(from, toFile, to, DEFAULT_TEXT);
     }
 
-    public DifferentFileHyperlink(final IRegion from, final IFile toFile, final IRegion to, final String label) {
+    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to,
+            final String label) {
         this.source = from;
         this.destinationFile = toFile;
         this.destination = to;
@@ -75,7 +76,7 @@ public class DifferentFileHyperlink implements IHyperlink {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
         try {
-            final IEditorPart ed = page.openEditor(new FileEditorInput(destinationFile), desc.getId());
+            final IEditorPart ed = page.openEditor(new FileEditorInput(destinationFile.getFile()), desc.getId());
             if (ed instanceof RobotFormEditor) { // it can be ErrorEditorPart if something went wrong
                 final RobotFormEditor editor = (RobotFormEditor) ed;
                 final SuiteSourceEditor sourcePage = editor.activateSourcePage();

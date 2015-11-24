@@ -13,13 +13,8 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -28,7 +23,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
@@ -64,10 +58,13 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             }
             final IRegion fromRegion = hyperlinkRegion.get();
 
-            final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
             final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
-            final Path path = new Path(suiteFile.getProject().resolve(pathAsString));
+            if (lineContent.trim().toLowerCase().startsWith("library") && !isPath(pathAsString)) {
+                return null;
+            }
 
+            final Path path = new Path(suiteFile.getProject().resolve(pathAsString));
+            final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
             IPath wsRelativePath = null;
             if (path.isAbsolute()) {
                 wsRelativePath = path.makeRelativeTo(wsRoot.getLocation());
@@ -79,11 +76,10 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
                 wsRelativePath = PathsConverter.fromResourceRelativeToWorkspaceRelative(suiteFile.getFile(), path);
             }
             final IResource resource = wsRoot.findMember(wsRelativePath);
-            if (resource != null && resource.exists() && resource.getType() == IResource.FILE
-                    && isRobotFile((IFile) resource)) {
+            if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
 
                 final List<IHyperlink> hyperlinks = newArrayList();
-                hyperlinks.add(new DifferentFileHyperlink(fromRegion, (IFile) resource, "Open File"));
+                hyperlinks.add(new FileHyperlink(fromRegion, (IFile) resource, "Open File"));
 
                 if (canShowMultipleHyperlinks && hyperlinks.size() > 1) {
                     throw new IllegalStateException(
@@ -97,25 +93,14 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
         }
     }
 
-    protected boolean isRobotFile(final IFile file) {
-        try {
-            final IContentType textContentType = Platform.getContentTypeManager()
-                    .getContentType(IContentTypeManager.CT_TEXT);
-            final IContentType robotContentType = Platform.getContentTypeManager()
-                    .getContentType(RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID);
-            final IContentDescription contentDescription = file.getContentDescription();
-            final IContentType currentContentType = contentDescription == null ? null
-                    : contentDescription.getContentType();
-            return currentContentType != null
-                    && (currentContentType.isKindOf(textContentType) || currentContentType.isKindOf(robotContentType));
-        } catch (final CoreException e) {
-            return false;
-        }
-    }
-
     private boolean isApplicable(final String lineContent) {
         return lineContent.trim().toLowerCase().startsWith("resource")
-                || lineContent.trim().toLowerCase().startsWith("variables");
+                || lineContent.trim().toLowerCase().startsWith("variables")
+                || lineContent.trim().toLowerCase().startsWith("library");
     }
 
+    private boolean isPath(final String pathAsString) {
+        return pathAsString.endsWith("/") || pathAsString.endsWith(".py") || pathAsString.endsWith(".class")
+                || pathAsString.endsWith(".java");
+    }
 }
