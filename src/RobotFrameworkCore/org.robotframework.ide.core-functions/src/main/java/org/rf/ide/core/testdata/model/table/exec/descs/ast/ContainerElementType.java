@@ -23,8 +23,8 @@ public enum ContainerElementType {
             ContainerSettings.newInstance()
                     .setCloseForType(SQUARE_BRACKET_OPEN), ']');
 
-    private static final Map<Character, ContainerElementType> mapping = new HashMap<>();
-    private static final Map<ContainerElementType, ContainerElementType> openTypesToCloseTypes = new HashMap<>();
+    private static final Map<Character, ContainerElementType> MAPPING = new HashMap<>();
+    private static final Map<ContainerElementType, ContainerElementType> OPEN_TYPES_TO_CLOSE_TYPES = new HashMap<>();
 
     private final List<Character> representation = new ArrayList<>();
     private final ContainerSettings settings;
@@ -61,29 +61,29 @@ public enum ContainerElementType {
 
     public static ContainerElementType getCloseContainerType(
             final ContainerElementType containerElementType) {
-        synchronized (openTypesToCloseTypes) {
-            if (openTypesToCloseTypes.isEmpty()) {
+        synchronized (OPEN_TYPES_TO_CLOSE_TYPES) {
+            if (OPEN_TYPES_TO_CLOSE_TYPES.isEmpty()) {
                 for (final ContainerElementType cet : values()) {
                     final ContainerElementType openType = cet.getCloseContainer();
                     if (openType != null) {
-                        openTypesToCloseTypes.put(openType, cet);
+                        OPEN_TYPES_TO_CLOSE_TYPES.put(openType, cet);
                     }
                 }
             }
         }
 
-        return openTypesToCloseTypes.get(containerElementType);
+        return OPEN_TYPES_TO_CLOSE_TYPES.get(containerElementType);
     }
 
 
     public static ContainerElementType getTypeFor(final char c) {
-        synchronized (mapping) {
-            if (mapping.isEmpty()) {
+        synchronized (MAPPING) {
+            if (MAPPING.isEmpty()) {
                 initMappingCharToType();
             }
         }
 
-        ContainerElementType type = mapping.get(c);
+        ContainerElementType type = MAPPING.get(c);
         if (type == null) {
             type = ContainerElementType.TEXT;
         }
@@ -95,10 +95,10 @@ public enum ContainerElementType {
     private static void initMappingCharToType() {
         for (final ContainerElementType cet : values()) {
             for (final char representationChar : cet.getRepresentation()) {
-                final ContainerElementType checkType = mapping
+                final ContainerElementType checkType = MAPPING
                         .get(representationChar);
                 if (checkType == null) {
-                    mapping.put(representationChar, cet);
+                    MAPPING.put(representationChar, cet);
                 } else {
                     throw new IllegalStateException("Char \'"
                             + representationChar + "\' is already defined for "

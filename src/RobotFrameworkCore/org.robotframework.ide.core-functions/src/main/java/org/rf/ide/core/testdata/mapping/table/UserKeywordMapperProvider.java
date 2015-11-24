@@ -27,28 +27,28 @@ import org.rf.ide.core.testdata.mapping.keywords.UserKeywordNameMapper;
 
 public class UserKeywordMapperProvider {
 
-    private static final List<IParsingMapper> mappers = new ArrayList<>();
+    private static final List<IParsingMapper> MAPPERS = new ArrayList<>();
 
     static {
-        mappers.add(new UserKeywordNameMapper());
-        mappers.add(new KeywordDocumentationMapper());
-        mappers.add(new KeywordDocumentationTextMapper());
-        mappers.add(new KeywordTagsMapper());
-        mappers.add(new KeywordTagsTagNameMapper());
-        mappers.add(new KeywordArgumentsMapper());
-        mappers.add(new KeywordArgumentsValueMapper());
-        mappers.add(new KeywordReturnMapper());
-        mappers.add(new KeywordReturnValueMapper());
-        mappers.add(new KeywordTeardownMapper());
-        mappers.add(new KeywordTeardownNameMapper());
-        mappers.add(new KeywordTeardownArgumentMapper());
-        mappers.add(new KeywordTimeoutMapper());
-        mappers.add(new KeywordTimeoutValueMapper());
-        mappers.add(new KeywordTimeoutMessageMapper());
+        MAPPERS.add(new UserKeywordNameMapper());
+        MAPPERS.add(new KeywordDocumentationMapper());
+        MAPPERS.add(new KeywordDocumentationTextMapper());
+        MAPPERS.add(new KeywordTagsMapper());
+        MAPPERS.add(new KeywordTagsTagNameMapper());
+        MAPPERS.add(new KeywordArgumentsMapper());
+        MAPPERS.add(new KeywordArgumentsValueMapper());
+        MAPPERS.add(new KeywordReturnMapper());
+        MAPPERS.add(new KeywordReturnValueMapper());
+        MAPPERS.add(new KeywordTeardownMapper());
+        MAPPERS.add(new KeywordTeardownNameMapper());
+        MAPPERS.add(new KeywordTeardownArgumentMapper());
+        MAPPERS.add(new KeywordTimeoutMapper());
+        MAPPERS.add(new KeywordTimeoutValueMapper());
+        MAPPERS.add(new KeywordTimeoutMessageMapper());
     }
 
 
     public List<IParsingMapper> getMappers() {
-        return mappers;
+        return MAPPERS;
     }
 }

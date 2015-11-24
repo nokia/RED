@@ -53,35 +53,35 @@ public class HashCommentMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
 
-    private static final List<IHashCommentMapper> commentMappers = new ArrayList<>();
+    private static final List<IHashCommentMapper> COMMENT_MAPPERS = new ArrayList<>();
     static {
-        commentMappers.add(new TableHeaderCommentMapper());
-        commentMappers.add(new SettingLibraryCommentMapper());
-        commentMappers.add(new SettingVariableCommentMapper());
-        commentMappers.add(new SettingResourceCommentMapper());
-        commentMappers.add(new SettingDocumentationCommentMapper());
-        commentMappers.add(new SettingMetadataCommentMapper());
-        commentMappers.add(new SettingSuiteSetupCommentMapper());
-        commentMappers.add(new SettingSuiteTeardownCommentMapper());
-        commentMappers.add(new SettingForceTagsCommentMapper());
-        commentMappers.add(new SettingDefaultTagsCommentMapper());
-        commentMappers.add(new SettingTestSetupCommentMapper());
-        commentMappers.add(new SettingTestTeardownCommentMapper());
-        commentMappers.add(new SettingTestTemplateCommentMapper());
-        commentMappers.add(new SettingTestTimeoutCommentMapper());
-        commentMappers.add(new VariablesDeclarationCommentMapper());
-        commentMappers.add(new TestCaseSettingDocumentationCommentMapper());
-        commentMappers.add(new TestCaseSettingSetupCommentMapper());
-        commentMappers.add(new TestCaseSettingTeardownCommentMapper());
-        commentMappers.add(new TestCaseSettingTagsCommentMapper());
-        commentMappers.add(new TestCaseSettingTemplateCommentMapper());
-        commentMappers.add(new TestCaseSettingTimeoutCommentMapper());
-        commentMappers.add(new UserKeywordSettingDocumentationCommentMapper());
-        commentMappers.add(new UserKeywordSettingTagsCommentMapper());
-        commentMappers.add(new UserKeywordSettingArgumentsCommentMapper());
-        commentMappers.add(new UserKeywordSettingReturnCommentMapper());
-        commentMappers.add(new UserKeywordSettingTeardownCommentMapper());
-        commentMappers.add(new UserKeywordSettingTimeoutCommentMapper());
+        COMMENT_MAPPERS.add(new TableHeaderCommentMapper());
+        COMMENT_MAPPERS.add(new SettingLibraryCommentMapper());
+        COMMENT_MAPPERS.add(new SettingVariableCommentMapper());
+        COMMENT_MAPPERS.add(new SettingResourceCommentMapper());
+        COMMENT_MAPPERS.add(new SettingDocumentationCommentMapper());
+        COMMENT_MAPPERS.add(new SettingMetadataCommentMapper());
+        COMMENT_MAPPERS.add(new SettingSuiteSetupCommentMapper());
+        COMMENT_MAPPERS.add(new SettingSuiteTeardownCommentMapper());
+        COMMENT_MAPPERS.add(new SettingForceTagsCommentMapper());
+        COMMENT_MAPPERS.add(new SettingDefaultTagsCommentMapper());
+        COMMENT_MAPPERS.add(new SettingTestSetupCommentMapper());
+        COMMENT_MAPPERS.add(new SettingTestTeardownCommentMapper());
+        COMMENT_MAPPERS.add(new SettingTestTemplateCommentMapper());
+        COMMENT_MAPPERS.add(new SettingTestTimeoutCommentMapper());
+        COMMENT_MAPPERS.add(new VariablesDeclarationCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingDocumentationCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingSetupCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingTeardownCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingTagsCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingTemplateCommentMapper());
+        COMMENT_MAPPERS.add(new TestCaseSettingTimeoutCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingDocumentationCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingTagsCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingArgumentsCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingReturnCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingTeardownCommentMapper());
+        COMMENT_MAPPERS.add(new UserKeywordSettingTimeoutCommentMapper());
     }
 
 
@@ -122,7 +122,7 @@ public class HashCommentMapper implements IParsingMapper {
     @VisibleForTesting
     public IHashCommentMapper findApplicableMapper(final ParsingState state) {
         IHashCommentMapper mapperApplicable = null;
-        for (final IHashCommentMapper mapper : commentMappers) {
+        for (final IHashCommentMapper mapper : COMMENT_MAPPERS) {
             if (mapper.isApplicable(state)) {
                 mapperApplicable = mapper;
                 break;

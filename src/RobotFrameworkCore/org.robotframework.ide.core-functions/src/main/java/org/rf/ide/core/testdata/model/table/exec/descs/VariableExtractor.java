@@ -26,6 +26,7 @@ public class VariableExtractor {
     }
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     public MappingResult extract(final FilePosition fp, final String text,
             final String fileName) {
         try {

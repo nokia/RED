@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
-import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
+import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import com.google.common.annotations.VisibleForTesting;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class PreviousLineHandler {
 
     private final ElementPositionResolver posResolver;

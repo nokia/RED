@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class ElementPositionResolver {
 
     public PositionInformation buildPositionDescription(final RobotFile model,
@@ -122,7 +123,8 @@ public class ElementPositionResolver {
         public boolean isContinuePreviousLineTheFirstToken() {
             boolean result = false;
             if (!previousLineContinuePosIndexes.isEmpty()) {
-                final int theFirstContinue = previousLineContinuePosIndexes.get(0);
+                final int theFirstContinue = previousLineContinuePosIndexes
+                        .get(0);
                 if (!robotTokensPosIndexes.isEmpty()) {
                     final int theFirstToken = robotTokensPosIndexes.get(0);
                     result = theFirstContinue < theFirstToken;
@@ -319,14 +321,17 @@ public class ElementPositionResolver {
                     && posInfo.getRobotTokensPosIndexes().size() == 1) {
                 final int theFirstPreviousContinue = posInfo
                         .getPreviousLineContinuePosIndexes().get(0);
-                final int theFirstToken = posInfo.getRobotTokensPosIndexes().get(0);
+                final int theFirstToken = posInfo.getRobotTokensPosIndexes()
+                        .get(0);
                 if (theFirstToken < theFirstPreviousContinue) {
-                    final SeparatorType separatorType = posInfo.getLineSeparator();
+                    final SeparatorType separatorType = posInfo
+                            .getLineSeparator();
                     final List<Integer> separatorsPosIndexes = posInfo
                             .getSeparatorsPosIndexes();
                     if (separatorType == SeparatorType.PIPE) {
                         if (separatorsPosIndexes.size() >= 2) {
-                            final int theFirstSeparator = separatorsPosIndexes.get(0);
+                            final int theFirstSeparator = separatorsPosIndexes
+                                    .get(0);
                             final int theSecondSeparator = separatorsPosIndexes
                                     .get(1);
                             result = theFirstSeparator < theFirstToken
@@ -335,7 +340,8 @@ public class ElementPositionResolver {
                         }
                     } else {
                         if (separatorsPosIndexes.size() == 1) {
-                            final int theFirstSeparator = separatorsPosIndexes.get(0);
+                            final int theFirstSeparator = separatorsPosIndexes
+                                    .get(0);
                             result = theFirstToken < theFirstSeparator
                                     && theFirstSeparator < theFirstPreviousContinue;
                         }
