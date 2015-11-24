@@ -44,6 +44,7 @@ import com.google.common.base.Optional;
 /**
  * @author mmarzec
  */
+@SuppressWarnings("PMD.GodClass")
 class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     private static final int CONNECTION_TIMEOUT = 10;
