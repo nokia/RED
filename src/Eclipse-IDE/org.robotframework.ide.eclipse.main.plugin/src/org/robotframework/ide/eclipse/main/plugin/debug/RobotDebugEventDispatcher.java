@@ -299,7 +299,9 @@ public class RobotDebugEventDispatcher extends Job {
         final String keyword = (String) endList.get(0);
         target.getCurrentKeywordsContextMap().remove(keyword);
         
-        executionContext.endKeyword();
+        final Map<?, ?> endElements = (Map<?, ?>) endList.get(1);
+        final String keywordType = (String) endElements.get("type");
+        executionContext.endKeyword(keywordType);
     }
 
     private void handleEndTestEvent(final Map<String, ?> eventMap) {
