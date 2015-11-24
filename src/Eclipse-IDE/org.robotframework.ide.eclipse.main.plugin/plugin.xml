@@ -683,7 +683,7 @@
        point="org.eclipse.ui.commands">
     <category
           id="org.robotframework.ide.eclipse.robotCommands"
-          name="Robot Commands">
+          name="Robot">
     </category>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
@@ -801,12 +801,19 @@
           name="Edit Variable">
     </command>
     <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.formatSource"
           name="Format source">
     </command>
     <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.renameInSource"
           name="Rename">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.toggleComment"
+          name="Toggle comment">
     </command>
  </extension>
  <extension
@@ -1827,7 +1834,7 @@
           commandId="org.robotframework.red.formatSource">
        <activeWhen>
           <reference
-                definitionId="org.robotframework.sourcePartIsActive">
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
           </reference>
        </activeWhen>
     </handler>
@@ -1836,7 +1843,7 @@
           commandId="org.robotframework.red.renameInSource">
        <activeWhen>
           <reference
-                definitionId="org.robotframework.sourcePartIsActive">
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
           </reference>
        </activeWhen>
     </handler>
@@ -1846,6 +1853,15 @@
        <activeWhen>
           <reference
                 definitionId="org.robotframework.sourcePartIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleCommentHandler"
+          commandId="org.robotframework.red.toggleComment">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
           </reference>
        </activeWhen>
     </handler>
@@ -1937,6 +1953,12 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="F3">
+    </key>
+    <key
+          commandId="org.robotframework.red.toggleComment"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+/">
     </key>
  </extension>
  <extension
@@ -2739,6 +2761,11 @@
          <menu
                label="Source">
             <command
+                  commandId="org.robotframework.red.toggleComment"
+                  label="Toggle comment"
+                  style="push">
+            </command>
+            <command
                   commandId="org.robotframework.red.formatSource"
                   label="Format source"
                   style="push">
@@ -3045,6 +3072,28 @@
              </equals>
           </iterate>
        </with>
+    </definition>
+    <definition
+          id="org.robotframework.sourcePartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.sources.context">
+                </equals>
+             </iterate>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
     </definition>
     <definition
           id="org.robotframework.canDeleteSectionUsingToolbar">
@@ -3517,6 +3566,26 @@
             verticalRulerPreferenceKey="org.robotframework.red.cellHighlighting.verticalVisibility"
             verticalRulerPreferenceValue="false">
       </specification>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchPages">
+      <page
+            canSearchEnclosingProjects="true"
+            class="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchPage"
+            enabled="true"
+            icon="resources/robot.png"
+            id="org.robotframework.red.search.page"
+            label="Robot Search"
+            showScopeSection="true">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchResultViewPages">
+      <viewPage
+            class="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchResultPage"
+            id="org.robotframework.red.search.page.result"
+            searchResultClass="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchResult">
+      </viewPage>
    </extension>
 
 </plugin>

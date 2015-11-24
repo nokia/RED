@@ -27,6 +27,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.Ren
 
 import com.google.common.base.Optional;
 
+/**
+ * @author Michal Anglart
+ */
 public class RenameInSourceHandler extends DIHandler<E4RenameInSourceHandler> {
 
     public RenameInSourceHandler() {
