@@ -103,7 +103,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
 
                     final IHyperlink definitionHyperlink = file == suiteFile
                             ? new RegionsHyperlink(textViewer, fromRegion, destination)
-                            : new DifferentFileHyperlink(fromRegion, file.getFile(), destination);
+                            : new SuiteFileHyperlink(fromRegion, file, destination);
                     hyperlinks.add(definitionHyperlink);
                     if (canShowMultipleHyperlinks) {
                         hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
