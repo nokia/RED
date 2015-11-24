@@ -22,6 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.Ope
 
 import com.google.common.base.Optional;
 
+/**
+ * @author Michal Anglart
+ */
 public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> {
 
     public OpenDeclarationHandler() {

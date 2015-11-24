@@ -14,7 +14,9 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.FormatSourceHandler.E4FormatSourceHandler;
 
-
+/**
+ * @author Michal Anglart
+ */
 public class FormatSourceHandler extends DIHandler<E4FormatSourceHandler> {
 
     public FormatSourceHandler() {
