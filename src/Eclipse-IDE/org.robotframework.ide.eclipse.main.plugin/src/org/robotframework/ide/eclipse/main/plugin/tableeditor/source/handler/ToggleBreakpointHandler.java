@@ -28,7 +28,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler.E4ToggleBreakpointHandler;
 
-
+/**
+ * @author Michal Anglart
+ */
 public class ToggleBreakpointHandler extends DIHandler<E4ToggleBreakpointHandler> {
 
     public ToggleBreakpointHandler() {
@@ -73,7 +75,7 @@ public class ToggleBreakpointHandler extends DIHandler<E4ToggleBreakpointHandler
             }
         }
 
-        private static boolean isExecutableLine(IResource file, int line) {
+        private static boolean isExecutableLine(final IResource file, final int line) {
             if (file instanceof IFile) {
                 final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) file);
                 if (robotSuiteFile != null) {
