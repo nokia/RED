@@ -21,9 +21,8 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>3.5</version>
 				<configuration>
-					<skip>true</skip>
 					<rulesets>
-						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
+						<ruleset>../../PMD/pegasus-pmd-tests.xml</ruleset>
 					</rulesets>
 					<linkXref>false</linkXref>
 					<sourceEncoding>utf-8</sourceEncoding>
