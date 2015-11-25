@@ -6,21 +6,17 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Robotframework IDE Core Functions</name>
 	<description>It is base functions for Robot Framework IDE - it is not depend from view part - can be adopt to any kind of editor, which will handle in MVC - view responsibility.</description>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-		<jdk.version>1.7</jdk.version>	
+		<jdk.version>1.7</jdk.version>
 	</properties>
-	
+
 	<reporting>
 		<plugins>
-			<!--plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>emma-maven-plugin</artifactId>
-				<version>1.0-alpha-3</version>
-				<inherited>true</inherited>
-			</plugin-->
+			<!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>emma-maven-plugin</artifactId> 
+				<version>1.0-alpha-3</version> <inherited>true</inherited> </plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
@@ -41,7 +37,7 @@
 				<configuration>
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
-			</plugin>	
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
@@ -78,10 +74,10 @@
 				<configuration>
 					<!-- excludes>**/model/**/*</excludes -->
 				</configuration>
-			</plugin>							
+			</plugin>
 		</plugins>
 	</reporting>
-	
+
 	<build>
 		<defaultGoal>package</defaultGoal>
 		<resources>
@@ -93,7 +89,7 @@
 			</resource>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
-			</resource> 			
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -115,10 +111,10 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<!--Main-Class>${mainClass}</Main-Class-->
+										<!--Main-Class>${mainClass}</Main-Class -->
 										<Implementation-Product>${project.artifactId}</Implementation-Product>
 										<Implementation-Version>${project.version}</Implementation-Version>
-										<!--Implementation-Revision>${buildRevision}</Implementation-Revision-->
+										<!--Implementation-Revision>${buildRevision}</Implementation-Revision -->
 										<!-- Implementation-ScmBranch>${scmBranch}</Implementation-ScmBranch -->
 									</manifestEntries>
 								</transformer>
@@ -170,47 +166,17 @@
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-exec</artifactId>
 									<version>1.3</version>
-								</artifactItem>		
+								</artifactItem>
 								<artifactItem>
 									<groupId>org.slf4j</groupId>
 									<artifactId>slf4j-api</artifactId>
-									<version>1.7.5</version>								
-								</artifactItem>						
+									<version>1.7.5</version>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<!--
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.1.201405082137</version>
-				<executions> -->
-					<!-- prepare agent for measuring integration tests -->
-				<!--	
-					<execution>
-						<id>prepare-integration-tests</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jacoco-site</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -223,7 +189,7 @@
 					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
 					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
-			</plugin>														
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -274,51 +240,15 @@
 										<execute></execute>
 									</action>
 								</pluginExecution>
-								<!--pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											emma-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-alpha-3,)
-										</versionRange>
-										<goals>
-											<goal>instrument</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.jacoco</groupId>
-										<artifactId>
-											jacoco-maven-plugin
-										</artifactId>
-										<versionRange>
-											[0.6.4.201312101107,)
-										</versionRange>
-										<goals>
-											<goal>prepare-agent</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution-->
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		<finalName>${project.artifactId}-${project.version}</finalName>							
+		<finalName>${project.artifactId}-${project.version}</finalName>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.assertj</groupId>
@@ -337,12 +267,12 @@
 			<artifactId>mockito-all</artifactId>
 			<version>1.10.19</version>
 			<scope>test</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.8.5</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -357,6 +287,12 @@
 			<groupId>org.apache.xmlrpc</groupId>
 			<artifactId>xmlrpc-client</artifactId>
 			<version>3.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>2.0.1</version>
+			<scope>provided</scope>
 		</dependency>		
 	</dependencies>
 </project>
