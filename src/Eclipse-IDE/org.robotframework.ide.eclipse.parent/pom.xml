@@ -72,7 +72,30 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.7</version>	
+				<version>2.7</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>help</report>
+							<report>project-team</report>
+							<report>modules</report>
+							<report>plugins</report>
+							<report>cim</report>
+							<report>issue-tracking</report>
+							<report>scm</report>
+							<report>license</report>
+							<report>plugin-management</report>
+							<report>distribution-management</report>
+							<report>summary</report>
+							<report>mailing-list</report>
+							<report>issue-tracking</report>
+							<!--
+							<report>dependencies</report>
+							-->
+						</reports>
+					</reportSet>
+				</reportSets>				
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
