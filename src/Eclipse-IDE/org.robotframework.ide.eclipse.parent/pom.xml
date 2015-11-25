@@ -47,6 +47,9 @@
 				<version>3.0.3</version>
 				<configuration>
 					<xmlOutput>true</xmlOutput>
+					<includeFilterFile>../../findbugs/findbugs-setting.xml</includeFilterFile>
+					<encoding>UTF-8</encoding>
+					<onlyAnalyze>org.rf.*,org.robotframework.*</onlyAnalyze>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -146,6 +149,32 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<configuration>
+					<effort>Max</effort>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>annotations</artifactId>
+						<version>2.0.1</version>
+						<scope>provided</scope>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>analyze-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin-->
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -156,9 +185,19 @@
 						<arguments>-Pjdk17</arguments>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>findbugs-maven-plugin</artifactId>
+					<version>3.0.3</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-
-
+	<dependencies>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+	</dependencies>
 </project>	
