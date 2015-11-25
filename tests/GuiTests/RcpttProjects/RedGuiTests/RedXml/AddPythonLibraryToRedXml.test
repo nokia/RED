@@ -1,0 +1,78 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _rNY3QJKkEeWGA6GsgqW2Mw
+Element-Name: AddPythonLibraryToRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _RTKmUJNnEeWXp4iZQnTw0A
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/25/15 12:45 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
+
+// add to Source path to library Calculator 
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 8 1
+    type-text "Library	external_lib/CalculatorLibrary.py "
+
+}
+
+// add Keyword from Calc lib, now RED does not see it - should be a problem reporteed
+with [get-editor "TestSuite.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 3 19
+        key-type Enter
+        type-text "Push button"
+        key-type "M1+s"
+    }
+    get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 4
+}
+
+// check if lib and KW is reported as unknown
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(2 items\\)" | get-property "getItemCount()" | equals 2 | verify-true
+    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Unknown 'external_lib/CalculatorLibrary.py' library" | verify-true
+    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Unknown keyword 'Push button'" | verify-true
+}
+
+// open red.xml and add CalculatorLibrary to Python libs by button
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+set-dialog-result File "platform:/resource/ProjectWithResource/external_lib/CalculatorLibrary.py"
+get-editor "ProjectWithResource/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+get-window "Select library class" | get-table | select CalculatorLibrary | click -default
+get-editor "ProjectWithResource/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
+    | key-type "M1+s"
+// go back to Source and check errors - there should be zro
+get-tab-folder -index 1 | get-tab-item "TestSuite.robot" | click
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 11 27
+    key-type "M1+s"
+    type-text " "
+    key-type "M1+s"
+}
+// there are no problems
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+// check if libspec is generated from CalculatorLibrary
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+        | get-property caption | equals "CalculatorLibrary ProjectWithResource/external_lib (4)" | verify-true
+    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Push Button" | verify-true
+    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Push Buttons" | verify-true
+    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+        | get-property "getItems().TreeItem[2].getText()" | equals "Result Should Be" | verify-true
+    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+        | get-property "getItems().TreeItem[3].getText()" | equals "Should Cause Error" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

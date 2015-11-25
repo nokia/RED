@@ -1,0 +1,63 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _rNY3QJKkEeWGA6GsgqW2Mw
+Element-Name: AddVariableFileToRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _XgSTEJNrEeWXp4iZQnTw0A
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/25/15 3:23 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
+// add to test Log ${external_val} which is defined in external var.py file
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    hover-text 3 11
+    set-caret-pos 3 20
+    key-type Enter
+    type-text Log
+    key-type Tab
+    type-text "${externalvar}"
+	key-type "M1+s"
+	
+}
+// check if error exists for not known variable
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Variable 'externalvar' is used, but not defined" 
+    | get-property caption | equals "Variable 'externalvar' is used, but not defined" | verify-true
+
+
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+// open Red.xml editor and add external var.py
+get-editor "ProjectWithResource/red.xml" | get-section "Variable files" | get-button "Add Variable File" | click
+set-dialog-result File "platform:/resource/ProjectWithResource/external_var/var.py"
+with [get-window "Add Variable File"] {
+    get-button "Browse..." | click
+   
+    get-button OK | click
+}
+with [get-editor "ProjectWithResource/red.xml"] {
+    get-section "Variable files" | get-button "Add Variable File" | key-type "M1+s"
+}
+
+
+get-editor "ProjectWithResource/red.xml" | get-section "Variable files" | get-table | key-type "M1+s"
+
+
+
+// force validation
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    type-text " "
+}
+// check if there are not errors - variable is seen
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
