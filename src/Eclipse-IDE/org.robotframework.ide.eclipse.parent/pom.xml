@@ -66,6 +66,7 @@
 				<version>2.8.1</version>
 				<configuration>
 					<skip>true</skip>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>		
 			<plugin>
