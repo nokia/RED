@@ -14,6 +14,27 @@
 		<relativePath>${project.basedir}/../org.robotframework.ide.eclipse.parent/pom.xml</relativePath>
 	</parent>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.5</version>
+				<configuration>
+					<skip>true</skip>
+					<rulesets>
+						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
+					</rulesets>
+					<linkXref>false</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<includeTests>false</includeTests>
+					<minimumTokens>100</minimumTokens>
+					<targetJdk>${jdk.version}</targetJdk>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+	
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
