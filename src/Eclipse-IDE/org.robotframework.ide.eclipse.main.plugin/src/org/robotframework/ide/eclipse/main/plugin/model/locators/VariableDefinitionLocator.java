@@ -14,7 +14,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.importer.AVariableImported;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -22,7 +22,6 @@ import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -42,6 +41,7 @@ import com.google.common.base.Optional;
 /**
  * @author Michal Anglart
  */
+@SuppressWarnings("PMD.GodClass")
 public class VariableDefinitionLocator {
 
     private final IFile file;
@@ -73,7 +73,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInVariableFiles(PathsResolver.getAbsoluteVariableFilesPaths(startingFile), detector);
+        shouldContinue = locateInVariableFiles(detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
@@ -91,7 +91,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInVariableFiles(PathsResolver.getAbsoluteVariableFilesPaths(startingFile), detector);
+        shouldContinue = locateInVariableFiles(detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
@@ -219,24 +219,15 @@ public class VariableDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private ContinueDecision locateInVariableFiles(final List<IPath> absoluteVariablePaths,
-            final VariableDetector detector) {
-
+    private ContinueDecision locateInVariableFiles(final VariableDetector detector) {
         final List<ReferencedVariableFile> knownParamFiles = model.createRobotProject(file.getProject())
                 .getVariablesFromReferencedFiles();
-        for (final IPath importedFilePath : absoluteVariablePaths) {
-            for (final ReferencedVariableFile knownFile : knownParamFiles) {
-                final IPath absKnownFilePath = PathsConverter
-                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(knownFile.getPath()));
-
-                if (absKnownFilePath.equals(importedFilePath)) {
-                    for (final Entry<String, Object> var : knownFile.getVariablesWithProperPrefixes().entrySet()) {
-                        final ContinueDecision shouldContinue = detector.varFileVariableDetected(knownFile,
-                                var.getKey(), var.getValue());
-                        if (shouldContinue == ContinueDecision.STOP) {
-                            return ContinueDecision.STOP;
-                        }
-                    }
+        for (final ReferencedVariableFile knownFile : knownParamFiles) {
+            for (final Entry<String, Object> var : knownFile.getVariablesWithProperPrefixes().entrySet()) {
+                final ContinueDecision shouldContinue = detector.varFileVariableDetected(knownFile, var.getKey(),
+                        var.getValue());
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
                 }
             }
         }
