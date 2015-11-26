@@ -15,23 +15,23 @@ import org.rf.ide.core.testdata.importer.ResourceImporter;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.text.read.TsvRobotFileParser;
 import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
-
 
 public class RobotParser {
 
     private static final List<IRobotFileParser> AVAIL_FORMAT_PARSERS = new ArrayList<>();
     static {
         AVAIL_FORMAT_PARSERS.add(new TxtRobotFileParser());
+        AVAIL_FORMAT_PARSERS.add(new TsvRobotFileParser());
     }
 
     private final boolean shouldEagerImport;
 
     private final RobotProjectHolder robotProject;
-
 
     /**
      * Creates parser which eagerly parses given file with all dependent
@@ -44,7 +44,6 @@ public class RobotParser {
         return new RobotParser(projectHolder, true);
     }
 
-
     /**
      * Creates parser which parses only given file without dependencies.
      * 
@@ -55,18 +54,14 @@ public class RobotParser {
         return new RobotParser(projectHolder, false);
     }
 
-
-    private RobotParser(final RobotProjectHolder robotProject,
-            final boolean shouldImportEagerly) {
+    private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
         this.robotProject = robotProject;
         this.shouldEagerImport = shouldImportEagerly;
     }
 
-
     public boolean isImportingEagerly() {
         return shouldEagerImport;
     }
-
 
     /**
      * Should be used for unsaved editor content. Parsed output is not replacing
@@ -76,8 +71,7 @@ public class RobotParser {
      * @param fileOrDir
      * @return
      */
-    public RobotFileOutput parseEditorContent(final String fileContent,
-            final File fileOrDir) {
+    public RobotFileOutput parseEditorContent(final String fileContent, final File fileOrDir) {
         final RobotFileOutput robotFile = new RobotFileOutput();
 
         final IRobotFileParser parserToUse = getParser(fileOrDir, true);
@@ -85,28 +79,25 @@ public class RobotParser {
         if (parserToUse != null) {
             ByteArrayInputStream bais = new ByteArrayInputStream(new byte[0]);
             if (fileContent != null && fileContent.length() > 0) {
-                bais = new ByteArrayInputStream(fileContent.getBytes(Charset
-                        .forName("UTF-8")));
+                bais = new ByteArrayInputStream(fileContent.getBytes(Charset.forName("UTF-8")));
             }
 
             parserToUse.parse(robotFile, bais, fileOrDir);
             importExternal(robotFile);
         } else {
-            robotFile.addBuildMessage(BuildMessage.createErrorMessage(
-                    "No parser found for file.", fileOrDir.getAbsolutePath()));
+            robotFile.addBuildMessage(BuildMessage.createErrorMessage("No parser found for file.",
+                    fileOrDir.getAbsolutePath()));
             robotFile.setStatus(Status.FAILED);
         }
 
         return robotFile;
     }
 
-
     public List<RobotFileOutput> parse(final File fileOrDir) {
         final List<RobotFileOutput> output = new ArrayList<>();
         parse(fileOrDir, output);
         return output;
     }
-
 
     private void parse(final File fileOrDir, final List<RobotFileOutput> output) {
         if (fileOrDir != null) {
@@ -138,8 +129,7 @@ public class RobotParser {
                     robotProject.addModelFile(robotFile);
                 }
             } else {
-                final RobotFileOutput fileByName = robotProject
-                        .findFileByName(fileOrDir);
+                final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
 
                 if (fileByName != null) {
                     importExternal(fileByName);
@@ -148,7 +138,6 @@ public class RobotParser {
             }
         }
     }
-
 
     private void importExternal(final RobotFileOutput robotFile) {
         if (robotFile.getStatus() == Status.PASSED) {
@@ -159,16 +148,13 @@ public class RobotParser {
             }
 
             final VariablesImporter varImporter = new VariablesImporter();
-            final List<VariablesFileImportReference> varsImported = varImporter
-                    .importVariables(robotProject.getRobotRuntime(),
-                            robotProject, robotFile);
+            final List<VariablesFileImportReference> varsImported = varImporter.importVariables(
+                    robotProject.getRobotRuntime(), robotProject, robotFile);
             robotFile.addVariablesReferenced(varsImported);
         }
     }
 
-
-    private IRobotFileParser getParser(final File fileOrDir,
-            final boolean isFromStringContent) {
+    private IRobotFileParser getParser(final File fileOrDir, final boolean isFromStringContent) {
         IRobotFileParser parserToUse = null;
         for (final IRobotFileParser parser : AVAIL_FORMAT_PARSERS) {
             synchronized (parser) {

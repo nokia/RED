@@ -9,27 +9,43 @@ import java.util.regex.Pattern;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class TokenSeparatorBuilder {
 
-    private static final Pattern PIPE_SEPARATOR_BEGIN = Pattern
-            .compile("(^[|]\\s+)|(^[|]$)");
+    private static final Pattern PIPE_SEPARATOR_BEGIN = Pattern.compile("(^[|]\\s+)|(^[|]$)");
 
+    private final FileFormat format;
 
-    public ALineSeparator createSeparator(final int lineNumber,
-            final String line) {
-        ALineSeparator thisLineSeparator = new WhitespaceSeparator(lineNumber,
-                line);
-        if (isPipeSeparated(line)) {
-            thisLineSeparator = new PipeSeparator(lineNumber, line);
+    public TokenSeparatorBuilder(final FileFormat fileFormat) {
+        this.format = fileFormat;
+    }
+
+    public ALineSeparator createSeparator(final int lineNumber, final String line) {
+        ALineSeparator thisLineSeparator = null;
+
+        if (format == FileFormat.TXT_OR_ROBOT) {
+            thisLineSeparator = new WhitespaceSeparator(lineNumber, line);
+            if (isPipeSeparated(line)) {
+                thisLineSeparator = new PipeSeparator(lineNumber, line);
+            }
+        } else if (format == FileFormat.TSV) {
+            thisLineSeparator = new StrictTsvTabulatorSeparator(lineNumber, line);
         }
 
         return thisLineSeparator;
     }
 
-
     @VisibleForTesting
     protected boolean isPipeSeparated(final String line) {
-        return PIPE_SEPARATOR_BEGIN.matcher(line).find();
+        boolean result = false;
+        if (format == FileFormat.TXT_OR_ROBOT) {
+            result = PIPE_SEPARATOR_BEGIN.matcher(line).find();
+        }
+
+        return result;
+    }
+
+    public enum FileFormat {
+        TXT_OR_ROBOT,
+        TSV
     }
 }
