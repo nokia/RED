@@ -16,6 +16,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement.OpenStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 
 import com.google.common.base.Optional;
 
@@ -55,14 +56,7 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
                 }
             }
         } catch (final PartInitException e) {
-            throw new EditorOpeningException("Unable to open editor for file: " + file.getName(), e);
-        }
-    }
-
-    public static class EditorOpeningException extends RuntimeException {
-
-        public EditorOpeningException(final String message, final PartInitException cause) {
-            super(message, cause);
+            throw new RobotEditorOpeningException("Unable to open editor for file: " + file.getName(), e);
         }
     }
 }

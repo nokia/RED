@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
 /**
@@ -87,7 +88,7 @@ public class SuiteFileHyperlink implements IHyperlink {
                 }
             }
         } catch (final PartInitException e) {
-            throw new RuntimeException("Unable to open editor for file: " + destinationFile.getName(), e);
+            throw new RobotEditorOpeningException("Unable to open editor for file: " + destinationFile.getName(), e);
         }
     }
 }
