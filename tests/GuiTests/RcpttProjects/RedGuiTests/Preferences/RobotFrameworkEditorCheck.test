@@ -1,0 +1,51 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: RobotFrameworkEditorCheck
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _XxFF4JQgEeWNpL9oeriwCw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/26/15 10:59 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// verify if Editor preference is present
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor"
+with [get-window Preferences] {
+    get-tree | get-item "Robot Framework/Editor" | get-property caption | equals Editor | verify-true
+    get-label Editor | get-property caption | equals Editor | verify-true
+}
+
+
+//set different column for arguments
+with [get-window Preferences] {
+    get-group Tables | get-editbox -after [get-label "Default number of columns for arguments in table editors"] 
+        | set-text 2
+    get-button Apply | click
+    get-button OK | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+// 4 columns - 1 for item , 2 for arguments , 1 comment
+get-editor "TestFile.robot" | get-tree | get-property "getColumnCount()" | equals 4 | verify-true
+
+get-editor "TestFile.robot" | close
+
+// change to 3 columns for arguments
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Tables | get-editbox -after [get-label "Default number of columns for arguments in table editors"] 
+        | set-text 3
+    get-button Apply | click
+    get-button OK | click
+}
+// 5 columns - 1 for item, 3 for args , 1 for comment
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tree | get-property "getColumnCount()" | equals 5 | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
