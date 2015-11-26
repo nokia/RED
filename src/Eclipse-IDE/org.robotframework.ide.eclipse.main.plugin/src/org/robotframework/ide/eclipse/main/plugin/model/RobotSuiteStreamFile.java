@@ -15,7 +15,9 @@ import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
 
@@ -44,11 +46,15 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         if (input != null) {
             int validationResult;
             try {
-                validationResult = new RobotSuiteFileDescriber().describe(input, null);
+                ASuiteFileDescriber desc = new RobotSuiteFileDescriber();
+                if (getFileExtension() != null && "tsv".equals(getFileExtension().toLowerCase())) {
+                    desc = new TsvRobotSuiteFileDescriber();
+                }
+                validationResult = desc.describe(input, null);
                 if (validationResult == IContentDescriber.VALID) {
-                    return RobotSuiteFileDescriber.SUITE_FILE_CONTENT_ID;
+                    return ASuiteFileDescriber.SUITE_FILE_CONTENT_ID;
                 } else {
-                    return RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
+                    return ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
                 }
             } catch (final IOException e) {
                 return null;
