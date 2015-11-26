@@ -71,6 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecisio
 import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator.TestCaseDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -301,7 +302,8 @@ public class ExecutionView {
 
                         }
                     } catch (final PartInitException e) {
-                        throw new RuntimeException("Unable to open editor for file: " + sourceFile.getName(), e);
+                        throw new RobotEditorOpeningException("Unable to open editor for file: " + sourceFile.getName(),
+                                e);
                     }
 
                     return ContinueDecision.STOP;
