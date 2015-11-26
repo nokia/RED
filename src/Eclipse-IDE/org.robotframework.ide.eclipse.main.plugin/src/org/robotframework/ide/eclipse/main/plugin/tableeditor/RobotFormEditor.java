@@ -327,7 +327,7 @@ public class RobotFormEditor extends FormEditor {
             try {
                 suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
             } catch (final CoreException e) {
-                throw new RuntimeException("Unable to provide model for given input", e);
+                throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }
         }
         return suiteModel;
@@ -444,6 +444,10 @@ public class RobotFormEditor extends FormEditor {
 
         public IllegalRobotEditorInputException(final String message) {
             super(message);
+        }
+
+        public IllegalRobotEditorInputException(final String message, final Throwable cause) {
+            super(message, cause);
         }
     }
 
