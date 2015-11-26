@@ -61,7 +61,7 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
     private static boolean hasContentType(final IFile resource, final String id) {
         try {
             final IContentDescription contentDescription = resource.getContentDescription();
-            return contentDescription != null && id.equals(contentDescription.getContentType().getId());
+            return contentDescription != null && id.startsWith(contentDescription.getContentType().getId());
         } catch (final CoreException e) {
             return false;
         }
