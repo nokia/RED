@@ -140,7 +140,7 @@ public class RobotFormEditor extends FormEditor {
 
             setActivePart(getPageToActivate());
         } catch (final Exception e) {
-            throw new RobotEditorInitalizationException("Unable to initialize Suite editor", e);
+            throw new RobotEditorOpeningException("Unable to initialize Suite editor", e);
         }
     }
 
@@ -447,9 +447,9 @@ public class RobotFormEditor extends FormEditor {
         }
     }
 
-    private static class RobotEditorInitalizationException extends RuntimeException {
+    public static class RobotEditorOpeningException extends RuntimeException {
 
-        public RobotEditorInitalizationException(final String message, final Throwable cause) {
+        public RobotEditorOpeningException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }

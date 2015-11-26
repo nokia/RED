@@ -36,8 +36,8 @@ public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> 
         @Execute
         public Object openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
-            final int offset = viewer.getTextWidget().getCaretOffset();
-            final Region hyperlinkRegion = new Region(offset, 0);
+
+            final IRegion hyperlinkRegion = new Region(viewer.getTextWidget().getCaretOffset(), 0);
 
             final SourceViewerConfiguration configuration = editor.getSourceEditor().getViewerConfiguration();
             final IHyperlinkDetector[] detectors = configuration.getHyperlinkDetectors(viewer);
