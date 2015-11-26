@@ -80,8 +80,6 @@ public class RedContentProposalAdapter {
 
     private Listener controlListener;
 
-    private final boolean isEnabled = true;
-
     private int autoActivationDelay = 0;
 
     private boolean receivedKeyDown;
@@ -215,10 +213,6 @@ public class RedContentProposalAdapter {
 
             @Override
             public void handleEvent(final Event e) {
-                if (!isEnabled) {
-                    return;
-                }
-
                 switch (e.type) {
                     case SWT.Traverse:
                     case SWT.KeyDown:
