@@ -98,7 +98,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
                 support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
         contentProposalAdapter.setLabelProvider(labelProvider);
         contentProposalAdapter.setAutoActivationDelay(200);
-        contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_REPLACE);
+        contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
         text.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(final DisposeEvent e) {
