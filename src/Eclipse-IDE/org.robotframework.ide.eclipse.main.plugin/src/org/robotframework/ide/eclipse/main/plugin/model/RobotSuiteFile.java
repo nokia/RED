@@ -22,21 +22,21 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
@@ -178,15 +178,15 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public boolean isSuiteFile() {
-        return RobotSuiteFileDescriber.SUITE_FILE_CONTENT_ID.equals(getContentTypeId());
+        return ASuiteFileDescriber.SUITE_FILE_CONTENT_ID.equals(getContentTypeId());
     }
 
     public boolean isResourceFile() {
-        return RobotSuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(getContentTypeId());
+        return ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(getContentTypeId());
     }
 
     public boolean isInitializationFile() {
-        return RobotSuiteFileDescriber.INIT_FILE_CONTENT_ID.equals(getContentTypeId());
+        return ASuiteFileDescriber.INIT_FILE_CONTENT_ID.equals(getContentTypeId());
     }
 
     protected String getContentTypeId() {

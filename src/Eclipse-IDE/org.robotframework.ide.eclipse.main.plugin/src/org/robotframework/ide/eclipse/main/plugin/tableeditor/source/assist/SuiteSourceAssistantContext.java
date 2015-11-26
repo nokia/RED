@@ -23,8 +23,8 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
@@ -98,7 +98,7 @@ public class SuiteSourceAssistantContext {
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE) {
                         final IFile file = (IFile) resource;
-                        if (RobotSuiteFileDescriber.isResourceFile(file)) {
+                        if (ASuiteFileDescriber.isResourceFile(file)) {
                             resourceFiles.add(file);
                         }
                     }
