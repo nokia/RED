@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -88,9 +88,9 @@ class GeneralSettingsModel {
         abstract Map<String, RobotElement> createInitialMapping();
 
         static AccessibleSettings forFile(final IFile file) {
-            if (RobotSuiteFileDescriber.isInitializationFile(file)) {
+            if (ASuiteFileDescriber.isInitializationFile(file)) {
                 return OF_INIT_FILE;
-            } else if (RobotSuiteFileDescriber.isSuiteFile(file)) {
+            } else if (ASuiteFileDescriber.isSuiteFile(file)) {
                 return OF_SUITE_FILE;
             } else {
                 return OF_RESOURCE_FILE;

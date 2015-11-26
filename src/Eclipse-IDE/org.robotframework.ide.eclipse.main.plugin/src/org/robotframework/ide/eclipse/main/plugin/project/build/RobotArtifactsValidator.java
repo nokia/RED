@@ -27,8 +27,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
@@ -184,11 +184,11 @@ public class RobotArtifactsValidator {
     public static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
             final IFile file) {
 
-        if (RobotSuiteFileDescriber.isSuiteFile(file)) {
+        if (ASuiteFileDescriber.isSuiteFile(file)) {
             return Optional.of(new RobotSuiteFileValidator(context, file));
-        } else if (RobotSuiteFileDescriber.isResourceFile(file)) {
+        } else if (ASuiteFileDescriber.isResourceFile(file)) {
             return Optional.of(new RobotResourceFileValidator(context, file));
-        } else if (RobotSuiteFileDescriber.isInitializationFile(file)) {
+        } else if (ASuiteFileDescriber.isInitializationFile(file)) {
             return Optional.of(new RobotInitFileValidator(context, file));
         } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
             return Optional.of(new RobotProjectConfigFileValidator(context, file));

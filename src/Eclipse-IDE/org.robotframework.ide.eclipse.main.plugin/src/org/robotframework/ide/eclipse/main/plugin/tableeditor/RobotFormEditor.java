@@ -54,7 +54,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
@@ -216,7 +218,11 @@ public class RobotFormEditor extends FormEditor {
         int description = IContentDescriber.INDETERMINATE;
         try {
             final StringReader reader = new StringReader(getSourceEditor().getDocument().get());
-            description = new RobotSuiteFileDescriber().describe(reader, null);
+            ASuiteFileDescriber desc = new RobotSuiteFileDescriber();
+            if ("tsv".equals(suiteModel.getFileExtension().toLowerCase())) {
+                desc = new TsvRobotSuiteFileDescriber();
+            }
+            description = desc.describe(reader, null);
         } catch (final IOException e) {
             // nothing to do
         }

@@ -25,8 +25,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -312,7 +312,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
                         pathToken);
-            } else if (!RobotSuiteFileDescriber.isResourceFile((IFile) resource)) {
+            } else if (!ASuiteFileDescriber.isResourceFile((IFile) resource)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                         .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
                         pathToken);

@@ -8,9 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
-public class RobotSuiteFileDescriber extends ASuiteFileDescriber {
-
-    public RobotSuiteFileDescriber() {
-        super(new TokenSeparatorBuilder(FileFormat.TXT_OR_ROBOT));
+public class TsvRobotSuiteFileDescriber extends ASuiteFileDescriber {
+    public TsvRobotSuiteFileDescriber() {
+        super(new TokenSeparatorBuilder(FileFormat.TSV));
     }
 }
