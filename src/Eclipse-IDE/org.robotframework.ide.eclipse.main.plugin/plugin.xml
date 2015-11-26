@@ -80,7 +80,7 @@
             base-type="org.robotframework.red.robotfile"
             describer="org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber"
             file-extensions="robot,txt"
-            id="org.robotframework.red.robotsuitefile"
+            id="org.robotframework.red.robotsuitefile_robot"
             name="Robot suite file"
             priority="high">
       </content-type>
@@ -88,7 +88,7 @@
             base-type="org.robotframework.red.robotfile"
             describer="org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber"
             file-extensions="tsv"
-            id="org.robotframework.red.robotsuitefile"
+            id="org.robotframework.red.robotsuitefile_tsv"
             name="Robot suite file"
             priority="high">
       </content-type>      
@@ -112,8 +112,11 @@
             id="org.robotframework.red.robotfile">
       </content-type>
       <content-type
-            id="org.robotframework.red.robotsuitefile">
+            id="org.robotframework.red.robotsuitefile_robot">
       </content-type>
+      <content-type
+            id="org.robotframework.red.robotsuitefile_tsv">
+      </content-type>      
       <content-type
             id="org.robotframework.red.robotsuiteinitfile">
       </content-type>
@@ -248,8 +251,11 @@
                  contentTypeId="org.robotframework.red.robotfile">
            </contentTypeBinding>
            <contentTypeBinding
-                 contentTypeId="org.robotframework.red.robotsuitefile">
+                 contentTypeId="org.robotframework.red.robotsuitefile_robot">
            </contentTypeBinding>
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.robotsuitefile_tsv">
+           </contentTypeBinding>           
            <contentTypeBinding
                  contentTypeId="org.robotframework.red.robotsuiteinitfile">
            </contentTypeBinding>
@@ -334,10 +340,16 @@
                             <instanceof
                                   value="org.eclipse.core.resources.IFile">
                             </instanceof>
+                            <or>
                             <test
                                   property="org.eclipse.core.resources.contentTypeId"
-                                  value="org.robotframework.red.robotsuitefile">
+                                  value="org.robotframework.red.robotsuitefile_robot">
                             </test>
+                            <test
+                                  property="org.eclipse.core.resources.contentTypeId"
+                                  value="org.robotframework.red.robotsuitefile_tsv">
+                            </test>                            
+                            </or>
                          </and>
                       </or>
                    </iterate>
