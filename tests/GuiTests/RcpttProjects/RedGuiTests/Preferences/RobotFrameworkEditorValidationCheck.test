@@ -1,0 +1,27 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: RobotFrameworkEditorValidationCheck
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _srvewJQcEeWNpL9oeriwCw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/26/15 10:06 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// simple check if Validation menu exists
+
+// open preferences
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Validation"
+// check if Validation is present in item tree and opened page has caption Validation
+with [get-window Preferences] {
+    get-tree | get-item "Robot Framework/Validation" | get-property caption | equals Validation | verify-true
+    get-label Validation | get-property caption | equals Validation | verify-true
+}
+get-window Preferences | get-button OK | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

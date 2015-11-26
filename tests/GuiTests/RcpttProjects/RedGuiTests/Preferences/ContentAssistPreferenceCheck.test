@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistPreferenceCheck
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Nu4IgJQdEeWNpL9oeriwCw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/26/15 10:28 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assist"
+with [get-window Preferences] {
+    get-tree | get-item "Robot Framework/Editor/Content Assist" | get-property caption | equals "Content Assist" 
+        | verify-true
+    get-label "Content Assist" | get-property caption | equals "Content Assist" | verify-true
+        get-button OK | click
+}
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+// write keyword with content assist
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    type-text Test
+    key-type Enter
+    type-text Call
+    key-type "M1+SPACE"
+    key-type Enter
+}
+// kayword name is plain, no lib attached
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    Call Method" | verify-true
+get-preferences-menu | click
+// change Assist option to add lib name 
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
+    get-button Apply | click
+    get-button OK | click
+}
+// write new keyword with content assist
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 17
+    key-type Enter
+    type-text Cal
+    key-type "M1+SPACE"
+    key-type Enter
+}
+// new keyword should have lib name 
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    Call Method \n"
+    + "    BuiltIn.Call Method" | verify-true
+
+// set Completion overrides for content assist
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Proposals | get-button "Completion overrides" | click
+    get-button Apply | click
+    get-button OK | click
+}
+// save and reload editor 
+// clicking on Call Method in the middle and doing content assist, whole KW will be replaced
+get-eclipse-window | key-type "M1+s"
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 10
+    key-type "M1+SPACE"
+    hover-text 3 10 -with M1
+}
+// check outcome
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    Call Method \n"
+    + "    BuiltIn.Call Method" | verify-true
+// change in preference to completion insert 
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Proposals | get-button "Completion inserts" | click
+    get-button Apply | click
+    get-button OK | click
+}
+// clicking in the middle of Call Method assist will inser another Call Method inside edited KW
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 3 10
+    set-caret-pos 3 9
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Call Method - BuiltIn" 
+    | click -default
+
+// verify outcome
+get-editor "TestFile.robot" | get-text-viewer | hover-text 4 14
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    BuiltIn.Call Method     Method \n"
+    + "    BuiltIn.Call Method" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
