@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
@@ -87,7 +86,7 @@ public class RobotArtifactsValidator {
                 try {
 
                     final Queue<ModelUnitValidator> unitValidators = Queues.newArrayDeque();
-                    final ValidationContext context = new ValidationContext(new RobotModel(), project);
+                    final ValidationContext context = new ValidationContext(project);
 
                     if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
                         unitValidators.addAll(createValidationUnitsForWholeProject(context));
