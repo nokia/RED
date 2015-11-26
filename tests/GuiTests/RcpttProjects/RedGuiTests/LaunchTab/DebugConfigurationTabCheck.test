@@ -1,0 +1,128 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _kJ0i8BXWEeW05sQKg0mypw
+Element-Name: DebugConfigurationTabCheck
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _gCszcJREEeWNpL9oeriwCw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 11/26/15 2:55 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// run script to get Script.robot run configuration
+
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
+get-editor "Script.robot" | get-text-viewer | key-type "F11"
+
+
+
+// check if Robot entry is visible in Debug Configurations
+get-menu "Run/Debug Configurations..." | click
+get-window "Debug Configurations" | get-tree | select Robot | double-click
+
+// check item in tree
+with [get-window "Debug Configurations"] {
+    get-tree | get-item Robot | get-property caption | equals Robot | verify-true
+    // check tab Main
+    get-tab-folder | get-property activePage | equals Main | verify-true
+}
+// check tab Source
+get-window "Debug Configurations" | get-tab-folder | get-tab-item Source | click
+get-window "Debug Configurations" | get-tab-folder | get-property activePage | equals Source | verify-true
+// check tab Common
+get-window "Debug Configurations" | get-tab-folder | get-tab-item Common | click
+get-window "Debug Configurations" | get-tab-folder | get-property activePage | equals "&Common" | verify-true
+
+get-window "Debug Configurations" | get-button Close | click
+
+
+// open Run configuration and deselect test1 suite from list of tests to be executed
+get-menu "Run/Debug Configurations..." | click
+with [get-window "Debug Configurations"] {
+    get-tree | select "Robot/Script.robot"
+    get-group "Test Suite(s)" | get-tree | get-item "Script.robot/test1" | uncheck
+    get-button Apply | click
+    get-button Close | click
+}
+with [get-button "Run Script.robot"] {
+    click -arrow
+    click
+}
+get-tab-folder -index 5 | get-tab-item "Execution View" | click
+// check if in Console only 1 test was executed
+get-view Console | get-text-viewer | get-property text | matches "1 critical test, 1 passed"
+
+// change run configuration so all tests will be run
+get-menu "Run/Debug Configurations..." | click
+with [get-window "Debug Configurations"] {
+    get-tree | select "Robot/Script.robot"
+    get-group "Test Suite(s)" | get-tree | get-item "Script.robot/test1" | check
+    get-button Apply | click
+    get-button Close | click
+}
+// run and verify if 2 tests were run
+get-eclipse-window | key-type "F11"
+get-view Console | get-text-viewer | get-property text |  matches "2 critical test, 2 passed"
+
+// add Tag OnlyThis to first script 
+with [get-editor "Script.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 12 15
+        key-type Enter
+        type-text "[Tags]"
+        key-type Tab
+		type-text "OnlyThis"
+		key-type "M1+s"
+    }
+ }
+ // limit tests to run only with OnliThis tag
+get-menu "Run/Debug Configurations..." | click
+with [get-window "Debug Configurations"] {
+    with [get-group Tags] {
+        get-button "Only run tests with these tags:" | check
+        with [get-editbox] {
+            set-text T
+            key-type Enter
+            set-text OnlyThis
+            key-type Enter
+        }
+        get-button "Add new tag" | click
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+// varify if one test was executed
+get-editor "Script.robot" | get-text-viewer | key-type "F11"
+get-view Console | get-text-viewer | get-property text | matches "1 critical test, 1 passed, 0 failed"
+get-view Console | get-text-viewer | get-property text | matches "CAPITAL LETTER"
+
+// go to Debug Configurations and use option Skip tests with tags
+get-menu "Run/Debug Configurations..." | click
+with [get-window "Debug Configurations"] {
+    get-tree | select "Robot/Script.robot"
+    with [get-group Tags] {
+        get-button "Remove tag" | click
+        get-button "Only run tests with these tags:" | uncheck
+        get-button "Skip tests with these tags:" | check
+        with [get-editbox -index 1] {
+            set-text Only
+            key-type Enter
+            set-text OnlyThis
+            key-type Enter
+        }
+        get-button "Add new tag" -index 1 | click
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+get-eclipse-window | key-type "F11"
+// verify if test was skipped during  execution
+get-view Console | get-text-viewer | get-property text | matches "1 critical test, 1 passed, 0 failed"
+get-view Console | get-text-viewer | get-property text | matches "test1"
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
