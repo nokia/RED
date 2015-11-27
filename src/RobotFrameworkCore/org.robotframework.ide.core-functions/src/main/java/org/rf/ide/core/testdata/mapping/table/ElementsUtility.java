@@ -31,27 +31,23 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.ALineSeparator;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
-
+import org.rf.ide.core.testdata.text.read.separators.StrictTsvTabulatorSeparator;
 
 @SuppressWarnings("PMD.GodClass")
 public class ElementsUtility {
 
     private final ParsingStateHelper parsingStateHelper;
 
-
     public ElementsUtility() {
         this.parsingStateHelper = new ParsingStateHelper();
     }
 
-
-    public boolean isNewExecutableSection(final ALineSeparator separator,
-            final RobotLine line) {
+    public boolean isNewExecutableSection(final ALineSeparator separator, final RobotLine line) {
         boolean result = false;
         if (separator.getProducedType() == SeparatorType.PIPE) {
             final List<IRobotLineElement> lineElements = line.getLineElements();
             if (lineElements.size() == 1) {
-                result = lineElements.get(0).getTypes()
-                        .contains(SeparatorType.PIPE);
+                result = lineElements.get(0).getTypes().contains(SeparatorType.PIPE);
             }
         } else {
             result = line.getLineElements().isEmpty();
@@ -59,9 +55,7 @@ public class ElementsUtility {
         return result;
     }
 
-
-    public LibraryImport findNearestLibraryImport(
-            final RobotFileOutput robotFileOutput) {
+    public LibraryImport findNearestLibraryImport(final RobotFileOutput robotFileOutput) {
         final AImported imported = getNearestImport(robotFileOutput);
         LibraryImport lib;
         if (imported instanceof LibraryImport) {
@@ -76,22 +70,16 @@ public class ElementsUtility {
         return lib;
     }
 
-
-    public RobotToken computeCorrectRobotToken(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp,
-            final String text, final boolean isNewLine,
+    public RobotToken computeCorrectRobotToken(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final boolean isNewLine,
             final List<RobotToken> robotTokens, final String fileName) {
-        final ParsingState state = parsingStateHelper
-                .getCurrentStatus(processingState);
+        final ParsingState state = parsingStateHelper.getCurrentStatus(processingState);
 
         RobotToken correct = null;
         if (robotTokens.size() > 1) {
-            final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(
-                    robotTokens, fp);
+            final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);
             final TableType currentTable = state.getTable();
-            if (tokensExactlyOnPosition.size() != 1
-                    || currentTable == TableType.KEYWORD
+            if (tokensExactlyOnPosition.size() != 1 || currentTable == TableType.KEYWORD
                     || currentTable == TableType.TEST_CASE) {
                 final List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
                 if (!headersPossible.isEmpty()) {
@@ -101,8 +89,7 @@ public class ElementsUtility {
                         // FIXME: error
                     }
                 } else {
-                    final RobotToken comment = findCommentToken(robotTokens,
-                            text);
+                    final RobotToken comment = findCommentToken(robotTokens, text);
                     if (comment != null) {
                         correct = comment;
                     } else {
@@ -115,10 +102,8 @@ public class ElementsUtility {
                     }
 
                     if (correct == null) {
-                        if (ParsingState.getSettingsStates().contains(state)
-                                || currentTable == TableType.VARIABLES
-                                || currentTable == TableType.KEYWORD
-                                || currentTable == TableType.TEST_CASE
+                        if (ParsingState.getSettingsStates().contains(state) || currentTable == TableType.VARIABLES
+                                || currentTable == TableType.KEYWORD || currentTable == TableType.TEST_CASE
                                 || state == ParsingState.COMMENT) {
                             final RobotToken newRobotToken = new RobotToken();
                             newRobotToken.setLineNumber(fp.getLine());
@@ -137,8 +122,7 @@ public class ElementsUtility {
                             newRobotToken.setText(text);
                             newRobotToken.setRaw(text);
                             newRobotToken.setType(RobotTokenType.UNKNOWN);
-                            final List<IRobotTokenType> types = newRobotToken
-                                    .getTypes();
+                            final List<IRobotTokenType> types = newRobotToken.getTypes();
                             for (final RobotToken currentProposal : robotTokens) {
                                 types.addAll(currentProposal.getTypes());
                             }
@@ -147,14 +131,12 @@ public class ElementsUtility {
                     }
                 }
             } else {
-                final RobotToken exactlyOnPosition = tokensExactlyOnPosition
-                        .get(0);
+                final RobotToken exactlyOnPosition = tokensExactlyOnPosition.get(0);
                 if (state.getPreviousState() != ParsingState.VARIABLE_TABLE_HEADER
                         && state.getPreviousState() != ParsingState.VARIABLE_TABLE_INSIDE
                         && state.getPreviousState() != ParsingState.SETTING_TABLE_HEADER
                         && state.getPreviousState() != ParsingState.SETTING_TABLE_INSIDE) {
-                    final List<IRobotTokenType> types = exactlyOnPosition
-                            .getTypes();
+                    final List<IRobotTokenType> types = exactlyOnPosition.getTypes();
                     for (final RobotToken currentProposal : robotTokens) {
                         if (exactlyOnPosition != currentProposal) {
                             types.addAll(currentProposal.getTypes());
@@ -170,8 +152,7 @@ public class ElementsUtility {
                     newRobotToken.setText(text);
                     newRobotToken.setRaw(text);
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
-                    final List<IRobotTokenType> types = newRobotToken
-                            .getTypes();
+                    final List<IRobotTokenType> types = newRobotToken.getTypes();
                     for (final RobotToken rt : robotTokens) {
                         types.addAll(rt.getTypes());
                     }
@@ -214,22 +195,18 @@ public class ElementsUtility {
             }
         }
 
-        if (hasAnyProposalVariableInside
-                && state != ParsingState.VARIABLE_TABLE_INSIDE) {
+        if (hasAnyProposalVariableInside && state != ParsingState.VARIABLE_TABLE_INSIDE) {
             correct.getTypes().add(RobotTokenType.VARIABLE_USAGE);
         }
 
         return correct;
     }
 
-
-    private List<RobotToken> getTokensExactlyOnPosition(
-            final List<RobotToken> robotTokens,
+    private List<RobotToken> getTokensExactlyOnPosition(final List<RobotToken> robotTokens,
             final FilePosition currentPosition) {
         final List<RobotToken> tokens = new ArrayList<>();
         for (final RobotToken rt : robotTokens) {
-            if (currentPosition.compare(rt.getFilePosition(), false) == ECompareResult.EQUAL_TO
-                    .getValue()) {
+            if (currentPosition.compare(rt.getFilePosition(), false) == ECompareResult.EQUAL_TO.getValue()) {
                 tokens.add(rt);
             }
         }
@@ -237,14 +214,11 @@ public class ElementsUtility {
         return tokens;
     }
 
-
-    public RobotToken findCommentToken(final List<RobotToken> robotTokens,
-            final String text) {
+    public RobotToken findCommentToken(final List<RobotToken> robotTokens, final String text) {
         RobotToken comment = null;
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
-            if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                    || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
                 if (text.equals(rt.getRaw().toString())) {
                     comment = rt;
                     break;
@@ -254,7 +228,6 @@ public class ElementsUtility {
 
         return comment;
     }
-
 
     public List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
         final List<RobotToken> found = new ArrayList<>();
@@ -267,7 +240,6 @@ public class ElementsUtility {
         return found;
     }
 
-
     public boolean isComment(final RobotLine line) {
         boolean result = false;
         for (final IRobotLineElement elem : line.getLineElements()) {
@@ -277,8 +249,7 @@ public class ElementsUtility {
                 break;
             } else {
                 final IRobotTokenType tokenType = types.get(0);
-                if (tokenType == SeparatorType.PIPE
-                        || tokenType == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+                if (tokenType == SeparatorType.PIPE || tokenType == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
                     continue;
                 } else if (tokenType == RobotTokenType.START_HASH_COMMENT) {
                     result = true;
@@ -293,7 +264,6 @@ public class ElementsUtility {
         return result;
     }
 
-
     public boolean isTableSection(final RobotLine line) {
         boolean result = false;
         for (final IRobotLineElement elem : line.getLineElements()) {
@@ -306,11 +276,9 @@ public class ElementsUtility {
         return result;
     }
 
-
     public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
         AImported result;
-        final List<AImported> imports = robotFileOutput.getFileModel()
-                .getSettingTable().getImports();
+        final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
         if (!imports.isEmpty()) {
             result = imports.get(imports.size() - 1);
         } else {
@@ -320,10 +288,8 @@ public class ElementsUtility {
         return result;
     }
 
-
     public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(
-            final RobotFileOutput robotFileOutput,
-            final ParsingState tableHeaderState) {
+            final RobotFileOutput robotFileOutput, final ParsingState tableHeaderState) {
         List<TableHeader<? extends ARobotSectionTable>> tableKnownHeaders = new ArrayList<>();
         final RobotFile fileModel = robotFileOutput.getFileModel();
         if (tableHeaderState == ParsingState.SETTING_TABLE_HEADER) {
@@ -341,13 +307,10 @@ public class ElementsUtility {
         return tableKnownHeaders;
     }
 
-
     public boolean isTableHeader(final IRobotTokenType type) {
-        return (type == RobotTokenType.SETTINGS_TABLE_HEADER
-                || type == RobotTokenType.VARIABLES_TABLE_HEADER
+        return (type == RobotTokenType.SETTINGS_TABLE_HEADER || type == RobotTokenType.VARIABLES_TABLE_HEADER
                 || type == RobotTokenType.TEST_CASES_TABLE_HEADER || type == RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
-
 
     public boolean isTableHeader(final RobotToken t) {
         boolean result = false;
@@ -366,7 +329,6 @@ public class ElementsUtility {
         return result;
     }
 
-
     public boolean isTableHeader(final IRobotLineElement elem) {
         boolean result = false;
         if (elem instanceof RobotToken) {
@@ -376,7 +338,6 @@ public class ElementsUtility {
         return result;
     }
 
-
     public boolean isUserTableHeader(final RobotToken t) {
         final String raw = t.getRaw();
         if (raw != null && !raw.isEmpty()) {
@@ -385,9 +346,7 @@ public class ElementsUtility {
         return false;
     }
 
-
-    public boolean checkIfHasAlreadyKeywordName(
-            final List<? extends AKeywordBaseSetting<?>> keywordBases) {
+    public boolean checkIfHasAlreadyKeywordName(final List<? extends AKeywordBaseSetting<?>> keywordBases) {
         boolean result = false;
         for (final AKeywordBaseSetting<?> setting : keywordBases) {
             result = (setting.getKeywordName() != null);
@@ -400,11 +359,9 @@ public class ElementsUtility {
         return result;
     }
 
-
     public boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
         boolean anyValuableToken = false;
-        final List<IRobotLineElement> lineElements = currentLine
-                .getLineElements();
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         for (final IRobotLineElement lineElem : lineElements) {
             if (lineElem instanceof RobotToken) {
                 anyValuableToken = true;
@@ -415,28 +372,21 @@ public class ElementsUtility {
         return anyValuableToken;
     }
 
-
-    public boolean shouldGiveEmptyToProcess(
-            final RobotFileOutput parsingOutput,
-            final ALineSeparator separator, final Separator currentSeparator,
-            final RobotLine line, final Stack<ParsingState> processingState) {
+    public boolean shouldGiveEmptyToProcess(final RobotFileOutput parsingOutput, final ALineSeparator separator,
+            final Separator currentSeparator, final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        final ParsingState state = parsingStateHelper
-                .getCurrentStatus(processingState);
+        final ParsingState state = parsingStateHelper.getCurrentStatus(processingState);
         final TableType tableType = state.getTable();
-        final List<IRobotLineElement> splittedLine = separator
-                .getSplittedLine();
+        final List<IRobotLineElement> splittedLine = separator.getSplittedLine();
 
-        if (separator.getProducedType() == SeparatorType.PIPE
-                && currentSeparator.getStartColumn() == 0) {
+        if (separator.getProducedType() == SeparatorType.PIPE && currentSeparator.getStartColumn() == 0) {
             result = false;
-        } else if (separator.getProducedType() == SeparatorType.PIPE) {
-            final LineTokenInfo lineTokenInfo = LineTokenInfo
-                    .build(splittedLine);
+        } else if (separator.getProducedType() == SeparatorType.PIPE
+                || separator instanceof StrictTsvTabulatorSeparator) {
+            final LineTokenInfo lineTokenInfo = LineTokenInfo.build(splittedLine);
             if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
-                    || !lineTokenInfo.getPositionsOfNotEmptyElements()
-                            .isEmpty()) {
+                    || !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
                 // Logic: Grant valid to process empty elements in case:
                 // SETTINGS or VARIABLES: always read empty the exclusion is
                 // only that we have line continue and element is not the first
@@ -445,16 +395,13 @@ public class ElementsUtility {
                 // line continue in any case only first element is omitted
                 // GRANT LOGIC main: always process start from beginning until
                 // last not empty element
-                final boolean isContinoue = lineTokenInfo
-                        .isLineContinoueTheFirst();
-                if (tableType == TableType.SETTINGS
-                        || tableType == TableType.VARIABLES) {
+                final boolean isContinoue = lineTokenInfo.isLineContinoueTheFirst();
+                if (tableType == TableType.SETTINGS || tableType == TableType.VARIABLES) {
                     if (isContinoue) {
                         final RobotFile model = parsingOutput.getFileModel();
                         final PreviousLineHandler prevLineHandler = new PreviousLineHandler();
                         if (prevLineHandler.isSomethingToContinue(model)) {
-                            result = lineTokenInfo.getDataStartIndex() <= separator
-                                    .getCurrentElementIndex();
+                            result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
                         } else {
                             result = true;
                         }
@@ -462,15 +409,11 @@ public class ElementsUtility {
                         result = true;
                     }
 
-                    result = result
-                            && lineTokenInfo.getDataEndIndex() >= separator
-                                    .getCurrentElementIndex();
-                } else if (tableType == TableType.TEST_CASE
-                        || tableType == TableType.KEYWORD) {
+                    result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
+                } else if (tableType == TableType.TEST_CASE || tableType == TableType.KEYWORD) {
                     if (line.getLineElements().size() >= 2) {
                         if (isContinoue) {
-                            result = lineTokenInfo.getDataStartIndex() <= separator
-                                    .getCurrentElementIndex();
+                            result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
                         } else {
                             if (state == ParsingState.TEST_CASE_DECLARATION
                                     || state == ParsingState.KEYWORD_DECLARATION) {
@@ -486,24 +429,18 @@ public class ElementsUtility {
                                  * </pre>
                                  */
                                 if (shouldTreatAsInlineContinue(lineTokenInfo)) {
-                                    result = separator.getCurrentElementIndex() > lineTokenInfo
-                                            .getPositionsOfLineContinoue().get(
-                                                    0)
-                                            || separator
-                                                    .getCurrentElementIndex() < lineTokenInfo
-                                                    .getDataStartIndex();
+                                    result = separator.getCurrentElementIndex() > lineTokenInfo.getPositionsOfLineContinoue()
+                                            .get(0)
+                                            || separator.getCurrentElementIndex() < lineTokenInfo.getDataStartIndex();
                                 } else {
                                     result = true;
                                 }
                             } else if (state == ParsingState.TEST_CASE_INSIDE_ACTION
                                     || state == ParsingState.KEYWORD_INSIDE_ACTION) {
-                                final ForDescriptorInfo forInfo = ForDescriptorInfo
-                                        .build(splittedLine);
+                                final ForDescriptorInfo forInfo = ForDescriptorInfo.build(splittedLine);
                                 if (forInfo.getForStartIndex() > -1) {
                                     if (forInfo.getForLineContinueInlineIndex() > -1) {
-                                        result = (separator
-                                                .getCurrentElementIndex() > forInfo
-                                                .getForLineContinueInlineIndex());
+                                        result = (separator.getCurrentElementIndex() > forInfo.getForLineContinueInlineIndex());
                                     } else {
                                         result = true;
                                     }
@@ -515,9 +452,7 @@ public class ElementsUtility {
                             }
                         }
 
-                        result = result
-                                && lineTokenInfo.getDataEndIndex() >= separator
-                                        .getCurrentElementIndex();
+                        result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
                     }
                 }
             }
@@ -526,22 +461,16 @@ public class ElementsUtility {
         return result;
     }
 
-
-    private boolean shouldTreatAsInlineContinue(
-            final LineTokenInfo lineTokenInfo) {
+    private boolean shouldTreatAsInlineContinue(final LineTokenInfo lineTokenInfo) {
         boolean result = false;
 
         if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
                 && !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
-            final int theFirstToken = lineTokenInfo
-                    .getPositionsOfNotEmptyElements().get(0);
-            final int theFirstContinoue = lineTokenInfo
-                    .getPositionsOfLineContinoue().get(0);
+            final int theFirstToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(0);
+            final int theFirstContinoue = lineTokenInfo.getPositionsOfLineContinoue().get(0);
             if (lineTokenInfo.getPositionsOfNotEmptyElements().size() > 1) {
-                final int theSecondToken = lineTokenInfo
-                        .getPositionsOfNotEmptyElements().get(1);
-                result = theFirstToken < theFirstContinoue
-                        && theFirstContinoue < theSecondToken;
+                final int theSecondToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(1);
+                result = theFirstToken < theFirstContinoue && theFirstContinoue < theSecondToken;
             } else {
                 result = theFirstToken < theFirstContinoue;
             }
@@ -550,9 +479,7 @@ public class ElementsUtility {
         return result;
     }
 
-
-    public ARobotSectionTable getTable(final RobotFile robotModel,
-            final TableType type) {
+    public ARobotSectionTable getTable(final RobotFile robotModel, final TableType type) {
         ARobotSectionTable table = null;
         if (type == TableType.SETTINGS) {
             table = robotModel.getSettingTable();
@@ -570,11 +497,14 @@ public class ElementsUtility {
     private static class LineTokenInfo {
 
         private final List<Integer> positionsOfNotEmptyElements = new ArrayList<>();
-        private final List<Integer> positionsOfLineContinoue = new ArrayList<>();
-        private boolean isLineContinoue;
-        private int dataStartIndex = -1;
-        private int dataEndIndex = -1;
 
+        private final List<Integer> positionsOfLineContinoue = new ArrayList<>();
+
+        private boolean isLineContinoue;
+
+        private int dataStartIndex = -1;
+
+        private int dataEndIndex = -1;
 
         public static LineTokenInfo build(final List<IRobotLineElement> elements) {
             final LineTokenInfo lti = new LineTokenInfo();
@@ -584,8 +514,7 @@ public class ElementsUtility {
                 if (elem instanceof RobotToken) {
                     final RobotToken token = (RobotToken) elem;
                     final String tokenText = token.getRaw().toString();
-                    if (RobotTokenType.PREVIOUS_LINE_CONTINUE
-                            .getRepresentation().get(0).equals(tokenText)) {
+                    if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(tokenText)) {
                         lti.positionsOfLineContinoue.add(elemIndex);
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
                             lti.isLineContinoue = true;
@@ -595,8 +524,7 @@ public class ElementsUtility {
                             lti.dataStartIndex = elemIndex;
                         }
                         lti.dataEndIndex = elemIndex;
-                    } else if (tokenText != null
-                            && !"".equals(tokenText.trim())) {
+                    } else if (tokenText != null && !"".equals(tokenText.trim())) {
                         lti.positionsOfNotEmptyElements.add(elemIndex);
 
                         if (lti.dataStartIndex == -1) {
@@ -610,32 +538,26 @@ public class ElementsUtility {
             return lti;
         }
 
-
         public List<Integer> getPositionsOfNotEmptyElements() {
             return positionsOfNotEmptyElements;
         }
-
 
         public List<Integer> getPositionsOfLineContinoue() {
             return positionsOfLineContinoue;
         }
 
-
         public boolean isLineContinoueTheFirst() {
             return isLineContinoue;
         }
-
 
         public int getDataStartIndex() {
             return dataStartIndex;
         }
 
-
         public int getDataEndIndex() {
             return dataEndIndex;
         }
     }
-
 
     public int getEndOfLineLength(final List<Constant> eols) {
         int size = 0;
@@ -649,7 +571,6 @@ public class ElementsUtility {
 
         return size;
     }
-
 
     public void fixNotSetPositions(final RobotToken token, final FilePosition fp) {
         if (token.getStartOffset() == IRobotLineElement.NOT_SET) {
