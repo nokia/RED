@@ -33,7 +33,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         if (text != null) {
             final String trimmed = text.trim();
             if (RobotTokenType.FOR_CONTINUE_TOKEN.getRepresentation().get(0).equalsIgnoreCase(trimmed)
-                    || (trimmed.isEmpty() || isTsv(execRowLine))) {
+                    || (trimmed.isEmpty() && isTsv(execRowLine))) {
                 final int forLoopDeclarationLine = getForLoopDeclarationLine(execRowLine);
                 result = new AcceptResultWithParameters(forLoopDeclarationLine >= 0, forLoopDeclarationLine);
             }
