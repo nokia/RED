@@ -37,15 +37,16 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
     public static final String INIT_FILE_CONTENT_ID = "org.robotframework.red.robotsuiteinitfile";
 
     private final ElementPositionResolver positionResolver = new ElementPositionResolver();
-    
+
     private final Pattern newFullComplex = Pattern
             .compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)?$");
+
     private final TokenSeparatorBuilder tokenSeparatorBuilder;
-    
+
     public ASuiteFileDescriber(final TokenSeparatorBuilder tokenSeparatorBuilder) {
         this.tokenSeparatorBuilder = tokenSeparatorBuilder;
     }
-    
+
     public static boolean isSuiteFile(final IFile resource) {
         return hasContentType(resource, SUITE_FILE_CONTENT_ID);
     }
@@ -61,7 +62,7 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
     private static boolean hasContentType(final IFile resource, final String id) {
         try {
             final IContentDescription contentDescription = resource.getContentDescription();
-            return contentDescription != null && id.startsWith(contentDescription.getContentType().getId());
+            return contentDescription != null && contentDescription.getContentType().getId().startsWith(id);
         } catch (final CoreException e) {
             return false;
         }

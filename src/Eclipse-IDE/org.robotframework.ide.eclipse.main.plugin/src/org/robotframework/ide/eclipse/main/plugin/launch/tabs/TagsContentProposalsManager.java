@@ -157,7 +157,7 @@ public class TagsContentProposalsManager {
         for (int i = 0; i < members.length; i++) {
             if (members[i] instanceof IFile
                     && (members[i].getFileExtension().equalsIgnoreCase("robot") || members[i].getFileExtension()
-                            .equalsIgnoreCase("txt"))) {
+                            .equalsIgnoreCase("txt") || members[i].getFileExtension().equalsIgnoreCase("tsv"))) {
                 final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) members[i]);
                 if (robotSuiteFile != null && robotSuiteFile.isSuiteFile()) {
                     suiteList.add(robotSuiteFile);
