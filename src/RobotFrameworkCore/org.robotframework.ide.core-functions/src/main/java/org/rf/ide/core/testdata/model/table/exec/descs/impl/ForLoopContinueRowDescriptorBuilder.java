@@ -84,7 +84,9 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         forContinueDesc.addMessages(mappingResult.getMessages());
         forContinueDesc.setAction(new RobotAction(execRowLine.getAction(), mappingResult.getMappedElements()));
 
-        mapRestOfForLoopContinue(execRowLine, forContinueDesc, lineElements);
+        if (lineElements.size() > 1) {
+            mapRestOfForLoopContinue(execRowLine, forContinueDesc, lineElements);
+        }
 
         return forContinueDesc;
     }
