@@ -45,7 +45,21 @@ public class TokenSeparatorBuilder {
     }
 
     public enum FileFormat {
+        UNKNOWN,
         TXT_OR_ROBOT,
-        TSV
+        TSV;
+
+        public static FileFormat getByExtension(final String fileExtension) {
+            FileFormat format = FileFormat.UNKNOWN;
+            if (fileExtension != null) {
+                String lowerCase = fileExtension.toLowerCase();
+                if ("txt".equals(lowerCase) || "robot".equals(lowerCase)) {
+                    format = TXT_OR_ROBOT;
+                } else if ("tsv".equals(lowerCase)) {
+                    format = TSV;
+                }
+            }
+            return format;
+        }
     }
 }
