@@ -18,136 +18,118 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
-public class UserKeyword extends AModelElement<KeywordTable> implements
-        IExecutableStepsHolder<UserKeyword> {
+public class UserKeyword extends AModelElement<KeywordTable> implements IExecutableStepsHolder<UserKeyword> {
 
     private RobotToken keywordName;
-    private final List<KeywordDocumentation> documentation = new ArrayList<>();
-    private final List<KeywordTags> tags = new ArrayList<>();
-    private final List<KeywordArguments> keywordArguments = new ArrayList<>();
-    private final List<KeywordReturn> keywordReturns = new ArrayList<>();
-    private final List<KeywordTeardown> teardowns = new ArrayList<>();
-    private final List<KeywordTimeout> timeouts = new ArrayList<>();
-    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
+    private final List<KeywordDocumentation> documentation = new ArrayList<>();
+
+    private final List<KeywordTags> tags = new ArrayList<>();
+
+    private final List<KeywordArguments> keywordArguments = new ArrayList<>();
+
+    private final List<KeywordReturn> keywordReturns = new ArrayList<>();
+
+    private final List<KeywordTeardown> teardowns = new ArrayList<>();
+
+    private final List<KeywordTimeout> timeouts = new ArrayList<>();
+
+    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
     public UserKeyword(final RobotToken keywordName) {
         this.keywordName = keywordName;
     }
 
-
     public RobotToken getKeywordName() {
         return keywordName;
     }
-
 
     public void setKeywordName(final RobotToken keywordName) {
         this.keywordName = keywordName;
     }
 
-
-    public void addKeywordExecutionRow(
-            final RobotExecutableRow<UserKeyword> executionRow) {
+    public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
         executionRow.setParent(this);
         this.keywordContext.add(executionRow);
     }
 
-
     public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
         return Collections.unmodifiableList(keywordContext);
     }
-
 
     @Override
     public List<RobotExecutableRow<UserKeyword>> getExecutionContext() {
         return getKeywordExecutionRows();
     }
 
-
     public void addDocumentation(final KeywordDocumentation doc) {
         doc.setParent(this);
         this.documentation.add(doc);
     }
 
-
     public List<KeywordDocumentation> getDocumentation() {
         return Collections.unmodifiableList(documentation);
     }
-
 
     public void addTag(final KeywordTags tag) {
         tag.setParent(this);
         tags.add(tag);
     }
 
-
     public List<KeywordTags> getTags() {
         return Collections.unmodifiableList(tags);
     }
-
 
     public void addArguments(final KeywordArguments arguments) {
         arguments.setParent(this);
         keywordArguments.add(arguments);
     }
 
-
     public List<KeywordArguments> getArguments() {
         return Collections.unmodifiableList(keywordArguments);
     }
-
 
     public void addReturn(final KeywordReturn keywordReturn) {
         keywordReturn.setParent(this);
         keywordReturns.add(keywordReturn);
     }
 
-
     public List<KeywordReturn> getReturns() {
         return Collections.unmodifiableList(keywordReturns);
     }
-
 
     public void addTeardown(final KeywordTeardown teardown) {
         teardown.setParent(this);
         teardowns.add(teardown);
     }
 
-
     public List<KeywordTeardown> getTeardowns() {
         return Collections.unmodifiableList(teardowns);
     }
-
 
     public void addTimeout(final KeywordTimeout timeout) {
         timeout.setParent(this);
         timeouts.add(timeout);
     }
 
-
     public List<KeywordTimeout> getTimeouts() {
         return Collections.unmodifiableList(timeouts);
     }
-
 
     @Override
     public boolean isPresent() {
         return (getKeywordName() != null);
     }
 
-
     @Override
     public ModelType getModelType() {
         return ModelType.USER_KEYWORD;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getKeywordName().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
@@ -189,5 +171,10 @@ public class UserKeyword extends AModelElement<KeywordTable> implements
         }
 
         return tokens;
+    }
+
+    @Override
+    public UserKeyword getHolder() {
+        return this;
     }
 }

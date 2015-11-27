@@ -9,8 +9,9 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 
-
 public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobotSectionTable>> {
 
     List<RobotExecutableRow<T>> getExecutionContext();
+
+    T getHolder();
 }
