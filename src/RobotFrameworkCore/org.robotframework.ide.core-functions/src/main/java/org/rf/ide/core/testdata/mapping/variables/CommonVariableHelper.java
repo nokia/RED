@@ -22,22 +22,19 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class CommonVariableHelper {
 
     private static final Pattern NAME = Pattern.compile("[{](.+?)[}]");
-    private static final Pattern ASSIGN = Pattern
-            .compile("((\\s)*[=]+)+(\\s)*$");
-    private final ParsingStateHelper stateHelper;
 
+    private static final Pattern ASSIGN = Pattern.compile("((\\s)*[=]+)+(\\s)*$");
+
+    private final ParsingStateHelper stateHelper;
 
     public CommonVariableHelper() {
         this.stateHelper = new ParsingStateHelper();
     }
 
-
-    public void extractVariableAssignmentPart(final RobotLine line,
-            final Stack<ParsingState> state) {
+    public void extractVariableAssignmentPart(final RobotLine line, final Stack<ParsingState> state) {
         final List<IRobotLineElement> lineElements = line.getLineElements();
         boolean wasNotVariableElement = false;
         for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
@@ -46,37 +43,25 @@ public class CommonVariableHelper {
                 final RobotToken token = (RobotToken) element;
                 if (isVariable(token) && !wasNotVariableElement) {
                     final String variableText = token.getRaw().toString();
-                    final RobotToken assignment = extractAssignmentPart(
-                            token.getFilePosition(), variableText);
+                    final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
                     if (!assignment.getFilePosition().isNotSet()) {
-                        final String variable = variableText.substring(
-                                0,
-                                assignment.getStartColumn()
-                                        - token.getStartColumn());
+                        final String variable = variableText.substring(0,
+                                assignment.getStartColumn() - token.getStartColumn());
                         token.setText(variable);
                         token.setRaw(variable);
                         line.addLineElementAt(elementIndex + 1, assignment);
                         elementIndex++;
                     }
-                } else {
-                    if (element.getTypes().contains(
-                            RobotTokenType.FOR_CONTINUE_TOKEN)) {
-                        ParsingState currentStatus = stateHelper
-                                .getCurrentStatus(state);
-                    }
-                    wasNotVariableElement = true;
                 }
             }
         }
     }
 
-
     public boolean isVariable(final RobotToken token) {
         boolean isVar = false;
         final List<IRobotTokenType> types = token.getTypes();
         for (final IRobotTokenType type : types) {
-            if (type == RobotTokenType.START_HASH_COMMENT
-                    || type == RobotTokenType.COMMENT_CONTINUE) {
+            if (type == RobotTokenType.START_HASH_COMMENT || type == RobotTokenType.COMMENT_CONTINUE) {
                 isVar = false;
                 break;
             } else if (type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
@@ -85,8 +70,7 @@ public class CommonVariableHelper {
                     || type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) {
                 final String text = token.getText().toString();
                 if (text != null && !text.isEmpty()) {
-                    final VariableType varType = VariableType
-                            .getTypeByTokenType(type);
+                    final VariableType varType = VariableType.getTypeByTokenType(type);
                     if (varType != null) {
                         isVar = (text.startsWith(varType.getIdentificator()));
                     } else {
@@ -101,9 +85,7 @@ public class CommonVariableHelper {
         return isVar;
     }
 
-
-    private RobotToken extractAssignmentPart(final FilePosition startPossition,
-            final String text) {
+    private RobotToken extractAssignmentPart(final FilePosition startPossition, final String text) {
         final RobotToken assignToken = new RobotToken();
 
         final Matcher matcher = NAME.matcher(text);
@@ -113,10 +95,8 @@ public class CommonVariableHelper {
             final Matcher assignMatcher = ASSIGN.matcher(assignmentText);
             if (assignMatcher.find()) {
                 assignToken.setLineNumber(startPossition.getLine());
-                assignToken.setStartColumn(startPossition.getColumn()
-                        + assignPart);
-                assignToken.setStartOffset(startPossition.getOffset()
-                        + assignPart);
+                assignToken.setStartColumn(startPossition.getColumn() + assignPart);
+                assignToken.setStartOffset(startPossition.getOffset() + assignPart);
                 assignToken.setText(assignmentText);
                 assignToken.setRaw(assignmentText);
                 assignToken.setType(RobotTokenType.ASSIGNMENT);
@@ -125,7 +105,6 @@ public class CommonVariableHelper {
 
         return assignToken;
     }
-
 
     public String extractVariableName(final String text) {
         String name = null;
@@ -140,7 +119,6 @@ public class CommonVariableHelper {
 
         return (name != null) ? name : "";
     }
-
 
     @VisibleForTesting
     protected String mergeNotEscapedVariableWhitespaces(final String text) {
@@ -168,12 +146,9 @@ public class CommonVariableHelper {
         return replaced.toString();
     }
 
-
     public boolean isCorrectVariable(final String text) {
-        return (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text,
-                '}') == 1);
+        return (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text, '}') == 1);
     }
-
 
     @VisibleForTesting
     protected int countNumberOfChars(final String text, final char expected) {
@@ -188,9 +163,7 @@ public class CommonVariableHelper {
         return count;
     }
 
-
-    public boolean isIncludedInVariableTable(final RobotLine line,
-            final Stack<ParsingState> processingState) {
+    public boolean isIncludedInVariableTable(final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             result = (processingState.get(processingState.size() - 1) == ParsingState.VARIABLE_TABLE_INSIDE);
