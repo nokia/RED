@@ -411,7 +411,8 @@ public class ElementsUtility {
 
                     result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
                 } else if (tableType == TableType.TEST_CASE || tableType == TableType.KEYWORD) {
-                    if (line.getLineElements().size() >= 2) {
+                    if (line.getLineElements().size() >= 2
+                            || (line.getLineElements().size() == 1 && separator instanceof StrictTsvTabulatorSeparator)) {
                         if (isContinoue) {
                             result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
                         } else {
