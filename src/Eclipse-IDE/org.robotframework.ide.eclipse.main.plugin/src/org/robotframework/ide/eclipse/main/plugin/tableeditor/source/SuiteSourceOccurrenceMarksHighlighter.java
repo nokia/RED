@@ -137,7 +137,9 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private void removeOccurencesHighlighting() {
         try {
-            file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
+            if (file.exists()) {
+                file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
+            }
         } catch (final CoreException e) {
             RedPlugin.logError("Unable to remove occurences markers", e);
         }
