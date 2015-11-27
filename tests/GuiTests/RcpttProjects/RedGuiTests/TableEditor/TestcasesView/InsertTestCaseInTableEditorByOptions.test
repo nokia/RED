@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OU8kwJTzEeWYZObeKm8QMA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/27/15 11:41 AM
+Save-Time: 11/27/15 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,11 +22,18 @@ with [get-editor "new_test.robot"] {
     get-tree | select "test 2" | get-menu "Add new test case" | click
 }
 // verify if added
-get-editor "new_test.robot" | get-tree | get-property "getItems().TreeItem[1].getText()" | equals case | verify-true
+
+
+with [get-editor "new_test.robot" | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals "test 1" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals case | verify-true
+    get-property "getItems().TreeItem[2].getText()" | equals "test 2" | verify-true
+}
 
 // remove middle TC
 get-editor "new_test.robot" | get-tree | select case | get-menu "Row/Delete row" | click
 
 // verify if removed
 get-editor "new_test.robot" | get-tree | get-property itemCount | equals 3 | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
