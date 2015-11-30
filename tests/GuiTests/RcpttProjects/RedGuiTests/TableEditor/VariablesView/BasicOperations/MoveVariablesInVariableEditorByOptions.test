@@ -7,7 +7,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _EH33UJT0EeWYZObeKm8QMA
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/27/15 12:00 PM
+Save-Time: 11/30/15 1:30 PM
+Tags: Unstable
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,33 +22,33 @@ with [get-editor "new_test.robot"] {
     get-tab-folder | get-tab-item Variables | click
     with [get-table] {
         select "${long_name_global_value}" | get-menu "Add new scalar" | click
-        select "${var}" | get-menu "Add new list" | click
-        select "${var}" | get-menu "Add new dictionary" | click
+        select "${long_name_global_value}" | get-menu "Add new list" | click
+        select "${long_name_global_value}" | get-menu "Add new dictionary" | click
     }
 }
 // check if variables are created
 with [get-editor "new_test.robot" | get-table] {
-    get-property itemCount | equals 6 | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "@{var1}" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "&{var2}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "@{var1}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "&{var2}" | verify-true
 }
 // move one variable up
 get-editor "new_test.robot" | get-table | select "${var}" | get-menu "Row/Move up" | click
 // verify
+
+
 with [get-editor "new_test.robot" | get-table] {
-    get-property "getItems().TableItem[1].getText()" | equals "@{var1}" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "${var}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "&{var2}" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${x}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "@{var1}" | verify-true
 }
 // move one down
 get-editor "new_test.robot" | get-table | select "${var}" | get-menu "Row/Move down" | click
 
 //verify
 with [get-editor "new_test.robot" | get-table] {
-    get-property itemCount | equals 6 | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "@{var1}" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "&{var2}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${var}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "@{var1}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "&{var2}" | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
