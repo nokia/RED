@@ -130,6 +130,13 @@ public class VariableDefinitionLocator {
                     }
                 }
             }
+            final List<VariableDeclaration> embeddedArguments = keywordDef.getEmbeddedArguments();
+            for (final VariableDeclaration declaration : embeddedArguments) {
+                final ContinueDecision shouldContinue = detector.localVariableDetected(file, declaration.asToken());
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
         }
         return ContinueDecision.CONTINUE;
     }
