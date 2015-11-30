@@ -206,7 +206,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (row.isExecutable()) {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
-                for (VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
+                for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
                     if (!isDefinedVariable(variableDeclaration, definedVariables)) {
                         final String variableName = variableDeclaration.getVariableName().getText();
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
@@ -254,7 +254,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
     static List<String> extractVariableNames(final List<VariableDeclaration> assignments) {
         final List<String> vars = newArrayList();
         for (final VariableDeclaration variableDeclaration : assignments) {
-            vars.add(variableDeclaration.asToken().getText().toString().toLowerCase());
+            vars.add(variableDeclaration.asToken().getText().toLowerCase());
         }
         return vars;
     }
@@ -262,7 +262,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
     static List<String> extractVariableNamesFromArguments(final List<RobotToken> assignments,
             final VariableExtractor extractor, final String fileName) {
         final List<String> vars = newArrayList();
-        for (RobotToken token : assignments) {
+        for (final RobotToken token : assignments) {
             final MappingResult mappingResult = extractor.extract(token, fileName);
             vars.addAll(extractVariableNames(mappingResult.getCorrectVariables()));
         }
