@@ -178,7 +178,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public boolean isSuiteFile() {
-        return getContentTypeId().startsWith(ASuiteFileDescriber.SUITE_FILE_CONTENT_ID);
+        final String ctId = getContentTypeId();
+        return ctId != null && ctId.startsWith(ASuiteFileDescriber.SUITE_FILE_CONTENT_ID);
     }
 
     public boolean isResourceFile() {
