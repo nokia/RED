@@ -21,6 +21,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -50,27 +51,10 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
 
         final Set<String> libs = newLinkedHashSet();
-        new KeywordDefinitionLocator(file, new RobotModel())
-                .locateKeywordDefinitionInLibraries(project,
-                new KeywordDetector() {
-
-                    @Override
-                    public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                            final KeywordSpecification kwSpec, final String libraryAlias,
-                            final boolean isFromNestedLibrary) {
-                        if (kwSpec.getName().equalsIgnoreCase(keywordName)) {
-                            libs.add(libSpec.getName());
-                        }
-                        return ContinueDecision.CONTINUE;
-                    }
-
-
-                    @Override
-                    public ContinueDecision keywordDetected(final RobotSuiteFile file,
-                            final RobotKeywordDefinition keyword) {
-                        return ContinueDecision.CONTINUE;
-                    }
-                });
+        new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
+                createKeywordsDetector(keywordName, libs));
+        new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
+                createKeywordsDetector(GherkinStyleUtilities.removeGherkinPrefix(keywordName), libs));
 
         return newArrayList(Iterables.transform(libs, new Function<String, IMarkerResolution>() {
             @Override
@@ -78,6 +62,28 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
                 return new ImportLibraryFixer(libName);
             }
         }));
+    }
+
+    private static KeywordDetector createKeywordsDetector(final String keywordName, final Set<String> libs) {
+        return new KeywordDetector() {
+
+            @Override
+            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final String libraryAlias,
+                    final boolean isFromNestedLibrary) {
+                if (kwSpec.getName().equalsIgnoreCase(keywordName)) {
+                    libs.add(libSpec.getName());
+                }
+                return ContinueDecision.CONTINUE;
+            }
+
+
+            @Override
+            public ContinueDecision keywordDetected(final RobotSuiteFile file,
+                    final RobotKeywordDefinition keyword) {
+                return ContinueDecision.CONTINUE;
+            }
+        };
     }
 
     private final String libName;
