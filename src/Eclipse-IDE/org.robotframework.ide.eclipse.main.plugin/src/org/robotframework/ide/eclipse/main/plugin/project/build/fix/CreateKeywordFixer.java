@@ -7,14 +7,20 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static com.google.common.collect.Iterables.transform;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
@@ -31,10 +37,22 @@ import com.google.common.base.Splitter;
  */
 public class CreateKeywordFixer extends RedSuiteMarkerResolution {
 
-    private final String keywordName;
+    public static Collection<? extends IMarkerResolution> createFixers(final String name) {
+        final List<IMarkerResolution> fixers = new ArrayList<>();
+        if (name == null) {
+            return fixers;
+        }
 
-    public CreateKeywordFixer(final String keywordName) {
-        this.keywordName = toCamelCased(keywordName);
+        String previous = name;
+        String current = GherkinStyleUtilities.removeGherkinPrefix(name);
+
+        fixers.add(new CreateKeywordFixer(toCamelCased(previous)));
+        while (!previous.equals(current)) {
+            previous = current;
+            current = GherkinStyleUtilities.removeGherkinPrefix(current);
+            fixers.add(new CreateKeywordFixer(toCamelCased(previous)));
+        }
+        return fixers;
     }
 
     private static String toCamelCased(final String name) {
@@ -44,6 +62,12 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
                 return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
             }
         }));
+    }
+
+    private final String keywordName;
+
+    public CreateKeywordFixer(final String keywordName) {
+        this.keywordName = keywordName;
     }
 
     @Override
