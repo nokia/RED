@@ -75,9 +75,17 @@ def extractDotDict(dict):
     return mapFromDotDict
 
 def escape_unicode(data):
-   if isinstance(data, basestring):
-       return data.encode('unicode_escape')
-   return data
+    if isinstance(data, basestring):
+        return data.encode('unicode_escape')
+    if isinstance(data, long):  # for OverflowError in XML-RPC
+        return str(data)
+    if isinstance(data, dict):
+        for key, val in data.items():
+         data[key] = escape_unicode(val)
+    if isinstance(data, list):
+        for index, item in enumerate(data):
+         data[index] = escape_unicode(item)
+    return data
 def getGlobalVariables():
     try:
 
