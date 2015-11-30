@@ -156,13 +156,19 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
             
             if (!keywordName.getFilePosition().isNotSet()) {
-                final String name = keywordName.getText();
-                final String gherkinFreeName = GherkinStyleUtilities.removeGherkinPrefix(name);
+                String previousName = keywordName.getText();
+                String currentName = GherkinStyleUtilities.removeGherkinPrefix(previousName);
 
-                if (!validationContext.isKeywordAccessible(name)
-                        && !validationContext.isKeywordAccessible(gherkinFreeName)) {
+                while (!validationContext.isKeywordAccessible(previousName) && !previousName.equals(currentName)) {
+                    previousName = currentName;
+                    currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
+                }
+                final String name = previousName;
+
+                if (!validationContext.isKeywordAccessible(name)) {
                     reportKeywordProblemWithArguments(reporter, KeywordsProblem.UNKNOWN_KEYWORD, name,
-                            robotSuiteFile.getFile(), keywordName, ImmutableMap.<String, Object> of("name", name));
+                            robotSuiteFile.getFile(), keywordName,
+                            ImmutableMap.<String, Object> of("name", name, "originalName", keywordName.getText()));
                 }
                 if (validationContext.isKeywordDeprecated(name)) {
                     reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, name, robotSuiteFile.getFile(),

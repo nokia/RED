@@ -22,16 +22,6 @@ public class GherkinStyleUtilities {
     }
 
     public static String removeGherkinPrefix(final String name) {
-        String previous = name;
-        String current = removeSingleGherkinWord(name);
-        while (!current.equals(previous)) {
-            previous = current;
-            current = removeSingleGherkinWord(current);
-        }
-        return current;
-    }
-
-    private static String removeSingleGherkinWord(final String name) {
         for (final String prefix : PREFIXES) {
             if (name.toLowerCase().startsWith(prefix)) {
                 return name.substring(prefix.length()).trim();
