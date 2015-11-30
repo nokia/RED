@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
@@ -156,22 +157,24 @@ class TestCasesTableValidator implements ModelUnitValidator {
             
             if (!keywordName.getFilePosition().isNotSet()) {
                 final String name = keywordName.getText();
-                
-                if (!validationContext.isKeywordAccessible(name)) {
+                final String gherkinFreeName = GherkinStyleUtilities.removeGherkinPrefix(name);
+
+                if (!validationContext.isKeywordAccessible(name)
+                        && !validationContext.isKeywordAccessible(gherkinFreeName)) {
                     reportKeywordProblemWithArguments(reporter, KeywordsProblem.UNKNOWN_KEYWORD, name,
                             robotSuiteFile.getFile(), keywordName, ImmutableMap.<String, Object> of("name", name));
                 }
                 if (validationContext.isKeywordDeprecated(name)) {
-                    reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, name,
-                            robotSuiteFile.getFile(), keywordName);
+                    reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, name, robotSuiteFile.getFile(),
+                            keywordName);
                 }
                 if (validationContext.isKeywordFromNestedLibrary(name)) {
                     reportKeywordProblem(reporter, KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY, name,
                             robotSuiteFile.getFile(), keywordName);
                 }
             } else {
-                reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, executable.getAction().getText().toString(), 
-                        robotSuiteFile.getFile(), executable.getAction());
+                reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD,
+                        executable.getAction().getText().toString(), robotSuiteFile.getFile(), executable.getAction());
             }
         }
     }
