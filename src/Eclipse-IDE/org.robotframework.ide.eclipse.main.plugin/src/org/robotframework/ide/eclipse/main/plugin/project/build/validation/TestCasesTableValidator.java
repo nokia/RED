@@ -155,7 +155,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
             
             if (!keywordName.getFilePosition().isNotSet()) {
-                final String name = keywordName.getText().toString();
+                final String name = keywordName.getText();
                 
                 if (!validationContext.isKeywordAccessible(name)) {
                     reportKeywordProblemWithArguments(reporter, KeywordsProblem.UNKNOWN_KEYWORD, name,
