@@ -72,9 +72,8 @@ class KeywordTableValidator implements ModelUnitValidator {
                 boolean report = true;
                 if (!keyword.getReturns().isEmpty()) {
                     KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
-                    if (!keywordReturn.getReturnValues().isEmpty()) {
-                        report = false;
-                    }
+                    List<RobotToken> returnValues = keywordReturn.getReturnValues();
+                    report = isReturnEmpty(returnValues);
                 }
                 if (report) {
                     TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
@@ -82,6 +81,20 @@ class KeywordTableValidator implements ModelUnitValidator {
                 }
             }
         }
+    }
+
+    private boolean isReturnEmpty(List<RobotToken> returnValues) {
+        boolean report = true;
+        if (!returnValues.isEmpty()) {
+            for (RobotToken rtValue: returnValues) {
+                if (!rtValue.getText().toString().trim().isEmpty()) {
+                    report = false;
+                    break;
+                }
+            }
+        }
+        
+        return report;
     }
 
     private void reportDuplicatedKewords(final IFile file, final List<UserKeyword> keywords) {
