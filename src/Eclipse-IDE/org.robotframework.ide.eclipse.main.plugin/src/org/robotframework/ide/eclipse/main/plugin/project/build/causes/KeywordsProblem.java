@@ -76,6 +76,12 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Keyword '%s' is from a library nested in a resource file";
         }
+    },
+    ARGUMENTS_DEFINED_TWICE {
+        @Override
+        public String getProblemDescription() {
+            return "Keyword '%s' defines arguments by using both embedded syntax and [Arguments] setting";
+        }
     };
 
     @Override

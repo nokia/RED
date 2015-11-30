@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -57,9 +58,10 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         reportEmptyKeyword(suiteModel.getFile(), keywords);
         reportDuplicatedKewords(suiteModel.getFile(), keywords);
+        reportEmbeddedArgumentsConflicts(suiteModel.getFile(), keywords);
         TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
                 findExecutableRows(keywords));
-        reportUnknownVariables(suiteModel, keywords);
+        reportUnknownVariables(suiteModel.getFile(), keywords);
     }
 
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
@@ -99,6 +101,28 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
     }
 
+    private void reportEmbeddedArgumentsConflicts(final IFile file, final List<UserKeyword> keywords) {
+        final VariableExtractor variableExtractor = new VariableExtractor();
+        final String fileName = file.getName();
+
+        for (final UserKeyword keyword : keywords) {
+            final List<KeywordArguments> arguments = keyword.getArguments();
+            final boolean hasArgumentsSetting = arguments != null && !arguments.isEmpty();
+
+            final List<VariableDeclaration> extractedVariables = variableExtractor
+                    .extract(keyword.getKeywordName(), fileName).getCorrectVariables();
+            final boolean hasEmbeddedArguments = !extractedVariables.isEmpty();
+
+            if (hasArgumentsSetting && hasEmbeddedArguments) {
+                final String name = keyword.getKeywordName().getText();
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENTS_DEFINED_TWICE)
+                        .formatMessageWith(name);
+                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                reporter.handleProblem(problem, file, keyword.getKeywordName(), additionalArguments);
+            }
+        }
+    }
+
     private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {
         final List<RobotExecutableRow<?>> executables = newArrayList();
         for (final UserKeyword keyword : keywords) {
@@ -107,22 +131,26 @@ class KeywordTableValidator implements ModelUnitValidator {
         return executables;
     }
 
-    private void reportUnknownVariables(final RobotSuiteFile suiteModel, final List<UserKeyword> keywords) {
+    private void reportUnknownVariables(final IFile file, final List<UserKeyword> keywords) {
         final Set<String> variables = validationContext.getAccessibleVariables();
         final VariableExtractor variableExtractor = new VariableExtractor();
-        final String fileName = suiteModel.getName();
+        final String fileName = file.getName();
 
         for (final UserKeyword keyword : keywords) {
             final Set<String> allVariables = newHashSet(variables);
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
-            TestCasesTableValidator.reportUnknownVariables(suiteModel.getFile(), reporter,
-                    keyword.getKeywordExecutionRows(), allVariables);
+            TestCasesTableValidator.reportUnknownVariables(file, reporter, keyword.getKeywordExecutionRows(),
+                    allVariables);
         }
     }
 
     private Collection<String> extractArgumentVariables(final UserKeyword keyword, final VariableExtractor extractor, final String fileName) {
         final Set<String> arguments = newHashSet();
+
+        // first add arguments embedded in name, then from [Arguments] setting
+        arguments.addAll(TestCasesTableValidator
+                .extractVariableNamesFromArguments(newArrayList(keyword.getKeywordName()), extractor, fileName));
         for (final KeywordArguments argument : keyword.getArguments()) {
             arguments.addAll(TestCasesTableValidator.extractVariableNamesFromArguments(argument.getArguments(), extractor, fileName));
         }
