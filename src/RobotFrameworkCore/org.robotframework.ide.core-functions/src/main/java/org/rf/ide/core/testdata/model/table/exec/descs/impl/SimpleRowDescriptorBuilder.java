@@ -19,7 +19,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
@@ -28,20 +28,14 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         return new AcceptResult(true);
     }
 
-
     @Override
-    public <T> IExecutableRowDescriptor<T> buildDescription(
-            final RobotExecutableRow<T> execRowLine,
+    public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine,
             final AcceptResult acceptResult) {
-        final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(
-                execRowLine);
-        final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine
-                .getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase
-                .getParent();
+        final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(execRowLine);
+        final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
+        final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase.getParent();
         final RobotFile robotFile = table.getParent();
-        final String fileName = robotFile.getParent().getProcessedFile()
-                .getAbsolutePath();
+        final String fileName = robotFile.getParent().getProcessedFile().getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
@@ -52,10 +46,8 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
             // value is keyword if is on the first place and have in it nested
             // variables and when contains text on the beginning or end of field
-            final List<VariableDeclaration> correctVariables = mappingResult
-                    .getCorrectVariables();
-            final List<IElementDeclaration> mappedElements = mappingResult
-                    .getMappedElements();
+            final List<VariableDeclaration> correctVariables = mappingResult.getCorrectVariables();
+            final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
             if (isAfterFirstAction) {
                 simple.addUsedVariables(correctVariables);
                 simple.addTextParameters(mappingResult.getTextElements());
@@ -64,9 +56,13 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                     // definition variable
                     simple.addCreatedVariable(correctVariables.get(0));
                 } else {
-                    simple.setAction(new RobotAction(elem, mappedElements));
-                    simple.addUsedVariables(correctVariables);
-                    isAfterFirstAction = true;
+                    if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                        simple.addTextParameters(mappingResult.getTextElements());
+                    } else {
+                        simple.setAction(new RobotAction(elem, mappedElements));
+                        simple.addUsedVariables(correctVariables);
+                        isAfterFirstAction = true;
+                    }
                 }
             }
         }
