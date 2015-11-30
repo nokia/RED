@@ -14,6 +14,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
@@ -57,7 +58,9 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
             final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
             final String lineDelimiter = getLineDelimiter(document);
             if (section.isPresent()) {
-                final String toInsert = lineDelimiter + keywordName + lineDelimiter + "    " + lineDelimiter;
+                final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
+                final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
+                final String toInsert = lineDelimiter + keywordName + lineDelimiter + separator + lineDelimiter;
                 final int line = section.get().getHeaderLine();
                 try {
                     final IRegion lineInformation = document.getLineInformation(line - 1);
