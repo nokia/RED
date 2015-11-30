@@ -19,18 +19,15 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class SettingDocumentationRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
 
-
     @Test
     public void test_documentationColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Documentation:");
+        List<String> combinations = new CombinationGenerator().combinations("Documentation:");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
@@ -40,12 +37,10 @@ public class SettingDocumentationRecognizerTest {
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndDocumentationColonThanWord() {
@@ -59,7 +54,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndDocumentationColonThanWord() {
@@ -75,7 +69,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleDocumentationColonThanLetterCWord() {
         StringBuilder text = new StringBuilder("Documentation:");
@@ -90,7 +83,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleDocumentationColonWord() {
         StringBuilder text = new StringBuilder("Documentation:");
@@ -104,11 +96,9 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_documentationWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Documentation");
+        List<String> combinations = new CombinationGenerator().combinations("Documentation");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
@@ -118,12 +108,10 @@ public class SettingDocumentationRecognizerTest {
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndDocumentationThanWord() {
@@ -137,7 +125,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndDocumentationThanWord() {
@@ -153,7 +140,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleDocumentationThanLetterCWord() {
         StringBuilder text = new StringBuilder("Documentation");
@@ -168,7 +154,6 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleDocumentationWord() {
         StringBuilder text = new StringBuilder("Documentation");
@@ -182,34 +167,25 @@ public class SettingDocumentationRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?("
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Documentation")
-                        + "[\\s]*:"
-                        + "|"
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Documentation")
-                        + ")");
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + "[\\s]*:" + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + ")|("
+                        + ATokenRecognizer.createUpperLowerCaseWord("Document") + "[\\s]*:" + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Document") + ")");
 
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
     }
-
 
     @Before
     public void setUp() {
         rec = new SettingDocumentationRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {
