@@ -42,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
+import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -98,7 +99,18 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                         return libInfo;
                     }
                 }
-                return getKeywordHoverInfo(hoveredText);
+                String info = getKeywordHoverInfo(hoveredText);
+
+                String previousName = hoveredText;
+                String currentName = GherkinStyleUtilities.removeGherkinPrefix(hoveredText);
+                while (info == null && !previousName.equals(currentName)) {
+                    info = getKeywordHoverInfo(currentName);
+
+                    previousName = currentName;
+                    currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
+                }
+
+                return info;
             }
         } catch (final BadLocationException | CoreException e) {
         }
