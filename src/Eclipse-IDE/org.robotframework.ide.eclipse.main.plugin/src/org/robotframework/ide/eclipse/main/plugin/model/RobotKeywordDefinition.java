@@ -15,6 +15,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
@@ -238,6 +241,12 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         final int length = keyword.getKeywordName().getText().length();
 
         return new Position(begin, length);
+    }
+
+    public List<VariableDeclaration> getEmbeddedArguments() {
+        final VariableExtractor extractor = new VariableExtractor();
+        final MappingResult extractedVars = extractor.extract(keyword.getKeywordName(), getSuiteFile().getName());
+        return extractedVars.getCorrectVariables();
     }
 
     public KeywordSpecification createSpecification() {
