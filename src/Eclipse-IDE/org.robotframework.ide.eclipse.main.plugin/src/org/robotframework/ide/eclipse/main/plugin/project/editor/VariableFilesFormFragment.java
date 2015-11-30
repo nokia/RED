@@ -204,6 +204,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         addFileBtn.setEnabled(false);
         removeFileBtn.setEnabled(false);
         viewer.getTable().setEnabled(false);
+        setInput();
     }
 
     private void setInput() {
