@@ -339,11 +339,13 @@ public class ElementsUtility {
     }
 
     public boolean isUserTableHeader(final RobotToken t) {
+        boolean result = false;
         final String raw = t.getRaw();
-        if (raw != null && !raw.isEmpty()) {
-            return raw.trim().startsWith("*");
+        if (raw != null && raw.length() > 1) {
+            result = raw.trim().startsWith("*");
         }
-        return false;
+
+        return result;
     }
 
     public boolean checkIfHasAlreadyKeywordName(final List<? extends AKeywordBaseSetting<?>> keywordBases) {
