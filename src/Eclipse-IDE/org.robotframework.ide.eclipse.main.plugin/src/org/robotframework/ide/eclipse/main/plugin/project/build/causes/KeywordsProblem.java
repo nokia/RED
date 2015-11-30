@@ -27,7 +27,7 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.add(new CreateKeywordFixer(marker.getAttribute("name", null)));
+            fixers.addAll(CreateKeywordFixer.createFixers(marker.getAttribute("originalName", null)));
             fixers.addAll(ImportLibraryFixer.createFixers(marker));
             return fixers;
         }

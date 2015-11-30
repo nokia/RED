@@ -57,15 +57,17 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             final List<IHyperlink> hyperlinks = newArrayList();
             new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(
                     createDetector(textViewer, keywordName, fromRegion, hyperlinks, canShowMultipleHyperlinks));
-            if (hyperlinks.isEmpty()) {
-                final String gherkinFreeName = GherkinStyleUtilities.removeGherkinPrefix(keywordName);
 
+            String previousName = keywordName;
+            String currentName = GherkinStyleUtilities.removeGherkinPrefix(keywordName);
+            while (hyperlinks.isEmpty() && !previousName.equals(currentName)) {
                 final IRegion fromRegionWithoutGherkin = new Region(
-                        fromRegion.getOffset() + keywordName.length() - gherkinFreeName.length(),
-                        gherkinFreeName.length());
-
+                        fromRegion.getOffset() + keywordName.length() - currentName.length(), currentName.length());
                 new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(createDetector(textViewer,
-                        gherkinFreeName, fromRegionWithoutGherkin, hyperlinks, canShowMultipleHyperlinks));
+                        currentName, fromRegionWithoutGherkin, hyperlinks, canShowMultipleHyperlinks));
+
+                previousName = currentName;
+                currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
             }
 
             if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
