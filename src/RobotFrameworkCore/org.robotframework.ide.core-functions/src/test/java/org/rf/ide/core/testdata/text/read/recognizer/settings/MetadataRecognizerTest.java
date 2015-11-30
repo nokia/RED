@@ -19,18 +19,15 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class MetadataRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
 
-
     @Test
     public void test_metadataColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Metadata:");
+        List<String> combinations = new CombinationGenerator().combinations("Metadata:");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
@@ -40,12 +37,10 @@ public class MetadataRecognizerTest {
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndMetadataColonThanWord() {
@@ -59,7 +54,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndMetadataColonThanWord() {
@@ -75,7 +69,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleMetadataColonThanLetterCWord() {
         StringBuilder text = new StringBuilder("Metadata:");
@@ -90,7 +83,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleMetadataColonWord() {
         StringBuilder text = new StringBuilder("Metadata:");
@@ -104,11 +96,9 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_metadataWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Metadata");
+        List<String> combinations = new CombinationGenerator().combinations("Metadata");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
@@ -118,12 +108,10 @@ public class MetadataRecognizerTest {
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndMetadataThanWord() {
@@ -137,7 +125,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndMetadataThanWord() {
@@ -153,7 +140,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleMetadataThanLetterCWord() {
         StringBuilder text = new StringBuilder("Metadata");
@@ -168,7 +154,6 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleMetadataWord() {
         StringBuilder text = new StringBuilder("Metadata");
@@ -182,30 +167,25 @@ public class MetadataRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
-                        + "[\\s]*:" + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
-                        + ")");
+                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Metadata") + "[\\s]*:" + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Metadata") + ")|("
+                        + ATokenRecognizer.createUpperLowerCaseWord("Meta") + "[\\s]*:" + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Meta") + ")");
 
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.SETTING_METADATA_DECLARATION);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_METADATA_DECLARATION);
     }
-
 
     @Before
     public void setUp() {
         rec = new MetadataRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {
