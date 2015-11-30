@@ -21,7 +21,11 @@ public enum SuiteFileProblem implements IProblemCause {
         }
     },
     UNRECOGNIZED_TABLE_HEADER {
-
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+        
         @Override
         public String getProblemDescription() {
             return "Unrecognized table header: '%s";
