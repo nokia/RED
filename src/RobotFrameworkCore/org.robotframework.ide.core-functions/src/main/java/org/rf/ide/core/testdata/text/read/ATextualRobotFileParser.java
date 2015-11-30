@@ -409,10 +409,11 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 }
             }
 
-            if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine, robotToken)) {
-                if (utility.isUserTableHeader(robotToken)) {
-                    robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
+            if (utility.isUserTableHeader(robotToken)) {
+                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
+                        robotToken)) {
                     // FIXME: add warning about user trash table
+                    robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
                     processingState.clear();
                     processingState.push(ParsingState.TRASH);
 
