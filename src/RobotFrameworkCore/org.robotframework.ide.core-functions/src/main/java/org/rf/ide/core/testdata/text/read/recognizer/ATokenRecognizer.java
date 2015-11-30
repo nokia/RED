@@ -13,21 +13,21 @@ import com.google.common.annotations.VisibleForTesting;
 public abstract class ATokenRecognizer {
 
     private final Pattern pattern;
+
     private Matcher m;
+
     private int lineNumber = -1;
+
     private final RobotTokenType type;
 
     private String text;
-
 
     protected ATokenRecognizer(final Pattern p, final RobotTokenType type) {
         this.pattern = p;
         this.type = type;
     }
 
-
     public abstract ATokenRecognizer newInstance();
-
 
     @VisibleForTesting
     public boolean hasNext(final StringBuilder newText, final int currentLineNumber) {
@@ -44,7 +44,6 @@ public abstract class ATokenRecognizer {
         return m.find();
     }
 
-
     public RobotToken next() {
         final RobotToken t = new RobotToken();
         t.setLineNumber(lineNumber);
@@ -58,11 +57,9 @@ public abstract class ATokenRecognizer {
         return t;
     }
 
-
     public RobotTokenType getProducedType() {
         return type;
     }
-
 
     public static String createUpperLowerCaseWord(final String text) {
         final StringBuilder str = new StringBuilder();
@@ -74,8 +71,7 @@ public abstract class ATokenRecognizer {
                 str.append('[');
                 final char c = ca[i];
                 if (Character.isLetter(c)) {
-                    str.append(Character.toUpperCase(c)).append('|')
-                            .append(Character.toLowerCase(c));
+                    str.append(Character.toUpperCase(c)).append('|').append(Character.toLowerCase(c));
                 } else {
                     str.append(c);
                 }
@@ -86,7 +82,6 @@ public abstract class ATokenRecognizer {
 
         return str.toString();
     }
-
 
     public Pattern getPattern() {
         return this.pattern;
