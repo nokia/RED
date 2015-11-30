@@ -11,6 +11,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rule
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordCallRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordUsageInSettings;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createLocalSettingRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createReadAllRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createSectionHeaderRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createVariableRule;
 
@@ -41,6 +42,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
@@ -349,7 +351,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final ColoringPreference settingPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SETTING);
         final IToken setting = new Token(createAttribute(settingPref));
         
-        final IRule[] defaultRules = new IRule[] {};
+        final ColoringPreference garbagePref = preferences
+                .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
+        final IToken defaultSection = new Token(createAttribute(garbagePref));
+
+        final IRule[] defaultRules = new IRule[] { new EndOfLineRule("#", comment), createReadAllRule(defaultSection) };
         createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
 
         final IRule[] testCasesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),

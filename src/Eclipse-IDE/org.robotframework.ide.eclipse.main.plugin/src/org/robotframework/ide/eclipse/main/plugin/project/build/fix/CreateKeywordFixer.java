@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import static com.google.common.collect.Iterables.transform;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -16,7 +18,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
@@ -27,7 +33,16 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
     private final String keywordName;
 
     public CreateKeywordFixer(final String keywordName) {
-        this.keywordName = keywordName;
+        this.keywordName = toCamelCased(keywordName);
+    }
+
+    private static String toCamelCased(final String name) {
+        return Joiner.on(' ').join(transform(Splitter.on(' ').splitToList(name), new Function<String, String>() {
+            @Override
+            public String apply(final String str) {
+                return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
+            }
+        }));
     }
 
     @Override

@@ -249,6 +249,10 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return extractedVars.getCorrectVariables();
     }
 
+    public boolean hasEmbeddedArguments() {
+        return !getEmbeddedArguments().isEmpty();
+    }
+
     public KeywordSpecification createSpecification() {
         final KeywordSpecification keywordSpecification = new KeywordSpecification();
         keywordSpecification.setName(getName());

@@ -88,14 +88,23 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                     return ContinueDecision.CONTINUE;
                 }
             }
+            
+            private boolean hasEqualSources(final LibrarySpecification libSpec, final String libraryAlias,
+                    final String sourceName) {
+                if (!sourceName.isEmpty()) {
+                    return !libraryAlias.isEmpty() ? libraryAlias.equalsIgnoreCase(sourceName)
+                            : libSpec.getName().equalsIgnoreCase(sourceName);
+                }
+                return true;
+            }
 
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file,
                     final RobotKeywordDefinition keyword) {
                 
-                final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
-                if (keyword.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
-                        && hasEqualSources(file, typedKeywordNameSplitter.getKeywordSource())) {
+                final KeywordNameSplitter splitter = KeywordNameSplitter.splitKeywordName(name);
+                if (keywordNameIsMatching(keyword, splitter.getKeywordName())
+                        && hasEqualSources(file, splitter.getKeywordSource())) {
 
                     final KeywordSpecification kwSpec = keyword.createSpecification();
                     final Position position = keyword.getDefinitionPosition();
@@ -113,24 +122,18 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                     return ContinueDecision.CONTINUE;
                 }
             }
-            
-            private boolean hasEqualSources(final LibrarySpecification libSpec, final String libraryAlias,
-                    final String typedKeywordSourceName) {
-                if (!typedKeywordSourceName.isEmpty()) {
-                    return !libraryAlias.isEmpty() ? libraryAlias.equalsIgnoreCase(typedKeywordSourceName)
-                            : libSpec.getName().equalsIgnoreCase(typedKeywordSourceName);
-                }
-                return true;
-            }
-            
-            private boolean hasEqualSources(final RobotSuiteFile file, final String typedKeywordSourceName) {
-                if (!typedKeywordSourceName.isEmpty()) {
-                    return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()).equalsIgnoreCase(
-                            typedKeywordSourceName) : false;
-                }
-                return true;
-            }
 
+            private boolean keywordNameIsMatching(final RobotKeywordDefinition keyword, final String name) {
+                return keyword.getName().equalsIgnoreCase(name);
+            }
+            
+            private boolean hasEqualSources(final RobotSuiteFile file, final String sourceName) {
+                if (!sourceName.isEmpty()) {
+                    return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()).equalsIgnoreCase(
+                            sourceName) : false;
+                }
+                return true;
+            }
         };
     }
 
