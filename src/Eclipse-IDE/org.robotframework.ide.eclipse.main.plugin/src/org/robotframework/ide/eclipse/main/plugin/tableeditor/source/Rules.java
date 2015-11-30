@@ -44,6 +44,27 @@ public class Rules {
         };
     }
 
+    static IRule createReadAllRule(final IToken token) {
+        return new IRule() {
+            @Override
+            public IToken evaluate(final ICharacterScanner scanner) {
+                int next = scanner.read();
+                scanner.unread();
+                if (next == EOF || Character.isWhitespace(next)) {
+                    return Token.UNDEFINED;
+                }
+                while (true) {
+                    next = scanner.read();
+
+                    if (next == EOF || Character.isWhitespace(next)) {
+                        scanner.unread();
+                        return token;
+                    }
+                }
+            }
+        };
+    }
+
     static IRule createVariableRule(final IToken token) {
         return createCombinedRule(createScalarVariableRule(token), createListVariableRule(token),
                 createDictionaryVariableRule(token), createEnvironmentVariableRule(token));
@@ -80,7 +101,8 @@ public class Rules {
     }
 
     static String getSectionHeader(final ICharacterScanner scanner) {
-        if (scanner.getColumn() > 1) {
+        if (scanner.getColumn() > 1
+                || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("#")) {
             return "";
         }
         final StringBuilder header = new StringBuilder();

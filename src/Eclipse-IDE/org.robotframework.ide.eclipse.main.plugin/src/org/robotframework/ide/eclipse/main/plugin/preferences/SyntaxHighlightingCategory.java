@@ -15,7 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPrefere
  *
  */
 public enum SyntaxHighlightingCategory {
-
+    DEFAULT_SECTION("default", new ColoringPreference(new RGB(255, 200, 100), SWT.ITALIC), "Undefined tables"),
     SECTION_HEADER("section", new ColoringPreference(new RGB(255, 0, 0), SWT.NORMAL), "Section headers"),
     COMMENT("comment", new ColoringPreference(new RGB(192, 192, 192), SWT.NORMAL), "Comments"),
     SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), "Settings"),
