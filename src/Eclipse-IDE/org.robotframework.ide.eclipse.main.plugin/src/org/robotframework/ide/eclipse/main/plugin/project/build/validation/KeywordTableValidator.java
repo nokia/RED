@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -67,8 +68,19 @@ class KeywordTableValidator implements ModelUnitValidator {
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
         for (final UserKeyword keyword : keywords) {
             final RobotToken caseName = keyword.getKeywordName();
-            TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
-                    keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
+            if (keyword.getExecutionContext().isEmpty()) {
+                boolean report = true;
+                if (!keyword.getReturns().isEmpty()) {
+                    KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
+                    if (!keywordReturn.getReturnValues().isEmpty()) {
+                        report = false;
+                    }
+                }
+                if (report) {
+                    TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
+                            keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
+                }
+            }
         }
     }
 
