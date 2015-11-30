@@ -77,7 +77,7 @@ public class ToggleCommentHandler extends DIHandler<E4ToggleCommentHandler> {
             try (BufferedReader reader = new BufferedReader(new StringReader(affectedRegionContent))) {
                 String line = reader.readLine();
                 while (line != null) {
-                    if (!line.trim().startsWith("#")) {
+                    if (!line.trim().startsWith("#") && !line.trim().isEmpty()) {
                         return true;
                     }
                     line = reader.readLine();
