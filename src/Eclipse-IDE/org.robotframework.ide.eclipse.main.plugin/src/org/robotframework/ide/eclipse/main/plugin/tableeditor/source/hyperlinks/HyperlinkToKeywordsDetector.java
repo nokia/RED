@@ -16,6 +16,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -56,6 +57,16 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             final List<IHyperlink> hyperlinks = newArrayList();
             new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(
                     createDetector(textViewer, keywordName, fromRegion, hyperlinks, canShowMultipleHyperlinks));
+            if (hyperlinks.isEmpty()) {
+                final String gherkinFreeName = GherkinStyleUtilities.removeGherkinPrefix(keywordName);
+
+                final IRegion fromRegionWithoutGherkin = new Region(
+                        fromRegion.getOffset() + keywordName.length() - gherkinFreeName.length(),
+                        gherkinFreeName.length());
+
+                new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(createDetector(textViewer,
+                        gherkinFreeName, fromRegionWithoutGherkin, hyperlinks, canShowMultipleHyperlinks));
+            }
 
             if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
                 throw new IllegalStateException(
@@ -75,7 +86,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
-                
+
                 final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
                 if (kwSpec.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
                         && hasEqualSources(libSpec, libraryAlias, typedKeywordNameSplitter.getKeywordSource())) {
@@ -88,7 +99,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                     return ContinueDecision.CONTINUE;
                 }
             }
-            
+
             private boolean hasEqualSources(final LibrarySpecification libSpec, final String libraryAlias,
                     final String sourceName) {
                 if (!sourceName.isEmpty()) {
@@ -99,9 +110,8 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             }
 
             @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file,
-                    final RobotKeywordDefinition keyword) {
-                
+            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
+
                 final KeywordNameSplitter splitter = KeywordNameSplitter.splitKeywordName(name);
                 if (keywordNameIsMatching(keyword, splitter.getKeywordName())
                         && hasEqualSources(file, splitter.getKeywordSource())) {
@@ -126,11 +136,11 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             private boolean keywordNameIsMatching(final RobotKeywordDefinition keyword, final String name) {
                 return keyword.getName().equalsIgnoreCase(name);
             }
-            
+
             private boolean hasEqualSources(final RobotSuiteFile file, final String sourceName) {
                 if (!sourceName.isEmpty()) {
-                    return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()).equalsIgnoreCase(
-                            sourceName) : false;
+                    return file.isResourceFile()
+                            ? Files.getNameWithoutExtension(file.getName()).equalsIgnoreCase(sourceName) : false;
                 }
                 return true;
             }
