@@ -355,8 +355,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             if (robotToken != null) {
                 if (!text.trim().equals(robotToken.getText().toString().trim())) {
                     wasRecognizedCorrectly = false;
-                    // FIXME: add information that type is incorrect missing
-                    // separator
+                    // FIXME: incorrect type
                     final RobotToken newRobotToken = new RobotToken();
                     newRobotToken.setLineNumber(fp.getLine());
                     newRobotToken.setStartColumn(fp.getColumn());
@@ -410,17 +409,15 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 }
             }
 
-            if (!wasRecognizedCorrectly
-                    && !text.equals(robotToken.getRaw().toString())
-                    && utility.isUserTableHeader(robotToken)
-                    && positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
-                            robotToken)) {
-                robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
-                // FIXME: add warning about user trash table
-                processingState.clear();
-                processingState.push(ParsingState.TRASH);
+            if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine, robotToken)) {
+                if (utility.isUserTableHeader(robotToken)) {
+                    robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
+                    // FIXME: add warning about user trash table
+                    processingState.clear();
+                    processingState.push(ParsingState.TRASH);
 
-                useMapper = false;
+                    useMapper = false;
+                }
             }
 
             robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(currentLine, processingState, robotFileOutput, fp,
