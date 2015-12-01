@@ -85,7 +85,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private final RobotDebugStackFrameManager robotDebugStackFrameManager;
     
-    private final IOConsoleOutputStream remoteDebugConsole;
+    private IOConsoleOutputStream remoteDebugConsole;
     
     public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
             final RobotEventBroker robotEventBroker, final DebugSocketManager socketManager,
@@ -292,16 +292,26 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         fireTerminateEvent();
        
         try {
+            if (eventWriter != null) {
+                eventWriter.close();
+            }
+            if (eventReader != null) {
+                eventReader.close();
+            }
+            if (eventSocket != null) {
+                eventSocket.close();
+            }
             if (serverSocket != null) {
                 serverSocket.close();
             }
             if(remoteDebugConsole != null) {
                 remoteDebugConsole.write("Remote connection closed.");
+                remoteDebugConsole = null;
             }
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        
+
         if(getProcess() != null) {
             try {
                 getProcess().terminate();
