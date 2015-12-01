@@ -47,6 +47,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
+import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.IExecutionHandler;
@@ -178,39 +179,39 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final IProject project = getProject(robotConfig);
-        List<IResource> suiteResources = getSuiteResources(robotConfig, project);
         final RobotProject robotProject = getRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final SuiteExecutor executor = robotConfig.getExecutor();
+        List<IResource> suiteResources = getSuiteResources(robotConfig, project);
 
         final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
+        
+        boolean isRemoteDebugging = false;
+        String host = robotConfig.getRemoteDebugHost();
+        final String remoteDebugPort = robotConfig.getRemoteDebugPort();
+        if(isDebugging && !remoteDebugPort.isEmpty() && !host.isEmpty()) {
+            isRemoteDebugging = true;
+        }
 
-        final List<String> suites = getSuitesToRun(suiteResources);
-        final List<String> testCases = robotConfig.getTestCasesNames();
-        final String userArguments = robotConfig.getExecutorArguments();
-        List<String> includedTags = newArrayList();
-        if(robotConfig.isIncludeTagsEnabled()) {
-            includedTags = robotConfig.getIncludedTags();
-        }
-        List<String> excludedTags = newArrayList();
-        if(robotConfig.isExcludeTagsEnabled()) {
-            excludedTags = robotConfig.getExcludedTags();
+        RunCommandLine cmdLine = null;
+        if(!isRemoteDebugging) {
+            cmdLine = createStandardModeCmd(robotConfig, robotProject, project, runtimeEnvironment, suiteResources, isDebugging);
+            host = "localhost";
+        } else {
+            int debugServerPort = -1;
+            try {
+                debugServerPort = Integer.parseInt(remoteDebugPort);
+            } catch(NumberFormatException e) {
+                throw newCoreException("Invalid port specified", e);
+            }
+            cmdLine = runtimeEnvironment.createRunRemoteDebugTempScriptCmd(debugServerPort);
         }
         
-        final List<String> pythonpath = robotProject.getPythonpath();
-        final List<String> classpath = robotProject.getClasspath();
-        final List<String> variableFilesPath = robotProject.getVariableFilePaths();
-        
-        final RunCommandLine cmdLine = runtimeEnvironment.createCommandLineCall(executor, classpath, pythonpath,
-                variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,
-                excludedTags, isDebugging);
-        final String executorVersion = runtimeEnvironment.getVersion(executor);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
         }
-
         DebugSocketManager socketManager = null;
-        
+        boolean isDebugServerSocketListening = false; 
         if (!isDebugging) {
             runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), new ILineHandler() {
                 @Override
@@ -225,16 +226,33 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 }
             });
         } else {
-            socketManager = new DebugSocketManager(cmdLine.getPort());
+            socketManager = new DebugSocketManager(host, cmdLine.getPort());
             new Thread(socketManager).start();
-            waitForDebugServerSocket(cmdLine.getPort());
+            isDebugServerSocketListening = waitForDebugServerSocket(host, cmdLine.getPort());
+        }
+       
+        final String description = runtimeEnvironment.getFile().getAbsolutePath();
+        Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
+        IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
+        
+        IOConsoleOutputStream remoteDebugConsole = null;
+        if (isRemoteDebugging) {
+            remoteDebugConsole = getConsoleForRemoteDebugMessages(configuration, description);
+            if (isDebugServerSocketListening) {
+                if (remoteDebugConsole != null) {
+                    remoteDebugConsole.write("Debug server is listening on " + host + ":" + remoteDebugPort
+                            + ", you can run a remote test.\n");
+                }
+            } else {
+                if (eclipseProcess != null) {
+                    eclipseProcess.terminate();
+                }
+                throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort + ".", null);
+            }
+        } else {
+            printCommandOnConsole(cmdLine.getCommandLine(), runtimeEnvironment.getVersion(executor), configuration, description);
         }
         
-        final Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
-        final String description = runtimeEnvironment.getFile().getAbsolutePath();
-        final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
-        printCommandOnConsole(cmdLine.getCommandLine(), executorVersion, configuration, description);
-
         if (isDebugging) {
             if(suiteResources.isEmpty()) {
                 suiteResources = newArrayList();
@@ -242,7 +260,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             }
             IDebugTarget target = null;
             try {
-                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager);
+                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager, remoteDebugConsole);
             } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
@@ -258,6 +276,30 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         } catch (final InterruptedException e) {
             throw newCoreException("Robot process was interrupted", e);
         }
+    }
+    
+    private RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
+            final RobotProject robotProject, final IProject project, final RobotRuntimeEnvironment runtimeEnvironment,
+            final List<IResource> suiteResources, final boolean isDebugging) throws CoreException, IOException {
+        final List<String> suites = getSuitesToRun(suiteResources);
+        final List<String> testCases = robotConfig.getTestCasesNames();
+        final String userArguments = robotConfig.getExecutorArguments();
+        List<String> includedTags = newArrayList();
+        if (robotConfig.isIncludeTagsEnabled()) {
+            includedTags = robotConfig.getIncludedTags();
+        }
+        List<String> excludedTags = newArrayList();
+        if (robotConfig.isExcludeTagsEnabled()) {
+            excludedTags = robotConfig.getExcludedTags();
+        }
+
+        final List<String> pythonpath = robotProject.getPythonpath();
+        final List<String> classpath = robotProject.getClasspath();
+        final List<String> variableFilesPath = robotProject.getVariableFilePaths();
+
+        return runtimeEnvironment.createCommandLineCall(robotConfig.getExecutor(), classpath, pythonpath,
+                variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,
+                excludedTags, isDebugging);
     }
     
     private RobotProject getRobotProject(final IProject project) throws CoreException {
@@ -358,11 +400,23 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
     }
     
-    private void waitForDebugServerSocket(final int port) {
+    private IOConsoleOutputStream getConsoleForRemoteDebugMessages(final ILaunchConfiguration configuration,
+            final String description) throws IOException {
+        final String consoleName = configuration.getName() + " [Robot] " + description;
+        final IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
+        for (final IConsole console : existingConsoles) {
+            if (console instanceof IOConsole && console.getName().contains(consoleName)) {
+                return ((IOConsole) console).newOutputStream();
+            }
+        }
+        return null;
+    }
+    
+    private boolean waitForDebugServerSocket(final String host, final int port) {
         boolean isListening = false;
         int retryCounter = 0;
         while (!isListening && retryCounter < 20) {
-            try (Socket temporarySocket = new Socket("localhost", port)) {
+            try (Socket temporarySocket = new Socket(host, port)) {
                 isListening = true;
             } catch (final IOException e) {
                 try {
@@ -373,6 +427,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 }
             }
         }
+        return isListening;
     }
     
     private void initExecutionView() {

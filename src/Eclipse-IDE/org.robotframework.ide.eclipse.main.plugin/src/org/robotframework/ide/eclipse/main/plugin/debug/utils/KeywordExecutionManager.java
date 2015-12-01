@@ -174,10 +174,14 @@ public class KeywordExecutionManager {
     }
 
     private boolean isParentsEqual(final IPath suiteParentPath, final IResource resource) {
-        return resource.getParent()
-                .getName()
-                .equalsIgnoreCase(
-                        ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(suiteParentPath).getName());
+        final IContainer suiteParent = ResourcesPlugin.getWorkspace()
+                .getRoot()
+                .getContainerForLocation(suiteParentPath);
+        if (suiteParent != null) {
+            return resource.getParent().getName().equalsIgnoreCase(suiteParent.getName());
+        }
+
+        return true;  // e.g. remote files can have different parents
     }
 
     private void extractResourceParent() {
