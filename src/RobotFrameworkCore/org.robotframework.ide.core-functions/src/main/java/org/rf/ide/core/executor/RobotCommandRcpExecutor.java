@@ -301,12 +301,12 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             if (!wasGenerated) {
                 throw new RobotEnvironmentException(
                         "Unable to generate library specification file for library "
-                                + libName);
+                                + libName + ", for library path " + libPath + " and result file " + resultFilePath);
             }
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException(
                     "Unable to generate library specification file for library "
-                            + libName, e);
+                            + libName  + ", for library path " + libPath + " and result file " + resultFilePath, e);
         }
     }
 
