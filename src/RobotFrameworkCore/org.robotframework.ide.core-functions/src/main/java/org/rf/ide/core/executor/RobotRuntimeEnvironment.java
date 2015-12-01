@@ -691,7 +691,22 @@ public class RobotRuntimeEnvironment {
         final Thread handlerThread = new Thread(testRunnerAgentHandler);
         handlerThread.start();
     }
-
+    
+    public RunCommandLine createRunRemoteDebugTempScriptCmd(final int port) {
+        try {
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("RemoteDebugTempScript.py");
+            if (scriptFile != null) {
+                final String interpreterPath = location.toPath()
+                        .resolve(((PythonInstallationDirectory) location).getInterpreter().executableName())
+                        .toAbsolutePath()
+                        .toString();
+                return new RunCommandLine(Arrays.asList(interpreterPath, scriptFile.getAbsolutePath()), port);
+            }
+            return new RunCommandLine(new ArrayList<String>(), -1);
+        } catch (final IOException e) {
+            return new RunCommandLine(new ArrayList<String>(), -1);
+        }
+    }
 
     @Override
     public int hashCode() {
