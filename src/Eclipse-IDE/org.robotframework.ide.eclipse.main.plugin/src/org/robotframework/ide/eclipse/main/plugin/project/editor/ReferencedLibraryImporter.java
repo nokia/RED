@@ -64,6 +64,7 @@ public class ReferencedLibraryImporter {
                 StatusManager.getManager().handle(new Status(IStatus.WARNING, RedPlugin.PLUGIN_ID,
                     "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
                         StatusManager.SHOW);
+                return null;
             }
 
             if (pythonClasses.isEmpty()) {
