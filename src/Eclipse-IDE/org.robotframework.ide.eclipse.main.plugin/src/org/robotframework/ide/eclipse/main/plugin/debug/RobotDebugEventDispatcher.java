@@ -26,6 +26,7 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.rf.ide.core.execution.ExecutionElementsParser;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
@@ -58,13 +59,16 @@ public class RobotDebugEventDispatcher extends Job {
     
     private final KeywordExecutionManager keywordExecutionManager;
     
+    private final IOConsoleOutputStream remoteDebugConsole;
+    
     public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteFilesToDebug,
-            final RobotEventBroker robotEventBroker) {
+            final RobotEventBroker robotEventBroker, final IOConsoleOutputStream remoteDebugConsole) {
         super("Robot Event Dispatcher");
         setSystem(true);
 
         this.target = target;
         this.robotEventBroker = robotEventBroker;
+        this.remoteDebugConsole = remoteDebugConsole;
 
         executionContext = new RobotDebugExecutionContext();
         keywordExecutionManager = new KeywordExecutionManager(suiteFilesToDebug);
@@ -173,6 +177,7 @@ public class RobotDebugEventDispatcher extends Job {
             final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
             final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
             executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0));
+            printRemoteDebugMessage("Debugging test suite: " + suiteFilePath.toOSString());
         }
 
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
@@ -363,6 +368,16 @@ public class RobotDebugEventDispatcher extends Job {
     private void resetBreakpointConditionState() {
         isBreakpointConditionFulfilled = false;
         keywordExecutionManager.setBreakpointCondition("");
+    }
+    
+    private void printRemoteDebugMessage(final String message) {
+        if (remoteDebugConsole != null) {
+            try {
+                remoteDebugConsole.write(message + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     private static class MissingFileToExecuteException extends RuntimeException {

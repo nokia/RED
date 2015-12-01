@@ -93,8 +93,6 @@ except ImportError:
     else:
         from io import StringIO
 
-HOST = "localhost"
-
 try:
     # RF 2.7.5
     from robot.running import EXECUTION_CONTEXTS
@@ -137,6 +135,9 @@ class TestRunnerAgent:
 
     def __init__(self, *args):
         self.port = int(args[0])
+        HOST = "localhost"
+        if len(args) >= 3:
+            HOST = args[2]
         self.host = HOST
         self.sock = None
         self.filehandler = None

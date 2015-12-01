@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,16 +18,19 @@ public class DebugSocketManager implements Runnable {
 
     private int port = 0;
     
-    public DebugSocketManager(int port) {
+    private String host = "";
+    
+    public DebugSocketManager(final String host, final int port) {
+        this.host = host;
         this.port = port;
     }
 
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
             serverSocket.setReuseAddress(true);
-            serverSocket.setSoTimeout(10000);
+            serverSocket.setSoTimeout(30000);
 
             while (true) {
                 eventSocket = serverSocket.accept();
