@@ -61,7 +61,7 @@ public class ReferencedLibraryImporter {
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e) {
-                StatusManager.getManager().handle(new Status(IStatus.WARNING, RedPlugin.PLUGIN_ID,
+                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                     "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
                         StatusManager.SHOW);
                 return null;
