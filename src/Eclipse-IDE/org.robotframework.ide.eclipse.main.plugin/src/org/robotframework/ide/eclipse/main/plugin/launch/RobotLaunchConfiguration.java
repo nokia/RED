@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
+@SuppressWarnings("PMD.GodClass")
 public class RobotLaunchConfiguration {
 
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
@@ -39,6 +40,8 @@ public class RobotLaunchConfiguration {
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
     private static final String TEST_CASES_ATTRIBUTE = "Test cases";
+    private static final String REMOTE_DEBUG_HOST_ATTRIBUTE = "Remote debug host";
+    private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
 
     private final ILaunchConfiguration configuration;
     
@@ -67,6 +70,8 @@ public class RobotLaunchConfiguration {
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
+        robotConfig.setRemoteDebugHost("localhost");
+        robotConfig.setRemoteDebugPort("");
     }
 
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
@@ -90,6 +95,8 @@ public class RobotLaunchConfiguration {
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
+        robotConfig.setRemoteDebugHost("localhost");
+        robotConfig.setRemoteDebugPort("");
     }
     
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -163,6 +170,20 @@ public class RobotLaunchConfiguration {
             launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
         }
     }
+    
+    public void setRemoteDebugHost(final String host) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, host);
+        }
+    }
+    
+    public void setRemoteDebugPort(final String port) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
+        }
+    }
 
     public SuiteExecutor getExecutor() throws CoreException {
         return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
@@ -198,6 +219,14 @@ public class RobotLaunchConfiguration {
     
     public List<String> getExcludedTags() throws CoreException {
         return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
+    }
+    
+    public String getRemoteDebugHost() throws CoreException {
+        return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "localhost");
+    }
+    
+    public String getRemoteDebugPort() throws CoreException {
+        return configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, "");
     }
 
     public boolean isSuitableFor(final List<IResource> resources) {
