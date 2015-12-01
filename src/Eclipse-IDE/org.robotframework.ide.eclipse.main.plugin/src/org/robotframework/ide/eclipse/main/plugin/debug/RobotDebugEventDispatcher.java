@@ -170,6 +170,7 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> suiteList = (List<?>) eventMap.get("start_suite");
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         final IPath suiteFilePath = new Path((String) suiteElements.get("source"));
+        printRemoteDebugMessage(suiteFilePath);
         
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suiteFilePath);
         
@@ -177,7 +178,6 @@ public class RobotDebugEventDispatcher extends Job {
             final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
             final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
             executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0));
-            printRemoteDebugMessage("Debugging test suite: " + suiteFilePath.toOSString());
         }
 
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
@@ -370,10 +370,12 @@ public class RobotDebugEventDispatcher extends Job {
         keywordExecutionManager.setBreakpointCondition("");
     }
     
-    private void printRemoteDebugMessage(final String message) {
+    private void printRemoteDebugMessage(final IPath suiteFilePath) {
         if (remoteDebugConsole != null) {
             try {
-                remoteDebugConsole.write(message + "\n");
+                if (suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
+                    remoteDebugConsole.write("Debugging test suite: " + suiteFilePath.toOSString() + "\n");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
