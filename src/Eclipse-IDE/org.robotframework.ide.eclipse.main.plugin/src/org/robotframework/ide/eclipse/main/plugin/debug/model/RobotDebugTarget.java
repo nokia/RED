@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -55,7 +56,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     // program name
     private String name;
     
-    final DebugSocketManager socketManager;
+    private ServerSocket serverSocket;
 
     // socket to communicate with Agent
     private Socket eventSocket;
@@ -93,7 +94,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         target = this;
         this.launch = launch;
         this.process = process;
-        this.socketManager = socketManager;
         this.remoteDebugConsole = remoteDebugConsole;
         currentKeywordDebugContextMap = new LinkedHashMap<>();
         robotVariablesManager = new RobotDebugVariablesManager(this);
@@ -117,6 +117,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
             }
+            serverSocket = socketManager.getServerSocket();
         	eventSocket = socketManager.getEventSocket();
         	if (remoteDebugConsole != null && eventSocket != null) {
                 remoteDebugConsole.write("Remote connection from " + eventSocket.getInetAddress().getHostAddress()
@@ -291,8 +292,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         fireTerminateEvent();
        
         try {
-            if (socketManager.getServerSocket() != null) {
-                socketManager.getServerSocket().close();
+            if (serverSocket != null) {
+                serverSocket.close();
             }
             if(remoteDebugConsole != null) {
                 remoteDebugConsole.write("Remote connection closed.");
