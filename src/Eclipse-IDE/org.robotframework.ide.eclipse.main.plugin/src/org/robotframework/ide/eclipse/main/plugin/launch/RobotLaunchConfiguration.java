@@ -70,7 +70,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
-        robotConfig.setRemoteDebugHost("localhost");
+        robotConfig.setRemoteDebugHost("");
         robotConfig.setRemoteDebugPort("");
     }
 
@@ -95,7 +95,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
-        robotConfig.setRemoteDebugHost("localhost");
+        robotConfig.setRemoteDebugHost("");
         robotConfig.setRemoteDebugPort("");
     }
     
@@ -222,7 +222,7 @@ public class RobotLaunchConfiguration {
     }
     
     public String getRemoteDebugHost() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "localhost");
+        return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "");
     }
     
     public String getRemoteDebugPort() throws CoreException {
