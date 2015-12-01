@@ -122,6 +122,27 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
     }
+    
+    @Override
+    public boolean isValid(final ILaunchConfiguration configuration) {
+        setErrorMessage(null);
+        setWarningMessage(null);
+        if (!portTxt.getText().isEmpty()) {
+            int port = -1;
+            try {
+                port = Integer.parseInt(portTxt.getText());
+            } catch (NumberFormatException e) {
+                setErrorMessage("Invalid port specified.");
+                return false;
+            }
+            if (port < 1 || port > 65535) {
+                setErrorMessage("Invalid port specified.");
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
@@ -129,7 +150,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
         robotConfig.setRemoteDebugPort(portTxt.getText().trim());
     }
-
+    
     @Override
     public String getName() {
         return "Remote";
