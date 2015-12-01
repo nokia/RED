@@ -238,7 +238,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         IOConsoleOutputStream remoteDebugConsole = null;
         if (isRemoteDebugging) {
             remoteDebugConsole = getConsoleForRemoteDebugMessages(configuration, description);
-            if (isDebugServerSocketListening) {
+            if (isDebugServerSocketListening && socketManager.getServerSocket() != null) {
                 if (remoteDebugConsole != null) {
                     remoteDebugConsole.write("Debug server is listening on " + host + ":" + remoteDebugPort
                             + ", you can run a remote test.\n");
