@@ -109,7 +109,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     e.printStackTrace();
                 }
                 retryCounter++;
-                if(retryCounter > 60 || process.isTerminated()) {
+                if(process.isTerminated()) {
+                    if (remoteDebugConsole != null) {
+                        remoteDebugConsole.write("Debug server terminated by user.\n");
+                    }
+                    throw new CoreException(Status.CANCEL_STATUS);
+                }
+                if(retryCounter > 60) {
                     if (remoteDebugConsole != null) {
                         remoteDebugConsole.write("A timeout was reached while waiting for a remote connection.\n");
                     }
