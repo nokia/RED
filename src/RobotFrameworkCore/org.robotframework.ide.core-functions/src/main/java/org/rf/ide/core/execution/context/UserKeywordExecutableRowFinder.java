@@ -71,13 +71,8 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         if (keywordContext.getUserKeyword() != null) {
             return keywordContext.getUserKeyword();
         }
-        final String keywordName = extractNameFromVariableDeclaration(keywordContext.getName());
-        for (final UserKeyword userKeyword : userKeywords) {
-            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(keywordName)) {
-                return userKeyword;
-            }
-        }
-        return null;
+        final String keywordName = extractIfNameIsFromVariableDeclaration(keywordContext.getName());
+        return findKeywordByName(userKeywords, keywordName);
     }
 
     private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword,
@@ -101,7 +96,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         }
         final String[] nameElements = keywordContext.getName().split("\\.");
         if (nameElements.length > 0) {
-            final String resourceName = extractNameFromVariableDeclaration(nameElements[0]);
+            final String resourceName = extractIfNameIsFromVariableDeclaration(nameElements[0]);
             final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
             findImportReferencesByFileName(resourceName, resourceImportReferences, referencesByFileName);
             return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
@@ -109,7 +104,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return null;
     }
 
-    private String extractNameFromVariableDeclaration(final String keywordOrResourceName) {
+    private String extractIfNameIsFromVariableDeclaration(final String keywordOrResourceName) {
         String name = keywordOrResourceName;
         if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') { 
             // e.g. ${var}= resource1.MyKeyword
@@ -175,12 +170,15 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
                 .getFileModel()
                 .getKeywordTable()
                 .getKeywords();
+        return findKeywordByName(keywords, name);
+    }
+    
+    private UserKeyword findKeywordByName(final List<UserKeyword> keywords, final String name) {
         for (final UserKeyword userKeyword : keywords) {
             if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(name)) {
                 return userKeyword;
             }
         }
-
         return null;
     }
 
