@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1GCpAILuEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/17/15 5:29 PM
+Save-Time: 12/2/15 12:34 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -18,7 +18,7 @@ Entry-Name: .content
 proc "wait-for-thread"{
 
 try -times 5 -delay 500 -command{
-	get-view Debug | get-tree | get-item "Script.robot \\[Robot\\]/Robot Test/Thread \\[main\\]" 
+	get-view Debug | get-tree | get-item "Script.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
 	    | get-property childCount -raw | int| gt 0 | verify-true
 	}
 }
@@ -46,7 +46,7 @@ exec-with-options -disableJobWaiting -command {
 	try -times 6 -delay 500 -command{
 	
 		get-view Debug | get-tree 
-		    | get-item "Script.robot \\[Robot\\]/Robot Test/Thread \\[main\\]/res.from res 1 \\[line:15\\]" 
+		    | get-item "Script.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/res.from res 1 \\[line:15\\]" 
 		    | get-property caption | equals "res.from res 1 [line:15]" | verify-true
 	}
 	
