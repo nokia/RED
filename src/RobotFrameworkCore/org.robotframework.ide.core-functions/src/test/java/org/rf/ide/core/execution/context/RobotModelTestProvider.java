@@ -22,10 +22,13 @@ public class RobotModelTestProvider {
     }
 
     public static RobotFile getModelFile(final String filename) throws URISyntaxException {
+        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
+        return getModelFile(path);
+    }
+
+    public static RobotFile getModelFile(final Path path) {
         final RobotProjectHolder robotProject = new RobotProjectHolder();
         final RobotParser parser = RobotParser.createEager(robotProject);
-
-        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
         final List<RobotFileOutput> parsedFileList = parser.parse(path.toFile());
         final RobotFileOutput robotFileOutput = parsedFileList.get(0);
         return robotFileOutput.getFileModel();
