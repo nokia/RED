@@ -30,15 +30,17 @@ public class TestCaseExecutableRowFinder implements IRobotExecutableRowFinder {
 
     @Override
     public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
-        final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getTestExecutionRows();
-        if (testCaseExecutionRowCounter.getCounter() < executionRows.size()) {
-            final RobotExecutableRow<TestCase> executionRow = executionRows.get(testCaseExecutionRowCounter.getCounter());
-            testCaseExecutionRowCounter.increment();
+        if (currentTestCase != null) {
+            final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getTestExecutionRows();
+            if (testCaseExecutionRowCounter.getCounter() < executionRows.size()) {
+                final RobotExecutableRow<TestCase> executionRow = executionRows.get(testCaseExecutionRowCounter.getCounter());
+                testCaseExecutionRowCounter.increment();
 
-            if (executionRow.isExecutable()) {
-                return executionRow;
-            } else {
-                return findExecutableRow(currentKeywords);
+                if (executionRow.isExecutable()) {
+                    return executionRow;
+                } else {
+                    return findExecutableRow(currentKeywords);
+                }
             }
         }
         return null;
