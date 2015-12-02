@@ -21,28 +21,22 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class TestTemplateKeywordMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
-
 
     public TestTemplateKeywordMapper() {
         this.stateHelper = new ParsingStateHelper();
     }
 
-
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
         rt.setText(text);
         rt.setRaw(text);
 
-        final SettingTable settings = robotFileOutput.getFileModel()
-                .getSettingTable();
+        final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TestTemplate> templates = settings.getTestTemplates();
         if (!templates.isEmpty()) {
             templates.get(templates.size() - 1).setKeywordName(rt);
@@ -54,33 +48,27 @@ public class TestTemplateKeywordMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
         final ParsingState state = stateHelper.getCurrentStatus(processingState);
 
         if (state == ParsingState.SETTING_TEST_TEMPLATE) {
             final List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
-                    .getSettingTable().getTestTemplates();
+                    .getSettingTable()
+                    .getTestTemplates();
             result = !checkIfHasAlreadyKeywordName(testTemplates);
         }
         return result;
     }
 
-
     @VisibleForTesting
-    protected boolean checkIfHasAlreadyKeywordName(
-            final List<TestTemplate> testTemplates) {
+    protected boolean checkIfHasAlreadyKeywordName(final List<TestTemplate> testTemplates) {
         boolean result = false;
-        for (final TestTemplate setting : testTemplates) {
-            result = (setting.getKeywordName() != null);
-            result = result || !setting.getUnexpectedTrashArguments().isEmpty();
-            if (result) {
-                break;
-            }
+        if (!testTemplates.isEmpty()) {
+            TestTemplate lastTemplate = testTemplates.get(testTemplates.size() - 1);
+            result = (lastTemplate.getKeywordName() != null);
         }
 
         return result;
