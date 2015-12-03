@@ -228,9 +228,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         } else {
             socketManager = new DebugSocketManager(host, cmdLine.getPort());
             new Thread(socketManager).start();
-            isDebugServerSocketListening = waitForDebugServerSocket(host, cmdLine.getPort());
+            isDebugServerSocketListening = waitForDebugServerSocket(socketManager);
         }
-       
+
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
         Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
         IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
@@ -412,13 +412,16 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return null;
     }
     
-    private boolean waitForDebugServerSocket(final String host, final int port) {
+    private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {
         boolean isListening = false;
         int retryCounter = 0;
         while (!isListening && retryCounter < 20) {
-            try (Socket temporarySocket = new Socket(host, port)) {
+            try (Socket temporarySocket = new Socket(socketManager.getHost(), socketManager.getPort())) {
                 isListening = true;
             } catch (final IOException e) {
+                if(socketManager.hasServerException()) {
+                    return isListening;
+                }
                 try {
                     Thread.sleep(100);
                     retryCounter++;
