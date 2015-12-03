@@ -27,9 +27,15 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.addAll(CreateKeywordFixer.createFixers(marker.getAttribute("originalName", null)));
             fixers.addAll(ImportLibraryFixer.createFixers(marker));
+            fixers.addAll(CreateKeywordFixer.createFixers(marker.getAttribute("originalName", null)));
             return fixers;
+        }
+    },
+    AMBIGUOUS_KEYWORD {
+        @Override
+        public String getProblemDescription() {
+            return "Ambiguous keyword '%s' reference. Matching keywords are defined in: %s";
         }
     },
     DEPRECATED_KEYWORD {
@@ -81,6 +87,12 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' defines arguments by using both embedded syntax and [Arguments] setting";
+        }
+    },
+    MISSING_KEYWORD {
+        @Override
+        public String getProblemDescription() {
+            return "There is no keyword to execute specified";
         }
     };
 

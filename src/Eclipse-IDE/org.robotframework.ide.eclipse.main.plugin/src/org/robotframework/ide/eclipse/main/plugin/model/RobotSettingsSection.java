@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -258,5 +259,16 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         elements.addAll(settingTable.getForceTags());
         elements.addAll(settingTable.getDefaultTags());
         return elements;
+    }
+
+    public Optional<RobotToken> getTemplateKeyword() {
+        final SettingTable settingsTable = (SettingTable) sectionTable;
+        final List<TestTemplate> templates = settingsTable.getTestTemplates();
+        if (templates.isEmpty()) {
+            return Optional.absent();
+        } else {
+            final RobotToken keywordName = templates.get(0).getKeywordName();
+            return Optional.fromNullable(keywordName == null ? new RobotToken() : keywordName);
+        }
     }
 }

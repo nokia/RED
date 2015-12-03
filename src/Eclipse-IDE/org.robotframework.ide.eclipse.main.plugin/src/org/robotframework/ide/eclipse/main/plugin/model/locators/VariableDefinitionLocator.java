@@ -132,13 +132,20 @@ public class VariableDefinitionLocator {
             }
             final List<VariableDeclaration> embeddedArguments = keywordDef.getEmbeddedArguments();
             for (final VariableDeclaration declaration : embeddedArguments) {
-                final ContinueDecision shouldContinue = detector.localVariableDetected(file, declaration.asToken());
+                final RobotToken variableAsToken = declaration.asToken();
+                variableAsToken.setText(removeRegex(variableAsToken.getText()));
+
+                final ContinueDecision shouldContinue = detector.localVariableDetected(file, variableAsToken);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
             }
         }
         return ContinueDecision.CONTINUE;
+    }
+
+    private static String removeRegex(final String variable) {
+        return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 
     private ContinueDecision locateInPreviousCalls(final RobotSuiteFile file, final VariableDetector detector,

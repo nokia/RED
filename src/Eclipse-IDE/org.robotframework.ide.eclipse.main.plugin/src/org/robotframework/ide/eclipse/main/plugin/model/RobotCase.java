@@ -21,8 +21,10 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 public class RobotCase extends RobotCodeHoldingElement {
@@ -38,6 +40,10 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     RobotCase(final RobotCasesSection parent, final String name, final String comment) {
         super(parent, name, comment);
+    }
+
+    public TestCase getLinkedElement() {
+        return testCase;
     }
 
     public void link(final TestCase testCase) {
@@ -115,7 +121,7 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return RedImages.getTestCaseImage();
+        return isTemplated() ? RedImages.getTemplatedTestCaseImage() : RedImages.getTestCaseImage();
     }
 
     public boolean hasDocumentation() {
@@ -190,5 +196,32 @@ public class RobotCase extends RobotCodeHoldingElement {
         final int length = testCase.getTestName().getText().length();
 
         return new Position(begin, length);
+    }
+
+    public Optional<RobotToken> getTemplateInUse() {
+        return getLocalTemplate().or(getGlobalTemplate());
+    }
+
+    private Optional<RobotToken> getLocalTemplate() {
+        final List<TestCaseTemplate> templates = testCase.getTemplates();
+        if (templates.isEmpty()) {
+            return Optional.absent();
+        } else {
+            final RobotToken keywordName = templates.get(0).getKeywordName();
+            return Optional.fromNullable(keywordName == null ? new RobotToken() : keywordName);
+        }
+    }
+
+    private Optional<RobotToken> getGlobalTemplate() {
+        final Optional<RobotSettingsSection> section = getSuiteFile().findSection(RobotSettingsSection.class);
+        return section.isPresent() ? section.get().getTemplateKeyword() : Optional.<RobotToken> absent();
+    }
+
+    public boolean isTemplated() {
+        final Optional<RobotToken> template = getTemplateInUse();
+        if (template.isPresent()) {
+            return !template.get().getText().isEmpty() && !template.get().getText().toLowerCase().equals("none");
+        }
+        return false;
     }
 }
