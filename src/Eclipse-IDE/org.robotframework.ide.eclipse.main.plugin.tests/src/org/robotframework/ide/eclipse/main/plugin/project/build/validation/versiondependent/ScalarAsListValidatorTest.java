@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
@@ -16,13 +17,25 @@ import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
+
+import com.google.common.collect.Range;
 
 public class ScalarAsListValidatorTest {
 
+    private MockReporter reporter;
+
+    @Before
+    public void beforeTest() {
+        reporter = new MockReporter();
+    }
+
     @Test
     public void validatorIsNotApplicableForVersionsUnder28() {
-        final ScalarAsListValidator validator = new ScalarAsListValidator(null);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, null, null);
 
         assertThat(validator.isApplicableFor(RobotVersion.from("2.0"))).isFalse();
         assertThat(validator.isApplicableFor(RobotVersion.from("2.6"))).isFalse();
@@ -32,7 +45,7 @@ public class ScalarAsListValidatorTest {
 
     @Test
     public void validatorIsNotApplicableForVersionsOver28() {
-        final ScalarAsListValidator validator = new ScalarAsListValidator(null);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, null, null);
 
         assertThat(validator.isApplicableFor(RobotVersion.from("2.9"))).isFalse();
         assertThat(validator.isApplicableFor(RobotVersion.from("2.9.0"))).isFalse();
@@ -42,7 +55,7 @@ public class ScalarAsListValidatorTest {
 
     @Test
     public void validatorIsApplicableForVersions28x() {
-        final ScalarAsListValidator validator = new ScalarAsListValidator(null);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, null, null);
 
         assertThat(validator.isApplicableFor(RobotVersion.from("2.8"))).isTrue();
         assertThat(validator.isApplicableFor(RobotVersion.from("2.8.0"))).isTrue();
@@ -50,37 +63,44 @@ public class ScalarAsListValidatorTest {
         assertThat(validator.isApplicableFor(RobotVersion.from("2.8.100"))).isTrue();
     }
 
-    @Test(expected = ValidationProblemException.class)
+    @Test
     public void validatorThrowsProblem_whenScalarAsListVariableIsUsed() throws CoreException {
         final ScalarVariable variable = new ScalarVariable("scalar_as_list", new RobotToken(), VariableScope.TEST_CASE);
         variable.addValue(new RobotToken());
         variable.addValue(new RobotToken());
-        final ScalarAsListValidator validator = new ScalarAsListValidator(variable);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, variable, reporter);
 
         validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                VariablesProblem.SCALAR_WITH_MULTIPLE_VALUES_2_8_x, new ProblemPosition(-1, Range.closed(-1, -1))));
     }
 
     @Test
     public void validatorDoesNothing_whenScalarVariableIsUsed() throws CoreException {
         final ScalarVariable variable = new ScalarVariable("scalar", new RobotToken(), VariableScope.TEST_CASE);
-        final ScalarAsListValidator validator = new ScalarAsListValidator(variable);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, variable, reporter);
 
         validator.validate(null);
+        assertThat(reporter.wasProblemReported()).isFalse();
     }
 
     @Test
     public void validatorDoesNothing_whenListVariableIsUsed() throws CoreException {
         final IVariableHolder variable = new ListVariable("list", new RobotToken(), VariableScope.TEST_CASE);
-        final ScalarAsListValidator validator = new ScalarAsListValidator(variable);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, variable, reporter);
 
         validator.validate(null);
+        assertThat(reporter.wasProblemReported()).isFalse();
     }
 
     @Test
     public void validatorDoesNothing_whenDictionaryVariableIsUsed() throws CoreException {
         final IVariableHolder variable = new DictionaryVariable("dict", new RobotToken(), VariableScope.TEST_CASE);
-        final ScalarAsListValidator validator = new ScalarAsListValidator(variable);
+        final ScalarAsListValidator validator = new ScalarAsListValidator(null, variable, reporter);
 
         validator.validate(null);
+        assertThat(reporter.wasProblemReported()).isFalse();
     }
 }
