@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -32,10 +33,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -47,12 +50,14 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter;
 
+    private final VersionDependentValidators versionDependentValidators;
 
     GeneralSettingsTableValidator(final FileValidationContext validationContext,
             final Optional<RobotSettingsSection> settingSection) {
         this.validationContext = validationContext;
         this.settingsSection = settingSection;
         this.reporter = new ProblemsReportingStrategy();
+        this.versionDependentValidators = new VersionDependentValidators();
     }
 
     @Override
@@ -63,6 +68,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
         final IFile file = suiteFile.getFile();
         final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+
+        reportVersionSpecificProblems(file, settingsSection.get(), monitor);
 
         reportUnknownSettings(file, settingsTable.getUnknownSettings());
 
@@ -76,6 +83,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateTags(file, getTags(settingsTable));
         validateDocumentations(file, settingsTable.getDocumentation());
         validateMetadatas(file, settingsTable.getMetadatas());
+    }
+
+    private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
+            final IProgressMonitor monitor) throws CoreException {
+        final List<? extends ModelUnitValidator> validators = versionDependentValidators
+                .getGeneralSettingsValidators(file, section, validationContext.getVersion());
+        for (final ModelUnitValidator validator : validators) {
+            validator.validate(monitor);
+        }
     }
 
     private List<ATags<?>> getTags(final SettingTable settingsTable) {
@@ -148,7 +164,9 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
+                    final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", keywordName,
+                            "originalName", keywordName);
+                    reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
@@ -177,11 +195,17 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             } else {
                 
                 final String keywordName = keywordToken.getText().toString();
+                
+                if (keywordName.toLowerCase().equals("none")) {
+                    continue;
+                }
 
                 if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
+                    final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", keywordName,
+                            "originalName", keywordName);
+                    reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)

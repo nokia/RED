@@ -65,7 +65,7 @@ public class ValidationContext {
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
         this.version = runtimeEnvironment != null ? RobotVersion.from(robotProject.getVersion()) : null;
-        this.executorInUse = runtimeEnvironment.getInterpreter();
+        this.executorInUse = runtimeEnvironment != null ? runtimeEnvironment.getInterpreter() : null;
 
         this.accessibleLibraries = collectLibraries(robotProject);
         this.referencedAccessibleLibraries = newHashMap(robotProject.getReferencedLibraries());
@@ -156,8 +156,7 @@ public class ValidationContext {
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
 
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
-                        kwSpec.getName().toLowerCase(), libSpec.getName(), libraryAlias, kwSpec.isDeprecated(),
-                        isFromNestedLibrary);
+                        libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
                 addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
@@ -165,8 +164,7 @@ public class ValidationContext {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
-                        keyword.getName().toLowerCase(), extractResourceFileName(file), "", keyword.isDeprecated(),
-                        false);
+                        extractResourceFileName(file), "", keyword.isDeprecated(), false);
                 addAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }

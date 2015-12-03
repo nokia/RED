@@ -93,7 +93,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
                     final RobotToken variableToken) {
                 if (variableToken.getText().toString().startsWith(fullVariableName)) {
                     final IRegion destination = new Region(variableToken.getStartOffset(),
-                            variableToken.getText().length());
+                            variableToken.getRaw().length());
                     hyperlinks.add(new RegionsHyperlink(textViewer, fromRegion, destination));
                     return ContinueDecision.STOP;
                 } else {

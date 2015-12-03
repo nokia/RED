@@ -164,35 +164,4 @@ public class KeywordDefinitionLocator {
                 String libraryAlias, boolean isFromNestedLibrary);
 
     }
-    
-    public static class KeywordNameSplitter {
-
-        private final String name;
-
-        private final String source;
-
-        public KeywordNameSplitter(final String name, final String source) {
-            this.name = name;
-            this.source = source;
-        }
-
-        public static KeywordNameSplitter splitKeywordName(final String keywordName) {
-            final String[] split = keywordName.split("\\.");
-            if (split.length == 1) {
-                return new KeywordNameSplitter(split[0], "");
-            } else if (split.length == 2) {
-                return new KeywordNameSplitter(split[1], split[0]);
-            }
-
-            return new KeywordNameSplitter("", "");
-        }
-
-        public String getKeywordName() {
-            return name;
-        }
-
-        public String getKeywordSource() {
-            return source;
-        }
-    }
 }

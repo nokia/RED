@@ -20,9 +20,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport.NameOperation;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.CaseFormat;
@@ -43,15 +44,14 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
             return fixers;
         }
 
-        String previous = name;
-        String current = GherkinStyleUtilities.removeGherkinPrefix(name);
-
-        fixers.add(new CreateKeywordFixer(toCamelCased(previous)));
-        while (!previous.equals(current)) {
-            previous = current;
-            current = GherkinStyleUtilities.removeGherkinPrefix(current);
-            fixers.add(new CreateKeywordFixer(toCamelCased(previous)));
-        }
+        GherkinStyleSupport.forEachPossibleGherkinName(name, new NameOperation() {
+            @Override
+            public void perform(final String gherkinNameVariant) {
+                if (!gherkinNameVariant.isEmpty()) {
+                    fixers.add(new CreateKeywordFixer(toCamelCased(gherkinNameVariant)));
+                }
+            }
+        });
         return fixers;
     }
 
