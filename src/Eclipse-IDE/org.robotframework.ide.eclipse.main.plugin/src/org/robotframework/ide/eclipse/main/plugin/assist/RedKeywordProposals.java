@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -74,8 +75,10 @@ public class RedKeywordProposals {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
                 if (kwSpec.getName().toLowerCase().startsWith(prefix.toLowerCase()) && !libSpec.isReserved()) {
-                    proposals.add(RedKeywordProposal.create(libSpec, kwSpec, libraryAlias.isEmpty() ? libSpec.getName()
-                            : libraryAlias));
+                    final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
+                            : KeywordScope.STD_LIBRARY;
+                    final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
+                    proposals.add(RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName));
                 }
                 return ContinueDecision.CONTINUE;
             }
@@ -83,8 +86,9 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
                 if (keyword.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
-                    proposals.add(
-                            RedKeywordProposal.create(file, keyword, Files.getNameWithoutExtension(file.getName())));
+                    final KeywordScope scope = suiteFile == file ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
+                    final String sourceName = Files.getNameWithoutExtension(file.getName());
+                    proposals.add(RedKeywordProposal.create(file, keyword, scope, sourceName));
                 }
                 return ContinueDecision.CONTINUE;
             }

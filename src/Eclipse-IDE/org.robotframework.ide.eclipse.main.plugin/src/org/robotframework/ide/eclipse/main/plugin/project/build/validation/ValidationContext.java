@@ -23,6 +23,7 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -36,7 +37,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext.Scope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -157,7 +157,7 @@ public class ValidationContext {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
 
-                final Scope scope = libSpec.isReferenced() ? Scope.REF_LIBRARY : Scope.STD_LIBRARY;
+                final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
                         libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
                 addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
@@ -167,7 +167,7 @@ public class ValidationContext {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
                     final RobotKeywordDefinition keyword) {
-                final Scope scope = file.equals(suiteFile.getFile()) ? Scope.LOCAL : Scope.RESOURCE;
+                final KeywordScope scope = file.equals(suiteFile.getFile()) ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
 
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
                         Files.getNameWithoutExtension(suiteFile.getName()), "", keyword.isDeprecated(), false);
