@@ -173,32 +173,39 @@ public class RedImages {
     public static ImageDescriptor getFailuresImage() {
         return RedPlugin.getImageDescriptor("resources/failures.png");
     }
-    
+
     public static ImageDescriptor getGoToImage() {
         return RedPlugin.getImageDescriptor("resources/goto.png");
     }
-    
+
     public static ImageDescriptor getTestPassImage() {
         return RedPlugin.getImageDescriptor("resources/testok.png");
     }
+
     public static ImageDescriptor getTestFailImage() {
         return RedPlugin.getImageDescriptor("resources/testerr.png");
     }
+
     public static ImageDescriptor getTestInProgressImage() {
         return RedPlugin.getImageDescriptor("resources/testrun.png");
     }
+
     public static ImageDescriptor getSuitePassImage() {
         return RedPlugin.getImageDescriptor("resources/tsuiteok.png");
     }
+
     public static ImageDescriptor getSuiteFailImage() {
         return RedPlugin.getImageDescriptor("resources/tsuiteerror.png");
     }
+
     public static ImageDescriptor getSuiteInProgressImage() {
         return RedPlugin.getImageDescriptor("resources/tsuiterun.png");
     }
+
     public static ImageDescriptor getSuccessImage() {
         return RedPlugin.getImageDescriptor("resources/success.png");
     }
+
     public static ImageDescriptor getErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error.png");
     }
@@ -209,6 +216,10 @@ public class RedImages {
     
     public static ImageDescriptor getRemoveTagImage() {
         return RedPlugin.getImageDescriptor("resources/close_tag.png");
+    }
+
+    public static ImageDescriptor getChangeImage() {
+        return RedPlugin.getImageDescriptor("resources/change.png");
     }
 
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {

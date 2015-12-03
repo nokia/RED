@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -164,8 +165,9 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
-                    final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", keywordName,
-                            "originalName", keywordName);
+                    final Map<String, Object> additional = ImmutableMap.<String, Object> of(
+                            AdditionalMarkerAttributes.NAME, keywordName,
+                            AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
@@ -203,8 +205,9 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 if (!validationContext.isKeywordAccessible(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
-                    final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", keywordName,
-                            "originalName", keywordName);
+                    final Map<String, Object> additional = ImmutableMap.<String, Object> of(
+                            AdditionalMarkerAttributes.NAME, keywordName,
+                            AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
