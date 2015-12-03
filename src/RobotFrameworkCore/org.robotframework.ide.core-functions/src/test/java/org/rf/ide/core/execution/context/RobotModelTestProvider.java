@@ -5,11 +5,15 @@
  */
 package org.rf.ide.core.execution.context;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -27,7 +31,9 @@ public class RobotModelTestProvider {
     }
 
     public static RobotFile getModelFile(final Path path) {
-        final RobotProjectHolder robotProject = new RobotProjectHolder();
+        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        when(runEnv.getVersion()).thenReturn("3.0a1");
+        final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
         final RobotParser parser = RobotParser.createEager(robotProject);
         final List<RobotFileOutput> parsedFileList = parser.parse(path.toFile());
         final RobotFileOutput robotFileOutput = parsedFileList.get(0);
