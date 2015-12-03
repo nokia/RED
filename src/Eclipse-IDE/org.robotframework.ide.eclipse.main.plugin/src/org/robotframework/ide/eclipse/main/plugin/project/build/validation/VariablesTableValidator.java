@@ -15,13 +15,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -31,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
 
 class VariablesTableValidator implements ModelUnitValidator {
 
@@ -75,16 +71,10 @@ class VariablesTableValidator implements ModelUnitValidator {
 	private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
             final IProgressMonitor monitor) throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
-            final List<? extends ModelUnitValidator> validators = versionDependentValidators
-                    .getVariableValidators(variable, validationContext.getVersion());
+            final List<? extends ModelUnitValidator> validators = versionDependentValidators.getVariableValidators(file,
+                    variable, reporter, validationContext.getVersion());
             for (final ModelUnitValidator validator : validators) {
-                try {
-                    validator.validate(monitor);
-                } catch (final ValidationProblemException e) {
-                    final ProblemPosition position = e.shouldMarkWholeDefinition()
-                            ? toPositionOfWholeDefinition(variable) : toPosition(variable);
-                    reporter.handleProblem(e.getProblem(), file, position);
-                }
+                validator.validate(monitor);
             }
         }
     }
@@ -136,19 +126,5 @@ class VariablesTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
             }
         }
-    }
-
-    private static ProblemPosition toPosition(final IVariableHolder variable) {
-        return new ProblemPosition(variable.getDeclaration().getLineNumber(),
-                Range.closed(variable.getDeclaration().getStartOffset(),
-                        variable.getDeclaration().getStartOffset() + variable.getDeclaration().getText().length()));
-    }
-
-    private static ProblemPosition toPositionOfWholeDefinition(final IVariableHolder variable) {
-        final List<RobotToken> tokens = ((AVariable) variable).getElementTokens();
-        final RobotToken lastToken = tokens.isEmpty() ? variable.getDeclaration() : tokens.get(tokens.size() - 1);
-
-        return new ProblemPosition(variable.getDeclaration().getLineNumber(), Range.closed(
-                variable.getDeclaration().getStartOffset(), lastToken.getStartOffset() + lastToken.getText().length()));
     }
 }

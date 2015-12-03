@@ -360,12 +360,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     private String extractLibraryAlias(final RobotSetting setting) {
-        String alias = "";
         final LibraryAlias libAlias = ((LibraryImport) setting.getLinkedElement()).getAlias();
-        if (libAlias.isPresent()) {
-            alias = libAlias.getLibraryAlias().getText().toString();
-        }
-        return alias;
+        return libAlias.isPresent() ? libAlias.getLibraryAlias().getText() : "";
     }
 
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {

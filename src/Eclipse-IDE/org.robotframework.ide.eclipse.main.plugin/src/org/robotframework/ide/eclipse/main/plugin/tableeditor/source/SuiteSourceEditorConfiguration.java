@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createCommentRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createDefinitionRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordCallRule;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordDefinitionRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordUsageInSettings;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createLocalSettingRule;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createReadAllRule;
@@ -364,7 +365,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules);
 
         final IRule[] keywordsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
+                createKeywordDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
                 createCommentRule(comment) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
 

@@ -127,6 +127,39 @@ public class Rules {
         }
     }
 
+    static IRule createKeywordDefinitionRule(final IToken token) {
+        return new IRule() {
+
+            @Override
+            public IToken evaluate(final ICharacterScanner scanner) {
+                if (scanner.getColumn() > 1 || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("\t")) {
+                    final String lineContent = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
+                    if (DocumentUtilities.getNumberOfCellSeparators(lineContent) != 0) {
+                        return Token.UNDEFINED;
+                    }
+                }
+
+                final String n = CharacterScannerUtilities.lookAhead(scanner, 1);
+                if (!n.isEmpty() && Character.isAlphabetic(n.charAt(0))) {
+                    while (true) {
+                        final int ch = scanner.read();
+
+                        final String next = CharacterScannerUtilities.lookAhead(scanner, 3);
+                        if (CharacterScannerUtilities.isCellSeparator(next) || next.startsWith("$")) {
+                            return token;
+                        }
+                        if (ch == EOF || ch == '\r' || ch == '\n') {
+                            scanner.unread();
+                            return token;
+                        }
+                    }
+                } else {
+                    return Token.UNDEFINED;
+                }
+            }
+        };
+    }
+
     static IRule createDefinitionRule(final IToken token) {
         return new IRule() {
 

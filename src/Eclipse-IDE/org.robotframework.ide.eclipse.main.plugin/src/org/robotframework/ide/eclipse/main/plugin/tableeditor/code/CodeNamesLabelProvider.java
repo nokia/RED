@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -48,10 +49,8 @@ class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
     @Override
     public Image getImage(final Object element) {
-        if (element instanceof RobotKeywordDefinition) {
-            return ImagesManager.getImage(RedImages.getUserKeywordImage());
-        } else if (element instanceof RobotCase) {
-            return ImagesManager.getImage(RedImages.getTestCaseImage());
+        if (element instanceof RobotCodeHoldingElement) {
+            return ImagesManager.getImage(((RobotCodeHoldingElement) element).getImage());
         } else if (element instanceof ElementAddingToken) {
             return ((ElementAddingToken) element).getImage();
         }

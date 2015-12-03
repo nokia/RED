@@ -21,7 +21,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -30,6 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
@@ -53,8 +53,6 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
         final Set<String> libs = newLinkedHashSet();
         new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
                 createKeywordsDetector(keywordName, libs));
-        new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
-                createKeywordsDetector(GherkinStyleUtilities.removeGherkinPrefix(keywordName), libs));
 
         return newArrayList(Iterables.transform(libs, new Function<String, IMarkerResolution>() {
             @Override
@@ -71,7 +69,8 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias,
                     final boolean isFromNestedLibrary) {
-                if (kwSpec.getName().equalsIgnoreCase(keywordName)) {
+                if (QualifiedKeywordName.from(keywordName)
+                        .matchesIgnoringCase(QualifiedKeywordName.create(kwSpec.getName(), libSpec.getName()))) {
                     libs.add(libSpec.getName());
                 }
                 return ContinueDecision.CONTINUE;

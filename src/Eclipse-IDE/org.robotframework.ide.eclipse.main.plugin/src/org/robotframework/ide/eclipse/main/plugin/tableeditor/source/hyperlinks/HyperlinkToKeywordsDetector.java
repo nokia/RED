@@ -16,13 +16,15 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
-import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
+import org.robotframework.ide.eclipse.main.plugin.model.names.EmbeddedKeywordNamesSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.QualifiedKeywordName;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport.NameOperation;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -55,20 +57,20 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             final String keywordName = textViewer.getDocument().get(fromRegion.getOffset(), fromRegion.getLength());
 
             final List<IHyperlink> hyperlinks = newArrayList();
-            new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(
-                    createDetector(textViewer, keywordName, fromRegion, hyperlinks, canShowMultipleHyperlinks));
 
-            String previousName = keywordName;
-            String currentName = GherkinStyleUtilities.removeGherkinPrefix(keywordName);
-            while (hyperlinks.isEmpty() && !previousName.equals(currentName)) {
-                final IRegion fromRegionWithoutGherkin = new Region(
-                        fromRegion.getOffset() + keywordName.length() - currentName.length(), currentName.length());
-                new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(createDetector(textViewer,
-                        currentName, fromRegionWithoutGherkin, hyperlinks, canShowMultipleHyperlinks));
-
-                previousName = currentName;
-                currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
-            }
+            GherkinStyleSupport.forEachPossibleGherkinName(keywordName, new NameOperation() {
+                @Override
+                public void perform(final String gherkinNameVariant) {
+                    if (hyperlinks.isEmpty()) {
+                        final IRegion fromRegionWithoutGherkin = new Region(
+                                fromRegion.getOffset() + keywordName.length() - gherkinNameVariant.length(),
+                                gherkinNameVariant.length());
+                        new KeywordDefinitionLocator(suiteFile.getFile())
+                                .locateKeywordDefinition(createDetector(textViewer, gherkinNameVariant,
+                                        fromRegionWithoutGherkin, hyperlinks, canShowMultipleHyperlinks));
+                    }
+                }
+            });
 
             if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
                 throw new IllegalStateException(
@@ -89,9 +91,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
 
-                final KeywordNameSplitter typedKeywordNameSplitter = KeywordNameSplitter.splitKeywordName(name);
-                if (kwSpec.getName().equalsIgnoreCase(typedKeywordNameSplitter.getKeywordName())
-                        && hasEqualSources(libSpec, libraryAlias, typedKeywordNameSplitter.getKeywordSource())) {
+                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(name);
+                if (hasEqualSources(libSpec, libraryAlias, qualifiedName.getKeywordSource())
+                        && EmbeddedKeywordNamesSupport.matches(kwSpec.getName(), qualifiedName.getKeywordName())) {
                     hyperlinks.add(new LibrarySourceHyperlink(fromRegion, suiteFile.getFile().getProject(), libSpec));
                     if (canShowMultipleHyperlinks) {
                         hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
@@ -114,9 +116,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
 
-                final KeywordNameSplitter splitter = KeywordNameSplitter.splitKeywordName(name);
-                if (keywordNameIsMatching(keyword, splitter.getKeywordName())
-                        && hasEqualSources(file, splitter.getKeywordSource())) {
+                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(name);
+                if (hasEqualSources(file, qualifiedName.getKeywordSource())
+                        && EmbeddedKeywordNamesSupport.matches(keyword.getName(), qualifiedName.getKeywordName())) {
 
                     final KeywordSpecification kwSpec = keyword.createSpecification();
                     final Position position = keyword.getDefinitionPosition();
@@ -133,10 +135,6 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 } else {
                     return ContinueDecision.CONTINUE;
                 }
-            }
-
-            private boolean keywordNameIsMatching(final RobotKeywordDefinition keyword, final String name) {
-                return keyword.getName().equalsIgnoreCase(name);
             }
 
             private boolean hasEqualSources(final RobotSuiteFile file, final String sourceName) {

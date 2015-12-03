@@ -42,9 +42,11 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
-import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
+import org.robotframework.ide.eclipse.main.plugin.model.names.EmbeddedKeywordNamesSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.QualifiedKeywordName;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport.NameTransformation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -99,18 +101,15 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                         return libInfo;
                     }
                 }
-                String info = getKeywordHoverInfo(hoveredText);
 
-                String previousName = hoveredText;
-                String currentName = GherkinStyleUtilities.removeGherkinPrefix(hoveredText);
-                while (info == null && !previousName.equals(currentName)) {
-                    info = getKeywordHoverInfo(currentName);
-
-                    previousName = currentName;
-                    currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
-                }
-
-                return info;
+                final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
+                        new NameTransformation<String>() {
+                            @Override
+                            public Optional<String> transform(final String gherkinNameVariant) {
+                                return Optional.fromNullable(getKeywordHoverInfo(gherkinNameVariant));
+                            }
+                        });
+                return info.orNull();
             }
         } catch (final BadLocationException | CoreException e) {
         }
@@ -198,10 +197,11 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
-        final KeywordNameSplitter keywordNameSplitter = KeywordNameSplitter.splitKeywordName(keywordName);
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(keywordName);
+
         for (final RedKeywordProposal proposal : keywordProposals) {
-            if (proposal.getLabel().equalsIgnoreCase(keywordNameSplitter.getKeywordName())
-                    && hasEqualSources(keywordNameSplitter.getKeywordSource(), proposal.getSourcePrefix())) {
+            if (hasEqualSources(qualifiedName.getKeywordSource(), proposal.getSourcePrefix())
+                    && EmbeddedKeywordNamesSupport.matches(proposal.getLabel(), qualifiedName.getKeywordName())) {
                 return proposal.getDocumentation();
             }
         }

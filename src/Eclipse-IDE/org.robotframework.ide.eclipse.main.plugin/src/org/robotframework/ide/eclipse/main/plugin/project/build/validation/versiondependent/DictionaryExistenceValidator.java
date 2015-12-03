@@ -10,38 +10,56 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationProblemException;
 
 import com.google.common.collect.Range;
 
 
 class DictionaryExistenceValidator extends VersionDependentModelUnitValidator {
 
+    private final IFile file;
     private final IVariableHolder variable;
+    private final ProblemsReportingStrategy reporter;
 
-    DictionaryExistenceValidator(final IVariableHolder variable) {
+    DictionaryExistenceValidator(final IFile file, final IVariableHolder variable,
+            final ProblemsReportingStrategy reporter) {
+        this.file = file;
         this.variable = variable;
+        this.reporter = reporter;
     }
 
     @Override
     protected Range<RobotVersion> getApplicableVersionRange() {
-        // run only up to versions 2.8.x
         return Range.lessThan(new RobotVersion(2, 9));
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         if (variable.getType() == VariableType.DICTIONARY) {
-            throw new ValidationProblemException(RobotProblem.causedBy(VariablesProblem.DICTIONARY_NOT_AVAILABLE)
-                    .formatMessageWith(variable.getName()), true);
+            final ProblemPosition position = toPositionOfWholeDefinition(variable);
+            reporter.handleProblem(RobotProblem.causedBy(VariablesProblem.DICTIONARY_NOT_AVAILABLE)
+                    .formatMessageWith(variable.getName()), file, position);
         }
     }
 
+    static ProblemPosition toPositionOfWholeDefinition(final IVariableHolder variable) {
+        final List<RobotToken> tokens = ((AVariable) variable).getElementTokens();
+        final RobotToken lastToken = tokens.isEmpty() ? variable.getDeclaration() : tokens.get(tokens.size() - 1);
+
+        return new ProblemPosition(variable.getDeclaration().getLineNumber(), Range.closed(
+                variable.getDeclaration().getStartOffset(), lastToken.getStartOffset() + lastToken.getText().length()));
+    }
 }

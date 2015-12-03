@@ -25,10 +25,27 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Unknown '%s' setting";
         }
     },
+    EMPTY_SETTING {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Empty setting '%s'";
+        }
+    },
     UNSUPPORTED_SETTING {
         @Override
         public String getProblemDescription() {
             return "The setting '%s' is not supported inside %s file";
+        }
+    },
+    DUPLICATED_SETTING {
+        @Override
+        public String getProblemDescription() {
+            return "The setting '%s' is duplicated";
         }
     },
     MISSING_LIBRARY_NAME {
@@ -142,7 +159,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Variable import '%s' is invalid%s";
         }
     },
-    EMPTY_SETTING {
+    DUPLICATED_TEMPLATE_28 {
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
@@ -150,7 +167,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Empty setting '%s'";
+            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as template";
         }
     };
 

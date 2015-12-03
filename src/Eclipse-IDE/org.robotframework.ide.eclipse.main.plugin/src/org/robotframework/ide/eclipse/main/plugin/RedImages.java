@@ -78,6 +78,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/case.png");
     }
 
+    public static ImageDescriptor getTemplatedTestCaseImage() {
+        return RedPlugin.getImageDescriptor("resources/case_templated.png");
+    }
+
     public static ImageDescriptor getTestCaseSettingImage() {
         return RedPlugin.getImageDescriptor("resources/gear_small.png");
     }
