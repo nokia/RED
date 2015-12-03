@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Cy3VkJm9EeWwXrMNKVDTwg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/3/15 3:55 PM
+Save-Time: 12/3/15 4:14 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -27,7 +27,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 exec-with-options -disableJobWaiting -command {
 //got to Debug configuration
-	get-button "Debug TestFile.robot" | click -arrow
+	get-button "Debug.*" | click -arrow
 	get-menu "Debug Configurations..." | click
 	with [get-window "Debug Configurations"] {
 	    get-tree | select "Robot/TestFile.robot"
