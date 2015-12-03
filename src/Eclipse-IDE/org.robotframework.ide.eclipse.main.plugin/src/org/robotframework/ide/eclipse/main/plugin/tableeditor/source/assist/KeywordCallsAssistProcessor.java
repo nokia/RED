@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,8 @@ import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 
 /**
@@ -62,38 +65,39 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
                 final String separator = getSeparatorToFollow();
-                final boolean shouldAddKeywordPrefix = isKeywordPrefixAutoAdditionEnabled();
+                final boolean isKeywordPrefixAutoAdditionEnabled = isKeywordPrefixAutoAdditionEnabled();
 
                 final List<RedCompletionProposal> proposals = newArrayList();
-                for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
-                    final String keywordName = keywordProposal.getLabel();
-                    String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
 
-                    if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
-                            || keywordPrefix.equalsIgnoreCase(prefix)) {
-                        if (!shouldAddKeywordPrefix || keywordPrefix.length() == 1) {
-                            keywordPrefix = "";
-                        }
-                        final String textToInsert = keywordPrefix + keywordName + separator;
+                final List<RedKeywordProposal> matchingProposals = getMatchingProposals(prefix);
+                final Multimap<String, RedKeywordProposal> groupedProposals = groupProposalsByContent(
+                        matchingProposals);
 
-                        final List<String> args = keywordProposal.getArguments();
-                        final String arguments = args.isEmpty() ? "no arguments" : Joiner.on(" | ").join(args);
-                        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assist.getAcceptanceMode())
-                                .theText(textToInsert)
-                                .atOffset(offset - prefix.length())
-                                .givenThatCurrentPrefixIs(prefix)
-                                .andWholeContentIs(content)
-                                .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
-                                .contextInformationShouldBeShownAfterAccepting(new ContextInformation(keywordName, arguments))
-                                .thenCursorWillStopAtTheEndOfInsertion()
-                                .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(keywordName)
-                                .labelShouldBeAugmentedWith(keywordProposal.getLabelDecoration())
-                                .proposalsShouldHaveIcon(ImagesManager.getImage(keywordProposal.getImage()))
-                                .create();
-                        proposals.add(proposal);
-                    }
+                for (final RedKeywordProposal keywordProposal : matchingProposals) {
+                    final String keywordName = keywordProposal.getContent();
+                    final boolean shouldAddKeywordPrefix = isKeywordPrefixAutoAdditionEnabled
+                            || keywordProposalIsConflicting(groupedProposals, keywordProposal);
+                    final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
+                    final String textToInsert = keywordPrefix + keywordName + separator;
+
+                    final List<String> args = keywordProposal.getArguments();
+                    final String arguments = args.isEmpty() ? "no arguments" : Joiner.on(" | ").join(args);
+                    final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                            .will(assist.getAcceptanceMode())
+                            .theText(textToInsert)
+                            .atOffset(offset - prefix.length())
+                            .givenThatCurrentPrefixIs(prefix)
+                            .andWholeContentIs(content)
+                            .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
+                            .contextInformationShouldBeShownAfterAccepting(
+                                    new ContextInformation(keywordName, arguments))
+                            .thenCursorWillStopAtTheEndOfInsertion()
+                            .currentPrefixShouldBeDecorated()
+                            .displayedLabelShouldBe(keywordName)
+                            .labelShouldBeAugmentedWith(keywordProposal.getLabelDecoration())
+                            .proposalsShouldHaveIcon(ImagesManager.getImage(keywordProposal.getImage()))
+                            .create();
+                    proposals.add(proposal);
                 }
                 Collections.sort(proposals);
                 return proposals;
@@ -102,6 +106,32 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         } catch (final BadLocationException e) {
             return null;
         }
+    }
+
+    private List<RedKeywordProposal> getMatchingProposals(final String prefix) {
+        final List<RedKeywordProposal> proposals = new ArrayList<>();
+        for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
+            final String keywordName = keywordProposal.getLabel();
+            final String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
+
+            if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix) || keywordPrefix.equalsIgnoreCase(prefix)) {
+                proposals.add(keywordProposal);
+            }
+        }
+        return proposals;
+    }
+
+    private Multimap<String, RedKeywordProposal> groupProposalsByContent(final List<RedKeywordProposal> proposals) {
+        final Multimap<String, RedKeywordProposal> groupedProposals = LinkedHashMultimap.create();
+        for (final RedKeywordProposal proposal : proposals) {
+            groupedProposals.put(proposal.getContent(), proposal);
+        }
+        return groupedProposals;
+    }
+
+    private boolean keywordProposalIsConflicting(final Multimap<String, RedKeywordProposal> groupedProposals,
+            final RedKeywordProposal keywordProposal) {
+        return groupedProposals.get(keywordProposal.getContent()).size() > 1;
     }
 
     protected String getSeparatorToFollow() {
