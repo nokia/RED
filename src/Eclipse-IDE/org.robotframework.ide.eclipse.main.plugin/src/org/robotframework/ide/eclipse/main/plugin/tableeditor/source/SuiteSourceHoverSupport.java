@@ -46,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -166,7 +167,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     if (robotStackFrame.getFileName().equals(suiteFile.getFile().getName())) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
                             if (variable.getName().equals(variableName)) {
-                                return "Current value:\n" + variable.getValue().getValueString();
+                                return "Current value:\n" + RobotDebugValueManager.extractValueDetail(variable.getValue());
                             }
                         }
                     }
