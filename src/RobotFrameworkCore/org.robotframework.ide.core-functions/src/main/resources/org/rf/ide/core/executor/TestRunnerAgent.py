@@ -52,6 +52,7 @@ import os
 import sys
 import socket
 import threading
+import inspect
 if sys.version_info < (3,0,0):
     import SocketServer as socketserver
 else:
@@ -234,10 +235,12 @@ class TestRunnerAgent:
             vars = BuiltIn().get_variables()
             data = {}
             for k in vars.keys():
-                if (type(vars[k]) is list) or (isinstance(vars[k], dict)):
-                    data[k] = self.fix_unicode(vars[k])
-                else:
-                    data[k] = str(self.fix_unicode(vars[k]))
+                value = vars[k]
+                if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
+                    if (type(value) is list) or (isinstance(value, dict)):
+                        data[k] = self.fix_unicode(value)
+                    else:
+                        data[k] = str(self.fix_unicode(value))
             self._send_socket('vars','vars',data)
         except AttributeError:
             self._send_socket('error')
