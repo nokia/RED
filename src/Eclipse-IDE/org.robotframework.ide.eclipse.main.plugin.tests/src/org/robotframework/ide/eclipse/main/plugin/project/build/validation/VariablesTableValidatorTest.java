@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.Before;
@@ -24,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
@@ -82,13 +84,15 @@ public class VariablesTableValidatorTest {
         final ModelUnitValidator alwaysFailingVersionDepValidator_1 = new ModelUnitValidator() {
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
-                throw new ValidationProblemException(RobotProblem.causedBy(mockedCause), false);
+                reporter.handleProblem(RobotProblem.causedBy(mockedCause), null,
+                        new ProblemPosition(2, Range.closed(18, 27)));
             }
         };
         final ModelUnitValidator alwaysFailingVersionDepValidator_2 = new ModelUnitValidator() {
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
-                throw new ValidationProblemException(RobotProblem.causedBy(mockedCause), true);
+                reporter.handleProblem(RobotProblem.causedBy(mockedCause), null,
+                        new ProblemPosition(2, Range.closed(18, 30)));
             }
         };
         final ModelUnitValidator alwaysPassingVersionDepValidator = new ModelUnitValidator() {
@@ -187,7 +191,8 @@ public class VariablesTableValidatorTest {
     private static VersionDependentValidators createVersionDependentValidators(final ModelUnitValidator... validators) {
         return new VersionDependentValidators() {
             @Override
-            public List<? extends ModelUnitValidator> getVariableValidators(final IVariableHolder variable,
+            public List<? extends ModelUnitValidator> getVariableValidators(final IFile file,
+                    final IVariableHolder variable, final ProblemsReportingStrategy reporter,
                     final RobotVersion version) {
                 return newArrayList(validators);
             }

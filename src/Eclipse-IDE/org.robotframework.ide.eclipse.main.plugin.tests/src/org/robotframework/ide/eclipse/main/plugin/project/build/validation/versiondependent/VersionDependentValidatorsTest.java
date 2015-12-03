@@ -19,8 +19,8 @@ public class VersionDependentValidatorsTest {
     public void properValidatorsAreReturnedForVersionsUnder28() {
         final VersionDependentValidators validators = new VersionDependentValidators();
 
-        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null,
-                RobotVersion.from("2.7.7"));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null, null,
+                null, RobotVersion.from("2.7.7"));
         assertThat(applicableValidators.size()).isEqualTo(2);
         assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
         assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListInOlderRobotValidator.class);
@@ -30,8 +30,8 @@ public class VersionDependentValidatorsTest {
     public void properValidatorsAreReturnedForVersions28() {
         final VersionDependentValidators validators = new VersionDependentValidators();
 
-        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null,
-                RobotVersion.from("2.8.0"));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null, null,
+                null, RobotVersion.from("2.8.0"));
         assertThat(applicableValidators.size()).isEqualTo(2);
         assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
         assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListValidator.class);
@@ -41,8 +41,8 @@ public class VersionDependentValidatorsTest {
     public void properValidatorsAreReturnedForVersions29() {
         final VersionDependentValidators validators = new VersionDependentValidators();
 
-        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null,
-                RobotVersion.from("2.9"));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null, null,
+                null, RobotVersion.from("2.9"));
         assertThat(applicableValidators).isEmpty();
     }
 }
