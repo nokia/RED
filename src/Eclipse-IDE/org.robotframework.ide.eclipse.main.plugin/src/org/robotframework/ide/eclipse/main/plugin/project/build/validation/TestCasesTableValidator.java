@@ -126,16 +126,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final List<RobotCase> cases) {
         for (final RobotCase testCase : cases) {
-            final Optional<RobotToken> templateToUse = testCase.isTemplated() ? testCase.getTemplateInUse()
-                    : Optional.<RobotToken> absent();
             reportKeywordUsageProblems(robotSuiteFile, validationContext, reporter,
-                    testCase.getLinkedElement().getTestExecutionRows(), templateToUse);
+                    testCase.getLinkedElement().getTestExecutionRows(), testCase.getTemplateInUse());
         }
     }
 
     static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile,
             final FileValidationContext validationContext, final ProblemsReportingStrategy reporter,
-            final List<? extends RobotExecutableRow<?>> executables, final Optional<RobotToken> templateKeyword) {
+            final List<? extends RobotExecutableRow<?>> executables, final Optional<String> templateKeyword) {
         
         for (final RobotExecutableRow<?> executable : executables) {
             if (!executable.isExecutable() || templateKeyword.isPresent()) {
