@@ -89,10 +89,10 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             @Override
             public void widgetSelected(SelectionEvent e) {
                 final DirectoryDialog dirDialog = new DirectoryDialog(parent.getShell());
-                dirDialog.setMessage("Choose export destination.");
+                final String fileName = "TestRunnerAgent.py";
+                dirDialog.setMessage("Choose \"" + fileName + "\" export destination.");
                 final String dir = dirDialog.open();
                 if (dir != null) {
-                    final String fileName = "TestRunnerAgent.py";
                     final File scriptFile = new File(dir + File.separator + fileName);
                     try {
                         Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(fileName), scriptFile.toPath(),
