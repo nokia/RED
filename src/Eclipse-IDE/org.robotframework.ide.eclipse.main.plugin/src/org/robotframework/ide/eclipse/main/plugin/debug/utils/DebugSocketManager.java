@@ -20,6 +20,8 @@ public class DebugSocketManager implements Runnable {
     
     private String host = "";
     
+    private boolean hasServerException;
+    
     public DebugSocketManager(final String host, final int port) {
         this.host = host;
         this.port = port;
@@ -39,6 +41,8 @@ public class DebugSocketManager implements Runnable {
             // TODO: check if socket exception was caused by close during accept, then some info log
             // should be printed without stack trace
             //e.printStackTrace();
+            
+            hasServerException = true;
         }
     }
 
@@ -48,6 +52,18 @@ public class DebugSocketManager implements Runnable {
 
     public Socket getEventSocket() {
         return eventSocket;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public boolean hasServerException() {
+        return hasServerException;
     }
 
 }
