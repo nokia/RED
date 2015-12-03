@@ -10,15 +10,23 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordNameSplitter;
+import org.robotframework.ide.eclipse.main.plugin.model.names.EmbeddedKeywordNamesSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+
+import com.google.common.base.Function;
 
 public class FileValidationContext {
 
@@ -61,6 +69,17 @@ public class FileValidationContext {
         return accessibleVariables;
     }
 
+    public List<String> getKeywordSourceNames(final String keywordName) {
+        return newArrayList(transform(findMatchingKeywordValidationContexts(keywordName),
+                new Function<KeywordValidationContext, String>() {
+
+                    @Override
+                    public String apply(final KeywordValidationContext context) {
+                        return context.getSourceNameInUse();
+                    }
+                }));
+    }
+
     public boolean isKeywordAccessible(final String keywordName) {
         return findKeywordValidationContext(keywordName) != null;
     }
@@ -76,35 +95,56 @@ public class FileValidationContext {
     }
 
     private KeywordValidationContext findKeywordValidationContext(final String name) {
-        return extractKeywordValidationContext(KeywordNameSplitter.splitKeywordName(name));
-    }
-    
-    private KeywordValidationContext extractKeywordValidationContext(final KeywordNameSplitter typedKeywordNameSplitter) {
-        final List<KeywordValidationContext> keywordsContextList = getAccessibleKeywords()
-                .get(typedKeywordNameSplitter.getKeywordName().toLowerCase());
-        final String typedKeywordSourceName = typedKeywordNameSplitter.getKeywordSource();
-        if (keywordsContextList != null) {
-            for (final KeywordValidationContext keywordValidationContext : keywordsContextList) {
-                if (hasEqualSources(typedKeywordSourceName, keywordValidationContext)) {
-                    return keywordValidationContext;
+        final List<KeywordValidationContext> keywordsContexts = getPossibleContexts(name);
+
+        if (keywordsContexts != null) {
+            final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
+            for (final KeywordValidationContext context : keywordsContexts) {
+                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
+                        .create(qualifedName.getKeywordName(), context.getSourceNameInUse());
+                if (qualifedName.matchesIgnoringCase(candidateQualifiedName)) {
+                    return context;
                 }
             }
         }
         return null;
     }
-    
-    private boolean hasEqualSources(final String typedKeywordSourceName,
-            final KeywordValidationContext keywordValidationContext) {
-        if (!typedKeywordSourceName.isEmpty()) {
-            return !keywordValidationContext.getAlias().isEmpty() ? typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getAlias())
-                    : typedKeywordSourceName.equalsIgnoreCase(keywordValidationContext.getSourceName());
+
+    private List<KeywordValidationContext> findMatchingKeywordValidationContexts(final String name) {
+        final List<KeywordValidationContext> keywordsContexts = getPossibleContexts(name);
+
+        final List<KeywordValidationContext> matchingContexts = new ArrayList<>();
+        if (keywordsContexts != null) {
+            final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
+            for (final KeywordValidationContext context : keywordsContexts) {
+                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
+                        .create(qualifedName.getKeywordName(), context.getSourceNameInUse());
+                if (qualifedName.matchesIgnoringCase(candidateQualifiedName)) {
+                    matchingContexts.add(context);
+                }
+            }
         }
-        return true;
+        return matchingContexts;
+    }
+
+    private List<KeywordValidationContext> getPossibleContexts(final String name) {
+        final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
+        final List<KeywordValidationContext> keywordsContexts = getAccessibleKeywords()
+                .get(qualifedName.getKeywordName().toLowerCase());
+        return keywordsContexts == null ? tryWithEmbeddedArguments(qualifedName.getKeywordName()) : keywordsContexts;
+    }
+    
+    private List<KeywordValidationContext> tryWithEmbeddedArguments(final String keywordName) {
+        for (final Entry<String, List<KeywordValidationContext>> entry : getAccessibleKeywords()
+                .entrySet()) {
+            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), keywordName)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     static class KeywordValidationContext {
-
-        private final String keywordName;
 
         private final String sourceName;
 
@@ -114,21 +154,16 @@ public class FileValidationContext {
 
         private final boolean isFromNestedLibrary;
 
-        KeywordValidationContext(final String keywordName, final String sourceName, final String alias,
+        KeywordValidationContext(final String sourceName, final String alias,
                 final boolean isDeprecated, final boolean isFromNestedLibrary) {
-            this.keywordName = keywordName;
             this.sourceName = sourceName;
             this.alias = alias;
             this.isDeprecated = isDeprecated;
             this.isFromNestedLibrary = isFromNestedLibrary;
         }
 
-        String getKeywordName() {
-            return keywordName;
-        }
-
-        String getSourceName() {
-            return sourceName;
+        String getSourceNameInUse() {
+            return alias.isEmpty() ? sourceName : alias;
         }
 
         boolean isDeprecated() {
@@ -137,10 +172,6 @@ public class FileValidationContext {
 
         boolean isFromNestedLibrary() {
             return isFromNestedLibrary;
-        }
-
-        String getAlias() {
-            return alias;
         }
     }
 }

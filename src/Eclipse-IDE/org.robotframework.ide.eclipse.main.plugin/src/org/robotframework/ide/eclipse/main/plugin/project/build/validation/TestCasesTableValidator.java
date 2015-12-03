@@ -27,9 +27,11 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.model.GherkinStyleUtilities;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport.NameTransformation;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -40,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCases
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
@@ -68,7 +71,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
-        reportKeywordUsageProblems(suiteModel, validationContext, reporter, findExecutableRows(cases));
+        reportKeywordUsageProblems(suiteModel, testCaseSection.get().getChildren());
         reportUnknownVariables(suiteModel, cases);
     }
 
@@ -118,23 +121,24 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, caseName, additionalArguments);
             }
         }
-
     }
 
-    private static List<RobotExecutableRow<?>> findExecutableRows(final List<TestCase> cases) {
-        final List<RobotExecutableRow<?>> executables = newArrayList();
-        for (final TestCase testCase : cases) {
-            executables.addAll(testCase.getTestExecutionRows());
+    void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final List<RobotCase> cases) {
+        for (final RobotCase testCase : cases) {
+            final Optional<RobotToken> templateToUse = testCase.isTemplated() ? testCase.getTemplateInUse()
+                    : Optional.<RobotToken> absent();
+            reportKeywordUsageProblems(robotSuiteFile, validationContext, reporter,
+                    testCase.getLinkedElement().getTestExecutionRows(), templateToUse);
         }
-        return executables;
     }
 
-    static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile, final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final List<RobotExecutableRow<?>> executables) {
+    static void reportKeywordUsageProblems(final RobotSuiteFile robotSuiteFile,
+            final FileValidationContext validationContext, final ProblemsReportingStrategy reporter,
+            final List<? extends RobotExecutableRow<?>> executables, final Optional<RobotToken> templateKeyword) {
         
         for (final RobotExecutableRow<?> executable : executables) {
             
-            if (!executable.isExecutable()) {
+            if (!executable.isExecutable() || templateKeyword.isPresent()) {
                 continue;
             }
             
@@ -144,8 +148,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
             if (executableRowDescriptor.getRowType() == ERowType.FOR) {
                 final List<BuildMessage> messages = executableRowDescriptor.getMessages();
                 for (final BuildMessage buildMessage : messages) {
-                    reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, buildMessage.getMessage(),
-                            robotSuiteFile.getFile(), keywordName);
+                    final Object[] msg = new Object[] { buildMessage.getMessage() };
+                    reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, msg, robotSuiteFile.getFile(),
+                            keywordName);
                 }
                 continue;
             }
@@ -156,44 +161,57 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
             
             if (!keywordName.getFilePosition().isNotSet()) {
-                String previousName = keywordName.getText();
-                String currentName = GherkinStyleUtilities.removeGherkinPrefix(previousName);
 
-                while (!validationContext.isKeywordAccessible(previousName) && !previousName.equals(currentName)) {
-                    previousName = currentName;
-                    currentName = GherkinStyleUtilities.removeGherkinPrefix(currentName);
-                }
-                final String name = previousName;
+                final Optional<String> nameToUse = GherkinStyleSupport
+                        .firstNameTransformationResult(keywordName.getText(), new NameTransformation<String>() {
+                            @Override
+                            public Optional<String> transform(final String gherkinNameVariant) {
+                                return validationContext.isKeywordAccessible(gherkinNameVariant)
+                                        ? Optional.of(gherkinNameVariant) : Optional.<String> absent();
+                            }
+                        });
+                final String name = !nameToUse.isPresent() || nameToUse.get().isEmpty() ? keywordName.getText()
+                        : nameToUse.get().toString();
 
                 if (!validationContext.isKeywordAccessible(name)) {
-                    reportKeywordProblemWithArguments(reporter, KeywordsProblem.UNKNOWN_KEYWORD, name,
-                            robotSuiteFile.getFile(), keywordName,
+                    final Object[] msg = new Object[] { name };
+                    reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD, msg, robotSuiteFile.getFile(),
+                            keywordName,
+                            ImmutableMap.<String, Object> of("name", name, "originalName", keywordName.getText()));
+                }
+                final List<String> sources = validationContext.getKeywordSourceNames(name);
+                if (sources.size() > 1) {
+                    final Object[] msg = new Object[] { name, "[" + Joiner.on(", ").join(sources) + "]" };
+                    reportKeywordProblem(reporter, KeywordsProblem.AMBIGUOUS_KEYWORD, msg, robotSuiteFile.getFile(),
+                            keywordName,
                             ImmutableMap.<String, Object> of("name", name, "originalName", keywordName.getText()));
                 }
                 if (validationContext.isKeywordDeprecated(name)) {
-                    reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, name, robotSuiteFile.getFile(),
+                    final Object[] msg = new Object[] { name };
+                    reportKeywordProblem(reporter, KeywordsProblem.DEPRECATED_KEYWORD, msg, robotSuiteFile.getFile(),
                             keywordName);
                 }
                 if (validationContext.isKeywordFromNestedLibrary(name)) {
-                    reportKeywordProblem(reporter, KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY, name,
+                    final Object[] msg = new Object[] { name };
+                    reportKeywordProblem(reporter, KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY, msg,
                             robotSuiteFile.getFile(), keywordName);
                 }
             } else {
-                reportKeywordProblem(reporter, KeywordsProblem.UNKNOWN_KEYWORD,
-                        executable.getAction().getText().toString(), robotSuiteFile.getFile(), executable.getAction());
+                final Object[] msg = new Object[] { executable.getAction().getText() };
+                reportKeywordProblem(reporter, KeywordsProblem.MISSING_KEYWORD, msg, robotSuiteFile.getFile(),
+                        executable.getAction());
             }
         }
     }
-    
+
     private static void reportKeywordProblem(final ProblemsReportingStrategy reporter, final IProblemCause cause,
-            final String message, final IFile file, final RobotToken token) {
-        reportKeywordProblemWithArguments(reporter, cause, message, file, token, new HashMap<String, Object>());
+            final Object[] messageInfo, final IFile file, final RobotToken token) {
+        reportKeywordProblem(reporter, cause, messageInfo, file, token, new HashMap<String, Object>());
     }
 
-    private static void reportKeywordProblemWithArguments(final ProblemsReportingStrategy reporter,
-            final IProblemCause cause, final String message, final IFile file, final RobotToken token,
-            final Map<String, Object> arguments) {
-        final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(message);
+    private static void reportKeywordProblem(final ProblemsReportingStrategy reporter, final IProblemCause cause,
+            final Object[] messageInfo, final IFile file, final RobotToken token, final Map<String, Object> arguments) {
+        final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(messageInfo);
         reporter.handleProblem(problem, file, token, arguments);
     }
 

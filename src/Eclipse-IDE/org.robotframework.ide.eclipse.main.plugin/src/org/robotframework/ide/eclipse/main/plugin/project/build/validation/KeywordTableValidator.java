@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -31,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -61,7 +63,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         reportDuplicatedKewords(suiteModel.getFile(), keywords);
         reportEmbeddedArgumentsConflicts(suiteModel.getFile(), keywords);
         TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
-                findExecutableRows(keywords));
+                findExecutableRows(keywords), Optional.<RobotToken> absent());
         reportUnknownVariables(suiteModel.getFile(), keywords);
     }
 
@@ -174,11 +176,25 @@ class KeywordTableValidator implements ModelUnitValidator {
         final Set<String> arguments = newHashSet();
 
         // first add arguments embedded in name, then from [Arguments] setting
-        arguments.addAll(TestCasesTableValidator
-                .extractVariableNamesFromArguments(newArrayList(keyword.getKeywordName()), extractor, fileName));
+        arguments.addAll(newArrayList(transform(TestCasesTableValidator.extractVariableNamesFromArguments(
+                newArrayList(keyword.getKeywordName()), extractor, fileName), removeRegex())));
         for (final KeywordArguments argument : keyword.getArguments()) {
             arguments.addAll(TestCasesTableValidator.extractVariableNamesFromArguments(argument.getArguments(), extractor, fileName));
         }
         return arguments;
+    }
+
+    private static Function<String, String> removeRegex() {
+        return new Function<String, String>() {
+
+            @Override
+            public String apply(final String variable) {
+                return removeRegex(variable);
+            }
+        };
+    }
+
+    private static String removeRegex(final String variable) {
+        return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 }

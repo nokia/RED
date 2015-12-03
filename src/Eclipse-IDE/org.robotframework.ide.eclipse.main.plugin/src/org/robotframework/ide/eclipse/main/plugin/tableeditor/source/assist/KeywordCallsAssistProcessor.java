@@ -17,6 +17,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.model.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -68,7 +69,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                     final String keywordName = keywordProposal.getLabel();
                     String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
 
-                    if (keywordName.toLowerCase().startsWith(prefix.toLowerCase())
+                    if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
                             || keywordPrefix.equalsIgnoreCase(prefix)) {
                         if (!shouldAddKeywordPrefix || keywordPrefix.length() == 1) {
                             keywordPrefix = "";
