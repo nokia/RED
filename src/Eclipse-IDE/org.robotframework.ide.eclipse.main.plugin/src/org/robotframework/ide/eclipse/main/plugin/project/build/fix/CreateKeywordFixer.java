@@ -18,12 +18,12 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameOperation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport;
-import org.robotframework.ide.eclipse.main.plugin.model.names.GherkinStyleSupport.NameOperation;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.CaseFormat;
