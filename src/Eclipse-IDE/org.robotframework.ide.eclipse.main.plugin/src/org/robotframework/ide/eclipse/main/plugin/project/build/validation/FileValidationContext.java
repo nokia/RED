@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.robotframework.ide.eclipse.main.plugin.model.names.EmbeddedKeywordNamesSupport;
-import org.robotframework.ide.eclipse.main.plugin.model.names.QualifiedKeywordName;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
