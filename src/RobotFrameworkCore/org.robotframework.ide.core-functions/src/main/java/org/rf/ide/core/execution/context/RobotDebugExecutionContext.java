@@ -61,17 +61,18 @@ public class RobotDebugExecutionContext {
                 robotFileOutput.getResourceImportReferences());
     }
 
-    public void startTest(final String testName) {
+    public boolean startTest(final String testName) {
         if (currentModel != null) {
             final TestCaseTable testCaseTable = currentModel.getTestCaseTable();
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase testCase : testCases) {
                 if (testCase.getTestName().getText().toString().equalsIgnoreCase(testName)) {
                     executableRowFindersManager.initFindersAtTestCaseStart(testCase);
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     public void startKeyword(final String name, final String type, final List<String> arguments) {
