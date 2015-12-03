@@ -195,6 +195,10 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
             keywordName = null;
         }
 
+        if (keywordName != null && keywordName.equalsIgnoreCase("none")) {
+            keywordName = null;
+        }
+
         return keywordName;
     }
 
