@@ -178,11 +178,10 @@ public class VariableDefinitionLocator {
                     return ContinueDecision.STOP;
                 }
             }
-
-            final ContinueDecision shouldContinue = locateInLocalVariableFiles(file, detector);
-            if (shouldContinue == ContinueDecision.STOP) {
-                return ContinueDecision.STOP;
-            }
+        }
+        final ContinueDecision shouldContinue = locateInLocalVariableFiles(file, detector);
+        if (shouldContinue == ContinueDecision.STOP) {
+            return ContinueDecision.STOP;
         }
         return ContinueDecision.CONTINUE;
     }
