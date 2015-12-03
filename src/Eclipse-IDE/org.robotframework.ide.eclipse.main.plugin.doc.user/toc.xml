@@ -14,4 +14,8 @@
     <topic href="doc/first_steps/preferences_misc.html" label="Preferences &amp; red.xml">
     </topic>
 	</topic>
+ <topic href="doc/user_guide/user_guide.html" label="User guide">
+    <topic href="doc/user_guide/libs.html" label="Recognising external libraries and variable files in RED">
+    </topic>
+ </topic>
 </toc>
