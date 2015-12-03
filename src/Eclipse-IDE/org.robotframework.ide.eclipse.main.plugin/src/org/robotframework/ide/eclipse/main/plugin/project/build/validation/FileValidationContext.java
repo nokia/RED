@@ -24,8 +24,8 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext.Scope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Function;
@@ -76,13 +76,13 @@ public class FileValidationContext {
 
     public List<String> getKeywordSourceNames(final String keywordName) {
         final List<KeywordValidationContext> keywords = findMatchingKeywordValidationContexts(keywordName);
-        final Multimap<Scope, KeywordValidationContext> scopedKeywords = LinkedHashMultimap.create();
+        final Multimap<KeywordScope, KeywordValidationContext> scopedKeywords = LinkedHashMultimap.create();
         
         for (final KeywordValidationContext contextKw : keywords) {
             scopedKeywords.put(contextKw.scope, contextKw);
         }
         
-        for (final Scope scope : newArrayList(Scope.LOCAL, Scope.RESOURCE, Scope.REF_LIBRARY, Scope.STD_LIBRARY)) {
+        for (final KeywordScope scope : newArrayList(KeywordScope.LOCAL, KeywordScope.RESOURCE, KeywordScope.REF_LIBRARY, KeywordScope.STD_LIBRARY)) {
             final Collection<KeywordValidationContext> contextKws = scopedKeywords.get(scope);
             if (!contextKws.isEmpty()) {
                 return newArrayList(transform(contextKws,
@@ -162,7 +162,7 @@ public class FileValidationContext {
 
     static final class KeywordValidationContext {
 
-        private final Scope scope;
+        private final KeywordScope scope;
 
         private final String sourceName;
 
@@ -172,7 +172,7 @@ public class FileValidationContext {
 
         private final boolean isFromNestedLibrary;
 
-        KeywordValidationContext(final Scope scope, final String sourceName, final String alias,
+        KeywordValidationContext(final KeywordScope scope, final String sourceName, final String alias,
                 final boolean isDeprecated, final boolean isFromNestedLibrary) {
             this.scope = scope;
             this.sourceName = sourceName;
@@ -210,13 +210,6 @@ public class FileValidationContext {
         @Override
         public int hashCode() {
             return Objects.hashCode(scope, sourceName, alias, isDeprecated, isFromNestedLibrary);
-        }
-
-        enum Scope {
-            LOCAL,
-            RESOURCE,
-            REF_LIBRARY,
-            STD_LIBRARY
         }
     }
 }
