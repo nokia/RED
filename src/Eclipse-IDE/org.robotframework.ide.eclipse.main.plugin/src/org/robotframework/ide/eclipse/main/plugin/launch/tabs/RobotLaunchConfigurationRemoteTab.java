@@ -56,7 +56,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(remoteGroup);
 
         final Label hostLbl = new Label(remoteGroup, SWT.NONE);
-        hostLbl.setText("Host:");
+        hostLbl.setText("Local IP:");
 
         hostTxt = new Text(remoteGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(hostTxt);
@@ -69,7 +69,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         });
 
         final Label portLbl = new Label(remoteGroup, SWT.NONE);
-        portLbl.setText("Port:");
+        portLbl.setText("Local port:");
 
         portTxt = new Text(remoteGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(portTxt);
