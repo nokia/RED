@@ -23,6 +23,8 @@ public class RobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
 
+    private final RobotVersion robotVersion;
+
     private File processedFile;
 
     private final RobotFile fileModel;
@@ -39,7 +41,8 @@ public class RobotFileOutput {
 
     private FileFormat format = FileFormat.UNKNOWN;
 
-    public RobotFileOutput() {
+    public RobotFileOutput(final RobotVersion robotVersion) {
+        this.robotVersion = robotVersion;
         this.fileModel = new RobotFile(this);
     }
 
@@ -60,6 +63,10 @@ public class RobotFileOutput {
         }
 
         return result;
+    }
+
+    public RobotVersion getRobotVersion() {
+        return robotVersion;
     }
 
     public File getProcessedFile() {
