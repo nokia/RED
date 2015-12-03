@@ -10,11 +10,16 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
+
+import com.google.common.base.Splitter;
 
 
 public enum KeywordsProblem implements IProblemCause {
@@ -25,10 +30,18 @@ public enum KeywordsProblem implements IProblemCause {
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.addAll(ImportLibraryFixer.createFixers(marker));
-            fixers.addAll(CreateKeywordFixer.createFixers(marker.getAttribute("originalName", null)));
+
+            fixers.addAll(ImportLibraryFixer.createFixers((IFile) marker.getResource(),
+                    marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
+            fixers.addAll(CreateKeywordFixer
+                    .createFixers(marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null)));
             return fixers;
         }
     },
@@ -36,6 +49,22 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Ambiguous keyword '%s' reference. Matching keywords are defined in: %s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final List<String> sources = Splitter.on(';')
+                    .splitToList(marker.getAttribute(AdditionalMarkerAttributes.SOURCES, ""));
+
+            fixers.addAll(AddPrefixToKeywordUsage.createFixers(name, sources));
+            return fixers;
         }
     },
     DEPRECATED_KEYWORD {
@@ -56,20 +85,29 @@ public enum KeywordsProblem implements IProblemCause {
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveKeywordFixer(marker.getAttribute("name", null)));
+            return newArrayList(new RemoveKeywordFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
     EMPTY_KEYWORD {
-
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' contains no keywords to execute";
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveKeywordFixer(marker.getAttribute("name", null)));
+            return newArrayList(new RemoveKeywordFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
     KEYWORD_FROM_NESTED_LIBRARY {
@@ -108,7 +146,7 @@ public enum KeywordsProblem implements IProblemCause {
 
     @Override
     public boolean hasResolution() {
-        return true;
+        return false;
     }
 
     @Override
