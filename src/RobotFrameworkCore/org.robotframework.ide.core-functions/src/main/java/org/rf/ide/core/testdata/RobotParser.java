@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.TsvRobotFileParser;
 import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
 
@@ -30,6 +31,10 @@ public class RobotParser {
     }
 
     private final boolean shouldEagerImport;
+
+    private final String robotVersionFromCommand;
+
+    private final RobotVersion robotVersion;
 
     private final RobotProjectHolder robotProject;
 
@@ -56,6 +61,8 @@ public class RobotParser {
 
     private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
         this.robotProject = robotProject;
+        this.robotVersionFromCommand = robotProject.getRobotRuntime().getVersion();
+        this.robotVersion = RobotVersion.from(robotVersionFromCommand);
         this.shouldEagerImport = shouldImportEagerly;
     }
 
@@ -72,7 +79,8 @@ public class RobotParser {
      * @return
      */
     public RobotFileOutput parseEditorContent(final String fileContent, final File fileOrDir) {
-        final RobotFileOutput robotFile = new RobotFileOutput();
+        System.out.println(robotVersion);
+        final RobotFileOutput robotFile = new RobotFileOutput(robotVersion);
 
         final IRobotFileParser parserToUse = getParser(fileOrDir, true);
 
@@ -118,7 +126,7 @@ public class RobotParser {
                 final IRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
-                    final RobotFileOutput robotFile = new RobotFileOutput();
+                    final RobotFileOutput robotFile = new RobotFileOutput(robotVersion);
                     output.add(robotFile);
 
                     // do not change order !!! for performance reason is better

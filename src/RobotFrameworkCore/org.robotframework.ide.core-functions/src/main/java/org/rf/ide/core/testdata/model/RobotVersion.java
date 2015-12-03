@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.Optional;
 
 public final class RobotVersion implements Comparable<RobotVersion> {
+
     private final int major;
 
     private final int minor;
@@ -52,9 +53,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     }
 
     public boolean isOlderThan(final RobotVersion otherVersion) {
-        return major < otherVersion.major || (major == otherVersion.major && minor < otherVersion.minor)
-                || (major == otherVersion.major && minor == otherVersion.minor
-                        && isLessPatch(patch, otherVersion.patch));
+        return major < otherVersion.major
+                || (major == otherVersion.major && minor < otherVersion.minor)
+                || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(patch, otherVersion.patch));
     }
 
     public boolean isOlderThanOrEqualTo(final RobotVersion otherVersion) {
@@ -62,9 +63,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     }
 
     public boolean isNewerThan(final RobotVersion otherVersion) {
-        return major > otherVersion.major || (major == otherVersion.major && minor > otherVersion.minor)
-                || (major == otherVersion.major && minor == otherVersion.minor
-                        && isLessPatch(otherVersion.patch, patch));
+        return major > otherVersion.major
+                || (major == otherVersion.major && minor > otherVersion.minor)
+                || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(otherVersion.patch, patch));
     }
 
     public boolean isNewerOrEqualTo(final RobotVersion otherVersion) {
@@ -108,5 +109,11 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     @Override
     public int hashCode() {
         return Objects.hash(major, minor, patch);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(getClass().getName() + "[major=%s, minor=%s, patch=%s]", this.major, this.minor,
+                this.patch);
     }
 }
