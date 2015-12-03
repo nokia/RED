@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -20,8 +19,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 /**
@@ -72,18 +71,7 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
 
     @Override
     public void computeDetail(final IValue value, final IValueDetailListener listener) {
-        String detail = "";
-        try {
-            if (value.hasVariables()) {
-                detail = ((RobotDebugTarget) value.getDebugTarget()).getRobotDebugValueManager().extractValueDetail(
-                        value.getVariables());
-            } else {
-                detail = value.getValueString();
-            }
-        } catch (final DebugException e) {
-            e.printStackTrace();
-        }
-        listener.detailComputed(value, detail);
+        listener.detailComputed(value, RobotDebugValueManager.extractValueDetail(value));
     }
     
     @Override
