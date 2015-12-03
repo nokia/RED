@@ -1,0 +1,52 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AGtzQJkLEeWwXrMNKVDTwg
+Element-Name: UsingBlockComments
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _fLugQJkHEeWwXrMNKVDTwg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/2/15 5:01 PM
+Testcase-Type: ecl
+Verifications: _N6FnEJkMEeWwXrMNKVDTwg,_USukIJkMEeWwXrMNKVDTwg,_X1BmMJkMEeWwXrMNKVDTwg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select "MediumRobotTest/Test1.robot" | double-click
+    select "MediumRobotTest/Test2.tsv" | double-click
+    select "MediumRobotTest/Test3.txt" | double-click
+}
+//save entire file
+get-tab-folder -index 1 | get-tab-item "Test1.robot" | click
+with [get-editor "Test1.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+a"
+    key-type "M1+/"
+}
+//select test with spaces
+get-tab-folder -index 1 | get-tab-item "Test2.tsv" | click
+with [get-editor "Test2.tsv" | get-text-viewer] {
+    set-caret-pos 27 1
+    select-range 27 5 22 1
+    key-type "M1+/"
+}
+
+//select first line with part of Variable settings
+get-tab-folder -index 1 | get-tab-item "Test3.txt" | click
+with [get-editor "Test3.txt" | get-text-viewer] {
+    set-caret-pos 7 9
+    select-range 7 10 1 1
+    key-type "M1+/"
+    set-caret-pos 39 28
+    select-range 39 29 35 1
+    get-menu "Source/Toggle comment" | click
+    hover-text 31 11
+    set-caret-pos 34 1
+    select-range 34 5 33 1
+    key-type "M1+/"
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
