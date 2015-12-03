@@ -170,6 +170,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
                 }
+                final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
+                if (sources.size() > 1) {
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(keywordName,
+                                    "[" + Joiner.on(", ").join(sources) + "]"),
+                            file, keywordToken,
+                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
+                                    AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName,
+                                    AdditionalMarkerAttributes.SOURCES, Joiner.on(';').join(sources)));
+                }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
                             .formatMessageWith(keywordName);
@@ -209,6 +219,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             AdditionalMarkerAttributes.NAME, keywordName,
                             AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
+                }
+                final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
+                if (sources.size() > 1) {
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(keywordName,
+                                    "[" + Joiner.on(", ").join(sources) + "]"),
+                            file, keywordToken,
+                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
+                                    AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName,
+                                    AdditionalMarkerAttributes.SOURCES, Joiner.on(';').join(sources)));
                 }
                 if (validationContext.isKeywordDeprecated(keywordName)) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
