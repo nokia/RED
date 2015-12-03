@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -73,8 +74,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (keyword.getExecutionContext().isEmpty()) {
                 boolean report = true;
                 if (!keyword.getReturns().isEmpty()) {
-                    KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
-                    List<RobotToken> returnValues = keywordReturn.getReturnValues();
+                    final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
+                    final List<RobotToken> returnValues = keywordReturn.getReturnValues();
                     report = isReturnEmpty(returnValues);
                 }
                 if (report) {
@@ -85,10 +86,10 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
     }
 
-    private boolean isReturnEmpty(List<RobotToken> returnValues) {
+    private boolean isReturnEmpty(final List<RobotToken> returnValues) {
         boolean report = true;
         if (!returnValues.isEmpty()) {
-            for (RobotToken rtValue: returnValues) {
+            for (final RobotToken rtValue: returnValues) {
                 if (!rtValue.getText().toString().trim().isEmpty()) {
                     report = false;
                     break;
@@ -122,7 +123,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
                         .formatMessageWith(name);
-                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                final Map<String, Object> additionalArguments = ImmutableMap
+                        .<String, Object> of(AdditionalMarkerAttributes.NAME, name);
                 reporter.handleProblem(problem, file, keywordName, additionalArguments);
             }
         }

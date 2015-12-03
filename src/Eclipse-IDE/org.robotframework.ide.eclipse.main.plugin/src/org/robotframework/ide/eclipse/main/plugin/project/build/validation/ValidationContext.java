@@ -5,12 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext.Scope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -147,24 +149,28 @@ public class ValidationContext {
         return variables;
     }
 
-    public Map<String, List<KeywordValidationContext>> collectAccessibleKeywordNames(final IFile file) {
-        final Map<String, List<KeywordValidationContext>> accessibleKeywords = newHashMap();
+    public Map<String, Collection<KeywordValidationContext>> collectAccessibleKeywordNames(final IFile file) {
+        final Map<String, Collection<KeywordValidationContext>> accessibleKeywords = newHashMap();
         new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
 
-                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
+                final Scope scope = libSpec.isReferenced() ? Scope.REF_LIBRARY : Scope.STD_LIBRARY;
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
                         libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
                 addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(
-                        extractResourceFileName(file), "", keyword.isDeprecated(), false);
+            public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
+                    final RobotKeywordDefinition keyword) {
+                final Scope scope = file.equals(suiteFile.getFile()) ? Scope.LOCAL : Scope.RESOURCE;
+
+                final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
+                        Files.getNameWithoutExtension(suiteFile.getName()), "", keyword.isDeprecated(), false);
                 addAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
@@ -174,12 +180,10 @@ public class ValidationContext {
                 if (accessibleKeywords.containsKey(keywordName)) {
                     accessibleKeywords.get(keywordName).add(keywordValidationContext);
                 } else {
-                    accessibleKeywords.put(keywordName, newArrayList(keywordValidationContext));
+                    final LinkedHashSet<KeywordValidationContext> setOfKeywords = newLinkedHashSet();
+                    setOfKeywords.add(keywordValidationContext);
+                    accessibleKeywords.put(keywordName, setOfKeywords);
                 }
-            }
-
-            private String extractResourceFileName(final RobotSuiteFile file) {
-                return file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()) : "";
             }
         });
         return accessibleKeywords;

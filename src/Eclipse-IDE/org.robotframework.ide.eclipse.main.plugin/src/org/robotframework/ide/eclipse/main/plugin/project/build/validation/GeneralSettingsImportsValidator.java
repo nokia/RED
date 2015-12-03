@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -123,7 +124,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
         final IResource resource = wsRoot.findMember(wsRelativePath);
         if (resource == null || !resource.exists()) {
-            final Map<String, Object> attributes = ImmutableMap.<String, Object> of("path",
+            final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                     wsRelativePath.toPortableString());
             reporter.handleProblem(
                     RobotProblem.causedBy(getCauseForNonExistingResourceImport()).formatMessageWith(path),
@@ -153,7 +154,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     private void reportParameterizedImport(final RobotToken pathOrNameToken) {
         final String path = pathOrNameToken.getText().toString();
-        final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", path);
+        final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, path);
         reporter.handleProblem(
                 RobotProblem.causedBy(GeneralSettingsProblem.PARAMETERIZED_IMPORT_PATH).formatMessageWith(path),
                 suiteFile.getFile(), pathOrNameToken, additional);
@@ -243,8 +244,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             } else {
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_LIBRARY)
                         .formatMessageWith(pathOrName);
-                final Map<String, Object> additional = ImmutableMap.<String, Object> of("name", pathOrName, "isPath",
-                        isPath);
+                final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        pathOrName, AdditionalMarkerAttributes.IS_PATH, isPath);
                 reporter.handleProblem(problem, suiteFile.getFile(), pathOrNameToken, additional);
             }
         }

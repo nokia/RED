@@ -166,7 +166,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     if (robotStackFrame.getFileName().equals(suiteFile.getFile().getName())) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
                             if (variable.getName().equals(variableName)) {
-                                return "Current value:\n\n" + variable.getValue().getValueString();
+                                return "Current value:\n" + variable.getValue().getValueString();
                             }
                         }
                     }

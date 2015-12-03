@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineVariableFixer;
@@ -79,7 +80,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final String nameOrPath = marker.getAttribute("name", null);
+            final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
             return DefineVariableFixer.createFixers(nameOrPath);
         }
     },
@@ -113,8 +114,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final String nameOrPath = marker.getAttribute("name", null);
-            final boolean isPath = marker.getAttribute("isPath", false);
+            final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final boolean isPath = marker.getAttribute(AdditionalMarkerAttributes.IS_PATH, false);
             return newArrayList(new AddLibraryToRedXmlFixer(nameOrPath, isPath));
         }
     },
@@ -137,7 +138,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final IPath path = Path.fromPortableString(marker.getAttribute("path", null));
+            final IPath path = Path.fromPortableString(marker.getAttribute(AdditionalMarkerAttributes.PATH, null));
             return ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path);
         }
     },

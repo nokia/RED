@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -88,7 +89,8 @@ class VariablesTableValidator implements ModelUnitValidator {
                     if (variableName.charAt(1) != '{') {
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)
                                 .formatMessageWith(variableName);
-                        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variableName);
+                        final Map<String, Object> attributes = ImmutableMap
+                                .<String, Object> of(AdditionalMarkerAttributes.NAME, variableName);
                         reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
                     }
                 }
@@ -101,7 +103,8 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (variable.getType() == VariableType.INVALID) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_TYPE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variable.getName());
+                final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        variable.getName());
                 reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
             }
         }
@@ -122,7 +125,8 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(variable.getName())) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = ImmutableMap.<String, Object> of("name", variable.getName());
+                final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        variable.getName());
                 reporter.handleProblem(problem, file, variable.getDeclaration(), attributes);
             }
         }
