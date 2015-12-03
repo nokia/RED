@@ -44,10 +44,7 @@ import com.google.common.collect.Iterables;
  */
 public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
-    public static Collection<IMarkerResolution> createFixers(final IMarker marker) {
-        final IFile file = (IFile) marker.getResource();
-        final String keywordName = marker.getAttribute("name", "");
-
+    public static Collection<IMarkerResolution> createFixers(final IFile file, final String keywordName) {
         final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
 
         final Set<String> libs = newLinkedHashSet();

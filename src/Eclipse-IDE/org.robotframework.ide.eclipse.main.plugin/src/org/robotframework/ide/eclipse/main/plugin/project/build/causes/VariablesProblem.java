@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhitespacesFromVariableNameFixer;
 
@@ -34,7 +35,7 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveVariableFixer(marker.getAttribute("name", null)));
+            return newArrayList(new RemoveVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
     INVALID_TYPE {
@@ -50,7 +51,7 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveVariableFixer(marker.getAttribute("name", null)));
+            return newArrayList(new RemoveVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
     INVALID_NAME {
@@ -66,7 +67,8 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveWhitespacesFromVariableNameFixer(marker.getAttribute("name", null)));
+            return newArrayList(new RemoveWhitespacesFromVariableNameFixer(
+                    marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },    
     DICTIONARY_NOT_AVAILABLE {
