@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
@@ -61,13 +62,23 @@ public class RobotDebugValueManager {
         return "Dictionary[" + value.size() + "]";
     }
     
-    public String extractValueDetail(final IVariable[] variables) throws DebugException {
-        final StringBuilder detailBuilder = new StringBuilder();
-        extractNestedVariablesDetails(variables, detailBuilder);
-        return detailBuilder.toString();
+    public static String extractValueDetail(final IValue value) {
+        String detail = "";
+        try {
+            if (value.hasVariables()) {
+                final StringBuilder detailBuilder = new StringBuilder();
+                extractNestedVariablesDetails(value.getVariables(), detailBuilder);
+                detail = detailBuilder.toString();
+            } else {
+                detail = value.getValueString();
+            }
+        } catch (final DebugException e) {
+            e.printStackTrace();
+        }
+        return detail;
     }
     
-    private void extractNestedVariablesDetails(final IVariable[] variables, final StringBuilder detailBuilder) throws DebugException {
+    private static void extractNestedVariablesDetails(final IVariable[] variables, final StringBuilder detailBuilder) throws DebugException {
         detailBuilder.append("[");
         for (int i = 0; i < variables.length; i++) {
             if(variables[i].getValue().hasVariables()) {
@@ -82,7 +93,7 @@ public class RobotDebugValueManager {
         detailBuilder.append("]");
     }
     
-    private String getTextValue(final IVariable variable) throws DebugException {
+    private static String getTextValue(final IVariable variable) throws DebugException {
         final String variableName = variable.getName();
         if(isDictionaryElement(variableName)) {
             return variableName + "=" + variable.getValue().getValueString();
@@ -90,7 +101,7 @@ public class RobotDebugValueManager {
         return variable.getValue().getValueString();
     }
     
-    private boolean isDictionaryElement(final String variableName) {
+    private static boolean isDictionaryElement(final String variableName) {
         return (variableName.indexOf("[") < 0 && variableName.indexOf("]") < 0);
     }
 }
