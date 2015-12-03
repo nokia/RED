@@ -1,0 +1,46 @@
+_indent,Description,Resource,Path,Location,Type
+0,Errors (44 items),,,,
+1,Unknown keyword '${variables} =',pipes2.robot,/ProjectWithNoErrors/tests/arguments_separated_by_pipe,line 4,Robot Problem
+1,"Variable '-1e-4' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 80,Robot Problem
+1,"Variable '0B1010' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 38,Robot Problem
+1,"Variable '0b1011' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 35,Robot Problem
+1,"Variable '0o10' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 36,Robot Problem
+1,"Variable '0XA' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 38,Robot Problem
+1,"Variable '0xff' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 37,Robot Problem
+1,"Variable '1' is used, but not defined",assigning_variables.robot,/ProjectWithNoErrors/tests/all_variables,line 15,Robot Problem
+1,"Variable '1' is used, but not defined",assigning_variables.robot,/ProjectWithNoErrors/tests/all_variables,line 16,Robot Problem
+1,"Variable '11' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 35,Robot Problem
+1,"Variable '2' is used, but not defined",assigning_variables.robot,/ProjectWithNoErrors/tests/all_variables,line 15,Robot Problem
+1,"Variable '2' is used, but not defined",assigning_variables.robot,/ProjectWithNoErrors/tests/all_variables,line 31,Robot Problem
+1,"Variable '255' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 37,Robot Problem
+1,"Variable '3.14' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 80,Robot Problem
+1,"Variable '3' is used, but not defined",assigning_variables.robot,/ProjectWithNoErrors/tests/all_variables,line 31,Robot Problem
+1,"Variable '8' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 36,Robot Problem
+1,"Variable '80' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 77,Robot Problem
+1,"Variable 'DEBUG FILE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 58,Robot Problem
+1,"Variable 'KEYWORD MESSAGE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 131,Robot Problem
+1,"Variable 'KEYWORD STATUS' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 130,Robot Problem
+1,"Variable 'LOG FILE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 56,Robot Problem
+1,"Variable 'LOG LEVEL' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 54,Robot Problem
+1,"Variable 'OUTPUT DIR' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 59,Robot Problem
+1,"Variable 'OUTPUT FILE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 55,Robot Problem
+1,"Variable 'PREV TEST MESSAGE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 48,Robot Problem
+1,"Variable 'PREV TEST NAME' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 46,Robot Problem
+1,"Variable 'PREV TEST STATUS' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 47,Robot Problem
+1,"Variable 'REPORT FILE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 57,Robot Problem
+1,"Variable 'SPACE * 10' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 12,Robot Problem
+1,"Variable 'SPACE * 10' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 12,Robot Problem
+1,"Variable 'SPACE * 10' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 16,Robot Problem
+1,"Variable 'SPACE * 2' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 22,Robot Problem
+1,"Variable 'SPACE * 4' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 9,Robot Problem
+1,"Variable 'SUITE DOCUMENTATION' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 51,Robot Problem
+1,"Variable 'SUITE MESSAGE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 96,Robot Problem
+1,"Variable 'SUITE METADATA' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 52,Robot Problem
+1,"Variable 'SUITE NAME' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 49,Robot Problem
+1,"Variable 'SUITE SOURCE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 50,Robot Problem
+1,"Variable 'SUITE STATUS' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 95,Robot Problem
+1,"Variable 'TEST DOCUMENTATION' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 44,Robot Problem
+1,"Variable 'TEST MESSAGE' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 100,Robot Problem
+1,"Variable 'TEST NAME' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 42,Robot Problem
+1,"Variable 'TEST STATUS' is used, but not defined",robot_varaibles.robot,/ProjectWithNoErrors/tests/all_variables,line 99,Robot Problem
+1,"Variable 'variables' is used, but not defined",pipes2.robot,/ProjectWithNoErrors/tests/arguments_separated_by_pipe,line 4,Robot Problem
