@@ -170,7 +170,7 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> suiteList = (List<?>) eventMap.get("start_suite");
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         final IPath suiteFilePath = new Path((String) suiteElements.get("source"));
-        printRemoteDebugMessage(suiteFilePath);
+        printRemoteDebugSuiteMessage(suiteFilePath);
         
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suiteFilePath);
         
@@ -190,7 +190,8 @@ public class RobotDebugEventDispatcher extends Job {
         final String line = "Starting test: " + testElements.get("longname") + '\n';
         final String testCaseName = (String) testList.get(0);
         
-        executionContext.startTest(testCaseName);
+        final boolean hasTestCase = executionContext.startTest(testCaseName);
+        printRemoteDebugTestCaseMessage(testCaseName, hasTestCase);
         
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
@@ -370,12 +371,23 @@ public class RobotDebugEventDispatcher extends Job {
         keywordExecutionManager.setBreakpointCondition("");
     }
     
-    private void printRemoteDebugMessage(final IPath suiteFilePath) {
+    private void printRemoteDebugSuiteMessage(final IPath suiteFilePath) {
         if (remoteDebugConsole != null) {
             try {
                 if (suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
                     remoteDebugConsole.write("Debugging test suite: " + suiteFilePath.toOSString() + "\n");
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void printRemoteDebugTestCaseMessage(final String testCaseName, final boolean isTestCaseAvailable) {
+        if (remoteDebugConsole != null && !isTestCaseAvailable) {
+            try {
+                remoteDebugConsole.write("Test case \"" + testCaseName + "\" not available. Check the files content!"
+                        + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
