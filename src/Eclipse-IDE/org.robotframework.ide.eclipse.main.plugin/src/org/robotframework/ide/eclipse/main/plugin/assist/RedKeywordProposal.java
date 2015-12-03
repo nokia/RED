@@ -45,8 +45,10 @@ public class RedKeywordProposal {
         this.argumentsProvider = argumentsProvider;
     }
 
-    static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword, final String sourcePrefix) {
+    static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword,
+            final String sourcePrefix) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
+
             @Override
             public String provide() {
                 return keyword.getDocumentationAsHtml();
@@ -62,8 +64,10 @@ public class RedKeywordProposal {
                 true, argsProvider, htmlDocuProvider, keyword.getDocumentation(), sourcePrefix);
     }
 
-    static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword, final String sourcePrefix) {
+    static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword,
+            final String sourcePrefix) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
+
             @Override
             public String provide() {
                 return "<p>to be implemented</p>";

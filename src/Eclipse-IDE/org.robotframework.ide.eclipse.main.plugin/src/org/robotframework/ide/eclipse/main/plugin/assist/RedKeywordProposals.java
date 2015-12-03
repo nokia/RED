@@ -83,8 +83,8 @@ public class RedKeywordProposals {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
                 if (keyword.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
-                    proposals.add(RedKeywordProposal.create(file, keyword,
-                            file.isResourceFile() ? Files.getNameWithoutExtension(file.getName()) : ""));
+                    proposals.add(
+                            RedKeywordProposal.create(file, keyword, Files.getNameWithoutExtension(file.getName())));
                 }
                 return ContinueDecision.CONTINUE;
             }
