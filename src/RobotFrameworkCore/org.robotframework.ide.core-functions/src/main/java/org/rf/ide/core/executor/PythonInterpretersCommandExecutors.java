@@ -53,7 +53,7 @@ class PythonInterpretersCommandExecutors {
         if (executor != null && executor.isAlive()) {
             return executor;
         } else if (executor != null) {
-            executor.kill();
+            //executor.kill();
             executors.remove(pathAsName);
         }
         try {
