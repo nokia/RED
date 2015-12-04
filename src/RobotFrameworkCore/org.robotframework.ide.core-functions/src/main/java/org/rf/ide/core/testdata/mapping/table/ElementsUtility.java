@@ -162,21 +162,22 @@ public class ElementsUtility {
         } else {
             final RobotToken token = robotTokens.get(0);
             if (!token.getTypes().contains(RobotTokenType.UNKNOWN)) {
+                final RobotToken newRobotToken = new RobotToken();
+                newRobotToken.setLineNumber(fp.getLine());
+                newRobotToken.setStartColumn(fp.getColumn());
+                newRobotToken.setText(text);
+                newRobotToken.setRaw(text);
                 if (text != null
-                        && (text.equals(token.getRaw().toString()) || text.trim().equals(token.getRaw().trim()))) {
-                    correct = token;
-                } else {
-                    final RobotToken newRobotToken = new RobotToken();
-                    newRobotToken.setLineNumber(fp.getLine());
-                    newRobotToken.setStartColumn(fp.getColumn());
-                    newRobotToken.setText(text);
-                    newRobotToken.setRaw(text);
+                        && !(text.equals(token.getRaw().toString()) || text.trim().equals(token.getRaw().trim()))) {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
-                    // FIXME: decide what to do
-                    newRobotToken.getTypes().addAll(token.getTypes());
-                    // or add warning about possible type
-                    correct = newRobotToken;
+                } else {
+                    newRobotToken.getTypes().clear();
                 }
+                // FIXME: decide what to do
+
+                newRobotToken.getTypes().addAll(token.getTypes());
+                // or add warning about possible type
+                correct = newRobotToken;
             } else {
                 correct = token;
             }
