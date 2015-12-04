@@ -34,6 +34,15 @@ For more information about LibDoc please refer to <a href="https://robot-framewo
 <h2>Importing Python Variable files into code assistance</h2>
 
 Python variable files can be imported to RED by adding path in red.xml
- 
+
+<h2>Parametrised file path to Libraries and Resources - Variable mappings</h2> <br>
+Whenever parametrised file path is used in resources or libraries paths (parameter value is assigned during test runtime), RED will not be able to evaluate parameter value by itself.<br>
+<br><br><img src="libs/libs_5.png"> <br><br>
+In this case Variables mappings can be used to statically assign value to variable for test editing time only. <br>
+This will allow RED to resolve path to libraries and resources with parametrised paths. <br>
+Open red.xml file by Eclipse Default Editor, in Variables mappings assign static value for variable in path:<br>
+<br><br><img src="libs/libs_6.png"> <br><br> 
+When successful, path will be recognised and validation will take placed
+<br><br><img src="libs/libs_7.png"> <br><br>
 </body>
 </html>
