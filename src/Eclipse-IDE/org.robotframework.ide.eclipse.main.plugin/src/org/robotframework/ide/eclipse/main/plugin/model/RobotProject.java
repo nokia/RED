@@ -317,7 +317,8 @@ public class RobotProject extends RobotContainer {
         if (configuration != null) {
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON && lib.getName().equals(libName)) {
-                    return lib.getPath() + "/" + lib.getName() + ".py";
+                    return PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                            new Path(lib.getPath()).append(lib.getName() + ".py")).toPortableString();
                 }
             }
         }
