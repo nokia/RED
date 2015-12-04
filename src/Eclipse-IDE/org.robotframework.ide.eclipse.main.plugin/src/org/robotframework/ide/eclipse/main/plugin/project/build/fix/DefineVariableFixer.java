@@ -10,27 +10,29 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.VariableMappingsFormFragment.VariableMappingDialog;
+import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.swt.SwtThread.Calculation;
 
 /**
  * @author Michal Anglart
  *
  */
-public class DefineVariableFixer extends RedSuiteMarkerResolution {
+public class DefineVariableFixer extends RedXmlConfigMarkerResolution {
 
     private final String variable;
 
@@ -57,39 +59,53 @@ public class DefineVariableFixer extends RedSuiteMarkerResolution {
     }
 
     @Override
-    public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
-            final RobotSuiteFile suiteModel) {
-        System.out.println("Variable defined: " + variable);
-
-        return Optional.<ICompletionProposal> of(createProposal());
+    protected ICompletionProposal asContentProposal(final IMarker marker, final IFile externalFile) {
+        return new DefineLibraryProposal(marker, externalFile, variable, getLabel());
     }
 
-    private EmptyCompletionProposal createProposal() {
-        return new EmptyCompletionProposal(getLabel()) {
-            @Override
-            public void apply(final IDocument document) {
-                final StringBuilder builder = new StringBuilder();
-                Display.getDefault().syncExec(new Runnable() {
+    private class DefineLibraryProposal extends RedConfigFileCompletionProposal {
 
-                    @Override
-                    public void run() {
-                        final Shell shell = Display.getCurrent().getActiveShell();
-                        final InputDialog dialog = new InputDialog(shell, "blah", "msg", "", null);
-                        dialog.open();
-                        builder.append(dialog.getValue());
-                    }
-                });
-                final Map<String, String> variables = newHashMap();
-                variables.put(variable, builder.toString());
-                final List<String> vars = newArrayList();
-                for (final Entry<String, String> entry : variables.entrySet()) {
-                    vars.add(entry.getKey());
-                    vars.add(entry.getValue());
+        private final String name;
+        private VariableMapping variableMapping;
+
+        public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String variableName,
+                final String shortDescritption) {
+            super(marker, externalFile, shortDescritption, null);
+            this.name = variableName;
+        }
+
+        @Override
+        public boolean apply(final IFile externalFile, final RobotProjectConfig config)
+                throws ProposalApplyingException {
+            variableMapping = SwtThread.syncExec(new Calculation<VariableMapping>() {
+                @Override
+                public VariableMapping runCalculation() {
+                    final Shell shell = Display.getCurrent().getActiveShell();
+                    final VariableMappingDialog dialog = new VariableMappingDialog(shell, name);
+                    return dialog.open() == Window.OK ? dialog.getMapping() : null;
                 }
-                final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-                store.setValue("variablesInResolution", Joiner.on(';').join(vars));
-            }
-        };
-    }
+            });
 
+            if (variableMapping == null) {
+                return false;
+            }
+            config.addVariableMapping(variableMapping);
+            return true;
+        }
+
+        @Override
+        protected void fireEvents() {
+            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED, variableMapping);
+        }
+
+        @Override
+        public String getAdditionalProposalInfo() {
+            return "Add " + name + " variable mapping to red.xml file";
+        }
+
+        @Override
+        public Image getImage() {
+            return ImagesManager.getImage(RedImages.getRobotVariableImage());
+        }
+    }
 }

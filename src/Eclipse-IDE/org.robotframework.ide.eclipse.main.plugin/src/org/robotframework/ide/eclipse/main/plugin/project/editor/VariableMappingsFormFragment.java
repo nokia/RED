@@ -9,7 +9,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -37,11 +39,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
 
-class VariableMappingsFormFragment implements ISectionFormFragment {
+public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     @Inject
     private RedFormToolkit toolkit;
@@ -186,7 +189,15 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
         return null;
     }
 
-    private static class VariableMappingDialog extends Dialog {
+    @Inject
+    @Optional
+    private void whenMappingsChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final VariableMapping mapping) {
+        dirtyProviderService.setDirtyState(true);
+        viewer.refresh();
+    }
+
+    public static class VariableMappingDialog extends Dialog {
 
         private VariableMapping mapping;
         private Label exceptionLabel;
@@ -194,8 +205,15 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
         private Text nameText;
         private Text valueText;
 
-        protected VariableMappingDialog(final Shell parentShell) {
+        private final String initialVariableName;
+
+        public VariableMappingDialog(final Shell parentShell) {
+            this(parentShell, "${var}");
+        }
+
+        public VariableMappingDialog(final Shell parentShell, final String variableName) {
             super(parentShell);
+            this.initialVariableName = variableName;
         }
 
         @Override
@@ -210,7 +228,7 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
             GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).applyTo(dialogComposite);
 
             final Label infoLabel = new Label(dialogComposite, SWT.WRAP);
-            infoLabel.setText("Specify name and valu of variable which will be used in parameterized imports.");
+            infoLabel.setText("Specify name and value of variable which will be used in parameterized imports.");
             GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).span(2, 1).applyTo(infoLabel);
 
             final Label nameLabel = new Label(dialogComposite, SWT.NONE);
@@ -218,7 +236,7 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
             
             nameText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(nameText);
-            nameText.setText("${var}");
+            nameText.setText(initialVariableName);
             nameText.addModifyListener(new ModifyListener() {
 
                 @Override
@@ -245,7 +263,8 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
             exceptionLabel.setText("");
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(exceptionLabel);
 
-            nameText.setFocus();
+            valueText.setFocus();
+            valueText.setSelection(0, valueLabel.getText().length());
 
             return dialogComposite;
         }
@@ -282,7 +301,7 @@ class VariableMappingsFormFragment implements ISectionFormFragment {
             super.okPressed();
         }
 
-        VariableMapping getMapping() {
+        public VariableMapping getMapping() {
             return mapping;
         }
     }
