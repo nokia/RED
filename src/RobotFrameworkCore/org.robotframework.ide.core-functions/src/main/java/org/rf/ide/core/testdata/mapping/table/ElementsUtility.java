@@ -162,7 +162,8 @@ public class ElementsUtility {
         } else {
             final RobotToken token = robotTokens.get(0);
             if (!token.getTypes().contains(RobotTokenType.UNKNOWN)) {
-                if (text.equals(token.getRaw().toString())) {
+                if (text != null
+                        && (text.equals(token.getRaw().toString()) || text.trim().equals(token.getRaw().trim()))) {
                     correct = token;
                 } else {
                     final RobotToken newRobotToken = new RobotToken();
