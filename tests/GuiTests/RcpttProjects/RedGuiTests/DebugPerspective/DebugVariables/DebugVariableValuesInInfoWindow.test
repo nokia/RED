@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw
 Element-Name: DebugVariableValuesInInfoWindow
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/3/15 3:54 PM
+Save-Time: 12/4/15 11:57 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,7 +17,7 @@ Entry-Name: .content
 
 proc "check-variable-in-info-window" [val value]{
 
-get-window -from "Information Window" | get-editbox | get-property text | equals [concat "Current value:\n\n" $value] | verify-true
+get-window -from "Information Window" | get-editbox | get-property text | equals [concat "Current value:\n" $value] | verify-true
 	    
 }
 
@@ -26,8 +26,8 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
     + "${x}  7      \n"
     + "${text}  text      \n"
-    + "${new Var}  vary long text with nothing special inside but must be long \\n"
-    + ". New line here\n"
+    + "${new Var}  vary long text with nothing special inside but must be long. Here is second sentence! \\n"
+    + ". New line here.\n"
     + "${concat}  ${text}${x}\n\n"
     + "*** Test cases ***\n"
     + "test 1\n"
@@ -40,8 +40,8 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
     + "kw 1\n"
     + "    [Arguments]    ${a}   ${b}\n"
     + "    Log  ${x} ${a} ${b}\n"
-    + "    Should Be Equal    ${new Var}   vary long text with nothing special inside but must be long \\n"
-    + ". New line here\n"
+    + "    Should Be Equal    ${new Var}   vary long text with nothing special inside but must be long. Here is second sentence! \\n"
+    + ". New line here.\n"
     + "    Should Be Equal As Strings    text7  ${concat}" 
     
     
@@ -69,8 +69,8 @@ exec-with-options -disableJobWaiting -command {
 	
 	//new var
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 4 5
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long \n"
-	    + ". New line here"
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \n"
+	    + ". New line here."
 	//concat    
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 5 5
 	check-variable-in-info-window -value  "text7"
@@ -105,12 +105,14 @@ exec-with-options -disableJobWaiting -command {
 	    
 	//Should Be Equal 
 	get-button "Step Into (F5)" | click
+	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 19 28
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long \n"
-	    + ". New line here"
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \n"
+	    + ". New line here."
 	    
 	//Should Be Equal As Strings    
 	get-button "Step Into (F5)" | click
+	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 20 46
 	check-variable-in-info-window -value  "text7"
 	    
