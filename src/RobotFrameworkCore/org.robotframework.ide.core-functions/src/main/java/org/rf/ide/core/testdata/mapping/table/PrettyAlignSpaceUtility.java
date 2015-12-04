@@ -103,7 +103,6 @@ public class PrettyAlignSpaceUtility {
 
             int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
             int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
-            System.out.println(numberOfSpacesRight);
             final RobotToken prettyRightAlign = new RobotToken();
             prettyRightAlign.setStartOffset(rt.getStartOffset() + theLongestTextLength - numberOfSpacesRight - 1);
             prettyRightAlign.setLineNumber(rt.getLineNumber());
