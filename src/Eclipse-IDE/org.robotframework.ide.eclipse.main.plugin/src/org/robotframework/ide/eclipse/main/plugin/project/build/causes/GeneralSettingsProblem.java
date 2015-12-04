@@ -70,7 +70,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
     PARAMETERIZED_IMPORT_PATH {
         @Override
         public String getProblemDescription() {
-            return "The library name/path '%s' is parameterized. Some of used parameters cannot be resolved";
+            return "The library name/path '%s' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution";
         }
 
         @Override
