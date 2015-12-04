@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/19/15 4:54 PM
+Save-Time: 12/4/15 2:53 PM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ
 
@@ -80,14 +80,14 @@ with [get-view Problems | get-tree] {
 with [get-view Problems | get-tree] {
     get-item "Warnings \\(2 items\\)" | get-property "getItems().length" | equals 2 | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "Path '/../../../../SecondProject/res1/res3/RES.ROBOT' is absolute. RED prefers relative paths" 
+        | equals "Path '/../../../../SecondProject/res1/res3/RES.ROBOT' is absolute. It is preferred to use relative paths" 
         | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getData().getLocation()" | equals "line 7" 
         | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Path '/ala/has/a/cat.txt' is absolute. RED prefers relative paths" | verify-true
+        | equals "Path '/ala/has/a/cat.txt' is absolute. It is preferred to use relative paths" | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getData().getLocation()" 
         | equals "line 17" | verify-true
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getData().getPath()" 
@@ -104,7 +104,7 @@ get-view Problems | get-tree
     | select "Errors (10 items)/Resource import 'Capture.JPG' is invalid: given file is not a Resource file"
 get-view Problems | get-tree | get-menu "Quick Fix" | get-property enablement | equals false | verify-true
 
-get-view Problems | get-tree | select "Errors (10 items)/Resource import 'var1.py' is invalid: file does not exist"
+get-view Problems | get-tree | select "Errors (10 items)/Resource import 'var1.py' is invalid: file does not exist. Check file name and path."
 get-view Problems | get-tree | get-menu "Quick Fix" | get-property enablement | equals false | verify-true
 
 get-view Problems | get-tree 
