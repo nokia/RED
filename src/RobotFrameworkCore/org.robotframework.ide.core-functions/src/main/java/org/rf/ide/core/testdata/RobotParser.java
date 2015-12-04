@@ -79,7 +79,6 @@ public class RobotParser {
      * @return
      */
     public RobotFileOutput parseEditorContent(final String fileContent, final File fileOrDir) {
-        System.out.println(robotVersion);
         final RobotFileOutput robotFile = new RobotFileOutput(robotVersion);
 
         final IRobotFileParser parserToUse = getParser(fileOrDir, true);
