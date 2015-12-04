@@ -104,9 +104,9 @@ public class PrettyAlignSpaceUtility {
             int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
             int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
             final RobotToken prettyRightAlign = new RobotToken();
-            prettyRightAlign.setStartOffset(rt.getStartOffset() + theLongestTextLength - numberOfSpacesRight - 1);
+            prettyRightAlign.setStartOffset(rt.getStartOffset() + rawText.length() - numberOfSpacesRight);
             prettyRightAlign.setLineNumber(rt.getLineNumber());
-            prettyRightAlign.setStartColumn(theLongestTextLength - numberOfSpacesRight - 1);
+            prettyRightAlign.setStartColumn(theLongestTextLength - numberOfSpacesRight);
             prettyRightAlign.setRaw(String.format("%" + numberOfSpacesRight + "s", " "));
             prettyRightAlign.setText(String.format("%" + numberOfSpacesRight + "s", " "));
             prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
