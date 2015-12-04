@@ -237,10 +237,13 @@ class TestRunnerAgent:
             for k in vars.keys():
                 value = vars[k]
                 if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
-                    if (type(value) is list) or (isinstance(value, dict)):
-                        data[k] = self.fix_unicode(value)
-                    else:
-                        data[k] = str(self.fix_unicode(value))
+                    try:
+                        if (type(value) is list) or (isinstance(value, dict)):
+                            data[k] = self.fix_unicode(value)
+                        else:
+                            data[k] = str(self.fix_unicode(value))
+                    except:
+                        data[k] = 'None'
             self._send_socket('vars','vars',data)
         except AttributeError:
             self._send_socket('error')
@@ -250,6 +253,8 @@ class TestRunnerAgent:
            return data.encode('utf-8')
        elif sys.version_info >= (3,0,0) and isinstance(data, str):
            return data
+       elif isinstance(data, basestring):
+           return data.encode('unicode_escape')
        elif isinstance(data, dict):
            data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
        elif isinstance(data, list):
