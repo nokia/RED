@@ -70,7 +70,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         }
 
         @Override
-        public boolean apply(final IFile externalFile) throws ProposalApplyingException {
+        public boolean apply(final IFile externalFile, final RobotProjectConfig config)
+                throws ProposalApplyingException {
             if (isPath) {
                 return importLibraryByPath(externalFile);
             } else {
@@ -89,16 +90,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                                     + " in PYTHONPATH of " + env.getFile() + " python installation.");
                     return false;
                 }
-                try {
-                    final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-                    final RobotProjectConfig config = reader.readConfiguration(externalFile);
-                    config.addReferencedLibraryInPython(libName, new Path(libPath));
-
-                    final RobotProjectConfigWriter writer = new RobotProjectConfigWriter();
-                    writer.writeConfiguration(config, externalFile.getProject());
-                } catch (final CannotReadProjectConfigurationException | CannotWriteProjectConfigurationException e) {
-                    throw new ProposalApplyingException("Unable to apply proposal", e);
-                }
+                config.addReferencedLibraryInPython(libName, new Path(libPath));
                 return true;
             }
 
