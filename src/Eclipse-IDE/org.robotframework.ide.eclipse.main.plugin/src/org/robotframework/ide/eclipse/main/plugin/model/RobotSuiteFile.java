@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,7 +109,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
     
     private void link(final RobotFile model) {
-        sections = new ArrayList<>();
+        sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
         if (model.getKeywordTable().isPresent()) {
             final RobotKeywordsSection section = new RobotKeywordsSection(this);
             section.link(model.getKeywordTable());
