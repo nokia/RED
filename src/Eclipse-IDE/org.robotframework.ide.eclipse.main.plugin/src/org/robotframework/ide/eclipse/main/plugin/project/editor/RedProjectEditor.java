@@ -35,6 +35,10 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     private RedProjectConfigurationEditorPart projectConfigPart;
 
+    public RedProjectEditorInput getRedProjectEditorInput() {
+        return redProjectEditorInput;
+    }
+
     @Override
     protected void setInput(final IEditorInput input) {
         if (input instanceof FileEditorInput) {

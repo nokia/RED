@@ -10,13 +10,13 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
-class RedProjectEditorInput {
+public class RedProjectEditorInput {
 
     private final IProject project;
     private final boolean isEditable;
     private RobotProjectConfig projectConfiguration;
 
-    RedProjectEditorInput(final boolean isEditable, final RobotProjectConfig projectConfig,
+    public RedProjectEditorInput(final boolean isEditable, final RobotProjectConfig projectConfig,
             final IProject project) {
         this.project = project;
         this.isEditable = isEditable;
@@ -27,7 +27,7 @@ class RedProjectEditorInput {
         return RedPlugin.getModelManager().getModel().createRobotProject(project);
     }
 
-    RobotProjectConfig getProjectConfiguration() {
+    public RobotProjectConfig getProjectConfiguration() {
         return projectConfiguration;
     }
 
@@ -35,7 +35,7 @@ class RedProjectEditorInput {
         return isEditable;
     }
     
-    void refreshProjectConfiguration() {
+    public void refreshProjectConfiguration() {
         projectConfiguration = RedPlugin.getModelManager().getModel().createRobotProject(project).getRobotProjectConfig();
     }
 }
