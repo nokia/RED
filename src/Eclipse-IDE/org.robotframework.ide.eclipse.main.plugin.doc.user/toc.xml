@@ -19,5 +19,7 @@
     </topic>
     <topic href="doc/user_guide/remote.html" label="Remote debug">
     </topic>
+    <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace.">
+    </topic>
  </topic>
 </toc>
