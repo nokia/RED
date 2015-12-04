@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g1Ox4HmQEeWIf_WwvRtf3w
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/6/15 12:19 PM
+Save-Time: 12/4/15 12:16 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -34,15 +34,16 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
 	
-	wait 3000
-	//check Debug window    
-	with [get-window "Confirm Perspective Switch"] {
-	    get-label "This kind of launch is configured to open the Debug perspective when it suspends.This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.Do you want to open this perspective now?" 
-	        | get-property caption 
-	        | equals "This kind of launch is configured to open the Debug perspective when it suspends.\n\n"
-	        + "This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.\n\n"
-	        + "Do you want to open this perspective now?" | verify-true
-	    get-button "Remember my decision" | get-property selected | equals false | verify-true
+	try -times 7 -delay 1000   -command{
+		//check Debug window    
+		with [get-window "Confirm Perspective Switch"] {
+		    get-label "This kind of launch is configured to open the Debug perspective when it suspends.This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.Do you want to open this perspective now?" 
+		        | get-property caption 
+		        | equals "This kind of launch is configured to open the Debug perspective when it suspends.\n\n"
+		        + "This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.\n\n"
+		        + "Do you want to open this perspective now?" | verify-true
+		    get-button "Remember my decision" | get-property selected | equals false | verify-true
+		}
 	}
 	//set to No - Robot perspective will stay (Project explorer exists)
 	get-window "Confirm Perspective Switch" | get-button No | click
@@ -63,15 +64,15 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | select "MediumRobotTest/Script.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
 	    
-	wait 3000
-	get-window "Confirm Perspective Switch" 
-	    | get-label "This kind of launch is configured to open the Debug perspective when it suspends.This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.Do you want to open this perspective now?" 
-	    | get-property caption 
-	    | equals "This kind of launch is configured to open the Debug perspective when it suspends.\n\n"
-	    + "This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.\n\n"
-	    + "Do you want to open this perspective now?" | verify-true
-	get-window "Confirm Perspective Switch" | get-button Yes | click
-	
+	try -times 7 -delay 1000   -command{
+		get-window "Confirm Perspective Switch" 
+		    | get-label "This kind of launch is configured to open the Debug perspective when it suspends.This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.Do you want to open this perspective now?" 
+		    | get-property caption 
+		    | equals "This kind of launch is configured to open the Debug perspective when it suspends.\n\n"
+		    + "This Debug perspective is designed to support application debugging.  It incorporates views for displaying the debug stack, variables and breakpoint management.\n\n"
+		    + "Do you want to open this perspective now?" | verify-true
+		get-window "Confirm Perspective Switch" | get-button Yes | click
+	}
 	
 	//check if Debug tab is shown
 	get-tab-folder | get-property activePage | equals Debug | verify-true
