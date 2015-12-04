@@ -21,5 +21,7 @@
     </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace.">
     </topic>
+    <topic href="doc/user_guide/general.html" label="General usage hints - validation, code assist, clean&amp;build">
+    </topic>
  </topic>
 </toc>
