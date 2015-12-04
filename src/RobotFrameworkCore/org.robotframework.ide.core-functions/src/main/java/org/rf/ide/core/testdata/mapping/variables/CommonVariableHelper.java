@@ -80,6 +80,16 @@ public class CommonVariableHelper {
                     isVar = false;
                 }
                 break;
+            } else if (type == RobotTokenType.VARIABLE_USAGE) {
+                isVar = false;
+                final String text = token.getText().toString();
+                if (text != null) {
+                    String trimmed = text.trim();
+
+                    final VariableType varType = VariableType.getTypeByChar(trimmed.charAt(0));
+                    isVar = (varType != VariableType.INVALID);
+                }
+                break;
             }
         }
         return isVar;
