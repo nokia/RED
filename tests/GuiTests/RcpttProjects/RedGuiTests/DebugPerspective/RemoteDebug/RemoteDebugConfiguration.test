@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LJw90Jm3EeWwXrMNKVDTwg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/3/15 4:13 PM
+Save-Time: 12/4/15 12:10 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -34,11 +34,11 @@ with [get-window "Debug Configurations"] {
 }
 //check layout
 with [get-window "Debug Configurations" | get-group "Remote Debugging"] {
-    get-property "getChildren().Control[0].getText()" | equals "Host:" | verify-true
+    get-property "getChildren().Control[0].getText()" | equals "Local IP:" | verify-true
     get-property "getChildren().Control[1].getText()" | equals "" | verify-true
     get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
     get-property "getChildren().Control[1].isEnabled()" | equals true | verify-true
-    get-property "getChildren().Control[2].getText()" | equals "Port:" | verify-true
+    get-property "getChildren().Control[2].getText()" | equals "Local port:" | verify-true
     get-property "getChildren().Control[3].getText()" | equals "" | verify-true
     get-property "getChildren().Control[3].getEditable()" | equals true | verify-true
     get-property "getChildren().Control[3].isEnabled()" | equals true | verify-true
@@ -56,7 +56,7 @@ proc "check-port-error-and-clear-field"{
 	get-window "Debug Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     	| get-property text | equals "Invalid port specified." | verify-true
     //clear port	
-	with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+	with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     	set-text ""
     check-if-no-error-is-shown
 	}
@@ -65,54 +65,54 @@ proc "check-port-error-and-clear-field"{
 
 
 //check host field
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Host:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local IP:"]] {
     set-text localhost
 }
 check-if-no-error-is-shown
     
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Host:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local IP:"]] {
     set-text "onet.pl"
 }
 check-if-no-error-is-shown
     
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Host:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local IP:"]] {
     set-text "125.3.5.6"
 }
 check-if-no-error-is-shown
 
 //remove Host and check correct ports
 with [get-window "Debug Configurations" | get-group "Remote Debugging"] {
-    get-editbox -after [get-label "Host:"] | set-text ""
-    get-editbox -after [get-label "Port:"] | set-text 1
+    get-editbox -after [get-label "Local IP:"] | set-text ""
+    get-editbox -after [get-label "Local port:"] | set-text 1
 }
 check-if-no-error-is-shown
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     set-text 65535
 }
 check-if-no-error-is-shown
 
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     set-text 7469
 }
 check-if-no-error-is-shown
 
 
 //set incorrect ports
-get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"] | set-text " "
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"] | set-text " "
 check-port-error-and-clear-field
 
  
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     set-text text
 }
 check-port-error-and-clear-field
 
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     set-text 65536
 }
 check-port-error-and-clear-field
 
-with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Port:"]] {
+with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     set-text 0
 }
 check-port-error-and-clear-field
