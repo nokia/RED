@@ -104,7 +104,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_LIBRARY {
         @Override
         public String getProblemDescription() {
-            return "Unknown '%s' library";
+            return "Unknown '%s' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation";
         }
 
         @Override
