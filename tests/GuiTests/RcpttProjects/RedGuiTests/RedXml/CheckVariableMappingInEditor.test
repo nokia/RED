@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yxxmEJHxEeWEZYgZQ8Au9A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/24/15 2:10 PM
+Save-Time: 12/4/15 12:42 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -31,7 +31,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
 
 // error shows that resource path is parametrised 
 get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-    | equals "The library name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved" 
+    | equals "The library name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
     | verify-true
 get-eclipse-window | key-type "TRAVERSE_ESCAPE"
 get-eclipse-window | key-type ESC
@@ -95,7 +95,7 @@ get-editor "TestSuite.robot" | get-text-viewer | key-type "M1+s"
 with [get-view Problems | get-tree] {
     get-item "Errors \\(3 items\\)" | get-property childCount | equals 3 | verify-true
     get-item "Errors \\(3 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "The library name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved" 
+        | equals "The library name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
         | verify-true
     get-item "Errors \\(3 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Unknown keyword 'test_resource'" | verify-true
