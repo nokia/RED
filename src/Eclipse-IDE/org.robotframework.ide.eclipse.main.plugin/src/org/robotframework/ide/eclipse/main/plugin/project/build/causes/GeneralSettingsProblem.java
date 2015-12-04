@@ -92,7 +92,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Path '%s' is absolute. RED prefers relative paths";
+            return "Path '%s' is absolute. It is preferred to use relative paths";
         }
     },
     IMPORT_PATH_OUTSIDE_WORKSPACE {
@@ -151,7 +151,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
     NON_EXISTING_VARIABLES_IMPORT {
         @Override
         public String getProblemDescription() {
-            return "Resource import '%s' is invalid: file does not exist";
+            return "Resource import '%s' is invalid: file does not exist. Check file name and path.";
         }
     },
     INVALID_VARIABLES_IMPORT {
