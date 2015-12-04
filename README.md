@@ -1,3 +1,4 @@
+![](https://github.com/nokia/RED/blob/master/doc/img/release_imgs/socks.png "Soon ...")
 # RED - Robot Editor
 ## General information 
 
