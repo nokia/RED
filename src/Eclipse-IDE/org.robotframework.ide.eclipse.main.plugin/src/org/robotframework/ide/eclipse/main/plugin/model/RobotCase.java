@@ -120,7 +120,8 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return testCase.isDataDrivenTestCase() ? RedImages.getTemplatedTestCaseImage() : RedImages.getTestCaseImage();
+        return testCase != null && testCase.isDataDrivenTestCase() ? RedImages.getTemplatedTestCaseImage()
+                : RedImages.getTestCaseImage();
     }
 
     public boolean hasDocumentation() {
