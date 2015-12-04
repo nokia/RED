@@ -12,7 +12,10 @@ import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordConte
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 
+import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 /**
@@ -175,7 +178,18 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     
     private UserKeyword findKeywordByName(final List<UserKeyword> keywords, final String name) {
         for (final UserKeyword userKeyword : keywords) {
-            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(name)) {
+            final Optional<String> keywordName = GherkinStyleSupport.firstNameTransformationResult(name,
+                    new NameTransformation<String>() {
+
+                        @Override
+                        public Optional<String> transform(final String gherkinNameVariant) {
+                            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(gherkinNameVariant))
+                                return Optional.fromNullable(gherkinNameVariant);
+                            else
+                                return Optional.absent();
+                        }
+                    });
+            if (keywordName.isPresent()) {
                 return userKeyword;
             }
         }
