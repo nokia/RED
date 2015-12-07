@@ -15,10 +15,17 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.contentassist.ContentAssistEvent;
+import org.eclipse.jface.text.contentassist.ICompletionListener;
+import org.eclipse.jface.text.contentassist.ICompletionListenerExtension;
+import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -27,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfigMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -34,14 +42,17 @@ import com.google.common.collect.Range;
 
 /**
  * @author Michal Anglart
- *
  */
-public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor {
+public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, ICompletionListener,
+        ICompletionListenerExtension, ICompletionListenerExtension2 {
 
     private final RobotSuiteFile suiteModel;
 
-    public SuiteSourceQuickAssistProcessor(final RobotSuiteFile fileModel) {
+    private final SourceViewer sourceViewer;
+
+    public SuiteSourceQuickAssistProcessor(final RobotSuiteFile fileModel, final ISourceViewer sourceViewer) {
         this.suiteModel = fileModel;
+        this.sourceViewer = (SourceViewer) sourceViewer;
     }
 
     @Override
@@ -145,5 +156,42 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor {
         return annotationPosition != null && Range
                 .closed(annotationPosition.getOffset(), annotationPosition.getOffset() + annotationPosition.getLength())
                 .contains(invocationContext.getOffset());
+    }
+
+    @Override
+    public void applied(final ICompletionProposal proposal) {
+        // this method is called also for processors from which the proposal was not chosen
+        // hence canReopenAssistantProgramatically is holding information which proccessor
+        // is able to open proposals after accepting
+        if (proposal instanceof RedCompletionProposal
+                && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
+            Display.getCurrent().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+                }
+            });
+        }
+
+    }
+
+    @Override
+    public void assistSessionEnded(final ContentAssistEvent event) {
+        // nothing to do
+    }
+
+    @Override
+    public void assistSessionStarted(final ContentAssistEvent event) {
+        // nothing to do
+    }
+
+    @Override
+    public void assistSessionRestarted(final ContentAssistEvent event) {
+        // nothing to do
+    }
+
+    @Override
+    public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
+        // nothing to do
     }
 }
