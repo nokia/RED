@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -20,6 +19,8 @@ import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+
+import com.google.common.base.Preconditions;
 
 public class RedCompletionProposal implements Comparable<RedCompletionProposal>, ICompletionProposal,
         ICompletionProposalExtension3, ICompletionProposalExtension6 {
@@ -51,6 +52,8 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     /** The additional info of this proposal. */
     private final String additionalProposalInfo;
+
+    private final boolean additionalInfoAsHtml;
 
     private final String additionalInfoForStyledLabel;
 
@@ -85,16 +88,17 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
      * @param prefixLength
      * @param decoratePrefix
      * @param activateAssitant
+     * @param additionalInfoAsHtml
      */
     RedCompletionProposal(final int priority, final String replacementString, final int replacementOffset,
             final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
             final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
             final IContextInformation contextInformation, final String additionalProposalInfo,
-            final String additionalInfoForStyledLabel) {
-        Assert.isNotNull(replacementString);
-        Assert.isTrue(replacementOffset >= 0);
-        Assert.isTrue(replacementLength >= 0);
-        Assert.isTrue(cursorPosition >= 0);
+            final boolean additionalInfoAsHtml, final String additionalInfoForStyledLabel) {
+        Preconditions.checkNotNull(replacementString);
+        Preconditions.checkState(replacementOffset >= 0);
+        Preconditions.checkState(replacementLength >= 0);
+        Preconditions.checkState(cursorPosition >= 0);
 
         this.priority = priority;
         this.replacementString = replacementString;
@@ -109,6 +113,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.contextInformation = contextInformation;
         this.activateAssistant = activateAssitant;
         this.additionalProposalInfo = additionalProposalInfo;
+        this.additionalInfoAsHtml = additionalInfoAsHtml;
         this.additionalInfoForStyledLabel = additionalInfoForStyledLabel;
     }
 
@@ -159,8 +164,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     @Override
     public IInformationControlCreator getInformationControlCreator() {
-        return new IInformationControlCreator() {
-
+        return additionalInfoAsHtml ? null : new IInformationControlCreator() {
             @Override
             public IInformationControl createInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent);

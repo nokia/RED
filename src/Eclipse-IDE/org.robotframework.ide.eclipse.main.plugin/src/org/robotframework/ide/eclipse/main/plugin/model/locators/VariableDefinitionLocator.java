@@ -23,7 +23,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -68,7 +67,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile),
+        shouldContinue = locateInResourceFiles(PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
                 newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -86,7 +85,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getAbsoluteResourceFilesPaths(startingFile),
+        shouldContinue = locateInResourceFiles(PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
                 newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -209,8 +208,7 @@ public class VariableDefinitionLocator {
     private ContinueDecision locateInResourceFiles(final List<IPath> resources, final Set<IFile> alreadyVisited,
             final VariableDetector detector) {
         for (final IPath path : resources) {
-            final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
-            final IResource resourceFile = file.getWorkspace().getRoot().findMember(wsRelative);
+            final IResource resourceFile = file.getWorkspace().getRoot().findMember(path);
             if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
@@ -219,7 +217,7 @@ public class VariableDefinitionLocator {
             alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
-            final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
+            final List<IPath> nestedResources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
             ContinueDecision result = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (result == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;

@@ -15,7 +15,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -58,7 +57,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        final List<IPath> resources = PathsResolver.getAbsoluteResourceFilesPaths(startingFile);
+        final List<IPath> resources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile);
         shouldContinue = locateInResourceFiles(resources, newHashSet(startingFile.getFile()), startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -83,8 +82,7 @@ public class KeywordDefinitionLocator {
     private ContinueDecision locateInResourceFiles(final List<IPath> resources, final Set<IFile> alreadyVisited,
             final RobotSuiteFile startingFile, final KeywordDetector detector) {
         for (final IPath path : resources) {
-            final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(path);
-            final IResource resourceFile = file.getWorkspace().getRoot().findMember(wsRelative);
+            final IResource resourceFile = file.getWorkspace().getRoot().findMember(path);
             if (resourceFile == null || !resourceFile.exists() || resourceFile.getType() != IResource.FILE
                     || alreadyVisited.contains(resourceFile)) {
                 continue;
@@ -92,7 +90,7 @@ public class KeywordDefinitionLocator {
             alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
-            final List<IPath> nestedResources = PathsResolver.getAbsoluteResourceFilesPaths(resourceSuiteFile);
+            final List<IPath> nestedResources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
             ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;

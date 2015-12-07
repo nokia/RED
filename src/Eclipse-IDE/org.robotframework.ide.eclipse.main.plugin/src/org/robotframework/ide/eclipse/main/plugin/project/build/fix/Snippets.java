@@ -32,7 +32,7 @@ public class Snippets {
                 final String afterSnippet = snippetRegion.get().getOffset()
                         + snippetRegion.get().getLength() >= document.getLength() ? "" : "<br>(...)";
 
-                return beforeSnippet + convertNewLinesToBr(snippetAfterChange) + afterSnippet;
+                return "<pre>" + beforeSnippet + convertNewLinesToBr(snippetAfterChange) + afterSnippet + "</pre>";
             } catch (final BadLocationException e) {
                 return null;
             }
