@@ -27,7 +27,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 public class PathsResolver {
 
     static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
-        final List<IPath> paths = file.getResourcesPaths();
+        return getWorkspaceRelativePaths(file.getResourcesPaths(), file);
+    }
+
+    private static List<IPath> getWorkspaceRelativePaths(final List<IPath> paths, final RobotSuiteFile file) {
         final List<IPath> resultPaths = newArrayList();
 
         final RobotProject project = file.getProject();
@@ -43,7 +46,7 @@ public class PathsResolver {
         return resultPaths;
     }
 
-    static IPath normalizePath(final RobotSuiteFile file, final IPath resolvedPath) {
+    private static IPath normalizePath(final RobotSuiteFile file, final IPath resolvedPath) {
         if (isParameterized(resolvedPath)) {
             return null;
         }
@@ -100,7 +103,6 @@ public class PathsResolver {
                 final URI filePath = new URI(file.getFile().getLocation().toPortableString());
                 final URI pathUri = filePath.resolve(path.toString());
 
-                final List<IPath> paths = newArrayList();
                 return new Path(pathUri.toString());
             } catch (final URISyntaxException | IllegalArgumentException e) {
                 throw new PathResolvingException("Path syntax problem", e);
