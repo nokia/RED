@@ -23,10 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter.CannotWriteProjectConfigurationException;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -63,6 +60,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private final RobotSuiteFile suiteFile;
 
+        private String libName;
+
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
                 final String shortDescritption) {
             super(marker, externalFile, shortDescritption, null);
@@ -72,49 +71,37 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config)
                 throws ProposalApplyingException {
-            if (isPath) {
-                return importLibraryByPath(externalFile);
-            } else {
-                final RobotProject project = RedPlugin.getModelManager().createProject(externalFile.getProject());
-                final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
-                
-                final String libName;
-                final String libPath;
-                final Optional<File> modulePath = env.getModulePath(pathOrName);
-                if (modulePath.isPresent()) {
-                    libName = pathOrName;
-                    libPath = modulePath.get().getPath();
-                } else {
-                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
-                            "Unable to locate '" + pathOrName + "' module. It seems that it is not contained"
-                                    + " in PYTHONPATH of " + env.getFile() + " python installation.");
-                    return false;
-                }
-                config.addReferencedLibraryInPython(libName, new Path(libPath));
-                return true;
-            }
-
+            return isPath ? importLibraryByPath(config) : importLibraryByName(externalFile, config);
         }
 
-        private boolean importLibraryByPath(final IFile externalFile) {
+        private boolean importLibraryByName(final IFile externalFile, final RobotProjectConfig config) {
+            final RobotProject project = RedPlugin.getModelManager().createProject(externalFile.getProject());
+            final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
+            
+            final String libPath;
+            final Optional<File> modulePath = env.getModulePath(pathOrName);
+            if (modulePath.isPresent()) {
+                libName = pathOrName;
+                libPath = modulePath.get().getPath();
+            } else {
+                MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
+                        "Unable to locate '" + pathOrName + "' module. It seems that it is not contained"
+                                + " in PYTHONPATH of " + env.getFile() + " python installation.");
+                return false;
+            }
+            config.addReferencedLibraryInPython(libName, new Path(libPath));
+            return true;
+        }
+
+        private boolean importLibraryByPath(final RobotProjectConfig config) {
             if (pathOrName.endsWith("/") || pathOrName.endsWith(".py")) {
                 final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, pathOrName);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
                 final ReferencedLibrary refLib = importer.importPythonLib(Display.getCurrent().getActiveShell(),
                         suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString());
                 if (refLib != null) {
-                    try {
-                        final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-                        final RobotProjectConfig config = reader.readConfiguration(externalFile);
-                        config.addReferencedLibrary(refLib);
-
-                        final RobotProjectConfigWriter writer = new RobotProjectConfigWriter();
-                        writer.writeConfiguration(config, externalFile.getProject());
-                        return true;
-                    } catch (final CannotReadProjectConfigurationException
-                            | CannotWriteProjectConfigurationException e) {
-                        throw new ProposalApplyingException("Unable to apply proposal", e);
-                    }
+                    config.addReferencedLibrary(refLib);
+                    return true;
                 } else {
                     throw new ProposalApplyingException("Unable to apply proposal");
                 }
@@ -123,6 +110,11 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         "The path '" + pathOrName + "' should point to either .py file or python module directory.");
                 return false;
             }
+        }
+
+        @Override
+        protected void fireEvents() {
+            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libName);
         }
 
         @Override
