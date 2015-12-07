@@ -186,7 +186,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final ProblemPosition position = new ProblemPosition(keywordName.getLineNumber(),
                 Range.closed(offset, offset + name.length()));
 
-        if (!validationContext.isKeywordAccessible(name)) {
+        if (!nameToUse.isPresent()) {
             reporter.handleProblem(
                     RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name), file,
                     position, ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
@@ -241,8 +241,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
                         final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()
                                 .getLine(), Range.closed(variableOffset, variableOffset
                                 + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
-                        final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name",
-                                variableName);
+                        final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of(
+                                AdditionalMarkerAttributes.NAME, variableDeclaration.asToken().getText());
                         reporter.handleProblem(problem, file, position, additionalArguments);
                     }
                 }

@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.CaseFormat;
@@ -80,7 +81,7 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
             final RobotSuiteFile suiteModel) {
         if (keywordName != null) {
             final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
-            final String lineDelimiter = getLineDelimiter(document);
+            final String lineDelimiter = DocumentUtilities.getDelimiter(document);
             if (section.isPresent()) {
                 final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
                 final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);

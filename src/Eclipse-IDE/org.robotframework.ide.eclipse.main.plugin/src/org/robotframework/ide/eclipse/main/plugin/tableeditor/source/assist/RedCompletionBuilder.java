@@ -37,6 +37,8 @@ public class RedCompletionBuilder {
 
         OptionalSettingsStep secondaryPopupShouldBeDisplayed(String additionalInfo);
 
+        OptionalSettingsStep secondaryPopupShouldBeDisplayedUsingHtml(String additionalInfo);
+
         OptionalSettingsStep contextInformationShouldBeShownAfterAccepting(IContextInformation contextInformation);
 
         OptionalSettingsStep activateAssistantAfterAccepting(boolean activate);
@@ -88,11 +90,14 @@ public class RedCompletionBuilder {
 
         private String additionalInfoInLabel;
 
+        private boolean additionalInfoAsHtml;
+
         private boolean decoratePrefix;
 
         private boolean activateAssitant;
 
         private int selectionLength;
+
 
         @Override
         public ProposalContentStep will(final AcceptanceMode mode) {
@@ -128,6 +133,13 @@ public class RedCompletionBuilder {
         @Override
         public OptionalSettingsStep secondaryPopupShouldBeDisplayed(final String additionalInfo) {
             this.additionalInfo = additionalInfo;
+            return this;
+        }
+
+        @Override
+        public OptionalSettingsStep secondaryPopupShouldBeDisplayedUsingHtml(final String additionalInfo) {
+            this.additionalInfo = additionalInfo;
+            this.additionalInfoAsHtml = true;
             return this;
         }
 
@@ -200,7 +212,8 @@ public class RedCompletionBuilder {
             if (mode == AcceptanceMode.INSERT) {
                 return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, contextInformation, additionalInfo, additionalInfoInLabel);
+                        activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
+                        additionalInfoInLabel);
             } else if (mode == AcceptanceMode.SUBSTITUTE) {
                 if (wholeContent == null) {
                     throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
@@ -208,7 +221,8 @@ public class RedCompletionBuilder {
                 }
                 return new RedCompletionProposal(priority, contentToInsert, offset, wholeContent.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, contextInformation, additionalInfo, additionalInfoInLabel);
+                        activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
+                        additionalInfoInLabel);
             } else {
                 throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
             }

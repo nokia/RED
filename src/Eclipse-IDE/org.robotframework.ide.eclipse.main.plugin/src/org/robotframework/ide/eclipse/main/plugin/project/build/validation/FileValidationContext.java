@@ -12,9 +12,11 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -148,7 +150,13 @@ public class FileValidationContext {
         final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
         final Collection<KeywordValidationContext> keywordsContexts = getAccessibleKeywords()
                 .get(qualifedName.getKeywordName().toLowerCase());
-        return keywordsContexts == null ? tryWithEmbeddedArguments(qualifedName.getKeywordName()) : keywordsContexts;
+        if (keywordsContexts != null) {
+            final LinkedHashSet<KeywordValidationContext> result = newLinkedHashSet(keywordsContexts);
+            result.addAll(tryWithEmbeddedArguments(qualifedName.getKeywordName()));
+            return result;
+        } else {
+            return tryWithEmbeddedArguments(qualifedName.getKeywordName());
+        }
     }
     
     private Collection<KeywordValidationContext> tryWithEmbeddedArguments(final String keywordName) {
