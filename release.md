@@ -19,10 +19,10 @@ In short:
 
 ## Updates
 - issue #3 - support for txt files and resources apart from .robot  
-- TSV file support added for test files and resource,Quick Fix to handle improper separators in TSV
-- Data driven validation & colouring
-- Gherkin validation & colouring
-- Remote Debug - debug testcase on remote testline using RED locally. Refer to RED help for more info. 
+- ***TSV file support*** added for test files and resource,Quick Fix to handle improper separators in TSV
+- ***Data driven validation & colouring***
+- ***Gherkin validation & colouring***
+- ***Remote Debug*** - debug testcase on remote testline using RED locally. Refer to RED help for more info. 
 - Variable mapping in red.xml - way to handle parametrised paths to resources and libs. 
 - Library aliases and keyword prefixes (library.keyword) validation and colouring
 - Duplicated keywords discovery
