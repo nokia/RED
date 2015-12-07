@@ -10,7 +10,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 import com.google.common.collect.Range;
@@ -18,9 +18,9 @@ import com.google.common.collect.Range;
 /**
  * @author Michal Anglart
  */
-public class DuplicatedTemplateValidator extends ADuplicatedValidator<TestTemplate> {
+public class DuplicatedSuiteSetupValidator extends ADuplicatedValidator<SuiteSetup> {
 
-    public DuplicatedTemplateValidator(final IFile file, final RobotSettingsSection section) {
+    public DuplicatedSuiteSetupValidator(final IFile file, final RobotSettingsSection section) {
         super(file, section);
     }
 
@@ -30,8 +30,8 @@ public class DuplicatedTemplateValidator extends ADuplicatedValidator<TestTempla
     }
 
     @Override
-    protected List<TestTemplate> getElements() {
+    protected List<SuiteSetup> getElements() {
         final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getTestTemplates();
+        return table.getSuiteSetups();
     }
 }
