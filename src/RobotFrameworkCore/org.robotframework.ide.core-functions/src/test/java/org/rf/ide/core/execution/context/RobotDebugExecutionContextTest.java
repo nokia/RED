@@ -39,7 +39,7 @@ public class RobotDebugExecutionContextTest {
 
     private int[] test8_lines = new int[] { 7, 8, 3, 9, 26, 27, 10, 8, 9 };
 
-    private int[] test9_lines = new int[] { 6, 6, 7, 8, -1, -1, -1, -1, -1, 9, 11 };
+    private int[] test9_lines = new int[] { 6, 6, 7, 8, 15, 16, 16, 18, 19, 9, 11 };
 
 
     @Test

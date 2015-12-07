@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
-
 /**
  * @author mmarzec
  */
@@ -38,56 +37,44 @@ public class ExecutableRowFindersManager {
 
     private TestCaseExecutableRowFinder testCaseExecutableRowFinder;
 
-
     public IRobotExecutableRowFinder provideSetupTeardownExecutableRowFinder() {
         if (setupTeardownExecutableRowFinder == null) {
-            setupTeardownExecutableRowFinder = new SetupTeardownExecutableRowFinder(
-                    currentTestCase, currentModel);
+            setupTeardownExecutableRowFinder = new SetupTeardownExecutableRowFinder(currentTestCase, currentModel);
         }
         return setupTeardownExecutableRowFinder;
     }
 
-
     public IRobotExecutableRowFinder provideForLoopExecutableRowFinder(
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         if (forLoopExecutableRowFinder == null) {
-            forLoopExecutableRowFinder = new ForLoopExecutableRowFinder(
-                    currentTestCase, testCaseExecutionRowCounter);
+            forLoopExecutableRowFinder = new ForLoopExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter,
+                    provideUserKeywordExecutableRowFinder());
         }
-        forLoopExecutableRowFinder
-                .setTestCaseExecutionRowCounter(testCaseExecutionRowCounter);
+        forLoopExecutableRowFinder.setTestCaseExecutionRowCounter(testCaseExecutionRowCounter);
         return forLoopExecutableRowFinder;
     }
 
-
     public IRobotExecutableRowFinder provideUserKeywordExecutableRowFinder() {
         if (userKeywordExecutableRowFinder == null) {
-            userKeywordExecutableRowFinder = new UserKeywordExecutableRowFinder(
-                    userKeywords, resourceImportReferences);
+            userKeywordExecutableRowFinder = new UserKeywordExecutableRowFinder(userKeywords, resourceImportReferences);
         }
         return userKeywordExecutableRowFinder;
     }
 
-
     public IRobotExecutableRowFinder provideTestCaseExecutableRowFinder(
             final TestCaseExecutionRowCounter testCaseExecutionRowCounter) {
         if (testCaseExecutableRowFinder == null) {
-            testCaseExecutableRowFinder = new TestCaseExecutableRowFinder(
-                    currentTestCase, testCaseExecutionRowCounter);
+            testCaseExecutableRowFinder = new TestCaseExecutableRowFinder(currentTestCase, testCaseExecutionRowCounter);
         }
-        testCaseExecutableRowFinder
-                .setTestCaseExecutionRowCounter(testCaseExecutionRowCounter);
+        testCaseExecutableRowFinder.setTestCaseExecutionRowCounter(testCaseExecutionRowCounter);
         return testCaseExecutableRowFinder;
     }
-
 
     public void clearForLoopState() {
         forLoopExecutableRowFinder.clear();
     }
 
-
-    public void initFindersAtSuiteStart(final RobotFile currentModel,
-            final List<UserKeyword> userKeywords,
+    public void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
             final List<ResourceImportReference> resourceImportReferences) {
         this.currentModel = currentModel;
         this.userKeywords = userKeywords;
@@ -97,17 +84,14 @@ public class ExecutableRowFindersManager {
         }
         if (userKeywordExecutableRowFinder != null) {
             userKeywordExecutableRowFinder.setUserKeywords(userKeywords);
-            userKeywordExecutableRowFinder
-                    .setResourceImportReferences(resourceImportReferences);
+            userKeywordExecutableRowFinder.setResourceImportReferences(resourceImportReferences);
         }
     }
-
 
     public void initFindersAtTestCaseStart(final TestCase currentTestCase) {
         this.currentTestCase = currentTestCase;
         if (setupTeardownExecutableRowFinder != null) {
-            setupTeardownExecutableRowFinder
-                    .setCurrentTestCase(currentTestCase);
+            setupTeardownExecutableRowFinder.setCurrentTestCase(currentTestCase);
         }
         if (testCaseExecutableRowFinder != null) {
             testCaseExecutableRowFinder.setCurrentTestCase(currentTestCase);
