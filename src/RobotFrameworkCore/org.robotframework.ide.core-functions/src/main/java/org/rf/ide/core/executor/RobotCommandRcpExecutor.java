@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.ws.commons.util.NamespaceContextImpl;
 import org.apache.xmlrpc.XmlRpcException;
@@ -40,68 +41,58 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
 
-
 /**
  * @author mmarzec
  */
 @SuppressWarnings("PMD.GodClass")
 class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
-    private static final int CONNECTION_TIMEOUT = 10;
+    private static final int CONNECTION_TIMEOUT = 30;
+
     private final String interpreterPath;
+
     private final File scriptFile;
 
     private Process serverProcess;
-    private XmlRpcClient client;
 
+    private XmlRpcClient client;
 
     RobotCommandRcpExecutor(final String interpreterPath, final File scriptFile) {
         this.interpreterPath = interpreterPath;
         this.scriptFile = scriptFile;
     }
 
-
     void waitForEstablishedConnection() {
         if (new File(interpreterPath).exists() && scriptFile.exists()) {
             final int port = findFreePort();
-            serverProcess = createPythonServerProcess(interpreterPath,
-                    scriptFile, port);
+            serverProcess = createPythonServerProcess(interpreterPath, scriptFile, port);
             client = createClient(port);
             waitForConnectionToServer(client, CONNECTION_TIMEOUT);
         } else {
-            throw new RobotCommandExecutorException(
-                    "Could not setup python server on file: " + interpreterPath);
+            throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath);
         }
     }
 
-
-    private Process createPythonServerProcess(final String interpreterPath,
-            final File scriptFile, final int port) {
+    private Process createPythonServerProcess(final String interpreterPath, final File scriptFile, final int port) {
         try {
-            final List<String> command = newArrayList(interpreterPath,
-                    scriptFile.getPath(), String.valueOf(port));
-            final Process process = new ProcessBuilder(command)
-                    .redirectErrorStream(true).start();
+            final List<String> command = newArrayList(interpreterPath, scriptFile.getPath(), String.valueOf(port));
+            final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
             startOutputReadingThread(process);
             return process;
         } catch (final IOException e) {
-            throw new RobotCommandExecutorException(
-                    "Could not setup python server on file: " + interpreterPath,
-                    e);
+            throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath, e);
         }
     }
 
-
     private void startOutputReadingThread(final Process process) {
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
 
             @Override
             public void run() {
                 final InputStream inputStream = process.getInputStream();
-                try (final BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inputStream))) {
+                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
-                    while(line != null) {
+                    while (line != null) {
                         line = reader.readLine();
                     }
                 } catch (final IOException e) {
@@ -113,27 +104,25 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }).start();
     }
 
-
     private static int findFreePort() {
         try (ServerSocket socket = new ServerSocket(0)) {
             return socket.getLocalPort();
         } catch (final IOException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to find empty port for XmlRpc server", e);
+            throw new RobotCommandExecutorException("Unable to find empty port for XmlRpc server", e);
         }
     }
-
 
     private XmlRpcClient createClient(final int port) {
         final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try {
             config.setServerURL(new URL("http://127.0.0.1:" + port));
+            config.setConnectionTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
+            config.setReplyTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
         } catch (final MalformedURLException e) {
             // can't happen here
         }
         final XmlRpcClient client = new XmlRpcClient();
-        final XmlRpcSun15HttpTransportFactory transportFactory = new XmlRpcSun15HttpTransportFactory(
-                client);
+        final XmlRpcSun15HttpTransportFactory transportFactory = new XmlRpcSun15HttpTransportFactory(client);
         transportFactory.setProxy(Proxy.NO_PROXY);
         client.setTransportFactory(transportFactory);
         client.setConfig(config);
@@ -141,11 +130,9 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         return client;
     }
 
-
-    private void waitForConnectionToServer(final XmlRpcClient client,
-            final int timeoutInSec) {
+    private void waitForConnectionToServer(final XmlRpcClient client, final int timeoutInSec) {
         final long start = System.currentTimeMillis();
-        while(true) {
+        while (true) {
             try {
                 client.execute("checkServerAvailability", new Object[] {});
                 break;
@@ -163,160 +150,128 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
-
     boolean isAlive() {
         return serverProcess != null;
     }
-
 
     void kill() {
         serverProcess.destroy();
         try {
             serverProcess.waitFor();
         } catch (final InterruptedException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to kill rcp server", e);
+            throw new RobotCommandExecutorException("Unable to kill rcp server", e);
         }
     }
 
-
     @Override
-    public Map<String, Object> getVariables(final String filePath,
-            final String fileArguments) {
+    public Map<String, Object> getVariables(final String filePath, final String fileArguments) {
         final Map<String, Object> variables = new LinkedHashMap<>();
         try {
-            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute(
-                    "getVariables", newArrayList(filePath, fileArguments));
+            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getVariables",
+                    newArrayList(filePath, fileArguments));
             for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
                 variables.put((String) entry.getKey(), entry.getValue());
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server - in file "
-                            + filePath + " with arguments " + fileArguments, e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server - in file " + filePath
+                    + " with arguments " + fileArguments, e);
         }
     }
-
 
     @Override
     public Map<String, Object> getGlobalVariables() {
         final Map<String, Object> variables = new LinkedHashMap<>();
         try {
-            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute(
-                    "getGlobalVariables", newArrayList());
+            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getGlobalVariables", newArrayList());
             for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
                 variables.put((String) entry.getKey(), entry.getValue());
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server", e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
-
 
     @Override
     public List<String> getStandardLibrariesNames() {
         try {
             final List<String> libraries = newArrayList();
-            final Object[] libs = (Object[]) client.execute(
-                    "getStandardLibrariesNames", newArrayList());
+            final Object[] libs = (Object[]) client.execute("getStandardLibrariesNames", newArrayList());
             for (final Object o : libs) {
                 libraries.add((String) o);
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server", e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
-
 
     @Override
     public String getStandardLibraryPath(final String libName) {
         try {
-            return (String) client.execute("getStandardLibraryPath",
-                    newArrayList(libName));
+            return (String) client.execute("getStandardLibraryPath", newArrayList(libName));
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server", e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
-
 
     @Override
     public String getRobotVersion() {
         try {
             return (String) client.execute("getRobotVersion", newArrayList());
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server", e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
-
 
     @Override
     public String getRunModulePath() {
         try {
             return (String) client.execute("getRunModulePath", newArrayList());
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException(
-                    "Unable to communicate with XML-RPC server", e);
+            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
         }
     }
 
-
     @Override
-    public void createLibdocForStdLibrary(final String resultFilePath,
-            final String libName, final String libPath)
+    public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath)
             throws RobotEnvironmentException {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
-
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath,
-            final String libName, final String libPath)
+    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath)
             throws RobotEnvironmentException {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
-
     @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath,
-            final String libName, final String libPath)
+    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath)
             throws RobotEnvironmentException {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
-
-    private void createLibdoc(final String resultFilePath,
-            final String libName, final String libPath)
+    private void createLibdoc(final String resultFilePath, final String libName, final String libPath)
             throws RobotEnvironmentException {
         try {
-            final Boolean wasGenerated = (Boolean) client.execute(
-                    "createLibdoc",
+            final Boolean wasGenerated = (Boolean) client.execute("createLibdoc",
                     newArrayList(resultFilePath, libName, libPath));
             if (!wasGenerated) {
-                throw new RobotEnvironmentException(
-                        "Unable to generate library specification file for library "
-                                + libName + ", for library path " + libPath + " and result file " + resultFilePath);
+                throw new RobotEnvironmentException("Unable to generate library specification file for library "
+                        + libName + ", for library path " + libPath + " and result file " + resultFilePath);
             }
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException(
-                    "Unable to generate library specification file for library "
-                            + libName  + ", for library path " + libPath + " and result file " + resultFilePath, e);
+            throw new RobotEnvironmentException("Unable to generate library specification file for library " + libName
+                    + ", for library path " + libPath + " and result file " + resultFilePath, e);
         }
     }
-
 
     @Override
     public List<File> getModulesSearchPaths() throws RobotEnvironmentException {
         try {
             final List<File> libraries = newArrayList();
-            final Object[] paths = (Object[]) client.execute(
-                    "getModulesSearchPaths", newArrayList());
+            final Object[] paths = (Object[]) client.execute("getModulesSearchPaths", newArrayList());
             for (final Object o : paths) {
                 if (!"".equals(o)) {
                     libraries.add(new File((String) o));
@@ -324,22 +279,17 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException(
-                    "Unable to obtain modules search path", e);
+            throw new RobotEnvironmentException("Unable to obtain modules search path", e);
         }
     }
 
-
     @Override
-    public Optional<File> getModulePath(final String moduleName)
-            throws RobotEnvironmentException {
+    public Optional<File> getModulePath(final String moduleName) throws RobotEnvironmentException {
         try {
-            final String path = (String) client.execute("getModulePath",
-                    newArrayList(moduleName));
+            final String path = (String) client.execute("getModulePath", newArrayList(moduleName));
             return Optional.of(new File(path));
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to path of '"
-                    + moduleName + "' module", e);
+            throw new RobotEnvironmentException("Unable to path of '" + moduleName + "' module", e);
         }
     }
 
@@ -350,9 +300,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             super(message);
         }
 
-
-        RobotCommandExecutorException(final String message,
-                final Throwable cause) {
+        RobotCommandExecutorException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }
@@ -372,36 +320,27 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             super(controller);
         }
 
-
         @Override
-        public TypeParser getParser(final XmlRpcStreamConfig config,
-                final NamespaceContextImpl context, final String uri,
-                final String localName) {
-            if (NullSerializer.NIL_TAG.equals(localName)
-                    || NullSerializer.EX_NIL_TAG.equals(localName)) {
+        public TypeParser getParser(final XmlRpcStreamConfig config, final NamespaceContextImpl context,
+                final String uri, final String localName) {
+            if (NullSerializer.NIL_TAG.equals(localName) || NullSerializer.EX_NIL_TAG.equals(localName)) {
                 return new NullParser();
             } else {
                 return super.getParser(config, context, uri, localName);
             }
         }
 
-
         @Override
-        public TypeSerializer getSerializer(final XmlRpcStreamConfig config,
-                final Object object) throws SAXException {
+        public TypeSerializer getSerializer(final XmlRpcStreamConfig config, final Object object) throws SAXException {
 
             if (object == null) {
-                return new TypeSerializerImpl(){
+                return new TypeSerializerImpl() {
 
                     @Override
-                    public void write(final ContentHandler handler,
-                            final Object o) throws SAXException {
-                        handler.startElement("", VALUE_TAG, VALUE_TAG,
-                                ZERO_ATTRIBUTES);
-                        handler.startElement("", NullSerializer.NIL_TAG,
-                                NullSerializer.NIL_TAG, ZERO_ATTRIBUTES);
-                        handler.endElement("", NullSerializer.NIL_TAG,
-                                NullSerializer.NIL_TAG);
+                    public void write(final ContentHandler handler, final Object o) throws SAXException {
+                        handler.startElement("", VALUE_TAG, VALUE_TAG, ZERO_ATTRIBUTES);
+                        handler.startElement("", NullSerializer.NIL_TAG, NullSerializer.NIL_TAG, ZERO_ATTRIBUTES);
+                        handler.endElement("", NullSerializer.NIL_TAG, NullSerializer.NIL_TAG);
                         handler.endElement("", VALUE_TAG, VALUE_TAG);
                     }
                 };
