@@ -16,49 +16,47 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class TableHeader<T> extends AModelElement<T> {
 
     private final RobotToken tableHeader;
-    private final List<RobotToken> columnNames = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final List<RobotToken> columnNames = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     public TableHeader(final RobotToken tableHeader) {
         this.tableHeader = tableHeader;
     }
 
-
     public void addColumnName(final RobotToken columnName) {
         columnNames.add(columnName);
     }
-
 
     public List<RobotToken> getColumnNames() {
         return Collections.unmodifiableList(columnNames);
     }
 
-
     public RobotToken getTableHeader() {
         return tableHeader;
     }
 
+    @Override
+    public RobotToken getDeclaration() {
+        return tableHeader;
+    }
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     public void addComment(final RobotToken commentWord) {
         this.comment.add(commentWord);
     }
-
 
     @Override
     public boolean isPresent() {
         return (tableHeader != null);
     }
-
 
     @Override
     public ModelType getModelType() {
@@ -79,7 +77,6 @@ public class TableHeader<T> extends AModelElement<T> {
         return type;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         FilePosition pos = FilePosition.createNotSet();
@@ -88,7 +85,6 @@ public class TableHeader<T> extends AModelElement<T> {
         }
         return pos;
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
@@ -102,11 +98,9 @@ public class TableHeader<T> extends AModelElement<T> {
         return tokens;
     }
 
-
     @Override
     public String toString() {
-        return String.format(
-                "TableHeader [tableHeader=%s, columnNames=%s, comment=%s]",
-                tableHeader, columnNames, comment);
+        return String.format("TableHeader [tableHeader=%s, columnNames=%s, comment=%s]", tableHeader, columnNames,
+                comment);
     }
 }

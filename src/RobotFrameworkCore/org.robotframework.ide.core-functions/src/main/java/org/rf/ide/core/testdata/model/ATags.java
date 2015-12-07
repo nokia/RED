@@ -11,55 +11,48 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public abstract class ATags<T> extends AModelElement<T> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> tags = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final List<RobotToken> tags = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     protected ATags(final RobotToken declaration) {
         this.declaration = declaration;
     }
-
 
     @Override
     public boolean isPresent() {
         return (declaration != null);
     }
 
-
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
-
 
     public List<RobotToken> getTags() {
         return Collections.unmodifiableList(tags);
     }
 
-
     public void addTag(final RobotToken tag) {
         tags.add(tag);
     }
-
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
-
 
     @Override
     public FilePosition getBeginPosition() {
         return declaration.getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
