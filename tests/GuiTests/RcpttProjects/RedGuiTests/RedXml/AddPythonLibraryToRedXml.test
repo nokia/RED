@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/4/15 12:31 PM
+Save-Time: 12/7/15 3:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -75,4 +75,36 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
         | get-property "getItems().TreeItem[3].getText()" | equals "Should Cause Error" | verify-true
 }
+
+
+// remove lib entry from red.xml
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+with [get-editor "ProjectWithResource/red.xml"] {
+    with [get-section "Referenced libraries"] {
+        get-table | select "CalculatorLibrary - ProjectWithResource\\/external_lib"
+        get-button Remove | click
+        get-table | key-type "M1+s"
+        
+    }
+    close
+}
+// use Quick fix to discover lib and add it to red.xml
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    type-text " "
+    set-caret-pos 9 38
+    hover-text 9 28
+    get-menu "Quick Fix" | click
+}
+// discovery
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'external_lib\\/CalculatorLibrary.py' and add to configuration" | click -default
+get-window "Select library class" | get-table | select CalculatorLibrary | click -default
+get-editor "ProjectWithResource/red.xml" | key-type "M1+s"
+// revalidate
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 8 40
+    type-text " "
+}
+// there should be zero problems
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
