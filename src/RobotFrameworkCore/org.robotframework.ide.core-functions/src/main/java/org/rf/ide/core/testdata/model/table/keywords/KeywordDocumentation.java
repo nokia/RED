@@ -14,61 +14,53 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public class KeywordDocumentation extends AModelElement<UserKeyword> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> text = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final List<RobotToken> text = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     public KeywordDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
     }
 
-
     public void addDocumentationText(final RobotToken token) {
         text.add(token);
     }
-
 
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
 
-
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
-
 
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
 
-
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
-
 
     @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
 
-
     @Override
     public ModelType getModelType() {
         return ModelType.USER_KEYWORD_DOCUMENTATION;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {

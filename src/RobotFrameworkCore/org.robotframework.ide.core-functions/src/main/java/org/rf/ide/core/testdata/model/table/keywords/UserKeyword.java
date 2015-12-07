@@ -132,6 +132,11 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     }
 
     @Override
+    public RobotToken getDeclaration() {
+        return getKeywordName();
+    }
+
+    @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {

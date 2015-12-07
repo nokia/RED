@@ -52,6 +52,11 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         this.testName = testName;
     }
 
+    @Override
+    public RobotToken getDeclaration() {
+        return getTestName();
+    }
+
     public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow) {
         executionRow.setParent(this);
         this.testContext.add(executionRow);

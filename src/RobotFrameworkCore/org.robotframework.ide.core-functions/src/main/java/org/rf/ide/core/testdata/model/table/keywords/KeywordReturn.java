@@ -14,61 +14,53 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public class KeywordReturn extends AModelElement<UserKeyword> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> values = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final List<RobotToken> values = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     public KeywordReturn(final RobotToken declaration) {
         this.declaration = declaration;
     }
-
 
     @Override
     public boolean isPresent() {
         return (declaration != null);
     }
 
-
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
-
 
     public List<RobotToken> getReturnValues() {
         return Collections.unmodifiableList(values);
     }
 
-
     public void addReturnValue(final RobotToken returnValue) {
         values.add(returnValue);
     }
-
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
-
 
     @Override
     public ModelType getModelType() {
         return ModelType.USER_KEYWORD_RETURN;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
