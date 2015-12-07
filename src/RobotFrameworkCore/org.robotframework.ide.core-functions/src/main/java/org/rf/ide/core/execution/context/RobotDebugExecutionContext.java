@@ -251,7 +251,7 @@ public class RobotDebugExecutionContext {
         }
     }
     
-    protected class TestCaseExecutionRowCounter {
+    static class TestCaseExecutionRowCounter {
         private int counter = 0;
         
         public void increment() {
