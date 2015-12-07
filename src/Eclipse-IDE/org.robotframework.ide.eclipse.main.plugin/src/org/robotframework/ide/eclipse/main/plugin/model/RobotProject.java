@@ -349,10 +349,16 @@ public class RobotProject extends RobotContainer {
         if (configuration != null) {
             referencedVariableFiles = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                final String path = variableFile.getPath();
-                final Map<String, Object> varsMap = getRuntimeEnvironment().getVariablesFromFile(
-                        PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path)).toPortableString(),
-                        variableFile.getArguments());
+                IPath path = new Path(variableFile.getPath());
+                if (!path.isAbsolute()) {
+                    final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
+                    if (targetFile != null && targetFile.exists()) {
+                        path = targetFile.getLocation();
+                    }
+                }
+
+                final Map<String, Object> varsMap = getRuntimeEnvironment()
+                        .getVariablesFromFile(path.toPortableString(), variableFile.getArguments());
                 if (varsMap != null && !varsMap.isEmpty()) {
                     variableFile.setVariables(varsMap);
                     referencedVariableFiles.add(variableFile);

@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -37,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
@@ -407,16 +405,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return newArrayList();
     }
     
-    public List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
-        return getProject().getVariablesFromReferencedFiles();
-    }
-    
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
         return fileOutput != null ? fileOutput.getVariablesImportReferences() : new ArrayList<VariablesFileImportReference>();
-    }
-    
-    public List<ARobotInternalVariable<?>> getGlobalVariables() {
-        return getProject().getRobotProjectHolder().getGlobalVariables();
     }
     
     public List<ImportedVariablesFile> getImportedVariables() {
