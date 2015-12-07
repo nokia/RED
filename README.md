@@ -1,8 +1,9 @@
 # RED - Robot Editor
 ## General information 
 
-RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow quick and comfortable work with Robot testware. 
-Latest release: https://github.com/nokia/RED/releases/latest
+RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow quick and comfortable work with Robot testware.
+
+**Latest release: https://github.com/nokia/RED/releases/latest**
 
 ## What RED provides:
 * text editor with validation and code colouring
