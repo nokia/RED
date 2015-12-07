@@ -45,7 +45,7 @@ def getVariables(dir, args):
 
     vars = robot.variables.Variables()
     try:
-        exec ("vars.set_from_file('" + dir + "'," + args.encode('utf-8') + ")")
+        vars.set_from_file(dir, args.encode('utf-8').decode())
     except:
         pass
     
@@ -54,30 +54,32 @@ def getVariables(dir, args):
         varsFromFile = vars.data
     except AttributeError:  # for robot >2.9
         varsFromFile = vars.store.data._data
-    
+        
     filteredVars = {}
-    for k in varsFromFile.keys():
-        value = varsFromFile[k]
+    for k, v in varsFromFile.items():
         try:
-            if isinstance(value, DotDict):
-                filteredVars[k] = extractDotDict(value)
-            elif not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
-                filteredVars[k] = escape_unicode(value)
-        except:
+            if isinstance(v, DotDict):
+                filteredVars[k] = extractDotDict(v)
+            elif not inspect.ismodule(v) and not inspect.isfunction(v) and not inspect.isclass(v):
+                filteredVars[k] = escape_unicode(v)
+        except Exception as e:
             filteredVars[k] = 'None'
            
     return filteredVars
 
 def extractDotDict(dict):
-    mapFromDotDict = {}
-    for k in dict.keys():
-        mapFromDotDict[k] = escape_unicode(dict.get(k))
-    return mapFromDotDict
+    return {k : escape_unicode(v) for k, v in dict.items()}
 
 def escape_unicode(data):
-    if isinstance(data, basestring):
+    # basestring and long is not defined in python3
+    py_version = sys.version_info
+    if py_version >= (3,0,0) and isinstance(data, str):
         return data.encode('unicode_escape')
-    if isinstance(data, long):  # for OverflowError in XML-RPC
+    if py_version < (3,0,0) and isinstance(data, basestring):
+        return data.encode('unicode_escape')
+    if py_version >= (3,0,0) and isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
+        return str(data)
+    if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
         return str(data)
     if isinstance(data, dict):
         for key, val in data.items():
