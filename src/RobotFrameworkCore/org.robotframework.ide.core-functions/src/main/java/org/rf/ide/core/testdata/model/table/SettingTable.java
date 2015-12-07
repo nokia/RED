@@ -91,10 +91,6 @@ public class SettingTable extends ARobotSectionTable {
         metadatas.add(metadata);
     }
 
-    public SuiteSetup getSuiteSetup() {
-        return null;
-    }
-
     public List<SuiteSetup> getSuiteSetups() {
         return Collections.unmodifiableList(suiteSetups);
     }
@@ -102,10 +98,6 @@ public class SettingTable extends ARobotSectionTable {
     public void addSuiteSetup(final SuiteSetup suiteSetup) {
         suiteSetup.setParent(this);
         suiteSetups.add(suiteSetup);
-    }
-
-    public SuiteTeardown getSuiteTeardown() {
-        return null;
     }
 
     public List<SuiteTeardown> getSuiteTeardowns() {
@@ -135,10 +127,6 @@ public class SettingTable extends ARobotSectionTable {
         defaultTags.add(tags);
     }
 
-    public TestSetup getTestSetup() {
-        return null;
-    }
-
     public List<TestSetup> getTestSetups() {
         return Collections.unmodifiableList(testSetups);
     }
@@ -148,10 +136,6 @@ public class SettingTable extends ARobotSectionTable {
         testSetups.add(testSetup);
     }
 
-    public TestTeardown getTestTeardown() {
-        return null;
-    }
-
     public List<TestTeardown> getTestTeardowns() {
         return Collections.unmodifiableList(testTeardowns);
     }
@@ -159,10 +143,6 @@ public class SettingTable extends ARobotSectionTable {
     public void addTestTeardown(final TestTeardown testTeardown) {
         testTeardown.setParent(this);
         testTeardowns.add(testTeardown);
-    }
-
-    public TestTemplate getTestTemplate() {
-        return null;
     }
 
     public List<TestTemplate> getTestTemplates() {
@@ -192,10 +172,6 @@ public class SettingTable extends ARobotSectionTable {
     public void addTestTemplate(final TestTemplate testTemplate) {
         testTemplate.setParent(this);
         testTemplates.add(testTemplate);
-    }
-
-    public TestTimeout getTestTimeout() {
-        return null;
     }
 
     public List<TestTimeout> getTestTimeouts() {
