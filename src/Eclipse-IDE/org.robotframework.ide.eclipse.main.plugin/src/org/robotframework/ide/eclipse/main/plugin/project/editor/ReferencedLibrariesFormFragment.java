@@ -36,6 +36,7 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
@@ -280,6 +281,14 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private void changeEvent(@UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
         editorInput.refreshProjectConfiguration();
         setInput();
+        viewer.refresh();
+    }
+
+    @Inject
+    @Optional
+    private void whenMappingsChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final String libName) {
+        dirtyProviderService.setDirtyState(true);
         viewer.refresh();
     }
 }
