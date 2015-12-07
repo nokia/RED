@@ -9,30 +9,25 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     private T parent;
 
-
     public abstract ModelType getModelType();
-
 
     public abstract FilePosition getBeginPosition();
 
-
     public abstract List<RobotToken> getElementTokens();
 
+    public abstract RobotToken getDeclaration();
 
     public void setParent(T parent) {
         this.parent = parent;
     }
 
-
     public T getParent() {
         return parent;
     }
-
 
     public FilePosition getEndPosition() {
         FilePosition pos = FilePosition.createNotSet();
@@ -46,8 +41,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
                     int endColumn = robotToken.getEndColumn();
                     int length = endColumn - robotToken.getStartColumn();
                     FilePosition fp = robotToken.getFilePosition();
-                    pos = new FilePosition(fp.getLine(),
-                            robotToken.getEndColumn(), fp.getOffset() + length);
+                    pos = new FilePosition(fp.getLine(), robotToken.getEndColumn(), fp.getOffset() + length);
                     break;
                 }
             }

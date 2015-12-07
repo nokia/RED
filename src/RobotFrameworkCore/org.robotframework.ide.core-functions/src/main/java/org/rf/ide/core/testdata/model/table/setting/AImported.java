@@ -15,54 +15,51 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public abstract class AImported extends AModelElement<SettingTable> {
 
     private final Type type;
-    private final RobotToken declaration;
-    private RobotToken pathOrName;
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final RobotToken declaration;
+
+    private RobotToken pathOrName;
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     protected AImported(final Type type, final RobotToken declaration) {
         this.type = type;
         this.declaration = declaration;
     }
 
-
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
-
 
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
 
-
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
 
-
     public RobotToken getPathOrName() {
         return pathOrName;
     }
-
 
     public void setPathOrName(final RobotToken pathOrName) {
         this.pathOrName = pathOrName;
     }
 
     public static enum Type {
-        LIBRARY, RESOURCE, VARIABLES;
+        LIBRARY,
+        RESOURCE,
+        VARIABLES;
     }
-
 
     public Type getType() {
         return type;
     }
-
 
     @Override
     public ModelType getModelType() {
@@ -78,7 +75,6 @@ public abstract class AImported extends AModelElement<SettingTable> {
 
         return modelType;
     }
-
 
     @Override
     public FilePosition getBeginPosition() {

@@ -18,43 +18,41 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class RobotExecutableRow<T> extends AModelElement<T> {
 
     private RobotToken action;
-    private final List<RobotToken> arguments = new ArrayList<>();
 
+    private final List<RobotToken> arguments = new ArrayList<>();
 
     public RobotExecutableRow() {
         this.action = new RobotToken();
     }
 
-
     public RobotToken getAction() {
         return action;
     }
-
 
     public void setAction(final RobotToken action) {
         this.action = action;
     }
 
-
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
 
-
     public void addArgument(final RobotToken argument) {
         arguments.add(argument);
     }
-
 
     @Override
     public boolean isPresent() {
         return true;
     }
 
+    @Override
+    public RobotToken getDeclaration() {
+        return action;
+    }
 
     @Override
     public ModelType getModelType() {
@@ -70,12 +68,10 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         return type;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getAction().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
@@ -86,20 +82,15 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         return tokens;
     }
 
-
     public boolean isExecutable() {
         final RobotToken action = getAction();
-        return (action != null && !action.getTypes().contains(
-                RobotTokenType.START_HASH_COMMENT))
+        return (action != null && !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
                 && isNotEmptyForContinoue();
     }
 
-
     private boolean isNotEmptyForContinoue() {
-        return getElementTokens().size() > 1
-                || !"\\".equals(action.getRaw().toString().trim());
+        return getElementTokens().size() > 1 || !"\\".equals(action.getRaw().toString().trim());
     }
-
 
     public IExecutableRowDescriptor<T> buildLineDescription() {
         return new ExecutableRowDescriptorBuilder().buildLineDescriptor(this);
