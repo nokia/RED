@@ -10,7 +10,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
+import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
@@ -20,9 +20,9 @@ import com.google.common.collect.Range;
 /**
  * @author Michal Anglart
  */
-public class DuplicatedTemplateInOlderValidator extends ADuplicatedInOldValidator<TestTemplate> {
+public class DuplicatedDocumentationInOlderValidator extends ADuplicatedInOldValidator<SuiteDocumentation> {
 
-    public DuplicatedTemplateInOlderValidator(final IFile file, final RobotSettingsSection section) {
+    public DuplicatedDocumentationInOlderValidator(final IFile file, final RobotSettingsSection section) {
         super(file, section);
     }
 
@@ -32,24 +32,24 @@ public class DuplicatedTemplateInOlderValidator extends ADuplicatedInOldValidato
     }
 
     @Override
-    protected List<TestTemplate> getElements() {
+    protected List<SuiteDocumentation> getElements() {
         final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getTestTemplates();
+        return table.getDocumentation();
     }
 
     @Override
-    protected Function<TestTemplate, String> getImportantElement() {
-        return new Function<TestTemplate, String>() {
+    protected Function<SuiteDocumentation, String> getImportantElement() {
+        return new Function<SuiteDocumentation, String>() {
 
             @Override
-            public String apply(final TestTemplate template) {
-                return template.getKeywordName() == null ? null : template.getKeywordName().getText();
+            public String apply(final SuiteDocumentation setup) {
+                return "";
             }
         };
     }
 
     @Override
     protected GeneralSettingsProblem getSettingProblemId() {
-        return GeneralSettingsProblem.DUPLICATED_TEMPLATE_28;
+        return GeneralSettingsProblem.DUPLICATED_SUITE_TEARDOWN_28;
     }
 }
