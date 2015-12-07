@@ -6,11 +6,15 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 
 /**
  * @author Michal Anglart
@@ -23,10 +27,13 @@ public class PathsConverter {
             throw new IllegalArgumentException("Unable to convert absolute path");
         }
         try {
-            final String pathWithoutSpaces = path.toPortableString().replaceAll(" ", "%20");
-            final URI resolvedPath = resource.getLocation().toFile().toURI().resolve(pathWithoutSpaces);
+            final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
+
+            final String pathWithoutSpaces = escaper.escape(path.toString());
+            final URI resolvedPath = new URI(escaper.escape(resource.getFullPath().toString()))
+                    .resolve(pathWithoutSpaces);
             return new Path(resolvedPath.getPath()).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
-        } catch (final IllegalArgumentException e) {
+        } catch (final IllegalArgumentException | URISyntaxException e) {
             return null;
         }
     }

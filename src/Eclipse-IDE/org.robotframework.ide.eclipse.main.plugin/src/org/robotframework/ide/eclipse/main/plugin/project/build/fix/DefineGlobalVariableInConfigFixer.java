@@ -32,24 +32,24 @@ import org.robotframework.red.swt.SwtThread.Calculation;
  * @author Michal Anglart
  *
  */
-public class DefineVariableFixer extends RedXmlConfigMarkerResolution {
+public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolution {
 
     private final String variable;
 
-    public static List<DefineVariableFixer> createFixers(final String parameterizedPath) {
+    public static List<DefineGlobalVariableInConfigFixer> createFixers(final String parameterizedPath) {
         final List<String> variables = RobotExpressions.getVariables(parameterizedPath);
         final Map<String, String> vars = newHashMap();
 
-        final List<DefineVariableFixer> fixers = newArrayList();
+        final List<DefineGlobalVariableInConfigFixer> fixers = newArrayList();
         for (final String var : variables) {
             if (!vars.containsKey(var)) {
-                fixers.add(new DefineVariableFixer(var));
+                fixers.add(new DefineGlobalVariableInConfigFixer(var));
             }
         }
         return fixers;
     }
 
-    public DefineVariableFixer(final String variable) {
+    public DefineGlobalVariableInConfigFixer(final String variable) {
         this.variable = variable;
     }
 

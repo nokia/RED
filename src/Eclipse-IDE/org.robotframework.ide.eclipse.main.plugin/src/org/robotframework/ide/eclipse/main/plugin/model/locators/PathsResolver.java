@@ -13,15 +13,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  * @author Michal Anglart
@@ -29,37 +26,37 @@ import com.google.common.collect.Lists;
  */
 public class PathsResolver {
 
-    static List<IPath> getAbsoluteVariableFilesPaths(final RobotSuiteFile file) {
-        return getNormalizedPaths(file.getVariablesPaths(), file.getProject(), file.getFile().getLocation());
-    }
+    static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
+        final List<IPath> paths = file.getResourcesPaths();
+        final List<IPath> resultPaths = newArrayList();
 
-    static List<IPath> getAbsoluteResourceFilesPaths(final RobotSuiteFile file) {
-        return getNormalizedPaths(file.getResourcesPaths(), file.getProject(), file.getFile().getLocation());
-    }
+        final RobotProject project = file.getProject();
+        for (final IPath path : paths) {
+            final IPath resolvedPath = isParameterized(path)
+                    ? Path.fromPortableString(project.resolve(path.toPortableString())) : path;
 
-    private static List<IPath> getNormalizedPaths(final List<IPath> relativePaths, final RobotProject project, 
-            final IPath location) {
-        // FIXME : those paths can point to python module search path
-        return newArrayList(Iterables.filter(Lists.transform(relativePaths, new Function<IPath, IPath>() {
-            @Override
-            public IPath apply(final IPath path) {
-                final IPath resolvedPath = isParameterized(path)
-                        ? Path.fromPortableString(project.resolve(path.toPortableString())) : path;
-                if (isParameterized(resolvedPath)) {
-                    return null;
-                } else if (resolvedPath.isAbsolute()) {
-                    return resolvedPath;
-                } else {
-                    try {
-                        final String pathWithoutSpaces = resolvedPath.toPortableString().replaceAll(" ", "%20");
-                        final URI normalizedPath = location.toFile().toURI().resolve(pathWithoutSpaces);
-                        return new Path(normalizedPath.getPath());
-                    } catch (final IllegalArgumentException e) {
-                        return null;
-                    }
-                }
+            final IPath r = normalizePath(file, resolvedPath);
+            if (r != null) {
+                resultPaths.add(r);
             }
-        }), Predicates.notNull()));
+        }
+        return resultPaths;
+    }
+
+    static IPath normalizePath(final RobotSuiteFile file, final IPath resolvedPath) {
+        if (isParameterized(resolvedPath)) {
+            return null;
+        }
+
+        final IWorkspaceRoot workspaceRoot = file.getFile().getWorkspace().getRoot();
+        if (resolvedPath.isAbsolute() && workspaceRoot.getLocation().isPrefixOf(resolvedPath)) {
+                return resolvedPath.makeRelativeTo(workspaceRoot.getLocation());
+        } else if (!resolvedPath.isAbsolute()) {
+            return PathsConverter.fromResourceRelativeToWorkspaceRelative(file.getFile(), resolvedPath);
+        }
+        // we don't handle the case when path is absolute, but outside of workspace. this could be
+        // done in special cases, but i think we don't want to do it
+        return null;
     }
 
     /**

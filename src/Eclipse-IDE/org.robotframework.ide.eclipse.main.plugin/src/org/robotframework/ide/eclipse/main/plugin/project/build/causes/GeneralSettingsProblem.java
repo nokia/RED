@@ -17,7 +17,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineVariableFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -81,7 +81,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
-            return DefineVariableFixer.createFixers(nameOrPath);
+            return DefineGlobalVariableInConfigFixer.createFixers(nameOrPath);
         }
     },
     ABSOLUTE_IMPORT_PATH {

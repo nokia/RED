@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineLocalVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhitespacesFromVariableNameFixer;
 
@@ -98,6 +99,16 @@ public enum VariablesProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Variable '%s' is used, but not defined";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DefineLocalVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
         }
     };
 
