@@ -74,7 +74,7 @@ public class CreateVariableFixer extends RedSuiteMarkerResolution {
             offsetOfChange = document.getLength();
         }
 
-        final Region regionOfChange = new Region(offsetOfChange, 0);
+        final IRegion regionOfChange = new Region(offsetOfChange, 0);
         final String info = Snippets.createSnippetInfo(document, regionOfChange, toInsert);
         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                 .will(AcceptanceMode.INSERT)
