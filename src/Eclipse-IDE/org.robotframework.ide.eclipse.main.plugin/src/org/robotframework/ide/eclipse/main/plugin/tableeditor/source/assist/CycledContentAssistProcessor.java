@@ -67,22 +67,24 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void assistSessionStarted(final ContentAssistEvent event) {
         if (event.processor == this) {
-            System.err.println("started: " + toString());
             assistContext.refreshPreferences();
             canReopenAssitantProgramatically = true;
             currentPage = 0;
+        } else {
+            canReopenAssitantProgramatically = false;
         }
     }
 
     @Override
     public void assistSessionRestarted(final ContentAssistEvent event) {
         if (event.processor == this) {
-            System.err.println("restarted: " + toString());
             canReopenAssitantProgramatically = true;
             currentPage--;
             if (currentPage < 0) {
                 currentPage = processors.size() - 1;
             }
+        } else {
+            canReopenAssitantProgramatically = false;
         }
 
     }
@@ -90,7 +92,6 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void assistSessionEnded(final ContentAssistEvent event) {
         if (event.processor == this) {
-            System.err.println("ended: " + toString());
             currentPage = 0;
         }
     }
@@ -100,7 +101,6 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        System.err.println("applied: " + toString() + " - " + canReopenAssitantProgramatically);
         if (canReopenAssitantProgramatically && proposal instanceof RedCompletionProposal
                 && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
             canReopenAssitantProgramatically = false;
