@@ -91,11 +91,13 @@ public class KeywordDefinitionLocator {
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
             final List<IPath> nestedResources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
-            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile, detector);
+            ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile,
+                    detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
-            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), startingFile, detector);
+            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), startingFile,
+                    detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
@@ -106,7 +108,7 @@ public class KeywordDefinitionLocator {
         }
         return ContinueDecision.CONTINUE;
     }
-    
+
     private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,
             final RobotSuiteFile startingFile, final KeywordDetector detector) {
         for (final LibrarySpecification spec : librariesMap.keySet()) {
@@ -139,15 +141,18 @@ public class KeywordDefinitionLocator {
         }
         return ContinueDecision.CONTINUE;
     }
-    
+
     private ContinueDecision locateInLibraries(final Map<LibrarySpecification, String> librariesMap,
             final KeywordDetector detector) {
         for (final LibrarySpecification libSpec : librariesMap.keySet()) {
-            for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
-                        librariesMap.get(libSpec), false);
-                if (shouldContinue == ContinueDecision.STOP) {
-                    return ContinueDecision.STOP;
+            List<KeywordSpecification> keywords = libSpec.getKeywords();
+            if (keywords != null) {
+                for (final KeywordSpecification kwSpec : keywords) {
+                    final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
+                            librariesMap.get(libSpec), false);
+                    if (shouldContinue == ContinueDecision.STOP) {
+                        return ContinueDecision.STOP;
+                    }
                 }
             }
         }

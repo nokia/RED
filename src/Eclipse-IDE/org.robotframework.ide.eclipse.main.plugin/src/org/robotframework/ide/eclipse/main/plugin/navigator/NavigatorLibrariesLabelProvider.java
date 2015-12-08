@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -14,6 +16,7 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies.ErroneousLibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -51,6 +54,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                 styled.append(" ");
             }
             return styled.append(additionalInfo, new Styler() {
+
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = RedTheme.getEclipseDecorationColor();
@@ -60,6 +64,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             final ErroneousLibrarySpecification libSpec = (ErroneousLibrarySpecification) element;
 
             final StyledString label = new StyledString(libSpec.getName(), new Styler() {
+
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = ColorsManager.getColor(255, 0, 0);
@@ -67,6 +72,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
                 }
             });
             label.append(" (non-accessible)", new Styler() {
+
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = ColorsManager.getColor(255, 0, 0);
@@ -82,14 +88,20 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             if (!additonalInfo.isEmpty()) {
                 styled.append(" ");
                 styled.append(additonalInfo, new Styler() {
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
-                }
+
+                    @Override
+                    public void applyStyles(final TextStyle textStyle) {
+                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                    }
                 });
             }
             styled.append(" ");
-            styled.append("(" + libSpec.getKeywords().size() + ")", new Styler() {
+            int numberOfKeywords = 0;
+            List<KeywordSpecification> keywords = libSpec.getKeywords();
+            if (keywords != null) {
+                numberOfKeywords = keywords.size();
+            }
+            styled.append("(" + numberOfKeywords + ")", new Styler() {
 
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
