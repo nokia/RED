@@ -1,0 +1,107 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ngFKcJ2ZEeWVv_UItyy1RQ
+Element-Name: ContentAssistForProjectOutsideWS
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KcAh0J2aEeWVv_UItyy1RQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/8/15 1:11 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//import project outside of workspace
+get-java-property "user.home" |let [val user_home -input]{	
+	
+	get-menu "File/Import..." | click
+	get-window Import | get-tree | select "General/Existing Projects into Workspace" | double-click
+	set-dialog-result Folder [concat $user_home "/Project1"]
+	with [get-window Import] {
+	    get-button "Browse..." | click
+	    get-button Finish | click
+	}
+}
+
+//open editor
+with [get-view "Project Explorer" | get-tree] {
+    select "MediumRobotTest/Script.robot" | double-click
+}
+//check ther is no errors
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 5 30
+    key-type Enter
+    type-text Re
+    key-type "M1+SPACE"
+    key-type Enter
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "MediumRobotTest/Resources 2/res2.tsv" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "MediumRobotTest/Resources/res1.robot" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${varfrompython}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "@{listfrompy}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
+}
+wait 200
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "MediumRobotTest\\/Resources 2\\/res2.tsv" | click -default
+    
+//add Log to test
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 11 27
+    key-type Enter
+    type-text "Log  "
+    key-type "M1+SPACE"
+    type-text "$"
+    wait 200
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${from_res2}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${varfrompython}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${/}" | verify-true
+}
+
+wait 200
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${from_res2}" | click -default
+
+//add second Resource file and keyword from it
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 33
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Re
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+    wait 500
+    key-type Down
+    wait 200
+    key-type Enter
+    wait 300
+    set-caret-pos 13 22
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text kw
+    key-type "M1+SPACE"
+    wait 200
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "kw from res 1 - res1.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "kw from res 2 - res2.tsv" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${from_res1}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${from_res2}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${varfrompython}" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "@{listfrompy}" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "${/}" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "kw from res 1 - res1.robot" 
+    | click -default
+
+wait 2000    
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
