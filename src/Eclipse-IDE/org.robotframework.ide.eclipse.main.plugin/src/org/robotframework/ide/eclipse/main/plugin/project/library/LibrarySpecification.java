@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,15 +19,23 @@ import com.google.common.base.Objects;
 public class LibrarySpecification {
 
     private String name;
+
     private String scope;
+
     private String format;
+
     private String version;
+
     private LibraryConstructor constructor;
+
     private String documentation;
 
     private List<KeywordSpecification> keywords;
+
     private boolean isRemote;
+
     private boolean isReferenced;
+
     private String secondaryKey = "";
 
     public String getName() {
@@ -75,12 +84,16 @@ public class LibrarySpecification {
     }
 
     public List<KeywordSpecification> getKeywords() {
-        return keywords;
+        return (keywords == null) ? new ArrayList<KeywordSpecification>(0) : keywords;
     }
 
     @XmlElement(name = "kw")
     public void setKeywords(final List<KeywordSpecification> keywords) {
-        this.keywords = keywords;
+        if (keywords == null) {
+            this.keywords = new ArrayList<>(0);
+        } else {
+            this.keywords = keywords;
+        }
     }
 
     public LibraryConstructor getConstructor() {
@@ -99,7 +112,7 @@ public class LibrarySpecification {
     public void setRemote() {
         isRemote = true;
     }
-    
+
     public boolean isReferenced() {
         return isReferenced;
     }
@@ -109,8 +122,10 @@ public class LibrarySpecification {
     }
 
     public void propagateFormat() {
-        for (final KeywordSpecification kwSpec : keywords) {
-            kwSpec.setFormat(format);
+        if (keywords != null) {
+            for (final KeywordSpecification kwSpec : keywords) {
+                kwSpec.setFormat(format);
+            }
         }
     }
 
