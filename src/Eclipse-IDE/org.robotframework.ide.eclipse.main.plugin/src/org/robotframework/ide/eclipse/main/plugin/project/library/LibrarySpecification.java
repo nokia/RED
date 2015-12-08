@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,16 +83,12 @@ public class LibrarySpecification {
     }
 
     public List<KeywordSpecification> getKeywords() {
-        return (keywords == null) ? new ArrayList<KeywordSpecification>(0) : keywords;
+        return keywords;
     }
 
     @XmlElement(name = "kw")
     public void setKeywords(final List<KeywordSpecification> keywords) {
-        if (keywords == null) {
-            this.keywords = new ArrayList<>(0);
-        } else {
-            this.keywords = keywords;
-        }
+        this.keywords = keywords;
     }
 
     public LibraryConstructor getConstructor() {
