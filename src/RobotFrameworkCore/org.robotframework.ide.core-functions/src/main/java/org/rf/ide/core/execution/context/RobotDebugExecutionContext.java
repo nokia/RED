@@ -147,16 +147,9 @@ public class RobotDebugExecutionContext {
             forLoopsCounter++;
         } else if (forLoopsCounter > 0) {
             isForLoopStarted = true;
-        } else if (isForLoopEnd(type)) {
-            isForLoopStarted = false;
-            executableRowFindersManager.clearForLoopState();
         } else if (isSetupTeardownStart(type)) {
             isSetupTeardownKeywordStarted = true;
         }
-    }
-
-    private boolean isForLoopEnd(final String keywordType) {
-        return isForLoopStarted && forLoopsCounter == 0;
     }
 
     private boolean isSetupTeardownStart(final String keywordType) {
@@ -166,6 +159,10 @@ public class RobotDebugExecutionContext {
     private void checkEndKeywordType(final String keywordType) {
         if (keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE)) {
             forLoopsCounter--;
+            if(forLoopsCounter == 0) {
+                isForLoopStarted = false;
+                executableRowFindersManager.clearForLoopState();
+            }
         }
         if (keywordType.equalsIgnoreCase(TESTCASE_SETUP_KEYWORD_TYPE)
                 || keywordType.equalsIgnoreCase(TESTCASE_TEARDOWN_KEYWORD_TYPE)
