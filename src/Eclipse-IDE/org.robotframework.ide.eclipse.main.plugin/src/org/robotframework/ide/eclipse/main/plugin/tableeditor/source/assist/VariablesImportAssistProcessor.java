@@ -9,8 +9,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -19,7 +19,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -64,10 +63,12 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
                 final Image image = ImagesManager.getImage(RedImages.getImageForFileWithExtension(".py"));
 
                 final List<RedCompletionProposal> proposals = newArrayList();
-                for (final ReferencedVariableFile varFile : assist.getReferencedVariableFiles()) {
-                    final String resourcePath = varFile.getPath();
+
+                for (final IFile varFile : assist.getVariableFiles()) {
+                    final String resourcePath = varFile.getFullPath().makeRelative().toString();
                     if (resourcePath.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String resourceRelativePath = createCurrentFileRelativePath(resourcePath);
+                        final String resourceRelativePath = createCurrentFileRelativePath(
+                                varFile.getFullPath().makeRelative());
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                                 .will(assist.getAcceptanceMode())
                                 .theText(resourceRelativePath)
@@ -90,13 +91,8 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private String createCurrentFileRelativePath(final String resourcePath) {
-        final IPath asPath = new Path(resourcePath);
-        final IPath wsRelatedPath = PathsConverter.toWorkspaceRelativeIfPossible(asPath);
-        if (wsRelatedPath.isAbsolute()) {
-            return asPath.toString();
-        }
-        return PathsConverter.fromWorkspaceRelativeToResourceRelative(assist.getFile(), wsRelatedPath).toString();
+    private String createCurrentFileRelativePath(final IPath resourcePath) {
+        return PathsConverter.fromWorkspaceRelativeToResourceRelative(assist.getFile(), resourcePath).toString();
     }
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
