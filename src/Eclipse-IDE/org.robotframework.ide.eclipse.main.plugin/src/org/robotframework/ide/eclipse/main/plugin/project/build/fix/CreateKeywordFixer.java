@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
@@ -25,6 +25,9 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.CaseFormat;
@@ -32,6 +35,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
@@ -88,29 +92,42 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
         final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
         final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
 
-        // final String toInsert;
-        // final int offsetOfChange;
+        final String toInsert;
+        final int offset;
+        final int cursorShift;
 
         final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
         if (section.isPresent()) {
-            final String toInsert = lineDelimiter + keywordName + lineDelimiter + separator + lineDelimiter;
-            final int line = section.get().getHeaderLine();
             try {
+                toInsert = lineDelimiter + keywordName + lineDelimiter + separator + lineDelimiter;
+
+                final int line = section.get().getHeaderLine();
                 final IRegion lineInformation = document.getLineInformation(line - 1);
-                final int offset = lineInformation.getOffset() + lineInformation.getLength();
-                return Optional
-                        .<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length() - 1,
-                                ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
+                offset = lineInformation.getOffset() + lineInformation.getLength();
+                cursorShift = lineDelimiter.length();
             } catch (final BadLocationException e) {
                 return Optional.absent();
             }
 
         } else {
-            final String toInsert = lineDelimiter + lineDelimiter + "*** Keywords ***" + lineDelimiter + keywordName
+            toInsert = Strings.repeat(lineDelimiter, 2) + "*** Keywords ***" + lineDelimiter + keywordName
                     + lineDelimiter + separator;
-            final int offset = document.getLength();
-            return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length(),
-                    ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
+            offset = document.getLength();
+            cursorShift = 0;
         }
+
+        final IRegion regionOfChange = new Region(offset, 0);
+        final String info = Snippets.createSnippetInfo(document, regionOfChange, toInsert);
+        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                .will(AcceptanceMode.INSERT)
+                .theText(toInsert)
+                .atOffset(regionOfChange.getOffset())
+                .givenThatCurrentPrefixIs("")
+                .secondaryPopupShouldBeDisplayedUsingHtml(info)
+                .thenCursorWillStopBeforeEnd(cursorShift)
+                .displayedLabelShouldBe(getLabel())
+                .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getUserKeywordImage()))
+                .create();
+        return Optional.<ICompletionProposal> of(proposal);
     }
 }
