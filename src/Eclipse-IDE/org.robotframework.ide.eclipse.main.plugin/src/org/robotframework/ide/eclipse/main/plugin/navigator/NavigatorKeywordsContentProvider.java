@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 public class NavigatorKeywordsContentProvider implements ITreeContentProvider {
@@ -29,7 +32,10 @@ public class NavigatorKeywordsContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof LibrarySpecification) {
-            return ((LibrarySpecification) parentElement).getKeywords().toArray();
+            List<KeywordSpecification> keywords = ((LibrarySpecification) parentElement).getKeywords();
+            if (keywords != null) {
+                return keywords.toArray();
+            }
         }
         return new Object[0];
     }
