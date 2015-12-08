@@ -58,6 +58,7 @@ In short:
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 - If RPC XML error dialogue appears, it indicates that there is an issue with importing one of python files associated with Robot test case. Please report that.   
 - folding/unfolding sections in Source editor does not work as intended 
+- Double variables in content assistance when variable file is included in test case and in red.xml
 
 ## Short term plans
 - Table editor persistence
