@@ -28,11 +28,11 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class DefineLocalVariableFixer extends RedSuiteMarkerResolution {
+public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
 
     private final String name;
 
-    public DefineLocalVariableFixer(final String name) {
+    public CreateLocalVariableFixer(final String name) {
         this.name = name;
     }
 
@@ -60,7 +60,7 @@ public class DefineLocalVariableFixer extends RedSuiteMarkerResolution {
 
             final IRegion regionToChange = new Region(firstCharacterOffset, 0);
 
-            final String info = Snippets.createSnippetInfo(document, firstCharacterOffset, regionToChange, toInsert);
+            final String info = Snippets.createSnippetInfo(document, regionToChange, toInsert);
             final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                     .will(AcceptanceMode.INSERT)
                     .theText(toInsert)

@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -104,10 +104,11 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         positions.addAll(calculateTestCasesFoldingPositions(model));
         positions.addAll(calculateKeywordsFoldingPositions(model));
 
-        return positions;
+        final int additionalLength = DocumentUtilities.getDelimiter(document).length();
+        return newArrayList(transform(positions, delimiterShiftedPosition(additionalLength)));
     }
 
-    private Collection<? extends Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
+    private List<Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
         final List<Position> positions = newArrayList();
         for (final RobotSuiteFileSection section : model.getChildren()) {
             positions.addAll(section.getPositions());
@@ -137,6 +138,16 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
             @Override
             public Position apply(final RobotCodeHoldingElement element) {
                 return element.getPosition();
+            }
+        };
+    }
+
+    private static Function<Position, Position> delimiterShiftedPosition(final int additionalLength) {
+        return new Function<Position, Position>() {
+
+            @Override
+            public Position apply(final Position position) {
+                return new Position(position.getOffset(), position.getLength() + additionalLength);
             }
         };
     }
