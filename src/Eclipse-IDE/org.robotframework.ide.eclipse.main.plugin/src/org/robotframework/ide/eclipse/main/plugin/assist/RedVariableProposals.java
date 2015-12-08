@@ -69,7 +69,7 @@ public class RedVariableProposals {
 
             @Override
             public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
-                final String varName = variable.getText().toString().trim();
+                final String varName = variable.getText().trim();
                 proposals.add(RedVariableProposal.createLocal(varName, file.getName()));
                 return ContinueDecision.CONTINUE;
             }

@@ -422,10 +422,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return newArrayList();
     }
 
-    public int getLineDelimiterLength() {
-        return fileOutput.getFileLineSeparator().length();
-    }
-    
     public static class ImportedVariablesFile {
 
         private List<String> args;

@@ -231,8 +231,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         final FilePosition begin = keyword.getBeginPosition();
         final FilePosition end = keyword.getEndPosition();
 
-        return new Position(begin.getOffset(),
-                end.getOffset() - begin.getOffset() + getSuiteFile().getLineDelimiterLength());
+        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
     }
 
     @Override
