@@ -36,6 +36,8 @@ In short:
 - Automatic indent when editing test case and keyword
 - Content assistance modes - insert or replace 
 - Content assistance library prefix - preference to automatically add library or resource prefix for proposals 
+- Automatic source formatting CTRL+SHIFT+F - proof of concept, non yet customisable 
+- Multi-line commenting via key short-cut CTRL+? 
 - Extended help
 
 ## What's in the package
@@ -57,7 +59,7 @@ In short:
 - Library auto-discovery is not yet supported thus user needs to add any external library to red.xml by themselves, if not then validation will show unknown library error. Either you add it in red.xml or invoke option Quick Fix on item in Source editor or in Problems view.  
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 - If RPC XML error dialogue appears, it indicates that there is an issue with importing one of python files associated with Robot test case. Please report that.   
-- folding/unfolding sections in Source editor does not work as intended 
+- Folding/unfolding sections in Source editor does not work as intended 
 - Double variables in content assistance when variable file is included in test case and in red.xml
 
 ## Short term plans
