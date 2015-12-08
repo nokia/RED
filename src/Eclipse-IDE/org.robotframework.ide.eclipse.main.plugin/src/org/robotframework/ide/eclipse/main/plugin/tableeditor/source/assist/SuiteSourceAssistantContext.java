@@ -24,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
@@ -85,30 +84,53 @@ public class SuiteSourceAssistantContext {
         return suiteModel.getImportedLibraries().containsKey(spec);
     }
 
-    public List<ReferencedVariableFile> getReferencedVariableFiles() {
-        return suiteModel.getProject().getVariablesFromReferencedFiles();
+    public List<IFile> getVariableFiles() {
+        final IWorkspaceRoot wsRoot = suiteModel.getProject().getProject().getWorkspace().getRoot();
+        return getMatchingFiles(wsRoot, new FileMatcher() {
+            @Override
+            public boolean matches(final IFile file) {
+                return file.getFileExtension().equals("py");
+            }
+        });
     }
 
     public List<IFile> getResourceFiles() {
         final IWorkspaceRoot wsRoot = suiteModel.getProject().getProject().getWorkspace().getRoot();
-        final List<IFile> resourceFiles = newArrayList();
+        return getMatchingFiles(wsRoot, new FileMatcher() {
+
+            @Override
+            public boolean matches(final IFile file) {
+                return ASuiteFileDescriber.isResourceFile(file);
+            }
+        });
+    }
+
+    private List<IFile> getMatchingFiles(final IResource root, final FileMatcher matcher) {
+        final IWorkspaceRoot wsRoot = suiteModel.getProject().getProject().getWorkspace().getRoot();
+        final List<IFile> matchingFiles = newArrayList();
         try {
             wsRoot.accept(new IResourceVisitor() {
+
                 @Override
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE) {
                         final IFile file = (IFile) resource;
-                        if (ASuiteFileDescriber.isResourceFile(file)) {
-                            resourceFiles.add(file);
+                        if (matcher.matches(file)) {
+                            matchingFiles.add(file);
                         }
                     }
                     return true;
                 }
             });
         } catch (final CoreException e) {
-            return resourceFiles;
+            return matchingFiles;
         }
-        return resourceFiles;
+        return matchingFiles;
+    }
+
+    private interface FileMatcher {
+
+        boolean matches(IFile file);
     }
 
     public static class AssistPreferences {
