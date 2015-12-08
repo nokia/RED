@@ -24,7 +24,7 @@ In short:
 - ***Gherkin validation & colouring***
 - ***Remote Debug*** - debug testcase on remote testline using RED locally. Refer to RED help for more info. 
 - Variable mapping in red.xml - way to handle parametrised paths to resources and libs. 
-- Library aliases and keyword prefixes (library.keyword) validation and colouring
+- Library and resources aliases (library.keyword , resource.keyword) validation and colouring
 - Duplicated keywords discovery
 - TAB key handling customisation - what to do when TAB is pressed, check Preferences 
 - Loops validation ,colouring and debug
@@ -35,6 +35,7 @@ In short:
 - Performance and memory management improvements especially visible when working with big (+500mb) projects
 - Automatic indent when editing test case and keyword
 - Content assistance modes - insert or replace 
+- Content assistance library prefix - preference to automatically add library or resource prefix for proposals 
 - Extended help
 
 ## What's in the package
