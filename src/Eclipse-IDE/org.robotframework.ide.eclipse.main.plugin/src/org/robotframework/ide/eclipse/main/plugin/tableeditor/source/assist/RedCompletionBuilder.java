@@ -48,6 +48,8 @@ public class RedCompletionBuilder {
         DecorationsStep thenCursorWillStopAt(int position, int length);
 
         DecorationsStep thenCursorWillStopAtTheEndOfInsertion();
+
+        DecorationsStep thenCursorWillStopBeforeEnd(int shift);
     }
 
     public static interface DecorationsStep {
@@ -84,6 +86,10 @@ public class RedCompletionBuilder {
 
         private int cursorPosition;
 
+        private int cursorBackShift;
+
+        private int selectionLength;
+
         private String labelToDisplay;
 
         private Image image;
@@ -95,9 +101,6 @@ public class RedCompletionBuilder {
         private boolean decoratePrefix;
 
         private boolean activateAssitant;
-
-        private int selectionLength;
-
 
         @Override
         public ProposalContentStep will(final AcceptanceMode mode) {
@@ -178,6 +181,14 @@ public class RedCompletionBuilder {
         }
 
         @Override
+        public DecorationsStep thenCursorWillStopBeforeEnd(final int shift) {
+            this.cursorPosition = -1;
+            this.selectionLength = 0;
+            this.cursorBackShift = shift;
+            return this;
+        }
+
+        @Override
         public DecorationsStep displayedLabelShouldBe(final String label) {
             this.labelToDisplay = label;
             return this;
@@ -208,7 +219,7 @@ public class RedCompletionBuilder {
 
         @Override
         public RedCompletionProposal createWithPriority(final int priority) {
-            final int cursorPos = cursorPosition == -1 ? contentToInsert.length() : cursorPosition;
+            final int cursorPos = cursorPosition == -1 ? (contentToInsert.length() - cursorBackShift) : cursorPosition;
             if (mode == AcceptanceMode.INSERT) {
                 return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
