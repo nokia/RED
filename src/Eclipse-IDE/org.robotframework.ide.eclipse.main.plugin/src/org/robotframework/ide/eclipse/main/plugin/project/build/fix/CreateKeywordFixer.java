@@ -79,41 +79,38 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
-        if (keywordName != null) {
-            final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
-            final String lineDelimiter = DocumentUtilities.getDelimiter(document);
-            if (section.isPresent()) {
-                final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
-                final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
-                final String toInsert = lineDelimiter + keywordName + lineDelimiter + separator + lineDelimiter;
-                final int line = section.get().getHeaderLine();
-                try {
-                    final IRegion lineInformation = document.getLineInformation(line - 1);
-                    final int offset = lineInformation.getOffset() + lineInformation.getLength();
-                    return Optional
-                            .<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length() - 1,
-                                    ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
-                } catch (final BadLocationException e) {
-                    return Optional.absent();
-                }
-
-            } else {
-                final String toInsert = lineDelimiter + lineDelimiter + "*** Keywords ***" + lineDelimiter + keywordName
-                        + lineDelimiter + "    ";
-                final int offset = document.getLength();
-                return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length(),
-                        ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
-            }
+        if (keywordName == null) {
+            return Optional.absent();
         }
-        return Optional.absent();
-    }
 
-    private static String getLineDelimiter(final IDocument document) {
-        try {
-            final String delimiter = document.getLineDelimiter(0);
-            return delimiter == null ? "\n" : delimiter;
-        } catch (final BadLocationException e) {
-            return "\n";
+        final String lineDelimiter = DocumentUtilities.getDelimiter(document);
+
+        final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
+        final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
+
+        // final String toInsert;
+        // final int offsetOfChange;
+
+        final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
+        if (section.isPresent()) {
+            final String toInsert = lineDelimiter + keywordName + lineDelimiter + separator + lineDelimiter;
+            final int line = section.get().getHeaderLine();
+            try {
+                final IRegion lineInformation = document.getLineInformation(line - 1);
+                final int offset = lineInformation.getOffset() + lineInformation.getLength();
+                return Optional
+                        .<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length() - 1,
+                                ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
+            } catch (final BadLocationException e) {
+                return Optional.absent();
+            }
+
+        } else {
+            final String toInsert = lineDelimiter + lineDelimiter + "*** Keywords ***" + lineDelimiter + keywordName
+                    + lineDelimiter + separator;
+            final int offset = document.getLength();
+            return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, offset, 0, toInsert.length(),
+                    ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
         }
     }
 }
