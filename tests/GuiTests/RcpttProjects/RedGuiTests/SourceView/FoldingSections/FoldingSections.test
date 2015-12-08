@@ -1,0 +1,165 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _kJ0i8BXWEeW05sQKg0mypw
+Element-Name: FoldingSections
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _COFiUJ2TEeW7B-b6O1LPeg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/8/15 3:56 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open test case
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
+get-editor "Script.robot" | get-text-viewer | key-type "M1+M2+7" "&"
+// verify initial state of test file
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n\n"
+    + "\tLog   ${long_name_global_value} \n\n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}" | verify-true
+ // collapse each of testcasase 
+with [get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    click-ruler -line 12
+    hover-ruler -line 12
+    click-ruler -line 18
+}
+
+// verifyu if each testcase is collapsed
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\tLog   ${long_name_global_value} \n\n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}" | verify-true
+// uncollapse testcases
+with [get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    click-ruler -line 18
+    hover-ruler -line 12
+    click-ruler -line 12
+}
+// verify if testcases are unccollapsed 
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n\n"
+    + "\tLog   ${long_name_global_value} \n\n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}" | verify-true
+ // collase one keyword
+get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 30
+// verify if collapsed
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n\n"
+    + "\tLog   ${long_name_global_value} \n\n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST" | verify-true
+// uncollapse keyword
+get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 30
+
+// verify if uncollapsed
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "\t\n"
+    + "\t\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n\n"
+    + "\tLog   ${long_name_global_value} \n\n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
