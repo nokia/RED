@@ -27,7 +27,7 @@ In short:
 - Library aliases and keyword prefixes (library.keyword) validation and colouring
 - Duplicated keywords discovery
 - TAB key handling customisation - what to do when TAB is pressed, check Preferences 
-- Loops validation & colouring 
+- Loops validation ,colouring and debug
 - Keywords with embedded arguments validation and colouring
 - Embedded variables validation & colouring
 - Custom code colouring preference
@@ -61,6 +61,15 @@ In short:
 - Table editor persistence
 - Check Style-like module 
 
+## Notes
+By default, Eclipse is shipped with limited heap size which impacts performance while working with bigger projects. It is recommended to increase Xmx and Xmx parameters to higher values. Memory allocation can be done via startup arguments or by editing eclipse.ini in Eclipse folder.
+We recommend to set following lines to eclipse.ini :
+'''
+-vmargs
+-Xms512m
+-Xmx1024m
+'''
+For details visit Eclipse Wiki: https://wiki.eclipse.org/FAQ_How_do_I_increase_the_heap_size_available_to_Eclipse%3F
 
 ## Feedback
 We would appreciate any feedback about RED - Robot Editor, especially in every day functions like editors usability, false positive validation errors, problem with source parsing& colouring, performance etc. We are open for improvements and new functionalities. Fell free to create issue in GitHub issue tracker.
