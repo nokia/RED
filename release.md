@@ -64,11 +64,11 @@ In short:
 ## Notes
 By default, Eclipse is shipped with limited heap size which impacts performance while working with bigger projects. It is recommended to increase Xmx and Xmx parameters to higher values. Memory allocation can be done via startup arguments or by editing eclipse.ini in Eclipse folder.
 We recommend to set following lines to eclipse.ini :
-'''
+```
 -vmargs
 -Xms512m
 -Xmx1024m
-'''
+```
 For details visit Eclipse Wiki: https://wiki.eclipse.org/FAQ_How_do_I_increase_the_heap_size_available_to_Eclipse%3F
 
 ## Feedback
