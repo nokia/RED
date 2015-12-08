@@ -18,9 +18,9 @@ import com.google.common.base.Optional;
  */
 public class Snippets {
 
-    static String createSnippetInfo(final IDocument document, final int offset, final IRegion regionToChange,
+    static String createSnippetInfo(final IDocument document, final IRegion regionToChange,
             final String replacement) {
-        final Optional<IRegion> snippetRegion = DocumentUtilities.getSnippet(document, offset, 2);
+        final Optional<IRegion> snippetRegion = DocumentUtilities.getSnippet(document, regionToChange.getOffset(), 2);
         if (snippetRegion.isPresent()) {
             try {
                 final String snippet = document.get(snippetRegion.get().getOffset(), snippetRegion.get().getLength());

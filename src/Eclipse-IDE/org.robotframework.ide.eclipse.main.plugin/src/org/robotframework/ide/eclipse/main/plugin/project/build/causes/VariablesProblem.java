@@ -7,12 +7,14 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineLocalVariableFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateLocalVariableFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhitespacesFromVariableNameFixer;
 
@@ -108,7 +110,10 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DefineLocalVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
+            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
+            fixers.add(new CreateLocalVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
+            fixers.add(new CreateVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
+            return fixers;
         }
     };
 
