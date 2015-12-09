@@ -497,16 +497,16 @@ public class RobotRuntimeEnvironment {
                     .copyResourceFile("module_classes_printer.py");
 
             if (scriptFile != null) {
-                final String interpreterPath = location
-                        .toPath()
-                        .resolve(
-                                ((PythonInstallationDirectory) location)
-                                        .getInterpreter().executableName())
-                        .toAbsolutePath().toString();
+                final String interpreterPath = location.toPath()
+                        .resolve(((PythonInstallationDirectory) location).getInterpreter().executableName())
+                        .toAbsolutePath()
+                        .toString();
 
+                String modulePath = moduleLocation.getAbsolutePath();
+                modulePath = modulePath.contains(" ") ? "\"" + modulePath + "\"" : modulePath;
                 final List<String> cmdLine = Arrays.asList(interpreterPath,
                         scriptFile.getAbsolutePath(),
-                        moduleLocation.getAbsolutePath());
+                        modulePath);
                 final List<String> output = newArrayList();
                 final ILineHandler linesHandler = new ILineHandler(){
 
