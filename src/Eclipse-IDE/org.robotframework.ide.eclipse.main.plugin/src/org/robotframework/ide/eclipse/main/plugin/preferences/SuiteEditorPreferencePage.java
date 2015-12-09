@@ -14,11 +14,15 @@ import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -47,9 +51,30 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
 
+        createLink(parent);
         createGeneralSettingsGroup(parent);
         new Label(parent, SWT.NONE);
         createTablesSettingsGroup(parent);
+    }
+    
+    private void createLink(final Composite parent) {
+        final Link link = new Link(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).hint(150, SWT.DEFAULT).grab(true, false).applyTo(link);
+
+        final String text = "Robot editor preferences. See <a href=\"org.eclipse.ui.preferencePages.GeneralTextEditor\">'Text Editors'</a> for general text editor preferences "
+                + "and <a href=\"org.eclipse.ui.preferencePages.ColorsAndFonts\">'Colors and Fonts'</a> to configure the font.";
+        link.setText(text);
+        link.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if ("org.eclipse.ui.preferencePages.GeneralTextEditor".equals(e.text))
+                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
+                else if ("org.eclipse.ui.preferencePages.ColorsAndFonts".equals(e.text))
+                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
+                            "selectFont:org.robotframework.ide.textfont");
+            }
+        });
     }
 
     private void createGeneralSettingsGroup(final Composite parent) {
