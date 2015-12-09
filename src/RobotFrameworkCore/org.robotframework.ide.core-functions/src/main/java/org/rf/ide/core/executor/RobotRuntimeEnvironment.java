@@ -389,6 +389,12 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    public void resetCommandExecutors() {
+        if (hasRobotInstalled()) {
+            PythonInterpretersCommandExecutors.getInstance().resetExecutorFor((PythonInstallationDirectory) location);
+        }
+    }
+
 
     public void createLibdocForStdLibrary(final String libName, final File file)
             throws RobotEnvironmentException {
