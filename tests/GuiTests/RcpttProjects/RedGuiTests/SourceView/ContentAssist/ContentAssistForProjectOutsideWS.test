@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KcAh0J2aEeWVv_UItyy1RQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/8/15 1:11 PM
+Save-Time: 12/9/15 10:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,11 +30,11 @@ get-java-property "user.home" |let [val user_home -input]{
 with [get-view "Project Explorer" | get-tree] {
     select "MediumRobotTest/Script.robot" | double-click
 }
-//check ther is no errors
+//check there is no errors
 get-tab-folder -index 4 | get-tab-item Problems | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
-
+//add res2.tsv file
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 5 30
     key-type Enter
@@ -52,8 +52,9 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 wait 200
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "MediumRobotTest\\/Resources 2\\/res2.tsv" | click -default
-    
-//add Log to test
+
+wait 2000    
+//add Log to test with var: "${from_res2}" 
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 11 27
     key-type Enter
