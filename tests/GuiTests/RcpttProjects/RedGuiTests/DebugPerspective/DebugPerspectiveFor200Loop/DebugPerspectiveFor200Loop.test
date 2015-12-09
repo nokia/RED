@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/2/15 12:31 PM
+Save-Time: 12/9/15 11:40 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -22,7 +22,7 @@ get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
-	wait 3000    	   
+	wait 5000    	   
 	repeat [val index] -times 5 -command{
 	
 		try -times 5 -delay 1000 -command{
