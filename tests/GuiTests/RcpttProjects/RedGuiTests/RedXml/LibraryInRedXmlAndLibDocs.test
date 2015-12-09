@@ -1,0 +1,235 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: LibraryInRedXmlAndLibDocs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _evjW4J3DEeWVv_UItyy1RQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/8/15 6:06 PM
+Testcase-Type: ecl
+Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file
+get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
+
+//add empty python file
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 3 21
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Li
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "empty_file/empty.py"
+    key-type "M1+s"
+    set-caret-pos 4 24
+    hover-text 4 21
+    get-menu "Quick Fix" | click
+}
+
+//add this file to red.xml
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'empty_file\\/empty.py' and add to configuration" | click -default
+with [get-window "Select library class"] {
+    get-table | select empty
+    get-button OK | click
+}
+//check libspec
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "empty RobotProject/empty_file (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
+        | verify-true
+}
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file (0)"
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+    | get-property childCount | equals 0 | verify-true
+    
+//check red.xml    
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+    get-property "getItemCount()" | equals 1 | verify-true
+}
+
+//add only_function.py
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    type-text Lib
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "only_function.py"
+    key-type "M1+s"
+    hover-text 5 20
+    set-caret-pos 5 18
+    get-menu "Quick Fix" | click
+}
+//add it to red.xml
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'only_function.py' and add to configuration" | click -default
+with [get-window "Select library class"] {
+    get-table | select "only_function"
+    get-button OK | click
+}
+
+//check libspec
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+}
+get-button "Save All (M1+M2+S)" | click
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 2 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "empty RobotProject/empty_file (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "only_function RobotProject (1)" | verify-true
+}
+//check if libspec for only_function was generated
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    | get-property "getItems().TreeItem[0].getText()" | equals News | verify-true
+
+////open libspec
+//get-view "Project Explorer" | get-tree 
+//    | select "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)/News" | double-click
+//get-window -class KeywordDocumentationPopup | get-canvas -after [get-label News] -index 1 | get-property text 
+//    | equals "Arguments\r\n"
+//    + "This is only simple function\r\n" | verify-true    
+
+
+
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 5 28
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Li
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "here_is_class"
+    key-type "M1+s"
+    set-caret-pos 6 19
+    hover-text 6 18
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class' and add to configuration" | click -default
+with [get-window "Library import problem"] {
+    get-property title | equals "Library import problem" | verify-true
+    get-label "Unable to locate .*" 
+        | get-property caption 
+        | equals "Unable to locate 'here_is_class' module. It seems that it is not contained in PYTHONPATH of c:\\Python27 python installation." 
+        | verify-true
+}
+get-window "Library import problem" | get-button OK | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 25
+    type-text "."
+    show-content-assist
+    type-text py
+    key-type "M1+s"
+    set-caret-pos 6 21
+    hover-text 6 20
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class.py' and add to configuration" | click -default
+get-window "Select library class" | get-table | select "here_is_class.Cat"
+with [get-window "Select library class" | get-table] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "here_is_class.Cat" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "here_is_class.Dog" | verify-true
+}
+with [get-window "Select library class"] {
+    get-table | select "here_is_class.Cat"
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+wait 2000
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | get-property childCount 
+    | equals 3 | verify-true
+ 
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+    | get-property "getItems().length" | equals 1 | verify-true
+
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    | get-property "getItems().length" | equals 1 | verify-true
+           
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "empty RobotProject/empty_file (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Garfield | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "here_is_class.Cat RobotProject (1)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals News | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "only_function RobotProject (1)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
+        | verify-true
+}
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 28
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Li
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "here_is_class."
+    type-text D
+    type-text o
+    type-text g
+    key-type "M1+s"
+    hover-text 7 20
+    set-caret-pos 7 19
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
+get-window "Library import problem" | get-button OK | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 29
+    key-type BackSpace -times 3
+    type-text py
+    key-type "M1+s"
+    set-caret-pos 7 21
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class.py' and add to configuration" | click -default
+with [get-window "Select library class"] {
+    get-table | select "here_is_class.Dog"
+    get-button OK | click
+}
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Cat - RobotProject" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject" | verify-true
+    get-property "getItemCount()" | equals 4 | verify-true
+}
+get-button "Save (M1+S)" | click
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 28
+    key-type BackSpace -times 2
+    type-text Dog
+    key-type Up
+    key-type BackSpace -times 2
+    type-text Cat
+    key-type "M1+s"
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
