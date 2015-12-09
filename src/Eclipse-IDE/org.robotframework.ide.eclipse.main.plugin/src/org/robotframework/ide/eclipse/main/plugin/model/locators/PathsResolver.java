@@ -109,7 +109,7 @@ public class PathsResolver {
                 final URI filePath = new URI(escaper.escape(portablePath));
                 final URI pathUri = filePath.resolve(path.toString());
 
-                return new Path(pathUri.toString());
+                return new Path(pathUri.toString().replaceAll("%20", " "));
             } catch (final URISyntaxException | IllegalArgumentException e) {
                 throw new PathResolvingException("Path syntax problem", e);
             }
