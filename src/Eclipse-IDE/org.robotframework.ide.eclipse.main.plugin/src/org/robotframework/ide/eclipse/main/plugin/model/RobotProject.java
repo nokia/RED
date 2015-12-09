@@ -221,6 +221,10 @@ public class RobotProject extends RobotContainer {
         return configuration;
     }
 
+    public void clearCachedData() {
+        projectHolder.clearModelFiles();
+    }
+
     /**
      * Clearing should be done when user changed his/hers execution environment (python+robot)
      */

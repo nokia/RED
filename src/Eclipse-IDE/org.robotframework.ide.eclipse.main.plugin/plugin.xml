@@ -561,6 +561,54 @@
     </commonWizard>
  </extension>
  <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=export">
+       <separator
+             name="org.robotframework.red.navigator"
+             visible="true">
+       </separator>
+       <menu
+             icon="resources/robot.png"
+             label="Robot Framework">
+          <command
+                commandId="org.robotframework.red.reloadProjectRuntimeEnvironment"
+                label="Reset Robot Environment"
+                style="push">
+             <visibleWhen
+                   checkEnabled="true">
+             </visibleWhen>
+          </command>
+       </menu>
+    </menuContribution>
+ </extension>
+ <extension
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ReloadPythonModulesHandler"
+          commandId="org.robotframework.red.reloadProjectRuntimeEnvironment">
+       <activeWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <instanceof
+                         value="org.eclipse.core.resources.IProject">
+                   </instanceof>
+                   <test
+                         property="org.eclipse.core.resources.projectNature"
+                         value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </activeWhen>
+    </handler>
+ </extension>
+ <extension
        point="org.eclipse.ui.themes">
     <themeElementCategory
           id="org.robotframework.ide.eclipse.theme"
@@ -705,6 +753,11 @@
           id="org.robotframework.ide.eclipse.robotCommands"
           name="Robot">
     </category>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.reloadProjectRuntimeEnvironment"
+          name="Reset Robot Environment">
+    </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.insertNew"
