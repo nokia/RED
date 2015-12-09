@@ -39,6 +39,17 @@ class PythonInterpretersCommandExecutors {
         }
     }
 
+    synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {
+        final String pathAsName = interpreterPath.toPath()
+                .resolve(interpreterPath.getInterpreter().executableName())
+                .toAbsolutePath()
+                .toString();
+        final RobotCommandRcpExecutor executor = executors.remove(pathAsName);
+        if (executor != null) {
+            executor.kill();
+        }
+    }
+
     synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
         final String pathAsName = interpreterPath.toPath()
                 .resolve(interpreterPath.getInterpreter().executableName())
