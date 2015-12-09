@@ -12,10 +12,18 @@ Python & RobotFramework
 Download RED eclipse feature zip: https://github.com/nokia/RED/archive/0.5.zip
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
 
+### Install on clean Eclipse 
 In short:
 - GUI: Help -> Install New software -> Add -> Archive and continue with prompts
 - CLI: by issuing command: 
 `eclipse -application org.eclipse.equinox.p2.director -nosplash -consoleLog --launcher.suppressErrors -repository jar:file:<PATH_TO_ZIP>\!/,http://download.vogella.com/luna/e4tools,http://download.eclipse.org/releases/luna/   -installIU org.robotframework.ide.eclipse.main.feature.feature.group 
+
+### Update existing RED installation
+We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
+Uninstall:
+Open Help -> Installation Details, select old RED feature and perform unistall
+
+
 
 ## Updates
 - issue #3 - support for txt files and resources apart from .robot  

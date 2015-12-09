@@ -20,7 +20,12 @@ Python official site: [www.python.org](http://www.python.org)
 
 RobotFramework official site: [robotframework.org](http://robotframework.org/)
 
-### Install RED into Eclipse
+### Update existing RED installation
+We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
+Uninstall:
+Open Help -> Installation Details, select old RED feature and perform unistall
+
+### Install RED into clean Eclipse
 
 Start Eclipse, accept default Workspace folder placement
 Open _Help -> Install New Software_

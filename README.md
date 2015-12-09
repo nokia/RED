@@ -20,6 +20,10 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 ## Binaries distribution:
 RED is distributed as Eclipse feature to be installed on existing Eclipse platform. 
 
+### Update existing RED installation
+We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
+Open Help -> Installation Details, select old RED feature and perform unistall, restart Eclipse
+
 ## Look & feel
 ![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_source_1.png "Robot perspective with text editor")
 
