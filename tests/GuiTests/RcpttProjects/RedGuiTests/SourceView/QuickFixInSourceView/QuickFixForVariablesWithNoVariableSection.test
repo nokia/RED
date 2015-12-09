@@ -1,0 +1,178 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: QuickFixForVariablesWithNoVariableSection
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _N_eAcJ5pEeWVv_UItyy1RQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/9/15 2:20 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Log  ${a_1} \n"
+    + "    Should Be Equal As Integers    ${b${index}}   6\n"
+    + "    Log Many  @{list 1}\n"
+    + "    Log Many  &{dict}" 
+    
+wait 2000
+//check errors
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Variable 'a_1' is used, but not defined" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getData().getLocation()" | equals "line 3" 
+        | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getData().getPath()" 
+        | equals "/RobotProject" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Variable 'b${index}' is used, but not defined" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getData().getLocation()" | equals "line 4" 
+        | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getData().getPath()" 
+        | equals "/RobotProject" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Variable 'dict' is used, but not defined" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getData().getLocation()" | equals "line 6" 
+        | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getData().getPath()" 
+        | equals "/RobotProject" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Variable 'index' is used, but not defined" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getData().getLocation()" | equals "line 4" 
+        | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getData().getPath()" 
+        | equals "/RobotProject" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Variable 'list 1' is used, but not defined" | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getData().getLocation()" | equals "line 5" 
+        | verify-true
+    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getData().getPath()" 
+        | equals "/RobotProject" | verify-true
+}
+
+//use QuickFix on a_1 var
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 3 13
+    set-caret-pos 3 13
+    get-menu "Quick Fix" | click
+    wait 1000
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Define ${a_1} as local variable in previous line" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Define ${a_1} in Variables table" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define ${a_1} in Variables table" | click -default
+
+//check text
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Log  ${a_1} \n"
+    + "    Should Be Equal As Integers    ${b${index}}   6\n"
+    + "    Log Many  @{list 1}\n"
+    + "    Log Many  &{dict}\n\n"
+    + "*** Variables ***\n"
+    + "${a_1}" | verify-true
+    
+//use quick fix ond dynamic parameter: ${b${index}}   6
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 44
+    hover-text 4 41
+    get-menu "Quick Fix" | click
+    wait 500
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Define ${index} as local variable in previous line" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Define ${index} in Variables table" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define ${index} in Variables table" | click -default
+wait 500    
+//add values to variables    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 13
+    type-text 66 
+    set-caret-pos 10 11
+    type-text 55 
+    
+    //use quick fix on  @{list 1}
+    set-caret-pos 5 17
+    hover-text 5 19
+    get-menu "Quick Fix" | click
+    wait 500
+  
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Define @{list 1} as local variable in previous line" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Define @{list 1} in Variables table" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define @{list 1} in Variables table" | click -default
+wait 500    
+// add value to list
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 14
+    type-text "1  2"
+}
+
+//use quick fix onn dictionary
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 18
+    hover-text 6 18
+    get-menu "Quick Fix" | click
+	wait 500
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Define &{dict} as local variable in previous line" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Define &{dict} in Variables table" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define &{dict} in Variables table" | click -default
+wait 500
+//add value to dict    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	set-caret-pos 9 12
+    type-text "key=value"
+    key-type "M1+s"
+}
+wait 2000
+
+//check problems
+with [get-view Problems | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "Variable 'b${index}' is used, but not defined" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Errors (1 item)" | verify-true
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Log  ${a_1} \n"
+    + "    Should Be Equal As Integers    ${b${index}}   6\n"
+    + "    Log Many  @{list 1}\n"
+    + "    Log Many  &{dict}\n\n"
+    + "*** Variables ***\n"
+    + "&{dict}    key=value\n"
+    + "@{list 1}    1  2\n"
+    + "${index}    66\n"
+    + "${a_1}    55" | verify-true
+    
+    
+      
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
