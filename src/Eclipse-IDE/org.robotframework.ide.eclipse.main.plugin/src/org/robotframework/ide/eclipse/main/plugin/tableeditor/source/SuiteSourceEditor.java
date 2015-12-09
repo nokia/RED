@@ -87,7 +87,7 @@ public class SuiteSourceEditor extends TextEditor {
         super.doSetInput(input);
         if (input instanceof IStorageEditorInput) {
             fileModel.reparseEverything(getDocument().get());
-            PlatformUI.getWorkbench().getService(IEventBroker.class)).post(RobotModelEvents.REPARSING_DONE,
+            PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.REPARSING_DONE,
                     fileModel);
         }
     }
