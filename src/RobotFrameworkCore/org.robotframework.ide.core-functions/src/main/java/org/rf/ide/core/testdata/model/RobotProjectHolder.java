@@ -112,6 +112,9 @@ public class RobotProjectHolder {
         }
     }
 
+    public void clearModelFiles() {
+        readableProjectFiles.clear();
+    }
 
     public void removeModelFile(final RobotFileOutput robotOutput) {
         readableProjectFiles.remove(robotOutput);
