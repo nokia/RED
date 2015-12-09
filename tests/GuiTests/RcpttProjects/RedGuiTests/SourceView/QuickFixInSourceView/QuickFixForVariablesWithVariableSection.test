@@ -1,0 +1,129 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: QuickFixForVariablesWithVariableSection
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nbwsQJ53EeWbnevllkSSnQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/9/15 2:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Log  ${a_1} \n"
+    + "    Should Be Equal As Integers    ${b}   6\n"
+    + "    Log Many  @{list 1}\n"
+    + "    Log Many  &{dict}\n\n"
+    + "*** Variables ***\n"
+    + "${a 2}"
+
+wait 3000    
+get-view Problems | get-tree | select "Errors \\(.* items\\)" | double-click
+
+with [get-view Problems | get-tree] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "Variable 'a_1' is used, but not defined" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "Variable 'b' is used, but not defined" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "Variable 'dict' is used, but not defined" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" 
+        | equals "Variable 'list 1' is used, but not defined" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Errors (4 items)" | verify-true
+}
+
+//use quick fix for "Log  ${a_1}"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 13
+    hover-text 3 13
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define ${a_1} as local variable in previous line" | click -default
+    
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        type-text "set va"
+        key-type "M1+SPACE"
+        key-type Enter
+        key-type "NUMPAD_5" 5 -times 2
+    }
+}
+
+//use qucik fix for "b"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 39
+    hover-text 5 38
+    get-menu "Quick Fix" | click
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define ${b} in Variables table" | click -default
+get-editor "TestFile.robot" | get-text-viewer | type-text text
+
+//use quick fix for list
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 6 19
+    set-caret-pos 6 19
+    get-menu "Quick Fix" | click
+    wait 500
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define @{list 1} as local variable in previous line" | click -default
+    
+//add value to lista nd use quick fix for dict    
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        type-text Crea
+        key-type "M1+SPACE"
+        wait 200
+        key-type Down
+        key-type Enter
+        type-text "1  2"
+        hover-text 8 18
+        set-caret-pos 8 18
+        get-menu "Quick Fix" | click
+        wait 500
+    }
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define &{dict} as local variable in previous line" | click -default
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        type-text cre
+        key-type "M1+SPACE"
+        wait 200
+        key-type Enter
+        type-text "key  value"
+        key-type "M1+s"
+    }
+}
+
+wait 2000
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    ${a_1}    Set Variable    55\n"
+    + "    Log  ${a_1} \n"
+    + "    Should Be Equal As Integers    ${b}   6\n"
+    + "    @{list 1}    Create List    1  2\n"
+    + "    Log Many  @{list 1}\n"
+    + "    &{dict}    Create Dictionary    key  value\n"
+    + "    Log Many  &{dict}\n\n"
+    + "*** Variables ***\n"
+    + "${b}    text\n"
+    + "${a 2}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
