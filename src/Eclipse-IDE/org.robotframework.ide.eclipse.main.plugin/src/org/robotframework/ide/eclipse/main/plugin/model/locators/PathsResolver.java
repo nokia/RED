@@ -20,6 +20,9 @@ import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+
 /**
  * @author Michal Anglart
  *
@@ -100,7 +103,10 @@ public class PathsResolver {
             return path;
         } else {
             try {
-                final URI filePath = new URI(file.getFile().getLocation().toPortableString());
+                final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
+
+                final String portablePath = file.getFile().getLocation().toPortableString();
+                final URI filePath = new URI(escaper.escape(portablePath));
                 final URI pathUri = filePath.resolve(path.toString());
 
                 return new Path(pathUri.toString());
