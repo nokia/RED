@@ -677,6 +677,13 @@
           label="Setting "
           value="255,205,165">
     </colorDefinition>
+    <fontDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          defaultsTo="org.eclipse.jface.textfont"
+          id="org.robotframework.ide.textfont"
+          isEditable="true"
+          label="Text Font">
+    </fontDefinition>
  </extension>
  <extension
        point="org.eclipse.ui.contexts">

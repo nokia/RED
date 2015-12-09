@@ -15,18 +15,26 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerExtension;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PlatformUI;
@@ -36,6 +44,7 @@ import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -78,7 +87,7 @@ public class SuiteSourceEditor extends TextEditor {
         super.doSetInput(input);
         if (input instanceof IStorageEditorInput) {
             fileModel.reparseEverything(getDocument().get());
-            PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.REPARSING_DONE,
+            PlatformUI.getWorkbench().getService(IEventBroker.class)).post(RobotModelEvents.REPARSING_DONE,
                     fileModel);
         }
     }
@@ -93,6 +102,9 @@ public class SuiteSourceEditor extends TextEditor {
         new SuiteSourceOccurrenceMarksHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
         installBreakpointTogglingOnDoubleClick();
         installStatusBarUpdater(viewer);
+        
+        setFontFromPreference(viewer);
+        addFontChangeListener(viewer);
 
         activateContext();
     }
@@ -239,5 +251,69 @@ public class SuiteSourceEditor extends TextEditor {
      */
     public int getLineFromRulerActivity() {
         return getVerticalRuler().getLineOfLastMouseButtonActivity() + 1;
+    }
+    
+    private void addFontChangeListener(final ProjectionViewer viewer) {
+        PlatformUI.getWorkbench()
+                .getThemeManager()
+                .getCurrentTheme()
+                .addPropertyChangeListener(new IPropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(final PropertyChangeEvent event) {
+                        if (RedTheme.RED_SOURCE_EDITOR_FONT.equals(event.getProperty())) {
+                            setFont(viewer, RedTheme.getRedSourceEditorFont());
+                        }
+                    }
+                });
+    }
+    
+    private void setFontFromPreference(final ProjectionViewer viewer) {
+        final Font redSourceEditorFont = RedTheme.getRedSourceEditorFont();
+        final Font defaultTextEditorFont = RedTheme.getTextEditorFont();
+
+        if (!redSourceEditorFont.isDisposed() && !defaultTextEditorFont.isDisposed()
+                && !redSourceEditorFont.getFontData()[0].equals(defaultTextEditorFont.getFontData()[0])) {
+            setFont(viewer, RedTheme.getRedSourceEditorFont());
+        }
+    }
+    
+    private void setFont(final ISourceViewer sourceViewer, final Font font) {
+        if (sourceViewer.getDocument() != null) {
+            final ISelectionProvider provider = sourceViewer.getSelectionProvider();
+            final ISelection selection = provider.getSelection();
+            int topIndex = sourceViewer.getTopIndex();
+
+            final StyledText styledText = sourceViewer.getTextWidget();
+            Control parent = styledText;
+            if (sourceViewer instanceof ITextViewerExtension) {
+                ITextViewerExtension extension = (ITextViewerExtension) sourceViewer;
+                parent = extension.getControl();
+            }
+            parent.setRedraw(false);
+
+            styledText.setFont(font);
+
+            if (getVerticalRuler() instanceof IVerticalRulerExtension) {
+                final IVerticalRulerExtension e = (IVerticalRulerExtension) getVerticalRuler();
+                e.setFont(font);
+            }
+
+            provider.setSelection(selection);
+            sourceViewer.setTopIndex(topIndex);
+
+            if (parent instanceof Composite) {
+                Composite composite = (Composite) parent;
+                composite.layout(true);
+            }
+            parent.setRedraw(true);
+        } else {
+            final StyledText styledText = sourceViewer.getTextWidget();
+            styledText.setFont(font);
+            if (getVerticalRuler() instanceof IVerticalRulerExtension) {
+                final IVerticalRulerExtension e = (IVerticalRulerExtension) getVerticalRuler();
+                e.setFont(font);
+            }
+        }
     }
 }
