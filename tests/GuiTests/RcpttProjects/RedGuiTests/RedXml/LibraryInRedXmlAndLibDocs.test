@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/8/15 6:06 PM
+Save-Time: 12/10/15 10:39 AM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -127,7 +127,7 @@ with [get-window "Library import problem"] {
     get-property title | equals "Library import problem" | verify-true
     get-label "Unable to locate .*" 
         | get-property caption 
-        | equals "Unable to locate 'here_is_class' module. It seems that it is not contained in PYTHONPATH of c:\\Python27 python installation." 
+        | equals "Unable to locate 'here_is_class' module. It seems that it is not contained in PYTHONPATH of .* python installation." 
         | verify-true
 }
 get-window "Library import problem" | get-button OK | click
