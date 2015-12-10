@@ -11,6 +11,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class DebugSocketManager implements Runnable {
+    
+    private static final int DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT = 30000;
+    
+    public static final int WAIT_FOR_AGENT_TIME = 500;
 
     private ServerSocket serverSocket = null;
 
@@ -20,11 +24,14 @@ public class DebugSocketManager implements Runnable {
     
     private String host = "";
     
+    private int connectionTimeoutInMilliseconds = 0;
+    
     private boolean hasServerException;
     
-    public DebugSocketManager(final String host, final int port) {
+    public DebugSocketManager(final String host, final int port, final String connectionTimeout) {
         this.host = host;
         this.port = port;
+        connectionTimeoutInMilliseconds = parseTimeout(connectionTimeout);
     }
 
     @Override
@@ -32,7 +39,7 @@ public class DebugSocketManager implements Runnable {
         try {
             serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
             serverSocket.setReuseAddress(true);
-            serverSocket.setSoTimeout(30000);
+            serverSocket.setSoTimeout(connectionTimeoutInMilliseconds);
 
             while (true) {
                 eventSocket = serverSocket.accept();
@@ -64,6 +71,24 @@ public class DebugSocketManager implements Runnable {
 
     public boolean hasServerException() {
         return hasServerException;
+    }
+    
+    public int getRetryCounterMaxValue() {
+        return connectionTimeoutInMilliseconds / WAIT_FOR_AGENT_TIME;
+    }
+
+    private int parseTimeout(final String connectionTimeout) {
+        if (connectionTimeout != null && !connectionTimeout.isEmpty()) {
+            try {
+                int timeoutInMilliseconds = Integer.parseInt(connectionTimeout) * 1000;
+                if(timeoutInMilliseconds > 0) {
+                    return timeoutInMilliseconds;
+                }
+            } catch (NumberFormatException e) {
+                // return default timeout
+            }
+        }
+        return DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT;
     }
 
 }
