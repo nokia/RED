@@ -42,6 +42,7 @@ public class RobotLaunchConfiguration {
     private static final String TEST_CASES_ATTRIBUTE = "Test cases";
     private static final String REMOTE_DEBUG_HOST_ATTRIBUTE = "Remote debug host";
     private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
+    private static final String REMOTE_DEBUG_TIMEOUT_ATTRIBUTE = "Remote debug timeout";
 
     private final ILaunchConfiguration configuration;
     
@@ -72,6 +73,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
         robotConfig.setRemoteDebugPort("");
+        robotConfig.setRemoteDebugTimeout("");
     }
 
     private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
@@ -97,6 +99,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
         robotConfig.setRemoteDebugPort("");
+        robotConfig.setRemoteDebugTimeout("");
     }
     
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -184,6 +187,13 @@ public class RobotLaunchConfiguration {
             launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
         }
     }
+    
+    public void setRemoteDebugTimeout(final String timeout) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
+        }
+    }
 
     public SuiteExecutor getExecutor() throws CoreException {
         return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
@@ -227,6 +237,10 @@ public class RobotLaunchConfiguration {
     
     public String getRemoteDebugPort() throws CoreException {
         return configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, "");
+    }
+    
+    public String getRemoteDebugTimeout() throws CoreException {
+        return configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, "");
     }
 
     public boolean isSuitableFor(final List<IResource> resources) {
