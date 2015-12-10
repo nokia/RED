@@ -15,7 +15,6 @@ import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
 import com.google.common.base.Splitter;
@@ -66,24 +65,7 @@ public class Rules {
     }
 
     static IRule createVariableRule(final IToken token) {
-        return createCombinedRule(createScalarVariableRule(token), createListVariableRule(token),
-                createDictionaryVariableRule(token), createEnvironmentVariableRule(token));
-    }
-
-    private static IRule createScalarVariableRule(final IToken token) {
-        return new SingleLineRule("${", "}", token);
-    }
-
-    private static IRule createListVariableRule(final IToken token) {
-        return new SingleLineRule("@{", "}", token);
-    }
-
-    private static IRule createDictionaryVariableRule(final IToken token) {
-        return new SingleLineRule("&{", "}", token);
-    }
-
-    private static IRule createEnvironmentVariableRule(final IToken token) {
-        return new SingleLineRule("%{", "}", token);
+        return new VariableRule(token);
     }
 
     static IRule createCommentRule(final IToken token) {
