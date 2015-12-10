@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R1ijQIMDEeW3Y6KfPyHe6A
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/2/15 12:34 PM
+Save-Time: 12/10/15 10:50 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,11 +17,11 @@ Entry-Name: .content
 
 
 proc "wait-for-thread"{
-
-try -times 5 -delay 500 -command{
-	get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	    | get-property childCount -raw | int| gt 0 | verify-true
-	}
+	wait 1000
+	try -times 5 -delay 500 -command{
+		get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
+		    | get-property childCount -raw | int| gt 0 | verify-true
+		}
 }
 
 with [get-view "Project Explorer" | get-tree] {
@@ -37,7 +37,7 @@ with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
-	wait 3000
+	wait 5000
 	try -times 5 -delay 1000 -command{ 
 		get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
    			 | get-property "getItems().TreeItem[0].getText()" | equals "Sum Two Values [line:42]" | verify-true
