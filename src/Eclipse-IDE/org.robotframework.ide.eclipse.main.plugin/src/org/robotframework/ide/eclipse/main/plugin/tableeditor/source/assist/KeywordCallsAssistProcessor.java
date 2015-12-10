@@ -19,6 +19,7 @@ import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -76,8 +77,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
                 for (final RedKeywordProposal keywordProposal : matchingProposals) {
                     final String keywordName = keywordProposal.getContent();
-                    final boolean shouldAddKeywordPrefix = isKeywordPrefixAutoAdditionEnabled
-                            || keywordProposalIsConflicting(groupedProposals, keywordProposal);
+                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled || keywordProposalIsConflicting(
+                            groupedProposals, keywordProposal)) && keywordProposal.getScope() != KeywordScope.LOCAL;
                     final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
                     final String textToInsert = keywordPrefix + keywordName + separator;
 
