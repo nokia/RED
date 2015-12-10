@@ -62,7 +62,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.ASSISTANT_COMPLETION_MODE, AcceptanceMode.INSERT.name());
         preferences.putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         preferences.putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
-        preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, ".");
+        preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
         preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
     }
 
