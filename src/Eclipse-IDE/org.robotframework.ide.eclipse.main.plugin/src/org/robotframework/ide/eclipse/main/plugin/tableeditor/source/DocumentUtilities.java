@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,17 +46,42 @@ public class DocumentUtilities {
         if (cellRegion.isPresent()) {
             final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
 
-            final Matcher matcher = Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(cellContent);
-            while (matcher.find()) {
-                final int start = matcher.start() + cellRegion.get().getOffset();
-                final int end = matcher.end() + cellRegion.get().getOffset();
-                if (Range.closed(start, end).contains(offset)) {
-                    return Optional.<IRegion> of(new Region(start, end - start));
+            final int projectedOffset = offset - cellRegion.get().getOffset();
+
+            final Stack<Integer> positions = new Stack<>();
+
+            int stackLevel = -1;
+            int lastIndex = 0;
+            for (int i = 0; i < cellContent.length(); i++) {
+                if (varStartDetected(cellContent, i)) {
+                    positions.push(i);
+                }
+                if (i == projectedOffset) {
+                    stackLevel = positions.size() - 1;
+                }
+                if (varEndDetected(cellContent, i) && !positions.isEmpty()) {
+                    lastIndex = positions.pop();
+                    if (stackLevel == positions.size() && i >= projectedOffset) {
+                        return Optional
+                                .<IRegion> of(new Region(lastIndex + cellRegion.get().getOffset(), i - lastIndex + 1));
+                    }
                 }
             }
             return Optional.absent();
         }
         return Optional.absent();
+    }
+
+    private static boolean varStartDetected(final String cellContent, final int i) {
+        if (i + 1 < cellContent.length()) {
+            return newHashSet("${", "@{", "%{", "&{").contains(cellContent.substring(i, i + 2));
+        }
+        return false;
+
+    }
+
+    private static boolean varEndDetected(final String cellContent, final int i) {
+        return i < cellContent.length() && cellContent.charAt(i) == '}';
     }
 
     public static Optional<IRegion> findLiveVariable(final IDocument document, final int offset)
