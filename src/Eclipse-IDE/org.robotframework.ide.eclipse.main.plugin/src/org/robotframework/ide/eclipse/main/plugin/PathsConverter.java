@@ -32,7 +32,11 @@ public class PathsConverter {
             final String pathWithoutSpaces = escaper.escape(path.toString());
             final URI resolvedPath = new URI(escaper.escape(resource.getFullPath().toString()))
                     .resolve(pathWithoutSpaces);
-            return new Path(resolvedPath.getPath()).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
+            final String resolvedPathAsString = resolvedPath.getPath();
+            if (resolvedPathAsString == null) {
+                return null;
+            }
+            return new Path(resolvedPathAsString).makeRelativeTo(resource.getWorkspace().getRoot().getLocation());
         } catch (final IllegalArgumentException | URISyntaxException e) {
             return null;
         }
