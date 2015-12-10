@@ -9,7 +9,7 @@ Eclipse Luna (v 4.4) or Mars (v 4.5)
 Python & RobotFramework 
 
 ## How to install
-Download RED eclipse feature zip: https://github.com/nokia/RED/archive/0.5.zip
+Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.5/RED_0.5.0.201512081354.zip
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
 
 ### Install on clean Eclipse 
