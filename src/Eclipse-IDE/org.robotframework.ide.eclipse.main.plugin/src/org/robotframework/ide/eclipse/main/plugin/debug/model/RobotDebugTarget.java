@@ -100,11 +100,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         robotDebugValueManager = new RobotDebugValueManager();
         
         int retryCounter = 0;
-        try {
+        try {  //wait for TestRunnerAgent
             while (socketManager.getEventSocket() == null ? true : (eventReader = new BufferedReader(
                     new InputStreamReader(socketManager.getEventSocket().getInputStream()))).readLine() == null) {
                 try {
-                    Thread.sleep(500);  //wait 30s for TestRunnerAgent
+                    Thread.sleep(DebugSocketManager.WAIT_FOR_AGENT_TIME);
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -115,7 +115,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                     }
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
-                if(retryCounter > 60) {
+                if(retryCounter > socketManager.getRetryCounterMaxValue()) {
                     if (remoteDebugConsole != null) {
                         remoteDebugConsole.write("A timeout was reached while waiting for a remote connection.\n");
                     }
