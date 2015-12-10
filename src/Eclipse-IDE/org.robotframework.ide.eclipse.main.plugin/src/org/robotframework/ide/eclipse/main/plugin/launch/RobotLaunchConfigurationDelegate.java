@@ -189,6 +189,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         boolean isRemoteDebugging = false;
         String host = robotConfig.getRemoteDebugHost();
         final String remoteDebugPort = robotConfig.getRemoteDebugPort();
+        String connectionTimeout = robotConfig.getRemoteDebugTimeout();
         if(isDebugging && !remoteDebugPort.isEmpty() && !host.isEmpty()) {
             isRemoteDebugging = true;
         }
@@ -197,6 +198,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if(!isRemoteDebugging) {
             cmdLine = createStandardModeCmd(robotConfig, robotProject, project, runtimeEnvironment, suiteResources, isDebugging);
             host = "localhost";
+            connectionTimeout = "";
         } else {
             int debugServerPort = -1;
             try {
@@ -226,7 +228,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 }
             });
         } else {
-            socketManager = new DebugSocketManager(host, cmdLine.getPort());
+            socketManager = new DebugSocketManager(host, cmdLine.getPort(), connectionTimeout);
             new Thread(socketManager).start();
             isDebugServerSocketListening = waitForDebugServerSocket(socketManager);
         }

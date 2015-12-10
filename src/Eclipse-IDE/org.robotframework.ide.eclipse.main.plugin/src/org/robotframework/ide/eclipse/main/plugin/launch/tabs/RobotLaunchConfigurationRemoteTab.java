@@ -44,7 +44,9 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     private Text hostTxt;
 
     private Text portTxt;
-
+    
+    private Text timeoutTxt;
+    
     @Override
     public void createControl(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
@@ -74,6 +76,19 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         portTxt = new Text(remoteGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(portTxt);
         portTxt.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        
+        final Label timeoutLbl = new Label(remoteGroup, SWT.NONE);
+        timeoutLbl.setText("Connection timeout[s]:");
+
+        timeoutTxt = new Text(remoteGroup, SWT.BORDER);
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(timeoutTxt);
+        timeoutTxt.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
@@ -118,6 +133,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             hostTxt.setText(robotConfig.getRemoteDebugHost());
             portTxt.setText(robotConfig.getRemoteDebugPort());
+            timeoutTxt.setText(robotConfig.getRemoteDebugTimeout());
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
@@ -127,28 +143,29 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
         setWarningMessage(null);
-        if (!portTxt.getText().isEmpty()) {
-            int port = -1;
-            try {
-                port = Integer.parseInt(portTxt.getText());
-            } catch (NumberFormatException e) {
-                setErrorMessage("Invalid port specified.");
-                return false;
-            }
-            if (port < 1 || port > 65535) {
-                setErrorMessage("Invalid port specified.");
-                return false;
-            }
+        if(!isPortValid()) {
+            setErrorMessage("Invalid port specified.");
+            return false;
         }
-
+        if(!isConnectionTimeoutValid()) {
+            setErrorMessage("Invalid connection timeout specified.");
+            return false;
+        }
         return true;
     }
+    
+    @Override
+    public boolean canSave() {
+        return isPortValid() && isConnectionTimeoutValid();
+    }
+
 
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
         robotConfig.setRemoteDebugPort(portTxt.getText().trim());
+        robotConfig.setRemoteDebugTimeout(timeoutTxt.getText().trim());
     }
     
     @Override
@@ -160,4 +177,35 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     public Image getImage() {
         return ImagesManager.getImage(RedImages.getRobotImage());
     }
+    
+    private boolean isPortValid() {
+        if (!portTxt.getText().isEmpty()) {
+            int port = -1;
+            try {
+                port = Integer.parseInt(portTxt.getText());
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (port < 1 || port > 65535) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean isConnectionTimeoutValid() {
+        if (!timeoutTxt.getText().isEmpty()) {
+            int timeout = -1;
+            try {
+                timeout = Integer.parseInt(timeoutTxt.getText());
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (timeout < 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
 }
