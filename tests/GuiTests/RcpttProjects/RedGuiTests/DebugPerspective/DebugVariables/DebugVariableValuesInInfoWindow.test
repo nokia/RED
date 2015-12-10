@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/7/15 3:08 PM
+Save-Time: 12/10/15 11:24 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -20,7 +20,6 @@ proc "check-variable-in-info-window" [val value]{
 get-window -from "Information Window" | get-editbox | get-property text | equals [concat "Current value:\n" $value] | verify-true
 	    
 }
-
 //set test
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
@@ -75,13 +74,18 @@ exec-with-options -disableJobWaiting -command {
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 5 5
 	check-variable-in-info-window -value  "text7"
 	    
-	//step into    
+	//step into   
+	try -times 5 -delay 500 -command{
+		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	} 
 	get-button "Step Into (F5)" | click
 	//x
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 10 12
 	check-variable-in-info-window -value 6
 	
-	
+	try -times 5 -delay 500 -command{
+		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	}
 	with [get-button "Step Into (F5)"] {
 	    click
 	    wait 1000
@@ -89,6 +93,9 @@ exec-with-options -disableJobWaiting -command {
 	}
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 12 12
 	//here will be checking line: Log  ${d}
+	try -times 5 -delay 500 -command{
+		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	}
 	with [get-button "Step Into (F5)"] {
 	    click
 	    wait 1000
@@ -104,6 +111,9 @@ exec-with-options -disableJobWaiting -command {
 	check-variable-in-info-window -value 9
 	    
 	//Should Be Equal 
+	try -times 5 -delay 500 -command{
+		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	}
 	get-button "Step Into (F5)" | click
 	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 19 28
@@ -111,6 +121,9 @@ exec-with-options -disableJobWaiting -command {
 	    + ". New line here."
 	    
 	//Should Be Equal As Strings    
+	try -times 5 -delay 500 -command{
+		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	}
 	get-button "Step Into (F5)" | click
 	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 20 46
