@@ -233,7 +233,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
                 for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
-                    if (!isDefinedVariable(variableDeclaration, definedVariables)) {
+                    if (!variableDeclaration.isDynamic() && !isDefinedVariable(variableDeclaration, definedVariables)) {
                         final String variableName = variableDeclaration.getVariableName().getText();
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                 .formatMessageWith(variableName);
