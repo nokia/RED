@@ -11,12 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -26,8 +28,73 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 public class LibrariesBuilder {
+
+    public void forceLibrariesRebuild(final Multimap<IProject, LibrarySpecification> groupedSpecifications,
+            final SubMonitor monitor) {
+        monitor.subTask("generating libdocs");
+        final Multimap<IProject, GeneratorWithSource> groupedGenerators = LinkedHashMultimap.create();
+        for (final IProject project : groupedSpecifications.keySet()) {
+            for (final LibrarySpecification specification : groupedSpecifications.get(project)) {
+                final GeneratorWithSource generatorWithSource = new GeneratorWithSource(specification.getSourceFile(),
+                        provideGenerator(specification));
+                groupedGenerators.put(project, generatorWithSource);
+            }
+        }
+        
+        monitor.setWorkRemaining(groupedGenerators.size());
+        for (final IProject project : groupedGenerators.keySet()) {
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+
+            for (final GeneratorWithSource generatorWithSource : groupedGenerators.get(project)) {
+                monitor.subTask(generatorWithSource.generator.getMessage());
+                try {
+                    generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment);
+                } catch (final RobotEnvironmentException e) {
+                    try {
+                        generatorWithSource.sourceLibdocFile.delete(true, null);
+                    } catch (final CoreException e1) {
+                        // ok fine
+                    }
+                }
+                monitor.worked(1);
+            }
+        }
+        monitor.done();
+    }
+
+    private ILibdocGenerator provideGenerator(final LibrarySpecification specification) {
+        final IFile libspecSourceFile = specification.getSourceFile();
+
+        if (!specification.isReferenced() && !specification.isRemote()) {
+            return new StandardLibraryLibdocGenerator(libspecSourceFile);
+        } else if (!specification.isReferenced()) {
+            return new RemoteLibraryLibdocGenerator(specification.getRemoteLocation().getUriAddress(),
+                    libspecSourceFile);
+        } else {
+            final String path = specification.getSecondaryKey();
+            final ReferencedLibrary refLib = specification.getReferencedLibrary();
+            final LibraryType type = refLib.provideType();
+            if (type == LibraryType.VIRTUAL) {
+                return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), libspecSourceFile);
+            } else if (type == LibraryType.PYTHON) {
+                final String libPath = PathsConverter
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(refLib.getPath()))
+                        .toOSString();
+                return new PythonLibraryLibdocGenerator(refLib.getName(), libPath, libspecSourceFile);
+            } else if (type == LibraryType.JAVA) {
+                return new JavaLibraryLibdocGenerator(specification.getName(), path, libspecSourceFile);
+            }
+            throw new IllegalStateException("Unknown library type: " + type);
+        }
+    }
 
     public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment runtimeEnvironment,
             final RobotProjectConfig configuration, final SubMonitor monitor) {
@@ -147,5 +214,32 @@ public class LibrariesBuilder {
             }
         }
         return generators;
+    }
+
+    private static final class GeneratorWithSource {
+
+        private final IFile sourceLibdocFile;
+
+        private final ILibdocGenerator generator;
+
+        GeneratorWithSource(final IFile source, final ILibdocGenerator generator) {
+            this.sourceLibdocFile = source;
+            this.generator = generator;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == GeneratorWithSource.class) {
+                final GeneratorWithSource that = (GeneratorWithSource) obj;
+                return Objects.equal(this.sourceLibdocFile, that.sourceLibdocFile)
+                        && Objects.equal(this.getClass(), that.generator);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(sourceLibdocFile, generator);
+        }
     }
 }

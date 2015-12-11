@@ -12,6 +12,8 @@ interface ILibdocGenerator {
 
     void generateLibdoc(RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException;
 
+    void generateLibdocForcibly(RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException;
+
     String getMessage();
 
 }

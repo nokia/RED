@@ -11,7 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -30,10 +36,29 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
             if (entry.getValue() != null) {
                 libraries.add(entry.getValue());
             } else {
-                libraries.add(new ErroneousLibrarySpecification(entry.getKey().getName()));
+                final ReferencedLibrary lib = entry.getKey();
+                final ErroneousLibrarySpecification specification = new ErroneousLibrarySpecification(lib.getName());
+
+                specification.setReferenced(lib);
+                specification.setSecondaryKey(lib.getPath());
+                specification.setSourceFile(getSourceFile(lib));
+                libraries.add(specification);
             }
         }
         return libraries;
+    }
+
+    private IFile getSourceFile(final ReferencedLibrary lib) {
+        final IPath path = Path.fromPortableString(lib.getPath());
+        final IResource libspec = project.getProject().getParent().findMember(path);
+
+        final IFile sourceFile;
+        if (lib.provideType() == LibraryType.VIRTUAL && libspec != null && libspec.exists()) {
+            sourceFile = (IFile) libspec;
+        } else {
+            sourceFile = LibspecsFolder.get(project.getProject()).getSpecFile(lib.getName());
+        }
+        return sourceFile;
     }
 
     @Override
