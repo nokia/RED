@@ -8,28 +8,18 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
-class RemoteLibraryLibdocGenerator implements ILibdocGenerator {
+class RemoteLibraryLibdocGenerator extends StandardLibraryLibdocGenerator {
 
-    private final IFile spec;
     private final URI uri;
 
-    RemoteLibraryLibdocGenerator(final URI uri, final IFile spec) {
-        this.spec = spec;
+    RemoteLibraryLibdocGenerator(final URI uri, final IFile targetSpecFile) {
+        super(targetSpecFile);
         this.uri = uri;
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
-        final String libName = "Remote::" + uri;
-        runtimeEnvironment.createLibdocForStdLibrary(libName, spec.getLocation().toFile());
+    protected String getLibraryName() {
+        return "Remote::" + uri;
     }
-
-    @Override
-    public String getMessage() {
-        return "generating libdoc for remote library located at " + uri;
-    }
-
 }

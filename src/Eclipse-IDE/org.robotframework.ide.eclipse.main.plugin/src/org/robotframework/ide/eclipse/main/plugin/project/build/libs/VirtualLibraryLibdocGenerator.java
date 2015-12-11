@@ -16,25 +16,33 @@ import com.google.common.io.Files;
 
 /**
  * @author Michal Anglart
- *
  */
 public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final IPath path;
 
-    private final IFile specFile;
+    private final IFile targetSpecFile;
 
-    public VirtualLibraryLibdocGenerator(final IPath libPath, final IFile specFile) {
+    public VirtualLibraryLibdocGenerator(final IPath libPath, final IFile targetSpecFile) {
         this.path = libPath;
-        this.specFile = specFile;
+        this.targetSpecFile = targetSpecFile;
     }
 
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
         try {
-            Files.copy(path.toFile(), specFile.getLocation().toFile());
+            Files.copy(path.toFile(), targetSpecFile.getLocation().toFile());
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to create link to " + path.toOSString() + " libspec file", e);
+        }
+    }
+
+    @Override
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment) {
+        try {
+            generateLibdoc(runtimeEnvironment);
+        } catch (final RobotEnvironmentException e) {
+            // nothing to do
         }
     }
 
@@ -42,5 +50,4 @@ public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     public String getMessage() {
         return "linking libdoc for workspace-external virutal library located at " + path.toOSString();
     }
-
 }

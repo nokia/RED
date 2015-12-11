@@ -11,23 +11,29 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 
 class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
-    private final IFile spec;
+    private final IFile targetSpecFile;
 
-    StandardLibraryLibdocGenerator(final IFile specFile) {
-        this.spec = specFile;
+    StandardLibraryLibdocGenerator(final IFile targetSpecFile) {
+        this.targetSpecFile = targetSpecFile;
     }
 
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForStdLibrary(getLibraryName(), spec.getLocation().toFile());
+        runtimeEnvironment.createLibdocForStdLibrary(getLibraryName(), targetSpecFile.getLocation().toFile());
+    }
+
+    @Override
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment)
+            throws RobotEnvironmentException {
+        runtimeEnvironment.createLibdocForStdLibraryForcibly(getLibraryName(), targetSpecFile.getLocation().toFile());
+    }
+
+    protected String getLibraryName() {
+        return targetSpecFile.getLocation().removeFileExtension().lastSegment();
     }
 
     @Override
     public String getMessage() {
         return "generating libdoc for " + getLibraryName() + " library";
-    }
-
-    private String getLibraryName() {
-        return spec.getLocation().removeFileExtension().lastSegment();
     }
 }

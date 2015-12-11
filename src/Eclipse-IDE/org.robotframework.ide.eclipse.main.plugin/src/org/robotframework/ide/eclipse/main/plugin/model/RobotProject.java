@@ -38,7 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigRead
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadlibrarySpecificationException;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadLibrarySpecificationException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -137,7 +137,7 @@ public class RobotProject extends RobotContainer {
         }
         refLibsSpecs = newLinkedHashMap();
         for (final ReferencedLibrary library : configuration.getLibraries()) {
-            refLibsSpecs.put(library, libToSpec(getProject()).apply(library));
+            refLibsSpecs.put(library, reflibToSpec(getProject()).apply(library));
         }
         return refLibsSpecs;
     }
@@ -149,8 +149,8 @@ public class RobotProject extends RobotContainer {
             public LibrarySpecification apply(final String libraryName) {
                 try {
                     final IFile file = LibspecsFolder.get(project).getSpecFile(libraryName);
-                    return LibrarySpecificationReader.readSpecification(file);
-                } catch (final CannotReadlibrarySpecificationException e) {
+                    return LibrarySpecificationReader.readStandardLibrarySpecification(file, libraryName);
+                } catch (final CannotReadLibrarySpecificationException e) {
                     return null;
                 }
             }
@@ -165,40 +165,30 @@ public class RobotProject extends RobotContainer {
                 try {
                     final IFile file = LibspecsFolder.get(project).getSpecFile(remoteLocation.createLibspecFileName());
                     return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
-                } catch (final CannotReadlibrarySpecificationException e) {
+                } catch (final CannotReadLibrarySpecificationException e) {
                     return null;
                 }
             }
         };
     }
 
-    private static Function<ReferencedLibrary, LibrarySpecification> libToSpec(final IProject project) {
+    private static Function<ReferencedLibrary, LibrarySpecification> reflibToSpec(final IProject project) {
         return new Function<ReferencedLibrary, LibrarySpecification>() {
 
             @Override
             public LibrarySpecification apply(final ReferencedLibrary lib) {
                 try {
-                    if (lib.provideType() == LibraryType.VIRTUAL) {
-                        final IPath path = Path.fromPortableString(lib.getPath());
-                        final IResource libspec = project.getParent().findMember(path);
-                        IFile fileToRead;
+                    final IPath path = Path.fromPortableString(lib.getPath());
+                    final IResource libspec = project.getParent().findMember(path);
 
-                        if (libspec != null && libspec.getType() == IResource.FILE) {
-                            fileToRead = (IFile) libspec;
-                            return LibrarySpecificationReader.readSpecification((IFile) libspec);
-                        } else if (libspec == null) {
-                            fileToRead = LibspecsFolder.get(project).getSpecFile(lib.getName());
-                        } else {
-                            fileToRead = null;
-                        }
-                        return fileToRead == null ? null : LibrarySpecificationReader.readSpecification(fileToRead);
-                    } else if (lib.provideType() == LibraryType.JAVA || lib.provideType() == LibraryType.PYTHON) {
-                        final IFile file = LibspecsFolder.get(project).getSpecFile(lib.getName());
-                        return LibrarySpecificationReader.readReferencedSpecification(file, lib.getPath());
+                    final IFile fileToRead;
+                    if (lib.provideType() == LibraryType.VIRTUAL && libspec != null && libspec.exists()) {
+                        fileToRead = (IFile) libspec;
                     } else {
-                        return null;
+                        fileToRead = LibspecsFolder.get(project).getSpecFile(lib.getName());
                     }
-                } catch (final CannotReadlibrarySpecificationException e) {
+                    return LibrarySpecificationReader.readReferencedSpecification(fileToRead, lib);
+                } catch (final CannotReadLibrarySpecificationException e) {
                     return null;
                 }
             }

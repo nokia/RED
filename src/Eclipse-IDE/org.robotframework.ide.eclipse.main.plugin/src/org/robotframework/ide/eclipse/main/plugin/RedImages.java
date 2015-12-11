@@ -21,6 +21,10 @@ public class RedImages {
     public static ImageDescriptor getCloseImage() {
         return RedPlugin.getImageDescriptor("resources/close.png");
     }
+
+    public static ImageDescriptor getRefreshImage() {
+        return RedPlugin.getImageDescriptor("resources/refresh.png");
+    }
     
     public static ImageDescriptor getRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot.png");

@@ -27,6 +27,12 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment)
+            throws RobotEnvironmentException {
+        runtimeEnvironment.createLibdocForJavaLibraryForcibly(libName, jarPath, targetSpecFile.getLocation().toFile());
+    }
+
+    @Override
     public String getMessage() {
         return "generating libdoc for " + libName + " library contained in " + jarPath;
     }
