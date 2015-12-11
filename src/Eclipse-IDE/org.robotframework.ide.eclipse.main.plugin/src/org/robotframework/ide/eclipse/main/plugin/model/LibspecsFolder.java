@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -121,8 +120,8 @@ public class LibspecsFolder {
         for (final IResource resource : folder.members()) {
             if (resource.getType() == IResource.FILE && resource.getName().endsWith(LIBSPEC_FILE_EXTENSION)) {
                 final IFile specFile = (IFile) resource;
-                final LibrarySpecification spec = LibrarySpecificationReader.readSpecification(specFile);
-                if (version.startsWith("Robot Framework " + spec.getVersion())) {
+                final String otherVersion = LibrarySpecification.getVersion(specFile);
+                if (version.startsWith("Robot Framework " + otherVersion)) {
                     toRecreate.remove(specFile);
                 }
             }

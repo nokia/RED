@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -35,7 +36,24 @@ public class NavigatorLibrariesContentProvider implements ITreeContentProvider {
             @Override
             public void resourceChanged(final IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_BUILD) {
-                    refreshViewer();
+                    final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
+                    try {
+                        event.getDelta().accept(new IResourceDeltaVisitor() {
+
+                            @Override
+                            public boolean visit(final IResourceDelta delta) throws CoreException {
+                                if (delta.getFlags() != 0 && delta.getFlags() != IResourceDelta.MARKERS) {
+                                    shouldRefresh.set(true);
+                                }
+                                return true;
+                            }
+                        });
+                    } catch (final CoreException e) {
+                        // nothing to do
+                    }
+                    if (shouldRefresh.get()) {
+                        refreshViewer();
+                    }
                 } else if (event.getType() == IResourceChangeEvent.POST_CHANGE && event.getDelta() != null) {
                     try {
                         event.getDelta().accept(new IResourceDeltaVisitor() {

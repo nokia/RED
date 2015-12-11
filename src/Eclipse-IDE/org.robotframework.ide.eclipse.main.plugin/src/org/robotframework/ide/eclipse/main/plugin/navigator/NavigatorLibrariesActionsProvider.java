@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -17,6 +18,7 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ReloadLibraryAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibraryDocumentationAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
 
@@ -25,6 +27,8 @@ public class NavigatorLibrariesActionsProvider extends CommonActionProvider {
     private ISelectionProvider selectionProvider;
 
     private ISelectionChangedListener listener;
+
+    private ReloadLibraryAction reloadLibraryAction;
 
     private ShowLibrarySourceAction showLibrarySourceAction;
 
@@ -40,6 +44,7 @@ public class NavigatorLibrariesActionsProvider extends CommonActionProvider {
             selectionProvider = workbenchSite.getSelectionProvider();
             selectionProvider.addSelectionChangedListener(listener);
 
+            reloadLibraryAction = new ReloadLibraryAction(workbenchSite.getPage(), selectionProvider);
             showDocumentationAction = new ShowLibraryDocumentationAction(workbenchSite.getPage(), selectionProvider);
             showLibrarySourceAction = new ShowLibrarySourceAction(workbenchSite.getPage(), selectionProvider);
         }
@@ -49,6 +54,7 @@ public class NavigatorLibrariesActionsProvider extends CommonActionProvider {
         return new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
+                reloadLibraryAction.updateEnablement((IStructuredSelection) event.getSelection());
                 showDocumentationAction.updateEnablement((IStructuredSelection) event.getSelection());
                 showLibrarySourceAction.updateEnablement((IStructuredSelection) event.getSelection());
             }
@@ -68,6 +74,8 @@ public class NavigatorLibrariesActionsProvider extends CommonActionProvider {
 
     @Override
     public void fillContextMenu(final IMenuManager menu) {
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, reloadLibraryAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, new Separator());
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, showDocumentationAction);
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, showLibrarySourceAction);
     }
