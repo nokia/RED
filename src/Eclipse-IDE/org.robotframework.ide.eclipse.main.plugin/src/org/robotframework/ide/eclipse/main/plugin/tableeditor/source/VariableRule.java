@@ -42,28 +42,43 @@ class VariableRule implements IPredicateRule {
                 return token;
             }
         } else {
+            int charactersRead = 0;
             if (startDetected(scanner)) {
-                int balance = 1;
-                int next = 0;
-                while (true) {
-                    if (endDetected(scanner)) {
-                        balance--;
-                    }
-                    if (balance == 0 || next == -1 || next == '\n' || next == '\r'
-                            || next == '\t' && CharacterScannerUtilities.lookAhead(scanner, 2).equals("  ")) {
-                        break;
-                    }
-                    next = scanner.read();
+                int next = CharacterScannerUtilities.eat(scanner, 2);
+                charactersRead = 2;
 
+                int balance = 1;
+                while (true) {
                     if (startDetected(scanner)) {
+                        next = CharacterScannerUtilities.eat(scanner, 2);
+                        charactersRead += 2;
                         balance++;
+                    } else if (endDetected(scanner)) {
+                        next = CharacterScannerUtilities.eat(scanner, 1);
+                        charactersRead += 1;
+                        balance--;
+                        if (balance == 0) {
+                            return token;
+                        }
+                    } else if (isCellEnd(scanner, next)) {
+                        for (int i = 0; i < charactersRead; i++) {
+                            scanner.unread();
+                        }
+                        return Token.UNDEFINED;
+
+                    } else {
+                        charactersRead += 1;
+                        next = scanner.read();
                     }
                 }
-                scanner.read();
-                return token;
             }
         }
         return Token.UNDEFINED;
+    }
+
+    private boolean isCellEnd(final ICharacterScanner scanner, final int next) {
+        return next == -1 || next == '\n' || next == '\r' || next == '\t'
+                || CharacterScannerUtilities.lookAhead(scanner, 2).equals("  ");
     }
 
     private boolean startDetected(final ICharacterScanner scanner) {
