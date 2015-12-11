@@ -44,17 +44,20 @@ class CharacterScannerUtilities {
     }
 
     static String lookAhead(final ICharacterScanner scanner, final int n) {
+        boolean eofOccured = false;
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < n; i++) {
             final int ch = scanner.read();
             if (ch == -1) {
+                eofOccured = true;
                 break;
             } else {
                 builder.append((char) ch);
             }
         }
+        final int additional = eofOccured ? 1 : 0;
         // maybe we've read less due to EOF
-        for (int i = 0; i < builder.length(); i++) {
+        for (int i = 0; i < builder.length() + additional; i++) {
             scanner.unread();
         }
         return builder.toString();
@@ -78,5 +81,13 @@ class CharacterScannerUtilities {
         }
         builder.reverse();
         return builder.toString();
+    }
+
+    static int eat(final ICharacterScanner scanner, final int n) {
+        int ch = -1;
+        for (int i = 0; i < n; i++) {
+            ch = scanner.read();
+        }
+        return ch;
     }
 }
