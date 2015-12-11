@@ -81,4 +81,11 @@ class PythonInterpretersCommandExecutors {
         }
     }
 
+    RobotCommandExecutor getDirectRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
+        final String pathAsName = interpreterPath.toPath()
+                .resolve(interpreterPath.getInterpreter().executableName())
+                .toAbsolutePath()
+                .toString();
+        return new RobotCommandDirectExecutor(pathAsName);
+    }
 }
