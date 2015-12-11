@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.xmlrpc.XmlRpcException;
 import org.rf.ide.core.execution.ExecutionElementsParser;
 import org.rf.ide.core.execution.IExecutionHandler;
 
@@ -565,7 +566,12 @@ public class RobotRuntimeEnvironment {
             final String argAsString = args.isEmpty() ? "None" : "['"
                     + Joiner.on("','").join(args) + "']";
             final String normalizedPath = path.replace('\\', '/');
-            return executor.getVariables(normalizedPath, argAsString);
+            try {
+                return executor.getVariables(normalizedPath, argAsString);
+            } catch (XmlRpcException e) {
+                System.err.println("XML-RPC server error in file " + path + " with arguments " + args);
+                e.printStackTrace();
+            }
         }
         return new LinkedHashMap<String, Object>();
     }
