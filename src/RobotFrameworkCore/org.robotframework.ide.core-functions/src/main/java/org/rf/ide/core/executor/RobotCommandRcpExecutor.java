@@ -164,19 +164,14 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final String filePath, final String fileArguments) {
+    public Map<String, Object> getVariables(final String filePath, final String fileArguments) throws XmlRpcException {
         final Map<String, Object> variables = new LinkedHashMap<>();
-        try {
-            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getVariables",
-                    newArrayList(filePath, fileArguments));
-            for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
-                variables.put((String) entry.getKey(), entry.getValue());
-            }
-            return variables;
-        } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server - in file " + filePath
-                    + " with arguments " + fileArguments, e);
+        final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getVariables",
+                newArrayList(filePath, fileArguments));
+        for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
+            variables.put((String) entry.getKey(), entry.getValue());
         }
+        return variables;
     }
 
     @Override
