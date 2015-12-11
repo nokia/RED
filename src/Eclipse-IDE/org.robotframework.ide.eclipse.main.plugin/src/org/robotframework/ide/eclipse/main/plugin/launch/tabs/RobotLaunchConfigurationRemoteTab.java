@@ -156,9 +156,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     
     @Override
     public boolean canSave() {
-        return isPortValid() && isConnectionTimeoutValid();
+        return isDirty() && isPortValid() && isConnectionTimeoutValid();
     }
-
 
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
