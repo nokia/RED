@@ -88,7 +88,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                             .will(assist.getAcceptanceMode())
                             .theText(textToInsert)
                             .atOffset(offset - prefix.length())
-                            .givenThatCurrentPrefixIs(prefix)
+                            .givenThatCurrentPrefixIs(
+                                    prefix.contains(".") ? prefix.substring(prefix.lastIndexOf('.') + 1) : prefix)
                             .andWholeContentIs(content)
                             .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
                             .contextInformationShouldBeShownAfterAccepting(
@@ -115,8 +116,10 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
             final String keywordName = keywordProposal.getLabel();
             final String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
+            final String wholeDefinition = keywordPrefix + keywordName;
 
-            if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix) || keywordPrefix.equalsIgnoreCase(prefix)) {
+            if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
+                    || EmbeddedKeywordNamesSupport.startsWith(wholeDefinition, prefix)) {
                 proposals.add(keywordProposal);
             }
         }
