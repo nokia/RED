@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.xmlrpc.XmlRpcException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Optional;
@@ -23,7 +24,7 @@ interface RobotCommandExecutor {
 
     Optional<File> getModulePath(String moduleName) throws RobotEnvironmentException;
 
-    Map<String, Object> getVariables(final String filePath, final String fileArguments);
+    Map<String, Object> getVariables(final String filePath, final String fileArguments) throws XmlRpcException;
 
     Map<String, Object> getGlobalVariables();
 
