@@ -11,11 +11,29 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 
 import com.google.common.base.Objects;
 
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
+
+    public static String getVersion(final IFile libspecFile) {
+        return LibrarySpecificationReader.readSpecification(libspecFile).getVersion();
+    }
+
+    @XmlTransient
+    private IFile sourceFile;
+
+    @XmlTransient
+    private RemoteLocation remoteLocation;
+
+    @XmlTransient
+    private ReferencedLibrary referencedLibrary;
 
     private String name;
 
@@ -30,10 +48,6 @@ public class LibrarySpecification {
     private String documentation;
 
     private List<KeywordSpecification> keywords;
-
-    private boolean isRemote;
-
-    private boolean isReferenced;
 
     private String secondaryKey = "";
 
@@ -100,22 +114,6 @@ public class LibrarySpecification {
         this.constructor = constructor;
     }
 
-    public boolean isRemote() {
-        return isRemote;
-    }
-
-    public void setRemote() {
-        isRemote = true;
-    }
-
-    public boolean isReferenced() {
-        return isReferenced;
-    }
-
-    public void setReferenced() {
-        isReferenced = true;
-    }
-
     public void propagateFormat() {
         if (keywords != null) {
             for (final KeywordSpecification kwSpec : keywords) {
@@ -163,6 +161,41 @@ public class LibrarySpecification {
         return null;
     }
 
+    @XmlTransient
+    public void setSourceFile(final IFile sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    public IFile getSourceFile() {
+        return sourceFile;
+    }
+
+    @XmlTransient
+    public void setRemoteLocation(final RemoteLocation location) {
+        this.remoteLocation = location;
+    }
+
+    public RemoteLocation getRemoteLocation() {
+        return remoteLocation;
+    }
+
+    public boolean isRemote() {
+        return remoteLocation != null;
+    }
+
+    @XmlTransient
+    public void setReferenced(final ReferencedLibrary library) {
+        this.referencedLibrary = library;
+    }
+
+    public ReferencedLibrary getReferencedLibrary() {
+        return referencedLibrary;
+    }
+
+    public boolean isReferenced() {
+        return referencedLibrary != null;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj == null) {
@@ -172,13 +205,14 @@ public class LibrarySpecification {
             final LibrarySpecification that = (LibrarySpecification) obj;
             return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
                     && Objects.equal(this.keywords, that.keywords) && Objects.equal(this.version, that.version)
-                    && this.isReferenced == that.isReferenced && this.isRemote == that.isRemote;
+                    && this.referencedLibrary == that.referencedLibrary
+                    && Objects.equal(this.remoteLocation, that.remoteLocation);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, secondaryKey, keywords, version, isReferenced, isRemote);
+        return Objects.hashCode(name, secondaryKey, keywords, version, referencedLibrary, remoteLocation);
     }
 }

@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -28,12 +30,24 @@ class RobotProjectDependencies {
     List<LibrarySpecification> getLibraries() {
         final List<LibrarySpecification> libraries = newArrayList();
 
+        final LibspecsFolder libspecsFolder = LibspecsFolder.get(project.getProject());
+
         final Map<String, LibrarySpecification> libs = project.getStandardLibraries();
         for (final Entry<String, LibrarySpecification> entry : libs.entrySet()) {
             if (entry.getValue() != null) {
                 libraries.add(entry.getValue());
             } else {
-                libraries.add(new ErroneousLibrarySpecification(entry.getKey()));
+                final LibrarySpecification specification = new ErroneousLibrarySpecification(entry.getKey());
+                if (entry.getKey().startsWith("Remote")) {
+                    final RemoteLocation remoteLocation = new RemoteLocation();
+                    remoteLocation.setUri(entry.getKey().substring("Remote".length()).trim());
+
+                    specification.setRemoteLocation(remoteLocation);
+                    specification.setSourceFile(libspecsFolder.getSpecFile(remoteLocation.createLibspecFileName()));
+                } else {
+                    specification.setSourceFile(libspecsFolder.getSpecFile(entry.getKey()));
+                }
+                libraries.add(specification);
             }
         }
         return libraries;
@@ -90,6 +104,5 @@ class RobotProjectDependencies {
         public String getDocumentation() {
             return "";
         }
-
     }
 }

@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEven
 import org.robotframework.ide.eclipse.main.plugin.project.editor.VariableMappingsFormFragment.VariableMappingDialog;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;
-import org.robotframework.red.swt.SwtThread.Calculation;
+import org.robotframework.red.swt.SwtThread.Evaluation;
 
 /**
  * @author Michal Anglart
@@ -77,7 +77,7 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config)
                 throws ProposalApplyingException {
-            variableMapping = SwtThread.syncExec(new Calculation<VariableMapping>() {
+            variableMapping = SwtThread.syncEval(new Evaluation<VariableMapping>() {
                 @Override
                 public VariableMapping runCalculation() {
                     final Shell shell = Display.getCurrent().getActiveShell();

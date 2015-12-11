@@ -5,6 +5,11 @@
  */
 package org.robotframework.red.swt;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -13,18 +18,45 @@ import org.eclipse.swt.widgets.Display;
  */
 public class SwtThread {
 
-    public static <T> T syncExec(final Calculation<T> calculation) {
-        return syncExec(Display.getDefault(), calculation);
+    public static void syncExec(final Runnable runnable) {
+        syncExec(Display.getDefault(), runnable);
     }
 
-    public static <T> T syncExec(final Display display, final Calculation<T> calculation) {
-        display.syncExec(calculation);
-        return calculation.result;
+    public static void syncExec(final Display display, final Runnable runnable) {
+        display.syncExec(runnable);
     }
 
-    public abstract static class Calculation<T> implements Runnable {
+    public static <T> T syncEval(final Evaluation<T> evaluation) {
+        return syncEval(Display.getDefault(), evaluation);
+    }
+
+    public static <T> T syncEval(final Display display, final Evaluation<T> evaluation) {
+        display.syncExec(evaluation);
+        return evaluation.result;
+    }
+
+    public static void asyncExec(final Runnable runnable) {
+        asyncExec(Display.getDefault(), runnable);
+    }
+
+    public static void asyncExec(final Display display, final Runnable runnable) {
+        display.asyncExec(runnable);
+    }
+
+    public static <T> Future<T> asyncEval(final Evaluation<T> evaluation) {
+        return asyncEval(Display.getDefault(), evaluation);
+    }
+
+    public static <T> Future<T> asyncEval(final Display display, final Evaluation<T> evaluation) {
+        display.asyncExec(evaluation);
+        return new EvaluationPromise<>(evaluation);
+    }
+
+    public abstract static class Evaluation<T> implements Runnable {
 
         private T result = null;
+
+        private boolean isDone = false;
 
         T getResult() {
             return result;
@@ -33,8 +65,62 @@ public class SwtThread {
         @Override
         public final void run() {
             result = runCalculation();
+            isDone = true;
         }
 
         public abstract T runCalculation();
+    }
+
+    private static class EvaluationPromise<T> implements Future<T> {
+
+        private final Evaluation<T> evaluation;
+
+        public EvaluationPromise(final Evaluation<T> evaluation) {
+            this.evaluation = evaluation;
+        }
+
+        @Override
+        public boolean cancel(final boolean mayInterruptIfRunning) {
+            return false;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isDone() {
+            return evaluation.isDone;
+        }
+
+        @Override
+        public T get() throws InterruptedException, ExecutionException {
+            while (!evaluation.isDone) {
+                Thread.sleep(500);
+            }
+            return evaluation.result;
+        }
+
+        @Override
+        public T get(final long timeout, final TimeUnit unit)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            final long timeoutInMs = TimeUnit.MILLISECONDS.convert(timeout, unit);
+            final long start = System.currentTimeMillis();
+
+            while (timeoutIsNotReached(start, timeoutInMs)) {
+                if (evaluation.isDone) {
+                    return evaluation.result;
+                }
+                Thread.sleep(500);
+            }
+            throw new TimeoutException("Timeout has been reached");
+        }
+
+        private boolean timeoutIsNotReached(final long start, final long timeout) {
+            final long current = System.currentTimeMillis();
+            return current - start < timeout;
+        }
+
     }
 }

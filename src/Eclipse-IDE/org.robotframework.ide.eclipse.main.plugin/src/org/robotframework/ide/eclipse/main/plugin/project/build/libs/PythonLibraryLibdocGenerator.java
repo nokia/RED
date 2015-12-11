@@ -32,6 +32,15 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment)
+            throws RobotEnvironmentException {
+        final File libFile = new File(libPath);
+        final String additionalLocation = libFile.isFile() ? libFile.getParent() : libPath;
+        runtimeEnvironment.createLibdocForPythonLibraryForcibly(libName, additionalLocation,
+                targetSpecFile.getLocation().toFile());
+    }
+
+    @Override
     public String getMessage() {
         return "generating libdoc for " + libName + " library contained in " + libPath;
     }
