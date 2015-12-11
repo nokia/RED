@@ -395,45 +395,58 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    public void createLibdocForStdLibrary(final String libName, final File file) throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
+        }
+    }
 
-    public void createLibdocForStdLibrary(final String libName, final File file)
+    public void createLibdocForStdLibraryForcibly(final String libName, final File file)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors
-                    .getInstance().getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location);
-            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName,
-                    "");
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
         }
     }
 
-
-    public void createLibdocForPythonLibrary(final String libName,
-            final String libPath, final File file)
+    public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors
-                    .getInstance().getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location);
-            executor.createLibdocForPythonLibrary(file.getAbsolutePath(),
-                    libName, libPath);
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
         }
     }
 
-
-    public void createLibdocForJavaLibrary(final String libName,
-            final String jarPath, final File file)
+    public void createLibdocForPythonLibraryForcibly(final String libName, final String libPath, final File file)
             throws RobotEnvironmentException {
-        if (hasRobotInstalled()
-                && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors
-                    .getInstance().getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location);
-            executor.createLibdocForJavaLibrary(file.getAbsolutePath(),
-                    libName, jarPath);
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
         }
     }
 
+    public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file)
+            throws RobotEnvironmentException {
+        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
+        }
+    }
+
+    public void createLibdocForJavaLibraryForcibly(final String libName, final String jarPath, final File file)
+            throws RobotEnvironmentException {
+        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
+        }
+    }
 
     public List<String> getStandardLibrariesNames() {
         if (hasRobotInstalled()) {
