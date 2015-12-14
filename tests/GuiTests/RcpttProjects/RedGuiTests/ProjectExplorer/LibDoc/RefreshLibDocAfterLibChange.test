@@ -1,0 +1,60 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: RefreshLibDocAfterLibChange
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _qW9rQKJrEeWiTrudgyrHcQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/14/15 3:44 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 4 1
+    key-type "M1+v" -times 2
+    type-text "Library	libs/SumTwoDigits.py"
+    key-type "M1+s"
+    get-menu "Quick Fix" | click
+}
+
+
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'libs\\/SumTwoDigits.py' and add to configuration" | click -default
+get-window "Select library class" | get-table | select SumTwoDigits | click -default
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table 
+    | select "SumTwoDigits - RobotProject\\/libs" | key-type "M1+s"
+
+get-editor "RobotProject/red.xml" | close
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+        | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals Sum | verify-true
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/libs/SumTwoDigits.py" 
+    | select "RobotProject/libs/SumTwoDigits.py" | get-menu "Open With/Text Editor" | click
+with [get-editor "SumTwoDigits.py"] {
+    with [get-text-viewer] {
+        set-caret-pos 4 12
+        type-text "_change"
+        key-type "M1+s"
+    }
+    close
+}
+
+
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs (1)" | get-menu Reload | click
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+        | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
