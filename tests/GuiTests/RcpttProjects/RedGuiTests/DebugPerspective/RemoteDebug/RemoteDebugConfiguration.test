@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LJw90Jm3EeWwXrMNKVDTwg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/4/15 12:10 PM
+Save-Time: 12/14/15 11:00 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -21,7 +21,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test cases ***\n"
     + "test 1\n"
     + "    Log  5" 
 
-get-button "Save (M1+S)" | click    
+get-button "Save (.*)" | click    
 //run in debug to create run configuration
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 
@@ -41,10 +41,13 @@ with [get-window "Debug Configurations" | get-group "Remote Debugging"] {
     get-property "getChildren().Control[2].getText()" | equals "Local port:" | verify-true
     get-property "getChildren().Control[3].getText()" | equals "" | verify-true
     get-property "getChildren().Control[3].getEditable()" | equals true | verify-true
-    get-property "getChildren().Control[3].isEnabled()" | equals true | verify-true
-    get-property "getChildren().Control[4].getClassName()" | equals "org.eclipse.swt.widgets.Button" | verify-true
-    get-property "getChildren().Control[4].getText()" | equals "Export Debug Script" | verify-true
-    get-property "getChildren().Control[4].isEnabled()" | equals true | verify-true
+    get-property "getChildren().Control[3].getVisible()" | equals true | verify-true
+    get-property "getChildren().Control[4].getText()" | equals "Connection timeout [s]:" | verify-true
+    get-property "getChildren().Control[5].getText()" | equals "" | verify-true
+    get-property "getChildren().Control[5].getEditable()" | equals true | verify-true
+    get-property "getChildren().Control[6].getClassName()" | equals "org.eclipse.swt.widgets.Button" | verify-true
+    get-property "getChildren().Control[6].getText()" | equals "Export Debug Script" | verify-true
+    get-property "getChildren().Control[6].isEnabled()" | equals true | verify-true
 }
 proc "check-if-no-error-is-shown"{
 	get-window "Debug Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
@@ -117,5 +120,37 @@ with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-edi
 }
 check-port-error-and-clear-field
 
+
+//set incorrect timeout
+proc "check-timeout-error-and-clear-field"{
+	get-window "Debug Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    | get-property text | equals "Invalid connection timeout specified." | verify-true
+	    
+	    
+	get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox 
+	    -after [get-label "Connection timeout [s]:"] | set-text 1
+	    
+	check-if-no-error-is-shown
+}
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text 0
+check-timeout-error-and-clear-field
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text 9999999999
+check-timeout-error-and-clear-field
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text t
+check-timeout-error-and-clear-field
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text "89.67"
+check-timeout-error-and-clear-field
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text " "
+check-timeout-error-and-clear-field
+
+
+get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [s]:"]| set-text " text "
+check-timeout-error-and-clear-field
+ 
   
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
