@@ -83,16 +83,26 @@ def escape_unicode(data):
         return replace_unicode_by_it_numbers(str(data))
     if isinstance(data, dict):
         for key, val in data.items():
-         data[key] = replace_unicode_by_it_numbers(escape_unicode(val))
+         data[key] = escape_unicode(val)
     if isinstance(data, list):
         for index, item in enumerate(data):
-         data[index] = replace_unicode_by_it_numbers(escape_unicode(item))
+         data[index] = escape_unicode(item)
     return data
 
 def replace_unicode_by_it_numbers(text):
     convertedText = text
     if text is not None:
-        convertedText = text.encode(encoding='ascii',errors='xmlcharrefreplace')
+        convertedText = ''
+        for char in text:
+            if (ord(char) < 128):
+                convertedText += char
+            else:
+                unicode_as_text = str(ord(char))
+                if len(unicode_as_text) <= 4:
+                    convertedText += '\u' + unicode_as_text
+                else:
+                    convertedText += '\U' + unicode_as_text
+
     return convertedText
 
 def getGlobalVariables():
