@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _N_eAcJ5pEeWVv_UItyy1RQ
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/9/15 2:20 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 12/14/15 1:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,41 +22,22 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "    Log Many  @{list 1}\n"
     + "    Log Many  &{dict}" 
     
-wait 2000
 //check errors
 get-tab-folder -index 4 | get-tab-item Problems | click
+wait 3000
+get-view Problems | get-tree | select "Errors \\(.*\\)" | double-click
+
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-property "getItems().TreeItem[0].getItemCount()" | equals 4 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Errors (4 items)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
         | equals "Variable 'a_1' is used, but not defined" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getData().getLocation()" | equals "line 3" 
-        | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getData().getPath()" 
-        | equals "/RobotProject" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Variable 'b${index}' is used, but not defined" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getData().getLocation()" | equals "line 4" 
-        | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getData().getPath()" 
-        | equals "/RobotProject" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
         | equals "Variable 'dict' is used, but not defined" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getData().getLocation()" | equals "line 6" 
-        | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getData().getPath()" 
-        | equals "/RobotProject" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
         | equals "Variable 'index' is used, but not defined" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getData().getLocation()" | equals "line 4" 
-        | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getData().getPath()" 
-        | equals "/RobotProject" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" 
         | equals "Variable 'list 1' is used, but not defined" | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getData().getLocation()" | equals "line 5" 
-        | verify-true
-    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getData().getPath()" 
-        | equals "/RobotProject" | verify-true
 }
 
 //use QuickFix on a_1 var
@@ -155,12 +136,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 wait 2000
 
 //check problems
-with [get-view Problems | get-tree] {
-    get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-        | equals "Variable 'b${index}' is used, but not defined" | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "Errors (1 item)" | verify-true
-}
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test 1\n"
     + "    Log  ${a_1} \n"
