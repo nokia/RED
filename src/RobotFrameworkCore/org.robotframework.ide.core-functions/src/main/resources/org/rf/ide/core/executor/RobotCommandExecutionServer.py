@@ -48,7 +48,7 @@ def getVariables(dir, args):
         vars.set_from_file(dir, args.encode('utf-8').decode())
     except:
         pass
-    
+     
     varsFromFile = {}
     try:
         varsFromFile = vars.data
@@ -73,7 +73,7 @@ def extractDotDict(dict):
 def escape_unicode(data):
     # basestring and long is not defined in python3
     py_version = sys.version_info
-    if(isinstance(data, unicode)):
+    if py_version < (3,0,0) and isinstance(data, unicode):
         import unicodedata
         return unicodedata.normalize('NFKD', data).encode('ascii','ignore') # for XML-RPC problems with unicode characters
     if py_version >= (3,0,0) and isinstance(data, str):
