@@ -92,16 +92,7 @@ def escape_unicode(data):
 def replace_unicode_by_it_numbers(text):
     convertedText = text
     if text is not None:
-        convertedText = ''
-        for char in text:
-            if (ord(char) < 128):
-                convertedText += char
-            else:
-                unicode_as_text = str(ord(char))
-                if len(unicode_as_text) <= 4:
-                    convertedText += '\u' + unicode_as_text
-                else:
-                    convertedText += '\U' + unicode_as_text
+        convertedText = text.encode(encoding='ascii',errors='xmlcharrefreplace')
     return convertedText
 
 def getGlobalVariables():
