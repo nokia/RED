@@ -86,7 +86,9 @@ def escape_unicode(data):
         return str(data)
     if isinstance(data, dict):
         for key, val in data.items():
-         data[key] = escape_unicode(val)
+            if isinstance(key, tuple):
+                return 'None'
+            data[key] = escape_unicode(val)
     if isinstance(data, list):
         for index, item in enumerate(data):
          data[index] = escape_unicode(item)
