@@ -73,14 +73,17 @@ def extractDotDict(dict):
 def escape_unicode(data):
     # basestring and long is not defined in python3
     py_version = sys.version_info
+    if(isinstance(data, unicode)):
+        import unicodedata
+        return unicodedata.normalize('NFKD', data).encode('ascii','ignore') # for XML-RPC problems with unicode characters
     if py_version >= (3,0,0) and isinstance(data, str):
-        return replace_unicode_by_it_numbers(data.encode('unicode_escape'))
+        return data.encode('unicode_escape')
     if py_version < (3,0,0) and isinstance(data, basestring):
-        return replace_unicode_by_it_numbers(data.encode('unicode_escape'))
+        return data.encode('unicode_escape')
     if py_version >= (3,0,0) and isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
-        return replace_unicode_by_it_numbers(str(data))
+        return str(data)
     if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
-        return replace_unicode_by_it_numbers(str(data))
+        return str(data)
     if isinstance(data, dict):
         for key, val in data.items():
          data[key] = escape_unicode(val)
@@ -88,22 +91,6 @@ def escape_unicode(data):
         for index, item in enumerate(data):
          data[index] = escape_unicode(item)
     return data
-
-def replace_unicode_by_it_numbers(text):
-    convertedText = text
-    if text is not None:
-        convertedText = ''
-        for char in text:
-            if (ord(char) < 128):
-                convertedText += char
-            else:
-                unicode_as_text = str(ord(char))
-                if len(unicode_as_text) <= 4:
-                    convertedText += '\u' + unicode_as_text
-                else:
-                    convertedText += '\U' + unicode_as_text
-
-    return convertedText
 
 def getGlobalVariables():
     try:
