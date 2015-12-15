@@ -765,6 +765,11 @@
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
     <context
+          id="org.robotframework.ide.eclipse.redxmleditor.remotelocations.context"
+          name="Context for Remote locations section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
           id="org.robotframework.ide.eclipse.redxmleditor.varfiles.context"
           name="Context for Variable files section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
