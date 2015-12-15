@@ -14,6 +14,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
@@ -25,6 +26,7 @@ import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
 public class RobotParser {
 
     private static final List<IRobotFileParser> AVAIL_FORMAT_PARSERS = new ArrayList<>();
+
     static {
         AVAIL_FORMAT_PARSERS.add(new TxtRobotFileParser());
         AVAIL_FORMAT_PARSERS.add(new TsvRobotFileParser());
@@ -90,10 +92,16 @@ public class RobotParser {
             }
 
             parserToUse.parse(robotFile, bais, fileOrDir);
-            importExternal(robotFile);
+
+            RobotFile fileModel = robotFile.getFileModel();
+            if (fileModel.containsAnyRobotSection()) {
+                importExternal(robotFile);
+            } else {
+                fileModel.removeLines();
+            }
         } else {
-            robotFile.addBuildMessage(BuildMessage.createErrorMessage("No parser found for file.",
-                    fileOrDir.getAbsolutePath()));
+            robotFile.addBuildMessage(
+                    BuildMessage.createErrorMessage("No parser found for file.", fileOrDir.getAbsolutePath()));
             robotFile.setStatus(Status.FAILED);
         }
 
@@ -132,7 +140,13 @@ public class RobotParser {
                     // to execute importing of variables before add to model,
                     // which replace previous object
                     parserToUse.parse(robotFile, fileOrDir);
-                    importExternal(robotFile);
+
+                    RobotFile fileModel = robotFile.getFileModel();
+                    if (fileModel.containsAnyRobotSection()) {
+                        importExternal(robotFile);
+                    } else {
+                        fileModel.removeLines();
+                    }
                     robotProject.addModelFile(robotFile);
                 }
             } else {
@@ -155,8 +169,8 @@ public class RobotParser {
             }
 
             final VariablesImporter varImporter = new VariablesImporter();
-            final List<VariablesFileImportReference> varsImported = varImporter.importVariables(
-                    robotProject.getRobotRuntime(), robotProject, robotFile);
+            final List<VariablesFileImportReference> varsImported = varImporter
+                    .importVariables(robotProject.getRobotRuntime(), robotProject, robotFile);
             robotFile.addVariablesReferenced(varsImported);
         }
     }
