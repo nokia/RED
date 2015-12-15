@@ -16,51 +16,46 @@ import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 
-
 public class VariablesFileImportReference {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
-    private final VariablesImport importDeclaration;
-    private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
-    private File variablesFile;
-    private List<AVariableImported<?>> variables = new ArrayList<>();
 
+    private final VariablesImport importDeclaration;
+
+    private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
+
+    private File variablesFile;
+
+    private List<AVariableImported<?>> variables = new ArrayList<>();
 
     public VariablesFileImportReference(final VariablesImport importDeclaration) {
         this.importDeclaration = importDeclaration;
     }
 
-
     public VariablesImport getImportDeclaration() {
         return importDeclaration;
     }
-
 
     public void setVariablesFile(final File variablesFile) {
         this.variablesFile = variablesFile;
         this.lastModificationEpoch = variablesFile.lastModified();
     }
 
-
     public File getVariablesFile() {
         return variablesFile;
     }
-
 
     public List<AVariableImported<?>> getVariables() {
         return Collections.unmodifiableList(variables);
     }
 
-
     public void setLastModificationEpochTime(final long lastModificationEpoch) {
         this.lastModificationEpoch = lastModificationEpoch;
     }
 
-
     public long getLastModificationEpochTime() {
         return lastModificationEpoch;
     }
-
 
     public void map(final Map<?, ?> varsRead) {
         final Set<?> variablesNames = varsRead.keySet();
@@ -68,31 +63,28 @@ public class VariablesFileImportReference {
             final Object varValue = varsRead.get(varName);
             AVariableImported<?> var;
             if (varValue instanceof List) {
-                final ListVariableImported listVar = new ListVariableImported(
-                        "" + varName);
+                final ListVariableImported listVar = new ListVariableImported("" + varName);
                 listVar.setValue((List<?>) varValue);
                 var = listVar;
             } else if (varValue instanceof Map) {
-                final DictionaryVariableImported dictVar = new DictionaryVariableImported(
-                        "" + varName);
+                final DictionaryVariableImported dictVar = new DictionaryVariableImported("" + varName);
                 dictVar.setValue(convert((Map<?, ?>) varValue));
                 var = dictVar;
-            } else if (varValue.getClass().isArray()) {
-                final ListVariableImported arrayAsList = new ListVariableImported(
-                        "" + varName);
+            } else if (varValue != null && varValue.getClass().isArray()) {
+                final ListVariableImported arrayAsList = new ListVariableImported("" + varName);
                 arrayAsList.setValue(Arrays.asList((Object[]) varValue));
                 var = arrayAsList;
             } else {
-                final ScalarVariableImported scalarVar = new ScalarVariableImported(
-                        "" + varName);
-                scalarVar.setValue("" + varValue);
+                final ScalarVariableImported scalarVar = new ScalarVariableImported("" + varName);
+                if (scalarVar != null) {
+                    scalarVar.setValue("" + varValue);
+                }
                 var = scalarVar;
             }
 
             variables.add(var);
         }
     }
-
 
     private Map<String, Object> convert(final Map<?, ?> m) {
         final Map<String, Object> map = new LinkedHashMap<>();
@@ -102,11 +94,8 @@ public class VariablesFileImportReference {
         return map;
     }
 
-
-    public VariablesFileImportReference copy(
-            final VariablesImport importDeclaration) {
-        final VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(
-                importDeclaration);
+    public VariablesFileImportReference copy(final VariablesImport importDeclaration) {
+        final VariablesFileImportReference newVarImportRef = new VariablesFileImportReference(importDeclaration);
         newVarImportRef.setVariablesFile(variablesFile.getAbsoluteFile());
         newVarImportRef.variables = variables;
 
