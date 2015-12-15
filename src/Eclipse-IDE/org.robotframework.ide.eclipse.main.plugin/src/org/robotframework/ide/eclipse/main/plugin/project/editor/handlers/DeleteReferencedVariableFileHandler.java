@@ -28,7 +28,7 @@ public class DeleteReferencedVariableFileHandler extends DIHandler<E4DeleteVaria
     public static class E4DeleteVariableFileHandler {
 
         @Execute
-        public Object deleteMappings(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public Object deleteFile(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedVariableFile> varFiles = Selections.getElements(selection,
                     ReferencedVariableFile.class);

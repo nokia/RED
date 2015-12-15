@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart.LibrariesProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
 
 public class ReferencedLibrariesProjectConfigurationEditorPart
         extends DIEditorPart<LibrariesProjectConfigurationEditor> {
@@ -25,17 +26,18 @@ public class ReferencedLibrariesProjectConfigurationEditorPart
     static class LibrariesProjectConfigurationEditor extends RedProjectEditorPage {
 
         private ReferencedLibrariesFormFragment referencedFragment;
+        private RemoteLibraryLocationsFormFragment remoteFragment;
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             referencedFragment = new ReferencedLibrariesFormFragment();
-            final RemoteLibraryLocationsFormFragment remoteFragment = new RemoteLibraryLocationsFormFragment();
+            remoteFragment = new RemoteLibraryLocationsFormFragment();
             return newArrayList(referencedFragment, remoteFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return referencedFragment.getViewer();
+            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer(), remoteFragment.getViewer());
         }
     }
 }
