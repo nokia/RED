@@ -82,7 +82,7 @@ public class RobotArtifactsValidator {
             protected IStatus run(final IProgressMonitor monitor) {
                 try {
                     dependentJob.join();
-                    if (dependentJob.getState() != Status.OK) {
+                    if (!dependentJob.getResult().isOK()) {
                         return Status.CANCEL_STATUS;
                     }
                 } catch (final InterruptedException e) {
@@ -188,8 +188,7 @@ public class RobotArtifactsValidator {
     private Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
             final IResource resource) throws CoreException {
         return resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)
-                ? createProperValidator(context, (IFile) resource)
-                : Optional.<ModelUnitValidator> absent();
+                ? createProperValidator(context, (IFile) resource) : Optional.<ModelUnitValidator> absent();
     }
 
     private boolean isInsideEclipseHiddenDirectory(final IResource resource) {
