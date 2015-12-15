@@ -92,6 +92,11 @@ def escape_unicode(data):
     if isinstance(data, list):
         for index, item in enumerate(data):
          data[index] = escape_unicode(item)
+    if isinstance(data, tuple):   
+        tupleData = ()
+        for item in data:
+            tupleData = tupleData + tuple(escape_unicode(item)) 
+        return tupleData
     return data
 
 def getGlobalVariables():
