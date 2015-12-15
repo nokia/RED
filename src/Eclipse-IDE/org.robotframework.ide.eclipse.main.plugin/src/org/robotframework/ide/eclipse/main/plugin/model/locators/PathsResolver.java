@@ -39,7 +39,7 @@ public class PathsResolver {
         final RobotProject project = file.getProject();
         for (final IPath path : paths) {
             final IPath resolvedPath = isParameterized(path)
-                    ? Path.fromPortableString(project.resolve(path.toPortableString())) : path;
+                    ? Path.fromPortableString(project.resolve(path.toPortableString()).replaceAll("\\\\", "/")) : path;
 
             final IPath r = normalizePath(file, resolvedPath);
             if (r != null) {
