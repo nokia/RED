@@ -7,22 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.viewers.TreeContentProvider;
 
-public class NavigatorKeywordsContentProvider implements ITreeContentProvider {
-
-    @Override
-    public void dispose() {
-        // nothing to do
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-        // nothing to do
-    }
+public class NavigatorKeywordsContentProvider extends TreeContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {
@@ -32,7 +21,7 @@ public class NavigatorKeywordsContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof LibrarySpecification) {
-            List<KeywordSpecification> keywords = ((LibrarySpecification) parentElement).getKeywords();
+            final List<KeywordSpecification> keywords = ((LibrarySpecification) parentElement).getKeywords();
             if (keywords != null) {
                 return keywords.toArray();
             }

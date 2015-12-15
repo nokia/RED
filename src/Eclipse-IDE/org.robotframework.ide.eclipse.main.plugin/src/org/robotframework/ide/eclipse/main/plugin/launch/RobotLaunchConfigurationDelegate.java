@@ -84,7 +84,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -203,7 +203,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             int debugServerPort = -1;
             try {
                 debugServerPort = Integer.parseInt(remoteDebugPort);
-            } catch(NumberFormatException e) {
+            } catch(final NumberFormatException e) {
                 throw newCoreException("Invalid port specified", e);
             }
             cmdLine = runtimeEnvironment.createRunRemoteDebugTempScriptCmd(debugServerPort);
@@ -234,8 +234,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
 
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
-        Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
-        IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
+        final Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
+        final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         
         IOConsoleOutputStream remoteDebugConsole = null;
         if (isRemoteDebugging) {

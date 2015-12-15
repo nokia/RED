@@ -40,7 +40,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -69,6 +68,8 @@ public class RobotFormEditor extends FormEditor {
     private static final String EDITOR_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.context";
 
     public static final String ID = "org.robotframework.ide.tableditor";
+
+    private final List<IEditorPart> parts = newArrayList();
 
     private Clipboard clipboard;
 
@@ -189,12 +190,13 @@ public class RobotFormEditor extends FormEditor {
         }
     }
 
-    private void addEditorPart(final EditorPart editorPart, final String partName) throws PartInitException {
+    private void addEditorPart(final IEditorPart editorPart, final String partName) throws PartInitException {
         addEditorPart(editorPart, partName, editorPart.getTitleImage());
     }
 
-    private void addEditorPart(final EditorPart editorPart, final String partName, final Image image)
+    private void addEditorPart(final IEditorPart editorPart, final String partName, final Image image)
             throws PartInitException {
+        parts.add(editorPart);
         final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.inject(editorPart, eclipseContext);
 
@@ -298,17 +300,17 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void dispose() {
+        final IEclipseContext context = getSite().getService(IEclipseContext.class).getActiveLeaf();
+        ContextInjectionFactory.uninject(this, context);
+        for (final IEditorPart part : parts) {
+            ContextInjectionFactory.uninject(part, context);
+        }
+
         super.dispose();
 
         clipboard.dispose();
-
-        final IEclipseContext context = getSite().getService(IEclipseContext.class).getActiveLeaf();
-        ContextInjectionFactory.uninject(this, context);
-
-        for (int i = 0; i < getPageCount(); i++) {
-            ContextInjectionFactory.uninject(getEditor(i), context);
-        }
         suiteModel.dispose();
+
         PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.SUITE_MODEL_DISPOSED,
                 RobotElementChange.createChangedElement(suiteModel));
         RobotArtifactsValidator.revalidate(suiteModel);

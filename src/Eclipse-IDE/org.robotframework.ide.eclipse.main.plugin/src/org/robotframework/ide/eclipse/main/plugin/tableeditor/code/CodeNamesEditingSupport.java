@@ -29,8 +29,8 @@ class CodeNamesEditingSupport extends RobotElementEditingSupport {
 
     private KeywordsContentProposingSupport contentAssistSupport;
 
-    CodeNamesEditingSupport(final RowExposingTreeViewer viewer,
-            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
+    CodeNamesEditingSupport(final RowExposingTreeViewer viewer, final RobotEditorCommandsStack commandsStack,
+            final NewElementsCreator<RobotElement> creator) {
         super(viewer, 0, commandsStack, creator);
     }
 

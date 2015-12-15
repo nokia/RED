@@ -58,7 +58,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -66,6 +65,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsM
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsMatchesFilter;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.collect.Range;

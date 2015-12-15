@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -53,18 +53,6 @@ public class JarStructureBuilder {
 
         private JarClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
-        }
-
-        private static JarClass createFromJavaFile(final String name) {
-            final String nameWithoutExtension = name.substring(0, name.length() - ".java".length());
-            return new JarClass(nameWithoutExtension);
-        }
-
-        private static JarClass createFromClassFile(final String name) {
-            final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
-            final String nameWithoutNested = nameWithoutExtension.contains("$")
-                    ? nameWithoutExtension.substring(0, nameWithoutExtension.lastIndexOf('$')) : nameWithoutExtension;
-            return new JarClass(nameWithoutNested);
         }
 
         private static JarClass createFromZipEntry(final String name) {
