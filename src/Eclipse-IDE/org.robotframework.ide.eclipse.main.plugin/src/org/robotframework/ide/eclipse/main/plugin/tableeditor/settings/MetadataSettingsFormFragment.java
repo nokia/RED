@@ -51,10 +51,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Function;
@@ -133,7 +133,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
                 return matches;
             }
         };
-        final NewElementsCreator creator = newElementsCreator();
+        final NewElementsCreator<RobotElement> creator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Metadata").withWidth(140)
                 .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, 0, true))
                 .editingSupportedBy(new SettingsArgsEditingSupport(viewer, 0, commandsStack, creator))
@@ -152,8 +152,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
                 .createFor(viewer);
     }
 
-    private NewElementsCreator newElementsCreator() {
-        return new NewElementsCreator() {
+    private NewElementsCreator<RobotElement> newElementsCreator() {
+        return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
                 final RobotSettingsSection settingsSection = getSection();

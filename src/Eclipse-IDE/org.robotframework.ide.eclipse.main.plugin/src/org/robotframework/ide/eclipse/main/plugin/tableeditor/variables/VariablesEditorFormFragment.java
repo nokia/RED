@@ -48,11 +48,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
     
@@ -127,7 +128,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final NewElementsCreator creator = newElementsCreator();
+        final NewElementsCreator<RobotElement> creator = newElementsCreator();
         final MatchesProvider matchesProvider = new MatchesProvider() {
             @Override
             public MatchesCollection getMatches() {
@@ -160,8 +161,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 .createFor(viewer);
     }
 
-    private NewElementsCreator newElementsCreator() {
-        return new NewElementsCreator() {
+    private NewElementsCreator<RobotElement> newElementsCreator() {
+        return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
                 final RobotVariablesSection section = (RobotVariablesSection) getViewer().getInput();
@@ -242,7 +243,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             final Menu menu = manager.createContextMenu(control);
             control.setMenu(menu);
             site.registerContextMenu(menuId, manager, valueEditViewer, false);
-            site.setSelectionProvider(new VariablesEditorPageSelectionProvider(viewer, valueEditViewer));
+            site.setSelectionProvider(new ViewersCombiningSelectionProvider(viewer, valueEditViewer));
         } else {
             site.setSelectionProvider(viewer);
         }

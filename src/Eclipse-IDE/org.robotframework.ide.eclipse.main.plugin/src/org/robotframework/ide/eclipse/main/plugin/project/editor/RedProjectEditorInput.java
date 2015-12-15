@@ -23,7 +23,7 @@ public class RedProjectEditorInput {
         this.projectConfiguration = projectConfig;
     }
 
-    RobotProject getRobotProject() {
+    public RobotProject getRobotProject() {
         return RedPlugin.getModelManager().getModel().createRobotProject(project);
     }
 
@@ -31,7 +31,7 @@ public class RedProjectEditorInput {
         return projectConfiguration;
     }
 
-    boolean isEditable() {
+    public boolean isEditable() {
         return isEditable;
     }
     

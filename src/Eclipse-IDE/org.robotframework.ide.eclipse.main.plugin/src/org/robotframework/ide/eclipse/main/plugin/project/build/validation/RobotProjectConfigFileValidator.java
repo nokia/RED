@@ -36,8 +36,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 
 import com.google.common.collect.ImmutableMap;
 

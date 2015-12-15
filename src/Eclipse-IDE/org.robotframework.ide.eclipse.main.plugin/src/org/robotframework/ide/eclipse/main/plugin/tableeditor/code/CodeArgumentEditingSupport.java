@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 class CodeArgumentEditingSupport extends RobotElementEditingSupport {
 
     CodeArgumentEditingSupport(final RowExposingTreeViewer viewer, final int index,
-            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
+            final RobotEditorCommandsStack commandsStack, final NewElementsCreator<RobotElement> creator) {
         super(viewer, index, commandsStack, creator);
     }
 

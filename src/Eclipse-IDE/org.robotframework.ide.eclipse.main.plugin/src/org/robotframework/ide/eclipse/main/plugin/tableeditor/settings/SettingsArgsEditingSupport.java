@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -18,8 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 
 class SettingsArgsEditingSupport extends RobotElementEditingSupport {
 
-    SettingsArgsEditingSupport(final ColumnViewer viewer, final int index,
-            final RobotEditorCommandsStack commandsStack, final NewElementsCreator creator) {
+    SettingsArgsEditingSupport(final ColumnViewer viewer, final int index, final RobotEditorCommandsStack commandsStack,
+            final NewElementsCreator<RobotElement> creator) {
         super(viewer, index, commandsStack, creator);
     }
 

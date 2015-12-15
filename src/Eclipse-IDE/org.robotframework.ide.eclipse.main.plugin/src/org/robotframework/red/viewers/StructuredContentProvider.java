@@ -3,14 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
-
-import java.util.List;
+package org.robotframework.red.viewers;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-class RemoteLibraryLocationsContentProvider implements IStructuredContentProvider {
+public abstract class StructuredContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
@@ -20,10 +18,5 @@ class RemoteLibraryLocationsContentProvider implements IStructuredContentProvide
     @Override
     public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
         // nothing to do
-    }
-
-    @Override
-    public Object[] getElements(final Object inputElement) {
-        return ((List<?>) inputElement).toArray();
     }
 }

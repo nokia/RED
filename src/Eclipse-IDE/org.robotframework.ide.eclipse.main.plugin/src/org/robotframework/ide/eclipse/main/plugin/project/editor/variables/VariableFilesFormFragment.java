@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -15,7 +15,9 @@ import javax.inject.Inject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -23,6 +25,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -46,11 +49,16 @@ import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
 /**
  * @author mmarzec
@@ -72,6 +80,10 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     private Button addFileBtn;
 
     private Button removeFileBtn;
+
+    public ISelectionProvider getViewer() {
+        return viewer;
+    }
 
     @Override
     public void initialize(final Composite parent) {
@@ -191,22 +203,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         };
     }
 
-    void whenEnvironmentWasLoaded() {
-        final boolean isEditable = editorInput.isEditable();
-
-        addFileBtn.setEnabled(isEditable);
-        removeFileBtn.setEnabled(false);
-        viewer.getTable().setEnabled(isEditable);
-
-    }
-
-    void whenConfigurationFileChanged() {
-        addFileBtn.setEnabled(false);
-        removeFileBtn.setEnabled(false);
-        viewer.getTable().setEnabled(false);
-        setInput();
-    }
-
     private void setInput() {
         final List<ReferencedVariableFile> files = editorInput.getProjectConfiguration().getReferencedVariableFiles();
         viewer.setInput(files);
@@ -220,6 +216,34 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Override
     public MatchesCollection collectMatches(final String filter) {
         return null;
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentLoadingStarted(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
+        addFileBtn.setEnabled(false);
+        removeFileBtn.setEnabled(false);
+        viewer.getTable().setEnabled(false);
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentsWereLoaded(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
+        final boolean isEditable = editorInput.isEditable();
+
+        addFileBtn.setEnabled(isEditable);
+        removeFileBtn.setEnabled(false);
+        viewer.getTable().setEnabled(isEditable);
+
+    }
+
+    private static class VariableFilesContentProvider extends StructuredContentProvider {
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            return ((List<?>) inputElement).toArray();
+        }
     }
 
     private static class VariableFileDialog extends Dialog {
@@ -265,7 +289,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
-                    final FileDialog dialog = new FileDialog(dialogComposite.getShell(), SWT.OPEN);
+                    final FileDialog dialog = new FileDialog(dialogComposite.getShell(), SWT.OPEN | SWT.MULTI);
                     dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
                     dialog.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
                     final String chosenFilePath = dialog.open();

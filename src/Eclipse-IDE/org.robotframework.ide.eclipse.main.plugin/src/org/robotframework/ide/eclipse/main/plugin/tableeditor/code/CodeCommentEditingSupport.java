@@ -24,7 +24,7 @@ class CodeCommentEditingSupport extends RobotElementEditingSupport {
 
     CodeCommentEditingSupport(final ColumnViewer viewer, final int index,
             final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
+            final NewElementsCreator<RobotElement> creator) {
         super(viewer, index, commandsStack, creator);
     }
 

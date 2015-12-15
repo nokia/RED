@@ -52,11 +52,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Function;
@@ -124,7 +124,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final NewElementsCreator creator = newElementsCreator();
+        final NewElementsCreator<RobotElement> creator = newElementsCreator();
         final MatchesProvider matchesProvider = getMatchesProvider();
         ViewerColumnsFactory.newColumn("Import").withWidth(140)
             .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
@@ -153,8 +153,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         };
     }
 
-    private NewElementsCreator newElementsCreator() {
-        return new NewElementsCreator() {
+    private NewElementsCreator<RobotElement> newElementsCreator() {
+        return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
                 new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel, null).open();
@@ -178,7 +178,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createArgumentColumn(final String name, final int index, final MatchesProvider matchesProvider,
-            final NewElementsCreator creator) {
+            final NewElementsCreator<RobotElement> creator) {
         ViewerColumnsFactory.newColumn(name).withWidth(120)
                 .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, index))
                 .editingSupportedBy(new SettingsArgsEditingSupport(viewer, index, commandsStack, creator))
