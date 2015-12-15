@@ -64,8 +64,12 @@ public class RobotParser {
     private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
         this.robotProject = robotProject;
         this.robotVersionFromCommand = robotProject.getRobotRuntime().getVersion();
-        this.robotVersion = RobotVersion.from(robotVersionFromCommand);
+        this.robotVersion = robotVersionFromCommand != null ? RobotVersion.from(robotVersionFromCommand) : null;
         this.shouldEagerImport = shouldImportEagerly;
+    }
+
+    public final RobotVersion getRobotVersion() {
+        return robotVersion;
     }
 
     public boolean isImportingEagerly() {
