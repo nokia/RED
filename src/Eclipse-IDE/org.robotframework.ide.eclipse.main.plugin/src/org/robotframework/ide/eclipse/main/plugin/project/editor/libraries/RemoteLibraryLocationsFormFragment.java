@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,7 +11,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -38,7 +40,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
@@ -67,7 +73,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
                 | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
         section.setText("Remote library locations");
-        section.setDescription("In this section locations of servers for Remote library can be specified. "
+        section.setDescription("In this section locations of servers for Remote standard library can be specified. "
                 + "Those addresses will be available for all suites within project.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
 
@@ -155,20 +161,6 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         };
     }
 
-    void whenEnvironmentWasLoaded() {
-        final boolean isEditable = editorInput.isEditable();
-
-        addLocationButton.setEnabled(isEditable);
-        removeLocationButton.setEnabled(false);
-        viewer.getTable().setEnabled(isEditable);
-    }
-
-    void whenConfigurationFileChanged() {
-        addLocationButton.setEnabled(false);
-        removeLocationButton.setEnabled(false);
-        viewer.getTable().setEnabled(false);
-    }
-
     private void setInput() {
         final List<RemoteLocation> remoteLocations = editorInput.getProjectConfiguration().getRemoteLocations();
         viewer.setInput(remoteLocations);
@@ -195,6 +187,26 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         } catch (final URISyntaxException e) {
             return uri;
         }
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentLoadingStarted(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
+        addLocationButton.setEnabled(false);
+        removeLocationButton.setEnabled(false);
+        viewer.getTable().setEnabled(false);
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentsWereLoaded(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
+        final boolean isEditable = editorInput.isEditable();
+
+        addLocationButton.setEnabled(isEditable);
+        removeLocationButton.setEnabled(false);
+        viewer.getTable().setEnabled(isEditable);
     }
 
     private static class RemoteLocationDialog extends Dialog {

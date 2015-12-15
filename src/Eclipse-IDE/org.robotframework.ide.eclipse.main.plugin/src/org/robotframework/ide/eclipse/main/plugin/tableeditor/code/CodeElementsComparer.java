@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.viewers.ElementAddingToken;
 
 
 class CodeElementsComparer implements IElementComparer {

@@ -5,21 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
-class GeneralSettingsContentProvider implements IStructuredContentProvider {
-
-    @Override
-    public void dispose() {
-        // nothing to do
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-        // nothing to do
-    }
+class GeneralSettingsContentProvider extends StructuredContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
@@ -22,11 +22,11 @@ class PythonLibStructureBuilder {
     
     private final RobotRuntimeEnvironment environment;
 
-    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
+    PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
         this.environment = environment;
     }
 
-    public List<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+    List<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
         
         final List<String> classes = environment.getClassesDefinedInModule(new File(path));
         return newArrayList(transform(classes, new Function<String, PythonClass>() {

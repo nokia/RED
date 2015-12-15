@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -17,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 class SettingsCommentsEditingSupport extends RobotElementEditingSupport {
 
     SettingsCommentsEditingSupport(final ColumnViewer column, final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
+            final NewElementsCreator<RobotElement> creator) {
         super(column, ((TableViewer) column).getTable().getColumnCount(), commandsStack, creator);
     }
 

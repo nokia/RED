@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
+package org.robotframework.red.viewers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,13 +16,13 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 
-class VariablesEditorPageSelectionProvider implements ISelectionProvider {
+public class ViewersCombiningSelectionProvider implements ISelectionProvider {
 
     private final List<TableViewer> viewers;
 
     private TableViewer activeViewer;
 
-    public VariablesEditorPageSelectionProvider(final TableViewer... viewers) {
+    public ViewersCombiningSelectionProvider(final TableViewer... viewers) {
         this.viewers = Arrays.asList(viewers);
 
         for (final TableViewer viewer : viewers) {

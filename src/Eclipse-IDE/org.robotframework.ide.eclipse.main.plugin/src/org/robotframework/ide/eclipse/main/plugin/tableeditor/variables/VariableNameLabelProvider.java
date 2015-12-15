@@ -13,10 +13,10 @@ import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.ElementAddingToken;
 
 class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -54,8 +54,6 @@ class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public String getToolTipText(final Object element) {
         if (element instanceof RobotVariable && ((RobotVariable) element).getType() != VariableType.INVALID) {
-            final DisposeNeededStyler variableStyler = addDisposeNeededStyler(withForeground(200, 200, 200));
-
             final RobotVariable variable = (RobotVariable) element;
             return variable.getPrefix() + variable.getName() + variable.getSuffix();
         } else if (element instanceof RobotVariable) {

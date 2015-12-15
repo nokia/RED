@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -17,7 +17,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
@@ -25,11 +27,13 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.JarStructureBuilder.JarClass;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.PythonLibStructureBuilder.PythonClass;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
+import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author Michal Anglart
@@ -41,8 +45,7 @@ public class ReferencedLibraryImporter {
     public ReferencedLibrary importPythonLib(final Shell shellForDialogs, final RobotRuntimeEnvironment environment,
             final String fullLibraryPath) {
         if (fullLibraryPath != null) {
-            final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                    environment);
+            final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
             final List<PythonClass> pythonClasses = newArrayList();
             
             try {
@@ -71,7 +74,7 @@ public class ReferencedLibraryImporter {
                 final String name = new File(fullLibraryPath).getName();
                 pythonClasses.add(PythonClass.create(name.substring(0, name.lastIndexOf('.'))));
             }
-            final ElementListSelectionDialog classesDialog = ClassesSelectionDialog.create(shellForDialogs,
+            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs,
                     pythonClasses, new PythonClassesLabelProvider());
             if (classesDialog.open() == Window.OK) {
                 final Object[] result = classesDialog.getResult();
@@ -122,8 +125,7 @@ public class ReferencedLibraryImporter {
             return null;
         }
 
-        final ElementListSelectionDialog classesDialog = ClassesSelectionDialog
-                .create(shell, classesFromJar, new JarClassesLabelProvider());
+        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, classesFromJar, new JarClassesLabelProvider());
 
         if (classesDialog.open() == Window.OK) {
             final Object[] result = classesDialog.getResult();
@@ -152,4 +154,38 @@ public class ReferencedLibraryImporter {
         return referencedLibrary;
     }
 
+    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final List<?> classes,
+            final LabelProvider labelProvider) {
+        final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(shell, labelProvider);
+        classesDialog.setMultipleSelection(true);
+        classesDialog.setTitle("Select library class");
+        classesDialog.setMessage("Select the class(es) which defines library:");
+        classesDialog.setElements(classes.toArray());
+
+        return classesDialog;
+    }
+
+    private static class PythonClassesLabelProvider extends LabelProvider {
+        @Override
+        public Image getImage(final Object element) {
+            return ImagesManager.getImage(RedImages.getJavaClassImage());
+        }
+
+        @Override
+        public String getText(final Object element) {
+            return ((PythonClass) element).getQualifiedName();
+        }
+    }
+
+    private static class JarClassesLabelProvider extends LabelProvider {
+        @Override
+        public Image getImage(final Object element) {
+            return ImagesManager.getImage(RedImages.getJavaClassImage());
+        }
+
+        @Override
+        public String getText(final Object element) {
+            return ((JarClass) element).getQualifiedName();
+        }
+    }
 }

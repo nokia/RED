@@ -3,8 +3,9 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
@@ -29,18 +30,18 @@ class VariableFilesLabelProvider extends StylersDisposingLabelProvider {
     public StyledString getStyledText(final Object element) {
         final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
 
-        final StyledString label = new StyledString(varFile.getName());
+        final StyledString label = new StyledString(Path.fromPortableString(varFile.getPath()).lastSegment());
 
-        final List<String> args = varFile.getArguments();
-        if (args != null && !args.isEmpty()) {
-            final DisposeNeededStyler styler = addDisposeNeededStyler(new DisposeNeededStyler() {
+        final List<String> args = varFile.getArguments() != null ? varFile.getArguments() : new ArrayList<String>();
+        if (!args.isEmpty()) {
+            label.append(" (" + Joiner.on(", ").join(args) + ")", addDisposeNeededStyler(new DisposeNeededStyler() {
+
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
                     textStyle.foreground = new Color(Display.getCurrent(), 200, 200, 200);
                     markForDisposal(textStyle.foreground);
                 }
-            });
-            label.append(" (" + Joiner.on(", ").join(args) + ")", styler);
+            }));
         }
         label.append(" - " + new Path(varFile.getPath()), new Styler() {
 

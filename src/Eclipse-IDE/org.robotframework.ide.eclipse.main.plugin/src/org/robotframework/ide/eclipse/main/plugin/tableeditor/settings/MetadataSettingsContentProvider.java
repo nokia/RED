@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
-class MetadataSettingsContentProvider implements IStructuredContentProvider {
+class MetadataSettingsContentProvider extends StructuredContentProvider {
 
     private ElementAddingToken elementAddingToken;
     private final boolean editable;
@@ -29,11 +28,6 @@ class MetadataSettingsContentProvider implements IStructuredContentProvider {
         if (elementAddingToken != null) {
             elementAddingToken.dispose();
         }
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-        // nothing to do
     }
 
     @Override

@@ -53,8 +53,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
 public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
@@ -225,7 +225,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     protected abstract RobotSuiteFileSection getSection();
 
     private void createColumns() {
-        final NewElementsCreator creator = provideNewElementsCreator();
+        final NewElementsCreator<RobotElement> creator = provideNewElementsCreator();
 
         createNameColumn(creator);
         final int maxLength = calculateLongestArgumentsList();
@@ -235,13 +235,13 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         createCommentColumn(maxLength + 1, creator);
     }
 
-    protected abstract NewElementsCreator provideNewElementsCreator();
+    protected abstract NewElementsCreator<RobotElement> provideNewElementsCreator();
 
     protected int calculateLongestArgumentsList() {
         return RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
     }
 
-    private void createNameColumn(final NewElementsCreator creator) {
+    private void createNameColumn(final NewElementsCreator<RobotElement> creator) {
         ViewerColumnsFactory.newColumn("").withWidth(150)
             .equipWithThreeWaySorting(CodesViewerComparators.codeNamesAscendingComparator(),
                     CodesViewerComparators.codeNamesDescendingComparator())
@@ -251,7 +251,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    private void createArgumentColumn(final int index, final NewElementsCreator creator) {
+    private void createArgumentColumn(final int index, final NewElementsCreator<RobotElement> creator) {
         ViewerColumnsFactory.newColumn("").withWidth(100)
             .labelsProvidedBy(new CodeArgumentLabelProvider(getMatchesProvider(), index))
             .editingSupportedBy(new CodeArgumentEditingSupport(viewer, index, commandsStack, creator))
@@ -259,7 +259,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    private void createCommentColumn(final int index, final NewElementsCreator creator) {
+    private void createCommentColumn(final int index, final NewElementsCreator<RobotElement> creator) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
             .labelsProvidedBy(new CodeCommentLabelProvider(getMatchesProvider()))

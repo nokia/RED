@@ -8,27 +8,15 @@ package org.robotframework.ide.eclipse.main.plugin.execution;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
+import org.robotframework.red.viewers.TreeContentProvider;
 
-public class ExecutionViewContentProvider implements ITreeContentProvider {
+public class ExecutionViewContentProvider extends TreeContentProvider {
 
     private boolean isFailedFilterEnabled;
 
     @Override
-    public void dispose() {
-
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-
-    }
-
-    @Override
     public Object[] getElements(final Object inputElement) {
-
         return (ExecutionStatus[]) inputElement;
     }
 
@@ -40,7 +28,7 @@ public class ExecutionViewContentProvider implements ITreeContentProvider {
 
             if (isFailedFilterEnabled) {
                 final List<ExecutionStatus> failedChildren = new ArrayList<ExecutionStatus>();
-                for (ExecutionStatus executionStatus : children) {
+                for (final ExecutionStatus executionStatus : children) {
                     if (executionStatus.getStatus() == Status.FAIL) {
                         failedChildren.add(executionStatus);
                     }
