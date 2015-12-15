@@ -764,6 +764,11 @@
           name="Context for Variables mappings section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.varfiles.context"
+          name="Context for Variable files section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -1979,9 +1984,26 @@
                       value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$VariableMapping">
                 </instanceof>
              </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedVariableFileHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.varFilesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
              <iterate
                    ifEmpty="false"
                    operator="and">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$ReferencedVariableFile">
+                </instanceof>
              </iterate>
           </with>
        </enabledWhen>
@@ -2087,6 +2109,15 @@
     <menuContribution
           allPopups="false"
           locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.variablesmapping.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.variablefiles.contextMenu?before=additions">
        <command
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
@@ -3520,6 +3551,37 @@
                    operator="or">
                 <equals
                       value="org.robotframework.ide.eclipse.redxmleditor.varmapping.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.redXmlIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.redxml.varFilesPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.redxmleditor.varfiles.context">
                 </equals>
              </iterate>
              <not>
