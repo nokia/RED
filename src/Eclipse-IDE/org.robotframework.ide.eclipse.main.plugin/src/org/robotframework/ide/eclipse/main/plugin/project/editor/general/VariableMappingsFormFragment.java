@@ -278,6 +278,8 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     public static class VariableMappingDialog extends Dialog {
 
+        private boolean isVariablePredefined;
+
         private VariableMapping mapping;
         private Label exceptionLabel;
 
@@ -288,10 +290,12 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
         public VariableMappingDialog(final Shell parentShell) {
             this(parentShell, "${var}");
+            this.isVariablePredefined = false;
         }
 
         public VariableMappingDialog(final Shell parentShell, final String variableName) {
             super(parentShell);
+            this.isVariablePredefined = true;
             this.initialVariableName = variableName;
         }
 
@@ -342,8 +346,9 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
             exceptionLabel.setText("");
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(exceptionLabel);
 
-            valueText.setFocus();
-            valueText.setSelection(0, valueLabel.getText().length());
+            final Text controlToFocus = isVariablePredefined ? valueText : nameText;
+            controlToFocus.setFocus();
+            controlToFocus.setSelection(0, controlToFocus.getText().length());
 
             return dialogComposite;
         }

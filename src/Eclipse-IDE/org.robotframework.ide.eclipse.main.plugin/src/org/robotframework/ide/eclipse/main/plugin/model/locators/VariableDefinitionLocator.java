@@ -193,7 +193,6 @@ public class VariableDefinitionLocator {
                     .toString();
             final ReferencedVariableFile localReferencedFile = new ReferencedVariableFile();
             localReferencedFile.setPath(path);
-            localReferencedFile.setName(path);
             for (final AVariableImported<?> aVariableImported : variablesFileImportReference.getVariables()) {
                 final ContinueDecision shouldContinue = detector.varFileVariableDetected(localReferencedFile,
                         aVariableImported.getRobotRepresentation(), aVariableImported.getValue());

@@ -5,66 +5,56 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableFilesPathEditingSupport.VariableFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsEditor;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.StructuredContentProvider;
+import org.robotframework.red.viewers.Viewers;
 
 /**
  * @author mmarzec
  */
-@SuppressWarnings("PMD.TooManyMethods")
 class VariableFilesFormFragment implements ISectionFormFragment {
+
+    private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.varfiles.context";
+
+    @Inject
+    private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -75,11 +65,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
-    private TableViewer viewer;
-
-    private Button addFileBtn;
-
-    private Button removeFileBtn;
+    private RowExposingTableViewer viewer;
 
     public ISelectionProvider getViewer() {
         return viewer;
@@ -87,120 +73,67 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
-                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
-        section.setText("Variable files");
-        section.setDescription("In this section variable files can be specified. Those variables will "
-                + "be available for all suites within project and will be accessible without importing.");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        final Section section = createSection(parent);
 
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
 
         createViewer(internalComposite);
-        createButtons(internalComposite);
+        createColumns();
+        createContextMenu();
 
         setInput();
     }
 
+    private Section createSection(final Composite parent) {
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
+        section.setText("Variable files");
+        section.setDescription("In this section variable files can be specified. Those variables will "
+                + "be available for all suites within project and will be accessible without importing.");
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        return section;
+    }
+
     private void createViewer(final Composite parent) {
-        viewer = new TableViewer(parent);
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 4).applyTo(viewer.getTable());
+        viewer = new RowExposingTableViewer(parent,
+                SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
+        viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
+        viewer.getTable().setLinesVisible(true);
+        viewer.getTable().setHeaderVisible(true);
 
         viewer.setContentProvider(new VariableFilesContentProvider());
-        viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new VariableFilesLabelProvider()));
-        final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
 
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                removeFileBtn.setEnabled(!event.getSelection().isEmpty());
-            }
-        };
-        viewer.addSelectionChangedListener(selectionChangedListener);
-        viewer.addDoubleClickListener(createDoubleClickListener());
         ViewersConfigurator.enableDeselectionPossibility(viewer);
-        viewer.getTable().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeSelectionChangedListener(selectionChangedListener);
-            }
-        });
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+        Viewers.boundViewerWithContext(viewer, site, CONTEXT_ID);
     }
 
-    private void createButtons(final Composite parent) {
-        addFileBtn = toolkit.createButton(parent, "Add Variable File", SWT.PUSH);
-        addFileBtn.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addFileBtn);
-        addFileBtnHandler();
-
-        removeFileBtn = toolkit.createButton(parent, "Remove", SWT.PUSH);
-        removeFileBtn.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(removeFileBtn);
-        addRemoveBtnHandler();
+    private void createColumns() {
+        final NewElementsCreator<ReferencedVariableFile> creator = new VariableFileCreator(viewer.getTable().getShell(),
+                editorInput);
+        ViewerColumnsFactory.newColumn("File").withWidth(150)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+            .editingEnabledOnlyWhen(editorInput.isEditable())
+            .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
+            .labelsProvidedBy(new VariableFilesLabelProvider()) 
+            .createFor(viewer);
     }
 
-    private void addFileBtnHandler() {
-        addFileBtn.addSelectionListener(new SelectionAdapter() {
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.redxmleditor.variablefiles.contextMenu";
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(), null, toolkit);
-                if (dialog.open() == Window.OK) {
-                    final ReferencedVariableFile variableFile = dialog.getVariableFile();
-                    if (variableFile != null) {
-                        final String name = new File(variableFile.getPath()).getName();
-                        variableFile.setName(name);
-
-                        editorInput.getProjectConfiguration().addReferencedVariableFile(variableFile);
-                        
-                        dirtyProviderService.setDirtyState(true);
-                        viewer.refresh();
-                    }
-                }
-            }
-        });
-    }
-
-    private void addRemoveBtnHandler() {
-        removeFileBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final List<ReferencedVariableFile> selectedFiles = Selections.getElements(
-                        (IStructuredSelection) viewer.getSelection(), ReferencedVariableFile.class);
-                editorInput.getProjectConfiguration().removeReferencedVariableFiles(selectedFiles);
-                dirtyProviderService.setDirtyState(true);
-                viewer.refresh();
-            }
-        });
-    }
-
-    private IDoubleClickListener createDoubleClickListener() {
-        return new IDoubleClickListener() {
-
-            @Override
-            public void doubleClick(final DoubleClickEvent event) {
-                if (event.getSelection() != null && event.getSelection() instanceof StructuredSelection) {
-                    final StructuredSelection selection = (StructuredSelection) event.getSelection();
-                    if (!selection.isEmpty()) {
-                        final ReferencedVariableFile variableFile = (ReferencedVariableFile) selection.getFirstElement();
-                        final VariableFileDialog dialog = new VariableFileDialog(viewer.getTable().getShell(),
-                                variableFile, toolkit);
-                        if (dialog.open() == Window.OK) {
-                            final String name = new File(variableFile.getPath()).getName();
-                            variableFile.setName(name);
-
-                            dirtyProviderService.setDirtyState(true);
-                            viewer.refresh();
-                        }
-                    }
-                }
-            }
-        };
+        final MenuManager manager = new MenuManager("Red.xml file editor variable files context menu", menuId);
+        final Table control = viewer.getTable();
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, viewer, false);
     }
 
     private void setInput() {
@@ -213,6 +146,10 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer.getTable().setFocus();
     }
 
+    private void setDirty(final boolean isDirty) {
+        dirtyProviderService.setDirtyState(isDirty);
+    }
+
     @Override
     public MatchesCollection collectMatches(final String filter) {
         return null;
@@ -222,8 +159,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        addFileBtn.setEnabled(false);
-        removeFileBtn.setEnabled(false);
+        setInput();
+
         viewer.getTable().setEnabled(false);
     }
 
@@ -231,141 +168,36 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        final boolean isEditable = editorInput.isEditable();
-
-        addFileBtn.setEnabled(isEditable);
-        removeFileBtn.setEnabled(false);
-        viewer.getTable().setEnabled(isEditable);
-
+        viewer.getTable().setEnabled(editorInput.isEditable());
     }
 
-    private static class VariableFilesContentProvider extends StructuredContentProvider {
+    @Inject
+    @Optional
+    private void whenVarFileDetailChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_DETAIL_CHANGED) final ReferencedVariableFile varFile) {
+        setDirty(true);
+        viewer.refresh();
+    }
+
+    @Inject
+    @Optional
+    private void whenVarFileChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final List<ReferencedVariableFile> varFiles) {
+        setDirty(true);
+        viewer.refresh();
+    }
+
+    private class VariableFilesContentProvider extends StructuredContentProvider {
         @Override
         public Object[] getElements(final Object inputElement) {
-            return ((List<?>) inputElement).toArray();
-        }
-    }
-
-    private static class VariableFileDialog extends Dialog {
-
-        private final RedFormToolkit toolkit;
-
-        private ReferencedVariableFile variableFile;
-
-        private Text pathText;
-
-        private ImportSettingFileArgumentsEditor argumentsEditor;
-
-        protected VariableFileDialog(final Shell parentShell, final ReferencedVariableFile variableFile,
-                final RedFormToolkit toolkit) {
-            super(parentShell);
-            this.variableFile = variableFile;
-            this.toolkit = toolkit;
-        }
-
-        @Override
-        public void create() {
-            super.create();
-            if (variableFile != null) {
-                getShell().setText("Edit Variable File");
+            final Object[] elements = ((List<?>) inputElement).toArray();
+            if (editorInput.isEditable()) {
+                final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
+                newElements[elements.length] = new ElementAddingToken("variable file", true);
+                return newElements;
             } else {
-                getShell().setText("Add Variable File");
+                return elements;
             }
-        }
-
-        @Override
-        protected Control createDialogArea(final Composite parent) {
-            final Composite dialogComposite = (Composite) super.createDialogArea(parent);
-            GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).applyTo(dialogComposite);
-            GridDataFactory.fillDefaults().grab(true, true).minSize(400, 50).applyTo(dialogComposite);
-
-            final Label pathLabel = new Label(dialogComposite, SWT.WRAP);
-            pathLabel.setText("Path:");
-            pathText = toolkit.createText(dialogComposite, "", SWT.BORDER);
-            GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(pathText);
-
-            final Button browseFileBtn = toolkit.createButton(dialogComposite, "Browse...", SWT.NONE);
-            browseFileBtn.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(final SelectionEvent e) {
-                    final FileDialog dialog = new FileDialog(dialogComposite.getShell(), SWT.OPEN | SWT.MULTI);
-                    dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
-                    dialog.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
-                    final String chosenFilePath = dialog.open();
-                    if (chosenFilePath != null) {
-                        pathText.setText(chosenFilePath);
-                    }
-                }
-            });
-
-            final ExpandableComposite section = toolkit.createExpandableComposite(dialogComposite,
-                    ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
-            section.setBackground(null);
-            section.setText("Add Arguments");
-            section.addExpansionListener(new IExpansionListener() {
-
-                @Override
-                public void expansionStateChanging(final ExpansionEvent e) {
-                }
-
-                @Override
-                public void expansionStateChanged(final ExpansionEvent e) {
-                    if (e.getState()) {
-                        dialogComposite.getShell().setSize(dialogComposite.getShell().getSize().x, 300);
-                    } else {
-                        dialogComposite.getShell().setSize(dialogComposite.getShell().getSize().x, 140);
-                    }
-                }
-            });
-            GridDataFactory.fillDefaults().grab(true, true).span(3, 1).applyTo(section);
-
-            final Composite sectionInternal = new Composite(section, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).applyTo(sectionInternal);
-            GridLayoutFactory.fillDefaults().applyTo(sectionInternal);
-            section.setClient(sectionInternal);
-
-            final List<String> arguments = newArrayList();
-            if (variableFile != null) {
-                pathText.setText(new Path(variableFile.getPath()).toOSString());
-                final List<String> args = variableFile.getArguments();
-                if (args != null && !args.isEmpty()) {
-                    arguments.addAll(args);
-                }
-            }
-            
-            if(arguments.isEmpty()) {
-                section.setExpanded(false);
-            } else {
-                section.setExpanded(true);
-            }
-
-            argumentsEditor = new ImportSettingFileArgumentsEditor();
-            argumentsEditor.createArgumentsEditor(sectionInternal, arguments);
-
-            return dialogComposite;
-        }
-
-        @Override
-        protected void okPressed() {
-            if (!pathText.getText().isEmpty()) {
-                if (variableFile == null) {
-                    variableFile = new ReferencedVariableFile();
-                }
-                final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(pathText.getText()));
-                variableFile.setPath(path.toPortableString());
-                variableFile.setArguments(argumentsEditor.getArguments());
-            }
-            super.okPressed();
-        }
-
-        @Override
-        public boolean close() {
-            return super.close();
-        }
-
-        public ReferencedVariableFile getVariableFile() {
-            return variableFile;
         }
     }
 }
