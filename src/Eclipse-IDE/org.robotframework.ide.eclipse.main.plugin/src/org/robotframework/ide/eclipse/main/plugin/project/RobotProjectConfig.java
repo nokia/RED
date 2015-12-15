@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.core.runtime.IPath;
@@ -369,38 +370,33 @@ public class RobotProjectConfig {
     public static class ReferencedVariableFile {
 
         @XmlAttribute
-        private String name;
-
-        @XmlAttribute
         private String path;
 
-        @XmlAttribute
+        @XmlElement
         private List<String> arguments;
 
+        @XmlTransient
         private Map<String, Object> variables;
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
+        public void setPath(final String path) {
+            this.path = path;
         }
 
         public String getPath() {
             return path;
         }
 
-        public void setPath(final String path) {
-            this.path = path;
+        public void setArguments(final List<String> arguments) {
+            this.arguments = arguments;
         }
 
         public List<String> getArguments() {
-            return arguments;
+            return arguments == null ? new ArrayList<String>() : arguments;
         }
 
-        public void setArguments(final List<String> arguments) {
-            this.arguments = arguments;
+        @XmlTransient
+        public void setVariables(final Map<String, Object> variables) {
+            this.variables = variables;
         }
 
         public Map<String, Object> getVariables() {
@@ -434,10 +430,6 @@ public class RobotProjectConfig {
         private Object toListIfNeeded(final Object object) {
             return object instanceof Object[] ? newArrayList((Object[]) object) : object;
         }
-
-        public void setVariables(final Map<String, Object> variables) {
-            this.variables = variables;
-        }
         
         @Override
         public boolean equals(final Object obj) {
@@ -445,14 +437,14 @@ public class RobotProjectConfig {
                 return false;
             } else if (obj.getClass() == getClass()) {
                 final ReferencedVariableFile other = (ReferencedVariableFile) obj;
-                return Objects.equals(name, other.name) && Objects.equals(path, other.path);
+                return Objects.equals(path, other.path) && Objects.equals(arguments, other.arguments);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, path);
+            return Objects.hash(path, arguments);
         }
     }
 

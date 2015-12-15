@@ -20,7 +20,7 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
 
     protected final int index;
 
-    private final NewElementsCreator<?> creator;
+    protected final NewElementsCreator<?> creator;
 
     public ElementsAddingEditingSupport(final ColumnViewer viewer, final int index,
             final NewElementsCreator<?> creator) {
@@ -57,7 +57,7 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
 
     // refresh and cell editor activation has to be done in GUI thread but after
     // current cell editor was properly deactivated
-    private void scheduleViewerRefreshAndEditorActivation(final Object value, final int cellColumnToActivate) {
+    protected final void scheduleViewerRefreshAndEditorActivation(final Object value, final int cellColumnToActivate) {
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
 
             @Override
