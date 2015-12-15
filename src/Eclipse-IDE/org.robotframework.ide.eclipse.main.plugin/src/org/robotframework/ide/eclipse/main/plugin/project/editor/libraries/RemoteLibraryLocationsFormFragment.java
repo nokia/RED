@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -33,7 +34,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -87,6 +90,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
 
         createViewer(internalComposite);
         createColumns();
+        createContextMenu();
 
         setInput();
     }
@@ -126,6 +130,16 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
                 .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, newElementsCreator()))
             .labelsProvidedBy(new RemoteLibraryLocationsAddressLabelProvider())
             .createFor(viewer);
+    }
+
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.redxmleditor.remotelocations.contextMenu";
+
+        final MenuManager manager = new MenuManager("Red.xml file editor remote locations context menu", menuId);
+        final Table control = viewer.getTable();
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, viewer, false);
     }
 
     private NewElementsCreator<RemoteLocation> newElementsCreator() {
