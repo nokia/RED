@@ -20,9 +20,11 @@ public class RobotProjectConfigEvents {
 
     public static final String ROBOT_CONFIG_VAR_FILE_DETAIL_CHANGED = "robot/redxml/detail/varfile/changed/*";
     public static final String ROBOT_CONFIG_VAR_FILE_PATH_CHANGED = "robot/redxml/detail/varfile/changed/path";
+    public static final String ROBOT_CONFIG_VAR_FILE_ARGUMENT_CHANGED = "robot/redxml/detail/varfile/changed/argument";
     public static final String ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED = "robot/redxml/structural/varfile/changed";
 
 
     public static final String ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED = "robot/redxml/structural/libs/changed";
+
 
 }
