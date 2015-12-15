@@ -162,7 +162,7 @@ public class ViewerColumnsFactory {
 		final int totalTableWidth = viewer.getControl().getSize().x;
 
 		TableColumn autoExtendingColumn = null;
-		for (TableColumn currentColumn : viewer.getTable().getColumns()) {
+		for (final TableColumn currentColumn : viewer.getTable().getColumns()) {
 			if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
 				autoExtendingColumn = currentColumn;
 			}
@@ -315,7 +315,7 @@ public class ViewerColumnsFactory {
 		final int totalTableWidth = viewer.getControl().getSize().x;
 
 		TreeColumn autoExtendingColumn = null;
-		for (TreeColumn currentColumn : viewer.getTree().getColumns()) {
+		for (final TreeColumn currentColumn : viewer.getTree().getColumns()) {
 			if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
 				autoExtendingColumn = currentColumn;
 			}
