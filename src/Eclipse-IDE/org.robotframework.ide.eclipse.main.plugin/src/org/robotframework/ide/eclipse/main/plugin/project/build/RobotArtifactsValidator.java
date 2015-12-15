@@ -177,8 +177,18 @@ public class RobotArtifactsValidator {
 
     private Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
             final IResource resource) throws CoreException {
-        return resource.getType() == IResource.FILE ? createProperValidator(context, (IFile) resource)
+        return resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)
+                ? createProperValidator(context, (IFile) resource)
                 : Optional.<ModelUnitValidator> absent();
+    }
+
+    private boolean isInsideEclipseHiddenDirectory(final IResource resource) {
+        for (final String segment : resource.getFullPath().segments()) {
+            if (!segment.isEmpty() && segment.charAt(0) == '.') {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
