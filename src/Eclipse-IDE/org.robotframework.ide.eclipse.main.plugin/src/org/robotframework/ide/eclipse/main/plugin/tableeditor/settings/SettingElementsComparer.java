@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.viewers.ElementAddingToken;
 
 
 class SettingElementsComparer implements IElementComparer {

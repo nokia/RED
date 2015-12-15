@@ -20,10 +20,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport.NewElementsCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
 public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
@@ -59,8 +59,8 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected NewElementsCreator provideNewElementsCreator() {
-        return new NewElementsCreator() {
+    protected NewElementsCreator<RobotElement> provideNewElementsCreator() {
+        return new NewElementsCreator<RobotElement>() {
 
             @Override
             public RobotElement createNew(final Object parent) {

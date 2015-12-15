@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -17,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
 class VariableCommentEditingSupport extends RobotElementEditingSupport {
 
     VariableCommentEditingSupport(final ColumnViewer viewer, final RobotEditorCommandsStack commandsStack,
-            final NewElementsCreator creator) {
+            final NewElementsCreator<RobotElement> creator) {
         super(viewer, 2, commandsStack, creator);
     }
 

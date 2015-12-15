@@ -10,29 +10,18 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-class CasesContentProvider implements ITreeContentProvider {
-
-    @Override
-    public void dispose() {
-        // nothing to do
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-        // nothing to do
-    }
+class CasesContentProvider extends TreeContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {

@@ -23,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.VariableMappingsFormFragment.VariableMappingDialog;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsFormFragment.VariableMappingDialog;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
@@ -67,6 +67,7 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
 
         private final String name;
         private VariableMapping variableMapping;
+        private List<VariableMapping> changedMappings;
 
         public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String variableName,
                 final String shortDescritption) {
@@ -90,12 +91,13 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
                 return false;
             }
             config.addVariableMapping(variableMapping);
+            changedMappings = config.getVariableMappings();
             return true;
         }
 
         @Override
         protected void fireEvents() {
-            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED, variableMapping);
+            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED, changedMappings);
         }
 
         @Override

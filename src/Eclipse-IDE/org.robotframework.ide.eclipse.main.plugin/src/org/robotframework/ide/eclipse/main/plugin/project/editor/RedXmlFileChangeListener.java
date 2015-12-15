@@ -13,13 +13,14 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
-class RedProjectConfigurationFileChangeListener implements IResourceChangeListener {
+class RedXmlFileChangeListener implements IResourceChangeListener {
 
     private final IProject project;
 
     private final OnRedConfigFileChange performOnChange;
 
-    RedProjectConfigurationFileChangeListener(final IProject project, final OnRedConfigFileChange performOnChange) {
+    RedXmlFileChangeListener(final IProject project,
+            final OnRedConfigFileChange performOnChange) {
         this.project = project;
         this.performOnChange = performOnChange;
     }
@@ -52,7 +53,8 @@ class RedProjectConfigurationFileChangeListener implements IResourceChangeListen
         }
     }
 
-    static interface OnRedConfigFileChange {
+    interface OnRedConfigFileChange {
+
         void whenFileChanged();
 
         void whenFileWasRemoved();

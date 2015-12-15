@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
@@ -35,8 +36,11 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Selections;
@@ -68,6 +72,10 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private RobotRuntimeEnvironment environment;
 
+    public ISelectionProvider getViewer() {
+        return viewer;
+    }
+
     @Override
     public void initialize(final Composite parent) {
         currentProject = editorInput.getRobotProject();
@@ -77,7 +85,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         section.setText("Referenced libraries");
         section.setDescription("In this section referenced libraries can be specified. Those libraries will "
                 + "be available for all suites within project.");
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 2).applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
 
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
@@ -223,44 +231,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         });
     }
 
+    @SuppressWarnings("restriction")
     private void setDirty(final boolean isDirty) {
         dirtyProviderService.setDirtyState(isDirty);
     }
 
-    void whenEnvironmentWasLoaded(final RobotRuntimeEnvironment env) {
-        this.environment = env;
-
-        final boolean isEditable = editorInput.isEditable();
-        final boolean projectIsInterpretedByJython = env.getInterpreter() == SuiteExecutor.Jython;
-
-        addPythonLibButton.setEnabled(isEditable);
-        addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
-        addLibspecButton.setEnabled(isEditable);
-        removeButton.setEnabled(false);
-        viewer.getTable().setEnabled(isEditable);
-
-        if (!addJavaLibButton.isEnabled()) {
-            decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
-            decoration.setDescriptionText("Project is configured to use " + env.getInterpreter().toString()
-                    + " interpreter, but Jython is needed for Java libraries.");
-            decoration.setImage(FieldDecorationRegistry.getDefault()
-                    .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage());
-        } else if (decoration != null) {
-            decoration.dispose();
-            decoration = null;
-        }
-    }
-
-    void whenConfigurationFileChanged() {
-        addPythonLibButton.setEnabled(false);
-        addJavaLibButton.setEnabled(false);
-        addLibspecButton.setEnabled(false);
-        removeButton.setEnabled(false);
-        viewer.getTable().setEnabled(false);
-        setInput();
-        viewer.refresh();
-    }
-    
     private void setInput() {
         final List<ReferencedLibrary> libspecs = editorInput.getProjectConfiguration().getLibraries();
         viewer.setInput(libspecs);
@@ -275,6 +250,47 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     public MatchesCollection collectMatches(final String filter) {
         return null;
     }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentLoadingStarted(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
+        addPythonLibButton.setEnabled(false);
+        addJavaLibButton.setEnabled(false);
+        addLibspecButton.setEnabled(false);
+        removeButton.setEnabled(false);
+        viewer.getTable().setEnabled(false);
+        setInput();
+        viewer.refresh();
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentsWereLoaded(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
+        this.environment = envs.getActiveEnvironment();
+
+        final boolean isEditable = editorInput.isEditable();
+        final boolean projectIsInterpretedByJython = environment.getInterpreter() == SuiteExecutor.Jython;
+
+        addPythonLibButton.setEnabled(isEditable);
+        addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
+        addLibspecButton.setEnabled(isEditable);
+        removeButton.setEnabled(false);
+        viewer.getTable().setEnabled(isEditable);
+
+        if (!addJavaLibButton.isEnabled()) {
+            decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
+            decoration.setDescriptionText("Project is configured to use " + environment.getInterpreter().toString()
+                    + " interpreter, but Jython is needed for Java libraries.");
+            decoration.setImage(FieldDecorationRegistry.getDefault()
+                    .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                    .getImage());
+        } else if (decoration != null) {
+            decoration.dispose();
+            decoration = null;
+        }
+    }
     
     @Inject
     @Optional
@@ -288,7 +304,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMappingsChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final String libName) {
-        dirtyProviderService.setDirtyState(true);
+        setDirty(true);
         viewer.refresh();
     }
 }

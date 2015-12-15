@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
+import org.robotframework.red.viewers.ElementAddingToken;
 
 public class ImportSettingFileArgumentsEditor {
 
@@ -41,8 +41,8 @@ public class ImportSettingFileArgumentsEditor {
     public ImportSettingFileArgumentsEditor() {
     }
 
-    public Composite createArgumentsEditor(Composite parent, List<String> currentArguments) {
-        Composite composite = new Composite(parent, SWT.BORDER);
+    public Composite createArgumentsEditor(final Composite parent, final List<String> currentArguments) {
+        final Composite composite = new Composite(parent, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(composite);
 
@@ -79,7 +79,7 @@ public class ImportSettingFileArgumentsEditor {
                 .editingSupportedBy(new ArgumentsEditingSupport(argumentsViewer))
                 .editingEnabledOnlyWhen(true)
                 .createFor(argumentsViewer);
-        Table table = argumentsViewer.getTable();
+        final Table table = argumentsViewer.getTable();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);

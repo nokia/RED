@@ -7,27 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import java.util.Arrays;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ElementAddingToken;
+import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
-public class VariablesContentProvider implements IStructuredContentProvider {
+public class VariablesContentProvider extends StructuredContentProvider {
 
     private final boolean editable;
 
     public VariablesContentProvider(final boolean editable) {
         this.editable = editable;
-    }
-
-    @Override
-    public void dispose() {
-        // nothing to do
-    }
-
-    @Override
-    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-        // nothing to do
     }
 
     @Override
