@@ -569,8 +569,8 @@ public class RobotRuntimeEnvironment {
             try {
                 return executor.getVariables(normalizedPath, argAsString);
             } catch (XmlRpcException e) {
-                System.err.println("XML-RPC server error in file " + path + " with arguments " + args);
-                e.printStackTrace();
+                System.err.println("XML-RPC server error in file " + path + " with arguments " + args + ". Reason: "
+                        + e.getMessage());
             }
         }
         return new LinkedHashMap<String, Object>();
