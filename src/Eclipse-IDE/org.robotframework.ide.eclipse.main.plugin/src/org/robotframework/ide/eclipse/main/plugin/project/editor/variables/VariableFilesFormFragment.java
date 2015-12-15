@@ -150,13 +150,13 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         return max;
     }
 
-    private void createArgumentColumn(final String name, final int i,
+    private void createArgumentColumn(final String name, final int index,
             final NewElementsCreator<ReferencedVariableFile> creator) {
         ViewerColumnsFactory.newColumn(name).withWidth(100)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
-//            .editingEnabledOnlyWhen(editorInput.isEditable())
-//            .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
-            .labelsProvidedBy(new VariableFileArgumentsLabelProvider(i))
+            .editingEnabledOnlyWhen(editorInput.isEditable())
+            .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, creator))
+            .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
             .createFor(viewer);
     }
 
