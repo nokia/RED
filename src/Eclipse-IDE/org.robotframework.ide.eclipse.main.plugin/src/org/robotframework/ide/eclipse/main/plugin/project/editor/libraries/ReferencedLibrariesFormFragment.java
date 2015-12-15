@@ -17,7 +17,6 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
@@ -72,7 +71,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private RobotRuntimeEnvironment environment;
 
-    public ISelectionProvider getViewer() {
+    public TableViewer getViewer() {
         return viewer;
     }
 

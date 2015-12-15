@@ -68,7 +68,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private RowExposingTableViewer viewer;
 
-    public ISelectionProvider getViewer() {
+    ISelectionProvider getViewer() {
         return viewer;
     }
 

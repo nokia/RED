@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -18,26 +19,23 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -45,13 +43,23 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
+import org.robotframework.red.viewers.StructuredContentProvider;
+import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Strings;
 
 class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
+
+    private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.remotelocations.context";
+
+    @Inject
+    private IEditorSite site;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -62,101 +70,80 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
-    private TableViewer viewer;
+    private RowExposingTableViewer viewer;
 
-    private Button addLocationButton;
-
-    private Button removeLocationButton;
+    TableViewer getViewer() {
+        return viewer;
+    }
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
-                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
-        section.setText("Remote library locations");
-        section.setDescription("In this section locations of servers for Remote standard library can be specified. "
-                + "Those addresses will be available for all suites within project.");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        final Section section = createSection(parent);
 
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
 
         createViewer(internalComposite);
-        createButtons(internalComposite);
+        createColumns();
 
         setInput();
     }
 
+    private Section createSection(final Composite parent) {
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
+        section.setText("Remote library locations");
+        section.setDescription("In this section locations of servers for Remote standard library can be specified. "
+                + "Those addresses will be available for all suites within project.");
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        return section;
+    }
+
     private void createViewer(final Composite parent) {
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 4).applyTo(viewer.getTable());
+        viewer = new RowExposingTableViewer(parent,
+                SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
+        viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
+        viewer.getTable().setLinesVisible(false);
+        viewer.getTable().setHeaderVisible(false);
 
         viewer.setContentProvider(new RemoteLibraryLocationsContentProvider());
-        
+
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+        Viewers.boundViewerWithContext(viewer, site, CONTEXT_ID);
+    }
+
+    private void createColumns() {
         ViewerColumnsFactory.newColumn("").withWidth(100)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, newElementsCreator()))
             .labelsProvidedBy(new RemoteLibraryLocationsAddressLabelProvider())
             .createFor(viewer);
-
-        final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                removeLocationButton.setEnabled(!event.getSelection().isEmpty());
-            }
-        };
-        viewer.addSelectionChangedListener(selectionChangedListener);
-        viewer.getTable().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeSelectionChangedListener(selectionChangedListener);
-            }
-        });
     }
 
-    private void createButtons(final Composite parent) {
-        addLocationButton = toolkit.createButton(parent, "Add location", SWT.PUSH);
-        addLocationButton.setEnabled(false);
-        addLocationButton.addSelectionListener(createAddingHandler());
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addLocationButton);
-
-        removeLocationButton = toolkit.createButton(parent, "Remove", SWT.PUSH);
-        removeLocationButton.setEnabled(false);
-        removeLocationButton.addSelectionListener(creteRemovingHandler());
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(removeLocationButton);
-    }
-
-    private SelectionListener createAddingHandler() {
-        return new SelectionAdapter() {
+    private NewElementsCreator<RemoteLocation> newElementsCreator() {
+        return new NewElementsCreator<RobotProjectConfig.RemoteLocation>() {
             @Override
-            public void widgetSelected(final SelectionEvent e) {
+            public RemoteLocation createNew() {
                 final RemoteLocationDialog dialog = new RemoteLocationDialog(viewer.getTable().getShell());
                 if (dialog.open() == Window.OK) {
                     final RemoteLocation remoteLocation = dialog.getRemoteLocation();
-                    @SuppressWarnings("unchecked")
-                    final List<RemoteLocation> locations = (List<RemoteLocation>) viewer.getInput();
+
+                    final List<RemoteLocation> locations = editorInput.getProjectConfiguration().getRemoteLocations();
                     if (!locations.contains(remoteLocation)) {
                         editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
+                        setDirty(true);
+                        return remoteLocation;
                     }
-
-                    dirtyProviderService.setDirtyState(true);
-                    viewer.refresh();
                 }
-            }
-        };
-    }
-
-    private SelectionListener creteRemovingHandler() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final List<RemoteLocation> selectedLocations = Selections.getElements(
-                        (IStructuredSelection) viewer.getSelection(), RemoteLocation.class);
-                editorInput.getProjectConfiguration().removeRemoteLocations(selectedLocations);
-
-                dirtyProviderService.setDirtyState(true);
-                viewer.refresh();
+                return null;
             }
         };
     }
@@ -169,6 +156,10 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     @Override
     public void setFocus() {
         viewer.getTable().setFocus();
+    }
+
+    private void setDirty(final boolean isDirty) {
+        dirtyProviderService.setDirtyState(isDirty);
     }
 
     @Override
@@ -193,8 +184,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        addLocationButton.setEnabled(false);
-        removeLocationButton.setEnabled(false);
+        setInput();
         viewer.getTable().setEnabled(false);
     }
 
@@ -202,11 +192,59 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        final boolean isEditable = editorInput.isEditable();
+        viewer.getTable().setEnabled(editorInput.isEditable());
+    }
 
-        addLocationButton.setEnabled(isEditable);
-        removeLocationButton.setEnabled(false);
-        viewer.getTable().setEnabled(isEditable);
+    @Inject
+    @Optional
+    private void whenRemoteLocationDetailChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RemoteLocation remoteLocation) {
+        setDirty(true);
+        viewer.refresh();
+    }
+
+    @Inject
+    @Optional
+    private void whenRemoteLocationChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final List<RemoteLocation> remoteLocations) {
+        setDirty(true);
+        viewer.refresh();
+    }
+
+    private class RemoteLibraryLocationsContentProvider extends StructuredContentProvider {
+
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            final Object[] elements = ((List<?>) inputElement).toArray();
+            if (editorInput.isEditable()) {
+                final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
+                newElements[elements.length] = new ElementAddingToken("remote location", true);
+                return newElements;
+            } else {
+                return elements;
+            }
+        }
+    }
+
+    private static class RemoteLibraryLocationsAddressLabelProvider extends StylersDisposingLabelProvider {
+
+        @Override
+        public StyledString getStyledText(final Object element) {
+            if (element instanceof RemoteLocation) {
+                final RemoteLocation location = (RemoteLocation) element;
+                return new StyledString(location.getUri());
+            } else {
+                return ((ElementAddingToken) element).getStyledText();
+            }
+        }
+
+        @Override
+        public Image getImage(final Object element) {
+            if (element instanceof ElementAddingToken) {
+                return ((ElementAddingToken) element).getImage();
+            }
+            return null;
+        }
     }
 
     private static class RemoteLocationDialog extends Dialog {
