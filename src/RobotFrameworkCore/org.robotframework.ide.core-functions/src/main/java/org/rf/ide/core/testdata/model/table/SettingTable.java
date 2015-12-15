@@ -152,7 +152,8 @@ public class SettingTable extends ARobotSectionTable {
     public String getRobotViewAboutTestTemplate() {
         String templateName = null;
         boolean useGenerator = true;
-        if (getParent().getParent().getRobotVersion().isNewerThan(new RobotVersion(2, 9))) {
+        RobotVersion robotVersion = getParent().getParent().getRobotVersion();
+        if (robotVersion != null && robotVersion.isNewerThan(new RobotVersion(2, 9))) {
             if (isDuplicatedTemplatesDeclaration()) {
                 useGenerator = false;
             }
