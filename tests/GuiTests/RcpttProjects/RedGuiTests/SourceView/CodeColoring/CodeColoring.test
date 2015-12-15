@@ -1,0 +1,102 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CodeColoring
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _r5GksKJxEeWiTrudgyrHcQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/15/15 9:57 AM
+Testcase-Type: ecl
+Verifications: _tzjjIKMJEeWor7xq1AExKg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+// add text 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Test1
+    key-type Enter
+    type-text "log    ${test"
+    key-type Enter
+    type-text "log    @{test"
+    key-type Enter
+    type-text "log    &{test"
+    key-type Enter
+    type-text "log    ${b${new}}"
+    key-type Enter
+    }
+    /*
+    type-text "*** Settings ***"
+        key-type Enter
+ type-text "Library    OperatingSystem"
+     key-type Enter
+ type-text "Resource"    
+     key-type Enter
+ type-text "*** Keywords ***"
+     key-type Enter
+ type-text "KW    "
+     key-type Enter
+ type-text "    Log    1"
+     key-type Enter
+ type-text "*** Test Cases ***"
+     key-type Enter
+ type-text "Test1"  
+   key-type Enter
+ type-text "    log    ${test"
+     key-type Enter
+ type-text "    log    @{test"
+     key-type Enter
+ type-text "    log    &{test"
+     key-type Enter
+ type-text "    log    ${b${new}}"
+     key-type Enter
+ type-text "    : FOR    Call Method    IN RANGE    5"
+     key-type Enter
+ type-text "    \    "
+     key-type Enter
+ type-text "    #comment"
+}
+
+*/
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 1
+        type-text "*** Settings ***"
+        key-type Enter
+ type-text "Library    OperatingSystem"
+ key-type Enter
+ type-text "Resource"    
+ key-type Enter
+ type-text "*** Keywords ***"
+ key-type Enter
+ type-text "KW    "
+ key-type Enter
+ type-text "    Log    1"
+ key-type Enter
+ type-text "    #comment"
+ key-type Enter
+  type-text "    : FOR    Call Method    IN RANGE    5"
+     key-type Enter
+ type-text "    \    "
+     key-type Enter
+         set-caret-pos 16 26
+    key-type Enter
+    key-type BackSpace -times 21
+     
+ set-caret-pos 17 1
+ type-text "*** WRONG_SECTION ***"
+  key-type Enter
+  type-text "*** Variables ***"
+  key-type Enter
+  type-text "${newScalar}"
+  key-type Enter
+  type-text "&{newDict}"
+  key-type Enter
+  type-text "@{newList} "
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
