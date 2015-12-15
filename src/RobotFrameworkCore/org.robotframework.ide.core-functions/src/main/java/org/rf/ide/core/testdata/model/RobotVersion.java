@@ -13,6 +13,8 @@ import com.google.common.base.Optional;
 
 public final class RobotVersion implements Comparable<RobotVersion> {
 
+    private static RobotVersion UNKNOWN = new RobotVersion(-1, -1);
+
     private final int major;
 
     private final int minor;
@@ -20,6 +22,10 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     private final Optional<Integer> patch;
 
     public static RobotVersion from(final String version) {
+        if (version == null) {
+            return UNKNOWN;
+        }
+
         final Matcher matcher = Pattern.compile("(\\d)\\.(\\d+)(\\.(\\d+))?").matcher(version);
         if (matcher.find()) {
             if (matcher.group(4) == null) {
@@ -45,6 +51,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     }
 
     public boolean isEqualTo(final RobotVersion otherVersion) {
+        if (otherVersion == UNKNOWN) {
+            return this == UNKNOWN;
+        }
         return major == otherVersion.major && minor == otherVersion.minor && patch.equals(otherVersion.patch);
     }
 
@@ -53,6 +62,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     }
 
     public boolean isOlderThan(final RobotVersion otherVersion) {
+        if (otherVersion == UNKNOWN) {
+            return false;
+        }
         return major < otherVersion.major
                 || (major == otherVersion.major && minor < otherVersion.minor)
                 || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(patch, otherVersion.patch));
@@ -63,6 +75,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     }
 
     public boolean isNewerThan(final RobotVersion otherVersion) {
+        if (otherVersion == UNKNOWN) {
+            return false;
+        }
         return major > otherVersion.major
                 || (major == otherVersion.major && minor > otherVersion.minor)
                 || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(otherVersion.patch, patch));
