@@ -39,7 +39,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected int getColumnShift() {
-        return -1;
+        return 1;
     }
 
     @Override
@@ -103,7 +103,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                     }
                     editorInput.getProjectConfiguration().addReferencedVariableFile(variableFile);
                 }
-                getEventBroker().post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED, variableFiles);
+                getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED, variableFiles);
             }
             return firstFile;
         }
@@ -120,7 +120,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                 final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFile));
                 varFile.setPath(path.toPortableString());
 
-                getEventBroker().post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED, varFile);
+                getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED, varFile);
             }
             return varFile;
         }
