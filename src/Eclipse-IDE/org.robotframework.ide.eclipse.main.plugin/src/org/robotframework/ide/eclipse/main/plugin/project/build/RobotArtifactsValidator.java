@@ -48,6 +48,9 @@ public class RobotArtifactsValidator {
     }
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
+        if (suiteModel.getProject().getRobotProjectHolder().getRobotRuntime().getVersion() == null) {
+            return;
+        }
         final IFile file = suiteModel.getFile();
         if (file == null || !file.exists() || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return;
@@ -74,10 +77,14 @@ public class RobotArtifactsValidator {
 
     public Job createValidationJob(final Job dependentJob, final IResourceDelta delta, final int kind) {
         return new Job("Validating") {
+
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 try {
                     dependentJob.join();
+                    if (dependentJob.getState() != Status.OK) {
+                        return Status.CANCEL_STATUS;
+                    }
                 } catch (final InterruptedException e) {
                     RedPlugin.logError("Project validation was corrupted", e);
                     return Status.CANCEL_STATUS;
@@ -130,12 +137,14 @@ public class RobotArtifactsValidator {
             throws CoreException {
         final List<ModelUnitValidator> validators = newArrayList();
         validators.add(new ModelUnitValidator() {
+
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
                 project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
             }
         });
         project.accept(new IResourceVisitor() {
+
             @Override
             public boolean visit(final IResource resource) throws CoreException {
                 final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, resource);
@@ -161,6 +170,7 @@ public class RobotArtifactsValidator {
                     final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, file);
                     if (validationUnit.isPresent()) {
                         validators.add(new ModelUnitValidator() {
+
                             @Override
                             public void validate(final IProgressMonitor monitor) throws CoreException {
                                 file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);

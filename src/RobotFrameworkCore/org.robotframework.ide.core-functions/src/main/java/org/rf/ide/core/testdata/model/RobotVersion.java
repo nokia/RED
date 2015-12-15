@@ -13,7 +13,7 @@ import com.google.common.base.Optional;
 
 public final class RobotVersion implements Comparable<RobotVersion> {
 
-    private static RobotVersion UNKNOWN = new RobotVersion(-1, -1);
+    public static final RobotVersion UNKNOWN = new RobotVersion(-1, -1);
 
     private final int major;
 
@@ -65,9 +65,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
         if (otherVersion == UNKNOWN) {
             return false;
         }
-        return major < otherVersion.major
-                || (major == otherVersion.major && minor < otherVersion.minor)
-                || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(patch, otherVersion.patch));
+        return major < otherVersion.major || (major == otherVersion.major && minor < otherVersion.minor)
+                || (major == otherVersion.major && minor == otherVersion.minor
+                        && isLessPatch(patch, otherVersion.patch));
     }
 
     public boolean isOlderThanOrEqualTo(final RobotVersion otherVersion) {
@@ -78,9 +78,9 @@ public final class RobotVersion implements Comparable<RobotVersion> {
         if (otherVersion == UNKNOWN) {
             return false;
         }
-        return major > otherVersion.major
-                || (major == otherVersion.major && minor > otherVersion.minor)
-                || (major == otherVersion.major && minor == otherVersion.minor && isLessPatch(otherVersion.patch, patch));
+        return major > otherVersion.major || (major == otherVersion.major && minor > otherVersion.minor)
+                || (major == otherVersion.major && minor == otherVersion.minor
+                        && isLessPatch(otherVersion.patch, patch));
     }
 
     public boolean isNewerOrEqualTo(final RobotVersion otherVersion) {
