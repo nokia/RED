@@ -190,7 +190,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) {
 
         final IPath libraryPath = Path.fromPortableString(variableFile.getPath());
-        final List<RobotProblem> pathProblems = validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_VARIABLE_FILE);
+        final List<RobotProblem> pathProblems = validateLibraryPath(libraryPath,
+                ConfigFileProblem.MISSING_VARIABLE_FILE);
         for (final RobotProblem pathProblem : pathProblems) {
             reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile).getLineNumber());
         }
