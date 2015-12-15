@@ -37,17 +37,15 @@ import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ReferencedLibraryImporter {
-
 
     public ReferencedLibrary importPythonLib(final Shell shellForDialogs, final RobotRuntimeEnvironment environment,
             final String fullLibraryPath) {
         if (fullLibraryPath != null) {
             final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
             final List<PythonClass> pythonClasses = newArrayList();
-            
+
             try {
                 PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 
@@ -56,17 +54,17 @@ public class ReferencedLibraryImporter {
                             throws InvocationTargetException, InterruptedException {
                         monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
                         try {
-                            pythonClasses
-                                    .addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
+                            pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
                         } catch (final RobotEnvironmentException e) {
                             throw new InvocationTargetException(e);
                         }
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e) {
-                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                    "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
-                        StatusManager.SHOW);
+                StatusManager.getManager()
+                        .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
+                                StatusManager.SHOW);
                 return null;
             }
 
@@ -74,8 +72,8 @@ public class ReferencedLibraryImporter {
                 final String name = new File(fullLibraryPath).getName();
                 pythonClasses.add(PythonClass.create(name.substring(0, name.lastIndexOf('.'))));
             }
-            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs,
-                    pythonClasses, new PythonClassesLabelProvider());
+            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs, pythonClasses,
+                    new PythonClassesLabelProvider());
             if (classesDialog.open() == Window.OK) {
                 final Object[] result = classesDialog.getResult();
 
@@ -90,14 +88,14 @@ public class ReferencedLibraryImporter {
                     referencedLibrary.setName(pythonClass.getQualifiedName());
                     referencedLibrary.setPath(
                             PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
-                            
+
                     return referencedLibrary;
                 }
             }
         }
         return null;
     }
-    
+
     public ReferencedLibrary importJavaLib(final Shell shell, final String fullLibraryPath) {
         final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder();
         final List<JarClass> classesFromJar = newArrayList();
@@ -105,27 +103,29 @@ public class ReferencedLibraryImporter {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 
                 @Override
-                public void run(final IProgressMonitor monitor)
-                        throws InvocationTargetException, InterruptedException {
+                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
                     classesFromJar.addAll(jarStructureBuilder.provideEntriesFromFile(fullLibraryPath));
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                    "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
-                        StatusManager.SHOW);
+            StatusManager.getManager()
+                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
+                            StatusManager.SHOW);
             return null;
         }
 
         if (classesFromJar.isEmpty()) {
-            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                "RED was unable to find classes inside '" + fullLibraryPath + "' module"), 
-                    StatusManager.SHOW);
+            StatusManager.getManager()
+                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes inside '" + fullLibraryPath + "' module"),
+                            StatusManager.SHOW);
             return null;
         }
 
-        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, classesFromJar, new JarClassesLabelProvider());
+        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, classesFromJar,
+                new JarClassesLabelProvider());
 
         if (classesDialog.open() == Window.OK) {
             final Object[] result = classesDialog.getResult();
@@ -166,6 +166,7 @@ public class ReferencedLibraryImporter {
     }
 
     private static class PythonClassesLabelProvider extends LabelProvider {
+
         @Override
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getJavaClassImage());
@@ -178,6 +179,7 @@ public class ReferencedLibraryImporter {
     }
 
     private static class JarClassesLabelProvider extends LabelProvider {
+
         @Override
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getJavaClassImage());
