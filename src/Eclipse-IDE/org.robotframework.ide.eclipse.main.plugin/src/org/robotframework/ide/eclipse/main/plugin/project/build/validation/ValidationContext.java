@@ -45,16 +45,17 @@ import com.google.common.io.Files;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ValidationContext {
 
     private final RobotModel model;
 
     private final SuiteExecutor executorInUse;
+
     private final RobotVersion version;
 
     private final Map<String, LibrarySpecification> accessibleLibraries;
+
     private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
 
     public ValidationContext(final IProject project) {
@@ -66,7 +67,8 @@ public class ValidationContext {
         final RobotProject robotProject = model.createRobotProject(project);
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
-        this.version = runtimeEnvironment != null ? RobotVersion.from(robotProject.getVersion()) : null;
+        final String versionGot = robotProject.getVersion();
+        this.version = (runtimeEnvironment != null && versionGot != null) ? RobotVersion.from(versionGot) : null;
         this.executorInUse = runtimeEnvironment != null ? runtimeEnvironment.getInterpreter() : null;
 
         this.accessibleLibraries = collectLibraries(robotProject);
@@ -167,7 +169,8 @@ public class ValidationContext {
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
                     final RobotKeywordDefinition keyword) {
-                final KeywordScope scope = file.equals(suiteFile.getFile()) ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
+                final KeywordScope scope = file.equals(suiteFile.getFile()) ? KeywordScope.LOCAL
+                        : KeywordScope.RESOURCE;
 
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
                         Files.getNameWithoutExtension(suiteFile.getName()), "", keyword.isDeprecated(), false);
