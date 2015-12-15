@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
@@ -114,7 +115,11 @@ public class ValidationContext {
         libs.putAll(robotProject.getStandardLibraries());
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
                 .entrySet()) {
-            libs.put(entry.getKey().getName(), entry.getValue());
+            if (entry.getKey().provideType() == LibraryType.VIRTUAL) {
+                libs.put(entry.getValue().getName(), entry.getValue());
+            } else {
+                libs.put(entry.getKey().getName(), entry.getValue());
+            }
         }
         return libs;
     }
