@@ -39,7 +39,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected int getColumnShift() {
-        return 1;
+        return -1;
     }
 
     @Override
@@ -55,10 +55,9 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ReferencedVariableFile) {
-            final int indexToActivate = index + getColumnShift();
             final VariableFileCreator variableFileCreator = (VariableFileCreator) creator;
             scheduleViewerRefreshAndEditorActivation(
-                    variableFileCreator.modifyExisting((ReferencedVariableFile) element), -1);
+                    variableFileCreator.modifyExisting((ReferencedVariableFile) element), getColumnShift());
         } else {
             super.setValue(element, value);
         }

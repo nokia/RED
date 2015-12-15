@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -118,11 +119,44 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     private void createColumns() {
         final NewElementsCreator<ReferencedVariableFile> creator = new VariableFileCreator(viewer.getTable().getShell(),
                 editorInput);
-        ViewerColumnsFactory.newColumn("File").withWidth(150)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+        createFileColumn(creator);
+
+        for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
+            final String name = i == 0 ? "Arguments" : "";
+            createArgumentColumn(name, i, creator);
+        }
+    }
+
+    private void createFileColumn(final NewElementsCreator<ReferencedVariableFile> creator) {
+        ViewerColumnsFactory.newColumn("File").withWidth(300)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .editingEnabledOnlyWhen(editorInput.isEditable())
             .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
             .labelsProvidedBy(new VariableFilesLabelProvider()) 
+            .createFor(viewer);
+    }
+
+    private int calculateLongestArgumentsLength() {
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        final List<?> elements = (List<?>) viewer.getInput();
+        if (elements != null) {
+            for (final Object element : elements) {
+                final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
+                if (varFile != null) {
+                    max = Math.max(max, varFile.getArguments().size());
+                }
+            }
+        }
+        return max;
+    }
+
+    private void createArgumentColumn(final String name, final int i,
+            final NewElementsCreator<ReferencedVariableFile> creator) {
+        ViewerColumnsFactory.newColumn(name).withWidth(100)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+//            .editingEnabledOnlyWhen(editorInput.isEditable())
+//            .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
+            .labelsProvidedBy(new VariableFileArgumentsLabelProvider(i))
             .createFor(viewer);
     }
 
