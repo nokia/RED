@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/14/15 1:33 PM
+Save-Time: 12/16/15 4:37 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -54,9 +54,10 @@ get-view "Project Explorer" | get-tree
     | get-property childCount | equals 0 | verify-true
     
 //check red.xml    
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
-    get-property "getItemCount()" | equals 1 | verify-true
 }
 
 //add only_function.py
