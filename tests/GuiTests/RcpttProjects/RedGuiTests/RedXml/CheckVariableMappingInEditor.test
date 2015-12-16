@@ -6,15 +6,14 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _yxxmEJHxEeWEZYgZQ8Au9A
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/4/15 12:42 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 12/16/15 4:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-eclipse-window | key-type "[" "\\u0000"
 // open test file
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
 // check if there are zero problems
@@ -39,32 +38,57 @@ get-eclipse-window | key-type ESC
 
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-button "Add mapping" | click
+get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+    | key-type Enter
+    
+//check how window looks like
+with [get-window "Add variable mapping"] {
+    with [get-control Any -index 1] {
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Specify name and value of variable which will be used in parameterized imports." | verify-true
+        get-property "getChildren().Control[1].getText()" | equals Name | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "${var}" | verify-true
+        get-property "getChildren().Control[2].getEditable()" | equals true | verify-true
+        get-property "getChildren().Control[2].getSelectionText()" | equals "${var}" | verify-true
+        get-property "getChildren().Control[3].getText()" | equals Value | verify-true
+        get-property "getChildren().Control[4].getText()" | equals value | verify-true
+        get-property "getChildren().Control[4].getEditable()" | equals true | verify-true
+    }
+    with [get-control Any] {
+        get-property "getChildren().Control[1].getChildren().Control[0].getClassName()" 
+            | equals "org.eclipse.swt.widgets.Button" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals OK | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getClassName()" 
+            | equals "org.eclipse.swt.widgets.Button" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals Cancel | verify-true
+    }
+}
+
+//add new variable
 with [get-window "Add variable mapping"] {
     with [get-editbox -after [get-label Name]] {
-        click-text 1 7
+        key-type Right
         key-type Left
-        key-type "M2+ARROW_LEFT" -times 3
-        key-type Right -times 4
-        key-type "M1+M2+ARROW_LEFT"
         set-text "${path}"
-        key-type "TRAVERSE_TAB_NEXT"
     }
-    with [get-editbox -after [get-label Value]] {
-        key-type "M1+M2+ARROW_RIGHT"
-        set-text "resource_folder"
-    }
+    get-editbox -after [get-label Value] | set-text resource_folder
     get-button OK | click
 }
-// close red.xml and testfile
 with [get-editor "ProjectWithResource/red.xml"] {
-    get-section "Variables mappings" | get-button "Add mapping" | key-type "M1+s"
+    with [get-section "Variables mappings" | get-table] {
+        select "${path}" | activate-cell-edit
+        get-editbox | key-type "M1+s"
+        apply-cell-edit -deactivate
+    }
+    //close red.xml
     close
 }
 
-get-eclipse-window | key-type "M1+s"
-get-editor "TestSuite.robot" | close
-
+//close test
+with [get-editor "TestSuite.robot"] {
+    get-text-viewer | key-type "M1+s"
+    close
+}
 
 // open testfile
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
@@ -80,16 +104,15 @@ get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
 
 // open red.xml editor and remove Variable mapping entry
-get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | select "ProjectWithResource/red.xml" 
-    | double-click
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
 with [get-editor "ProjectWithResource/red.xml"] {
-    with [get-section "Variables mappings"] {
-        get-table | select "${path}"
-        get-button Remove | click
-        get-table | key-type "M1+s"
+    with [get-section "Variables mappings" | get-table] {
+        select "${path}" | key-type Del
+        key-type "M1+s"
     }
     close
 }
+
 get-editor "TestSuite.robot" | get-text-viewer | key-type "M1+s"
 // check if problems accured due to unresolved path
 with [get-view Problems | get-tree] {
@@ -105,34 +128,38 @@ with [get-view Problems | get-tree] {
 
 // open red.xml add 2 Variable Mappings
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-button "Add mapping" | click
-
 // add correct mapping
+ 
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+    | key-type Enter
 with [get-window "Add variable mapping"] {
     with [get-editbox -after [get-label Name]] {
+        click-text 7
+        key-type Left
         set-text "${path}"
-        key-type "TRAVERSE_TAB_NEXT"
     }
-    with [get-editbox -after [get-label Value]] {
-        set-text "resource_folder"
-    }
+    get-editbox -after [get-label Value] | set-text "resource_folder"
     get-button OK | click
 }
-// add wrong path as a secound entry 
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-button "Add mapping" | click
+
+// add wrong path as a secound entry
+with [get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table] {
+    select "${path}" | activate-cell-edit
+    apply-cell-edit -deactivate
+    select "...add new mapping" | key-type Enter
+}
 with [get-window "Add variable mapping"] {
-    with [get-editbox -after [get-label Name]] {
-        set-text "${path}"
-        key-type "TRAVERSE_TAB_NEXT"
-    }
-    with [get-editbox -after [get-label Value]] {
-       set-text "wrong_path"
-    }
+    get-editbox -after [get-label Name] | set-text "${path}"
+    get-editbox -after [get-label Value] | set-text "wrong_path"
     get-button OK | click
 }
-// close red.xml
 with [get-editor "ProjectWithResource/red.xml"] {
-    get-section "Variables mappings" | get-button "Add mapping" | key-type "M1+s"
+    with [get-section "Variables mappings" | get-table] {
+        select [get-item "${path}" -index 1] | activate-cell-edit
+        get-editbox | key-type "M1+s"
+        apply-cell-edit -deactivate
+    }
     close
 }
 // check if validation provides error that resolved path from mapping does not exist
