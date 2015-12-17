@@ -253,6 +253,29 @@ public class RedProjectEditor extends MultiPageEditorPart {
         // save as is not allowed
     }
 
+    public void openGeneralPage() {
+        setActivePage(getPageIndexFor(GeneralProjectConfigurationEditorPart.class));
+    }
+
+    public void openLibrariesPage() {
+        setActivePage(getPageIndexFor(ReferencedLibrariesProjectConfigurationEditorPart.class));
+    }
+
+    public void openVariablesFilesPage() {
+        setActivePage(getPageIndexFor(VariablesProjectConfigurationEditorPart.class));
+    }
+
+    private int getPageIndexFor(final Class<? extends IEditorPart> classOfPage) {
+        int i = 0;
+        for (final IEditorPart part : parts) {
+            if (classOfPage.isInstance(part)) {
+                return i;
+            }
+            i++;
+        }
+        throw new IllegalStateException("Unable to find part of class: " + classOfPage.getName());
+    }
+
     @Override
     protected void pageChange(final int newPageIndex) {
         super.pageChange(newPageIndex);

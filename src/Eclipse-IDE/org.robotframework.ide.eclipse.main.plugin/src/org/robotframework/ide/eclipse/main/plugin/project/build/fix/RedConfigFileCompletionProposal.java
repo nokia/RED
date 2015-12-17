@@ -82,13 +82,17 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
                 final IEditorDescriptor desc = editorRegistry.findEditor(RedProjectEditor.ID);
-                page.openEditor(input, desc.getId());
+                final RedProjectEditor redXmlEditor = (RedProjectEditor) page.openEditor(input, desc.getId());
+                
+                openDesiredPageInEditor(redXmlEditor);
                 fireEvents();
             }
         } catch (final ProposalApplyingException | CoreException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e));
         }
     }
+
+    protected abstract void openDesiredPageInEditor(RedProjectEditor editor);
 
     protected void fireEvents() {
         // nothing to do here

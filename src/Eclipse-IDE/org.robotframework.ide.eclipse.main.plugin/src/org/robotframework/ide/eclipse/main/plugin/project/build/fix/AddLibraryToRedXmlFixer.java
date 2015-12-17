@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -120,6 +121,11 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         "The path '" + pathOrName + "' should point to either .py file or python module directory.");
                 return false;
             }
+        }
+
+        @Override
+        protected void openDesiredPageInEditor(final RedProjectEditor editor) {
+            editor.openLibrariesPage();
         }
 
         @Override
