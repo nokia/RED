@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -23,6 +24,7 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
@@ -68,7 +70,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateRemoteLocation(location, configFile, linesMapping, reporter);
+            validateRemoteLocation(location, linesMapping, reporter);
         }
 
         int index = 0;
@@ -76,7 +78,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateReferencedLibrary(library, index, configFile, linesMapping, reporter);
+            validateReferencedLibrary(library, index, linesMapping, reporter);
             index++;
         }
 
@@ -86,11 +88,17 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             }
             validateReferencedVariableFile(variableFile, linesMapping, reporter);
         }
+
+        for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            validateExcludedPath(excludedPath, model.getExcludedPath(), linesMapping, reporter);
+        }
     }
 
-    private void validateRemoteLocation(final RemoteLocation location, final IFile configFile,
-            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter)
-                    throws CoreException {
+    private void validateRemoteLocation(final RemoteLocation location, final Map<Object, ProblemPosition> linesMapping,
+            final ProblemsReportingStrategy reporter) throws CoreException {
         final URI uriAddress = location.getUriAddress();
         try (Socket s = new Socket(uriAddress.getHost(), uriAddress.getPort())) {
             // that's fine
@@ -101,7 +109,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateReferencedLibrary(final ReferencedLibrary library, final int index, final IFile configFile,
+    private void validateReferencedLibrary(final ReferencedLibrary library, final int index,
             final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
         final LibraryType libType = library.provideType();
         final IPath libraryPath = Path.fromPortableString(library.getPath());
@@ -195,5 +203,30 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         for (final RobotProblem pathProblem : pathProblems) {
             reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile));
         }
+    }
+
+    private void validateExcludedPath(final ExcludedFolderPath excludedPath, final List<ExcludedFolderPath> allExcluded,
+            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
+        final IProject project = configFile.getProject();
+        final IPath asExcludedPath = Path.fromPortableString(excludedPath.getPath());
+        final Path projectPath = new Path(project.getName());
+        if (!project.exists(asExcludedPath)) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_EXCLUDED_FOLDER)
+                    .formatMessageWith(projectPath.append(asExcludedPath).toString());
+            reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
+        }
+
+        for (final ExcludedFolderPath otherPath : allExcluded) {
+            if (otherPath != excludedPath) {
+                final IPath otherAsPath = Path.fromPortableString(otherPath.getPath());
+                if (otherAsPath.isPrefixOf(asExcludedPath)) {
+                    final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.USELESS_FOLDER_EXCLUSION)
+                            .formatMessageWith(projectPath.append(asExcludedPath).toString(),
+                                    projectPath.append(otherAsPath).toString());
+                    reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
+                }
+            }
+        }
+
     }
 }

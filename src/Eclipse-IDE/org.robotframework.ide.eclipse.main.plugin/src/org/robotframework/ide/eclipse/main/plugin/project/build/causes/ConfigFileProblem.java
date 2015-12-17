@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -68,6 +69,22 @@ public enum ConfigFileProblem implements IProblemCause {
             return "Missing variable file '%s'. Variables from this file will not be accessible";
         }
     },
+    MISSING_EXCLUDED_FOLDER {
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Missing excluded folder '%s'";
+        }
+    },
     JAVA_LIB_NOT_A_JAR_FILE {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
@@ -105,6 +122,22 @@ public enum ConfigFileProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Java library '%s' requires Jython, but %s environment is in use by this project";
+        }
+    },
+    USELESS_FOLDER_EXCLUSION {
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The path '%s' is already excluded by '%s'";
         }
     };
 
