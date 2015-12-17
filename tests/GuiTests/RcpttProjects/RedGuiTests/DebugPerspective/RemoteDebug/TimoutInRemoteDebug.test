@@ -1,0 +1,56 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _mJtj0Jm8EeWwXrMNKVDTwg
+Element-Name: TimoutInRemoteDebug
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _56LAoKS_EeW4l-rLhvMqpg
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 12/17/15 2:27 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type End
+    set-caret-pos 1 19
+    key-type Enter
+    type-text test
+    key-type Enter
+    type-text "log  56"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
+get-button "Debug TestFile.robot" | click -arrow
+get-menu "Debug Configurations..." | click
+
+with [get-window "Debug Configurations"] {
+    get-tree | select "Robot/TestFile.robot"
+    get-tab-folder | get-tab-item Remote | click
+}
+
+
+with [get-window "Debug Configurations"] {
+    with [get-group "Remote Debugging"] {
+        get-editbox -after [get-label "Connection timeout [s]:"] | set-text 5
+        get-editbox -after [get-label "Local IP:"] | set-text localhost
+        get-editbox -after [get-label "Local port:"] | set-text 65002
+    }
+    get-button Apply | click
+}
+
+with [get-window "Debug Configurations"] {
+    get-button Debug | click    
+}   
+
+try -times 7 -delay 1000 -command {
+	get-view Console | get-text-viewer | get-property text 
+	    | equals "Debug server is listening on localhost:65002, you can run a remote test.\n"
+	    + "A timeout was reached while waiting for a remote connection." | verify-true  
+    
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
