@@ -289,6 +289,10 @@ public class RobotProjectConfig {
             switch (provideType()) {
                 case JAVA:
                     return RedImages.getJavaLibraryImage();
+                case PYTHON:
+                    return RedImages.getPythonLibraryImage();
+                case VIRTUAL:
+                    return RedImages.getVirtualLibraryImage();
                 default:
                     return RedImages.getLibraryImage();
             }

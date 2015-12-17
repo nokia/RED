@@ -24,7 +24,7 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSupport {
 
     public RemoteLibraryLocationEditingSupport(final ColumnViewer viewer, final NewElementsCreator<?> creator) {
-        super(viewer, 0, creator);
+        super(viewer, -1, creator);
     }
 
     @Override

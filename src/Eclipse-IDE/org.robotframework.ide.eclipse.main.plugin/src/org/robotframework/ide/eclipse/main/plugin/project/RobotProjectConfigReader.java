@@ -11,9 +11,10 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.xml.sax.SAXParseException;
 
 import com.google.common.base.Charsets;
@@ -112,10 +114,11 @@ public class RobotProjectConfigReader {
     
     public static class RobotProjectConfigWithLines {
 
-        private final Map<Object, Location> locations;
+        private final Map<Object, ProblemPosition> locations;
         private final RobotProjectConfig config;
 
-        public RobotProjectConfigWithLines(final RobotProjectConfig config, final Map<Object, Location> locations) {
+        public RobotProjectConfigWithLines(final RobotProjectConfig config,
+                final Map<Object, ProblemPosition> locations) {
             this.config = config;
             this.locations = locations;
         }
@@ -124,15 +127,16 @@ public class RobotProjectConfigReader {
             return config;
         }
 
-        public Map<Object, Location> getLinesMapping() {
+        public Map<Object, ProblemPosition> getLinesMapping() {
             return locations;
         }
     }
 
     private static class LocationListener extends Listener {
         private final XMLStreamReader streamReader;
-        private final Stack<Location> locationsStack = new Stack<Location>();
-        private final Map<Object, Location> locations = new HashMap<>();;
+
+        private final Deque<Location> locationsStack = new LinkedList<>();
+        private final Map<Object, ProblemPosition> locations = new HashMap<>();;
 
         private LocationListener(final XMLStreamReader streamReader) {
             this.streamReader = streamReader;
@@ -140,14 +144,13 @@ public class RobotProjectConfigReader {
 
         @Override
         public void beforeUnmarshal(final Object target, final Object parent) {
-            locationsStack.push(streamReader.getLocation());
+            locationsStack.addFirst(streamReader.getLocation());
         }
 
         @Override
         public void afterUnmarshal(final Object target, final Object parent) {
-            final Location beginLocation = locationsStack.pop();
-            // final Location endLocation = streamReader.getLocation();
-            locations.put(target, beginLocation);
+            final Location beginLocation = locationsStack.removeFirst();
+            locations.put(target, new ProblemPosition(beginLocation.getLineNumber()));
         }
     }
 
