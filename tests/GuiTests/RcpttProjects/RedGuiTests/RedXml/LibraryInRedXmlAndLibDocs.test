@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/17/15 9:57 AM
+Save-Time: 12/17/15 1:31 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -28,7 +28,6 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text "empty_file/empty.py"
     key-type "M1+s"
     set-caret-pos 4 24
-    hover-text 4 21
     get-menu "Quick Fix" | click
 }
 
@@ -69,9 +68,9 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type Enter
     type-text "only_function.py"
     key-type "M1+s"
-    hover-text 5 20
     set-caret-pos 5 18
     get-menu "Quick Fix" | click
+    wait 500
 }
 //add it to red.xml
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
@@ -119,7 +118,6 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text "here_is_class"
     key-type "M1+s"
     set-caret-pos 6 19
-    hover-text 6 18
     get-menu "Quick Fix" | click
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
@@ -138,6 +136,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type "M1+s"
     set-caret-pos 6 21
     get-menu "Quick Fix" | click
+    wait 500
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.py' and add to configuration" | click -default
@@ -191,7 +190,6 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text o
     type-text g
     key-type "M1+s"
-    hover-text 7 20
     set-caret-pos 7 19
     get-menu "Quick Fix" | click
 }
