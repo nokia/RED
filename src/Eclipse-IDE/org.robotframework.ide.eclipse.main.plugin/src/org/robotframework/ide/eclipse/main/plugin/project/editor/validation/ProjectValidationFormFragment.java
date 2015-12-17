@@ -9,13 +9,19 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -31,6 +37,8 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -47,6 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Predicate;
@@ -94,6 +103,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         createContextMenu();
 
         setInput();
+        installResourceChangeListener();
     }
 
     private Section createSection(final Composite parent) {
@@ -184,6 +194,50 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
                 buildTreeFor(wrappedChild, child);
             }
         }
+    }
+
+    private void installResourceChangeListener() {
+        final IResourceChangeListener resourceListener = new IResourceChangeListener() {
+            @Override
+            public void resourceChanged(final IResourceChangeEvent event) {
+                final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
+                
+                if (event.getType() != IResourceChangeEvent.POST_CHANGE || event.getDelta() == null) {
+                    return;
+                }
+
+                try {
+                    event.getDelta().accept(new IResourceDeltaVisitor() {
+
+                        @Override
+                        public boolean visit(final IResourceDelta delta) throws CoreException {
+                            if (editorInput.getRobotProject().getProject().equals(delta.getResource().getProject())) {
+                                shouldRefresh.set(true);
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+                } catch (final CoreException e) {
+                    // nothing to do
+                }
+                if (shouldRefresh.get()) {
+                    SwtThread.syncExec(viewer.getTree().getDisplay(), new Runnable() {
+                        @Override
+                        public void run() {
+                            setInput();
+                        }
+                    });
+                }
+            }
+        };
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
+        viewer.getTree().addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+            }
+        });
     }
 
     @Override
