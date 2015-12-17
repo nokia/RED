@@ -46,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWrit
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectValidationConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart;
 
 import com.google.common.base.Optional;
@@ -104,6 +105,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             addEditorPart(new GeneralProjectConfigurationEditorPart(), "General", context);
             addEditorPart(new ReferencedLibrariesProjectConfigurationEditorPart(), "Referenced libraries", context);
             addEditorPart(new VariablesProjectConfigurationEditorPart(), "Variable files", context);
+            addEditorPart(new ProjectValidationConfigurationEditorPart(), "Validation", context);
 
             setActivePart(getPageToActivate());
 
