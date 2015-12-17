@@ -71,7 +71,9 @@ public class ExecutableRowFindersManager {
     }
 
     public void clearForLoopState() {
-        forLoopExecutableRowFinder.clear();
+        if(forLoopExecutableRowFinder != null) {
+            forLoopExecutableRowFinder.clear();
+        }
     }
 
     public void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
