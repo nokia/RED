@@ -40,7 +40,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -187,8 +186,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = PathsConverter
-                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).append(file);
                         final ReferencedLibrary lib = importer.importPythonLib(viewer.getTable().getShell(),
                                 environment, path.toString());
                         if (lib != null) {
@@ -219,8 +217,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = PathsConverter
-                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).append(file);
                         final ReferencedLibrary lib = importer.importJavaLib(viewer.getTable().getShell(),
                                 path.toString());
                         if (lib != null) {
@@ -250,8 +247,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = PathsConverter
-                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).append(file);
                         final ReferencedLibrary lib = importer.importLibFromSpecFile(path.toString());
                         if (lib != null) {
                             libs.add(lib);
