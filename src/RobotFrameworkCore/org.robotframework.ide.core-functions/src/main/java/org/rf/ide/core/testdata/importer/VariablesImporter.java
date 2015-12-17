@@ -11,25 +11,26 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
-import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class VariablesImporter {
 
-    public List<VariablesFileImportReference> importVariables(
-            final RobotRuntimeEnvironment robotRunEnv,
-            final RobotProjectHolder robotProject,
-            final RobotFileOutput robotFile) {
+    private static final Pattern ILLEGAL_PATH_TEXT = Pattern.compile("\\s+([\\\\]|/)");
+
+    public List<VariablesFileImportReference> importVariables(final RobotRuntimeEnvironment robotRunEnv,
+            final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
         final List<VariablesFileImportReference> varsImported = new ArrayList<>();
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {
@@ -42,29 +43,26 @@ public class VariablesImporter {
                         continue;
                     }
                     String path = varImport.getPathOrName().getRaw().toString();
+                    if (!isCorrectPath(path)) {
+                        continue;
+                    }
+
                     final List<String> varFileArguments = convertTokensToArguments(varImport);
 
-                    final File currentRobotFile = robotFile.getProcessedFile()
-                            .getAbsoluteFile();
+                    final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
                     if (currentRobotFile.exists()) {
-                        final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath())
-                                .resolveSibling(path);
-                        path = joinPath.toAbsolutePath().toFile()
-                                .getAbsolutePath();
+                        final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath()).resolveSibling(path);
+                        path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
                     }
 
                     final File varFile = new File(path);
-                    VariablesFileImportReference varImportRef = findInProjectVariablesImport(
-                            robotProject, varImport, varFile.toPath()
-                                    .normalize().toFile());
+                    VariablesFileImportReference varImportRef = findInProjectVariablesImport(robotProject, varImport,
+                            varFile.toPath().normalize().toFile());
 
                     if (varImportRef == null) {
-                        final Map<?, ?> variablesFromFile = robotRunEnv
-                                .getVariablesFromFile(path, varFileArguments);
-                        varImportRef = new VariablesFileImportReference(
-                                varImport);
-                        varImportRef
-                                .setVariablesFile(varFile.getAbsoluteFile());
+                        final Map<?, ?> variablesFromFile = robotRunEnv.getVariablesFromFile(path, varFileArguments);
+                        varImportRef = new VariablesFileImportReference(varImport);
+                        varImportRef.setVariablesFile(varFile.getAbsoluteFile());
                         varImportRef.map(variablesFromFile);
                     } else {
                         varImportRef = varImportRef.copy(varImport);
@@ -78,20 +76,27 @@ public class VariablesImporter {
         return varsImported;
     }
 
+    @VisibleForTesting
+    protected boolean isCorrectPath(final String path) {
+        boolean isCorrectPath = false;
+        if (path != null && !path.trim().isEmpty()) {
+            Matcher matcher = ILLEGAL_PATH_TEXT.matcher(path);
+            isCorrectPath = !matcher.find();
+        }
 
-    private VariablesFileImportReference findInProjectVariablesImport(
-            final RobotProjectHolder robotProject,
+        return isCorrectPath;
+    }
+
+    private VariablesFileImportReference findInProjectVariablesImport(final RobotProjectHolder robotProject,
             final VariablesImport varImport, final File varFile) {
 
         final List<RobotFileOutput> filesWhichImportingVariables = robotProject
                 .findFilesWithImportedVariableFile(varFile);
         VariablesFileImportReference varImportRef = null;
         for (final RobotFileOutput rfo : filesWhichImportingVariables) {
-            final VariablesFileImportReference variableFile = findVariableFileByPath(
-                    rfo, varFile);
+            final VariablesFileImportReference variableFile = findVariableFileByPath(rfo, varFile);
             if (variableFile != null) {
-                if (checkIfImportDeclarationAreTheSame(varImport,
-                        variableFile.getImportDeclaration())) {
+                if (checkIfImportDeclarationAreTheSame(varImport, variableFile.getImportDeclaration())) {
                     if (varFile.lastModified() == varFile.lastModified()) {
                         varImportRef = variableFile;
                         break;
@@ -102,16 +107,12 @@ public class VariablesImporter {
         return varImportRef;
     }
 
-
     @VisibleForTesting
-    protected VariablesFileImportReference findVariableFileByPath(
-            final RobotFileOutput rfo, final File varFile) {
+    protected VariablesFileImportReference findVariableFileByPath(final RobotFileOutput rfo, final File varFile) {
         VariablesFileImportReference varFileImportReference = null;
-        final List<VariablesFileImportReference> variablesImportReferences = rfo
-                .getVariablesImportReferences();
+        final List<VariablesFileImportReference> variablesImportReferences = rfo.getVariablesImportReferences();
         for (final VariablesFileImportReference varFileImport : variablesImportReferences) {
-            if (varFileImport.getVariablesFile().getAbsolutePath()
-                    .equals(varFile.getAbsolutePath())) {
+            if (varFileImport.getVariablesFile().getAbsolutePath().equals(varFile.getAbsolutePath())) {
                 varFileImportReference = varFileImport;
                 break;
             }
@@ -120,10 +121,8 @@ public class VariablesImporter {
         return varFileImportReference;
     }
 
-
     @VisibleForTesting
-    protected boolean checkIfImportDeclarationAreTheSame(
-            final VariablesImport varImportCurrent,
+    protected boolean checkIfImportDeclarationAreTheSame(final VariablesImport varImportCurrent,
             final VariablesImport alreadyExecuted) {
         boolean result = false;
         if (varImportCurrent != null && alreadyExecuted != null) {
@@ -134,19 +133,15 @@ public class VariablesImporter {
                 final int size = argsCurrent.size();
                 for (int i = 0; i < size; i++) {
                     final RobotToken argCurrent = argsCurrent.get(i);
-                    final String argumentTextCurrent = argCurrent.getText()
-                            .toString();
+                    final String argumentTextCurrent = argCurrent.getText().toString();
                     final RobotToken argPrevious = argsPrevious.get(i);
-                    final String argumentTextPrevious = argPrevious.getText()
-                            .toString();
+                    final String argumentTextPrevious = argPrevious.getText().toString();
                     // TODO: add resolve in case parameter is variable
-                    if (argumentTextCurrent != null
-                            && argumentTextPrevious != null) {
+                    if (argumentTextCurrent != null && argumentTextPrevious != null) {
                         if (!argumentTextCurrent.equals(argumentTextPrevious)) {
                             result = false;
                         }
-                    } else if (argumentTextCurrent == null
-                            && argumentTextPrevious == null) {
+                    } else if (argumentTextCurrent == null && argumentTextPrevious == null) {
                         result = true;
                     } else {
                         result = false;
@@ -162,10 +157,8 @@ public class VariablesImporter {
         return result;
     }
 
-
     @VisibleForTesting
-    protected List<String> convertTokensToArguments(
-            final VariablesImport varImport) {
+    protected List<String> convertTokensToArguments(final VariablesImport varImport) {
         final List<String> arguments = new ArrayList<>();
         for (final RobotToken rtArgument : varImport.getArguments()) {
             arguments.add(rtArgument.getRaw().toString());
