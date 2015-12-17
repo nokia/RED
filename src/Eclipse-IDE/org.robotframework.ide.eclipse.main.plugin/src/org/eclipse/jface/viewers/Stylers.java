@@ -23,6 +23,27 @@ public class Stylers {
 
     public static class Common {
 
+        public static final Styler EMPTY_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                // no styles to apply
+            }
+        };
+
+        public static final Styler ERROR_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = ColorsManager.getColor(255, 0, 0);
+            }
+        };
+
+        public static final Styler WARNING_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = ColorsManager.getColor(255, 165, 0);
+            }
+        };
+
         public static final Styler MARKED_PREFIX_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle style) {

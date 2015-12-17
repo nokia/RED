@@ -5,12 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
@@ -20,10 +21,12 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -37,6 +40,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -67,7 +71,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     private RedProjectEditorInput editorInput;
-    
+
     private RowExposingTableViewer viewer;
 
     private Button addPythonLibButton;
@@ -103,11 +107,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private Section createSection(final Composite parent) {
-        final Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED
-                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION | ExpandableComposite.TWISTIE);
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Referenced libraries");
-        section.setDescription("In this section referenced libraries can be specified. Those libraries will "
-                + "be available for all suites within project.");
+        section.setDescription("Specify third party libraries to be used by the project. "
+                + "Libraries defined here will be accessible from all suites within the project.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
     }
@@ -116,6 +120,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         viewer = new RowExposingTableViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         GridDataFactory.fillDefaults().grab(true, true).span(1, 4).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
@@ -131,10 +136,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        ViewerColumnsFactory.newColumn("").withWidth(100)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .labelsProvidedBy(new ReferencedLibrariesLabelProvider())
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn("")
+                .withWidth(100)
+                .shouldGrabAllTheSpaceLeft(true)
+                .withMinWidth(100)
+                .labelsProvidedBy(new ReferencedLibrariesLabelProvider(editorInput))
+                .createFor(viewer);
     }
 
     private void createContextMenu() {
@@ -163,26 +170,35 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addLibspecButton);
         addLibspecHandler();
     }
-    
+
     private void addPythonHandler() {
         addPythonLibButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent event) {
-                
+
                 final FileDialog dialog = createReferencedLibFileDialog();
                 dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
 
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                    final ReferencedLibrary lib = importer.importPythonLib(viewer.getTable().getShell(), environment,
-                            chosenFilePath);
-                    if (lib != null) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(lib);
 
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                                newArrayList(lib));
+                    final List<ReferencedLibrary> libs = new ArrayList<>();
+                    final String[] chosenFiles = dialog.getFileNames();
+                    for (final String file : chosenFiles) {
+                        final IPath path = PathsConverter
+                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final ReferencedLibrary lib = importer.importPythonLib(viewer.getTable().getShell(),
+                                environment, path.toString());
+                        if (lib != null) {
+                            libs.add(lib);
+                        }
                     }
+                    for (final ReferencedLibrary library : libs) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
+                    }
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
                 }
             }
         });
@@ -190,28 +206,39 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private void addJavaHandler() {
         addJavaLibButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                
+
                 final FileDialog dialog = createReferencedLibFileDialog();
                 dialog.setFilterExtensions(new String[] { "*.jar" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                    final ReferencedLibrary lib = importer.importJavaLib(viewer.getTable().getShell(), chosenFilePath);
-                    if (lib != null) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(lib);
-                        
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                                newArrayList(lib));
+
+                    final List<ReferencedLibrary> libs = new ArrayList<>();
+                    final String[] chosenFiles = dialog.getFileNames();
+                    for (final String file : chosenFiles) {
+                        final IPath path = PathsConverter
+                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final ReferencedLibrary lib = importer.importJavaLib(viewer.getTable().getShell(),
+                                path.toString());
+                        if (lib != null) {
+                            libs.add(lib);
+                        }
                     }
+                    for (final ReferencedLibrary library : libs) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
+                    }
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
                 }
             }
         });
     }
-    
+
     private void addLibspecHandler() {
         addLibspecButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final FileDialog dialog = createReferencedLibFileDialog();
@@ -219,13 +246,21 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                    final ReferencedLibrary lib = importer.importLibFromSpecFile(chosenFilePath);
-                    if (lib != null) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(lib);
 
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                                newArrayList(lib));
+                    final List<ReferencedLibrary> libs = new ArrayList<>();
+                    final String[] chosenFiles = dialog.getFileNames();
+                    for (final String file : chosenFiles) {
+                        final IPath path = PathsConverter
+                                .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath())).append(file);
+                        final ReferencedLibrary lib = importer.importLibFromSpecFile(path.toString());
+                        if (lib != null) {
+                            libs.add(lib);
+                        }
                     }
+                    for (final ReferencedLibrary library : libs) {
+                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
+                    }
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
                 }
             }
         });
@@ -233,7 +268,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private FileDialog createReferencedLibFileDialog() {
         final String startingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
-        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN);
+        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN | SWT.MULTI);
         dialog.setFilterPath(startingPath);
         return dialog;
     }
@@ -295,20 +330,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             decoration = null;
         }
     }
-    
-    @Inject
-    @Optional
-    private void changeEvent(@UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
-        editorInput.refreshProjectConfiguration();
-        setInput();
-        viewer.refresh();
-    }
 
     @Inject
     @Optional
-    private void whenLibrariesChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final String libName) {
-        setDirty(true);
+    private void changeEvent(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
+        editorInput.refreshProjectConfiguration();
+        setInput();
         viewer.refresh();
     }
 

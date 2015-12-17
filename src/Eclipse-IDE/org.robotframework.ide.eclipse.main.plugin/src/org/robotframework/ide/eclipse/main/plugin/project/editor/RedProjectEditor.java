@@ -29,9 +29,11 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
@@ -45,6 +47,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChang
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart;
+
+import com.google.common.base.Optional;
 
 public class RedProjectEditor extends MultiPageEditorPart {
 
@@ -69,8 +73,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
             final IFile file = ((FileEditorInput) input).getFile();
             setPartName(file.getProject().getName() + "/" + input.getName());
 
-            editorInput = new RedProjectEditorInput(!file.isReadOnly(),
-                    new RobotProjectConfigReader().readConfiguration(file), file.getProject());
+            editorInput = new RedProjectEditorInput(Optional.of(file), !file.isReadOnly(),
+                    new RobotProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
             final IStorage storage = input.getAdapter(IStorage.class);
@@ -78,8 +82,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
                 try {
-                    editorInput = new RedProjectEditorInput(!storage.isReadOnly(),
-                            new RobotProjectConfigReader().readConfiguration(storage.getContents()), null);
+                    editorInput = new RedProjectEditorInput(Optional.<IFile> absent(), !storage.isReadOnly(),
+                            new RobotProjectConfigReader().readConfigurationWithLines(storage.getContents()));
                 } catch (final CoreException e) {
                     throw new IllegalProjectConfigurationEditorInputException(
                             "Unable to open editor: unrecognized input of class: " + input.getClass().getName(), e);
@@ -101,6 +105,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
             addEditorPart(new ReferencedLibrariesProjectConfigurationEditorPart(), "Referenced libraries", context);
             addEditorPart(new VariablesProjectConfigurationEditorPart(), "Variable files", context);
 
+            setActivePart(getPageToActivate());
+
             setupEnvironmentLoadingJob();
         } catch (final PartInitException e) {
             throw new EditorInitalizationException("Unable to initialize editor", e);
@@ -116,13 +122,6 @@ public class RedProjectEditor extends MultiPageEditorPart {
         return context;
     }
 
-    private void addEditorPart(final IEditorPart part, final String title, final IEclipseContext context)
-            throws PartInitException {
-        parts.add(part);
-        ContextInjectionFactory.inject(part, context);
-        setPageText(addPage(part, getEditorInput()), title);
-    }
-
     private void installResourceListener() {
         final IProject project = editorInput.getRobotProject().getProject();
         resourceListener = new RedXmlFileChangeListener(project, new OnRedConfigFileChange() {
@@ -134,11 +133,45 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             @Override
             public void whenFileChanged() {
-                editorInput.refreshProjectConfiguration();
+                editorInput.refreshProjectConfiguration(((IFileEditorInput) getEditorInput()).getFile());
                 setupEnvironmentLoadingJob();
             }
         });
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
+    }
+
+    private void addEditorPart(final IEditorPart part, final String title, final IEclipseContext context)
+            throws PartInitException {
+        parts.add(part);
+        ContextInjectionFactory.inject(part, context);
+        setPageText(addPage(part, getEditorInput()), title);
+    }
+
+    private String getPageToActivate() {
+        if (getEditorInput() instanceof IFileEditorInput) {
+            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
+            final String projectName = fileInput.getFile().getProject().getName();
+
+            final String sectionName = ID + ".activePage." + projectName;
+            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
+            final IDialogSettings section = dialogSettings.getSection(sectionName);
+            if (section == null) {
+                return null;
+            }
+            return section.get("activePage");
+        }
+        return null;
+    }
+
+    private void setActivePart(final String simpleClassNameOfPage) {
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart.getClass().getSimpleName().equals(simpleClassNameOfPage)) {
+                setActivePage(i);
+                return;
+            }
+        }
+        setActivePage(0);
     }
 
     private void setupEnvironmentLoadingJob() {
@@ -218,6 +251,28 @@ public class RedProjectEditor extends MultiPageEditorPart {
     @Override
     public void doSaveAs() {
         // save as is not allowed
+    }
+
+    @Override
+    protected void pageChange(final int newPageIndex) {
+        super.pageChange(newPageIndex);
+        final IEditorPart activeEditor = getActiveEditor();
+        saveActivePage(activeEditor.getClass().getSimpleName());
+    }
+
+    private void saveActivePage(final String activePageClassName) {
+        if (getEditorInput() instanceof IFileEditorInput) {
+            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
+            final String projectName = fileInput.getFile().getProject().getName();
+
+            final String sectionName = ID + ".activePage." + projectName;
+            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
+            IDialogSettings section = dialogSettings.getSection(sectionName);
+            if (section == null) {
+                section = dialogSettings.addNewSection(sectionName);
+            }
+            section.put("activePage", activePageClassName);
+        }
     }
 
     @Override

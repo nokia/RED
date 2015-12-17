@@ -147,18 +147,6 @@ public class RobotFormEditor extends FormEditor {
         }
     }
 
-    private void setActivePart(final String pageIdToActivate) {
-        for (int i = 0; i < getPageCount(); i++) {
-            final IEditorPart editorPart = getEditor(i);
-            if (editorPart instanceof ISectionEditorPart
-                    && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
-                setActivePage(i);
-                return;
-            }
-        }
-        setActivePage(getPageCount() - 1);
-    }
-
     private String getPageToActivate() {
         if (getEditorInput() instanceof IFileEditorInput) {
             final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
@@ -175,19 +163,16 @@ public class RobotFormEditor extends FormEditor {
         return null;
     }
 
-    private void saveActivePage(final String activePageClassName) {
-        if (getEditorInput() instanceof IFileEditorInput) {
-            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
-            final IFile file = fileInput.getFile();
-
-            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
-            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
-            IDialogSettings section = dialogSettings.getSection(sectionName);
-            if (section == null) {
-                section = dialogSettings.addNewSection(sectionName);
+    private void setActivePart(final String pageIdToActivate) {
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart editorPart = getEditor(i);
+            if (editorPart instanceof ISectionEditorPart
+                    && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
+                setActivePage(i);
+                return;
             }
-            section.put("activePage", activePageClassName);
         }
+        setActivePage(getPageCount() - 1);
     }
 
     private void addEditorPart(final IEditorPart editorPart, final String partName) throws PartInitException {
@@ -374,6 +359,21 @@ public class RobotFormEditor extends FormEditor {
         final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
         final RobotFile model = provideSuiteModel().getLinkedElement();
         // document.set(model.toString());
+    }
+
+    private void saveActivePage(final String activePageClassName) {
+        if (getEditorInput() instanceof IFileEditorInput) {
+            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
+            final IFile file = fileInput.getFile();
+
+            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
+            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
+            IDialogSettings section = dialogSettings.getSection(sectionName);
+            if (section == null) {
+                section = dialogSettings.addNewSection(sectionName);
+            }
+            section.put("activePage", activePageClassName);
+        }
     }
 
     public SuiteSourceEditor activateSourcePage() {

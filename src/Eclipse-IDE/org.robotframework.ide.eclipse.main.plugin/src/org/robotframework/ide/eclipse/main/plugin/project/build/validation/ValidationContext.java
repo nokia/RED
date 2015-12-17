@@ -115,7 +115,7 @@ public class ValidationContext {
         libs.putAll(robotProject.getStandardLibraries());
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
                 .entrySet()) {
-            if (entry.getKey().provideType() == LibraryType.VIRTUAL) {
+            if (entry.getKey().provideType() == LibraryType.VIRTUAL && entry.getValue() != null) {
                 libs.put(entry.getValue().getName(), entry.getValue());
             } else {
                 libs.put(entry.getKey().getName(), entry.getValue());
