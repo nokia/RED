@@ -72,8 +72,8 @@ public class ReferencedLibraryImporter {
                 final String name = new File(fullLibraryPath).getName();
                 pythonClasses.add(PythonClass.create(name.substring(0, name.lastIndexOf('.'))));
             }
-            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs, pythonClasses,
-                    new PythonClassesLabelProvider());
+            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs, fullLibraryPath,
+                    pythonClasses, new PythonClassesLabelProvider());
             if (classesDialog.open() == Window.OK) {
                 final Object[] result = classesDialog.getResult();
 
@@ -124,8 +124,8 @@ public class ReferencedLibraryImporter {
             return null;
         }
 
-        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, classesFromJar,
-                new JarClassesLabelProvider());
+        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, fullLibraryPath,
+                classesFromJar, new JarClassesLabelProvider());
 
         if (classesDialog.open() == Window.OK) {
             final Object[] result = classesDialog.getResult();
@@ -154,12 +154,12 @@ public class ReferencedLibraryImporter {
         return referencedLibrary;
     }
 
-    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final List<?> classes,
-            final LabelProvider labelProvider) {
+    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path,
+            final List<?> classes, final LabelProvider labelProvider) {
         final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(shell, labelProvider);
         classesDialog.setMultipleSelection(true);
         classesDialog.setTitle("Select library class");
-        classesDialog.setMessage("Select the class(es) which defines library:");
+        classesDialog.setMessage("Select the class(es) which defines library:\n\t" + path);
         classesDialog.setElements(classes.toArray());
 
         return classesDialog;

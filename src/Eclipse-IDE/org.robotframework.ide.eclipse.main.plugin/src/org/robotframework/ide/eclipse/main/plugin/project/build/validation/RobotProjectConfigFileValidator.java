@@ -13,8 +13,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.Location;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -64,7 +63,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
 
         final RobotProjectConfig model = config.getConfigurationModel();
-        final Map<Object, Location> linesMapping = config.getLinesMapping();
+        final Map<Object, ProblemPosition> linesMapping = config.getLinesMapping();
         for (final RemoteLocation location : model.getRemoteLocations()) {
             if (monitor.isCanceled()) {
                 return;
@@ -90,22 +89,23 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateRemoteLocation(final RemoteLocation location, final IFile configFile,
-            final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) throws CoreException {
+            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter)
+                    throws CoreException {
         final URI uriAddress = location.getUriAddress();
         try (Socket s = new Socket(uriAddress.getHost(), uriAddress.getPort())) {
             // that's fine
-        } catch (final IOException ex) {
+        } catch (final IOException | IllegalArgumentException ex) {
             final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
                     .formatMessageWith(uriAddress);
-            reporter.handleProblem(unreachableHostProblem, configFile, linesMapping.get(location).getLineNumber());
+            reporter.handleProblem(unreachableHostProblem, configFile, linesMapping.get(location));
         }
     }
 
     private void validateReferencedLibrary(final ReferencedLibrary library, final int index, final IFile configFile,
-            final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) {
+            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
         final LibraryType libType = library.provideType();
         final IPath libraryPath = Path.fromPortableString(library.getPath());
-        final int lineNumber = linesMapping.get(library).getLineNumber();
+        final ProblemPosition position = linesMapping.get(library);
 
         final Map<String, Object> additional = ImmutableMap.<String, Object> of(ConfigFileProblem.LIBRARY_INDEX, index);
         List<RobotProblem> libProblems;
@@ -125,7 +125,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
 
         for (final RobotProblem problem : libProblems) {
-            reporter.handleProblem(problem, configFile, lineNumber, additional);
+            reporter.handleProblem(problem, configFile, position, additional);
         }
     }
 
@@ -187,13 +187,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateReferencedVariableFile(final ReferencedVariableFile variableFile,
-            final Map<Object, Location> linesMapping, final ProblemsReportingStrategy reporter) {
+            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
 
         final IPath libraryPath = Path.fromPortableString(variableFile.getPath());
         final List<RobotProblem> pathProblems = validateLibraryPath(libraryPath,
                 ConfigFileProblem.MISSING_VARIABLE_FILE);
         for (final RobotProblem pathProblem : pathProblems) {
-            reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile).getLineNumber());
+            reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile));
         }
     }
 }

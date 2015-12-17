@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Iterables.transform;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -20,12 +22,16 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -41,20 +47,25 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
@@ -99,8 +110,8 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Remote library locations");
-        section.setDescription("In this section locations of servers for Remote standard library can be specified. "
-                + "Those addresses will be available for all suites within project.");
+        section.setDescription("Define locations of servers for Remote standard library. "
+                + "Those remote libraries wille accessible from all suites within the project.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
     }
@@ -109,6 +120,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         viewer = new RowExposingTableViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
@@ -240,13 +252,15 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private static class RemoteLibraryLocationsAddressLabelProvider extends StylersDisposingLabelProvider {
+    private class RemoteLibraryLocationsAddressLabelProvider extends StylersDisposingLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
             if (element instanceof RemoteLocation) {
                 final RemoteLocation location = (RemoteLocation) element;
-                return new StyledString(location.getUri());
+                final Styler styler = editorInput.getProblemsFor(location).isEmpty() ? Stylers.Common.EMPTY_STYLER
+                        : Stylers.Common.ERROR_STYLER;
+                return new StyledString(location.getUri(), styler);
             } else {
                 return ((ElementAddingToken) element).getStyledText();
             }
@@ -254,8 +268,47 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
 
         @Override
         public Image getImage(final Object element) {
-            if (element instanceof ElementAddingToken) {
+            if (element instanceof RemoteLocation) {
+                final RemoteLocation location = (RemoteLocation) element;
+
+                final List<RedXmlProblem> problems = editorInput.getProblemsFor(location);
+                if (problems.isEmpty()) {
+                    return ImagesManager.getImage(RedImages.getRemoteConnectedImage());
+                } else {
+                    return ImagesManager.getImage(RedImages.getRemoteDisconnectedImage());
+                }
+            } else if (element instanceof ElementAddingToken) {
                 return ((ElementAddingToken) element).getImage();
+            }
+            return null;
+        }
+
+        @Override
+        public String getToolTipText(final Object element) {
+            if (element instanceof RemoteLocation) {
+                final RemoteLocation location = (RemoteLocation) element;
+
+                final List<RedXmlProblem> problems = editorInput.getProblemsFor(location);
+                final String description = Joiner.on('\n')
+                        .join(transform(problems, new Function<RedXmlProblem, String>() {
+                            @Override
+                            public String apply(final RedXmlProblem problem) {
+                                return problem.getDescription();
+                            }
+                        }));
+                return description.isEmpty() ? null : description;
+            }
+            return null;
+        }
+
+        @Override
+        public Image getToolTipImage(final Object element) {
+            if (element instanceof RemoteLocation) {
+                final RemoteLocation location = (RemoteLocation) element;
+                final List<RedXmlProblem> problems = editorInput.getProblemsFor(location);
+                if (!problems.isEmpty()) {
+                    return ImagesManager.getImage(RedImages.getErrorImage());
+                }
             }
             return null;
         }

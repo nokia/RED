@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
@@ -22,9 +24,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -62,6 +65,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private String libName;
 
+        private ReferencedLibrary addedLibrary;
+
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
                 final String shortDescritption) {
             super(marker, externalFile, shortDescritption, null);
@@ -89,7 +94,12 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                                 + " in PYTHONPATH of " + env.getFile() + " python installation.");
                 return false;
             }
-            config.addReferencedLibraryInPython(libName, new Path(libPath));
+            addedLibrary = new ReferencedLibrary();
+            addedLibrary.setType(LibraryType.PYTHON.toString());
+            addedLibrary.setName(libName);
+            addedLibrary.setPath(new Path(libPath).toPortableString());
+            config.addReferencedLibrary(addedLibrary);
+
             return true;
         }
 
@@ -97,10 +107,10 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (pathOrName.endsWith("/") || pathOrName.endsWith(".py")) {
                 final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, pathOrName);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                final ReferencedLibrary refLib = importer.importPythonLib(Display.getCurrent().getActiveShell(),
+                addedLibrary = importer.importPythonLib(Display.getCurrent().getActiveShell(),
                         suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString());
-                if (refLib != null) {
-                    config.addReferencedLibrary(refLib);
+                if (addedLibrary != null) {
+                    config.addReferencedLibrary(addedLibrary);
                     return true;
                 } else {
                     throw new ProposalApplyingException("Unable to apply proposal");
@@ -114,7 +124,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         @Override
         protected void fireEvents() {
-            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libName);
+            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                    newArrayList(addedLibrary));
         }
 
         @Override
