@@ -364,16 +364,27 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
-                .entrySet()) {
-            for (final IPath path : PathsResolver.resolveToAbsolutePossiblePaths(this, toImportPathOrName)) {
+        List<IPath> possiblePathsToLib = null;
+        try {
+            possiblePathsToLib = PathsResolver.resolveToAbsolutePossiblePaths(this, toImportPathOrName);
+        } catch (final PathResolvingException e) {
+            possiblePathsToLib = PathsResolver.resolveToAbsolutePossiblePaths(this,
+                    PathsResolver.resolveParametrizedPath(getProject(), toImportPathOrName).toPortableString());
+        }
+        if (possiblePathsToLib != null && !possiblePathsToLib.isEmpty()) {
+            for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
+                    .entrySet()) {
                 if (entry.getValue() != null) {
-                    if (path.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
-                            new Path(entry.getKey().getFilepath().toString())))) {
-                        return entry.getValue();
-                    } else if (path.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
-                            new Path(entry.getKey().getFilepath().toString())).addFileExtension("py"))) {
-                        return entry.getValue();
+                    final IPath refLibPath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(
+                            entry.getKey().getFilepath().toString()));
+                    for (final IPath possiblePath : possiblePathsToLib) {
+                        if (possiblePath.equals(refLibPath)) {
+                            return entry.getValue();
+                        } else if (possiblePath.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                                new Path(entry.getKey().getFilepath().toString())).addFileExtension("py"))) {
+                            return entry.getValue();
+                        }
+
                     }
                 }
             }
