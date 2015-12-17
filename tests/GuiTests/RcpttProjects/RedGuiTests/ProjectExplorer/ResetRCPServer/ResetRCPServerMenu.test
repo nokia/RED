@@ -1,0 +1,133 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ResetRCPServerMenu
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _n-QKcKS7EeW4l-rLhvMqpg
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 12/17/15 2:06 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//Reset when no variable file is in project
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | get-menu "Robot Framework/Reset Robot Environment" | click
+}
+//check no errors
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+//create folder
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | get-menu "New/Folder" | click
+}
+
+with [get-window "New Folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text var
+    get-button Finish | click
+}
+
+//create python file
+get-view "Project Explorer" | get-tree | select "RobotProject/var" | get-menu "New/File" | click
+with [get-window "New File"] {
+    get-editbox -after [get-label "File name:"] | set-text "var.py"
+    get-button Finish | click
+}
+
+//add Setting and test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	//remove all
+    key-type "M1+a"
+    key-type Del
+    //add settings
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text Va
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    wait 300
+    key-type Enter
+    wait 200
+    key-type Enter -times 2
+    //add test case section
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    type-text test1
+    key-type Enter
+    type-text "Log  ${a}"
+    key-type "M1+s"
+}
+
+//add variable to python file
+get-view "Project Explorer" | get-tree | select "RobotProject/var/var.py" | select "RobotProject/var/var.py" 
+    | get-menu "Open With/Text Editor" | click
+with [get-editor "var.py" | get-text-viewer] {
+    type-text "a = 6"
+    key-type "M1+s"
+}
+//clean project
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+//check that 1 error is shown
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-tree | select "Errors (1 item)"
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(1 item\\)" | get-property childCount | equals 1 | verify-true
+    get-item "Errors \\(1 item\\)" | get-property "getText()" | equals "Errors (1 item)" | verify-true
+    get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Variable 'a' is used, but not defined" | verify-true
+}
+
+//reset and clean
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Reset Robot Environment" 
+    | click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+//check that now variable is visible
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+//add new list to python file
+get-tab-folder -index 1 | get-tab-item "var.py" | click
+with [get-editor "var.py" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "b= [1,2]"
+    key-type "M1+s"
+}
+
+//log list
+get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 14
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "Log  ${b}"
+    key-type "M1+s"
+}
+wait 1000
+//check taht error is shown
+with [get-view Problems | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Errors (1 item)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "Variable 'b' is used, but not defined" | verify-true
+}
+
+//reset and clean
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Reset Robot Environment" 
+    | click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
