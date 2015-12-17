@@ -1,0 +1,226 @@
+/*
+ * Copyright 2015 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
+package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.RowExposingTreeViewer;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.window.ToolTip;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.viewers.Viewers;
+
+import com.google.common.base.Predicate;
+
+/**
+ * @author Michal Anglart
+ *
+ */
+public class ProjectValidationFormFragment implements ISectionFormFragment {
+
+    private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.validation.context";
+
+    @Inject
+    private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
+
+    @Inject
+    private RedFormToolkit toolkit;
+
+    @Inject
+    private IDirtyProviderService dirtyProviderService;
+
+    @Inject
+    private RedProjectEditorInput editorInput;
+
+    private RowExposingTreeViewer viewer;
+
+    ISelectionProvider getViewer() {
+        return viewer;
+    }
+
+    @Override
+    public void initialize(final Composite parent) {
+        final Section section = createSection(parent);
+
+        final Composite internalComposite = toolkit.createComposite(section);
+        section.setClient(internalComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
+
+        createViewer(internalComposite);
+        createColumns();
+        createContextMenu();
+
+        setInput();
+    }
+
+    private Section createSection(final Composite parent) {
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
+        section.setText("Excluded project parts");
+        section.setDescription("Specify parts of the project which shouldn't be validated.");
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+        return section;
+    }
+
+    private void createViewer(final Composite parent) {
+        viewer = new RowExposingTreeViewer(parent,
+                SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
+
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTree());
+        viewer.setUseHashlookup(true);
+        viewer.getTree().setEnabled(false);
+
+        viewer.setContentProvider(new WorkbenchContentProvider());
+
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
+        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+        Viewers.boundViewerWithContext(viewer, site, CONTEXT_ID);
+    }
+    
+    private void createColumns() {
+        ViewerColumnsFactory.newColumn("").withWidth(300)
+            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .labelsProvidedBy(new ProjectValidationPathsLabelProvider())
+            .createFor(viewer);
+    }
+
+    private void createContextMenu() {
+        final String menuId = "org.robotframework.ide.eclipse.redxmleditor.validation.contextMenu";
+
+        final MenuManager manager = new MenuManager("Red.xml file editor validation context menu", menuId);
+        final Tree control = viewer.getTree();
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        site.registerContextMenu(menuId, manager, viewer, false);
+    }
+
+    private void setInput() {
+        try {
+            final IProject project = editorInput.getRobotProject().getProject();
+            final IWorkspaceRoot wsRoot = project.getWorkspace().getRoot();
+            final ProjectTreeElement wrappedRoot = new ProjectTreeElement(wsRoot, false);
+
+            buildTreeFor(wrappedRoot, project);
+
+            viewer.getTree().setRedraw(false);
+
+            viewer.setInput(wrappedRoot);
+            viewer.setExpandedElements(getElementsToExpand(wrappedRoot));
+        } catch (final CoreException e) {
+            throw new IllegalStateException("Unable to read project structure");
+        } finally {
+            viewer.getTree().setRedraw(true);
+        }
+    }
+
+    private ProjectTreeElement[] getElementsToExpand(final ProjectTreeElement element) {
+        return toArray(filter(element.getAll(), new Predicate<ProjectTreeElement>() {
+            @Override
+            public boolean apply(final ProjectTreeElement element) {
+                return element.containsOtherFolders();
+            }
+        }), ProjectTreeElement.class);
+    }
+
+    private void buildTreeFor(final ProjectTreeElement parent, final IResource resource) throws CoreException {
+        if (resource.getName().startsWith(".") || LibspecsFolder.get(resource.getProject()).getResource().equals(resource)) {
+            return;
+        }
+
+        final boolean isExcluded = editorInput.getProjectConfiguration()
+                .isExcludedFromValidation(resource.getProjectRelativePath());
+        
+        final ProjectTreeElement wrappedChild = new ProjectTreeElement(resource, isExcluded);
+        parent.addChild(wrappedChild);
+
+        if (!isExcluded && resource instanceof IContainer) {
+            final IContainer childContainer = (IContainer) resource;
+            for (final IResource child : childContainer.members()) {
+                buildTreeFor(wrappedChild, child);
+            }
+        }
+    }
+
+    @Override
+    public void setFocus() {
+        viewer.getTree().setFocus();
+    }
+
+    private void setDirty(final boolean isDirty) {
+        dirtyProviderService.setDirtyState(isDirty);
+    }
+
+    @Override
+    public MatchesCollection collectMatches(final String filter) {
+        return null;
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentLoadingStarted(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
+        setInput();
+
+        viewer.getTree().setEnabled(false);
+    }
+
+    @Inject
+    @Optional
+    private void whenEnvironmentsWereLoaded(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
+        viewer.getTree().setEnabled(editorInput.isEditable());
+    }
+
+    @Inject
+    @Optional
+    private void whenRemoteLocationChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final List<ProjectTreeElement> elements) {
+        setDirty(true);
+        setInput();
+    }
+}

@@ -779,6 +779,11 @@
           name="Context for Variable files section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.validation.context"
+          name="Context for Validation section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -790,6 +795,16 @@
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.reloadProjectRuntimeEnvironment"
           name="Reset Robot Environment">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.include"
+          name="Include">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.exclude"
+          name="Exclude">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
@@ -2059,6 +2074,62 @@
           </with>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.IncludePathHandler"
+          commandId="org.robotframework.red.include">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.validationPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <test
+                         property="org.robotframework.redxml.validation.isInternalFolder"
+                         value="true">
+                   </test>
+                   <test
+                         property="org.robotframework.redxml.validation.isExcluded"
+                         value="true">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.ExcludePathHandler"
+          commandId="org.robotframework.red.exclude">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.validationPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <test
+                         property="org.robotframework.redxml.validation.isInternalFolder"
+                         value="true">
+                   </test>
+                   <test
+                         property="org.robotframework.redxml.validation.isIncluded"
+                         value="true">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
  </extension>
  <extension
        point="org.eclipse.ui.bindings">
@@ -2191,6 +2262,26 @@
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
              style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.validation.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.red.include"
+             label="Include"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
+       <command
+             commandId="org.robotframework.red.exclude"
+             label="Exclude"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
        </command>
     </menuContribution>
  </extension>
@@ -3028,6 +3119,13 @@
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
     </propertyTester>
     <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester"
+          id="org.robotframework.redxml.validationConfigPropertyTester"
+          namespace="org.robotframework.redxml.validation"
+          properties="isInternalFolder, isExcluded, isIncluded"
+          type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+    </propertyTester>
+    <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
@@ -3710,6 +3808,35 @@
                    operator="or">
                 <equals
                       value="org.robotframework.ide.eclipse.redxmleditor.libraries.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate>
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.redXmlIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.redxml.validationPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.redxmleditor.validation.context">
                 </equals>
              </iterate>
              <not>

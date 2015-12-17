@@ -28,5 +28,6 @@ public class RobotProjectConfigEvents {
 
     public static final String ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED = "robot/redxml/structural/libs/changed";
 
+    public static final String ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED = "robot/redxml/structural/validationexclusions/changed";
 
 }

@@ -19,15 +19,19 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
@@ -187,8 +191,23 @@ public class RobotArtifactsValidator {
 
     private Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
             final IResource resource) throws CoreException {
-        return resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)
+        return shouldValidate(context.getProjectConfiguration(), resource)
                 ? createProperValidator(context, (IFile) resource) : Optional.<ModelUnitValidator> absent();
+    }
+
+    private boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource) {
+        if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource) ) {
+            final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
+            for (final ExcludedFolderPath excludedPath : excludedPaths) {
+                final IPath exAsPath = Path.fromPortableString(excludedPath.getPath());
+
+                if (exAsPath.isPrefixOf(resource.getProjectRelativePath())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean isInsideEclipseHiddenDirectory(final IResource resource) {
