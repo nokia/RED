@@ -32,11 +32,13 @@ global_variables = {
     '${PREV_TEST_MESSAGE}': '',
     '${CURDIR}': '.',
     '${TEST_NAME}': '',
-    '@{TEST_TAGS}': '',
+    '${TEST DOCUMENTATION}': '',
+    '@{TEST_TAGS}': list(),
     '${TEST_STATUS}': '',
     '${TEST_MESSAGE}': '',
     '${SUITE_NAME}': '',
     '${SUITE_SOURCE}': '',
+    '&{SUITE METADATA}': map(),
     '${SUITE_STATUS}': '',
     '${SUITE_MESSAGE}': ''
 }
