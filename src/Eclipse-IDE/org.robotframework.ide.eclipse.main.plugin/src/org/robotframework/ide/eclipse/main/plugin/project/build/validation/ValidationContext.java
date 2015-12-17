@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
@@ -55,9 +56,12 @@ public class ValidationContext {
 
     private final RobotVersion version;
 
+    private RobotProjectConfig projectConfig;
+
     private final Map<String, LibrarySpecification> accessibleLibraries;
 
     private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
+
 
     public ValidationContext(final IProject project) {
         this(RedPlugin.getModelManager().getModel(), project);
@@ -66,6 +70,7 @@ public class ValidationContext {
     public ValidationContext(final RobotModel model, final IProject project) {
         this.model = model;
         final RobotProject robotProject = model.createRobotProject(project);
+        this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
         final String versionGot = robotProject.getVersion();
@@ -88,6 +93,10 @@ public class ValidationContext {
 
     RobotModel getModel() {
         return model;
+    }
+
+    public RobotProjectConfig getProjectConfiguration() {
+        return projectConfig;
     }
 
     public SuiteExecutor getExecutorInUse() {

@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -32,7 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
-        "referencedVariableFiles" })
+        "referencedVariableFiles", "excludedPath" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -57,6 +58,9 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "variable", required = false)
     private List<VariableMapping> variableMappings = new ArrayList<>();
+
+    @XmlElementWrapper(name = "excludedForValidation", required = false)
+    private List<ExcludedFolderPath> excludedPath = new ArrayList<>();
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -109,6 +113,50 @@ public class RobotProjectConfig {
 
     public List<VariableMapping> getVariableMappings() {
         return variableMappings;
+    }
+
+    public void setExcludedPath(final List<ExcludedFolderPath> excludedPaths) {
+        this.excludedPath = excludedPaths;
+    }
+
+    public List<ExcludedFolderPath> getExcludedPath() {
+        return excludedPath;
+    }
+
+    public void addExcludedPath(final IPath path) {
+        if (excludedPath == null) {
+            excludedPath = new ArrayList<>();
+        }
+        final ExcludedFolderPath excludedFolderPath = new ExcludedFolderPath();
+        excludedFolderPath.path = path.toPortableString();
+        excludedPath.add(excludedFolderPath);
+    }
+
+    public void removeExcludedPath(final IPath path) {
+        if (excludedPath == null) {
+            return;
+        }
+        ExcludedFolderPath foundToRemove = null;
+        for (final ExcludedFolderPath excludedPath : excludedPath) {
+            if (excludedPath.path.equals(path.toPortableString())) {
+                foundToRemove = excludedPath;
+            }
+        }
+        if (foundToRemove != null) {
+            excludedPath.remove(foundToRemove);
+        }
+    }
+
+    public boolean isExcludedFromValidation(final IPath path) {
+        if (excludedPath == null) {
+            return false;
+        }
+        for (final ExcludedFolderPath excludedPath : excludedPath) {
+            if (excludedPath.path.equals(path.toPortableString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addReferencedLibraryInPython(final String name, final IPath path) {
@@ -490,6 +538,36 @@ public class RobotProjectConfig {
         @Override
         public int hashCode() {
             return Objects.hash(name, value);
+        }
+    }
+
+    @XmlRootElement(name = "excludedPath")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class ExcludedFolderPath {
+
+        @XmlAttribute(required = true)
+        private String path;
+
+        public void setPath(final String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof ExcludedFolderPath) {
+                final ExcludedFolderPath that = (ExcludedFolderPath) obj;
+                return Objects.equals(this.path, that.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path);
         }
     }
 }
