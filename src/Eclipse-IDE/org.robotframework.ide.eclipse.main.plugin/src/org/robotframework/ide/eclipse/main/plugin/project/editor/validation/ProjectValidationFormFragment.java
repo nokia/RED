@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +25,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -70,9 +71,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEditorSite site;
-
-    @Inject
-    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -124,6 +122,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTree());
         viewer.setUseHashlookup(true);
         viewer.getTree().setEnabled(false);
+        viewer.setComparator(new ViewerSorter());
 
         viewer.setContentProvider(new WorkbenchContentProvider());
 
@@ -272,9 +271,26 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenRemoteLocationChanged(
+    private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final List<ProjectTreeElement> elements) {
         setDirty(true);
         setInput();
+    }
+
+    private static final class ViewerSorter extends ViewerComparator {
+
+        private ViewerSorter() {
+            super(new Comparator<String>() {
+                @Override
+                public int compare(final String elem1, final String elem2) {
+                    return elem1.compareToIgnoreCase(elem2);
+                }
+            });
+        }
+
+        @Override
+        public int category(final Object element) {
+            return ((ProjectTreeElement) element).isInternalFolder() ? 0 : 1;
+        }
     }
 }
