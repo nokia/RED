@@ -80,7 +80,8 @@ public class VariablesImporter {
     protected boolean isCorrectPath(final String path) {
         boolean isCorrectPath = false;
         if (path != null && !path.trim().isEmpty()) {
-            Matcher matcher = ILLEGAL_PATH_TEXT.matcher(path);
+            String convertedPath = path.replaceAll(" [\\\\] ", "  ");
+            Matcher matcher = ILLEGAL_PATH_TEXT.matcher(convertedPath);
             isCorrectPath = !matcher.find();
         }
 
