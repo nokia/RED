@@ -17,55 +17,50 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
-public abstract class AVariable extends AModelElement<VariableTable> implements
-        IVariableHolder {
+public abstract class AVariable extends AModelElement<VariableTable>implements IVariableHolder {
 
     protected VariableType type;
+
     protected VariableScope scope = VariableScope.LOCAL;
+
     private final RobotToken declaration;
+
     private final String name;
+
     private final List<RobotToken> comment = new ArrayList<>();
 
-
-    protected AVariable(final VariableType type, final String name,
-            final RobotToken declaration, final VariableScope scope) {
+    protected AVariable(final VariableType type, final String name, final RobotToken declaration,
+            final VariableScope scope) {
         this.type = type;
         this.name = name;
         this.declaration = declaration;
         this.scope = scope;
     }
 
-
     @Override
     public VariableType getType() {
         return type;
     }
-
 
     @Override
     public VariableScope getScope() {
         return scope;
     }
 
-
     @Override
     public String getName() {
         return name;
     }
-
 
     @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     @Override
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }
-
 
     @Override
     public RobotToken getDeclaration() {
@@ -111,28 +106,28 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
         /**
          * 
          */
+        ENVIRONMENT("%", RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION),
+        /**
+         * 
+         */
         INVALID("\\s", RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
 
         private final String identificator;
+
         private final RobotTokenType type;
 
-
-        private VariableType(final String identificator,
-                final RobotTokenType type) {
+        private VariableType(final String identificator, final RobotTokenType type) {
             this.identificator = identificator;
             this.type = type;
         }
-
 
         public String getIdentificator() {
             return identificator;
         }
 
-
         public RobotTokenType getType() {
             return type;
         }
-
 
         public static VariableType getTypeByTokenType(final IRobotTokenType type) {
             VariableType varType = null;
@@ -144,7 +139,6 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
             }
             return varType;
         }
-
 
         public static VariableType getTypeByChar(final char varId) {
             VariableType varType = null;
@@ -159,7 +153,6 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
         }
     }
 
-
     @Override
     public ModelType getModelType() {
         ModelType modelType = ModelType.UNKNOWN;
@@ -170,14 +163,12 @@ public abstract class AVariable extends AModelElement<VariableTable> implements
             modelType = ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE;
         } else if (type == VariableType.LIST) {
             modelType = ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE;
-        } else if (type == VariableType.SCALAR
-                || type == VariableType.SCALAR_AS_LIST) {
+        } else if (type == VariableType.SCALAR || type == VariableType.SCALAR_AS_LIST) {
             modelType = ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE;
         }
 
         return modelType;
     }
-
 
     @Override
     public FilePosition getBeginPosition() {
