@@ -5,7 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
+import static com.google.common.collect.Iterables.retainAll;
+
 import java.util.List;
+
+import javax.print.attribute.standard.RequestingUserName;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
@@ -82,6 +86,15 @@ public interface IProblemCause {
         ERROR(IMarker.SEVERITY_ERROR),
         WARNING(IMarker.SEVERITY_WARNING),
         INFO(IMarker.SEVERITY_INFO);
+
+        public static Severity fromMarkerSeverity(final int markerSeverity) {
+            switch (markerSeverity) {
+                case IMarker.SEVERITY_ERROR: return ERROR;
+                case IMarker.SEVERITY_WARNING: return WARNING;
+                case IMarker.SEVERITY_INFO: return INFO;
+                default: throw new IllegalStateException("Unrecognized marker severity: " + markerSeverity);
+            }
+        }
 
         private final int severity;
 

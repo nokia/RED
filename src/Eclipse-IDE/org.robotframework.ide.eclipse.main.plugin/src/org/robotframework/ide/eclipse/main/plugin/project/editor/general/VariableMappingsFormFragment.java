@@ -97,7 +97,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Variables mappings");
-        section.setDescription("In this section variable values can be defined. Those mappings will "
+        section.setDescription("Define variable values. Those mappings will "
                 + "be used by RED in order to resolve parameterized paths in Library, Resource and "
                 + "Variable settings.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);

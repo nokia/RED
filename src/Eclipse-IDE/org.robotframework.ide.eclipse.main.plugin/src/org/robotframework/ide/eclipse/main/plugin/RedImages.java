@@ -58,6 +58,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/variable_unknown.png");
     }
 
+    public static ImageDescriptor getRobotWarnedVariableImage() {
+        return RedPlugin.getImageDescriptor("resources/variable_warn.png");
+    }
+
     public static ImageDescriptor getRobotScalarVariableImage() {
         return RedPlugin.getImageDescriptor("resources/variable_scalar.png");
     }
@@ -127,7 +131,23 @@ public class RedImages {
     }
 
     public static ImageDescriptor getJavaLibraryImage() {
-        return RedPlugin.getImageDescriptor("resources/java_jar.png");
+        return RedPlugin.getImageDescriptor("resources/library_java.png");
+    }
+
+    public static ImageDescriptor getPythonLibraryImage() {
+        return RedPlugin.getImageDescriptor("resources/library_python.png");
+    }
+
+    public static ImageDescriptor getVirtualLibraryImage() {
+        return RedPlugin.getImageDescriptor("resources/library_virtual.png");
+    }
+
+    public static ImageDescriptor getRobotLibraryErrorImage() {
+        return RedPlugin.getImageDescriptor("resources/library_error.png");
+    }
+
+    public static ImageDescriptor getRobotLibraryWarnImage() {
+        return RedPlugin.getImageDescriptor("resources/library_warn.png");
     }
 
     public static ImageDescriptor getJavaClassImage() {
@@ -213,6 +233,10 @@ public class RedImages {
     public static ImageDescriptor getErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error.png");
     }
+
+    public static ImageDescriptor getWarningImage() {
+        return RedPlugin.getImageDescriptor("resources/warning.png");
+    }
     
     public static ImageDescriptor getTagImage() {
         return RedPlugin.getImageDescriptor("resources/tag.png");
@@ -224,6 +248,14 @@ public class RedImages {
 
     public static ImageDescriptor getChangeImage() {
         return RedPlugin.getImageDescriptor("resources/change.png");
+    }
+
+    public static ImageDescriptor getRemoteConnectedImage() {
+        return RedPlugin.getImageDescriptor("resources/remote_connected.png");
+    }
+
+    public static ImageDescriptor getRemoteDisconnectedImage() {
+        return RedPlugin.getImageDescriptor("resources/remote_disconnected.png");
     }
 
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {

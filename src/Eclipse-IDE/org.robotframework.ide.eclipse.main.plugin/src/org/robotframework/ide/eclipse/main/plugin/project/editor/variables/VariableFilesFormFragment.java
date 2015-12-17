@@ -17,10 +17,12 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -92,8 +94,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Variable files");
-        section.setDescription("In this section variable files can be specified. Those variables will "
-                + "be available for all suites within project and will be accessible without importing.");
+        section.setDescription("Specify global variables files. Variables from the files below will be "
+                + "available for all suites within the project without importing the file using Variables setting.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
     }
@@ -102,6 +104,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer = new RowExposingTableViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
+        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
@@ -132,7 +135,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .editingEnabledOnlyWhen(editorInput.isEditable())
             .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
-            .labelsProvidedBy(new VariableFilesLabelProvider()) 
+            .labelsProvidedBy(new VariableFilesLabelProvider(editorInput))
             .createFor(viewer);
     }
 

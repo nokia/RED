@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -71,6 +72,20 @@ public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSu
             } else {
                 arguments.add(argument);
             }
+
+            final List<String> filteredArguments = new ArrayList<>();
+            Collections.reverse(arguments);
+            boolean nonWhitespaceFound = false;
+            for (final String arg : arguments) {
+                if (!arg.isEmpty()) {
+                    nonWhitespaceFound = true;
+                }
+                if (nonWhitespaceFound) {
+                    filteredArguments.add(arg);
+                }
+            }
+            Collections.reverse(filteredArguments);
+            variableFile.setArguments(filteredArguments);
 
             getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_ARGUMENT_CHANGED, variableFile);
         } else {

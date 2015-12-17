@@ -71,7 +71,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
 
         VariableMappingNameEditingSupport(final ColumnViewer viewer,
                 final NewElementsCreator<VariableMapping> creator) {
-            super(viewer, 0, creator);
+            super(viewer, -1, creator);
         }
 
         @Override
@@ -94,7 +94,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
 
         VariableMappingValueEditingSupport(final ColumnViewer viewer,
                 final NewElementsCreator<VariableMapping> creator) {
-            super(viewer, 1, creator);
+            super(viewer, -1, creator);
         }
 
         @Override
