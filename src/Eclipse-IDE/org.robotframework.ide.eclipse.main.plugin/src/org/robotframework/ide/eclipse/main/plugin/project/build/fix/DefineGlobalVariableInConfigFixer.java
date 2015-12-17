@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsFormFragment.VariableMappingDialog;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;
@@ -93,6 +94,11 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
             config.addVariableMapping(variableMapping);
             changedMappings = config.getVariableMappings();
             return true;
+        }
+
+        @Override
+        protected void openDesiredPageInEditor(final RedProjectEditor editor) {
+            editor.openGeneralPage();
         }
 
         @Override
