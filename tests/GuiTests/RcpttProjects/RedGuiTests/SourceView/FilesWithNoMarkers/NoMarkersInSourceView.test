@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HMbVIHZCEeW40oUKBdzNfQ
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/3/15 10:51 AM
+Save-Time: 12/9/15 5:55 PM
 Tags: Bugs
 Testcase-Type: ecl
 
@@ -23,10 +23,19 @@ Entry-Name: .content
 //
 //verify-error {get-window "Problem Occurred"}
 
-get-view Problems | get-tree | get-item "Errors \\(44 items\\)" | get-property childCount | equals 44 | verify-true
 
-get-view Problems | get-tree | get-item "Errors \\(44 items\\)" | get-property childCount | equals 44 | verify-true
+
+get-view Problems | get-tree | get-property itemCount | equals 2 | verify-true
+with [get-view Problems | get-tree] {
+    select "Errors \\(.*\\)" | double-click
+    select "Warnings \\(.*\\)" | double-click
+}
+
+
+get-view Problems | get-tree | get-item "Errors \\(.*\\)" | get-property childCount | equals 42 | verify-true
+
+wait 10000
 get-view Problems | get-tree| get-table-data| eq [read-csv-file [uri-from-path [concat $RCPTT_project_path "/SourceView/FilesWithNoMarkers/AllProblems.csv"]]] | 
-		assert-true "Data in table does not match input file" 
+		verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
