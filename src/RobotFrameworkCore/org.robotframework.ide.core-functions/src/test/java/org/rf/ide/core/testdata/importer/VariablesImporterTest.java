@@ -125,6 +125,16 @@ public class VariablesImporterTest {
     }
 
     @Test
+    public void isCorrectPath_containsSpaceBackslashSpaceInTheEnd_WINDOWS_shouldReturn_TRUE() {
+        assertThat(new VariablesImporter().isCorrectPath("${var} \\ ")).isTrue();
+    }
+
+    @Test
+    public void isCorrectPath_containsSpaceBackslashSpace_WINDOWS_shouldReturn_TRUE() {
+        assertThat(new VariablesImporter().isCorrectPath("${var} \\ windows")).isTrue();
+    }
+
+    @Test
     public void isCorrectPath_containsSpaceBackslash_WINDOWS_shouldReturn_FALSE() {
         assertThat(new VariablesImporter().isCorrectPath("${var} \\windows")).isFalse();
     }
