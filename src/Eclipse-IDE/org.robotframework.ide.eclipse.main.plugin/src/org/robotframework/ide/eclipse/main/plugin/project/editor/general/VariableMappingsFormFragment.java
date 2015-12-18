@@ -20,7 +20,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -51,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
@@ -239,7 +239,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private static class VariableMappingsNameLabelProvider extends StylersDisposingLabelProvider {
+    private static class VariableMappingsNameLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
@@ -263,7 +263,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private static class VariableMappingsValueLabelProvider extends StylersDisposingLabelProvider {
+    private static class VariableMappingsValueLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
