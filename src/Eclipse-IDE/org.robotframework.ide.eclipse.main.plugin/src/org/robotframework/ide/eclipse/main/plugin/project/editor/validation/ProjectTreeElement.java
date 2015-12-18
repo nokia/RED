@@ -13,9 +13,17 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+
+import com.google.common.base.Objects;
 
 /**
  * @author Michal Anglart
@@ -36,12 +44,16 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         this.isExcluded = isExcluded;
     }
 
-    public IResource getResource() {
-        return resource;
+    public boolean isVirtual() {
+        return false;
     }
 
     public IPath getPath() {
         return resource.getProjectRelativePath();
+    }
+
+    public String getName() {
+        return resource.getName();
     }
 
     public boolean isExcluded() {
@@ -50,6 +62,17 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     public void setExcluded(final boolean excluded) {
         this.isExcluded = excluded;
+    }
+
+    public boolean isExcludedViaInheritance() {
+        ProjectTreeElement current = this;
+        while (current.parent != null) {
+            if (current.isExcluded) {
+                return true;
+            }
+            current = current.parent;
+        }
+        return false;
     }
 
     public boolean isInternalFolder() {
@@ -75,7 +98,35 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         return false;
     }
 
+    public void createVirtualNodeFor(final IPath path) {
+        createVirtualNodeFor(new Path(""), path);
+    }
+
+    protected void createVirtualNodeFor(final IPath currentPath, final IPath path) {
+        if (resource instanceof IWorkspaceRoot) {
+            children.get(0).createVirtualNodeFor(currentPath, path);
+            return;
+        }
+        if (path.isEmpty()) {
+            isExcluded = true;
+            return;
+        }
+
+        final String firstSegment = path.segment(0);
+        for (final ProjectTreeElement child : children) {
+            if (child.getName().equals(firstSegment)) {
+                child.createVirtualNodeFor(currentPath.append(firstSegment), path.removeFirstSegments(1));
+                return;
+            }
+        }
+        final VirtualProjectTreeElement newChild = new VirtualProjectTreeElement(currentPath.append(firstSegment),
+                path.segmentCount() == 1);
+        addChild(newChild);
+        newChild.createVirtualNodeFor(currentPath.append(firstSegment), path.removeFirstSegments(1));
+    }
+
     public void addChild(final ProjectTreeElement projectTreeElement) {
+        projectTreeElement.parent = this;
         children.add(projectTreeElement);
     }
 
@@ -100,10 +151,84 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     @Override
     public String getLabel(final Object o) {
-        return resource.getName();
+        return getLabel();
     }
 
     String getLabel() {
         return resource.getName();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj != null && obj.getClass() == ProjectTreeElement.class) {
+            final ProjectTreeElement that = (ProjectTreeElement) obj;
+            return Objects.equal(this.resource, that.resource);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(resource);
+    }
+
+    static class VirtualProjectTreeElement extends ProjectTreeElement {
+
+        private final IPath path;
+
+        public VirtualProjectTreeElement(final IPath path, final boolean isExcluded) {
+            super(null, isExcluded);
+            this.path = path;
+        }
+
+        @Override
+        public boolean isVirtual() {
+            return true;
+        }
+
+        @Override
+        public IPath getPath() {
+            return path;
+        }
+
+        @Override
+        public String getName() {
+            return path.lastSegment();
+        }
+
+        @Override
+        public boolean isInternalFolder() {
+            return true;
+        }
+
+        @Override
+        public ImageDescriptor getImageDescriptor(final Object object) {
+            final Image folderImg = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+            return RedImages.getGreyedImage(ImageDescriptor.createFromImage(folderImg));
+        }
+
+        @Override
+        public String getLabel(final Object o) {
+            return getLabel();
+        }
+
+        @Override
+        String getLabel() {
+            return getName();
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == VirtualProjectTreeElement.class) {
+                final VirtualProjectTreeElement that = (VirtualProjectTreeElement) obj;
+                return Objects.equal(this.path, that.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(path);
+        }
     }
 }

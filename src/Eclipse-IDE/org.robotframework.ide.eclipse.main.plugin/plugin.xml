@@ -2271,17 +2271,11 @@
              commandId="org.robotframework.red.include"
              label="Include"
              style="push">
-          <visibleWhen
-                checkEnabled="true">
-          </visibleWhen>
        </command>
        <command
              commandId="org.robotframework.red.exclude"
              label="Exclude"
              style="push">
-          <visibleWhen
-                checkEnabled="true">
-          </visibleWhen>
        </command>
     </menuContribution>
  </extension>

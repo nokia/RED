@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
@@ -41,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 /**
  * @author mmarzec
@@ -498,7 +498,7 @@ public class VariableValueEditForm {
 
     }
 
-    private class CollectionLabelProvider extends StylersDisposingLabelProvider {
+    private class CollectionLabelProvider extends RedCommonLabelProvider {
 
         private final boolean isValueColumn;
 
