@@ -6,11 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-class KeywordProposalsLabelProvider extends StylersDisposingLabelProvider {
+class KeywordProposalsLabelProvider extends RedCommonLabelProvider {
 
     @Override
     public Image getImage(final Object element) {

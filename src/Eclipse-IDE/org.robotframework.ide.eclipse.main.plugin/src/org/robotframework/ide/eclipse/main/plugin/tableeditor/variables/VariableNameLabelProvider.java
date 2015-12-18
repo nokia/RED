@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -35,7 +35,7 @@ class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
     @Override
     public StyledString getStyledText(final Object element) {
         if (element instanceof RobotVariable && ((RobotVariable) element).getType() != VariableType.INVALID) {
-            final DisposeNeededStyler variableStyler = addDisposeNeededStyler(withForeground(200, 200, 200));
+            final Styler variableStyler = withForeground(200, 200, 200);
 
             final RobotVariable variable = (RobotVariable) element;
             final StyledString label = new StyledString();

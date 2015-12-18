@@ -10,13 +10,13 @@ import java.util.Collection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 import com.google.common.collect.Range;
 
-public abstract class MatchesHighlightingLabelProvider extends StylersDisposingLabelProvider {
+public abstract class MatchesHighlightingLabelProvider extends RedCommonLabelProvider {
 
     private final MatchesProvider matchesProvider;
 

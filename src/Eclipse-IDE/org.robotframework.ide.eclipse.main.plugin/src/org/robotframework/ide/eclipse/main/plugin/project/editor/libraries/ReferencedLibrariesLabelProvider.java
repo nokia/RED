@@ -12,7 +12,6 @@ import java.util.List;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -21,11 +20,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
-class ReferencedLibrariesLabelProvider extends StylersDisposingLabelProvider {
+class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
 
     private final RedProjectEditorInput editorInput;
 
