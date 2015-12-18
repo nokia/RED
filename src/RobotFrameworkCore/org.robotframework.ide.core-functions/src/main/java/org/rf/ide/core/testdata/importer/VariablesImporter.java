@@ -47,6 +47,8 @@ public class VariablesImporter {
                         continue;
                     }
 
+                    path = replaceRobotSpecificArguments(path);
+
                     final List<String> varFileArguments = convertTokensToArguments(varImport);
 
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
@@ -86,6 +88,11 @@ public class VariablesImporter {
         }
 
         return isCorrectPath;
+    }
+
+    private String replaceRobotSpecificArguments(String path) {
+        // TODO: variable resolving should be done here
+        return path.replaceAll(" [\\\\] ", "  ");
     }
 
     private VariablesFileImportReference findInProjectVariablesImport(final RobotProjectHolder robotProject,

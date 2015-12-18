@@ -42,7 +42,6 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Michal Anglart
- *
  */
 abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
@@ -54,9 +53,9 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     protected final ProblemsReportingStrategy reporter;
 
-
-    public GeneralSettingsImportsValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
-            final List<? extends AImported> imports, final ProblemsReportingStrategy reporter) {
+    public GeneralSettingsImportsValidator(final FileValidationContext validationContext,
+            final RobotSuiteFile suiteFile, final List<? extends AImported> imports,
+            final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.suiteFile = suiteFile;
         this.imports = imports;
@@ -75,8 +74,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (pathOrNameToken == null) {
             reportMissingImportArgument(imported);
         } else {
-            final String pathOrName = pathOrNameToken.getText().toString();
-
+            String pathOrName = pathOrNameToken.getText().toString();
+            pathOrName = pathOrName.replaceAll(" [\\\\] ", "  ");
             if (isParameterized(pathOrName)) {
                 final String resolved = suiteFile.getProject().resolve(pathOrName);
                 if (isParameterized(resolved)) {
@@ -141,8 +140,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     @SuppressWarnings("unused")
     protected void validateNameImport(final AImported imported, final String pathOrName,
-            final RobotToken pathOrNameToken,
-            final IProgressMonitor monitor) throws CoreException {
+            final RobotToken pathOrNameToken, final IProgressMonitor monitor) throws CoreException {
         // nothing to do; override if needed
     }
 
@@ -167,7 +165,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     private boolean isParameterized(final String pathOrName) {
         return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(pathOrName).find();
     }
-
 
     static class LibraryImportValidator extends GeneralSettingsImportsValidator {
 
@@ -216,8 +213,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         protected void validateNameImport(final AImported imported, final String name, final RobotToken nameToken,
                 final IProgressMonitor monitor) throws CoreException {
             final String libName = createLibName(name, ((LibraryImport) imported).getArguments());
-            validateWithSpec(imported, validationContext.getLibrarySpecifications(libName), name, nameToken,
-                    monitor, false);
+            validateWithSpec(imported, validationContext.getLibrarySpecifications(libName), name, nameToken, monitor,
+                    false);
         }
 
         private String createLibName(final String name, final List<RobotToken> arguments) {
@@ -231,8 +228,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
         private void validateWithSpec(final AImported imported, final LibrarySpecification specification,
                 final String pathOrName, final RobotToken pathOrNameToken, final IProgressMonitor monitor,
-                final boolean isPath)
-                        throws CoreException {
+                final boolean isPath) throws CoreException {
             if (specification != null) {
                 final List<RobotToken> arguments = ((LibraryImport) imported).getArguments();
                 final LibraryConstructor constructor = specification.getConstructor();
