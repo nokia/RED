@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/17/15 1:31 PM
+Runtime-Version: 2.0.1.201508250612
+Save-Time: 12/18/15 12:19 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -79,12 +79,13 @@ with [get-window "Select library class"] {
     get-table | select "only_function"
     get-button OK | click
 }
-wait 2000
+try -times 8 -delay 1000 -command{
 //check libspec
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 2 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+	    get-property itemCount | equals 2 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+	}
 }
 get-button "Save All (M1+M2+S)" | click
 with [get-view "Project Explorer" | get-tree] {
@@ -150,12 +151,13 @@ with [get-window "Select library class"] {
     get-table | select "here_is_class.Cat"
     get-button OK | click
 }
-get-button "Save (M1+S)" | click
-
-wait 2000
-get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | get-property childCount 
-    | equals 3 | verify-true
- 
+try -times 8 -delay 1000 -command{
+	get-button "Save.*" | click
+}
+try -times 8 -delay 1000 -command{
+	get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | get-property childCount 
+	    | equals 3 | verify-true
+}
 get-view "Project Explorer" | get-tree 
     | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
     | get-property "getItems().length" | equals 1 | verify-true
@@ -201,21 +203,27 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type BackSpace -times 3
     type-text py
     key-type "M1+s"
+    wait 1000
     set-caret-pos 7 21
     get-menu "Quick Fix" | click
 }
+wait 300
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.py' and add to configuration" | click -default
 with [get-window "Select library class"] {
     get-table | select "here_is_class.Dog"
     get-button OK | click
 }
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Cat - RobotProject" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject" | verify-true
-    get-property "getItemCount()" | equals 4 | verify-true
+wait
+try -times 8 -delay 1000 -command{
+	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Cat - RobotProject" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject" | verify-true
+	    get-property "getItemCount()" | equals 4 | verify-true
+	}
+
 }
 get-button "Save (M1+S)" | click
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
