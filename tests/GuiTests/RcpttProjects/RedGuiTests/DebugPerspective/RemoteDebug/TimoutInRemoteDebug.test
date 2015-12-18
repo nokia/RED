@@ -7,7 +7,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _56LAoKS_EeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/17/15 2:27 PM
+Save-Time: 12/18/15 9:30 AM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,7 +26,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
-get-button "Debug TestFile.robot" | click -arrow
+get-button "Debug.*" | click -arrow
 get-menu "Debug Configurations..." | click
 
 with [get-window "Debug Configurations"] {
