@@ -19,11 +19,9 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -203,9 +201,8 @@ public class RobotArtifactsValidator {
         if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource) ) {
             final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
             for (final ExcludedFolderPath excludedPath : excludedPaths) {
-                final IPath exAsPath = Path.fromPortableString(excludedPath.getPath());
 
-                if (exAsPath.isPrefixOf(resource.getProjectRelativePath())) {
+                if (excludedPath.asPath().isPrefixOf(resource.getProjectRelativePath())) {
                     return false;
                 }
             }
