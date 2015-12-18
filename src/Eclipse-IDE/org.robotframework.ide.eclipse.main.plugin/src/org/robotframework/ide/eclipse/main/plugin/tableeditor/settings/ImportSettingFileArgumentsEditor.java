@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
@@ -31,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 public class ImportSettingFileArgumentsEditor {
 
@@ -160,7 +160,7 @@ public class ImportSettingFileArgumentsEditor {
 
     }
     
-    private class ArgumentsLabelProvider extends StylersDisposingLabelProvider {
+    private class ArgumentsLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public Image getImage(final Object element) {

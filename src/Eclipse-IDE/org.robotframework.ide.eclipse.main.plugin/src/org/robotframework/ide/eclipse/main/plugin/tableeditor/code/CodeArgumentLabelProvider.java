@@ -6,14 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.eclipse.jface.viewers.Stylers.mixStylers;
+import static org.eclipse.jface.viewers.Stylers.mixingStyler;
 import static org.eclipse.jface.viewers.Stylers.withFontStyle;
 import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
@@ -41,8 +41,9 @@ class CodeArgumentLabelProvider extends MatchesHighlightingLabelProvider {
             final RobotKeywordDefinition def = (RobotKeywordDefinition) element;
             final List<String> arguments = getKeywordDefinitionArguments(def);
             if (index < arguments.size()) {
-                final DisposeNeededStyler variableStyler = addDisposeNeededStyler(mixStylers(withForeground(RedTheme
-                        .getVariableColor().getRGB()), withFontStyle(SWT.BOLD)));
+                final Styler variableStyler = mixingStyler(
+                        withForeground(RedTheme.getVariableColor().getRGB()),
+                        withFontStyle(SWT.BOLD));
                 label = new StyledString(arguments.get(index), variableStyler);
             }
         } else if (element instanceof RobotKeywordCall) {
@@ -55,8 +56,7 @@ class CodeArgumentLabelProvider extends MatchesHighlightingLabelProvider {
 
                 final List<Range<Integer>> variablesPositions = RobotExpressions.getVariablesPositions(argument);
                 if (!variablesPositions.isEmpty()) {
-                    final DisposeNeededStyler variableStyler = addDisposeNeededStyler(withForeground(RedTheme
-                            .getVariableColor().getRGB()));
+                    final Styler variableStyler = withForeground(RedTheme.getVariableColor());
                     for (final Range<Integer> range : variablesPositions) {
                         variablesLabel.setStyle(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint() + 1,
                                 variableStyler);

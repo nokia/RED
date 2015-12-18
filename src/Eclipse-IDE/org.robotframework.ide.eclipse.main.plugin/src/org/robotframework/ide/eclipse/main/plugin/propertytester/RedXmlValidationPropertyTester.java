@@ -33,6 +33,8 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
             return !projectElement.isExcluded() == expected;
         } else if ("isExcluded".equals(property)) {
             return projectElement.isExcluded() == expected;
+        } else if ("isNonVirtual".equals(property)) {
+            return !projectElement.isVirtual() == expected;
         }
         return false;
     }

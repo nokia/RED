@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -60,6 +59,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
@@ -252,7 +252,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private class RemoteLibraryLocationsAddressLabelProvider extends StylersDisposingLabelProvider {
+    private class RemoteLibraryLocationsAddressLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
