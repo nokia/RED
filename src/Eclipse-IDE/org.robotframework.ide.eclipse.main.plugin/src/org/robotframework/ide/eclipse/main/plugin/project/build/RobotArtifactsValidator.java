@@ -60,22 +60,26 @@ public class RobotArtifactsValidator {
             return;
         }
 
-        final Optional<? extends ModelUnitValidator> validator = RobotArtifactsValidator
-                .createProperValidator(new ValidationContext(file.getProject()), file);
+        final ValidationContext context = new ValidationContext(file.getProject());
 
-        if (validator.isPresent()) {
-            final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
+        try {
+            final Optional<? extends ModelUnitValidator> validator = createValidationUnits(context, file);
+            if (validator.isPresent()) {
+                final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
 
-                @Override
-                public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                    file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
-                    ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
+                    @Override
+                    public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                        file.deleteMarkers(RobotProblem.TYPE_ID, true, 1);
+                        ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
 
-                    return Status.OK_STATUS;
-                }
-            };
-            wsJob.setSystem(true);
-            wsJob.schedule();
+                        return Status.OK_STATUS;
+                    }
+                };
+                wsJob.setSystem(true);
+                wsJob.schedule();
+            }
+        } catch (final CoreException e) {
+            // so we won't revalidate
         }
     }
 
@@ -189,13 +193,13 @@ public class RobotArtifactsValidator {
         return validators;
     }
 
-    private Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
+    private static Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
             final IResource resource) throws CoreException {
         return shouldValidate(context.getProjectConfiguration(), resource)
                 ? createProperValidator(context, (IFile) resource) : Optional.<ModelUnitValidator> absent();
     }
 
-    private boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource) {
+    private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource) {
         if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource) ) {
             final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
             for (final ExcludedFolderPath excludedPath : excludedPaths) {
@@ -210,7 +214,7 @@ public class RobotArtifactsValidator {
         return false;
     }
 
-    private boolean isInsideEclipseHiddenDirectory(final IResource resource) {
+    private static boolean isInsideEclipseHiddenDirectory(final IResource resource) {
         for (final String segment : resource.getFullPath().segments()) {
             if (!segment.isEmpty() && segment.charAt(0) == '.') {
                 return true;
