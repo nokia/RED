@@ -5,17 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
-import org.eclipse.jface.viewers.StylersDisposingLabelProvider;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
-import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import static org.eclipse.jface.viewers.Stylers.withForeground;
 
-class VariableFileArgumentsLabelProvider extends StylersDisposingLabelProvider {
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.graphics.Image;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
+
+class VariableFileArgumentsLabelProvider extends RedCommonLabelProvider {
     
     private final int index;
 
@@ -27,14 +24,8 @@ class VariableFileArgumentsLabelProvider extends StylersDisposingLabelProvider {
     public StyledString getStyledText(final Object element) {
         if (element instanceof ReferencedVariableFile) {
             final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
-            final Styler styler = addDisposeNeededStyler(new DisposeNeededStyler() {
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = new Color(Display.getCurrent(), 150, 150, 150);
-                }
-            });
             final String argument = index < varFile.getArguments().size() ? varFile.getArguments().get(index) : "";
-            return new StyledString(argument, styler);
+            return new StyledString(argument, withForeground(150, 150, 150));
         } else {
             return new StyledString();
         }

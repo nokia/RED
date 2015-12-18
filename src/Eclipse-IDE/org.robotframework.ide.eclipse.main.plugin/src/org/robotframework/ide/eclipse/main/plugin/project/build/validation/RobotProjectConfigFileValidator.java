@@ -208,7 +208,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     private void validateExcludedPath(final ExcludedFolderPath excludedPath, final List<ExcludedFolderPath> allExcluded,
             final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
         final IProject project = configFile.getProject();
-        final IPath asExcludedPath = Path.fromPortableString(excludedPath.getPath());
+        final IPath asExcludedPath = excludedPath.asPath();
         final Path projectPath = new Path(project.getName());
         if (!project.exists(asExcludedPath)) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_EXCLUDED_FOLDER)
@@ -218,7 +218,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         for (final ExcludedFolderPath otherPath : allExcluded) {
             if (otherPath != excludedPath) {
-                final IPath otherAsPath = Path.fromPortableString(otherPath.getPath());
+                final IPath otherAsPath = otherPath.asPath();
                 if (otherAsPath.isPrefixOf(asExcludedPath)) {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.USELESS_FOLDER_EXCLUSION)
                             .formatMessageWith(projectPath.append(asExcludedPath).toString(),
