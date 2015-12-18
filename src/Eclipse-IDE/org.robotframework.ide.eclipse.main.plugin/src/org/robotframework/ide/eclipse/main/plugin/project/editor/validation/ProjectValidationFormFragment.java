@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,6 +32,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewersConfigurator;
@@ -279,18 +279,26 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     private static final class ViewerSorter extends ViewerComparator {
 
-        private ViewerSorter() {
-            super(new Comparator<String>() {
-                @Override
-                public int compare(final String elem1, final String elem2) {
-                    return elem1.compareToIgnoreCase(elem2);
-                }
-            });
-        }
-
         @Override
         public int category(final Object element) {
             return ((ProjectTreeElement) element).isInternalFolder() ? 0 : 1;
+        }
+
+        @Override
+        public int compare(final Viewer viewer, final Object e1, final Object e2) {
+            final int cat1 = category(e1);
+            final int cat2 = category(e2);
+
+            if (cat1 != cat2) {
+                return cat1 - cat2;
+            }
+            final ProjectTreeElement elem1 = (ProjectTreeElement) e1;
+            final ProjectTreeElement elem2 = (ProjectTreeElement) e2;
+
+            final String name1 = elem1.getPath().removeFileExtension().lastSegment();
+            final String name2 = elem2.getPath().removeFileExtension().lastSegment();
+
+            return name1.compareToIgnoreCase(name2);
         }
     }
 }
