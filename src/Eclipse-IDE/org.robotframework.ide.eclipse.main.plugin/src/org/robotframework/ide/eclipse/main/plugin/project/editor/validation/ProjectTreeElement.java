@@ -36,14 +36,12 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         this.isExcluded = isExcluded;
     }
 
-    Collection<ProjectTreeElement> getAll() {
-        final List<ProjectTreeElement> elements = new ArrayList<>();
-        elements.add(this);
+    public IResource getResource() {
+        return resource;
+    }
 
-        for (final ProjectTreeElement child : children) {
-            elements.addAll(child.getAll());
-        }
-        return elements;
+    public IPath getPath() {
+        return resource.getProjectRelativePath();
     }
 
     public boolean isExcluded() {
@@ -58,6 +56,16 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         return resource instanceof IFolder;
     }
 
+    Collection<ProjectTreeElement> getAll() {
+        final List<ProjectTreeElement> elements = new ArrayList<>();
+        elements.add(this);
+
+        for (final ProjectTreeElement child : children) {
+            elements.addAll(child.getAll());
+        }
+        return elements;
+    }
+
     public boolean containsOtherFolders() {
         for (final ProjectTreeElement child : children) {
             if (child.isInternalFolder()) {
@@ -65,10 +73,6 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
             }
         }
         return false;
-    }
-
-    public IPath getPath() {
-        return resource.getProjectRelativePath();
     }
 
     public void addChild(final ProjectTreeElement projectTreeElement) {
