@@ -129,7 +129,9 @@ public class RobotProjectConfig {
         }
         final ExcludedFolderPath excludedFolderPath = new ExcludedFolderPath();
         excludedFolderPath.path = path.toPortableString();
-        excludedPath.add(excludedFolderPath);
+        if (!excludedPath.contains(excludedFolderPath)) {
+            excludedPath.add(excludedFolderPath);
+        }
     }
 
     public void removeExcludedPath(final IPath path) {

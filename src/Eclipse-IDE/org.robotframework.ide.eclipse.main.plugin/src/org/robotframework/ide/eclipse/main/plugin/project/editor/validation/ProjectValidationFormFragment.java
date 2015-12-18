@@ -52,12 +52,14 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.services.IEvaluationService;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -173,6 +175,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             if (topItem != null) {
                 viewer.setTopItem(topItem);
             }
+
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to read project structure");
         } finally {
@@ -313,7 +316,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         setInput();
-
         viewer.getTree().setEnabled(false);
     }
 
@@ -327,7 +329,11 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenExclusionListChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final List<ProjectTreeElement> elements) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final List<?> elements) {
+        final IEvaluationService evalService = site.getService(IEvaluationService.class);
+        evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INCLUDED);
+        evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_EXCLUDED);
+
         setDirty(true);
         setInput();
     }
