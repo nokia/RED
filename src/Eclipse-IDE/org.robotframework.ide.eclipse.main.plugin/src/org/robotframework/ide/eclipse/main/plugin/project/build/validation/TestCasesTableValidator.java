@@ -251,17 +251,32 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
     
-    private static boolean isDefinedVariable(final VariableDeclaration variableDeclaration, final Set<String> definedVariables) {
-        final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
-        final String varNameWithBrackets = createVariableNameWithBrackets(variableDeclaration.getVariableName()
+    private static boolean isDefinedVariable(final VariableDeclaration variableDeclaration,
+            final Set<String> definedVariables) {
+
+        final List<String> possibleVariableRepresentations = extractPossibleVariableRepresentations(variableDeclaration.getVariableName()
                 .getText()
                 .toLowerCase());
-        if (containsVariable(definedVariables, varTypeIdentificator, varNameWithBrackets)
-                || (varNameWithBrackets.contains(".") && containsVariable(definedVariables, varTypeIdentificator,
-                        extractVarNameFromDotsRepresentation(varNameWithBrackets)))) {
-            return true;
+        final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
+        for (final String variableRepresentation : possibleVariableRepresentations) {
+            if (containsVariable(definedVariables, varTypeIdentificator, variableRepresentation)) {
+                return true;
+            }
         }
         return false;
+    }
+    
+    private static List<String> extractPossibleVariableRepresentations(final String variableName) {
+        final List<String> possibleVariableRepresentations = newArrayList();
+        final String varNameWithBrackets = createVariableNameWithBrackets(variableName);
+        possibleVariableRepresentations.add(varNameWithBrackets);
+        if (varNameWithBrackets.contains(".")) {
+            possibleVariableRepresentations.add(extractVarNameFromDotsRepresentation(varNameWithBrackets));
+        }
+        if (varNameWithBrackets.contains("_")) {
+            possibleVariableRepresentations.add(extractVarNameFromUnderscoreRepresentation(varNameWithBrackets));
+        }
+        return possibleVariableRepresentations;
     }
 
     private static boolean containsVariable(final Set<String> definedVariables, final String varTypeIdentificator,
@@ -274,6 +289,10 @@ class TestCasesTableValidator implements ModelUnitValidator {
     
     private static String extractVarNameFromDotsRepresentation(final String varNameWithBrackets) {
         return varNameWithBrackets.split("\\.")[0] + "}";
+    }
+    
+    private static String extractVarNameFromUnderscoreRepresentation(final String varNameWithBrackets) {
+        return varNameWithBrackets.replaceAll("_", "");
     }
     
     @VisibleForTesting
