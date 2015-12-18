@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
-
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
@@ -27,10 +26,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 
 import com.google.common.base.Optional;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class HyperlinkToFilesDetector implements IHyperlinkDetector {
 
@@ -45,8 +42,7 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             final boolean canShowMultipleHyperlinks) {
         try {
             final IDocument document = textViewer.getDocument();
-            final Optional<IRegion> hyperlinkRegion = DocumentUtilities.findCellRegion(document,
-                    region.getOffset());
+            final Optional<IRegion> hyperlinkRegion = DocumentUtilities.findCellRegion(document, region.getOffset());
             if (!hyperlinkRegion.isPresent()) {
                 return null;
             }
@@ -58,7 +54,8 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             }
             final IRegion fromRegion = hyperlinkRegion.get();
 
-            final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
+            String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
+            pathAsString = pathAsString.replaceAll(" [\\\\] ", "  ");
             if (lineContent.trim().toLowerCase().startsWith("library") && !isPath(pathAsString)) {
                 return null;
             }
