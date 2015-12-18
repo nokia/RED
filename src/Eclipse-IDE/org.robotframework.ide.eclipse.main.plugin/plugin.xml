@@ -182,6 +182,22 @@
           </objectClass>
        </enablement>
     </decorator>
+    <decorator
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator"
+          id="org.robotframework.red.decorator.resource.validationExcluded"
+          label="Validation Excluded Elements"
+          lightweight="true"
+          location="TOP_LEFT"
+          state="true">
+       <description>
+          This decorator adds icon to elements of Robot project which are excluded from validation
+       </description>
+       <enablement>
+          <objectClass
+                name="org.eclipse.core.resources.IFolder">
+          </objectClass>
+       </enablement>
+    </decorator>
  </extension>
 
 	<extension
@@ -580,6 +596,20 @@
                    checkEnabled="true">
              </visibleWhen>
           </command>
+          <separator
+                name="validation"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.red.include"
+                label="Include for validation"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.red.exclude"
+                label="Exclude from validation"
+                style="push">
+          </command>
        </menu>
     </menuContribution>
  </extension>
@@ -606,6 +636,76 @@
              </iterate>
           </with>
        </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludeFolderForValidationHandler"
+          commandId="org.robotframework.red.exclude">
+       <activeWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test
+                      property="org.eclipse.core.resources.projectNature"
+                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                </test>
+             </iterate>
+          </with>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <instanceof
+                         value="org.eclipse.core.resources.IFolder">
+                   </instanceof>
+                   <test
+                         property="org.robotframework.redxml.navigator.isIncluded"
+                         value="true">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludeFolderForValidationHandler"
+          commandId="org.robotframework.red.include">
+       <activeWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test
+                      property="org.eclipse.core.resources.projectNature"
+                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                </test>
+             </iterate>
+          </with>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <instanceof
+                         value="org.eclipse.core.resources.IFolder">
+                   </instanceof>
+                   <test
+                         property="org.robotframework.redxml.navigator.isExcluded"
+                         value="true">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
     </handler>
  </extension>
  <extension
@@ -3118,6 +3218,13 @@
           namespace="org.robotframework.redxml.validation"
           properties="isInternalFolder, isExcluded, isIncluded"
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+    </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
+          id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
+          namespace="org.robotframework.redxml.navigator"
+          properties="isInternalFolder, isExcluded, isIncluded"
+          type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
