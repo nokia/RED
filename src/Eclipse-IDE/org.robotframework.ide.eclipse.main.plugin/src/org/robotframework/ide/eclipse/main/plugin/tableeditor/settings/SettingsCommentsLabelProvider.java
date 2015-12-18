@@ -5,14 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static org.eclipse.jface.viewers.Stylers.mixStylers;
+import static org.eclipse.jface.viewers.Stylers.mixingStyler;
 import static org.eclipse.jface.viewers.Stylers.withFontStyle;
 import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -48,8 +48,9 @@ class SettingsCommentsLabelProvider extends MatchesHighlightingLabelProvider {
     public final StyledString getStyledText(final Object element) {
         final String comment = getComment(element);
         if (!comment.isEmpty()) {
-            final DisposeNeededStyler commentStyler = addDisposeNeededStyler(mixStylers(withForeground(RedTheme
-                    .getCommentsColor().getRGB()), withFontStyle(SWT.ITALIC)));
+            final Styler commentStyler = mixingStyler(
+                    withForeground(RedTheme.getCommentsColor()),
+                    withFontStyle(SWT.ITALIC));
             final String prefix = "# ";
             return highlightMatches(new StyledString(prefix + comment, commentStyler), prefix.length(), comment);
         }

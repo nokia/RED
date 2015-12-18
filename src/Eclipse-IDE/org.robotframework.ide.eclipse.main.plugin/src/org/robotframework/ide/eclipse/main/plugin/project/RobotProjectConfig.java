@@ -148,15 +148,19 @@ public class RobotProjectConfig {
     }
 
     public boolean isExcludedFromValidation(final IPath path) {
+        return getExcludedPath(path) != null;
+    }
+
+    public ExcludedFolderPath getExcludedPath(final IPath path) {
         if (excludedPath == null) {
-            return false;
+            return null;
         }
         for (final ExcludedFolderPath excludedPath : excludedPath) {
-            if (excludedPath.path.equals(path.toPortableString())) {
-                return true;
+            if (excludedPath.asPath().equals(path)) {
+                return excludedPath;
             }
         }
-        return false;
+        return null;
     }
 
     public void addReferencedLibraryInPython(final String name, final IPath path) {
@@ -554,6 +558,10 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
+        }
+
+        public IPath asPath() {
+            return Path.fromPortableString(path);
         }
 
         @Override

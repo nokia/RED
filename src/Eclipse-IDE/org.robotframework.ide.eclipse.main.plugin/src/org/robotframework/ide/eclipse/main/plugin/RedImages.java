@@ -237,6 +237,10 @@ public class RedImages {
     public static ImageDescriptor getWarningImage() {
         return RedPlugin.getImageDescriptor("resources/warning.png");
     }
+
+    public static ImageDescriptor getBigWarningImage() {
+        return RedPlugin.getImageDescriptor("resources/warning_big.png");
+    }
     
     public static ImageDescriptor getTagImage() {
         return RedPlugin.getImageDescriptor("resources/tag.png");

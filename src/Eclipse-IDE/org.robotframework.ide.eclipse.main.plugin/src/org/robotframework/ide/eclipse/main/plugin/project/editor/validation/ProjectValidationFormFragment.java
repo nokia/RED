@@ -7,8 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -43,12 +47,14 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -134,7 +140,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void createColumns() {
         ViewerColumnsFactory.newColumn("").withWidth(300)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .labelsProvidedBy(new ProjectValidationPathsLabelProvider())
+            .labelsProvidedBy(new ProjectValidationPathsLabelProvider(editorInput))
             .createFor(viewer);
     }
 
@@ -150,30 +156,28 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     private void setInput() {
         try {
+            viewer.getTree().setRedraw(false);
+
+            final TreeItem topTreeItem = viewer.getTree().getTopItem();
+            final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
+
             final IProject project = editorInput.getRobotProject().getProject();
             final IWorkspaceRoot wsRoot = project.getWorkspace().getRoot();
             final ProjectTreeElement wrappedRoot = new ProjectTreeElement(wsRoot, false);
 
             buildTreeFor(wrappedRoot, project);
-
-            viewer.getTree().setRedraw(false);
+            addMissingEntriesToTree(wrappedRoot, wrappedRoot.getAll());
 
             viewer.setInput(wrappedRoot);
-            viewer.setExpandedElements(getElementsToExpand(wrappedRoot));
+            viewer.setExpandedElements(getElementsToExpand(wrappedRoot.getAll()));
+            if (topItem != null) {
+                viewer.setTopItem(topItem);
+            }
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to read project structure");
         } finally {
             viewer.getTree().setRedraw(true);
         }
-    }
-
-    private ProjectTreeElement[] getElementsToExpand(final ProjectTreeElement element) {
-        return toArray(filter(element.getAll(), new Predicate<ProjectTreeElement>() {
-            @Override
-            public boolean apply(final ProjectTreeElement element) {
-                return element.containsOtherFolders();
-            }
-        }), ProjectTreeElement.class);
     }
 
     private void buildTreeFor(final ProjectTreeElement parent, final IResource resource) throws CoreException {
@@ -193,6 +197,57 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
                 buildTreeFor(wrappedChild, child);
             }
         }
+    }
+
+    private void addMissingEntriesToTree(final ProjectTreeElement wrappedRoot,
+            final Collection<ProjectTreeElement> allElements) {
+        final Set<ProjectTreeElement> excludedShownInTree = getExcludedElementsInTheTree(allElements);
+        final List<ExcludedFolderPath> allExcluded = editorInput.getProjectConfiguration().getExcludedPath();
+        final List<ExcludedFolderPath> excludedNotShownInTree = getExcludedNotShownInTheTree(allExcluded,
+                excludedShownInTree);
+
+        for (final ExcludedFolderPath excludedNotShown : excludedNotShownInTree) {
+            wrappedRoot.createVirtualNodeFor(excludedNotShown.asPath());
+        }
+    }
+
+    private Set<ProjectTreeElement> getExcludedElementsInTheTree(final Collection<ProjectTreeElement> allElements) {
+        return newHashSet(filter(allElements, new Predicate<ProjectTreeElement>() {
+
+            @Override
+            public boolean apply(final ProjectTreeElement elem) {
+                return elem.isExcluded();
+            }
+        }));
+    }
+
+    private List<ExcludedFolderPath> getExcludedNotShownInTheTree(final List<ExcludedFolderPath> allExcluded,
+            final Set<ProjectTreeElement> excludedShownInTree) {
+        final List<ExcludedFolderPath> paths = newArrayList();
+
+        for (final ExcludedFolderPath excludedPath : allExcluded) {
+            boolean isInTree = false;
+            for (final ProjectTreeElement element : excludedShownInTree) {
+                if (element.getPath().equals(excludedPath.asPath())) {
+                    isInTree = true;
+                    break;
+                }
+            }
+            if (!isInTree) {
+                paths.add(excludedPath);
+            }
+        }
+        return paths;
+    }
+
+    private ProjectTreeElement[] getElementsToExpand(final Collection<ProjectTreeElement> allElements) {
+        return toArray(filter(allElements, new Predicate<ProjectTreeElement>() {
+
+            @Override
+            public boolean apply(final ProjectTreeElement element) {
+                return element.containsOtherFolders();
+            }
+        }), ProjectTreeElement.class);
     }
 
     private void installResourceChangeListener() {

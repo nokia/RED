@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import static org.eclipse.jface.viewers.Stylers.withFontStyle;
+
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
-import org.eclipse.jface.viewers.Stylers.DisposeNeededStyler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -34,11 +34,9 @@ class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
     public StyledString getStyledText(final Object element) {
         StyledString label = null;
         if (element instanceof RobotKeywordDefinition) {
-            final DisposeNeededStyler styler = addDisposeNeededStyler(Stylers.withFontStyle(SWT.BOLD));
-            label = new StyledString(((RobotKeywordDefinition) element).getName(), styler);
+            label = new StyledString(((RobotKeywordDefinition) element).getName(), withFontStyle(SWT.BOLD));
         } else if (element instanceof RobotCase) {
-            final DisposeNeededStyler styler = addDisposeNeededStyler(Stylers.withFontStyle(SWT.BOLD));
-            label = new StyledString(((RobotCase) element).getName(), styler);
+            label = new StyledString(((RobotCase) element).getName(), withFontStyle(SWT.BOLD));
         } else if (element instanceof RobotKeywordCall) {
             label = new StyledString(((RobotKeywordCall) element).getName());
         } else if (element instanceof ElementAddingToken) {
