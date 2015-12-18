@@ -1,35 +1,39 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _vAFZAKS8EeWCSZzk3osblg
+Contexts: _1vIZ8KV3EeWcDJJ2TRzOng
 Element-Name: VariableFileWithUnicode
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HWVnoKS8EeWCSZzk3osblg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/17/15 2:26 PM
+Save-Time: 12/18/15 12:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "ExceptionsHandling/test.robot" | double-click
-with [get-editor "test.robot" | get-text-viewer] {
+
+get-view "Project Explorer" | get-tree | select "ExceptionHandling/txt_test.robot" | double-click
+with [get-editor "txt_test.robot" | get-text-viewer] {
     set-caret-pos 2 1
+    type-text "*** Settings ***"
+    key-type Enter
     type-text "Variables    VariableFiles/UnicodeInVariables.py"
-
-}
-
-get-view "Project Explorer" | get-tree | select "ExceptionsHandling/VariableFiles/UnicodeInVariables.py" | double-click
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 6 1
+	key-type Enter
+	set-caret-pos 3 19
+	key-type Enter
+	type-text "test1"
+	key-type Enter
     type-text "    log    ${swamsqlplususer}"
     key-type "M1+SPACE"
     key-type "M1+s"
 }
+
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 get-tab-folder -index 4 | get-tab-item Problems | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

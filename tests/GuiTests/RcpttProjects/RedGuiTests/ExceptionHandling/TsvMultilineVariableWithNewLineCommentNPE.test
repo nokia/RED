@@ -1,0 +1,35 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _1vIZ8KV3EeWcDJJ2TRzOng
+Element-Name: TsvMultilineVariableWithNewLineCommentNPE
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _m0j4EKV3EeWcDJJ2TRzOng
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/18/15 12:53 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+/*
+### NPE dla https://svne1.access.nsn.com/isource/svnroot/pettool/trunk/ 
+### w pliku \robot_tests\NAPET-SNMPSimulator_tests\testcases\01.1.Installation.tsv
+
+*/
+
+get-view "Project Explorer" | get-tree | select "ExceptionHandling/tsv_test.tsv" | double-click
+with [get-editor "tsv_test.tsv" | get-text-viewer] {
+    key-type Enter
+    set-caret-pos 1 1
+    type-text "*** Variables ***"
+    key-type Enter
+    type-text "${test}	testvalue"
+	key-type Enter
+	type-text "...	#comment"
+
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
