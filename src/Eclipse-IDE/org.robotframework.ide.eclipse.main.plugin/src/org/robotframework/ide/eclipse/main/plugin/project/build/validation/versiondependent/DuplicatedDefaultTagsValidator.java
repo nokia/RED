@@ -15,9 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 import com.google.common.collect.Range;
 
-/**
- * @author Michal Anglart
- */
 public class DuplicatedDefaultTagsValidator extends ADuplicatedValidator<DefaultTags> {
 
     public DuplicatedDefaultTagsValidator(final IFile file, final RobotSettingsSection section) {
