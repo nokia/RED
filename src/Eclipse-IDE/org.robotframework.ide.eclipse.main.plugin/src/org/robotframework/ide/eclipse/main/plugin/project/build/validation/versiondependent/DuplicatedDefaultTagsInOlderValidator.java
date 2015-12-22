@@ -21,9 +21,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Range;
 
-/**
- * @author Michal Anglart
- */
 public class DuplicatedDefaultTagsInOlderValidator extends ADuplicatedInOldValidator<DefaultTags> {
 
     public DuplicatedDefaultTagsInOlderValidator(final IFile file, final RobotSettingsSection section) {

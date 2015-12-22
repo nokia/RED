@@ -15,9 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 import com.google.common.collect.Range;
 
-/**
- * @author Michal Anglart
- */
 public class DuplicatedTestTeardownValidator extends ADuplicatedValidator<TestTeardown> {
 
     public DuplicatedTestTeardownValidator(final IFile file, final RobotSettingsSection section) {
