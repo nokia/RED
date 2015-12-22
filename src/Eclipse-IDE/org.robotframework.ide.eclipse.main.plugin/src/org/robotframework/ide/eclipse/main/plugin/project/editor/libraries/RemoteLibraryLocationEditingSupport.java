@@ -11,8 +11,11 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
@@ -23,8 +26,12 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
  */
 public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSupport {
 
-    public RemoteLibraryLocationEditingSupport(final ColumnViewer viewer, final NewElementsCreator<?> creator) {
+    private final RedProjectEditorInput editorInput;
+
+    public RemoteLibraryLocationEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput,
+            final NewElementsCreator<?> creator) {
         super(viewer, -1, creator);
+        this.editorInput = editorInput;
     }
 
     @Override
@@ -55,7 +62,9 @@ public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSu
                 final RemoteLocation remoteLocation = (RemoteLocation) element;
                 remoteLocation.setUri(newAddress);
 
-                getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED, remoteLocation);
+                final RedProjectConfigEventData<RemoteLocation> eventData = new RedProjectConfigEventData<RobotProjectConfig.RemoteLocation>(
+                        editorInput.getRobotProject().getConfigurationFile(), remoteLocation);
+                getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED, eventData);
             } catch (final IllegalArgumentException e) {
                 // uri syntax was wrong...
             }
