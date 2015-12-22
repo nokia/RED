@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -38,8 +39,9 @@ public class DeleteRemoteLocationHandler extends DIHandler<E4DeleteRemoteLocatio
             final List<RemoteLocation> locations = Selections.getElements(selection, RemoteLocation.class);
             input.getProjectConfiguration().removeRemoteLocations(locations);
 
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED,
-                    input.getProjectConfiguration().getRemoteLocations());
+            final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<List<RemoteLocation>>(
+                    input.getRobotProject().getConfigurationFile(), locations);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
             
             return null;
         }
