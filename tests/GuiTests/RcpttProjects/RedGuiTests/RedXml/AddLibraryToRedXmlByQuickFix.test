@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
-Element-Name: LibraryInRedXmlAndLibDocs
+Element-Name: AddLibraryToRedXmlByQuickFix
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/18/15 3:32 PM
+Save-Time: 12/22/15 2:42 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
