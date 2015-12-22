@@ -22,6 +22,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.services.IEvaluationService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
@@ -47,13 +48,15 @@ abstract class ChangeExclusionHandler {
         for (final IProject groupingProject : groupedPaths.keySet()) {
             changeExclusion(groupingProject, groupedPaths.get(groupingProject));
 
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED,
-                    groupedPaths.get(groupingProject));
+            final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
+                    groupingProject.getFile(RobotProjectConfig.FILENAME), groupedPaths.get(groupingProject));
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
 
-            final IEvaluationService evalService = site.getService(IEvaluationService.class);
-            evalService.requestEvaluation(RedXmlForNavigatorPropertyTester.PROPERTY_IS_INCLUDED);
-            evalService.requestEvaluation(RedXmlForNavigatorPropertyTester.PROPERTY_IS_EXCLUDED);
         }
+        final IEvaluationService evalService = site.getService(IEvaluationService.class);
+        evalService.requestEvaluation(RedXmlForNavigatorPropertyTester.PROPERTY_IS_INTERNAL_FOLDER);
+        evalService.requestEvaluation(RedXmlForNavigatorPropertyTester.PROPERTY_IS_INCLUDED);
+        evalService.requestEvaluation(RedXmlForNavigatorPropertyTester.PROPERTY_IS_EXCLUDED);
         return null;
     }
 
