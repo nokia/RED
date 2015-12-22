@@ -42,7 +42,8 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement.isInternalFolder() == expected;
         } else if (IS_INCLUDED.equals(property)) {
-            return !projectElement.isExcluded() == expected;
+            final boolean isIncluded = !projectElement.isExcluded();
+            return isIncluded == expected;
         } else if (IS_EXCLUDED.equals(property)) {
             return projectElement.isExcluded() == expected;
         }
