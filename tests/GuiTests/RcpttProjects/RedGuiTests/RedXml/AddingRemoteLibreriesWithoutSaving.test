@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _sucj8JHsEeWEZYgZQ8Au9A
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/22/15 11:17 AM
+Save-Time: 12/22/15 5:57 PM
 Testcase-Type: ecl
 Verifications: _AcBHQKiVEeWg6OFh_tHgTw
 
@@ -139,7 +139,6 @@ with [get-editor "RobotProject/red.xml" | get-section "Remote library locations"
     get-property "getItems().TableItem[6].getText()" | equals "https://127.0.0.1:8270/" | verify-true
     get-property "getItems().TableItem[7].getText()" | equals "...add new remote location" | verify-true
     get-property "getItemCount()" | equals 8 | verify-true
-    get-property "getTopIndex()" | equals 0 | verify-true
 }
 
 //remove with 3 items
@@ -147,7 +146,6 @@ with [get-editor "RobotProject/red.xml" | get-section "Remote library locations"
     select "http:\\/\\/127.0.0.1:8270\\/" "http:\\/\\/127.0.0.1:15\\/repo" "https:\\/\\/127.0.0.1:8270\\/"
     key-type Del
 }
-
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
