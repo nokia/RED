@@ -22,6 +22,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -36,9 +40,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecificationReader.CannotReadLibrarySpecificationException;
+import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -209,6 +217,33 @@ public class RobotProject extends RobotContainer {
     public synchronized RobotProjectConfig getRobotProjectConfig() {
         readProjectConfigurationIfNeeded();
         return configuration;
+    }
+
+    /**
+     * Returns the configuration model from opened editor.
+     * 
+     * @return opened configuration
+     */
+    public RobotProjectConfig getOpenedProjectConfig() {
+        final RedProjectEditorInput redProjectInput = findEditorInputIfAlreadyOpened();
+        if (redProjectInput != null) {
+            return redProjectInput.getProjectConfiguration();
+        } else {
+            return null;
+        }
+    }
+
+    private RedProjectEditorInput findEditorInputIfAlreadyOpened() {
+        return SwtThread.syncEval(new Evaluation<RedProjectEditorInput>() {
+            @Override
+            public RedProjectEditorInput runCalculation() {
+                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                final FileEditorInput input = new FileEditorInput(getConfigurationFile());
+                final IEditorPart editor = page.findEditor(input);
+                return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput()
+                        : null;
+            }
+        });
     }
 
     public void clearCachedData() {
