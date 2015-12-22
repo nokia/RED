@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -38,9 +39,12 @@ public class DeleteReferencedLibraryHandler extends DIHandler<E4DeleteReferenced
             final List<ReferencedLibrary> libraries = Selections.getElements(selection, ReferencedLibrary.class);
             input.getProjectConfiguration().removeLibraries(libraries);
 
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                    input.getProjectConfiguration().getLibraries());
-            
+            if (!libraries.isEmpty()) {
+                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                        input.getRobotProject().getConfigurationFile(), libraries);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+            }
+
             return null;
         }
     }

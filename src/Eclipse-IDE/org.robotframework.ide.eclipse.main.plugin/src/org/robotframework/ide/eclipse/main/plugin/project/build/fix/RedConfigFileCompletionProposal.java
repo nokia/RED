@@ -45,7 +45,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
     private final IMarker marker;
 
-    private final IFile externalFile;
+    protected final IFile externalFile;
 
     private final String shortDescription;
 
