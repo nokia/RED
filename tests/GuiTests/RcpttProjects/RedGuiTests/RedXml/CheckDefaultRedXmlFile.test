@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mHeMEKQYEeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/21/15 2:10 PM
+Save-Time: 12/22/15 3:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,7 +70,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Robot framework"] {
     }
     //check label
     get-canvas | get-property text 
-        | equals " c:\\Python27 Robot Framework 2.9.2 (Python 2.7.8 on win32) (from Preferences)\r\n" | verify-true
+        | equals [format " %s %s (from Preferences)\n" $python_exe_path $robot_version] | verify-true
 }
 
 //tab Referenced libreries  -------------------------------------------------------------------------------------------------------------------------------------------
