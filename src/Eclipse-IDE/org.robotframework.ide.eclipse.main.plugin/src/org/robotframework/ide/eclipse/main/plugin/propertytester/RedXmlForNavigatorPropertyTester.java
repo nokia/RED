@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 import com.google.common.base.Preconditions;
 
@@ -55,7 +56,11 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
         final RobotProject robotProject = RedPlugin.getModelManager()
                 .getModel()
                 .createRobotProject(projectElement.getProject());
-        return robotProject.getRobotProjectConfig().isExcludedFromValidation(projectElement.getProjectRelativePath());
+        RobotProjectConfig config = robotProject.getOpenedProjectConfig();
+        if (config == null) {
+            config = robotProject.getRobotProjectConfig();
+        }
+        return config.isExcludedFromValidation(projectElement.getProjectRelativePath());
     }
 
 }

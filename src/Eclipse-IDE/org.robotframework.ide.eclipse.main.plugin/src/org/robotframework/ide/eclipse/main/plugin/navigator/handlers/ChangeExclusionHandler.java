@@ -10,18 +10,15 @@ import java.util.List;
 
 import javax.inject.Named;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.services.IEvaluationService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -29,8 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester;
 import org.robotframework.red.viewers.Selections;
 
@@ -72,38 +67,26 @@ abstract class ChangeExclusionHandler {
 
     private void changeExclusion(final IProject project, final Collection<IPath> toChange) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+        RobotProjectConfig config = robotProject.getOpenedProjectConfig();
 
-        final IEditorPart editor = findEditorIfAlreadyOpened(robotProject);
-        final RedProjectEditorInput redProjectInput = getEditorInput(editor);
-
-        final RobotProjectConfig config = provideConfig(redProjectInput, robotProject.getConfigurationFile());
+        final boolean inEditor = config != null;
+        if (config == null) {
+            config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+        }
 
         for (final IPath pathToChange : toChange) {
             changeExclusion(config, pathToChange);
         }
 
-        if (redProjectInput == null) {
+        if (!inEditor) {
             new RobotProjectConfigWriter().writeConfiguration(config, project);
+        }
+        try {
+            project.refreshLocal(IResource.DEPTH_INFINITE, null);
+        } catch (final CoreException e) {
+            // nothing to do
         }
     }
 
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
-
-    private IEditorPart findEditorIfAlreadyOpened(final RobotProject robotProject) {
-        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        final FileEditorInput input = new FileEditorInput(robotProject.getConfigurationFile());
-        return page.findEditor(input);
-    }
-
-    private RedProjectEditorInput getEditorInput(final IEditorPart editor) {
-        return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput() : null;
-    }
-
-    private RobotProjectConfig provideConfig(final RedProjectEditorInput redProjectInput, final IFile externalFile) {
-        if (redProjectInput == null) {
-            return new RobotProjectConfigReader().readConfiguration(externalFile);
-        } else {
-            return redProjectInput.getProjectConfiguration();
-        }
-    }
 }

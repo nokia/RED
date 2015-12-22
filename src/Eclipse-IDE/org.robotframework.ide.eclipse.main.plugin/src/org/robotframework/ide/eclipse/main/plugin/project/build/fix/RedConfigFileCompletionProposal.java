@@ -21,18 +21,18 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 
 /**
  * @author Michal Anglart
@@ -65,26 +65,24 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
     @Override
     public void apply(final IDocument currentFileDocument) {
         try {
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            final FileEditorInput input = new FileEditorInput(externalFile);
-            final IEditorPart editor = page.findEditor(input);
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(externalFile.getProject());
+            RobotProjectConfig config = robotProject.getOpenedProjectConfig();
 
-            final RedProjectEditorInput redProjectInput = findInput(editor);
-            final RobotProjectConfig config = provideConfig(redProjectInput);
+            final boolean isEditorOpeneEditor = config != null;
+            if (config == null) {
+                config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+            }
 
             if (apply(externalFile, config)) {
                 marker.delete();
 
-                if (redProjectInput == null) { // there is no editor opened
-                    final RobotProjectConfigWriter writer = new RobotProjectConfigWriter();
-                    writer.writeConfiguration(config, externalFile.getProject());
+                if (!isEditorOpeneEditor) {
+                    new RobotProjectConfigWriter().writeConfiguration(config, externalFile.getProject());
                 }
 
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                final IEditorDescriptor desc = editorRegistry.findEditor(RedProjectEditor.ID);
-                final RedProjectEditor redXmlEditor = (RedProjectEditor) page.openEditor(input, desc.getId());
-                
+                final RedProjectEditor redXmlEditor = openEditor();
                 openDesiredPageInEditor(redXmlEditor);
+                
                 fireEvents();
             }
         } catch (final ProposalApplyingException | CoreException e) {
@@ -92,23 +90,19 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
         }
     }
 
+    private RedProjectEditor openEditor() throws PartInitException {
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        final FileEditorInput input = new FileEditorInput(externalFile);
+        final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+        final IEditorDescriptor desc = editorRegistry.findEditor(RedProjectEditor.ID);
+        final RedProjectEditor redXmlEditor = (RedProjectEditor) page.openEditor(input, desc.getId());
+        return redXmlEditor;
+    }
+
     protected abstract void openDesiredPageInEditor(RedProjectEditor editor);
 
     protected void fireEvents() {
         // nothing to do here
-    }
-
-    private RedProjectEditorInput findInput(final IEditorPart editor) {
-        return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput() : null;
-    }
-
-    private RobotProjectConfig provideConfig(final RedProjectEditorInput redProjectInput) {
-        if (redProjectInput == null) {
-            final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-            return reader.readConfiguration(externalFile);
-        } else {
-            return redProjectInput.getProjectConfiguration();
-        }
     }
 
     public abstract boolean apply(final IFile externalFile, RobotProjectConfig config) throws ProposalApplyingException;
