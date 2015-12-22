@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -31,10 +30,14 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -53,7 +56,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
-import org.eclipse.ui.services.IEvaluationService;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -61,7 +63,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Exc
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -152,8 +153,23 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void createContextMenu() {
         final String menuId = "org.robotframework.ide.eclipse.redxmleditor.validation.contextMenu";
 
-        final MenuManager manager = new MenuManager("Red.xml file editor validation context menu", menuId);
         final Tree control = viewer.getTree();
+        final MenuManager manager = new MenuManager("Red.xml file editor validation context menu", menuId);
+        manager.setRemoveAllWhenShown(true);
+        final IMenuListener menuListener = new IMenuListener() {
+            @Override
+            public void menuAboutToShow(final IMenuManager menuManager) {
+                menuManager.add(new Separator("additions"));
+            }
+        };
+        manager.addMenuListener(menuListener);
+        control.addDisposeListener(new DisposeListener() {
+
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                manager.removeMenuListener(menuListener);
+            }
+        });
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, viewer, false);
@@ -162,6 +178,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void setInput() {
         try {
             viewer.getTree().setRedraw(false);
+
+            final ISelection selection = viewer.getSelection();
 
             final TreeItem topTreeItem = viewer.getTree().getTopItem();
             final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
@@ -174,10 +192,11 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             addMissingEntriesToTree(wrappedRoot, wrappedRoot.getAll());
 
             viewer.setInput(wrappedRoot);
-            // viewer.setExpandedElements(getElementsToExpand(wrappedRoot.getAll()));
             if (topItem != null) {
                 viewer.setTopItem(topItem);
             }
+
+            viewer.setSelection(selection);
 
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to read project structure");
@@ -244,16 +263,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             }
         }
         return paths;
-    }
-
-    private ProjectTreeElement[] getElementsToExpand(final Collection<ProjectTreeElement> allElements) {
-        return toArray(filter(allElements, new Predicate<ProjectTreeElement>() {
-
-            @Override
-            public boolean apply(final ProjectTreeElement element) {
-                return element.containsOtherFolders();
-            }
-        }), ProjectTreeElement.class);
     }
 
     private void installResourceChangeListener() {
@@ -333,23 +342,13 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Optional
     private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final RedProjectConfigEventData<Collection<IPath>> eventData) {
+        // some other file model has changed
         if (!eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
             return;
         }
 
         setDirty(true);
         setInput();
-
-        // FIXME : this should refresh context menu enablements but it does not...
-        SwtThread.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                final IEvaluationService evalService = site.getService(IEvaluationService.class);
-                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INTERNAL_FOLDER);
-                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INCLUDED);
-                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_EXCLUDED);
-            }
-        });
     }
 
     private static final class ViewerSorter extends ViewerComparator {
