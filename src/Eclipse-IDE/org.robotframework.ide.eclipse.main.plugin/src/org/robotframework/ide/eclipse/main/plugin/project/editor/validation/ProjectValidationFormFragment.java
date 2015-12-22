@@ -129,6 +129,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTree());
         viewer.setUseHashlookup(true);
+        viewer.setAutoExpandLevel(2);
         viewer.getTree().setEnabled(false);
         viewer.setComparator(new ViewerSorter());
 
@@ -171,7 +172,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             addMissingEntriesToTree(wrappedRoot, wrappedRoot.getAll());
 
             viewer.setInput(wrappedRoot);
-            viewer.setExpandedElements(getElementsToExpand(wrappedRoot.getAll()));
+            // viewer.setExpandedElements(getElementsToExpand(wrappedRoot.getAll()));
             if (topItem != null) {
                 viewer.setTopItem(topItem);
             }
@@ -330,12 +331,18 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Optional
     private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final List<?> elements) {
-        final IEvaluationService evalService = site.getService(IEvaluationService.class);
-        evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INCLUDED);
-        evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_EXCLUDED);
-
         setDirty(true);
         setInput();
+
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                final IEvaluationService evalService = site.getService(IEvaluationService.class);
+                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INTERNAL_FOLDER);
+                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_INCLUDED);
+                evalService.requestEvaluation(RedXmlValidationPropertyTester.PROPERTY_IS_EXCLUDED);
+            }
+        });
     }
 
     private static final class ViewerSorter extends ViewerComparator {
