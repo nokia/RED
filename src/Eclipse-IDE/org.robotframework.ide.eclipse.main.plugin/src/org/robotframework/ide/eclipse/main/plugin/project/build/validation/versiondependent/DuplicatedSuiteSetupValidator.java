@@ -15,9 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 
 import com.google.common.collect.Range;
 
-/**
- * @author Michal Anglart
- */
 public class DuplicatedSuiteSetupValidator extends ADuplicatedValidator<SuiteSetup> {
 
     public DuplicatedSuiteSetupValidator(final IFile file, final RobotSettingsSection section) {
