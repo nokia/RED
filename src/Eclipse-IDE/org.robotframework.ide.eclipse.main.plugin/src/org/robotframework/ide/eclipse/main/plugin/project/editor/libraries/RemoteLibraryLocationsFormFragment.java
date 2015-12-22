@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,6 +16,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -47,6 +49,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -59,8 +62,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
-import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
 
@@ -74,6 +77,9 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -139,7 +145,7 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
         ViewerColumnsFactory.newColumn("").withWidth(100)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, newElementsCreator()))
+                .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, editorInput, newElementsCreator()))
             .labelsProvidedBy(new RemoteLibraryLocationsAddressLabelProvider())
             .createFor(viewer);
     }
@@ -165,7 +171,11 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
                     final List<RemoteLocation> locations = editorInput.getProjectConfiguration().getRemoteLocations();
                     if (!locations.contains(remoteLocation)) {
                         editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
-                        setDirty(true);
+
+                        final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<List<RemoteLocation>>(
+                                editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
+                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
+
                         return remoteLocation;
                     }
                 }
@@ -224,17 +234,21 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenRemoteLocationDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RemoteLocation remoteLocation) {
-        setDirty(true);
-        viewer.refresh();
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RedProjectConfigEventData<RemoteLocation> eventData) {
+        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     @Inject
     @Optional
     private void whenRemoteLocationChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final List<RemoteLocation> remoteLocations) {
-        setDirty(true);
-        viewer.refresh();
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<RemoteLocation>> eventData) {
+        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     private class RemoteLibraryLocationsContentProvider extends StructuredContentProvider {
