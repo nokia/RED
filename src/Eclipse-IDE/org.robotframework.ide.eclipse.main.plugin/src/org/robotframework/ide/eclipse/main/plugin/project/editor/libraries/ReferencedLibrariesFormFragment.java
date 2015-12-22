@@ -41,6 +41,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -196,7 +197,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     for (final ReferencedLibrary library : libs) {
                         editorInput.getProjectConfiguration().addReferencedLibrary(library);
                     }
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
+                    if (!libs.isEmpty()) {
+                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                                editorInput.getRobotProject().getConfigurationFile(), libs);
+                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                    }
                 }
             }
         });
@@ -227,7 +232,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     for (final ReferencedLibrary library : libs) {
                         editorInput.getProjectConfiguration().addReferencedLibrary(library);
                     }
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
+                    if (!libs.isEmpty()) {
+                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                                editorInput.getRobotProject().getConfigurationFile(), libs);
+                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                    }
                 }
             }
         });
@@ -256,7 +265,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     for (final ReferencedLibrary library : libs) {
                         editorInput.getProjectConfiguration().addReferencedLibrary(library);
                     }
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, libs);
+                    if (!libs.isEmpty()) {
+                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                                editorInput.getRobotProject().getConfigurationFile(), libs);
+                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                    }
                 }
             }
         });
@@ -338,9 +351,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenLibrariesChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final List<ReferencedLibrary> libs) {
-        setDirty(true);
-        viewer.refresh();
+    private void whenLibrariesChanged(@UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) 
+                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
+        if (eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 }

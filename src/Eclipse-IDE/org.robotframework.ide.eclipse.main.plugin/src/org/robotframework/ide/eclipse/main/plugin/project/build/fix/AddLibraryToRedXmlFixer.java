@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -23,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -130,8 +133,13 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         @Override
         protected void fireEvents() {
-            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                    newArrayList(addedLibrary));
+            final List<ReferencedLibrary> addedLibs = addedLibrary == null ? new ArrayList<ReferencedLibrary>()
+                    : newArrayList(addedLibrary);
+            if (!addedLibs.isEmpty()) {
+                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                        externalFile, addedLibs);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+            }
         }
 
         @Override
