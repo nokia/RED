@@ -17,9 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import com.google.common.base.Function;
 import com.google.common.collect.Range;
 
-/**
- * @author Michal Anglart
- */
 public class DuplicatedTemplateInOlderValidator extends ADuplicatedInOldValidator<TestTemplate> {
 
     public DuplicatedTemplateInOlderValidator(final IFile file, final RobotSettingsSection section) {
