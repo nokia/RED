@@ -10,6 +10,10 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class DebugSocketManager implements Runnable {
     
     private static final int DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT = 30000;
