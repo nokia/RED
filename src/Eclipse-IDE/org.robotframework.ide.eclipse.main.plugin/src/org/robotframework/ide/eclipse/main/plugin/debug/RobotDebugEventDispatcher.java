@@ -91,7 +91,7 @@ public class RobotDebugEventDispatcher extends Job {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
         while (!target.isTerminated() && event != null) {
-
+            
             final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {};
             final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
@@ -198,13 +198,15 @@ public class RobotDebugEventDispatcher extends Job {
     }
     
     private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
-        if (keywordExecutionManager.getCurrentSuiteFile() == null) {
-            throw new MissingFileToExecuteException("Missing suite file for execution");
-        }
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeywordName = (String) startList.get(0);
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
         final String keywordType = (String) startElements.get("type");
+        if (keywordExecutionManager.getCurrentSuiteFile() == null
+                && !keywordType.equals(RobotDebugExecutionContext.SUITE_SETUP_KEYWORD_TYPE)
+                && !keywordType.equals(RobotDebugExecutionContext.SUITE_TEARDOWN_KEYWORD_TYPE)) {
+            throw new MissingFileToExecuteException("Missing suite file for execution");
+        }
         if(keywordType.equals(RobotDebugExecutionContext.TESTCASE_TEARDOWN_KEYWORD_TYPE)) {
             target.clearStackFrames();
         }
