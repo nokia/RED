@@ -78,6 +78,9 @@ public class KeywordExecutionManager {
 
     public boolean hasBreakpointAtCurrentKeywordPosition(final String executedSuite, final int keywordLineNumber,
             final RobotDebugTarget target) {
+        if(keywordLineNumber < 0) {
+            return false;
+        }
         boolean hasBreakpoint = false;
         final IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
                 .getBreakpointManager()
