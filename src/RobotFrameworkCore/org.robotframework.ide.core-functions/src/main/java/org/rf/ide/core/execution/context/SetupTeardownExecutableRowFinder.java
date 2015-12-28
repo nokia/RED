@@ -32,19 +32,20 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
 
     @Override
     public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
-        final KeywordContext currentKeywordContext = currentKeywords.get(0);
-        if (isKeywordType(RobotDebugExecutionContext.TESTCASE_SETUP_KEYWORD_TYPE, currentKeywordContext)) {
-            return extractExecutableRowFromTestCase(currentTestCase.getSetups(), currentModel.getSettingTable()
-                    .getTestSetups());
-        } else if (isKeywordType(RobotDebugExecutionContext.TESTCASE_TEARDOWN_KEYWORD_TYPE, currentKeywordContext)) {
-            return extractExecutableRowFromTestCase(currentTestCase.getTeardowns(), currentModel.getSettingTable()
-                    .getTestTeardowns());
-        } else if (isKeywordType(RobotDebugExecutionContext.SUITE_SETUP_KEYWORD_TYPE, currentKeywordContext)) {
-            return extractExecutableRowFromSettingTable(currentModel.getSettingTable().getSuiteSetups());
-        } else if (isKeywordType(RobotDebugExecutionContext.SUITE_TEARDOWN_KEYWORD_TYPE, currentKeywordContext)) {
-            return extractExecutableRowFromSettingTable(currentModel.getSettingTable().getSuiteTeardowns());
+        if (currentModel != null) {
+            final KeywordContext currentKeywordContext = currentKeywords.get(0);
+            if (isKeywordType(RobotDebugExecutionContext.TESTCASE_SETUP_KEYWORD_TYPE, currentKeywordContext)) {
+                return extractExecutableRowFromTestCase(currentTestCase.getSetups(), currentModel.getSettingTable()
+                        .getTestSetups());
+            } else if (isKeywordType(RobotDebugExecutionContext.TESTCASE_TEARDOWN_KEYWORD_TYPE, currentKeywordContext)) {
+                return extractExecutableRowFromTestCase(currentTestCase.getTeardowns(), currentModel.getSettingTable()
+                        .getTestTeardowns());
+            } else if (isKeywordType(RobotDebugExecutionContext.SUITE_SETUP_KEYWORD_TYPE, currentKeywordContext)) {
+                return extractExecutableRowFromSettingTable(currentModel.getSettingTable().getSuiteSetups());
+            } else if (isKeywordType(RobotDebugExecutionContext.SUITE_TEARDOWN_KEYWORD_TYPE, currentKeywordContext)) {
+                return extractExecutableRowFromSettingTable(currentModel.getSettingTable().getSuiteTeardowns());
+            }
         }
-
         return null;
     }
 
