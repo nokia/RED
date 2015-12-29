@@ -41,6 +41,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesS
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -166,7 +167,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     final RobotStackFrame robotStackFrame = (RobotStackFrame) stackFrame;
                     if (robotStackFrame.getFileName().equals(suiteFile.getFile().getName())) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
-                            if (variable.getName().equalsIgnoreCase(variableName)) {
+                            if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {    
                                 return "Current value:\n" + RobotDebugValueManager.extractValueDetail(variable.getValue());
                             }
                         }
