@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
@@ -114,15 +115,16 @@ class VariablesTableValidator implements ModelUnitValidator {
         final Set<String> duplicatedNames = newHashSet();
 
         for (final IVariableHolder var1 : variableTable.getVariables()) {
+            final String var1Name = VariableNamesSupport.extractUnifiedVariableName(var1.getName());
             for (final IVariableHolder var2 : variableTable.getVariables()) {
-                if (var1 != var2 && var1.getName().equals(var2.getName())) {
-                    duplicatedNames.add(var1.getName());
+                if (var1 != var2 && var1Name.equals(VariableNamesSupport.extractUnifiedVariableName(var2.getName()))) {
+                    duplicatedNames.add(var1Name);
                 }
             }
         }
 
         for (final IVariableHolder variable : variableTable.getVariables()) {
-            if (duplicatedNames.contains(variable.getName())) {
+            if (duplicatedNames.contains(VariableNamesSupport.extractUnifiedVariableName(variable.getName()))) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
                 final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,

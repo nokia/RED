@@ -24,6 +24,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -178,10 +179,11 @@ class KeywordTableValidator implements ModelUnitValidator {
         final Set<String> arguments = newHashSet();
 
         // first add arguments embedded in name, then from [Arguments] setting
-        arguments.addAll(newArrayList(transform(TestCasesTableValidator.extractVariableNamesFromArguments(
+        arguments.addAll(newArrayList(transform(VariableNamesSupport.extractUnifiedVariableNamesFromArguments(
                 newArrayList(keyword.getKeywordName()), extractor, fileName), removeRegex())));
         for (final KeywordArguments argument : keyword.getArguments()) {
-            arguments.addAll(TestCasesTableValidator.extractVariableNamesFromArguments(argument.getArguments(), extractor, fileName));
+            arguments.addAll(VariableNamesSupport.extractUnifiedVariableNamesFromArguments(argument.getArguments(), extractor,
+                    fileName));
         }
         return arguments;
     }
