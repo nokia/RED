@@ -15,7 +15,15 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class RobotDebugValueManager {
+    
+    private static final String DICT_VARIABLE_VALUE_NAME = "Dictionary";
+    
+    private static final String LIST_VARIABLE_VALUE_NAME = "List";
 
     public RobotDebugValue createRobotDebugValue(final Object value, final RobotDebugVariable variable, final RobotDebugTarget target) {
         if (value instanceof List<?>) {
@@ -55,11 +63,11 @@ public class RobotDebugValueManager {
     }
 
     private String createListRootValue(final List<?> value) {
-        return "List[" + value.size() + "]";
+        return LIST_VARIABLE_VALUE_NAME + "[" + value.size() + "]";
     }
 
     private String createDictionaryRootValue(final Map<?, ?> value) {
-        return "Dictionary[" + value.size() + "]";
+        return DICT_VARIABLE_VALUE_NAME + "[" + value.size() + "]";
     }
     
     public static String extractValueDetail(final IValue value) {
@@ -67,7 +75,7 @@ public class RobotDebugValueManager {
         try {
             if (value.hasVariables()) {
                 final StringBuilder detailBuilder = new StringBuilder();
-                extractNestedVariablesDetails(value.getVariables(), detailBuilder);
+                extractNestedVariablesDetails(value.getVariables(), detailBuilder, isDictionaryValue(value));
                 detail = detailBuilder.toString();
             } else {
                 detail = value.getValueString();
@@ -77,31 +85,50 @@ public class RobotDebugValueManager {
         }
         return detail;
     }
-    
-    private static void extractNestedVariablesDetails(final IVariable[] variables, final StringBuilder detailBuilder) throws DebugException {
-        detailBuilder.append("[");
+
+    private static void extractNestedVariablesDetails(final IVariable[] variables, final StringBuilder detailBuilder,
+            final boolean isDictionary) throws DebugException {
+        
+        detailBuilder.append(getDetailBeginCharacter(isDictionary));
         for (int i = 0; i < variables.length; i++) {
-            if(variables[i].getValue().hasVariables()) {
-                extractNestedVariablesDetails(variables[i].getValue().getVariables(), detailBuilder);
+            if (variables[i].getValue().hasVariables()) {
+                if (isDictionaryVariable(variables[i].getName())) {
+                    detailBuilder.append(variables[i].getName() + "=");
+                }
+                extractNestedVariablesDetails(variables[i].getValue().getVariables(), detailBuilder,
+                        isDictionaryValue(variables[i].getValue()));
             } else {
                 detailBuilder.append(getTextValue(variables[i]));
-                if(i < variables.length-1) {
-                    detailBuilder.append(", ");
-                }
+            }
+            if (i < variables.length - 1) {
+                detailBuilder.append(", ");
             }
         }
-        detailBuilder.append("]");
+        detailBuilder.append(getDetailEndCharacter(isDictionary));
     }
     
     private static String getTextValue(final IVariable variable) throws DebugException {
         final String variableName = variable.getName();
-        if(isDictionaryElement(variableName)) {
+        if(isDictionaryVariable(variableName)) {
             return variableName + "=" + variable.getValue().getValueString();
         }
         return variable.getValue().getValueString();
     }
     
-    private static boolean isDictionaryElement(final String variableName) {
+    private static boolean isDictionaryVariable(final String variableName) {
         return (variableName.indexOf("[") < 0 && variableName.indexOf("]") < 0);
+    }
+
+    private static boolean isDictionaryValue(final IValue value) throws DebugException {
+        final String valueString = value.getValueString();
+        return valueString != null ? valueString.contains(DICT_VARIABLE_VALUE_NAME) : false;
+    }
+
+    private static String getDetailBeginCharacter(final boolean isDictionary) {
+        return isDictionary ? "{" : "[";
+    }
+
+    private static String getDetailEndCharacter(final boolean isDictionary) {
+        return isDictionary ? "}" : "]";
     }
 }

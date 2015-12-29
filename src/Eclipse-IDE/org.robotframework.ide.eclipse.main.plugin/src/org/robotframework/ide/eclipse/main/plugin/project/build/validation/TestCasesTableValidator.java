@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
@@ -20,13 +19,12 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -41,7 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -233,7 +230,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
                 for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
-                    if (!variableDeclaration.isDynamic() && !isDefinedVariable(variableDeclaration, definedVariables)) {
+                    if (!variableDeclaration.isDynamic() && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)) {
                         final String variableName = variableDeclaration.getVariableName().getText();
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                 .formatMessageWith(variableName);
@@ -246,75 +243,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
                         reporter.handleProblem(problem, file, position, additionalArguments);
                     }
                 }
-                definedVariables.addAll(extractVariableNames(lineDescription.getCreatedVariables()));
+                definedVariables.addAll(VariableNamesSupport.extractUnifiedVariableNames(lineDescription.getCreatedVariables()));
             }
         }
     }
-    
-    private static boolean isDefinedVariable(final VariableDeclaration variableDeclaration,
-            final Set<String> definedVariables) {
 
-        final List<String> possibleVariableRepresentations = extractPossibleVariableRepresentations(variableDeclaration.getVariableName()
-                .getText()
-                .toLowerCase());
-        final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
-        for (final String variableRepresentation : possibleVariableRepresentations) {
-            if (containsVariable(definedVariables, varTypeIdentificator, variableRepresentation)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private static List<String> extractPossibleVariableRepresentations(final String variableName) {
-        final List<String> possibleVariableRepresentations = newArrayList();
-        final String varNameWithBrackets = createVariableNameWithBrackets(variableName);
-        possibleVariableRepresentations.add(varNameWithBrackets);
-        if (varNameWithBrackets.contains(".")) {
-            possibleVariableRepresentations.add(extractVarNameFromDotsRepresentation(varNameWithBrackets));
-        }
-        if (varNameWithBrackets.contains("_")) {
-            possibleVariableRepresentations.add(extractVarNameFromUnderscoreRepresentation(varNameWithBrackets));
-        }
-        return possibleVariableRepresentations;
-    }
-
-    private static boolean containsVariable(final Set<String> definedVariables, final String varTypeIdentificator,
-            final String varNameWithBrackets) {
-        return definedVariables.contains(varTypeIdentificator + varNameWithBrackets)
-                || (!varTypeIdentificator.equals("@") && definedVariables.contains("@" + varNameWithBrackets))
-                || (!varTypeIdentificator.equals("&") && definedVariables.contains("&" + varNameWithBrackets))
-                || (!varTypeIdentificator.equals("$") && definedVariables.contains("$" + varNameWithBrackets));
-    }
-    
-    private static String extractVarNameFromDotsRepresentation(final String varNameWithBrackets) {
-        return varNameWithBrackets.split("\\.")[0] + "}";
-    }
-    
-    private static String extractVarNameFromUnderscoreRepresentation(final String varNameWithBrackets) {
-        return varNameWithBrackets.replaceAll("_", "");
-    }
-    
-    @VisibleForTesting
-    static List<String> extractVariableNames(final List<VariableDeclaration> assignments) {
-        final List<String> vars = newArrayList();
-        for (final VariableDeclaration variableDeclaration : assignments) {
-            vars.add(variableDeclaration.asToken().getText().toLowerCase());
-        }
-        return vars;
-    }
-    
-    static List<String> extractVariableNamesFromArguments(final List<RobotToken> assignments,
-            final VariableExtractor extractor, final String fileName) {
-        final List<String> vars = newArrayList();
-        for (final RobotToken token : assignments) {
-            final MappingResult mappingResult = extractor.extract(token, fileName);
-            vars.addAll(extractVariableNames(mappingResult.getCorrectVariables()));
-        }
-        return vars;
-    }
-    
-    private static String createVariableNameWithBrackets(final String varName) {
-        return "{" + varName + "}";
-    }
 }

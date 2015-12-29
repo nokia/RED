@@ -16,6 +16,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -69,12 +70,12 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
 
     private VariableDetector createDetector(final ITextViewer textViewer, final IRegion fromRegion,
             final String fullVariableName, final List<IHyperlink> hyperlinks) {
-        final String variableName = fullVariableName.substring(2, fullVariableName.length() -1);
+        final String hoveredVariableName = VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(fullVariableName);
         return new VariableDetector() {
 
             @Override
             public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
-                if (variable.getName().equals(variableName)) {
+                if (VariableNamesSupport.extractUnifiedVariableName(variable.getName()).equals(hoveredVariableName)) {
                     final Position position = variable.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
@@ -91,9 +92,10 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision localVariableDetected(final RobotSuiteFile file,
                     final RobotToken variableToken) {
-                if (variableToken.getText().toString().startsWith(fullVariableName)) {
-                    final IRegion destination = new Region(variableToken.getStartOffset(),
-                            variableToken.getRaw().length());
+                if (VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(variableToken.getText().toString())
+                        .equals(hoveredVariableName)) {
+                    final IRegion destination = new Region(variableToken.getStartOffset(), variableToken.getRaw()
+                            .length());
                     hyperlinks.add(new RegionsHyperlink(textViewer, fromRegion, destination));
                     return ContinueDecision.STOP;
                 } else {
