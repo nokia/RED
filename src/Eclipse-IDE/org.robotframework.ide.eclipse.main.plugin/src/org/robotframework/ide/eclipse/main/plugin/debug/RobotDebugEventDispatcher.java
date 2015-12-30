@@ -203,11 +203,10 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
         final String keywordType = (String) startElements.get("type");
         if (keywordExecutionManager.getCurrentSuiteFile() == null
-                && !keywordType.equals(RobotDebugExecutionContext.SUITE_SETUP_KEYWORD_TYPE)
-                && !keywordType.equals(RobotDebugExecutionContext.SUITE_TEARDOWN_KEYWORD_TYPE)) {
+                && !executionContext.isSuiteSetupTeardownKeyword(keywordType)) {
             throw new MissingFileToExecuteException("Missing suite file for execution");
         }
-        if(keywordType.equals(RobotDebugExecutionContext.TESTCASE_TEARDOWN_KEYWORD_TYPE)) {
+        if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
             target.clearStackFrames();
         }
 
