@@ -50,6 +50,7 @@ public class RobotDebugStackFrameManager {
                 } else {
                     IStackFrame previousStackFrame = extractPreviousStackFrame(currentKeywordsContextMap,
                             numberOfStackFramesToCopy, currentKeywordsCounter);
+                    if(previousStackFrame == null) return new IStackFrame[0];
                     ((RobotStackFrame) previousStackFrame).setStackFrameData(currentKeywordsCounter, keywordName,
                             keywordContext);
                     newStackFrames[lowestStackFrameLevel] = previousStackFrame;
