@@ -75,6 +75,13 @@ public class ExecutableRowFindersManager {
             forLoopExecutableRowFinder.clear();
         }
     }
+    
+    public void clearAtTestCaseEnd() {
+        this.currentTestCase = null;
+        if(setupTeardownExecutableRowFinder != null) {
+            setupTeardownExecutableRowFinder.setCurrentTestCase(null);
+        }
+    }
 
     public void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
             final List<ResourceImportReference> resourceImportReferences) {
@@ -101,5 +108,9 @@ public class ExecutableRowFindersManager {
         if (forLoopExecutableRowFinder != null) {
             forLoopExecutableRowFinder.setCurrentTestCase(currentTestCase);
         }
+    }
+    
+    public boolean hasCurrentTestCase() {
+        return currentTestCase != null;
     }
 }
