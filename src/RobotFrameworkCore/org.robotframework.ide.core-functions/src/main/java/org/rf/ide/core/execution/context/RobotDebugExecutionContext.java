@@ -8,15 +8,15 @@ package org.rf.ide.core.execution.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.importer.ResourceImporter;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.execution.context.ExecutableRowFindersManager;
-import org.rf.ide.core.execution.context.IRobotExecutableRowFinder;
 
 
 /**
@@ -33,6 +33,12 @@ public class RobotDebugExecutionContext {
     
     private RobotFile currentModel;
     
+    private RobotParser robotParser;
+    
+    private ResourceImporter resourceImporter;
+    
+    private final List<String> resourceImportPaths;
+    
     private final List<KeywordContext> currentKeywords;
     
     private final TestCaseExecutionRowCounter testCaseExecutionRowCounter;
@@ -47,10 +53,28 @@ public class RobotDebugExecutionContext {
         currentKeywords = new ArrayList<>();
         testCaseExecutionRowCounter = new TestCaseExecutionRowCounter();
         executableRowFindersManager = new ExecutableRowFindersManager();
+        resourceImportPaths = new ArrayList<>();
+        resourceImporter = new ResourceImporter();
     }
     
-    public void startSuite(final RobotFileOutput robotFileOutput) {
-        currentModel = robotFileOutput.getFileModel();
+    public void resourceImport(final String path) {
+        if(currentModel != null) { // import during suite execution
+            resourceImporter.importDebugResource(robotParser, currentModel.getParent(), path);
+            executableRowFindersManager.updateResourceImportReferences(currentModel.getParent().getResourceImportReferences());
+        } else { // import before suite start
+            resourceImportPaths.add(path);
+        }
+    }
+    
+    public void startSuite(final RobotFileOutput robotFileOutput, final RobotParser robotParser) {
+        this.currentModel = robotFileOutput.getFileModel();
+        this.robotParser = robotParser;
+        
+        for (final String path : resourceImportPaths) {
+            resourceImporter.importDebugResource(robotParser, robotFileOutput, path);
+        }
+        resourceImportPaths.clear();
+        
         executableRowFindersManager.initFindersAtSuiteStart(currentModel, currentModel.getKeywordTable().getKeywords(),
                 robotFileOutput.getResourceImportReferences());
     }
@@ -82,6 +106,10 @@ public class RobotDebugExecutionContext {
     public void endTest() {
         testCaseExecutionRowCounter.reset();
         executableRowFindersManager.clearAtTestCaseEnd();
+    }
+    
+    public void endSuite() {
+        this.currentModel = null;
     }
     
     public KeywordPosition findKeywordPosition() {

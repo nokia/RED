@@ -24,17 +24,21 @@ public class RobotModelTestProvider {
     public static RobotModelTestProvider getInstance() {
         return new RobotModelTestProvider();
     }
-
-    public static RobotFile getModelFile(final String filename) throws URISyntaxException {
-        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
-        return getModelFile(path);
-    }
-
-    public static RobotFile getModelFile(final Path path) {
+    
+    public static RobotParser getParser() {
         final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn("3.0a1");
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
         final RobotParser parser = RobotParser.createEager(robotProject);
+        return parser;
+    }
+
+    public static RobotFile getModelFile(final String filename, final RobotParser parser) throws URISyntaxException {
+        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
+        return getModelFile(path, parser);
+    }
+
+    public static RobotFile getModelFile(final Path path, final RobotParser parser) {
         final List<RobotFileOutput> parsedFileList = parser.parse(path.toFile());
         final RobotFileOutput robotFileOutput = parsedFileList.get(0);
         return robotFileOutput.getFileModel();

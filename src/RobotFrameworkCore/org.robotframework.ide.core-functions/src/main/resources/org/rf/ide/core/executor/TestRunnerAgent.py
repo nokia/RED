@@ -335,6 +335,9 @@ class TestRunnerAgent:
     def end_keyword(self, name, attrs):
         self._send_socket("end_keyword", name, attrs)
         self._debugger.end_keyword(attrs['status'] == 'PASS')
+        
+    def resource_import(self, name, attributes):
+        self._send_socket("resource_import", name, attributes)
 
     def message(self, message):
         pass
