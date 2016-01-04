@@ -132,7 +132,7 @@ public class RobotFileOutput {
         }
     }
 
-    private int findResourceReferencePositionToReplace(final ResourceImportReference ref) {
+    public int findResourceReferencePositionToReplace(final ResourceImportReference ref) {
         int positionToSet = -1;
 
         final int numberOfReferences = resourceReferences.size();
