@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.rf.ide.core.testdata.RobotParser;
@@ -45,21 +46,23 @@ public class RobotDebugExecutionContextTest {
     private int[] test8_lines = new int[] { 7, 8, 3, 9, 26, 27, 10, 8, 9 };
 
     private int[] test9_lines = new int[] { 6, 6, 7, 8, 15, 16, 16, 18, 19, 9, 11 };
-    
-    private int[] test10_lines = new int[] { 7, 8, 3, 9, 26, 27, 10, 8, 9 };
 
     @BeforeClass
-    public static void setUp() {
+    public static void init() {
         parser = RobotModelTestProvider.getParser();
+    }
+    
+    @Before
+    public void setUp() {
+        linesCounter = 0;
+        debugExecutionContext = new RobotDebugExecutionContext();
     }
 
     @Test
     public void test_MultipleUserKeywordsAndResources()
             throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_1.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test a");
@@ -104,10 +107,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_MultipleResources() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_2.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test a");
@@ -147,10 +148,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_ForLoop() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_3.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
@@ -235,10 +234,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_Comments() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_4.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test a");
@@ -266,10 +263,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_SetupAndTeardownKeywords() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_5.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test5");
@@ -336,10 +331,8 @@ public class RobotDebugExecutionContextTest {
     
     @Test
     public void test_SetupAndTeardownKeywordsWithNewTypes() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_5.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test5");
@@ -375,10 +368,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_SuiteSetupAndTeardownKeywords() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_6.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startKeyword("my_setup", "Suite Setup", Arrays.asList(""));
@@ -414,10 +405,8 @@ public class RobotDebugExecutionContextTest {
     
     @Test
     public void test_SuiteSetupAndTeardownKeywordsWithNewTypes() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_6.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startKeyword("my_setup", "Setup", Arrays.asList(""));
@@ -453,10 +442,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_VariableDeclarationAsKeyword() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_7.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test7");
@@ -486,10 +473,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_ResourcesWithTheSameNames() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_8.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test8");
@@ -530,11 +515,8 @@ public class RobotDebugExecutionContextTest {
 
     @Test
     public void test_ResourcesWithParametrizedPath() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_10.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
-        
         debugExecutionContext.resourceImport(Paths.get(this.getClass().getResource("resources/resource1.robot").toURI()).toString());
 
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
@@ -576,11 +558,53 @@ public class RobotDebugExecutionContextTest {
     }
     
     @Test
+    public void test_ResourcesWithParametrizedPathAndImportAfterSuiteStart() throws URISyntaxException {
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_10.robot", parser);
+
+        debugExecutionContext.startSuite(modelFile.getParent(), parser);
+        
+        debugExecutionContext.startTest("test8");
+
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("start"));
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        
+        debugExecutionContext.resourceImport(Paths.get(this.getClass().getResource("resources/resource1.robot").toURI()).toString());
+
+        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword", Arrays.asList(""));
+        checkKeywordLine8();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("some log"));
+            checkKeywordLine8();
+            debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword", Arrays.asList(""));
+        checkKeywordLine8();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("12345"));
+            checkKeywordLine8();
+            debugExecutionContext.endKeyword("Keyword");
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+            checkKeywordLine8();
+            debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource2.testN", "Keyword", Arrays.asList(""));
+        checkKeywordLine8();
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+            checkKeywordLine8();
+            debugExecutionContext.endKeyword("Keyword");
+            debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+            checkKeywordLine8();
+            debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.endTest();
+    }
+    
+    @Test
     public void test_ForLoopWithUserKeyword() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_9.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
@@ -614,10 +638,8 @@ public class RobotDebugExecutionContextTest {
     
     @Test
     public void test_ForLoopWithUserKeywordWithNewTypes() throws URISyntaxException {
-        linesCounter = 0;
         RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_9.robot", parser);
 
-        debugExecutionContext = new RobotDebugExecutionContext();
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
@@ -747,49 +769,45 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
     }
+    
+    private void checkKeywordLine(int lineNumber) {
+        Assert.assertEquals(lineNumber, debugExecutionContext.findKeywordPosition().getLineNumber());
+        linesCounter++;
+    }
 
     private void checkKeywordLine1() {
-        Assert.assertEquals(test1_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test1_lines[linesCounter]);
     }
 
     private void checkKeywordLine2() {
-        Assert.assertEquals(test2_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test2_lines[linesCounter]);
     }
 
     private void checkKeywordLine3() {
-        Assert.assertEquals(test3_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test3_lines[linesCounter]);
     }
 
     private void checkKeywordLine4() {
-        Assert.assertEquals(test4_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test4_lines[linesCounter]);
     }
 
     private void checkKeywordLine5() {
-        Assert.assertEquals(test5_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test5_lines[linesCounter]);
     }
 
     private void checkKeywordLine6() {
-        Assert.assertEquals(test6_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test6_lines[linesCounter]);
     }
 
     private void checkKeywordLine7() {
-        Assert.assertEquals(test7_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test7_lines[linesCounter]);
     }
 
     private void checkKeywordLine8() {
-        Assert.assertEquals(test8_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test8_lines[linesCounter]);
     }
 
     private void checkKeywordLine9() {
-        Assert.assertEquals(test9_lines[linesCounter], debugExecutionContext.findKeywordPosition().getLineNumber());
-        linesCounter++;
+        checkKeywordLine(test9_lines[linesCounter]);
     }
 }
