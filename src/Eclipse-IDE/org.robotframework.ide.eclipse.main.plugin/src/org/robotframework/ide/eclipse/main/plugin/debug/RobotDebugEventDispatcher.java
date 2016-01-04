@@ -103,6 +103,9 @@ public class RobotDebugEventDispatcher extends Job {
                 case "pid":
                     handlePidEvent();
                     break;
+                case "resource_import": //since Robot 2.9
+                    handleResourceImportEvent(eventMap);
+                    break;
                 case "start_suite":
                     handleStartSuiteEvent(eventMap);
                     break;
@@ -165,6 +168,13 @@ public class RobotDebugEventDispatcher extends Job {
         robotEventBroker.sendClearEventToMessageLogView();
         target.started();
     }
+    
+    private void handleResourceImportEvent(final Map<String, ?> eventMap) {
+        final List<?> importList = (List<?>) eventMap.get("resource_import");
+        final Map<?, ?> importElements = (Map<?, ?>) importList.get(1);
+        final String resourceFilePath = (String) importElements.get("source");
+        executionContext.resourceImport(resourceFilePath);
+    }
 
     private void handleStartSuiteEvent(final Map<String, ?> eventMap) {
         final List<?> suiteList = (List<?>) eventMap.get("start_suite");
@@ -177,13 +187,13 @@ public class RobotDebugEventDispatcher extends Job {
         if (currentSuiteFile != null) {
             final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
             final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
-            executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0));
+            executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0), robotParser);
         }
 
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
                 (String) suiteList.get(0), (String) suiteElements.get("source")));
     }
-
+    
     private void handleStartTestEvent(final Map<String, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("start_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
@@ -328,6 +338,7 @@ public class RobotDebugEventDispatcher extends Job {
         target.clearStackFrames();
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndSuiteExecutionElement(
                 (String) suiteList.get(0), (Map<?, ?>) suiteList.get(1)));
+        executionContext.endSuite();
     }
 
 
