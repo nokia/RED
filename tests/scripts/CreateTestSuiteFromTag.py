@@ -25,21 +25,18 @@ else:
     tag=sys.argv[2]
 print 'tag:'+tag+'#'
 
-#path = "RedGuiTests"
-#tag='AllTestsWithoutTags'
-#tag=''
+
 TestCaseId=''
 matches=[]
 
-# get the files with Bugs in Tags line
+# get the files with tag in Tags line
 for root, dirnames, filenames in os.walk(path):
-    #print filenames
+
     for file in filenames:
         TestCaseId=''
-        licznik=0
-        #print file
+
         if re.search('\.test$',file) is not None:
-            #print file
+
             with open(root+'/'+file,"r+") as testfile:
                 
                 for lines in testfile:
@@ -56,20 +53,20 @@ for root, dirnames, filenames in os.walk(path):
                     if tag == 'AllTestsWithoutTags':
                         if re.search('Save-Time:.*\nTags: .*\nTestcase-Type:', data) is None:
                             matches.append([file,root+'/'+file,TestCaseId])
-                            #break
+                          
                     else:
                         if re.search('Save-Time:.*\nTags: '+tag+ '\nTestcase-Type:',data) is not None:
                             matches.append([file,root+'/'+file,TestCaseId])
-                            #break
+                            
                         
                 else:
                     
   
                     matches.append([file,root+'/'+file,TestCaseId])
                     TestCaseId=''
-                    #break
+                    
             
-
+# Create suite with found tests, generate RCPTT ID (internal magic)
 random_testcase_items=''
 random_testcase_items=''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))+'-'+''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))+'-'+''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))+'-'+''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))+'-'+''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
 random_id=''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(22))
@@ -98,7 +95,7 @@ output=''
 text=''
 
 output+=header
-#print len(matches)
+
 for i in matches:
 
     i[1]=i[1].replace('\\','/')
