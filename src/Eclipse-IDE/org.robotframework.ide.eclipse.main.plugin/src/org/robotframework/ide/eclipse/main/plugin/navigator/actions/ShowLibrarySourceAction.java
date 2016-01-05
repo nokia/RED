@@ -91,7 +91,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
     }
     
-    private static Path extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
+    private static IPath extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
         if (robotProject.isStandardLibrary(spec)) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
@@ -100,9 +100,21 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final String pythonLibPath = robotProject.getPythonLibraryPath(spec.getName());
             if (new File(pythonLibPath).exists()) {
                 return new Path(pythonLibPath);
+            } else {
+                return findModuleLibrary(pythonLibPath, spec);
             }
         }
 
+        return null;
+    }
+    
+    private static IPath findModuleLibrary(final String pythonLibPath, final LibrarySpecification spec) {
+        final IPath pathToInitFile = new Path(pythonLibPath).removeLastSegments(1)
+                .append(spec.getName())
+                .append("__init__.py");
+        if (pathToInitFile.toFile().exists()) {
+            return pathToInitFile;
+        }
         return null;
     }
 
