@@ -162,6 +162,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Resource import '%s' is invalid%s";
         }
     },
+    HTML_RESOURCE_IMPORT {
+        
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+        
+        @Override
+        public String getProblemDescription() {
+            return "HTML is valid resource type for Robot although RED does not support html files.";
+        }
+    },
     NON_EXISTING_VARIABLES_IMPORT {
 
         @Override
