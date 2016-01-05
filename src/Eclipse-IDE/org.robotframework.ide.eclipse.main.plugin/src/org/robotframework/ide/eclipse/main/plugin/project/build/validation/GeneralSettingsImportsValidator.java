@@ -310,9 +310,14 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
                         pathToken);
             } else if (!ASuiteFileDescriber.isResourceFile((IFile) resource)) {
-                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
-                        .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
-                        pathToken);
+                if (resource.getFileExtension().equalsIgnoreCase("html")) {
+                    reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.HTML_RESOURCE_IMPORT),
+                            suiteFile.getFile(), pathToken);
+                } else {
+                    reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
+                            .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
+                            pathToken);
+                }
             }
         }
     }
