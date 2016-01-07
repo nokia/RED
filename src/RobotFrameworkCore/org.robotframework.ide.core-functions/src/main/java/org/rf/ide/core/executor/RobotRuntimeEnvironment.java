@@ -557,17 +557,13 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public Map<String, Object> getVariablesFromFile(final String path,
-            final List<String> args) {
+    public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors
-                    .getInstance().getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location);
-            final String argAsString = args.isEmpty() ? "None" : "['"
-                    + Joiner.on("','").join(args) + "']";
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
             final String normalizedPath = path.replace('\\', '/');
             try {
-                return executor.getVariables(normalizedPath, argAsString);
+                return executor.getVariables(normalizedPath, args);
             } catch (XmlRpcException e) {
                 System.err.println("XML-RPC server error in file " + path + " with arguments " + args + ". Reason: "
                         + e.getMessage());

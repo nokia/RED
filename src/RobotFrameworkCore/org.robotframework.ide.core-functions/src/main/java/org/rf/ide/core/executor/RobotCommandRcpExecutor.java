@@ -164,7 +164,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final String filePath, final String fileArguments) throws XmlRpcException {
+    public Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) throws XmlRpcException {
         final Map<String, Object> variables = new LinkedHashMap<>();
         final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getVariables",
                 newArrayList(filePath, fileArguments));
