@@ -8,6 +8,9 @@ import imp
 This script prints all the classes contained in given module and submodules rooted in given path. 
 In case of package modules the path has to point to __init__.py file of this module.
 '''
+original_module_path = sys.argv[1]
+if original_path.startswith('"') and original_path.endswith('"'):
+    original_module_path = original_module_path[1:-1]
 
 modules = []
 parent = os.path.dirname(sys.argv[1])
