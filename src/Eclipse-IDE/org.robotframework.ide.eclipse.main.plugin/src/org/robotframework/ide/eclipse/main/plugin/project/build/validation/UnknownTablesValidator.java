@@ -11,15 +11,13 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
-
-import com.google.common.collect.Range;
 
 /**
  * @author Michal Anglart
@@ -38,6 +36,8 @@ class UnknownTablesValidator implements ModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
+        fileModel.parse(); // otherwise the file can be not-yet-parsed
+
         final RobotFile astModel = fileModel.getLinkedElement();
         if (astModel == null) {
             return;
@@ -47,21 +47,16 @@ class UnknownTablesValidator implements ModelUnitValidator {
             for (final IRobotLineElement lineElement : line.getLineElements()) {
                 for (final IRobotTokenType type : lineElement.getTypes()) {
                     if (type == RobotTokenType.USER_OWN_TABLE_HEADER) {
-                        reportUnrecognizedTableHeader(lineElement);
+                        reportUnrecognizedTableHeader((RobotToken) lineElement);
                     }
                 }
             }
         }
     }
 
-    private void reportUnrecognizedTableHeader(final IRobotLineElement lineElement) {
-        final String content = lineElement.getText().toString();
+    private void reportUnrecognizedTableHeader(final RobotToken token) {
         final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER)
-                .formatMessageWith(content);
-        final Range<Integer> offsetRange = Range.closed(lineElement.getStartOffset(),
-                lineElement.getStartOffset() + content.length());
-        final ProblemPosition filePosition = new ProblemPosition(lineElement.getLineNumber(), offsetRange);
-        reporter.handleProblem(problem, fileModel.getFile(), filePosition);
+                .formatMessageWith(token.getText());
+        reporter.handleProblem(problem, fileModel.getFile(), token);
     }
-
 }

@@ -106,6 +106,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return sections == null ? new ArrayList<RobotSuiteFileSection>() : sections;
     }
     
+    public void parse() {
+        getSections(); // this will parse the file if needed
+    }
+
     private void link(final RobotFile model) {
         sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
         if (model.getKeywordTable().isPresent()) {
