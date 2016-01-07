@@ -24,7 +24,7 @@ interface RobotCommandExecutor {
 
     Optional<File> getModulePath(String moduleName) throws RobotEnvironmentException;
 
-    Map<String, Object> getVariables(final String filePath, final String fileArguments) throws XmlRpcException;
+    Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) throws XmlRpcException;
 
     Map<String, Object> getGlobalVariables();
 

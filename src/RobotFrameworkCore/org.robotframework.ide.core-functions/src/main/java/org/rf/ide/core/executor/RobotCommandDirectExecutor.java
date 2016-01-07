@@ -44,7 +44,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final String filePath, final String fileArguments) {
+    public Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) {
 
         final String normalizedPath = filePath.replace('\\', '/');
         final List<String> cmdLine = Arrays.asList(interpreterPath, "-c",

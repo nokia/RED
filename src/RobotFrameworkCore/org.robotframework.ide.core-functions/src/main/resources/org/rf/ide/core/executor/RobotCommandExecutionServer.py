@@ -45,7 +45,7 @@ def getVariables(dir, args):
 
     vars = robot.variables.Variables()
     try:
-        vars.set_from_file(dir, args.encode('utf-8').decode())
+        vars.set_from_file(dir, args)
     except:
         pass
      
