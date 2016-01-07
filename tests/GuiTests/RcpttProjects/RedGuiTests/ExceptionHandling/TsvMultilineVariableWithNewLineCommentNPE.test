@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m0j4EKV3EeWcDJJ2TRzOng
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/18/15 12:53 PM
+Save-Time: 1/7/16 12:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,9 +15,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 /*
-### NPE dla https://svne1.access.nsn.com/isource/svnroot/pettool/trunk/ 
-### w pliku \robot_tests\NAPET-SNMPSimulator_tests\testcases\01.1.Installation.tsv
-
+Check if there is NPE with multiline TSV comment 
 */
 
 get-view "Project Explorer" | get-tree | select "ExceptionHandling/tsv_test.tsv" | double-click
