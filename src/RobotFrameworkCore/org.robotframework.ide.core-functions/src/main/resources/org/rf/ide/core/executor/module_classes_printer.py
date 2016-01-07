@@ -34,7 +34,7 @@ elif sys.argv[1].endswith('.py'):
     modules = [root_module]
 
 else:
-    raise Exception('')
+    raise Exception('Unrecognized library path: ' + sys.argv[1])
 
 for module in modules:
     for n, obj in inspect.getmembers(module):
