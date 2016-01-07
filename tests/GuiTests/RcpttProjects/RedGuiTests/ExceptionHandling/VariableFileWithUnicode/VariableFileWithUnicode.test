@@ -7,13 +7,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HWVnoKS8EeWCSZzk3osblg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/18/15 12:28 PM
+Save-Time: 1/7/16 12:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+
+// Check if there is no NPE while reading var file with unicode chars
 
 get-view "Project Explorer" | get-tree | select "ExceptionHandling/txt_test.robot" | double-click
 with [get-editor "txt_test.robot" | get-text-viewer] {
@@ -26,7 +28,7 @@ with [get-editor "txt_test.robot" | get-text-viewer] {
 	key-type Enter
 	type-text "test1"
 	key-type Enter
-    type-text "    log    ${swamsqlplususer}"
+    type-text "    log    ${ascivar}"
     key-type "M1+SPACE"
     key-type "M1+s"
 }
