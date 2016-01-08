@@ -125,7 +125,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     private void createColumns() {
         final NewElementsCreator<VariableMapping> creator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Variable name").withWidth(150)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+            .withMinWidth(50)
             .editingEnabledOnlyWhen(editorInput.isEditable())
             .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, creator))
             .labelsProvidedBy(new VariableMappingsNameLabelProvider())
