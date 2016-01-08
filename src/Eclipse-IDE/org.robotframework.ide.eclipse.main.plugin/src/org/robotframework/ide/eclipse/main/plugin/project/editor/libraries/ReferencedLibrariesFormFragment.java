@@ -122,7 +122,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 4).indent(0, 10).applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 3).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(false);
