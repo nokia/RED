@@ -113,10 +113,7 @@ public class KeywordDefinitionLocator {
             final RobotSuiteFile startingFile, final KeywordDetector detector) {
         for (final LibrarySpecification spec : librariesMap.keySet()) {
             if (!spec.isAccessibleWithoutImport()) {
-                boolean isFromNestedLibrary = true;
-                if (startingFile.getImportedLibraries().containsKey(spec)) {
-                    isFromNestedLibrary = false;
-                }
+                final boolean isFromNestedLibrary = !startingFile.getImportedLibraries().containsKey(spec);
                 for (final KeywordSpecification kwSpec : spec.getKeywords()) {
                     final ContinueDecision shouldContinue = detector.libraryKeywordDetected(spec, kwSpec,
                             librariesMap.get(spec), isFromNestedLibrary);
@@ -145,7 +142,7 @@ public class KeywordDefinitionLocator {
     private ContinueDecision locateInLibraries(final Map<LibrarySpecification, String> librariesMap,
             final KeywordDetector detector) {
         for (final LibrarySpecification libSpec : librariesMap.keySet()) {
-            List<KeywordSpecification> keywords = libSpec.getKeywords();
+            final List<KeywordSpecification> keywords = libSpec.getKeywords();
             if (keywords != null) {
                 for (final KeywordSpecification kwSpec : keywords) {
                     final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
