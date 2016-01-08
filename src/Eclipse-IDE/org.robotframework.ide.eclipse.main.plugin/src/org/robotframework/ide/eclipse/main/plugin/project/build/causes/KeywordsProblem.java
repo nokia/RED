@@ -14,7 +14,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
@@ -36,12 +38,16 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            final String keywordName = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final String keywordOriginalName = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
+            final IFile suiteFile = (IFile) marker.getResource();
 
-            fixers.addAll(ImportLibraryFixer.createFixers((IFile) marker.getResource(),
-                    marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
-            fixers.addAll(CreateKeywordFixer
-                    .createFixers(marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null)));
+            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
+            fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
+            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), new SimilaritiesAnalyst()
+                    .provideSimilarAccessibleKeywords(suiteFile, keywordName)));
+
             return fixers;
         }
     },

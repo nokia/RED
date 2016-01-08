@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -15,8 +16,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
@@ -125,9 +128,17 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final IFile suiteFile = (IFile) marker.getResource();
             final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
             final boolean isPath = marker.getAttribute(AdditionalMarkerAttributes.IS_PATH, false);
-            return newArrayList(new AddLibraryToRedXmlFixer(nameOrPath, isPath));
+
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+            fixers.add(new AddLibraryToRedXmlFixer(nameOrPath, isPath));
+            if (!isPath) {
+                fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
+                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, nameOrPath)));
+            }
+            return fixers;
         }
     },
     SETTING_ARGUMENTS_NOT_APPLICABLE {
