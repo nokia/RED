@@ -1,0 +1,27 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _tJm4YLX7EeWiPpdsqt1XOg
+Element-Name: DebugWithSuiteSetup
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _lym1oLX7EeWiPpdsqt1XOg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/8/16 12:40 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "DebugSuiteSetup/test/testCase.robot" | double-click
+with [get-editor "testCase.robot"] {
+    with [get-left-ruler] {
+        get-ruler-column LineNumberColumn | click-ruler -line 3 -button Right
+        get-menu "Toggle Breakpoint" | click
+    }
+    get-text-viewer | key-type F11
+}
+get-window "Confirm Perspective Switch" | get-button Yes | click
+get-editor "testCase.robot" | get-text-viewer | key-type F5
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
