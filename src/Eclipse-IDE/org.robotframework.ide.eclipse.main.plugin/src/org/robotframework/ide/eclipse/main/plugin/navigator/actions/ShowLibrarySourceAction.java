@@ -97,25 +97,33 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
             return standardLibraryPath == null ? null : new Path(standardLibraryPath.getAbsolutePath());
         } else if (robotProject.isReferencedLibrary(spec)) {
-            final String pythonLibPath = robotProject.getPythonLibraryPath(spec.getName());
-            if (new File(pythonLibPath).exists()) {
-                return new Path(pythonLibPath);
-            } else {
-                return findModuleLibrary(pythonLibPath, spec);
+            final IPath pythonLibPath = new Path(robotProject.getPythonLibraryPath(spec.getName()));
+            if (pythonLibPath.toFile().exists()) {
+                return pythonLibPath;
+            } else if (spec.getName().contains(".")) {
+                final IPath path = tryToFindLibWithoutQualifiedPart(pythonLibPath);
+                if (path != null) {
+                    return path;
+                }
             }
+            return findModuleLibrary(pythonLibPath, spec.getName());
         }
 
         return null;
     }
     
-    private static IPath findModuleLibrary(final String pythonLibPath, final LibrarySpecification spec) {
-        final IPath pathToInitFile = new Path(pythonLibPath).removeLastSegments(1)
-                .append(spec.getName())
-                .append("__init__.py");
-        if (pathToInitFile.toFile().exists()) {
-            return pathToInitFile;
-        }
-        return null;
+    private static IPath tryToFindLibWithoutQualifiedPart(final IPath pythonLibPath) {
+        final String fileExt = pythonLibPath.getFileExtension();
+        final String lastSegment = pythonLibPath.removeFileExtension().lastSegment();
+        final String withoutDot = lastSegment.substring(0, lastSegment.lastIndexOf('.'));
+
+        final IPath resultPath = pythonLibPath.removeLastSegments(1).append(withoutDot).addFileExtension(fileExt);
+        return resultPath.toFile().exists() ? resultPath : null;
+    }
+
+    private static IPath findModuleLibrary(final IPath pythonLibPath, final String libName) {
+        final IPath pathToInitFile = pythonLibPath.removeLastSegments(1).append(libName).append("__init__.py");
+        return pathToInitFile.toFile().exists() ? pathToInitFile : null;
     }
 
     private static class SourceOpeningException extends RuntimeException {
