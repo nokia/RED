@@ -29,7 +29,7 @@ public class RobotProjectHolder {
     private final RobotRuntimeEnvironment robotRuntime;
     private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
     private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
-
+    private Map<String, String> variableMappings = new HashMap<>();
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
         this.robotRuntime = robotRuntime;
@@ -55,6 +55,13 @@ public class RobotProjectHolder {
         return globalVariables;
     }
 
+    public Map<String, String> getVariableMappings() {
+        return variableMappings;
+    }
+
+    public void setVariableMappings(final Map<String, String> variableMappings) {
+        this.variableMappings = variableMappings;
+    }
 
     @VisibleForTesting
     protected void initGlobalVariables() {

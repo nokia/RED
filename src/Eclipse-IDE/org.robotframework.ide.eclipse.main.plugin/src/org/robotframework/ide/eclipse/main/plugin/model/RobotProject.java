@@ -28,10 +28,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -72,6 +73,7 @@ public class RobotProject extends RobotContainer {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
         }
+        provideVariableMappingsForProjectHolder();
         return projectHolder;
     }
 
@@ -402,14 +404,27 @@ public class RobotProject extends RobotContainer {
 
     public String resolve(final String expression) {
         readProjectConfigurationIfNeeded();
+        return RobotExpressions.resolve(extractVariableMappingsFromProjectConfiguration(), expression);
+    }
+    
+    private void provideVariableMappingsForProjectHolder() {
+        if (projectHolder != null && projectHolder.getVariableMappings().isEmpty()) {
+            projectHolder.setVariableMappings(extractVariableMappingsFromProjectConfiguration());
+        }
+    }
+
+    private synchronized Map<String, String> extractVariableMappingsFromProjectConfiguration() {
         final Map<String, String> knownVariables = newHashMap();
         knownVariables.put("${/}", File.separator);
-        knownVariables.put("${CURDIR}", ".");
+        knownVariables.put("${curdir}", ".");
         if (configuration != null) {
             for (final VariableMapping mapping : configuration.getVariableMappings()) {
-                knownVariables.put(mapping.getName(), mapping.getValue());
+                knownVariables.put(VariableNamesSupport.extractUnifiedVariableName(mapping.getName()),
+                        mapping.getValue());
             }
         }
-        return RobotExpressions.resolve(knownVariables, expression);
+        return knownVariables;
     }
+    
+    
 }
