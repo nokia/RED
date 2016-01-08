@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -46,10 +47,12 @@ public class VariablesImporter {
                     if (!isCorrectPath(path)) {
                         continue;
                     }
+                    
+                    final Map<String, String> variableMappings = robotProject.getVariableMappings();
 
-                    path = replaceRobotSpecificArguments(path);
+                    path = replaceRobotSpecificArguments(path, variableMappings);
 
-                    final List<String> varFileArguments = convertTokensToArguments(varImport);
+                    final List<String> varFileArguments = convertTokensToArguments(varImport, variableMappings);
 
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
                     if (currentRobotFile.exists()) {
@@ -90,9 +93,12 @@ public class VariablesImporter {
         return isCorrectPath;
     }
 
-    private String replaceRobotSpecificArguments(String path) {
-        // TODO: variable resolving should be done here
-        return path.replaceAll(" [\\\\] ", "  ");
+    private String replaceRobotSpecificArguments(final String path, final Map<String, String> variableMappings) {
+        String resultPath = path;
+        if(RobotExpressions.isParameterized(path)) {
+            resultPath = RobotExpressions.resolve(variableMappings, path);
+        }
+        return resultPath.replaceAll(" [\\\\] ", "  ");
     }
 
     private VariablesFileImportReference findInProjectVariablesImport(final RobotProjectHolder robotProject,
@@ -166,10 +172,14 @@ public class VariablesImporter {
     }
 
     @VisibleForTesting
-    protected List<String> convertTokensToArguments(final VariablesImport varImport) {
+    protected List<String> convertTokensToArguments(final VariablesImport varImport, final Map<String, String> variableMappings) {
         final List<String> arguments = new ArrayList<>();
         for (final RobotToken rtArgument : varImport.getArguments()) {
-            arguments.add(rtArgument.getRaw().toString());
+            String arg = rtArgument.getRaw().toString();
+            if(RobotExpressions.isParameterized(arg)) {
+                arg = RobotExpressions.resolve(variableMappings, arg);
+            }
+            arguments.add(arg);
         }
 
         return arguments;
