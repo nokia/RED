@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
@@ -25,6 +27,13 @@ public class RobotProblem {
 
     private final IProblemCause cause;
     private Object[] objects;
+
+    public static IRegion getRegionOf(final IMarker marker) {
+        final int start = marker.getAttribute(IMarker.CHAR_START, -1);
+        final int end = marker.getAttribute(IMarker.CHAR_END, -1);
+
+        return new Region(start, end - start);
+    }
 
     public static RobotProblem causedBy(final IProblemCause cause) {
         return new RobotProblem(cause);
