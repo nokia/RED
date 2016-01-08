@@ -35,11 +35,11 @@ public class ShellProvider implements TestRule {
                     shell.open();
                     base.evaluate();
                 } finally {
-                    if (shell != null) {
+                    if (shell != null && !shell.isDisposed()) {
                         shell.close();
                         shell.dispose();
-                        shell = null;
                     }
+                    shell = null;
                 }
             }
         };
