@@ -146,8 +146,8 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                     }
                 }), Predicates.notNull());
 
-        final List<ICompletionProposal> proposals = newArrayList(suiteRepairProposals);
-        proposals.addAll(newArrayList(redXmlRepairProposals));
+        final List<ICompletionProposal> proposals = newArrayList(redXmlRepairProposals);
+        proposals.addAll(newArrayList(suiteRepairProposals));
         return proposals;
     }
 

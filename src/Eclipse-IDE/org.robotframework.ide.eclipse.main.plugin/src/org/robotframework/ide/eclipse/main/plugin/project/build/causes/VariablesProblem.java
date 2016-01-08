@@ -10,9 +10,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateLocalVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
@@ -110,9 +114,16 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final IFile suiteFile = (IFile) marker.getResource();
+            final IRegion problemRegion = RobotProblem.getRegionOf(marker);
+            final String varName = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+
             final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
-            fixers.add(new CreateLocalVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
-            fixers.add(new CreateVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")));
+            fixers.add(new CreateLocalVariableFixer(varName));
+            fixers.add(new CreateVariableFixer(varName));
+            fixers.addAll(ChangeToFixer.createFixers(problemRegion, new SimilaritiesAnalyst()
+                    .provideSimilarAccessibleVariables(suiteFile, problemRegion.getOffset(), varName)));
+
             return fixers;
         }
     };
