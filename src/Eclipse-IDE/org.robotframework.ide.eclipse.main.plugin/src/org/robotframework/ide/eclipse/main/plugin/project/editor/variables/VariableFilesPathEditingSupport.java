@@ -94,6 +94,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                             .append(file);
 
                     final ReferencedVariableFile variableFile = new ReferencedVariableFile();
+                    variableFile.setArguments(new ArrayList<String>());
                     variableFile.setPath(path.toPortableString());
                     variableFiles.add(variableFile);
                 }
