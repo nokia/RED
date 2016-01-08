@@ -1,0 +1,53 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DebugVariableResolving
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Qz9jYLX5EeWiPpdsqt1XOg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/8/16 12:25 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// add test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
++"@{list}   1   2  \n"
++"${list}  6   \n"
++"${x 1}  7   \n"
++"*** Test cases ***\n"
++"test 1\n"
++"    Log Many  ${list}\n"
++"    Log  ${x1}\n"
+
+with [get-editor "TestFile.robot"] {
+    with [get-left-ruler] {
+        get-ruler-column LineNumberColumn | click-ruler -line 7 -button Right
+        get-menu "Toggle Breakpoint" | click
+    }
+    with [get-text-viewer] {
+        key-type "M1+s"
+        key-type F11
+    }
+}
+// go to Debug
+get-window "Confirm Perspective Switch" | get-button Yes | click
+
+// verify if different type duplicated variable value is shown - list should shown in informaiton window: @{list}
+// verify if value of ${x 1} is shown
+with [get-view Variables | get-tree] {
+    get-item "@{list}" | get-property "getText()" | equals "@{list}" | verify-true
+    get-item "@{list}" | get-property "getData().getValue().getVariables().IVariable[0].getValue().getValueString()" 
+        | equals 1 | verify-true
+    get-item "@{list}" | get-property "getData().getValue().getVariables().IVariable[1].getValue().getValueString()" 
+        | equals 2 | verify-true
+    get-item "${x 1}" | get-property "values['Name']" | equals "${x 1}" | verify-true
+    get-item "${x 1}" | get-property "values['Value']" | equals 7 | verify-true
+}
+get-eclipse-window | key-type F5
+get-eclipse-window | key-type F5
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
