@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin;
+package org.rf.ide.core.testdata.model;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Range;
@@ -58,12 +61,17 @@ public class RobotExpressions {
         
         final StringBuilder resolved = new StringBuilder(expression);
         for (final Range<Integer> position : positions) {
-            final String variable = expression.substring(position.lowerEndpoint(), position.upperEndpoint() + 1);
+            final String variable = VariableNamesSupport.extractUnifiedVariableName(expression.substring(
+                    position.lowerEndpoint(), position.upperEndpoint() + 1));
             if (knownVariables.containsKey(variable)) {
                 resolved.replace(position.lowerEndpoint(), position.upperEndpoint() + 1, knownVariables.get(variable));
             }
         }
         return resolved.toString();
+    }
+    
+    public static boolean isParameterized(final String pathOrName) {
+        return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(pathOrName).find();
     }
 
     private static Character lookahead(final String expression, final int index) {

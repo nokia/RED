@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -17,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -76,9 +76,9 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         } else {
             String pathOrName = pathOrNameToken.getText().toString();
             pathOrName = pathOrName.replaceAll(" [\\\\] ", "  ");
-            if (isParameterized(pathOrName)) {
+            if (RobotExpressions.isParameterized(pathOrName)) {
                 final String resolved = suiteFile.getProject().resolve(pathOrName);
-                if (isParameterized(resolved)) {
+                if (RobotExpressions.isParameterized(resolved)) {
                     reportParameterizedImport(pathOrNameToken);
                 } else {
                     validateSpecifiedImport(imported, resolved, pathOrNameToken, monitor);
@@ -161,10 +161,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected abstract IProblemCause getCauseForMissingImportArguments();
 
     protected abstract GeneralSettingsProblem getCauseForNonExistingResourceImport();
-
-    private boolean isParameterized(final String pathOrName) {
-        return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(pathOrName).find();
-    }
 
     static class LibraryImportValidator extends GeneralSettingsImportsValidator {
 
