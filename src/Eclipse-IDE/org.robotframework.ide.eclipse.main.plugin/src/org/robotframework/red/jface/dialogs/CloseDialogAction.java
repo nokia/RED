@@ -13,9 +13,9 @@ class CloseDialogAction extends Action {
 
     private static final String ACTION_TOOLTIP_NAME = "Close";
 
-    private final Shell _shell;
+    private final Shell shell;
 
-    private final DialogCloseListener _listener;
+    private final DialogCloseListener listener;
 
     CloseDialogAction(final Shell shell, final ImageDescriptor image) {
         this(shell, image, new DialogCloseListener());
@@ -24,15 +24,15 @@ class CloseDialogAction extends Action {
     CloseDialogAction(final Shell shell, final ImageDescriptor image, final DialogCloseListener listener) {
         super(ACTION_TOOLTIP_NAME, AS_PUSH_BUTTON);
         setImageDescriptor(image);
-        _shell = shell;
-        _listener = listener;
+        this.shell = shell;
+        this.listener = listener;
     }
 
     @Override
     public void run() {
-        _listener.beforeClose();
-        _shell.close();
-        _listener.afterClose();
+        listener.beforeClose();
+        shell.close();
+        listener.afterClose();
     }
 
     public static class DialogCloseListener {
