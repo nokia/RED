@@ -144,8 +144,8 @@ class RemoteLibraryLocationsFormFragment implements ISectionFormFragment {
     private void createColumns() {
         ViewerColumnsFactory.newColumn("").withWidth(100)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
-                .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, editorInput, newElementsCreator()))
+            .editingEnabledOnlyWhen(editorInput.isEditable())
+            .editingSupportedBy(new RemoteLibraryLocationEditingSupport(viewer, editorInput, newElementsCreator()))
             .labelsProvidedBy(new RemoteLibraryLocationsAddressLabelProvider())
             .createFor(viewer);
     }

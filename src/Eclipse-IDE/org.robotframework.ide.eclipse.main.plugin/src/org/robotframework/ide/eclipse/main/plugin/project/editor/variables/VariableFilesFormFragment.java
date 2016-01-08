@@ -11,7 +11,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -55,9 +54,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEditorSite site;
-
-    @Inject
-    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -124,15 +120,17 @@ class VariableFilesFormFragment implements ISectionFormFragment {
                 editorInput);
         createFileColumn(creator);
 
-        for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
+        final int numberOfColumns = calculateLongestArgumentsLength();
+        for (int i = 0; i < numberOfColumns; i++) {
             final String name = i == 0 ? "Arguments" : "";
-            createArgumentColumn(name, i, creator);
+            final boolean isLast = i == (numberOfColumns - 1);
+            createArgumentColumn(name, i, creator, isLast);
         }
     }
 
     private void createFileColumn(final NewElementsCreator<ReferencedVariableFile> creator) {
         ViewerColumnsFactory.newColumn("File").withWidth(300)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
+            .withMinWidth(100)
             .editingEnabledOnlyWhen(editorInput.isEditable())
             .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
             .labelsProvidedBy(new VariableFilesLabelProvider(editorInput))
@@ -154,9 +152,9 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createArgumentColumn(final String name, final int index,
-            final NewElementsCreator<ReferencedVariableFile> creator) {
+            final NewElementsCreator<ReferencedVariableFile> creator, final boolean shouldGrabAllTheSpace) {
         ViewerColumnsFactory.newColumn(name).withWidth(100)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
+            .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace).withMinWidth(50)
             .editingEnabledOnlyWhen(editorInput.isEditable())
             .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, creator))
             .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
