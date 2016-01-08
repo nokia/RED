@@ -1,0 +1,46 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9DJk8LXwEeWiPpdsqt1XOg
+Element-Name: DebugStepIntoDynamicPathResourceAndBuiltInImport
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _5GosELXwEeWiPpdsqt1XOg
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/8/16 11:31 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "DebugResourceImport/TestImportDynamic.robot" | double-click
+with [get-editor "TestImportDynamic.robot" | get-left-ruler] {
+    get-ruler-column AnnotationColumn | click-ruler -line 3 -button Right
+    get-menu "Toggle Breakpoint" | click
+    key-type F11
+}
+//get-button "Debug TestImportDynamic.robot" | click
+get-window "Confirm Perspective Switch" | get-button Yes | click
+get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5
+get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+//verify if res_master is open as this indicates that debug can handle dyn path to resource
+get-tab-folder -index 2 | get-property activePage | equals "res_master.robot" | verify-true
+// press F5 to do last step of Debug 
+get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+
+get-button Robot | click
+get-view "Project Explorer" | get-tree | select "DebugResourceImport/RobotViaParameters.robot" | double-click
+with [get-editor "RobotViaParameters.robot" | get-left-ruler] {
+    with [get-ruler-column AnnotationColumn] {
+        hover-ruler -line 7
+        click-ruler -line 7 -button Right
+    }
+    get-menu "Toggle Breakpoint" | click
+    key-type F11
+}
+//get-button "Debug RobotViaParameters.robot" | click
+get-window "Confirm Perspective Switch" | get-button Yes | click
+get-editor "RobotViaParameters.robot" | get-text-viewer | key-type F5
+get-editor "res_master.robot" | get-text-viewer | key-type F5
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
