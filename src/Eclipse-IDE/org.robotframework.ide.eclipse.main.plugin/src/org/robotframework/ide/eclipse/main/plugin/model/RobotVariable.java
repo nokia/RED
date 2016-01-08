@@ -16,11 +16,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
@@ -71,16 +73,23 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     @Override
     public String getName() {
-        return holder.getName();
+        return Strings.nullToEmpty(holder.getName());
     }
 
     public String getValue() {
+        if (getType() == VariableType.SCALAR) {
+            final ScalarVariable variable = (ScalarVariable) holder;
+            final List<RobotToken> values = variable.getValues();
+            if (!values.isEmpty()) {
+                return values.get(0).getText();
+            }
+        }
         return "value";
     }
 
     @Override
     public String getComment() {
-        return Joiner.on(" | ").join(Iterables.transform(holder.getComment(), TokenFunctions.tokenToString()));
+        return Joiner.on(" ").join(Iterables.transform(holder.getComment(), TokenFunctions.tokenToString()));
     }
 
     @Override
