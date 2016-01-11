@@ -30,4 +30,7 @@ public abstract class RobotPopupDialog extends PopupDialog {
     }
 
     protected abstract Control createDialogControls(Composite parent);
+
+    @Override
+    protected abstract Control getFocusControl();
 }
