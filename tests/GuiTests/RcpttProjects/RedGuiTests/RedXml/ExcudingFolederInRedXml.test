@@ -6,10 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-2m5wKjCEeWg6OFh_tHgTw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/23/15 11:51 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 1/11/16 4:40 PM
 Testcase-Type: ecl
-Verifications: _m9LPkKj7EeW6oYCgHZ503g,_3MO4IKj7EeW6oYCgHZ503g,_rI-sMKj8EeW6oYCgHZ503g
+Verifications: _m9LPkKj7EeW6oYCgHZ503g,_rI-sMKj8EeW6oYCgHZ503g,_lJPcoLh5EeWzJthH3JoEWQ
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -87,7 +87,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" |
 get-eclipse-window | key-type "M1+s"
 
 //remove excluded file
-get-view "Project Explorer" | get-tree | select "RobotProject/[excluded] folder_to_remove" | get-menu Delete | click
+get-view "Project Explorer" | get-tree | select "RobotProject/folder_to_remove [excluded]" | get-menu Delete | click
 get-window "Delete Resources" | get-button OK | click
 
 //add new folder
@@ -100,47 +100,53 @@ with [get-window "New Folder"] {
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
+//expand tree
 wait 4000
 with [get-view "Project Explorer" | get-tree] {
     get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
     get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
-        | equals "Robot Standard libraries [Robot Framework 2.9.2 (Python 2.7.10+ on linux2)]" | verify-true
+        | matches "Robot Standard libraries \[Robot Framework .*\]" | verify-true
     get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals test | verify-true
     get-property "getItems().TreeItem[1].getItems().TreeItem[2].getText()" | equals "red.xml" | verify-true
 }
-get-view "Project Explorer" | get-tree | select "RobotProject/a/[excluded] b"
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/a/\\[excluded\\] b" | get-property caption | equals "[excluded] b" | verify-true
-    get-item "RobotProject/a/\\[excluded\\] b/\\[excluded\\] c1" | get-property caption | equals "[excluded] c1" 
+    get-item "RobotProject/a/b \\[excluded\\]/c" | get-property caption | equals c | verify-true
+    get-item "RobotProject/a/b \\[excluded\\]/c1 \\[excluded\\]" | get-property caption | equals "c1 [excluded]" 
         | verify-true
+    get-item "RobotProject/a/b \\[excluded\\]/var" | get-property caption | equals var | verify-true
 }
 
-//check PE
+//check entire PE
 with [get-view "Project Explorer" | get-tree] {
-    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-        | equals "Robot Standard libraries [Robot Framework 2.9.2 (Python 2.7.10+ on linux2)]" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals a | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().length" | equals 1 | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
-        | equals "[excluded] b" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-        | equals c | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
-        | equals "[excluded] c1" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
-        | equals var | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "[excluded] empty folder" 
+    get-item RobotProject | get-property "getItems().TreeItem[0].getText()" 
+        | matches "Robot Standard libraries \[Robot Framework .*\]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getText()" | equals a | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "b [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().length" | equals 3 
         | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" | equals "new folder" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[4].getText()" | equals "single test" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[5].getText()" | equals "[excluded] suite folder with init" 
+    get-item RobotProject 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals c 
         | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[6].getText()" | equals "[excluded] tests" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[7].getText()" | equals TestSuiteFolder | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[8].getText()" | equals "[excluded] variables" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[9].getText()" | equals "red.xml" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[10].getText()" | equals "TestFile.robot" | verify-true
-    get-property "getItems().TreeItem[1].getText()" | equals SecondProject | verify-true
+    get-item RobotProject 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "c1 [excluded]" | verify-true
+    get-item RobotProject 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals var 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItemCount()" | equals 3 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[2].getText()" | equals "empty folder [excluded]" 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[3].getText()" | equals "new folder" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[4].getText()" | equals "single test" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getText()" 
+        | equals "suite folder with init [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[6].getText()" | equals "tests [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[7].getText()" | equals TestSuiteFolder | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[8].getText()" | equals "variables [excluded]" 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[9].getText()" | equals "red.xml" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[10].getText()" | equals "TestFile.robot" | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
