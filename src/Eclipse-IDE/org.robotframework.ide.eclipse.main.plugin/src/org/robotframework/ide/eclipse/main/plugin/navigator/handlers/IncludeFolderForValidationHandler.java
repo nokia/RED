@@ -5,10 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
+import javax.inject.Named;
+
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.compat.parts.DIHandler;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludeFolderForValidationHandler.E4IncludeFolderForValidationHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.red.viewers.Selections;
 
 public class IncludeFolderForValidationHandler extends DIHandler<E4IncludeFolderForValidationHandler> {
 
@@ -17,6 +23,13 @@ public class IncludeFolderForValidationHandler extends DIHandler<E4IncludeFolder
     }
 
     public static class E4IncludeFolderForValidationHandler extends ChangeExclusionHandler {
+
+        @Override
+        @Execute
+        public Object changeExclusion(final IEventBroker eventBroker,
+                final @Named(Selections.SELECTION) IStructuredSelection selection) {
+            return super.changeExclusion(eventBroker, selection);
+        }
 
         @Override
         protected void changeExclusion(final RobotProjectConfig config, final IPath pathToChange) {
