@@ -87,8 +87,9 @@ public class PathsResolver {
     private static List<IPath> resolveToAbsolutePossiblePath(final RobotSuiteFile file, final IPath path)
             throws PathResolvingException {
         final List<IPath> paths = newArrayList(resolveToAbsolutePath(file, path));
+        final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
         for (final File f : file.getProject().getModuleSearchPaths()) {
-            final URI resolvedPath = f.toURI().resolve(path.toString());
+            final URI resolvedPath = f.toURI().resolve(escaper.escape(path.toString()));
             paths.add(new Path(resolvedPath.getPath()));
         }
         return paths;
@@ -111,7 +112,7 @@ public class PathsResolver {
 
                 final String portablePath = file.getFile().getLocation().toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
-                final URI pathUri = filePath.resolve(path.toString());
+                final URI pathUri = filePath.resolve(escaper.escape(path.toString()));
 
                 return new Path(pathUri.toString().replaceAll("%20", " "));
             } catch (final URISyntaxException | IllegalArgumentException e) {
