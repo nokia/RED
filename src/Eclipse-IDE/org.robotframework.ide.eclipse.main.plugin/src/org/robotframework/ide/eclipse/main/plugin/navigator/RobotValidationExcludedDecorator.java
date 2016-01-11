@@ -47,7 +47,7 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
             final RobotProjectConfig config = robotProject.getRobotProjectConfig();
 
             if (config != null && config.isExcludedFromValidation(folder.getProjectRelativePath())) {
-                decoration.addPrefix("[excluded] ");
+                decoration.addSuffix(" [excluded]");
                 decoration.setForegroundColor(ColorsManager.getColor(200, 200, 200));
             }
         }
