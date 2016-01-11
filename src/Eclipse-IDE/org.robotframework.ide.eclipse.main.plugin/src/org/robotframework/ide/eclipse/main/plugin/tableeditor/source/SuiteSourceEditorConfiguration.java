@@ -304,6 +304,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
+        cycledProcessor.addProcessor(generalSettingNamesProcessor);
+        cycledProcessor.addProcessor(keywordCallsAssistProcessor);
+        cycledProcessor.addProcessor(variablesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);
         contentAssistant.addCompletionListener(cycledProcessor);

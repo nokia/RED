@@ -9,6 +9,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
 import org.eclipse.jface.text.contentassist.ICompletionListener;
@@ -49,19 +51,41 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         processors.add(processor);
     }
 
+    private RedContentAssistProcessor getCurrentProcessor() {
+        return processors.get(currentPage);
+    }
+
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-        assistant.setStatus(processors.size() == 1 ? "" : getTitle());
+        final RedContentAssistProcessor nextApplicableProcessor = getNextApplicableProcessor(viewer.getDocument(),
+                offset);
+        assistant.setStatus(nextApplicableProcessor == getCurrentProcessor() ? ""
+                : String.format("Press Ctrl+Space to show %s proposals", nextApplicableProcessor.getProposalsTitle()));
 
-        final ICompletionProposal[] proposals = processors.get(currentPage).computeCompletionProposals(viewer, offset);
+        final ICompletionProposal[] proposals = getCurrentProcessor().computeCompletionProposals(viewer, offset);
 
-        currentPage = (currentPage + 1) % processors.size();
+        currentPage = processors.indexOf(nextApplicableProcessor);
         return proposals;
     }
 
-    private String getTitle() {
-        final String title = processors.get((currentPage + 1) % processors.size()).getProposalsTitle();
-        return String.format("Press Ctrl+Space to show %s proposals", title);
+    private RedContentAssistProcessor getNextApplicableProcessor(final IDocument document, final int offset) {
+        int i = 1;
+        while (!processorFromIndexIsApplicable((currentPage + i) % processors.size(), document, offset)) {
+            i++;
+            if (i > processors.size()) {
+                return processors.get(0);
+            }
+        }
+        return processors.get((currentPage + i) % processors.size());
+    }
+
+    private boolean processorFromIndexIsApplicable(final int index, final IDocument document, final int offset) {
+        final RedContentAssistProcessor processor = processors.get(index);
+        try {
+            return processor.isInProperContentType(document, offset);
+        } catch (final BadLocationException e) {
+            throw new IllegalStateException("Offset should be always valid!", e);
+        }
     }
 
     @Override
