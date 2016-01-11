@@ -24,7 +24,7 @@ public class RobotPopupDialogTest {
 
     @Test
     public void whenDialogIsCreated_theParentCompositeHasFillLayoutAndControlsAreCreated() {
-        final RobotPopupDialog dialog = createDialog(shellProvider.getShell());
+        final RobotPopupDialog dialog = prepareDialogToTest(shellProvider.getShell());
         dialog.open();
 
         final Shell shell = dialog.getShell();
@@ -41,7 +41,7 @@ public class RobotPopupDialogTest {
         assertThat(((Label) internalParent.getChildren()[0])).isSameAs(dialog.getFocusControl());
     }
 
-    private RobotPopupDialog createDialog(final Shell shell) {
+    private static RobotPopupDialog prepareDialogToTest(final Shell shell) {
         return new RobotPopupDialog(shell) {
             private Label label;
 
