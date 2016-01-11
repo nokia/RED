@@ -21,11 +21,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite.InputJob;
 import org.robotframework.red.junit.ShellProvider;
 
+@Ignore
 public class InputLoadingFormCompositeTest {
 
     @Rule
