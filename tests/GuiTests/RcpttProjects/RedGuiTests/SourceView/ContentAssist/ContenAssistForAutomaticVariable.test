@@ -1,0 +1,104 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContenAssistForAutomaticVariable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _-8FTwKSdEeW4l-rLhvMqpg
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 1/11/16 5:37 PM
+Tags: Bugs
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file
+with [get-view "Project Explorer" | get-tree] {
+    double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+//open content assist in Test
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type  Enter
+    type-text test
+    key-type Enter
+    type-text "$"
+    key-type "M1+SPACE"
+    wait 500
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 30 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${:}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${\\n}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${CURDIR}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${DEBUG_FILE}" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "${EMPTY}" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "${EXECDIR}" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "${False}" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "${LOG_FILE}" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "${LOG_LEVEL}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "${None}" | verify-true
+    get-property "getItems().TableItem[11].getText()" | equals "${null}" | verify-true
+    get-property "getItems().TableItem[12].getText()" | equals "${OUTPUT_DIR}" | verify-true
+    get-property "getItems().TableItem[13].getText()" | equals "${OUTPUT_FILE}" | verify-true
+    get-property "getItems().TableItem[14].getText()" | equals "${PREV_TEST_MESSAGE}" | verify-true
+    get-property "getItems().TableItem[15].getText()" | equals "${PREV_TEST_NAME}" | verify-true
+    get-property "getItems().TableItem[16].getText()" | equals "${PREV_TEST_STATUS}" | verify-true
+    get-property "getItems().TableItem[17].getText()" | equals "${REPORT_FILE}" | verify-true
+    get-property "getItems().TableItem[18].getText()" | equals "${SPACE}" | verify-true
+    get-property "getItems().TableItem[19].getText()" | equals "${SUITE_MESSAGE}" | verify-true
+    get-property "getItems().TableItem[20].getText()" | equals "${SUITE_NAME}" | verify-true
+    get-property "getItems().TableItem[21].getText()" | equals "${SUITE_SOURCE}" | verify-true
+    get-property "getItems().TableItem[22].getText()" | equals "${SUITE_STATUS}" | verify-true
+    get-property "getItems().TableItem[23].getText()" | equals "${SUMMARY_FILE}" | verify-true
+    get-property "getItems().TableItem[24].getText()" | equals "${TEMPDIR}" | verify-true
+    get-property "getItems().TableItem[25].getText()" | equals "${TEST_DOCUMENTATION}" | verify-true
+    get-property "getItems().TableItem[26].getText()" | equals "${TEST_MESSAGE}" | verify-true
+    get-property "getItems().TableItem[27].getText()" | equals "${TEST_NAME}" | verify-true
+    get-property "getItems().TableItem[28].getText()" | equals "${TEST_STATUS}" | verify-true
+    get-property "getItems().TableItem[29].getText()" | equals "${True}" | verify-true
+}
+
+//missing:
+//${SUITE DOCUMENTATION}
+//${TEST DOCUMENTATION}
+//${KEYWORD MESSAGE
+//${KEYWORD STATUS}
+
+//close content assist
+get-eclipse-window | key-type "TRAVERSE_ESCAPE"
+get-eclipse-window | key-type ESC
+
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 6
+    key-type BackSpace
+    type-text "@"
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "@{EMPTY}" | verify-true
+}
+get-eclipse-window | key-type "TRAVERSE_ESCAPE"
+get-eclipse-window | key-type ESC
+
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 5
+    type-text "&"
+    key-type "M1+SPACE"
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 6
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "&{EMPTY}" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
