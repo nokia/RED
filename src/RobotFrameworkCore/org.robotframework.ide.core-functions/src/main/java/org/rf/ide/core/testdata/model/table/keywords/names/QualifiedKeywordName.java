@@ -28,8 +28,8 @@ public final class QualifiedKeywordName {
 
     public static QualifiedKeywordName from(final String wholeName) {
         final List<String> splitted = Splitter.on('.').splitToList(wholeName);
-        final String name = splitted.get(splitted.size() - 1);
-        final String source = Joiner.on('.').join(splitted.subList(0, splitted.size() - 1));
+        final String name = splitted.get(splitted.size() - 1).trim();
+        final String source = Joiner.on('.').join(splitted.subList(0, splitted.size() - 1)).trim();
         return new QualifiedKeywordName(name, source);
     }
 
