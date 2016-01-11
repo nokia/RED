@@ -173,13 +173,15 @@ public class RobotProjectConfig {
         addReferencedLibrary(referencedLibrary);
     }
 
-    public void addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
+    public boolean addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
         if (libraries == null) {
             libraries = newArrayList();
         }
         if (!libraries.contains(referencedLibrary)) {
             libraries.add(referencedLibrary);
+            return true;
         }
+        return false;
     }
 
     public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
